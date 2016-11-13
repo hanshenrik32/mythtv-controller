@@ -1,0 +1,41 @@
+# packs to install to compile
+# The program req 300 Mbytes of diskspace.
+# open shell
+# write in shell
+# updated 02-09-2014
+
+This packets need to be installed on Ubuntu.
+
+g++ make libdevil-dev libsdl1.2-dev glutg3-dev libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source 
+dialog libglc-dev imagemagick liblircclient-dev xmltv libglc-dev libdevil1c2 unzip lirc
+
+Version.
+
+mythtv-controller ver 0.32.x
+
+Howto install.
+
+mkdir mythtv-controller
+cd mythtv-controller   
+tar -zxf fmodapi44441linux.tar.gz
+
+Now install by doing.
+
+Possible targets:
+'sudo sh apt-get.sh'       - Install software required by mythtv-controller
+'sudo make installsound'   - Install FMOD sound system (You need this to compile the program)
+'make compile'             - Compile mythtv-controller
+'sudo make install'        - Install mythtv-controller in /usr/share/mythtv-controller
+
+You can uninstall by.
+
+'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang/libraries and headers
+
+
+# If you change the sound device or the screen size or the tema. The program have to be
+# restarted before the change is applyed.
+#
+# Programmed by Hans-Henrik Grüner-Pedersen
+# release under GPL V2
+# hanshenrik32@gmail.com
+#
