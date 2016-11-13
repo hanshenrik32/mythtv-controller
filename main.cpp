@@ -27,6 +27,11 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
+// used to get home dir
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
 // Set sound system used
 
 //#define USE_SDL_MIXER 1
@@ -9137,6 +9142,9 @@ void *xbmcdatainfoloader(void *data) {
   MYSQL_ROW row;
   bool dbexist=false;
   char sqlselect[1024];
+  char videohomedirpath[1024];
+  char musichomedirpath[1024];
+
   //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading data from xbmc/kodi).\n");
   //pthread_mutex_unlock(&count_mutex);
@@ -9217,17 +9225,31 @@ void *xbmcdatainfoloader(void *data) {
       }
     }
 
+    struct passwd *pw = getpwuid(getuid());
+    const char *homedir = pw->pw_dir;
+    strcpy(videohomedirpath,homedir);
+    strcpy(musichomedirpath,homedir);
     switch (kodiverfound) {
-      case 16:  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos104.db",(char *)"~/.kodi/userdata/Database/MyMusic60.db",(char *)"~/.kodi/userdata/Database/MyVideos104.db");
+      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
-      case 15:  xbmcSQL=new xbmcsqlite((char *) "127.0.0.1",(char *)"/home/hans/.kodi/userdata/Database/MyVideos99.db",(char *)"/home/hans/.kodi/userdata/Database/MyMusic56.db",(char *)"/home/hans/.kodi/userdata/Database/MyVideos99.db");
+      case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic56.db");
                 break;
-      case 14:  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos93.db",(char *)"~/.kodi/userdata/Database/MyMusic48.db",(char *)"~/.kodi/userdata/Database/MyVideos93.db");
+      case 14:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos93.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic48.db");
                 break;
-      case 13:  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos78.db",(char *)"~/.kodi/userdata/Database/MyMusic46.db",(char *)"~/.kodi/userdata/Database/MyVideos78.db");
+      case 13:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos78.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic46.db");
                 break;
-      case 12:  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic32.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
+      case 12:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos75.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
+                break;
+
     }
+
+    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
+
 //    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
     if (xbmcSQL) {
         xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
