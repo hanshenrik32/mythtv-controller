@@ -5,6 +5,11 @@
 
 Version.
 
+mythtv-controller ver 0.36.0
+
+New xbmc/kodi loader,faster tread loader on all types
+
+
 mythtv-controller ver 0.32.6
 
 Now 32/64B version
