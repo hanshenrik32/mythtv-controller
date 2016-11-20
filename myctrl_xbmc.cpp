@@ -92,6 +92,8 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   char artistname[256];
   char albumname[256];
   char temp[256];
+  char temp1[256];
+  char husklastdir[256];
   char *temppointer;
   int year;
   int length;
@@ -139,8 +141,10 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         nn=strlen(configdefaultmusicpath);
         if (nn>=0) strcpy(artistname,artistname+nn-1);               // remove the default path
       }
+
       // loop all dir in string (artistname)
       // and create them in music db directory
+      strcpy(husklastdir,"");
       do {
         n=0;
         nn=0;
@@ -157,7 +161,15 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
         printf("nn=%d artistname=%s \n ",nn,temp);
 
-        if (file_exists(temp)) {
+        strcpy(temp1,configdefaultmusicpath);
+        // add lastdir
+        if (strcmp(husklastdir,"")!=0) {
+          strcat(temp1,husklastdir);
+          strcat(temp1,"/");
+        }
+        strcat(temp1,temp);
+
+        if (file_exists(temp1)) {
           // husk sidste dirid
           last_directoryid=directoryid;
           // check if exist
@@ -197,7 +209,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
             mysql_close(conn);
           }
         }
-
+        strcat(husklastdir,temp);
         // get rest of path
         nn=strlen(temp)+2;
         if (nn>=0) strcpy(temp,artistname+nn-1);               // remove the last done
