@@ -134,9 +134,11 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
       strcpy(artistname,argv[i]);
 
       //printf("Artist name = %s \n",argv[i]);
-
-      nn=strlen(configdefaultmusicpath);
-      if (nn>=0) strcpy(artistname,artistname+nn-1);               // remove the default path
+      // remove default path from search stuf
+      if (strncmp(artistname,configdefaultmusicpath,strlen(configdefaultmusicpath))==0) {
+        nn=strlen(configdefaultmusicpath);
+        if (nn>=0) strcpy(artistname,artistname+nn-1);               // remove the default path
+      }
       // loop all dir in string (artistname)
       // and create them in music db directory
       do {
@@ -152,47 +154,48 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
         strncpy(temp,artistname+1,nn);
         temp[nn-1]=0;
-        // printf("nn=%d artistname=%s \n ",nn,temp);
 
-        // husk sidste dirid
-        last_directoryid=directoryid;
-        // check if exist
-        exist=false;
-        conn2=mysql_init(NULL);
-        if (conn2) {
-          mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-          //sprintf(sqlselect1,"search  music_directories after %s \n",temp);
-          sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",temp);
-          mysql_query(conn2,sqlselect1);
-          res2 = mysql_store_result(conn2);
-          if (res2) {
-            while ((row2 = mysql_fetch_row(res2)) != NULL) {
-              directoryid=atol(row2[0]);
-              exist=true;
+        printf("nn=%d artistname=%s \n ",nn,temp);
+
+        if (file_exists(temp)) {
+          // husk sidste dirid
+          last_directoryid=directoryid;
+          // check if exist
+          exist=false;
+          conn2=mysql_init(NULL);
+          if (conn2) {
+            mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+            //sprintf(sqlselect1,"search  music_directories after %s \n",temp);
+            sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",temp);
+            mysql_query(conn2,sqlselect1);
+            res2 = mysql_store_result(conn2);
+            if (res2) {
+              while ((row2 = mysql_fetch_row(res2)) != NULL) {
+                directoryid=atol(row2[0]);
+                exist=true;
+              }
             }
+            mysql_close(conn2);
           }
-          mysql_close(conn2);
-        }
+          if (!(exist)) {
+            conn=mysql_init(NULL);
+            mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+            //      printf("create directoryid %d on artist *%s* on db music_directories \n ",directoryid,temp);
+            sprintf(sqlselect2,"insert into music_directories values (%d,'%s',%d)",0,temp,last_directoryid);
+            mysql_query(conn,sqlselect2);
+            res = mysql_store_result(conn);
 
-
-        if (!(exist)) {
-          conn=mysql_init(NULL);
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-    //      printf("create directoryid %d on artist *%s* on db music_directories \n ",directoryid,temp);
-          sprintf(sqlselect2,"insert into music_directories values (%d,'%s',%d)",0,temp,last_directoryid);
-          mysql_query(conn,sqlselect2);
-          res = mysql_store_result(conn);
-
-          // hent dir id
-          sprintf(sqlselect2,"select directory_id from music_directories where path like '%s'",temp);
-          mysql_query(conn,sqlselect2);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res2)) != NULL) {
-              directoryid=atol(row2[0]);
+            // hent dir id
+            sprintf(sqlselect2,"select directory_id from music_directories where path like '%s'",temp);
+            mysql_query(conn,sqlselect2);
+            res2 = mysql_store_result(conn);
+            if (res) {
+              while ((row = mysql_fetch_row(res2)) != NULL) {
+                directoryid=atol(row2[0]);
+              }
             }
+            mysql_close(conn);
           }
-          mysql_close(conn);
         }
 
         // get rest of path
@@ -314,11 +317,11 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   strcpy(sted,filepath+(aaa+1));
   aaa=strlen(sted);
   sted[aaa-1]=0;
-
+  /*
   conn2=mysql_init(NULL);
   if (conn2) {
     mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-    //sprintf(sqlselect1,"search  music_directories after %s \n",temp);
+
     sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",sted);
     mysql_query(conn2,sqlselect1);
     res2 = mysql_store_result(conn2);
@@ -330,7 +333,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     }
     mysql_close(conn2);
   }
-
+*/
   strcat(temp,filename1);
 
   //strcat(temp,songname);
