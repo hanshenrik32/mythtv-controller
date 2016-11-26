@@ -103,6 +103,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   int sub_dirid;
   int directoryid=0;
   int last_directoryid=0;
+  int argomgang=0;
   bool dbexist=false;
   bool exist=false;
   bool cr=false;
@@ -134,16 +135,15 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     }
     if (strncmp("strPath",azColName[i],8)==0) {
       strcpy(artistname,argv[i]);
-
       //printf("Artist name = %s \n",argv[i]);
       // remove default path from search stuf
       if (strncmp(artistname,configdefaultmusicpath,strlen(configdefaultmusicpath))==0) {
         nn=strlen(configdefaultmusicpath);
         if (nn>=0) strcpy(artistname,artistname+nn-1);               // remove the default path
       }
-
       // loop all dir in string (artistname)
       // and create them in music db directory
+      // working ver
       strcpy(husklastdir,"");
       do {
         n=0;
@@ -162,7 +162,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         printf("nn=%d artistname=%s \n ",nn,temp);
 
         strcpy(temp1,configdefaultmusicpath);
-        // add lastdir
+        //
         if (strcmp(husklastdir,"")!=0) {
           strcat(temp1,husklastdir);
           strcat(temp1,"/");
@@ -201,19 +201,37 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
             sprintf(sqlselect2,"select directory_id from music_directories where path like '%s'",temp);
             mysql_query(conn,sqlselect2);
             res2 = mysql_store_result(conn);
-            if (res) {
-              while ((row = mysql_fetch_row(res2)) != NULL) {
+            if (res2) {
+              while ((row2 = mysql_fetch_row(res2)) != NULL) {
                 directoryid=atol(row2[0]);
               }
             }
+            strcpy(albumname,temp);
+/*
+            sprintf(sqlselect1,"insert into music_albums values(%d,%d,'%s',%d,%d)",0,artistid,temp,0,0);
+            //sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,temp);
+            mysql_query(conn,sqlselect2);
+            res2 = mysql_store_result(conn);
+*/
+/*
+            sprintf(sqlselect2,"select artist_id from music_artists where artist_name like '%s'",temp);
+            mysql_query(conn,sqlselect1);
+            res2 = mysql_store_result(conn);
+            if (res2) {
+              while ((row2 = mysql_fetch_row(res2)) != NULL) artistid=atol(row2[0]);
+            }
+*/
+
+
             mysql_close(conn);
           }
         }
-        strcat(husklastdir,temp);
+        strcpy(husklastdir,temp);
         // get rest of path
         nn=strlen(temp)+2;
         if (nn>=0) strcpy(temp,artistname+nn-1);               // remove the last done
         strcpy(artistname,temp);
+        argomgang++;                                          // next round
       } while (nn<strlen(artistname));
     }
 
@@ -227,11 +245,11 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
     if (strncmp("strArtists",azColName[i],10)==0) {
       strcpy(artistname,argv[i]);
-      // check if exist
+
       conn2=mysql_init(NULL);
       if (conn2) {
         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-        // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
+
         sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
         mysql_query(conn2,sqlselect1);
         res2 = mysql_store_result(conn2);
@@ -241,16 +259,15 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         mysql_close(conn2);
         if (artistid==0) {
           cr=true;
-          // create artist if noy exist
+
           conn=mysql_init(NULL);
           mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
-//          printf("create artist %20s ",artistname);
           sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,artistname);
           mysql_query(conn,sqlselect2);
           res = mysql_store_result(conn);
           mysql_close(conn);
 
-          // hent artist id
+
           conn2=mysql_init(NULL);
           mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
           sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
@@ -262,7 +279,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           mysql_close(conn2);
         }
       }
+
     }
+
     if (strncmp("iDuration",azColName[i],9)==0) {
       length=atoi(argv[i]);
     }
@@ -274,7 +293,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     }
 
     if (strncmp("strAlbum",azColName[i],8)==0) {
-      strcpy(albumname,argv[i]);
+
+      //strcpy(albumname,argv[i]);
+
       conn2=mysql_init(NULL);
       if (conn2) {
         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
@@ -314,8 +335,8 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           mysql_close(conn2);
         }
       }
+
     }
-//    if (cr) printf("\n");
   }
   strcpy(temp,filepath);
 
