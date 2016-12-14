@@ -132,6 +132,7 @@ const char *radio_station_setupsql="INSERT INTO `radio_stations` (`name`, `beskr
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 61, 1, '2011-07-29', 4, 45, '2011-09-16 21:50:41', 1), \
 ('Rockland Radio - 107.9 FM', '', 'http://edge.live.mp3.mdn.newmedia.nacamar.net/ps-rocklandradio/livestream.mp3', '', '', 1, 0, 2, 1, '2011-08-02', 5, 45, NULL, 1), \
 ('DR P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 6, 45, '2011-09-29 13:40:49', 1), \
+('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', '', 12, 0, 10, 1, '2011-08-02', 37, 4, '2011-10-02 02:25:35', 1), \
 ('Bay Radio', '[Bitrate: 128]', 'http://icy-e-01.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 0, 320, 1, 1, '2011-07-31', 7, 45, '2011-09-17 18:06:22', 1), \
 ('Sonic universe', 'Transcending the world of jazz with eclectic. [Bitrate: 128]', 'http://voxsc1.somafm.com:8600', '', '', 9, 128, 0, 1, '2011-07-31', 8, 7, NULL, 1), \
 ('Heat radio UK', '[Bitrate: 128] Denne radio er mega cool og spiller meget godt og blandet musik fra england. ', 'http://icy-e-02.sharp-stream.com/heat.mp3', '', 'Heat-Radio.png', 3, 128, 242, 1, '2011-07-31', 9, 9, '2011-10-21 15:23:52', 1),  \
@@ -161,7 +162,6 @@ const char *radio_station_setupsql="INSERT INTO `radio_stations` (`name`, `beskr
 ('Sky FM Reggae', '', 'http://scfire-ntc-aa05.stream.aol.com:80/stream/1017', '', 'SKYFM-World.png', 48, 192, 6, 1, '2011-08-02', 34, 7, '2011-10-07 16:01:57', 1), \
 ('Sky FM Salsa', '', 'http://205.188.215.231:8010/', '', 'SKYFM-World.png', 0, 192, 2, 1, '2011-08-02', 35, 7, NULL, 1), \
 ('Sky FM Beatles Tribute', '', 'http://72.26.204.18:6824/', '', 'SKYFM-World.png', 21, 192, 10, 1, '2011-08-02', 36, 7, '2011-09-28 14:38:24', 0), \
-('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', '', 12, 0, 10, 1, '2011-08-02', 37, 4, '2011-10-02 02:25:35', 1), \
 ('Hit Radio Veronica', 'Holand', 'http://5643.live.streamtheworld.com:80/HIT_RADIO_SC', 'hitradio.nl', '', 40, 192, 1, 1, '2011-08-05', 38, 6, NULL, 1), \
 ('Capital 95.8', '', 'http://media-ice.musicradio.com:80/CapitalMP3', '', '', 0, 192, 2, 1, '2011-08-05', 39, 9, NULL, 1), \
 ('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 0, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
@@ -12987,6 +12987,10 @@ const char *radio_station_setupsql45="INSERT INTO `radio_stations` (`name`, `bes
 ('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
 
 
+/*
+const char *radio_station_setupsql46="INSERT INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
+('NovaNation', '', 'mms://live.cumulusstreaming.com/WFTK-FM', 'http://www.novanation.com.au/', 'NovaNation.png', 0, 0, 0, 1, '2011-11-11', 14269, 0, '0000-00-00 00:00:00', 1)";
+*/
 
 
 // operet databaser/tables if now exist
