@@ -166,7 +166,15 @@ unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
-int debugmode=8+2;
+                                                        // 2  = music
+                                                        // 4  = stream
+                                                        // 8  = keyboard/mouse move
+                                                        // 16 = movie
+                                                        // 32 = searcg
+int debugmode=8+2;                                      // 64 = radio station land icon loader
+                                                        // 128= stream search
+                                                        // 256 = tv program stuf
+
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
 
@@ -8953,6 +8961,7 @@ void *datainfoloader_music(void *data) {
         global_use_internal_music_loader_system=true;
       } else {
         printf("Search for music in :%s\n",configdefaultmusicpath);
+        // build new db (internal db loader)
         opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
         printf("Done update db from datasource.\n");
         global_use_internal_music_loader_system=true;
@@ -9026,10 +9035,13 @@ void *datainfoloader_movie(void *data) {
   pthread_exit(NULL);
 }
 
+
+
+
+
 //
 // phread dataload stream
 //
-
 
 void *datainfoloader_stream(void *data) {
   //pthread_mutex_lock(&count_mutex);

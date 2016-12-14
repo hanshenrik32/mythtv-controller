@@ -7,6 +7,7 @@
 #include <mysql.h>
 #include <GL/glc.h>
 
+
 // listdir.c
 #include <sys/types.h>
 #include <dirent.h>
@@ -829,7 +830,9 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                   // if dir
                   // opret i album db
                   if (de->d_type==DT_DIR) {
-//                    printf("Foundet dir name %s in dir %10s  ",de->d_name,checkdir);
+
+                    if (debugmode & 2) printf("Foundet dir name %s in dir %10s  ",de->d_name,checkdir);
+
                     conn2=mysql_init(NULL);
                     if (conn2) {
                       mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -878,7 +881,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                     // open found dir having the songs
                     sprintf(checkdir2,"%s/%s",checkdir,de->d_name);
 
-//                    printf("Checking sub dir '%s'\n",checkdir2);
+                    if (debugmode & 2) printf("Checking sub dir '%s'\n",checkdir2);
 
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
@@ -961,9 +964,15 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
 }
 
 
-//opdatere_music_oversigt
-// opdatere list pr dir id from mythtv-backend eller internal
+
+
+
+
 //
+// update_music_oversigt
+// update list pr dir id from mythtv-backend or internal loader
+//
+
 int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int directory_id) {
     char fundetpath[512];
     char convert_command[512];
@@ -1086,7 +1095,8 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
 
 
 
-// opdatere list med playlistes
+// update list med playlistes
+
 int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
 //    char convert_command[512];
     char sqlselect[512];
@@ -1152,7 +1162,8 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
 }
 
 
-// opdatere list efter sogning
+// update list efter sogning
+
 int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *searchtxt,int search_art) {
     char convert_command[512];
     char sqlselect[1000];
