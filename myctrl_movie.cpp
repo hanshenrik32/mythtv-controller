@@ -231,7 +231,7 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
 film_oversigt_typem::~film_oversigt_typem() {
     delete [] filmoversigt;
     filmoversigtsize=0;
-    libvlc_release(vlc_inst);
+    if (vlc_inst) libvlc_release(vlc_inst);
 }
 
 // reset all movies in array
