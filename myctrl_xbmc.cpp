@@ -48,6 +48,7 @@ void xbmcsqlite::xbmc_readmusicdb() {
 
 
 
+
 // xbmc movie db loader
 
 void xbmcsqlite::xbmc_readmoviedb() {
@@ -384,7 +385,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     res = mysql_store_result(conn);
     mysql_close(conn);
   }
-
   //printf("XBMC - Antal xbmc music loaded %d \n",argc);
   return(0);
 }

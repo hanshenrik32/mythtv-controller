@@ -30,7 +30,7 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-extern int debugmode;
+extern int debugmode;                                          // set in main
 extern unsigned int musicoversigt_antal;
 extern int radio_key_selected;
 extern int music_select_iconnr;
@@ -1396,7 +1396,7 @@ bool radiostation_class::check_radio_online_bool() {
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
     conn=mysql_init(NULL);
-    strcpy(sqlselect,"select intnr from radio_stations where online=0 order by intnr limit 1");
+    strcpy(sqlselect,"select intnr from radio_stations where online=0 order by intnr limit 100");
     if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         mysql_query(conn,sqlselect);
@@ -1506,7 +1506,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     struct timeval tv;
     fd_set myset;
 
-    //printf("*Check radio stations*\n");
+    if (debugmode) printf("*Check radio stations*\n");
 
     if (check_radio_online_switch) {
         conn=mysql_init(NULL);
@@ -1568,9 +1568,9 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
             }
             if ((conn) && (radiostation)) {
                 if ((radiook) && (nfundet)) {
-                    sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",radiostation);
+                    sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
                 } else {
-                    sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld",radiostation);
+                    sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
                 }
                 mysql_query(conn,sqlselect);
                 res = mysql_store_result(conn);

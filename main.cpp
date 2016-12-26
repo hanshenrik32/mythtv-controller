@@ -1155,13 +1155,13 @@ int save_config(char * filename) {
         if (full_screen) sprintf(temp,"fullscreen=true\n"); else sprintf(temp,"fullscreen=false\n");
         fputs(temp,file);
 
-        sprintf(temp,"debug=0\n",configland);
+        sprintf(temp,"debug=0\n");
         fputs(temp,file);
 
-        sprintf(temp,"videoplayer=default\n",configvideoplayer);
+        sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
 
-        sprintf(temp,"configdefaultmusicpath=Music/\n",configdefaultmusicpath);
+        sprintf(temp,"configdefaultmusicpath=%s\n",configdefaultmusicpath);
         fputs(temp,file);
 
         fclose(file);
@@ -3266,7 +3266,6 @@ void display(void) {
         // create radio station online check tread
 
 /*
-
         if (!(check_radio_thread)) {
             check_radio_thread=true;
             pthread_t loaderthread;           // check radio status thread
@@ -3277,6 +3276,7 @@ void display(void) {
             }
         }
 */
+
         #endif
         #if defined USE_SDL_MIXER
 
@@ -4216,7 +4216,7 @@ void display(void) {
                     glPushMatrix();
                     // speed info
                     frequency=192;
-                    sprintf(temptxt,"Bitrate",frequency);
+                    sprintf(temptxt,"Bitrate ");
                     temptxt[40]=0;
                     glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -8915,6 +8915,8 @@ int init_sound_system(int devicenr) {
 // phread dataload  check radio stations
 //
 
+
+
 void *radio_check_statusloader(void *data) {
   bool notdone=false;
   //pthread_mutex_lock(&count_mutex);
@@ -9006,11 +9008,14 @@ void *datainfoloader_music(void *data) {
 //
 
 
+
+
 void *datainfoloader_movie(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting - Loading movie info from mythtv.\n");
+
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
+    printf("loader thread starting - Loading movie info from mythtv.\n");
       // Opdatere tv oversigt fra mythtv db
   //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
 
@@ -9030,6 +9035,8 @@ void *datainfoloader_movie(void *data) {
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       // stream
       //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
+  } else {
+    printf("Load movie from xbmc/kodi\n");
   }
   printf("loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
   pthread_exit(NULL);
@@ -9158,7 +9165,7 @@ void *xbmcdatainfoloader(void *data) {
   char musichomedirpath[1024];
 
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting - Loading data from xbmc/kodi).\n");
+  printf("loader thread starting - Loading music from xbmc/kodi).\n");
   //pthread_mutex_unlock(&count_mutex);
 
 
@@ -9291,6 +9298,125 @@ void *xbmcdatainfoloader(void *data) {
 
   pthread_exit(NULL);
 }
+
+
+
+
+
+
+void *xbmcdatainfoloader_movie(void *data) {
+  char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+  int kodiverfound=0;
+  char videohomedirpath[1024];
+  char musichomedirpath[1024];
+  char *ext;
+  char filename[256];
+  struct dirent *de=NULL;
+  DIR *dirp=NULL;
+  dirp=opendir("/home/hans/.kodi/userdata/Database/");                                // "~/.kodi/userdata/Database/");
+  if (dirp==NULL) {
+      printf("No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
+      exit(0);
+  }
+  // loop dir and update music songs db
+  while((de = readdir(dirp)) && (!(kodiverfound))) {
+    if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
+      ext = strrchr(de->d_name, '.');
+      if (ext) strcpy(filename,de->d_name);
+      if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
+        if (strcmp(filename,kodiver[0])==0) {
+          kodiverfound=16;
+          printf("Kodi version 16 is found \n");
+        }
+        if (strcmp(filename,kodiver[1])==0) {
+          kodiverfound=15;
+          printf("Kodi version 15 is found \n");
+        }
+        if (strcmp(filename,kodiver[2])==0) {
+          kodiverfound=14;
+          printf("Kodi version 14 is found \n");
+        }
+        if (strcmp(filename,kodiver[3])==0) {
+          kodiverfound=13;
+          printf("Kodi version 13 is found \n");
+        }
+        if (strcmp(filename,kodiver[4])==0) {
+          kodiverfound=12;
+          printf("Kodi version 12 is found \n");
+        }
+        if (strcmp(filename,kodiver[5])==0) {
+          kodiverfound=11;
+          printf("Kodi version 11 is found \n");
+        }
+      }
+    }
+  }
+
+  struct passwd *pw = getpwuid(getuid());
+  const char *homedir = pw->pw_dir;
+  strcpy(videohomedirpath,homedir);
+  switch (kodiverfound) {
+    case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
+              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+              break;
+    case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
+              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic56.db");
+              break;
+    case 14:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos93.db");
+              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic48.db");
+              break;
+    case 13:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos78.db");
+              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic46.db");
+              break;
+    case 12:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos75.db");
+              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
+              break;
+
+  }
+  printf("loader thread starting - Loading movies from xbmc/kodi.\n");
+
+  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
+
+//    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
+  if (xbmcSQL) {
+      xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
+      printf("XBMC - Load running\n");
+      //xbmcclient->SendNOTIFICATION("test", "message", 0);
+
+      // load xbmc movie db
+      xbmcSQL->xbmc_readmoviedb();   // IN use
+      //xbmcSQL->xbmc_readmusicdb();     // IN use
+      printf("XBMC - loader done.\n");
+
+  //pthread_mutex_lock(&count_mutex);
+
+  //pthread_mutex_unlock(&count_mutex);
+//  printf("loader thread starting - Loading movie info from xbmc/kodi.\n");
+      // Opdatere tv oversigt fra mythtv db
+  //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+
+      // opdatere music oversigt
+      //opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
+
+      //film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
+                                                                // load record file list
+/*
+      recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
+      // load old recorded list not some recorded any more
+      oldrecorded.earlyrecordedload(configmysqlhost,configmysqluser,configmysqlpass);
+      // load new tv schecule program
+      newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
+*/
+      //create_radio_oversigt();										                          // Create radio mysql database if not exist
+      //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
+      // stream
+      //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
+
+  }
+  printf("loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  pthread_exit(NULL);
+}
+
 
 
 
@@ -9534,12 +9660,12 @@ void loadgfx() {
 
     // radio buttons
     onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
-    onlineradio=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
-    onlineradio192=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
-    onlineradio320=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
-    onlineradiomask=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_mask");
-    radiobutton=loadgfxfile(temapath,(char *) "images/",(char *) "radio_button");
-    musicbutton=loadgfxfile(temapath,(char *) "images/",(char *) "music_button");
+    onlineradio      =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
+    onlineradio192   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
+    onlineradio320   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
+    onlineradiomask  =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_mask");
+    radiobutton      =loadgfxfile(temapath,(char *) "images/",(char *) "radio_button");
+    musicbutton      =loadgfxfile(temapath,(char *) "images/",(char *) "music_button");
     // radio/music button mask
     radiomusicbuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiomusic_button_mask");
     // radio options (O) key in radio oversigt
@@ -9916,12 +10042,24 @@ int main(int argc, char** argv) {
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
 
     if (strncmp(configbackend,"xbmc",4)==0) {
+
+      // music loader
       pthread_t loaderthread;           // the load
       int rc=pthread_create(&loaderthread,NULL,xbmcdatainfoloader,NULL);
       if (rc) {
           printf("ERROR; return code from pthread_create() is %d\n", rc);
           exit(-1);
       }
+
+      // movie loader
+      pthread_t loaderthread1;           // the load
+      int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
+      if (rc1) {
+        printf("ERROR; return code from pthread_create() is %d\n", rc1);
+        exit(-1);
+      }
+
+
     }
     if (strncmp(configbackend,"mythtv",5)==0) {
       if (configmythtvver>=0) {

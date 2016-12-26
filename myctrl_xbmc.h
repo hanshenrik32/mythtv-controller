@@ -869,12 +869,13 @@ private:
     char filename[1024*100];
     char fullfilename[1024*100];
 
+
     char *startp;
     char *slutp;
     unsigned int leng;
     for(int i=0; i<argc; i++) {
 
-//      if (azColName[i]) printf("i=%d %s argv[i]=%s  \n",i, azColName[i],argv[i]);
+  //      if (azColName[i]) printf("i=%d %s argv[i]=%s  \n",i, azColName[i],argv[i]);
 
       // init filmantal
       if (i==0) {
@@ -894,13 +895,13 @@ private:
             slutp=strstr(argv[10],">");
             if (slutp) {
               leng=slutp-startp;
-//              printf("length = %d \n",leng);
+  //              printf("length = %d \n",leng);
               strncpy(tmp,startp,leng-1);
               tmp[leng-1]=0;
             }
           }
 
-//          printf("tmp = %s \n",tmp);
+  //          printf("tmp = %s \n",tmp);
 
         // downloadfilename = name on file, from tmpfilename = full web url
         // return filename from tmp
@@ -961,23 +962,23 @@ private:
         film_oversigt.set_film_antal(film_antal);
       }
 
-//      filmoversigt[i].setfilmid(atoi(row[0]));
-//      if (i==2) film_oversigt.filmoversigt[flnr].setfilmtitle(argv[0]);
-//      if (i==22) film_oversigt.filmoversigt[flnr].setfilmfilename(argv[0]);
-//     hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-//      hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
-//      if (row[8]) {                                                       // hent film beskrivelse
-//        filmoversigt[i].setfilmsubtitle(row[8]);
-//      } else filmoversigt[i].setfilmsubtitle((char *) "");
- //     filmoversigt[i].setfilmfilename(row[2]);                            // fil navn på film
-//      filmoversigt[i].setfilmcoverfile(row[3]);                           // fil navn på cover fil
-//      filmoversigt[i].setfilmlength(atoi(row[4]));                        // film længde i unsigned int
-//      filmoversigt[i].setfilmaar(atoi(row[5]));
-//      filmoversigt[i].setimdbfilmrating(row[6]);                          // rating hmm imdb ?
-//      filmoversigt[i].setfilmrating(atoi(row[7]));                        // user rating
-//      filmoversigt[i].setfilmimdbnummer(row[9]);
- ///     if (row[10]) {                                                      // category (type text)
-//      if (i==16) strncpy(film_oversigt.filmoversigt[flnr].category_name,argv[16],127);
+  //      filmoversigt[i].setfilmid(atoi(row[0]));
+  //      if (i==2) film_oversigt.filmoversigt[flnr].setfilmtitle(argv[0]);
+  //      if (i==22) film_oversigt.filmoversigt[flnr].setfilmfilename(argv[0]);
+  //     hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
+  //      hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+  //      if (row[8]) {                                                       // hent film beskrivelse
+  //        filmoversigt[i].setfilmsubtitle(row[8]);
+  //      } else filmoversigt[i].setfilmsubtitle((char *) "");
+  //     filmoversigt[i].setfilmfilename(row[2]);                            // fil navn på film
+  //      filmoversigt[i].setfilmcoverfile(row[3]);                           // fil navn på cover fil
+  //      filmoversigt[i].setfilmlength(atoi(row[4]));                        // film længde i unsigned int
+  //      filmoversigt[i].setfilmaar(atoi(row[5]));
+  //      filmoversigt[i].setimdbfilmrating(row[6]);                          // rating hmm imdb ?
+  //      filmoversigt[i].setfilmrating(atoi(row[7]));                        // user rating
+  //      filmoversigt[i].setfilmimdbnummer(row[9]);
+  ///     if (row[10]) {                                                      // category (type text)
+  //      if (i==16) strncpy(film_oversigt.filmoversigt[flnr].category_name,argv[16],127);
 
     //  } else strcpy(filmoversigt[i].category_name,"");
      //if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
