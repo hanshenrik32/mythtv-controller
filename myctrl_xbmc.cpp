@@ -53,7 +53,7 @@ void xbmcsqlite::xbmc_readmusicdb() {
 
 void xbmcsqlite::xbmc_readmoviedb() {
     int rc;
-    const char *sql = "SELECT * from movieview"; // order by dateAdded";
+    const char *sql = "SELECT * from movie_view"; // order by dateAdded";
     const char* data = "Callback function called";
     char *zErrMsg = 0;
     opensqldb(dbmoviename);
@@ -70,7 +70,21 @@ void xbmcsqlite::xbmc_readmoviedb() {
 
 
 int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName) {
-
+  MYSQL *conn;
+  MYSQL_RES *res;
+  int n=0;
+  int i;
+  char sqlselect[2048];
+  for(int i=0; i<argc; i++) {
+    // movie name
+    if (strncmp("c00",azColName[i],8)==0) {
+    }
+    // fill path
+    if (strncmp("c22",azColName[i],8)==0) {
+    }
+    if (strncmp("strPath",azColName[i],8)==0) {
+    }
+  }
 }
 
 
