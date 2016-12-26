@@ -69,7 +69,9 @@ void xbmcsqlite::xbmc_readmoviedb() {
 }
 
 
+int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName) {
 
+}
 
 
 // callback to fill music db in mythtv-controller

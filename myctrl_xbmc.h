@@ -861,132 +861,7 @@ private:
   int filmantal;
   int musicantal;
 
-  // callback to fill movie db in mythtv-controller
-  static int xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName) {
-    int film_antal;
-    char huskfilmnavn[300];
-    char tmp[1024*100];
-    char filename[1024*100];
-    char fullfilename[1024*100];
-
-
-    char *startp;
-    char *slutp;
-    unsigned int leng;
-    for(int i=0; i<argc; i++) {
-
-  //      if (azColName[i]) printf("i=%d %s argv[i]=%s  \n",i, azColName[i],argv[i]);
-
-      // init filmantal
-      if (i==0) {
-        film_antal=film_oversigt.get_film_antal();
-        film_oversigt.filmoversigt[film_antal].setfilmnr(film_antal);				// set film nr
-      }
-      // imdb rating
-      if (i==7) film_oversigt.filmoversigt[film_antal].setimdbfilmrating(argv[7]);
-      // aar
-      if (i==9) film_oversigt.filmoversigt[film_antal].setfilmaar(atoi(argv[9]));
-
-      // set film cover
-      if (i==10) {
-          strcpy(tmp,"");
-          startp=strstr(argv[10],"http:");
-          if (startp) {
-            slutp=strstr(argv[10],">");
-            if (slutp) {
-              leng=slutp-startp;
-  //              printf("length = %d \n",leng);
-              strncpy(tmp,startp,leng-1);
-              tmp[leng-1]=0;
-            }
-          }
-
-  //          printf("tmp = %s \n",tmp);
-
-        // downloadfilename = name on file, from tmpfilename = full web url
-        // return filename from tmp
-        get_webfilename(filename,tmp);
-        if ((strlen(filename)>3) && (strcmp(filename+strlen(filename)-4,".jpg")==0)) {
-          // filename=filename to save
-          // tmp = full web path
-          strcpy(fullfilename,"/tmp/");
-          strcat(fullfilename,filename);
-          printf("Downloading movie :%s : coverfile %s\n",argv[18] ,filename);
-          if (!(file_exists(fullfilename))) {
-            get_webfile(tmp,fullfilename);
-          }
-          film_oversigt.filmoversigt[film_antal].settextureid(0);
-          film_oversigt.filmoversigt[film_antal].setfilmcoverfile(fullfilename);
-        }
-      }
-
-      if (i==11) {
-        if (argv[11]) {
-          film_oversigt.filmoversigt[film_antal].setfilmimdbnummer(argv[11]);
-        }
-      }
-
-      // movie art
-      if (i==16) {
-        if (argv[16]) film_oversigt.filmoversigt[film_antal].setfilmgenre(argv[16]);
-      }
-      // movie name
-      if (i==18) {
-        if (argv[18]) film_oversigt.filmoversigt[film_antal].setfilmtitle(argv[18]);
-      }
-      // gem filnavn
-      if (i==26) {
-        if (argv[26]) strncpy(huskfilmnavn,argv[26],255);
-      }
-      if (i==27) {
-         // get moviepath string
-         if (argv[27]) {
-           strcpy(tmp,argv[27]);
-           // add movie name
-           strcat(tmp,huskfilmnavn);
-           film_oversigt.filmoversigt[film_antal].setfilmfilename(tmp);
-         }
-      }
-
-      // add date
-      if (i==32) {
-        if (argv[32]) {
-          film_oversigt.filmoversigt[film_antal].setfilm_adddate(argv[32]);
-        }
-      }
-
-
-      // stop goto next record
-      if (i==argc-1) {
-        film_antal+=1;
-        film_oversigt.set_film_antal(film_antal);
-      }
-
-  //      filmoversigt[i].setfilmid(atoi(row[0]));
-  //      if (i==2) film_oversigt.filmoversigt[flnr].setfilmtitle(argv[0]);
-  //      if (i==22) film_oversigt.filmoversigt[flnr].setfilmfilename(argv[0]);
-  //     hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-  //      hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
-  //      if (row[8]) {                                                       // hent film beskrivelse
-  //        filmoversigt[i].setfilmsubtitle(row[8]);
-  //      } else filmoversigt[i].setfilmsubtitle((char *) "");
-  //     filmoversigt[i].setfilmfilename(row[2]);                            // fil navn på film
-  //      filmoversigt[i].setfilmcoverfile(row[3]);                           // fil navn på cover fil
-  //      filmoversigt[i].setfilmlength(atoi(row[4]));                        // film længde i unsigned int
-  //      filmoversigt[i].setfilmaar(atoi(row[5]));
-  //      filmoversigt[i].setimdbfilmrating(row[6]);                          // rating hmm imdb ?
-  //      filmoversigt[i].setfilmrating(atoi(row[7]));                        // user rating
-  //      filmoversigt[i].setfilmimdbnummer(row[9]);
-  ///     if (row[10]) {                                                      // category (type text)
-  //      if (i==16) strncpy(film_oversigt.filmoversigt[flnr].category_name,argv[16],127);
-
-    //  } else strcpy(filmoversigt[i].category_name,"");
-     //if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
-
-    }
-    return(0);
-  }
-
+  static int xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName);
 
   // callback to fill music db in mythtv-controller
   static int xbmc_load_sqldb_callback_music(void *data, int argc, char **argv, char **azColName);
@@ -1030,6 +905,7 @@ public:
   void xbmc_readmusicdb();
   // xbmc movie db load
   void xbmc_readmoviedb();
+
   int xbmcloadversion();
 };
 
