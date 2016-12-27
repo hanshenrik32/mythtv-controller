@@ -9332,7 +9332,8 @@ void *xbmcdatainfoloader_movie(void *data) {
     while ((row = mysql_fetch_row(res)) != NULL) {
       dbexist=true;
     }
-    // create databases if not exist
+    // create databases/tables if not exist
+    // needed by movie loader
     if (!(dbexist)) {
       strcpy(sqlselect,"create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int)");
       mysql_query(conn,sqlselect);
@@ -9464,6 +9465,10 @@ void *xbmcdatainfoloader_movie(void *data) {
 
       // load xbmc movie db
       xbmcSQL->xbmc_readmoviedb();   // IN use
+
+      // set use internal db for music
+      global_use_internal_music_loader_system=true;
+
       //xbmcSQL->xbmc_readmusicdb();     // IN use
       printf("XBMC - loader done.\n");
 
@@ -9477,7 +9482,7 @@ void *xbmcdatainfoloader_movie(void *data) {
       // opdatere music oversigt
       //opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
 
-      //film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
+      film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
                                                                 // load record file list
 /*
       recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv

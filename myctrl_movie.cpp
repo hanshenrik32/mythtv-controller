@@ -28,6 +28,9 @@ extern GLuint _defaultdvdcover2;
 extern GLuint _dvdcovermask;
 extern GLuint _dvdcovermask2;
 extern GLuint _dvdcovermask3;
+
+extern bool global_use_internal_music_loader_system;
+
 const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 
 extern GLint cur_avail_mem_kb;
@@ -459,12 +462,13 @@ void film_oversigt_typem::opdatere_film_oversigt() {
     unsigned int i;
     FILE *filhandle;
     char resl[200];
+    char database[200];
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
     int checkdirexist=0;
 //    gotoxy(10,16);
     printf("Opdatere Film oversigt fra mythtv :");
