@@ -28,19 +28,13 @@ extern GLuint _defaultdvdcover2;
 extern GLuint _dvdcovermask;
 extern GLuint _dvdcovermask2;
 extern GLuint _dvdcovermask3;
-
 extern bool global_use_internal_music_loader_system;
-
 const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
-
 extern GLint cur_avail_mem_kb;
-
 extern unsigned int filmoversigt_antal;
-
 extern GLuint _textureIdloading,_textureIdloading1;
-
 extern GLuint _textureIdloading_mask;
-
+// window info
 extern int orgwinsizey;
 extern int orgwinsizex;
 
@@ -77,7 +71,6 @@ film_oversigt_type::film_oversigt_type() {
 // destructor
 
 film_oversigt_type::~film_oversigt_type() {
-
     delete [] film_title;
     delete [] film_subtitle;
     delete [] film_filename;
@@ -90,7 +83,6 @@ film_oversigt_type::~film_oversigt_type() {
     delete [] film_imdbnr;
     delete [] category_name;
     delete [] genre;
-
 }
 
 // gem texture filname
@@ -232,7 +224,7 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
 // destructor
 
 film_oversigt_typem::~film_oversigt_typem() {
-    delete [] filmoversigt;
+    if (filmoversigt) delete [] filmoversigt;
     filmoversigtsize=0;
     if (vlc_inst) libvlc_release(vlc_inst);
 }

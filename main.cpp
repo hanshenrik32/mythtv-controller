@@ -103,6 +103,7 @@ struct configkeytype {
 int numCPU;                                             // have the numbers of cpu cores
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
 
+const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
 
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
@@ -9151,7 +9152,6 @@ xbmcsqlite *xbmcSQL=NULL;
 void *xbmcdatainfoloader(void *data) {
   // xbmc/kodi db version files
   int kodiverfound=0;
-  char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
   DIR *dirp=NULL;
   char *ext;
   struct dirent *de=NULL;
@@ -9167,7 +9167,6 @@ void *xbmcdatainfoloader(void *data) {
   //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading music from xbmc/kodi).\n");
   //pthread_mutex_unlock(&count_mutex);
-
 
   conn=mysql_init(NULL);
   // Connect to database
@@ -9290,22 +9289,18 @@ void *xbmcdatainfoloader(void *data) {
   // set use internal db for music
   global_use_internal_music_loader_system=true;
   // load db
-//  if (dbexist) {
-    printf("Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
-    //opdatere_music_oversigt_icons(); 					// load gfx icons
-    printf("Nusic db loaded.\n");
-//  }
-
+  printf("Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
+  printf("Nusic db loaded.\n");
   pthread_exit(NULL);
 }
 
 
 
 
-
+// load xbmc/kodi movies to db
 
 void *xbmcdatainfoloader_movie(void *data) {
-  char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+  // mxbc/kodi file names for sqlite
   int kodiverfound=0;
   char videohomedirpath[1024];
   char musichomedirpath[1024];
@@ -9456,33 +9451,30 @@ void *xbmcdatainfoloader_movie(void *data) {
   printf("loader thread starting - Loading movies from xbmc/kodi.\n");
 
   xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
-
-//    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
+  //xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
   if (xbmcSQL) {
       xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
       printf("XBMC - Load running\n");
-      //xbmcclient->SendNOTIFICATION("test", "message", 0);
 
       // load xbmc movie db
       xbmcSQL->xbmc_readmoviedb();   // IN use
-
       // set use internal db for music
       global_use_internal_music_loader_system=true;
 
       //xbmcSQL->xbmc_readmusicdb();     // IN use
       printf("XBMC - loader done.\n");
+      // load movies in from db
+      film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
+
+
+  //xbmcclient->SendNOTIFICATION("test", "message", 0);
 
   //pthread_mutex_lock(&count_mutex);
-
   //pthread_mutex_unlock(&count_mutex);
-//  printf("loader thread starting - Loading movie info from xbmc/kodi.\n");
-      // Opdatere tv oversigt fra mythtv db
+  //  printf("loader thread starting - Loading movie info from xbmc/kodi.\n");
+  // Opdatere tv oversigt fra mythtv db
   //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
 
-      // opdatere music oversigt
-      //opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
-
-      film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
                                                                 // load record file list
 /*
       recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
@@ -9497,7 +9489,7 @@ void *xbmcdatainfoloader_movie(void *data) {
       //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
 
   }
-  printf("loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  printf("loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
   pthread_exit(NULL);
 }
 

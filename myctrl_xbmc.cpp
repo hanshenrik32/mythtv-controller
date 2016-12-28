@@ -80,10 +80,14 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   char moviepath[1024];
   char moviepath1[1024];
   char movietitle[256];
+  char moviescoverfile[4096];
   int movieyear;
   char moviecategory[1024];
   char moviedateadded[64];
   char moviesubtitle[1024];
+  char moviescontry[80];
+  char movietrailerlink[1024];
+  char movieimdb[80];
   float movieuserrating;
   char c22[256];
   char c00[256];
@@ -96,6 +100,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
     }
 
     // file path
+    fundet=false;
     if (strncmp("strPath",azColName[i],7)==0) {
       strcpy(moviepath,argv[i]);
       sprintf(sqlselect,"select path from videopathinfo where path='%s'",moviepath);
@@ -143,17 +148,38 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       movieyear=atoi(argv[i]);
       film_oversigt.filmoversigt[0].setfilmaar(movieyear);
     }
+
+    // imdb nr
+    if (strncmp("c09",azColName[i],3)==0) {
+      strcpy(movieimdb,argv[i]);
+    }
+
     // category
     // create if not exist
     if (strncmp("c14",azColName[i],3)==0) {
+      fundet=false;
       strcpy(moviecategory,argv[i]);
-      sprintf(sqlselect,"insert into videocategory(intid , category) values (%d,'%s')",0,moviecategory);
+      // check if exist
+      sprintf(sqlselect,"select category from videocategory where category like '%s'",0,moviecategory);
       conn1=mysql_init(NULL);
       if (conn1) {
         mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
         mysql_query(conn1,sqlselect);
         res = mysql_store_result(conn1);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+        }
         mysql_close(conn1);
+      }
+      if (!(fundet)) {
+        sprintf(sqlselect,"insert into videocategory(intid , category) values (%d,'%s')",0,moviecategory);
+        conn1=mysql_init(NULL);
+        if (conn1) {
+          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+          mysql_query(conn1,sqlselect);
+          res = mysql_store_result(conn1);
+          mysql_close(conn1);
+        }
       }
     }
 
@@ -162,7 +188,22 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       strcpy(moviesubtitle,argv[i]);
     }
 
-    //
+    // youtube trailer link
+    if (strncmp("c19",azColName[i],3)==0) {
+      strcpy(movietrailerlink,argv[i]);
+    }
+
+    // cover/screenshot file
+    if (strncmp("c20",azColName[i],3)==0) {
+      strcpy(moviescoverfile,argv[i]);
+    }
+
+    // contry (name)
+    if (strncmp("c21",azColName[i],3)==0) {
+      strcpy(moviescontry,argv[i]);
+    }
+
+    // link to file to play (path+filername)
     if (strncmp("c22",azColName[i],3)==0) {
       strcpy(moviepath1,argv[i]);
     }
@@ -170,23 +211,37 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
     if (strncmp("dateAdded",azColName[i],9)==0) {
       strcpy(moviedateadded,argv[i]);
     }
-
   }
-  film_oversigt.filmoversigt[0].setfilmfilename(moviepath);				// fil navn på film
-  film_oversigt.filmoversigt[0].setfilmtitle(movietitle);				// fil navn på film
+
+  //film_oversigt.filmoversigt[0].setfilmfilename(moviepath);				// fil navn på film
+  //film_oversigt.filmoversigt[0].setfilmtitle(movietitle);				// fil navn på film
   printf("title %40s , path = %s \n",movietitle,moviepath);
-
-  sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                              (0,'%s','%s','','director','','%s','','',0,'',%d,'2016-12-31',%2.5f,0,0,0,0,0,'%s','hash','coverfile',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                              movietitle,moviesubtitle,movieplot,movieyear,movieuserrating ,moviepath1);
-  conn=mysql_init(NULL);
-  if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    mysql_close(conn);
+  fundet=false;
+  // create record if not exist
+  // do check if exist
+  sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
+  conn1=mysql_init(NULL);
+  if (conn1) {
+    mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+    mysql_query(conn1,sqlselect);
+    res = mysql_store_result(conn1);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+    }
+    mysql_close(conn1);
   }
-
+  if (!(fundet)) {
+    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                              (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,0,0,0,0,0,'%s','hash','coverfile',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                              movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating ,moviepath1);
+    conn=mysql_init(NULL);
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      mysql_close(conn);
+    }
+  }
   return(0);
 }
 
