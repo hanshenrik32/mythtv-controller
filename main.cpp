@@ -4290,6 +4290,10 @@ void display(void) {
 
           channel->getParameterData(FMOD_DSP_FFT_SPECTRUM,(void **)&data, &len, s, 256);
 */
+
+
+
+
           spec = new float[sampleSize];
           for (i = 0; i < sampleSize; i++) {
             spec[i] = ((specLeft[i] + specRight[i])/2);
@@ -9141,15 +9145,21 @@ int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
 
 
+// get user homedir
 
-
+int getuserhomedir(char *homedir) {
+  struct passwd *pw = getpwuid(getuid());
+  strcpy(homedir,pw->pw_dir);
+  return(1);
+}
 
 
 //
-// phread dataload xbmc
+// phread dataload xbmc/kodi music db
 //
 
 void *xbmcdatainfoloader(void *data) {
+  char userhomedir[200];
   // xbmc/kodi db version files
   int kodiverfound=0;
   DIR *dirp=NULL;
@@ -9204,7 +9214,11 @@ void *xbmcdatainfoloader(void *data) {
 
   if ((strcmp(configbackend,"xbmc")==0) && (!(dbexist))) {
     printf("XBMC - Loader starting.....\n");
-    dirp=opendir("/home/hans/.kodi/userdata/Database/");                                // "~/.kodi/userdata/Database/");
+
+    // get user homedir
+    getuserhomedir(userhomedir);
+    strcat(userhomedir,"/.kodi/userdata/Database/");
+    dirp=opendir(userhomedir);                                // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
         printf("No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
         exit(0);
@@ -9243,10 +9257,8 @@ void *xbmcdatainfoloader(void *data) {
       }
     }
 
-    struct passwd *pw = getpwuid(getuid());
-    const char *homedir = pw->pw_dir;
-    strcpy(videohomedirpath,homedir);
-    strcpy(musichomedirpath,homedir);
+    strcpy(videohomedirpath,userhomedir);
+    strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
       case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
@@ -9265,9 +9277,7 @@ void *xbmcdatainfoloader(void *data) {
                 break;
 
     }
-
     xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
-
 //    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
     if (xbmcSQL) {
         xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
@@ -9300,6 +9310,7 @@ void *xbmcdatainfoloader(void *data) {
 // load xbmc/kodi movies to db
 
 void *xbmcdatainfoloader_movie(void *data) {
+  char userhomedir[200];
   // mxbc/kodi file names for sqlite
   int kodiverfound=0;
   char videohomedirpath[1024];
@@ -9388,7 +9399,10 @@ void *xbmcdatainfoloader_movie(void *data) {
     mysql_close(conn);
   }
 
-  dirp=opendir("/home/hans/.kodi/userdata/Database/");                                // "~/.kodi/userdata/Database/");
+  // get user homedir
+  getuserhomedir(userhomedir);
+  strcat(userhomedir,"/.kodi/userdata/Database/");
+  dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
   if (dirp==NULL) {
       printf("No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
       exit(0);
@@ -9427,9 +9441,8 @@ void *xbmcdatainfoloader_movie(void *data) {
     }
   }
 
-  struct passwd *pw = getpwuid(getuid());
-  const char *homedir = pw->pw_dir;
-  strcpy(videohomedirpath,homedir);
+  // check user homedir
+  strcpy(videohomedirpath,userhomedir);
   switch (kodiverfound) {
     case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
               strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");

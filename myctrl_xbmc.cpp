@@ -67,6 +67,10 @@ void xbmcsqlite::xbmc_readmoviedb() {
 }
 
 
+
+
+
+
 // callback to fill movie db in mythtv-controller from xbmc/sqlite
 
 int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName) {
@@ -88,11 +92,17 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   char moviescontry[80];
   char movietrailerlink[1024];
   char movieimdb[80];
+  char moviecover[4096];
   float movieuserrating;
+  int movielength;
   char c22[256];
   char c00[256];
   char movieplot[4096];
   bool fundet;
+
+  char fullcovertxt[1024];
+  char *coverpointer;
+  char filetodownload[2048];
 
   for(int i=0; i<argc; i++) {
     if (i==0) {
@@ -146,13 +156,43 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
     // year
     if (strncmp("c07",azColName[i],3)==0) {
       movieyear=atoi(argv[i]);
-      film_oversigt.filmoversigt[0].setfilmaar(movieyear);
     }
+
+    // movie cover
+    if (strncmp("c08",azColName[i],3)==0) {
+      strcpy(fullcovertxt,argv[i]);
+      coverpointer=strstr(moviecover,"preview=");   // find startpointer
+      if (coverpointer) {
+        char *sted=strchr(coverpointer,'>');
+        if (sted) {
+          coverpointer[(sted-coverpointer)-1]=0;
+          //strcpy(moviecover,coverpointer);
+          strcpy(moviecover,coverpointer+8+1);
+          // if (debugmode) printf("Cover found %s\n\n",moviecover);
+          strcpy(filetodownload,"wget ");
+          strcat(filetodownload,moviecover);
+          strcat(filetodownload," -O /tmp/cover.jpg");
+          //i=system (filetodownload);
+        }
+      }
+
+      // sample from kodi
+      // <thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/il9XWx5CbNd2KdDUwrcClEZiLkv.jpg">http://image.tmdb.org/t/p/original/il9XWx5CbNd2KdDUwrcClEZiLkv.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/fIHF63oznk2PXlYM6pPfhnOB3SD.jpg">http://image.tmdb.org/t/p/original/fIHF63oznk2PXlYM6pPfhnOB3SD.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/2LXAj56D3NKuJuT2jnD7CpDpJIG.jpg">http://image.tmdb.org/t/p/original/2LXAj56D3NKuJuT2jnD7CpDpJIG.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/n7W7iUtfY9ll87AQPVqRwIdxNCY.jpg">http://image.tmdb.org/t/p/original/n7W7iUtfY9ll87AQPVqRwIdxNCY.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/hEMWpQbMoAzd0UpSpn9f1DMyRHi.jpg">http://image.tmdb.org/t/p/original/hEMWpQbMoAzd0UpSpn9f1DMyRHi.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/fa4PxEPRKWRyjzYje1jM4m30qzd.jpg">http://image.tmdb.org/t/p/original/fa4PxEPRKWRyjzYje1jM4m30qzd.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/oVkzfeIi8SugSjFeGCcWJ8CbZlK.jpg">http://image.tmdb.org/t/p/original/oVkzfeIi8SugSjFeGCcWJ8CbZlK.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/q8uffTLftPBftvHZ6EPjVARKRsf.jpg">http://image.tmdb.org/t/p/original/q8uffTLftPBftvHZ6EPjVARKRsf.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/i722AJYKvyZC2dSLVM0UJEYNw4M.jpg">http://image.tmdb.org/t/p/original/i722AJYKvyZC2dSLVM0UJEYNw4M.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/lSm7UUirk30xcEmMkphirrEkMl8.jpg">http://image.tmdb.org/t/p/original/lSm7UUirk30xcEmMkphirrEkMl8.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/jDlYj9nhIOIXb3F1G6hheRQBh4o.jpg">http://image.tmdb.org/t/p/original/jDlYj9nhIOIXb3F1G6hheRQBh4o.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/igrxC4ZwP9ZLq00tG66YSJcGRQR.jpg">http://image.tmdb.org/t/p/original/igrxC4ZwP9ZLq00tG66YSJcGRQR.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/9XHePtcuQlu7oTNrX1VUOKt2qnE.jpg">http://image.tmdb.org/t/p/original/9XHePtcuQlu7oTNrX1VUOKt2qnE.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/dg6NYC9WIBUDtF6Dn0szijL5s2f.jpg">http://image.tmdb.org/t/p/original/dg6NYC9WIBUDtF6Dn0szijL5s2f.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/2laS4xqkwA8TsQcvPAEAubbDJXp.jpg">http://image.tmdb.org/t/p/original/2laS4xqkwA8TsQcvPAEAubbDJXp.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/cc1d0A94BhBWC0GDWqETBs8xaxB.jpg">http://image.tmdb.org/t/p/original/cc1d0A94BhBWC0GDWqETBs8xaxB.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/igLAV1EWlPTiuRLsyYbpXkaDhQD.jpg">http://image.tmdb.org/t/p/original/igLAV1EWlPTiuRLsyYbpXkaDhQD.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/1iZXoQX8sDTSnRU8QxoqdaRMbi2.jpg">http://image.tmdb.org/t/p/original/1iZXoQX8sDTSnRU8QxoqdaRMbi2.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/vcRejvkzTL0pkfboJlV1t2a76P1.jpg">http://image.tmdb.org/t/p/original/vcRejvkzTL0pkfboJlV1t2a76P1.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/geuj8N3d5yPex9ZRLz9LADNh0jp.jpg">http://image.tmdb.org/t/p/original/geuj8N3d5yPex9ZRLz9LADNh0jp.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/mAb0rdCFfBZ14JPVhYY5ArdlZ22.jpg">http://image.tmdb.org/t/p/original/mAb0rdCFfBZ14JPVhYY5ArdlZ22.jpg</thumb>
+    }
+
 
     // imdb nr
     if (strncmp("c09",azColName[i],3)==0) {
       strcpy(movieimdb,argv[i]);
     }
+
+
+    // length of movie
+    if (strncmp("c11",azColName[i],3)==0) {
+      movielength=atoi(argv[i]);
+      movielength=movielength/60; // calc to min
+    }
+
 
     // category
     // create if not exist
@@ -215,7 +255,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
 
   //film_oversigt.filmoversigt[0].setfilmfilename(moviepath);				// fil navn på film
   //film_oversigt.filmoversigt[0].setfilmtitle(movietitle);				// fil navn på film
+
   printf("title %40s , path = %s \n",movietitle,moviepath);
+
   fundet=false;
   // create record if not exist
   // do check if exist
@@ -232,8 +274,8 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   }
   if (!(fundet)) {
     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                              (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,0,0,0,0,0,'%s','hash','coverfile',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                              movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating ,moviepath1);
+                                              (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','coverfile',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                              movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1);
     conn=mysql_init(NULL);
     if (conn) {
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
