@@ -9256,7 +9256,7 @@ void *xbmcdatainfoloader(void *data) {
         }
       }
     }
-
+    getuserhomedir(userhomedir);
     strcpy(videohomedirpath,userhomedir);
     strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
@@ -9401,10 +9401,10 @@ void *xbmcdatainfoloader_movie(void *data) {
 
   // get user homedir
   getuserhomedir(userhomedir);
-  strcat(userhomedir,"/.kodi/userdata/Database/");
+  strcat(userhomedir,"/.kodi/userdata/Database");
   dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
   if (dirp==NULL) {
-      printf("No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
+      printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
       exit(0);
   }
   // loop dir and update music songs db
@@ -9442,6 +9442,7 @@ void *xbmcdatainfoloader_movie(void *data) {
   }
 
   // check user homedir
+  getuserhomedir(userhomedir);
   strcpy(videohomedirpath,userhomedir);
   switch (kodiverfound) {
     case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
@@ -9471,14 +9472,13 @@ void *xbmcdatainfoloader_movie(void *data) {
 
       // load xbmc movie db
       xbmcSQL->xbmc_readmoviedb();   // IN use
-      // set use internal db for music
+      // set use internal db for movies
       global_use_internal_music_loader_system=true;
 
       //xbmcSQL->xbmc_readmusicdb();     // IN use
       printf("XBMC - loader done.\n");
       // load movies in from db
       film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
-
 
   //xbmcclient->SendNOTIFICATION("test", "message", 0);
 
