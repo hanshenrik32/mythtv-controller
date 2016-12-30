@@ -27,10 +27,6 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
-// used to get home dir
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
 
 // Set sound system used
 
@@ -996,7 +992,7 @@ int parse_config(char *filename) {
                     // set backupend system to XBMC or mythtv
                     if (command_nr==setbackend) {
                         strcpy(configbackend,value);
-                        printf("************** Set config mode MYTHTV/XBMC  *************\n");
+                        printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
                         printf("Mode selected : %s\n",configbackend);
                         printf("*********************************************************\n");
                     }
@@ -6440,7 +6436,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_videoplayer) {
-                        if (do_show_setup_select_linie<3) do_show_setup_select_linie++;
+                        if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
                     }
 
                     keybuffer[0]=0;
@@ -6857,14 +6853,20 @@ void handleKeypress(unsigned char key, int x, int y) {
                             printf("Keybuffer=%s\n",keybuffer);
                         }
                       }
-                      //
+                      // video player screen mode
                       if (do_show_setup_select_linie==1) {
                         if (key==32) {
                           if (configdefaultplayer_screenmode<3) configdefaultplayer_screenmode++;
                           else configdefaultplayer_screenmode=0;
                         }
                       }
-                      //
+                      // select debug mode to show in console
+                      if (do_show_setup_select_linie==2) {
+                        if (key==32) {
+                          if (debugmode>1) debugmode=debugmode*2; else debugmode++;
+                          if (debugmode>256) debugmode=0;
+                        }
+                      }
                   }
               }
           }
@@ -6992,9 +6994,11 @@ void handleKeypress(unsigned char key, int x, int y) {
            } else if (do_show_videoplayer) {
               switch(do_show_setup_select_linie) {
                   case 0: strcpy(configdefaultplayer,keybuffer);
-                         break;
+                          break;
                   case 1: strcpy(configvideoplayer,keybuffer);
-                         break;
+                          break;
+                  case 2: //strcpy(configvideoplayer,keybuffer);
+                          break;
             }
            }
        }
@@ -9092,18 +9096,6 @@ void *datainfoloader_stream(void *data) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 //
 // phread dataload
 // NOT IN USE
@@ -9145,13 +9137,6 @@ int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
 
 
-// get user homedir
-
-int getuserhomedir(char *homedir) {
-  struct passwd *pw = getpwuid(getuid());
-  strcpy(homedir,pw->pw_dir);
-  return(1);
-}
 
 
 //
@@ -9173,6 +9158,7 @@ void *xbmcdatainfoloader(void *data) {
   char sqlselect[1024];
   char videohomedirpath[1024];
   char musichomedirpath[1024];
+  bool allokay=false;
 
   //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading music from xbmc/kodi).\n");
@@ -9181,6 +9167,7 @@ void *xbmcdatainfoloader(void *data) {
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
+    allokay=true;
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -9212,7 +9199,7 @@ void *xbmcdatainfoloader(void *data) {
   }
 
 
-  if ((strcmp(configbackend,"xbmc")==0) && (!(dbexist))) {
+  if ((allokay) && (strcmp(configbackend,"xbmc")==0) && (!(dbexist))) {
     printf("XBMC - Loader starting.....\n");
 
     // get user homedir
@@ -9319,6 +9306,7 @@ void *xbmcdatainfoloader_movie(void *data) {
   char filename[256];
   struct dirent *de=NULL;
   DIR *dirp=NULL;
+  bool allokay=false;
 
   MYSQL *conn;
   MYSQL_RES *res;
@@ -9329,6 +9317,7 @@ void *xbmcdatainfoloader_movie(void *data) {
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
+    allokay=true;
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -9398,88 +9387,85 @@ void *xbmcdatainfoloader_movie(void *data) {
     }
     mysql_close(conn);
   }
-
-  // get user homedir
-  getuserhomedir(userhomedir);
-  strcat(userhomedir,"/.kodi/userdata/Database");
-  dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
-  if (dirp==NULL) {
-      printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
-      exit(0);
-  }
-  // loop dir and update music songs db
-  while((de = readdir(dirp)) && (!(kodiverfound))) {
-    if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
-      ext = strrchr(de->d_name, '.');
-      if (ext) strcpy(filename,de->d_name);
-      if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
-        if (strcmp(filename,kodiver[0])==0) {
-          kodiverfound=16;
-          printf("Kodi version 16 is found \n");
-        }
-        if (strcmp(filename,kodiver[1])==0) {
-          kodiverfound=15;
-          printf("Kodi version 15 is found \n");
-        }
-        if (strcmp(filename,kodiver[2])==0) {
-          kodiverfound=14;
-          printf("Kodi version 14 is found \n");
-        }
-        if (strcmp(filename,kodiver[3])==0) {
-          kodiverfound=13;
-          printf("Kodi version 13 is found \n");
-        }
-        if (strcmp(filename,kodiver[4])==0) {
-          kodiverfound=12;
-          printf("Kodi version 12 is found \n");
-        }
-        if (strcmp(filename,kodiver[5])==0) {
-          kodiverfound=11;
-          printf("Kodi version 11 is found \n");
+  if (allokay) {
+    // get user homedir
+    getuserhomedir(userhomedir);
+    strcat(userhomedir,"/.kodi/userdata/Database");
+    dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
+    if (dirp==NULL) {
+        printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
+        exit(0);
+    }
+    // loop dir and update music songs db
+    // and find kodi db version
+    while((de = readdir(dirp)) && (!(kodiverfound))) {
+      if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
+        ext = strrchr(de->d_name, '.');
+        if (ext) strcpy(filename,de->d_name);
+        if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
+          if (strcmp(filename,kodiver[0])==0) {
+            kodiverfound=16;
+            printf("Kodi version 16 is found \n");
+          }
+          if (strcmp(filename,kodiver[1])==0) {
+            kodiverfound=15;
+            printf("Kodi version 15 is found \n");
+          }
+          if (strcmp(filename,kodiver[2])==0) {
+            kodiverfound=14;
+            printf("Kodi version 14 is found \n");
+          }
+          if (strcmp(filename,kodiver[3])==0) {
+            kodiverfound=13;
+            printf("Kodi version 13 is found \n");
+          }
+          if (strcmp(filename,kodiver[4])==0) {
+            kodiverfound=12;
+            printf("Kodi version 12 is found \n");
+          }
+          if (strcmp(filename,kodiver[5])==0) {
+            kodiverfound=11;
+            printf("Kodi version 11 is found \n");
+          }
         }
       }
     }
-  }
+    // check user homedir
+    getuserhomedir(userhomedir);
+    strcpy(videohomedirpath,userhomedir);
+    // add kodi dir ro db files
+    switch (kodiverfound) {
+      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+                break;
+      case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic56.db");
+                break;
+      case 14:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos93.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic48.db");
+                break;
+      case 13:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos78.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic46.db");
+                break;
+      case 12:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos75.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
+                break;
 
-  // check user homedir
-  getuserhomedir(userhomedir);
-  strcpy(videohomedirpath,userhomedir);
-  switch (kodiverfound) {
-    case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
-              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
-              break;
-    case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
-              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic56.db");
-              break;
-    case 14:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos93.db");
-              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic48.db");
-              break;
-    case 13:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos78.db");
-              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic46.db");
-              break;
-    case 12:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos75.db");
-              strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
-              break;
-
-  }
-  printf("loader thread starting - Loading movies from xbmc/kodi.\n");
-
-  xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
-  //xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
-  if (xbmcSQL) {
+    }
+    printf("loader thread starting - Loading movies from xbmc/kodi.\n");
+    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
+    //xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
+    if (xbmcSQL) {
       xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
       printf("XBMC - Load running\n");
-
       // load xbmc movie db
-      xbmcSQL->xbmc_readmoviedb();   // IN use
+      xbmcSQL->xbmc_readmoviedb();                // load movies from kodi db to internal db
       // set use internal db for movies
       global_use_internal_music_loader_system=true;
-
       //xbmcSQL->xbmc_readmusicdb();     // IN use
       printf("XBMC - loader done.\n");
       // load movies in from db
-      film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
-
+      film_oversigt.opdatere_film_oversigt();     // gen covers 3d hvis de ikke findes.
   //xbmcclient->SendNOTIFICATION("test", "message", 0);
 
   //pthread_mutex_lock(&count_mutex);
@@ -9500,7 +9486,7 @@ void *xbmcdatainfoloader_movie(void *data) {
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       // stream
       //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
-
+    }
   }
   printf("loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
   pthread_exit(NULL);

@@ -4,5 +4,6 @@
 bool file_exists(const char * filename);
 int gotoxy(int x, int y);
 int clearscreen();
+int getuserhomedir(char *homedir);
 
 #endif

@@ -1,6 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 #include "utility.h"
+#include <sys/types.h>
+// used to get home dir
+// #include <unistd.h>
+#include <pwd.h>
+#include <unistd.h>
+
+
+// get user homedir
+
+int getuserhomedir(char *homedir) {
+  struct passwd *pw = getpwuid(getuid());
+  strcpy(homedir,pw->pw_dir);
+  return(1);
+}
 
 
 bool file_exists(const char * filename)
@@ -43,7 +57,7 @@ int gotoxy(int x, int y) {
 	** Vertical position absolute
 	*/
 	strcat(essq, "d");
-	
+
 	/*
 	** Horizontal move
 	** Horizontal position absolute
@@ -61,7 +75,3 @@ int gotoxy(int x, int y) {
 
 	return 0;
 }
-
-
-
-

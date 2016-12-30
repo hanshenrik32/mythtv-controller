@@ -22,6 +22,7 @@
 #include "myth_setup.h"
 #include "checknet.h"
 
+extern int debugmode;
 
 struct configkeytype {
     char cmdname[200];
@@ -561,7 +562,9 @@ void show_setup_screen() {
 }
 
 
+//
 // ************************************************************** setup video config *************************
+// play options menu
 
 void show_setup_video() {
     char resl[1024];
@@ -724,6 +727,32 @@ void show_setup_video() {
         myglprint4((char *) resl);
     }
     glPopMatrix();
+
+
+    glPushMatrix();
+    // show close on exit type
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(380.0f, 650.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Debug mode               ");
+    myglprint4((char *) " ");
+
+    if (debugmode==2) sprintf(resl,"Music",debugmode);
+    else if (debugmode==4) sprintf(resl,"Stream",debugmode);
+    else if (debugmode==8) sprintf(resl,"Keyboard/mouse",debugmode);
+    else if (debugmode==16) sprintf(resl,"Movie",debugmode);
+    else if (debugmode==128) sprintf(resl,"Stream",debugmode);
+    else if (debugmode==256) sprintf(resl,"TV guide stuf",debugmode);
+    else sprintf(resl,"%d",debugmode);
+
+    if (do_show_setup_select_linie==2) {
+        glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
+        myglprint4((char *) resl);
+    } else {
+        myglprint4((char *) resl);
+    }
+    glPopMatrix();
+
 
     if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(configaktivescreensavername));
 
@@ -1679,6 +1708,7 @@ void show_setup_sound() {
     glPopMatrix();
 
     glPushMatrix();
+    // close buttons
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1689,8 +1719,8 @@ void show_setup_sound() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     winsizx=100;
     winsizy=100;
-    xpos=0;
-    ypos=-670;
+    xpos=450;
+    ypos=100;
     glLoadName(40);
     glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -1699,6 +1729,9 @@ void show_setup_sound() {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
+
+
+
 
 }
 
