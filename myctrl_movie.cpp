@@ -246,6 +246,20 @@ void film_oversigt_typem::stopmovie() {
   if (vlc_mp) {
     libvlc_media_player_stop(vlc_mp);
     libvlc_media_player_release(vlc_mp);
+  } else {
+    printf("Error stop movie player\n");
+    exit(1);
+  }
+}
+
+
+void film_oversigt_typem::softstopmovie() {
+  if (vlc_mp) {
+    libvlc_media_player_stop(vlc_mp);
+//    libvlc_media_player_release(vlc_mp);
+  } else {
+    printf("Error stop movie player\n");
+    exit(1);
   }
 }
 
@@ -259,8 +273,8 @@ void film_oversigt_typem::stopmovie() {
 int film_oversigt_typem::playmovie(int nr) {
     int error=0;
     libvlc_media_t *vlc_m;
-    char systemcommand[2000];               // path
-    stopmovie();
+    char systemcommand[2000];                             // path
+    if (this->film_is_playing) stopmovie();               // stop last played movie
     strcpy(systemcommand,"");
     strcat(systemcommand,this->filmoversigt[nr].getfilmfilename());
     vlc_m=libvlc_media_new_path(vlc_inst, systemcommand);
@@ -269,11 +283,11 @@ int film_oversigt_typem::playmovie(int nr) {
       this->film_is_playing=true;
       // Create a media player playing environement
       vlc_mp=libvlc_media_player_new_from_media(vlc_m);
-      //libvlc_media_add_option(vlc_m,"no-video-title-show");
-
+      libvlc_media_add_option(vlc_m,"no-video-title-show");
       libvlc_set_fullscreen(vlc_mp,true);
-
-      libvlc_media_add_option(vlc_m,":fullscreen");
+      // enable ketboard input to vlc player
+      libvlc_video_set_key_input(vlc_mp,true);
+      //libvlc_media_add_option(vlc_m,":fullscreen");
       //libvlc_media_add_option(vlc_m,":sout-all");
       // <gdk/gdkx.h>
       // Bind to xwindows
@@ -300,10 +314,6 @@ int film_oversigt_typem::playmovie(int nr) {
 void film_oversigt_typem::pausemovie() {
   if (vlc_mp) libvlc_media_player_pause(vlc_mp);
 }
-
-
-
-
 
 
 // get position

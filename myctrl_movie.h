@@ -167,6 +167,7 @@ class film_oversigt_typem {
       int load_film_dvcovers();
       int playmovie(int nr);
       void stopmovie();
+      void softstopmovie();
       void pausemovie();
       film_oversigt_typem(unsigned int antal);
       ~film_oversigt_typem();

@@ -4406,6 +4406,21 @@ void display(void) {
         } else {
             if (debugmode && 16) fprintf(stderr,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
             // start play
+            //
+
+            #if defined USE_FMOD_MIXER
+            // if we play music/stream (radio) stop that before play movie stream (vlc)
+            if (sound) {
+              result=sound->release();          		// stop last played sound on soundsystem fmod
+              ERRCHECK(result,do_play_music_aktiv_table_nr);
+            }
+            #endif
+
+            if (film_oversigt.film_is_playing) {
+              if (debugmode) printf("Stop playing last movie before start new\n");
+              // stop playing (active movie)
+              film_oversigt.softstopmovie();
+            }
             if (film_oversigt.playmovie(fknapnr-1)==0) {
               vis_error=true;
               vis_error_timeout=60;
@@ -4423,6 +4438,7 @@ void display(void) {
         // close default player (vlc plugin)
         film_oversigt.stopmovie();
       }
+      //stop do it again next loop
       stopmovie=false;
     }
 
