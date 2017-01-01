@@ -738,11 +738,14 @@ void show_setup_video() {
     myglprint4((char *) " ");
 
     if (debugmode==2) sprintf(resl,"Music",debugmode);
-    else if (debugmode==4) sprintf(resl,"Stream",debugmode);
+    else if (debugmode==4) sprintf(resl,"radio",debugmode);
     else if (debugmode==8) sprintf(resl,"Keyboard/mouse",debugmode);
     else if (debugmode==16) sprintf(resl,"Movie",debugmode);
+    else if (debugmode==32) sprintf(resl,"Not def",debugmode);
+    else if (debugmode==64) sprintf(resl,"Not def",debugmode);
     else if (debugmode==128) sprintf(resl,"Stream",debugmode);
     else if (debugmode==256) sprintf(resl,"TV guide stuf",debugmode);
+    else if (debugmode==512) sprintf(resl,"media importer",debugmode);
     else sprintf(resl,"%d",debugmode);
 
     if (do_show_setup_select_linie==2) {

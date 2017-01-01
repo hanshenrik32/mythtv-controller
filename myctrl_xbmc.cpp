@@ -263,7 +263,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   // sample from kodi
   // <thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/il9XWx5CbNd2KdDUwrcClEZiLkv.jpg">http://image.tmdb.org/t/p/original/il9XWx5CbNd2KdDUwrcClEZiLkv.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/fIHF63oznk2PXlYM6pPfhnOB3SD.jpg">http://image.tmdb.org/t/p/original/fIHF63oznk2PXlYM6pPfhnOB3SD.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/2LXAj56D3NKuJuT2jnD7CpDpJIG.jpg">http://image.tmdb.org/t/p/original/2LXAj56D3NKuJuT2jnD7CpDpJIG.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/n7W7iUtfY9ll87AQPVqRwIdxNCY.jpg">http://image.tmdb.org/t/p/original/n7W7iUtfY9ll87AQPVqRwIdxNCY.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/hEMWpQbMoAzd0UpSpn9f1DMyRHi.jpg">http://image.tmdb.org/t/p/original/hEMWpQbMoAzd0UpSpn9f1DMyRHi.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/fa4PxEPRKWRyjzYje1jM4m30qzd.jpg">http://image.tmdb.org/t/p/original/fa4PxEPRKWRyjzYje1jM4m30qzd.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/oVkzfeIi8SugSjFeGCcWJ8CbZlK.jpg">http://image.tmdb.org/t/p/original/oVkzfeIi8SugSjFeGCcWJ8CbZlK.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/q8uffTLftPBftvHZ6EPjVARKRsf.jpg">http://image.tmdb.org/t/p/original/q8uffTLftPBftvHZ6EPjVARKRsf.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/i722AJYKvyZC2dSLVM0UJEYNw4M.jpg">http://image.tmdb.org/t/p/original/i722AJYKvyZC2dSLVM0UJEYNw4M.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/lSm7UUirk30xcEmMkphirrEkMl8.jpg">http://image.tmdb.org/t/p/original/lSm7UUirk30xcEmMkphirrEkMl8.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/jDlYj9nhIOIXb3F1G6hheRQBh4o.jpg">http://image.tmdb.org/t/p/original/jDlYj9nhIOIXb3F1G6hheRQBh4o.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/igrxC4ZwP9ZLq00tG66YSJcGRQR.jpg">http://image.tmdb.org/t/p/original/igrxC4ZwP9ZLq00tG66YSJcGRQR.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/9XHePtcuQlu7oTNrX1VUOKt2qnE.jpg">http://image.tmdb.org/t/p/original/9XHePtcuQlu7oTNrX1VUOKt2qnE.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/dg6NYC9WIBUDtF6Dn0szijL5s2f.jpg">http://image.tmdb.org/t/p/original/dg6NYC9WIBUDtF6Dn0szijL5s2f.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/2laS4xqkwA8TsQcvPAEAubbDJXp.jpg">http://image.tmdb.org/t/p/original/2laS4xqkwA8TsQcvPAEAubbDJXp.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/cc1d0A94BhBWC0GDWqETBs8xaxB.jpg">http://image.tmdb.org/t/p/original/cc1d0A94BhBWC0GDWqETBs8xaxB.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/igLAV1EWlPTiuRLsyYbpXkaDhQD.jpg">http://image.tmdb.org/t/p/original/igLAV1EWlPTiuRLsyYbpXkaDhQD.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/1iZXoQX8sDTSnRU8QxoqdaRMbi2.jpg">http://image.tmdb.org/t/p/original/1iZXoQX8sDTSnRU8QxoqdaRMbi2.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/vcRejvkzTL0pkfboJlV1t2a76P1.jpg">http://image.tmdb.org/t/p/original/vcRejvkzTL0pkfboJlV1t2a76P1.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/geuj8N3d5yPex9ZRLz9LADNh0jp.jpg">http://image.tmdb.org/t/p/original/geuj8N3d5yPex9ZRLz9LADNh0jp.jpg</thumb><thumb aspect="poster" preview="http://image.tmdb.org/t/p/w500/mAb0rdCFfBZ14JPVhYY5ArdlZ22.jpg">http://image.tmdb.org/t/p/original/mAb0rdCFfBZ14JPVhYY5ArdlZ22.jpg</thumb>
 
-  //download cover from web
+  //download cover from web if exist in kodi db
   coverpointer=strstr(moviescoverfile,"preview=");   // find startpointer
   if (coverpointer) {
     char *sted=strchr(coverpointer,'>');
@@ -283,9 +283,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       // download file and save it same path as movile file
       if (!(file_exists(filetodownload))) {
         if (get_webfile(moviecover,filetodownload)) {
-          if (debugmode) printf("Downloading cover %s\n",movietitle);
+          if (debugmode & 512) printf("Downloading cover %s\n",movietitle);
         } else {
-          if (debugmode) printf("Error downloading file cover from %s\n",moviecover);
+          if (debugmode & 512) printf("Error downloading file cover from %s\n",moviecover);
         }
       }
     }
@@ -310,7 +310,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   // create if not exist
   if (!(fundet)) {
 
-    if (debugmode & 2) printf("Import kodi title %40s\n",movietitle);
+    if (debugmode & 512) printf("Import kodi title %40s\n",movietitle);
 
 /*
     char tmp[2048];
@@ -326,8 +326,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      if (mysql_error(conn)) printf("%s\n",mysql_error(conn));
-
+      if ((mysql_error(conn)) && (debugmode & 512)) printf("%s\n",mysql_error(conn));
       mysql_close(conn);
     }
   }
@@ -640,7 +639,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
   //strcat(temp,songname);
 
-  if (debugmode & 2) printf("Import kodi song %40s \n",songname);
+  if (debugmode & 512) printf("Import kodi song %40s \n",songname);
   // if (debugmode & 2) printf("dirid %d artistid=%4d albumid=%4d path %s songname=%10s \n",directoryid,artistid,albumid,sted,songname);
 
   //printf("Song name %s \n",songname);

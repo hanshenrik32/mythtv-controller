@@ -163,6 +163,7 @@ unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
+                                                        // 1  = free
                                                         // 2  = music
                                                         // 4  = stream
                                                         // 8  = keyboard/mouse move
@@ -171,6 +172,7 @@ int orgwinsizex,orgwinsizey;
 int debugmode=8+2;                                      // 64 = radio station land icon loader
                                                         // 128= stream search
                                                         // 256 = tv program stuf
+                                                        // 512 = media importer
 
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
@@ -339,7 +341,7 @@ bool starving;
 char aktivsongname[40];                         	// song name
 char aktivartistname[40];                      		// navn på aktiv artist (som spilles)
 
-bool check_radio_thread=false;				//
+bool check_radio_thread=true;            			  	// DO NOT check radio station online status
 
 const unsigned int ERROR_TIMEOUT=120;                    // show error timeout
 int vis_error_timeout=ERROR_TIMEOUT;
@@ -3117,7 +3119,7 @@ void display(void) {
             }
             if (snd==0) {
                 snd=1;
-                if (debugmode) fprintf(stderr,"Play radio station nr %d url %s \n",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
+                if (debugmode & 4) fprintf(stderr,"Play radio station nr %d url %s \n",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
 
                 if (snd==0) {
                     #if defined USE_FMOD_MIXER
@@ -3262,7 +3264,10 @@ void display(void) {
 
         // create radio station online check tread
 
-/*
+        #endif
+        #if defined USE_SDL_MIXER
+
+        #endif
         if (!(check_radio_thread)) {
             check_radio_thread=true;
             pthread_t loaderthread;           // check radio status thread
@@ -3272,17 +3277,9 @@ void display(void) {
                 exit(-1);
             }
         }
-*/
 
-        #endif
-        #if defined USE_SDL_MIXER
-
-        #endif
 
     }
-
-
-
 
     if (vis_stream_oversigt) {
         if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
@@ -6864,7 +6861,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       if (do_show_setup_select_linie==2) {
                         if (key==32) {
                           if (debugmode>1) debugmode=debugmode*2; else debugmode++;
-                          if (debugmode>256) debugmode=0;
+                          if (debugmode>512) debugmode=0;
                         }
                       }
                   }
@@ -8738,8 +8735,9 @@ void update(int value) {
     sndsystem->update();				// run update on fmod sound system
     #endif
 //    printf("music_key_selected %d musik knap nr = %d  husk knapnr %d  music_select_iconnr= %d \n ",music_key_selected,mknapnr,music_select_iconnr);
+    glutTimerFunc(25, update, 0);
     glutPostRedisplay();
-    glutTimerFunc(50, update, 0);
+
 
 }
 
@@ -8791,7 +8789,6 @@ int init_sound_system(int devicenr) {
 
     if (fmodversion < FMOD_VERSION) {
        printf("Error!  You are using an old version of FMOD %08x.  This program requires %08x\n", fmodversion, FMOD_VERSION);
-//            getch();
        exit(0);
     }
 
@@ -8921,7 +8918,7 @@ int init_sound_system(int devicenr) {
 
 
 //
-// phread dataload  check radio stations
+// phread dataload  check radio stations if it is online
 //
 
 
@@ -8936,6 +8933,12 @@ void *radio_check_statusloader(void *data) {
           notdone=radiooversigt.check_radio_online(0);
       } while (notdone);
   }
+  if (strcmp(configbackend,"xbmc")==0) {
+      do {
+          notdone=radiooversigt.check_radio_online(0);
+      } while (notdone);
+  }
+
 
   printf("radio thread done\n");
   pthread_exit(NULL);
@@ -10246,7 +10249,8 @@ int main(int argc, char** argv) {
     loadgfx();
     if (full_screen) glutFullScreen();                  // set full screen mode
     glutDisplayFunc(display);
-    glutIdleFunc(display);
+
+    //glutIdleFunc(display);                            // idle func
 
     glutKeyboardFunc(handleKeypress);
     glutSpecialFunc(handlespeckeypress);

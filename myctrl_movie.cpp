@@ -265,25 +265,32 @@ int film_oversigt_typem::playmovie(int nr) {
     strcat(systemcommand,this->filmoversigt[nr].getfilmfilename());
     vlc_m=libvlc_media_new_path(vlc_inst, systemcommand);
     if (vlc_m) {
+      // set playing flag in class
       this->film_is_playing=true;
       // Create a media player playing environement
       vlc_mp=libvlc_media_player_new_from_media(vlc_m);
+      //libvlc_media_add_option(vlc_m,"no-video-title-show");
 
-      libvlc_media_add_option(vlc_m,"--no-video-title-show");
-      libvlc_media_add_option(vlc_m,"--fullscreen");
+      libvlc_set_fullscreen(vlc_mp,true);
 
+      libvlc_media_add_option(vlc_m,":fullscreen");
+      //libvlc_media_add_option(vlc_m,":sout-all");
       // <gdk/gdkx.h>
       // Bind to xwindows
       //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
-
       if (!(vlc_mp)) error=1;
       libvlc_media_release(vlc_m);
+      #if 0
+           /* This is a non working code that show how to hooks into a window,
+            * if we have a window around */
+            libvlc_media_player_set_xwindow (mp, xid);
+           /* or on windows */
+            libvlc_media_player_set_hwnd (mp, hwnd);
+           /* or on mac os */
+            libvlc_media_player_set_nsobject (mp, view);
+      #endif
       // start play
-
-
-
       libvlc_media_player_play(vlc_mp);
-
     }
     return(error);
 }

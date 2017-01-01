@@ -1506,7 +1506,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     struct timeval tv;
     fd_set myset;
 
-    if (debugmode) printf("*Check radio stations*\n");
+    if (debugmode & 1) printf(" ********************************** Check radio stations *****************************************************\n");
 
     if (check_radio_online_switch) {
         conn=mysql_init(NULL);
@@ -1525,7 +1525,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                         // get port and ip
                         port=get_url_data(hostname,ipadresse);
 
-                        if (debugmode) fprintf(stderr,"Checking Station : %-50s - hostname : %s ",row[0],hostname);
+                        if (debugmode & 1) fprintf(stderr,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
 
                         sock=socket(PF_INET, SOCK_STREAM, 0);
                         if (sock) {
@@ -1540,11 +1540,11 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                             error=(init_sockaddr(&servername,ipadresse,port));
                             if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
                                 if (cerror==0) {
-                                    if (debugmode) fprintf(stderr," Station OK. \n ");
+                                    if (debugmode & 1) fprintf(stderr," Station OK. \n ");
                                     radiook=true;
                                 } else radiook=false;
                             } else {
-                                if (debugmode) fprintf(stderr," Station BAD. \n ");
+                                if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
                                 radiook=false;
                             }
                             close (sock);
