@@ -3,6 +3,7 @@
 
 extern char configdefaultmusicpath[256];                      // internal db for music
 extern int debugmode;
+extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 
 // xbmc version loader
 //
@@ -140,7 +141,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       sprintf(sqlselect,"select path from videopathinfo where path='%s'",moviepath);
       conn1=mysql_init(NULL);
       if (conn1) {
-        mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+        mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
         mysql_query(conn1,sqlselect);
         res = mysql_store_result(conn1);
         fundet=false;
@@ -154,7 +155,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
         sprintf(sqlselect,"insert into videopathinfo values(%d,'%s',%d,%d,%d)",0,moviepath,0,0,0);
         conn1=mysql_init(NULL);
         if (conn1) {
-          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
           mysql_query(conn1,sqlselect);
           res = mysql_store_result(conn1);
           mysql_close(conn1);
@@ -207,10 +208,10 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       fundet=false;
       strcpy(moviecategory,argv[i]);
       // check if exist
-      sprintf(sqlselect,"select category from videocategory where category like '%s'",0,moviecategory);
+      sprintf(sqlselect,"select category from videocategory where category like '%s'",moviecategory);
       conn1=mysql_init(NULL);
       if (conn1) {
-        mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+        mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
         mysql_query(conn1,sqlselect);
         res = mysql_store_result(conn1);
         if (res) {
@@ -222,7 +223,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
         sprintf(sqlselect,"insert into videocategory(intid , category) values (%d,'%s')",0,moviecategory);
         conn1=mysql_init(NULL);
         if (conn1) {
-          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
           mysql_query(conn1,sqlselect);
           res = mysql_store_result(conn1);
           mysql_close(conn1);
@@ -299,7 +300,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
   conn1=mysql_init(NULL);
   if (conn1) {
-    mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+    mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
     mysql_query(conn1,sqlselect);
     res = mysql_store_result(conn1);
     if (res) {
@@ -323,7 +324,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
                                               movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1,filetodownload);
     conn=mysql_init(NULL);
     if (conn) {
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if ((mysql_error(conn)) && (debugmode & 512)) printf("%s\n",mysql_error(conn));
@@ -444,7 +445,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           exist=false;
           conn2=mysql_init(NULL);
           if (conn2) {
-            mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+            mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
             //sprintf(sqlselect1,"search  music_directories after %s \n",temp);
             sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",temp);
             mysql_query(conn2,sqlselect1);
@@ -459,7 +460,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           }
           if (!(exist)) {
             conn=mysql_init(NULL);
-            mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+            mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
             //      printf("create directoryid %d on artist *%s* on db music_directories \n ",directoryid,temp);
             sprintf(sqlselect2,"insert into music_directories values (%d,'%s',%d)",0,temp,last_directoryid);
             mysql_query(conn,sqlselect2);
@@ -516,7 +517,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
       conn2=mysql_init(NULL);
       if (conn2) {
-        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
 
         sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
         mysql_query(conn2,sqlselect1);
@@ -529,7 +530,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           cr=true;
 
           conn=mysql_init(NULL);
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,artistname);
           mysql_query(conn,sqlselect2);
           res = mysql_store_result(conn);
@@ -537,7 +538,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
 
           conn2=mysql_init(NULL);
-          mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
           mysql_query(conn2,sqlselect1);
           res2 = mysql_store_result(conn2);
@@ -566,7 +567,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
 
       conn2=mysql_init(NULL);
       if (conn2) {
-        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
         // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
         sprintf(sqlselect1,"select album_id from music_albums where album_name like '%s'",albumname);
         mysql_query(conn2,sqlselect1);
@@ -583,7 +584,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         sprintf(sqlselect1,"insert into music_albums values(%d,%d,'%s',%d,%d)",0,artistid,albumname,0,0);
         conn=mysql_init(NULL);
         if (conn) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           mysql_query(conn,sqlselect1);
           res = mysql_store_result(conn);
           mysql_close(conn);
@@ -592,7 +593,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         // get albumid
         conn2=mysql_init(NULL);
         if (conn2) {
-          mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+          mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
           sprintf(sqlselect1,"select album_id from music_albums where album_name like '%s'",albumname);
           mysql_query(conn2,sqlselect1);
@@ -621,7 +622,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   /*
   conn2=mysql_init(NULL);
   if (conn2) {
-    mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+    mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
 
     sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",sted);
     mysql_query(conn2,sqlselect1);
@@ -648,7 +649,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
                 0,      temp,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,directoryid);
   conn=mysql_init(NULL);
   if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,"mythtvcontroller", 0, NULL, 0);
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     mysql_close(conn);

@@ -48,6 +48,9 @@
 
 #include <pthread.h>                   // multi thread support
 
+
+
+
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/inc/fmod.hpp"
@@ -98,6 +101,8 @@ struct configkeytype {
 
 int numCPU;                                             // have the numbers of cpu cores
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
+
+const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 
 const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
 
@@ -434,14 +439,14 @@ void freegfx();
 
 class dirmusictype {
     private:
-        unsigned int listesize;					// antal elementer i liste
-        dirmusic_dirs_type *dirliste;				// antal sange i playliste
+        unsigned int listesize;			      		// antal elementer i liste
+        dirmusic_dirs_type *dirliste;		   		// antal sange i playliste
         dirmusic_list_type *songliste;				// directory navne i playliste
-        int numbersofsongs;					// numbers of songs in songlist array
-        int numbersofdirs;					// numbers of under directorys in songlist array
-        int artist_id;						// artist id from mythtv mysql
+        int numbersofsongs;				           	// numbers of songs in songlist array
+        int numbersofdirs;			          		// numbers of under directorys in songlist array
+        int artist_id;				            		// artist id from mythtv mysql
     public:
-        GLuint textureId;					// directorys texture
+        GLuint textureId;		             			// directorys texture
         int emtydirmusic() {
             for(unsigned int i=0;i<listesize;i++) {			// reset all music info
                 strcpy(songliste[i].name,"");
@@ -569,7 +574,7 @@ const int SAVER3D=3;
 const int SAVER3D2=4;
 const int PICTURE3D=5;
 
-int urtype=2;                           // set default screen saver
+int urtype=1;                           // set default screen saver
 
 // *************************************************************************************************
 
@@ -581,7 +586,7 @@ bool reset_recorded_texture=false;
 
 wifinetdef wifinets;                            // wifi net class
 
-// music
+// music oversigt struct
 struct music_oversigt_type musicoversigt[MUSIC_OVERSIGT_TYPE_SIZE+1];
 
 // *************************************************************************************************
@@ -601,16 +606,15 @@ int radiooversigt_antal=0;                      // antal aktive sange
 
 GLint cur_avail_mem_kb = 0;             // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
 
-
-GLuint _texturecdmirrormask;				// cd mirror mask
-GLuint _textureId1;	//The id of the texture
-GLuint _textureId2;	//error window
-GLuint _defaultdvdcover;	//The id of the texture
-GLuint _defaultdvdcover2;	//The id of the texture
-GLuint _textureId5;	// movie image
-GLuint _textureId5_1;	// movie mask
-GLuint _textureId7; 	//folder image
-GLuint _textureId7_1; 	//folder image
+GLuint _texturecdmirrormask;		      		// cd mirror mask
+GLuint _textureId1;                     	//The id of the texture
+GLuint _textureId2;                     	//error window
+GLuint _defaultdvdcover;                	//The id of the texture
+GLuint _defaultdvdcover2;	                //The id of the texture
+GLuint _texturemovieinfobox;	            // movie image
+GLuint _textureId5_1;	                    // movie mask
+GLuint _textureId7; 	                    //folder image
+GLuint _textureId7_1; 	                  //folder image
 GLuint _textureId7_2;	//folder image
 GLuint _textureId7_3;	//folder mask image
 GLuint _textureId7_4;	//folder trans mask image
@@ -675,6 +679,7 @@ GLuint gfxlande[80];
 
 GLuint texturedot;
 
+// loading window
 GLuint _textureIdloading_mask;
 GLuint _textureIdloading;                       // loading window
 GLuint _textureIdloading1;                      // empty window
@@ -694,7 +699,7 @@ GLuint setupfontback;
 GLuint setupkeysback;
 GLuint _texturesetupclose;
 
-
+// setup menu textures
 GLuint _texturesoundsetup;                       // setup icon
 GLuint _texturesourcesetup;                      //
 GLuint _textureimagesetup;                       //
@@ -1434,7 +1439,7 @@ int update_afspillinger_music_song(char *filename)
     char songname[1024];
     char *pathpointer;
     char database[256];
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     MYSQL *conn;
     MYSQL_RES *res;
     //MYSQL_ROW row;
@@ -1471,7 +1476,7 @@ void hent_dir_id1(char *path,char *parent_id,char *dirid) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     strcpy(sqlselect,"select parent_id,path from music_directories where directory_id=");
     strcat(sqlselect,dirid);
     conn=mysql_init(NULL);
@@ -1524,7 +1529,7 @@ int hent_mythtv_playlist(int playlistnr) {
     // mysql stuf
     char database[255];
 
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
 
     if (debugmode & 2) fprintf(stderr,"Hent info om playlist nr: %d \n",playlistnr);
     songnr=1;
@@ -1660,7 +1665,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     int songintnr;				// sang nr som skal i playliste
     long songantal=0;				// antal sange i array i database
     int songnr=1;
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
 
     if (debugmode & 2) fprintf(stderr,"Henter info om playlistnr = %d \n",playlistnr);
 
@@ -1730,7 +1735,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
     // mysql stuf
     char database[256];
 
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     if (debugmode & 2) fprintf(stderr,"Hent info om directory_id = %d \n",dirid);
 
     dirmusic.emtydirmusic();
@@ -4408,6 +4413,9 @@ void display(void) {
             // start play
             //
 
+
+
+            // UNDER TEST
             #if defined USE_FMOD_MIXER
             // if we play music/stream (radio) stop that before play movie stream (vlc)
             if (sound) {
@@ -4525,6 +4533,7 @@ void display(void) {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
+
       // mask
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -4537,8 +4546,8 @@ void display(void) {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+450, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+450 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+550, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+550 , 0.0);
       glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
       glEnd();
       glPopMatrix();
@@ -4550,13 +4559,13 @@ void display(void) {
       glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      glBindTexture(GL_TEXTURE_2D, _textureId5);        //
+      glBindTexture(GL_TEXTURE_2D, _texturemovieinfobox);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+450, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+450 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+550, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+550 , 0.0);
       glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
       glEnd();
       glPopMatrix();
@@ -4572,12 +4581,12 @@ void display(void) {
       glBindTexture(GL_TEXTURE_2D, _texturemplay);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(25);
+      glLoadName(25);                                                             // icon nr for play movie
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+65, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+80, 0+65 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+80, 0 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+65+10, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+80+10, 0+65+10 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+80+10, 0 , 0.0);
       glEnd();
       glPopMatrix();
 
@@ -4590,12 +4599,12 @@ void display(void) {
       glBindTexture(GL_TEXTURE_2D, _texturemstop);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(25);
+      glLoadName(25);                                                             // icon nr for stop movie
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+65, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+80, 0+65 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+80, 0 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+65+10, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+80+10, 0+65+10 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+80+10, 0 , 0.0);
       glEnd();
       glPopMatrix();
 
@@ -4613,19 +4622,19 @@ void display(void) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+240, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220, 0+240 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220, 0 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 0, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+220, 0+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+220, 100 , 0.0);
       glEnd();
       glPopMatrix();
 
-      // text
+      // text genre
       glDisable(GL_TEXTURE_2D);
       glPushMatrix();
       strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre);
       temptxt[41]=0;
-      glTranslatef(670,800,0);
+      glTranslatef(670,800+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       glcRenderString(movie_genre[configland]);
@@ -4634,7 +4643,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,760,0);
+      glTranslatef(670,760+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
@@ -4647,7 +4656,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,740,0);
+      glTranslatef(670,740+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       sprintf(temptxt,"%d min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
@@ -4658,7 +4667,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,720,0);
+      glTranslatef(670,720+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
@@ -4669,7 +4678,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,700,0);
+      glTranslatef(670,700+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) {
@@ -4684,7 +4693,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,680,0);
+      glTranslatef(670,680+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
@@ -4700,7 +4709,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(670,660,0);
+      glTranslatef(670,660+100,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       glcRenderString(movie_cast[configland]);
@@ -4719,7 +4728,7 @@ void display(void) {
       glPopMatrix();
 
       glPushMatrix();
-      glTranslatef(430,560,0);
+      glTranslatef(430,560+90,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       glcRenderString(movie_description[configland]);
@@ -4732,7 +4741,7 @@ void display(void) {
         strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
         temptxt[45]='\0';
         glPushMatrix();
-        glTranslatef(430,500-linof,0);
+        glTranslatef(430,(500+90)-linof,0);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.0, 20.0, 1.0);
         glcRenderString(temptxt);
@@ -4746,6 +4755,7 @@ void display(void) {
 
 
     // show pfs
+    // debug mode 1
     if ((showfps) && (debugmode & 1)) {
         glPushMatrix();
         // Gather our frames per second
@@ -9187,7 +9197,7 @@ void *xbmcdatainfoloader(void *data) {
   // Connect to database
   if (conn) {
     allokay=true;
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     // test fpom musik table exist
@@ -9337,7 +9347,7 @@ void *xbmcdatainfoloader_movie(void *data) {
   // Connect to database
   if (conn) {
     allokay=true;
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     // test fpom musik table exist
@@ -9564,19 +9574,20 @@ void loadgfx() {
     if (tema==8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
     if (tema==9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
     if (tema==10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
+        // default tema
         strcpy(temapath,"tema1/");
         tema=1;
     }
-
-    _textureuv1           = loadgfxfile((const char *) "",(const char *) "images/",(const char *) "uv_map1");
+    _textureuv1           = loadgfxfile("","images/",(char *) "uv_map1");
     _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _defaultdvdcover2	    = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
     if (screen_size<3)
-        _textureId5       = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
-    else _textureId5      = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
+    _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
+    else
+    _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
     if (screen_size<3)
         _textureId5_1     = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox_mask");
     else _textureId5_1    = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox_mask3-4");
@@ -9700,45 +9711,16 @@ void loadgfx() {
 
 // ************************* screen shot *******************************
 
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot1.jpg");
-    screenshot1=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot2.jpg");
-    screenshot2=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot3.jpg");
-    screenshot3=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot4.jpg");
-    screenshot4=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot5.png");
-    screenshot5=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot6.jpg");
-    screenshot6=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot7.jpg");
-    screenshot7=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot8.jpg");
-    screenshot8=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot9.jpg");
-    screenshot9=loadTexture (fileload);
-
-    strcpy(fileload,"");
-    strcat(fileload,(char *) "images/screenshot10.jpg");
-    screenshot10=loadTexture (fileload);
+    screenshot1=loadTexture ((char *) "images/screenshot1.jpg");
+    screenshot2=loadTexture ((char *) "images/screenshot2.jpg");
+    screenshot3=loadTexture ((char *) "images/screenshot3.jpg");
+    screenshot4=loadTexture ((char *) "images/screenshot4.jpg");
+    screenshot5=loadTexture ((char *) "images/screenshot5.png");
+    screenshot6=loadTexture ((char *) "images/screenshot6.jpg");
+    screenshot7=loadTexture ((char *) "images/screenshot7.jpg");
+    screenshot8=loadTexture ((char *) "images/screenshot8.jpg");
+    screenshot9=loadTexture ((char *) "images/screenshot9.jpg");
+    screenshot10=loadTexture ((char *) "images/screenshot10.jpg");
 
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
@@ -9748,10 +9730,7 @@ void loadgfx() {
     _tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
 
-
-
     // icons buttons
-
     // radio buttons
     onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
     onlineradio      =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
@@ -9831,7 +9810,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_defaultdvdcover2);		// default dvd cover 2 hvis der ikke er nogle at loade
-    glDeleteTextures( 1, &_textureId5);				  // movie info box
+    glDeleteTextures( 1, &_texturemovieinfobox);		  // movie info box
     glDeleteTextures( 1, &_textureId5_1);			  // movie info box mask
     glDeleteTextures( 1, &_textureId7);				  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_textureId7_1);			  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
@@ -9935,16 +9914,16 @@ void freegfx() {
     glDeleteTextures( 1, &setupscreenback);
     glDeleteTextures( 1, &setupfontback);
     glDeleteTextures( 1, &setupkeysback);
-    glDeleteTextures( 1, &screenshot1);				// screen shots
-    glDeleteTextures( 1, &screenshot2);				//
-    glDeleteTextures( 1, &screenshot3);				//
-    glDeleteTextures( 1, &screenshot4);				//
-    glDeleteTextures( 1, &screenshot5);				//
-    glDeleteTextures( 1, &screenshot6);                         //
-    glDeleteTextures( 1, &screenshot7);                         //
-    glDeleteTextures( 1, &screenshot8);                         //
-    glDeleteTextures( 1, &screenshot9);                         //
-    glDeleteTextures( 1, &screenshot10);                        //
+    glDeleteTextures( 1, &screenshot1);		                   		// screen shots
+    glDeleteTextures( 1, &screenshot2);			                  	// screen shots
+    glDeleteTextures( 1, &screenshot3);			                  	// screen shots
+    glDeleteTextures( 1, &screenshot4);				                  // screen shots
+    glDeleteTextures( 1, &screenshot5);				                  // screen shots
+    glDeleteTextures( 1, &screenshot6);                         // screen shots
+    glDeleteTextures( 1, &screenshot7);                         // screen shots
+    glDeleteTextures( 1, &screenshot8);                         // screen shots
+    glDeleteTextures( 1, &screenshot9);                         // screen shots
+    glDeleteTextures( 1, &screenshot10);                        // screen shots
 
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar2);
@@ -9952,20 +9931,19 @@ void freegfx() {
     glDeleteTextures( 1, &_tvoldrecordedmask);
     glDeleteTextures( 1, &_tv_prgtype);
     glDeleteTextures( 1, &onlineradio_empty);
-    glDeleteTextures( 1, &onlineradio);				// radio icon
-    glDeleteTextures( 1, &onlineradio192);			// radio icon
-    glDeleteTextures( 1, &onlineradio320);			// radio icon
-    glDeleteTextures( 1, &onlineradiomask);			// radio icon mask
+    glDeleteTextures( 1, &onlineradio);		                   		// radio icon
+    glDeleteTextures( 1, &onlineradio192);			                // radio icon
+    glDeleteTextures( 1, &onlineradio320);			                // radio icon
+    glDeleteTextures( 1, &onlineradiomask);			                // radio icon mask
     glDeleteTextures( 1, &radiobutton);
     glDeleteTextures( 1, &musicbutton);
     glDeleteTextures( 1, &radiooptions);
     glDeleteTextures( 1, &radiooptionsmask);
-    glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
-    glDeleteTextures( 1, &gfxlandemask);			// lande mask
+    glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
+    glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
     glDeleteTextures( 1, &texturedot);
-
-    glDeleteTextures( 1, &_textureuv1);       // uv img
-    glDeleteTextures( 1, &_errorbox);         // error box
+    glDeleteTextures( 1, &_textureuv1);                         // uv img
+    glDeleteTextures( 1, &_errorbox);                           // error box
 
     // delete radio lande flags
     i=0;

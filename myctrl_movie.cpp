@@ -13,7 +13,7 @@
 #include "readjpg.h"
 
 #include "myctrl_music.h"
-
+extern const char *dbname; 
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
@@ -253,6 +253,8 @@ void film_oversigt_typem::stopmovie() {
 }
 
 
+// stop player
+
 void film_oversigt_typem::softstopmovie() {
   if (vlc_mp) {
     libvlc_media_player_stop(vlc_mp);
@@ -268,7 +270,7 @@ void film_oversigt_typem::softstopmovie() {
 //vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
 
 
-// start playing movie
+// start playing movie by vlclib
 
 int film_oversigt_typem::playmovie(int nr) {
     int error=0;

@@ -22,9 +22,11 @@
 #include "readjpg.h"
 #include "loadpng.h"
 
-extern char configmysqluser[256];                              //
-extern char configmysqlpass[256];                              //
-extern char configmysqlhost[256];                              //
+
+extern const char *dbname;                                    // db name in mysql
+extern char configmysqluser[256];                             //
+extern char configmysqlpass[256];                             //
+extern char configmysqlhost[256];                             //
 extern char configmusicpath[256];
 extern int configmythtvver;
 extern int screen_size;
@@ -117,11 +119,10 @@ int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
-    char *database = (char *) "mythtvcontroller";
     sprintf(sqlselect,"update radio_stations set gfx_link='%s' where intnr=%d",gfxpath,nr);
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
@@ -197,7 +198,6 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
     MYSQL_ROW row;
     int art,intnr,kbps;
     int land;
-    char *database = (char *) "mythtvcontroller";
 //    char tmptxt1[80];
     bool online;
     strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and name like '%");
@@ -205,7 +205,7 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
     strcat(sqlselect,"%'");
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
@@ -257,7 +257,6 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
     MYSQL_ROW row;
     int art,intnr,kbps;
     int land;
-    char *database = (char *) "mythtvcontroller";
     bool online;
     //gotoxy(10,13);
     //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
@@ -273,7 +272,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
         sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 and art=%d order by popular desc,name",radiosortorder);
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
@@ -354,7 +353,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     // if no load 1 at eatch run
     if ((radio_oversigt_loaded==false) && (radio_oversigt_loaded_nr<radiooversigt.radioantal())) {
         radio_pictureloaded=false;
-        strcpy(tmpfilename,radiostation_iconsgfx);      		// hent path
+        strcpy(tmpfilename,radiostation_iconsgfx);      		                                    // hent path
         strcpy(gfxfilename,radiooversigt.get_station_gfxfile(radio_oversigt_loaded_nr));        // hent radio icon gfx filename
         strcat(tmpfilename,gfxfilename);        						// add filename to path
         if ((strcmp(gfxfilename,"")!=0) && (file_exists(tmpfilename))) {			// den har et navn samt gfx filen findes.
@@ -401,6 +400,8 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 
         if (i+1==(int) radio_key_selected) buttonsizey=180.0f; else buttonsizey=150.0f;
 
+/*
+        // NOT NEEDED ANY MORE
         // mask
         glPushMatrix();
         // er radio station online (hvis ja full color ellers 0.3)
@@ -420,7 +421,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
         glEnd();
         glPopMatrix();
-
+*/
         if (stack[i+sofset]->textureId) {
 
             // radio default icon
@@ -485,7 +486,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         // draw radio station contry flags
         if (stack[i+sofset]->land>0) {
             // gfxlandemask mask
-            if (gfxlande[stack[i+sofset]->land]!=0) {
+            if (gfxlande[stack[i+sofset]->land]) {
                 glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f(10+ xof, yof+10 , 0.0);
@@ -579,8 +580,18 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 }
 
 
-// old ver
 
+
+
+
+
+
+
+
+
+
+// old ver
+// NOT IN USE
 
 void radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
 
@@ -1189,7 +1200,6 @@ void radiostation_class::show_radio_options() {
     MYSQL_ROW row;
 //    int art,intnr,kbps;
 //    GLuint texture;
-    char *database = (char *) "mythtvcontroller";
     char tmptxt[80];
     float sizex=4.0f;
     float sizey=3.0f;
@@ -1244,7 +1254,7 @@ void radiostation_class::show_radio_options() {
         strcpy(sqlselect,"SELECT typename,radiotypes.art,count(radio_stations.art) FROM `radiotypes`,radio_stations where radiotypes.art=radio_stations.art or radiotypes.art=0 and radio_stations.online=1 group by (radiotypes.art)");
         conn=mysql_init(NULL);
         // Connect to database
-        if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+        if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
             mysql_query(conn,"set NAMES 'utf8'");
             res = mysql_store_result(conn);
             mysql_query(conn,sqlselect);
@@ -1312,11 +1322,10 @@ int radiostation_class::set_radio_popular(int stationid) {
     char sqlselect[512];
     MYSQL *conn;
     MYSQL_RES *res;
-    char *database = (char *) "mythtvcontroller";
     sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
@@ -1340,12 +1349,11 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythtvcontroller";
     if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
         else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
@@ -1394,10 +1402,9 @@ bool radiostation_class::check_radio_online_bool() {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythtvcontroller";
     conn=mysql_init(NULL);
     strcpy(sqlselect,"select intnr from radio_stations where online=0 order by intnr limit 100");
-    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -1496,7 +1503,6 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythtvcontroller";
     int nn;
     bool nfundet;
     bool radiook=false;
@@ -1511,7 +1517,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     if (check_radio_online_switch) {
         conn=mysql_init(NULL);
         strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
-        if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+        if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
             mysql_query(conn,"set NAMES 'utf8'");
             mysql_query(conn,sqlselect);
             res = mysql_store_result(conn);
