@@ -18,6 +18,7 @@
 #include "myctrl_readwebfile.h"
 
 
+extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
@@ -299,7 +300,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 //        loadweb_stream_iconoversigt();
 
         return(antal-1);
-    } else printf("Failed to update feed stream db, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
+    } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
     printf("Stream loader done.\n");
     return(0);
 }

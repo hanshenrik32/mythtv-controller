@@ -13,7 +13,7 @@
 #include "readjpg.h"
 
 #include "myctrl_music.h"
-extern const char *dbname; 
+extern const char *dbname;
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
@@ -479,7 +479,7 @@ void film_oversigt_typem::opdatere_film_oversigt() {
     MYSQL_RES *res;
     MYSQL_ROW row;
     // mysql stuf
-    if (global_use_internal_music_loader_system) strcpy(database,"mythtvcontroller"); else strcpy(database,"mythconverg");
+    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     int checkdirexist=0;
 //    gotoxy(10,16);
     printf("Opdatere Film oversigt fra mythtv :");

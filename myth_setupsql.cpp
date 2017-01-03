@@ -4,6 +4,8 @@
 #include "myth_setupsql.h"
 
 
+extern char *dbname;                                            // internal database name in mysql (music,movie,radio)
+
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
@@ -12999,12 +13001,11 @@ int create_radio_oversigt() {
     MYSQL_ROW row;
 //    MYSQL_ROW row;
     int mysqlerror;
-    char *database = (char *) "mythtvcontroller";
     bool dbexist=false;
     printf("Check/Create mythtvcontroller db radio tables/database. \n");
     conn=mysql_init(NULL);
     // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0);
+    mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0);
     mysqlerror=mysql_errno(conn);
     if (mysqlerror) {
         if (conn==NULL) {
@@ -13015,15 +13016,15 @@ int create_radio_oversigt() {
         if (conn) {
             mysql_query(conn,"CREATE DATABASE mythtvcontroller");                   // create radio stations db
             res = mysql_store_result(conn);
-            printf("Create db %s \nMysql error %d %s\n",database,mysql_errno(conn),mysql_error(conn));
+            printf("Create db %s \nMysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
             mysqlerror=mysql_errno(conn);
         }
         if (mysqlerror==1044) {
             printf("No access to mysql database (mythtvcontroller) on host %s user %s mysql error code:%d \nPlease crate database mythtvcontroller \n",configmysqlhost,configmysqluser,mysql_errno(conn));
             exit(-1);
         }
-        if ((database,mysql_errno(conn)!=2006) && (database,mysql_errno(conn)!=2003) && (database,mysql_errno(conn)!=1049)) {
-            printf("Mysql error %d %s\n",database,mysql_errno(conn),mysql_error(conn));
+        if ((dbname,mysql_errno(conn)!=2006) && (dbname,mysql_errno(conn)!=2003) && (dbname,mysql_errno(conn)!=1049)) {
+            printf("Mysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
             exit(-1);
         }
     }
@@ -13033,7 +13034,7 @@ int create_radio_oversigt() {
         mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, "mysql", 0, NULL, 0);
         mysql_query(conn,"CREATE DATABASE IF NOT EXISTS mythtvcontroller");                   // create radio stations db
         res = mysql_store_result(conn);
-        printf("Create db %s Mysql error %d \n",database,mysql_errno(conn));
+        printf("Create db %s Mysql error %d \n",dbname,mysql_errno(conn));
         mysql_query(conn,"use mythtvcontroller");
         res = mysql_store_result(conn);
         printf("On select mythtvcontroller Mysql error %d \n",mysql_errno(conn));
@@ -13159,9 +13160,9 @@ int create_radio_oversigt() {
         return(1);
     } else {
         printf("Create tables error-. Mysql error %d \n",mysql_errno(conn));
-        if (mysql_errno(conn)==1044) printf("MySQL Error: No access to %s database.\n",database);
-        if (mysql_errno(conn)==1049) printf("MySQL Error: Unknown database %s\n",database);
-        printf("Mysql error %d %s\n",database,mysql_errno(conn),mysql_error(conn));
+        if (mysql_errno(conn)==1044) printf("MySQL Error: No access to %s database.\n",dbname);
+        if (mysql_errno(conn)==1049) printf("MySQL Error: Unknown database %s\n",dbname);
+        printf("Mysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
         exit(1);
     }
     return(0);
