@@ -22,6 +22,7 @@ fontctrl::fontctrl() {
     }
 }
 
+
 // * ttf Font control/loader  **************************************************************
 
 
@@ -46,7 +47,7 @@ int fontctrl::updatefontlist()
     master = 0;
     i=0;
     // Print the path to the catalogs
-    count = glcGeti(GLC_CATALOG_COUNT);
+    count = glcGeti(GLC_FONT_COUNT);                                       // GLC_FONT_COUNT GLC_CATALOG_COUNT
     printf("\nTrue type fonts is found in this path\n");
     for (i = 0; i<count; i++) printf("%s\n", glcGetListc(GLC_CATALOG_LIST, i));
     // load font list
@@ -57,7 +58,11 @@ int fontctrl::updatefontlist()
           face_count = glcGetMasteri(i, GLC_FACE_COUNT);
           for (j = 0; j < face_count; j++) {
               if (debugmode & 64) printf(" %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
-              if (j==0) strcpy(typeinfo[0].fonttype,(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
+              //if (j==0) strcpy(typeinfo[0].fonttype,(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
+              if (j==0) sprintf(typeinfo[i].fontname,"%s",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j)); //glcGetMasterListc(i, GLC_FACE_LIST, j)
+
+              printf("Font list %s \n",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));	// 	glcGetMasterListc(i, GLC_CHAR_LIST, j));
+
               master = i;
           }
         }
@@ -71,8 +76,10 @@ int fontctrl::updatefontlist()
 int fontctrl::selectfont(char *fontname)
 {
     glcNewFontFromFamily(myFont, fontname);               // Droid Serif,Ubuntu
-    if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Not a face type font (select error).\n");  // Regular
     glcFont(myFont);
+    if (glcFontFace(myFont, "Bold")==GL_TRUE) {
+      //glcFontFace(myFont, "Bold"); // Select the face of my font
+    } else printf("Not a face type font (select error).\n");  // Regular
     return(1);
 }
 

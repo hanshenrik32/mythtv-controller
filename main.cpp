@@ -217,18 +217,16 @@ char aktivplay_music_path[1024];
 bool hent_radio_search=false;                           // skal vi søge efter music
 bool hent_stream_search=false;                          // skal vi søge efter stream
 
-int do_music_icon_anim_icon_ofset=0;            	// sin scrool ofset for show fast music
+int do_music_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast music
 
-int sinusofset=0;      					// bruges af show_music_oversigt
-
+int sinusofset=0;      					                        // bruges af show_music_oversigt
 
 int setupsinofset=0;
 
+bool show_volume_info=false;                        	// show vol info
+int show_volume_info_timeout=0;                   		// time out to close vol info again
 
-bool show_volume_info=false;            		// show vol info
-int show_volume_info_timeout=0;         		// time out to close vol info again
-
-bool stream_loadergfx_started=false;            	// thread stream gfx loader running ?
+bool stream_loadergfx_started=false;                	// thread stream gfx loader running ?
 bool stream_loadergfx_started_done=false;            	// thread stream gfx loader running ?
 bool stream_loadergfx_started_break=false;
 
@@ -10205,12 +10203,13 @@ int main(int argc, char** argv) {
     XRRScreenResources *xscreen_conf = XRRGetScreenResources(dpy, rootxwindow);
     XRRCrtcInfo *crtc_info = XRRGetCrtcInfo (dpy, xscreen_conf, xscreen_conf->crtcs[0]);
     if (orgwinsizex>crtc_info->width) {
-      printf("Monitor 0 screen size x:%d \n",crtc_info->width);
-      printf("Monitor 0 screen size y:%d \n",crtc_info->height);
+      printf("Monitor 0 screen size x:y %d:%d \n",crtc_info->width,crtc_info->height);
       // change screen size to monitor 0 screen mode
       orgwinsizex=crtc_info->width;
       orgwinsizey=crtc_info->height;
     }
+
+
     // create loader xorg window
     //Window w = XCreateWindow(dpy, DefaultRootWindow(dpy), 100, 100, 400,200, 0, CopyFromParent, CopyFromParent,CopyFromParent, 0, 0);
     // Show the window
@@ -10220,7 +10219,6 @@ int main(int argc, char** argv) {
     //XStoreName(dpy, w, "Mythtv-controller status window");
 
     //XDrawString(dpy,w,gc,1,1, "test", 4);
-
 
     XFlush(dpy);
 
@@ -10255,8 +10253,9 @@ int main(int argc, char** argv) {
     init_ttf_fonts();
     //aktivfont.updatefontlist();
 
-    //aktivfont.selectfont((char *) "Courier 12 Pitch");
+    //aktivfont.selectfont((char *) "Tlwg Mono");
 
+    // select font from configfile (/etc/mythtv-controller.conf)
     aktivfont.selectfont(configfontname);
 
     printf("\nHardware           %s\n",(char *)glGetString(GL_RENDERER));                         // Display Renderer

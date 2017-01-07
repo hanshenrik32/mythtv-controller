@@ -1,12 +1,21 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
+// screen saver options
+
+// 3D         - Do not work right now
+// 3D2        - Do not work right now
+// digital    - Digital Watch
+// analog     - Analog Watch
+// PICTURE3D  - Do not work right now
+
+//
 
 // end,danish
 
 //
 // Sprog struktur.
-// 
+//
 // English, danish, france, tysk, Arabic
 
 // music stuf
@@ -79,4 +88,3 @@ const int SINTABLE_SIZE=11*22*20;
 const char *music_zoom_anim_files[]={"stor_knap3_2_mask_10.jpg","stor_knap3_2_mask_9.jpg","stor_knap3_2_mask_8.jpg","stor_knap3_2_mask_7.jpg","stor_knap3_2_mask_6.jpg","stor_knap3_2_mask_5.jpg","stor_knap3_2_mask_4.jpg","stor_knap3_2_mask_3.jpg","stor_knap3_2_mask_2.jpg","stor_knap3_2_mask_1.jpg","stor_knap3_2_mask.jpg"};
 
 #endif
-
