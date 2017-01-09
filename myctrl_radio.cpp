@@ -186,6 +186,91 @@ int radiostation_class::load_radio_stations_gfx() {
     return(1);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+// TEMP USE TEMP USE TEMP USE TEMP USE
+// Shopw all radio stations working or not
+// You have to(set online to enable it on db)
+// OVERLOAD opdatere_radio_oversigt
+//
+
+int radiostation_class::opdatere_radio_oversigt() {
+  char sqlselect[512];
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  int art,intnr,kbps;
+  int land;
+  bool online;
+  //gotoxy(10,13);
+  //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
+  strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+          while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+              // printf("Hent info om radio station nr %s %-20s\n",row[6],row[0]);
+
+              art=atoi(row[3]);
+              intnr=atoi(row[6]);
+              kbps=atoi(row[7]);
+              online=atoi(row[8]);
+              land=atoi(row[9]);
+
+              if (antal<maxantal) {
+                  stack[antal]=new (struct radio_oversigt_type);
+                  if (stack[antal]) {
+                      strncpy(stack[antal]->station_name,row[0],stationamelength);
+                      strncpy(stack[antal]->desc,row[4],statiodesclength);
+                      strncpy(stack[antal]->streamurl,row[1],statiourl_homepage);
+                      strncpy(stack[antal]->homepage,row[2],statiourl_homepage);
+                      strncpy(stack[antal]->gfxfilename,row[5],stationamelength);
+                      stack[antal]->art=art;
+                      stack[antal]->kbps=kbps;
+                      stack[antal]->online=online;
+                      stack[antal]->land=land;
+                      stack[antal]->textureId=0;
+                      stack[antal]->intnr=intnr;
+                      antal++;
+                  }
+              }
+          }
+          if (antal==0) printf("No Radio station loaded");
+      } else {
+        fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
+      }
+      mysql_close(conn);
+      //load_radio_stations_gfx();
+      return(antal-1);
+  } else {
+    fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
+  //  exit(0);
+  }
+  return(0);
+}
+
+
+
+
+
+
+
+
 //
 // search radio station in db after searchtxt
 // OVERLOAD

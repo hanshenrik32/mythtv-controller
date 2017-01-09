@@ -51,8 +51,8 @@ class radiostation_class {
         void set_texture(int nr,GLuint idtexture);
         int opdatere_radiostation_gfx(int nr,char *gfxpath);		//
         bool startup_loaded;						// load radio statios list
-        bool check_radio_online_bool();        
-        
+        bool check_radio_online_bool();
+
     public:
         unsigned long check_radio_online(unsigned int startrecnr);	// check and set radio station online flag
         void nextradiooptselect();					// select next type in radio type oversigt
@@ -81,6 +81,7 @@ class radiostation_class {
         void clean_radio_oversigt();
         int opdatere_radio_oversigt(int radiosortorder);
         int opdatere_radio_oversigt(char *searchtxt);
+        int opdatere_radio_oversigt();
         void show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
         bool show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley);
 };
