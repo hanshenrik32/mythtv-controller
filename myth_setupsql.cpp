@@ -154,37 +154,8 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('Radio Hollandio [West Brabant]', '[Bitrate: 192]', 'http://62.212.132.9:8808', '', '', 0, 192, 3, 1, '2011-08-10', 101, 6, NULL, 1), \
 ('Beatdance FM', '[Bitrate: 192]', 'http://87.118.78.2:8050', '', '', 0, 192, 1, 1, '2011-08-10', 112, 25, '2011-10-03 19:18:51', 1), \
 ('RADIO MUNDUS', '[Bitrate: 192]', 'http://85.25.141.128:8010', '', '', 0, 192, 2, 1, '2011-08-10', 113, 9, '2011-09-15 18:30:33', 1), \
-('AnimeAMAZE', 'MIQ - Setsuna  [Bitrate: 192]  ', 'http://72.233.93.160:10007', '', '', 45, 192, 0, 1, '2011-08-10', 120, 7, NULL, 0), \
-('Ashdown FM Classic Hits', '[Bitrate: 192]  ', 'http://75.126.73.136:9060', '', '', 0, 192, 0, 1, '2011-08-10', 121, 7, NULL, 0), \
-('Underground Eighties', '[Bitrate: 192]', 'http://74.63.47.82:8884', '', '', 0, 192, 0, 1, '2011-08-10', 122, 7, NULL, 0), \
-('Gold24 [trinity-32 relay]', '[Bitrate: 192]   ', 'http://85.195.17.209:8080', '', '', 8, 192, 0, 1, '2011-08-10', 123, 23, NULL, 0), \
-('U-Rock ', '[Bitrate: 192]  ', 'http://50.22.216.203:8020', '', '', 1, 192, 0, 1, '2011-08-10', 124, 39, NULL, 0), \
-('Hardcore at RotterdamTerror.com', 'track info listed on RotterdamTerror.com  [Bitrate: 192]   ', 'http://83.170.89.30:8390', '', '', 0, 192, 0, 1, '2011-08-10', 125, 6, NULL, 0), \
-('GayRadioBec 100% Dance', '[Bitrate: 192]  ', 'http://94.23.29.60:9000', '', '', 45, 192, 0, 1, '2011-08-10', 126, 4, NULL, 0), \
-('SmoothJazz.com.pl', '[Bitrate: 192] ', 'http://91.121.95.34:8034', '', '', 9, 192, 0, 1, '2011-08-10', 127, 22, NULL, 0), \
-('ToXoRs minimalRADIO', 'o5 o6 2o11 ToXoR@level9 - 1st 1h40min  [Bitrate: 192]', 'http://85.214.107.201:8000', '', '', 0, 192, 0, 1, '2011-08-10', 128, 4, NULL, 0), \
-('VIBRATION POPROCK', '  [Bitrate: 192]', 'http://91.121.55.217:8260', '', '', 0, 192, 0, 1, '2011-08-10', 129, 4, NULL, 0), \
-('eRadio OnE', '[Bitrate: 192]', 'http://85.25.71.41:62000', '', '', 0, 192, 0, 1, '2011-08-10', 130, 9, NULL, 0), \
-('RADIO CAPRI', '[Bitrate: 192]', 'http://94.23.15.160:8012', '', '', 45, 192, 0, 1, '2011-08-10', 131, 4, NULL, 0), \
-('Radio Jimbo', '[Bitrate: 192]', 'http://91.121.104.120:8100', '', '', 46, 192, 0, 1, '2011-08-10', 132, 7, NULL, 0), \
-('Studio Barbados', '[Bitrate: 192]', 'http://81.26.220.16:20134', '', '', 0, 192, 0, 1, '2011-08-10', 133, 6, NULL, 0), \
-('Enjoy Radio', '[Bitrate: 192]', 'http://81.167.88.3:8000', '', '', 46, 192, 0, 1, '2011-08-10', 134, 21, NULL, 0), \
-('RadioHab.com - Rock Without Reason', '[Bitrate: 192] ', 'http://50.22.216.203:8060', '', '', 1, 192, 0, 1, '2011-08-10', 135, 39, NULL, 0), \
-('GOLDRADIO FRANCAIS', 'Carlos - papayou  [Bitrate: 192]', 'http://91.121.136.86:80', '', '', 0, 192, 0, 1, '2011-08-10', 136, 4, NULL, 0), \
-('ATOMIC RADIO', ' [Bitrate: 192]', 'http://88.191.126.62:80', '', '', 0, 192, 2, 1, '2011-08-10', 137, 7, NULL, 0), \
-('Z100 EUROPE', ' [Bitrate: 192]', 'http://88.191.80.39:8500', '', '', 45, 192, 0, 1, '2011-08-10', 138, 4, NULL, 0), \
-('www.BesteHits.nl', '[Bitrate: 192] ', 'http://85.25.147.232:8104', '', '', 0, 192, 0, 1, '2011-08-10', 139, 6, NULL, 0), \
-('Mix-Master', '[Bitrate: 192]', 'http://88.198.55.148:8725', '', '', 0, 192, 0, 1, '2011-08-10', 140, 8, NULL, 0), \
-('Ashdown FM 192k US', '[Bitrate: 192]', 'http://75.126.73.136:8000', '', '', 45, 192, 0, 1, '2011-08-10', 141, 7, NULL, 0), \
-('Ashdown FM 80s Hits', '[Bitrate: 192]', 'http://75.126.73.136:9080', '', '', 0, 192, 0, 1, '2011-08-10', 142, 7, NULL, 0), \
-('Ashdown FM 90s Hits ', '[Bitrate: 192]', 'http://75.126.73.136:9090', '', '', 14, 192, 0, 1, '2011-08-10', 143, 7, NULL, 0), \
-('Radio ULTRA Online', '[Bitrate: 192]', 'http://85.21.79.93:8100', '', '', 0, 192, 0, 1, '2011-08-10', 144, 29, NULL, 0), \
-('DJ BUZZ RADIO', '[Bitrate: 192]', 'http://91.121.55.217:8010', '', '', 4, 192, 3, 1, '2011-08-10', 145, 4, NULL, 0), \
-('Radio Chantre TWO', '[Bitrate: 192]', 'http://62.75.220.151:8002', '', '', 0, 192, 0, 1, '2011-08-10', 146, 41, NULL, 0), \
-('RFA eins', '[Bitrate: 192]', 'http://46.4.78.207:9595', '', '', 0, 192, 0, 1, '2011-08-10', 147, 8, NULL, 0), \
-('NOITE FM', '[Bitrate: 192] ', 'http://82.102.30.179:8080', '', '', 46, 192, 0, 1, '2011-08-10', 148, 38, NULL, 0), \
-('LAs Hot Country', '[Bitrate: 192] ', 'http://68.68.104.114:8000', '', '', 27, 192, 0, 1, '2011-08-10', 149, 7, NULL, 0), \
-('Sense.FM Progressive', '[Bitrate: 192]', 'http://88.191.73.231:5010', '', '', 0, 192, 0, 1, '2011-08-10', 150, 4, NULL, 0), \
+('Gold24 [trinity-32 relay]', '[Bitrate: 192]', 'http://85.195.17.209:8080', '', '', 8, 192, 0, 1, '2011-08-10', 123, 23, NULL, 1), \
+('GOLDRADIO FRANCAIS', 'Carlos - papayou [Bitrate: 192]', 'http://91.121.136.86:80', '', '', 0, 192, 0, 1, '2011-08-10', 136, 4, NULL, 0), \
 ('Radio 4', '[Bitrate: 192]', 'http://145.58.33.95:8106', '', '', 8, 192, 0, 1, '2011-08-10', 151, 34, NULL, 0), \
 ('wines.fm', '[Bitrate: 192]', 'http://89.20.136.214:8000', '', '', 0, 192, 0, 1, '2011-08-10', 152, 29, NULL, 0), \
 ('RoN FM', '[Bitrate: 192]', 'http://85.214.65.184:8060', '', '', 0, 192, 0, 1, '2011-08-10', 153, 8, NULL, 0), \
@@ -195,7 +166,6 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('KULTantenne', '[Bitrate: 192]', 'http://80.86.84.232:8020', '', '', 0, 192, 0, 1, '2011-08-10', 158, 8, NULL, 0), \
 ('PulsRadio Version 9.0', 'France [Bitrate: 192]', 'http://87.98.131.132:7000', '', '', 0, 192, 0, 1, '2011-08-10', 160, 4, NULL, 0), \
 ('Metal Tome Radio', 'Link http://www.metaltome.com [Bitrate: 192]', 'http://67.192.62.138:7900', '', '', 1, 192, 0, 1, '2011-08-10', 161, 7, NULL, 0), \
-('PSYCHEDELIK.COM1', '[Bitrate: 192]', 'http://88.191.102.69:8020', '', '', 0, 192, 0, 1, '2011-08-10', 162, 4, NULL, 0), \
 ('Radio Caramba', ' [Bitrate: 192]', 'http://46.231.87.21:8372', '', '', 0, 192, 0, 1, '2011-08-10', 163, 30, NULL, 0), \
 ('Land of Legends', '[Bitrate: 192]', 'http://89.163.172.250:8700', '', '', 46, 192, 0, 1, '2011-08-10', 164, 8, NULL, 0), \
 ('The Summer Inside', '[Bitrate: 192]', 'http://178.250.175.101:8000', '', '', 4, 192, 1, 1, '2011-08-10', 165, 7, NULL, 0), \
@@ -212,16 +182,6 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('Soulconnexion', '[Bitrate: 192]', 'http://46.23.68.186:8000', '', '', 3, 192, 0, 1, '2011-08-10', 176, 31, NULL, 0), \
 ('Gold Radio Funk', '[Bitrate: 192]', 'http://91.121.136.86:8016', '', '', 46, 192, 0, 1, '2011-08-10', 177, 4, NULL, 0), \
 ('SacTownRadio', '[Bitrate: 192]', 'http://99.198.113.234:8310', '', '', 0, 192, 0, 1, '2011-08-10', 178, 7, NULL, 0), \
-('Radio Italia Network (HQ)', '[Bitrate: 192]', 'http://78.129.226.12:8086', '', '', 46, 192, 0, 1, '2011-08-10', 179, 9, NULL, 0), \
-('Goldradio Israel', '[Bitrate: 192]', 'http://91.121.136.86:8012', '', '', 0, 192, 0, 1, '2011-08-10', 180, 4, NULL, 0), \
-('Radio Decibel', 'Holand [Bitrate: 192]', 'http://195.242.153.122:8062', '', '', 0, 192, 0, 1, '2011-08-10', 181, 34, NULL, 0), \
-('RADIO CALANDO', '[Bitrate: 192]', 'http://83.96.145.30:8482', '', '', 0, 192, 0, 1, '2011-08-10', 182, 6, NULL, 0), \
-('www.musicvaria.nl', '[Bitrate: 192]', 'http://94.75.233.164:8036', '', '', 46, 192, 0, 1, '2011-08-10', 183, 36, NULL, 0), \
-('Radio Station Name: Mix4U', '[Bitrate: 192]', 'http://178.63.102.150:8044', '', '', 40, 192, 0, 1, '2011-08-10', 184, 8, NULL, 0), \
-('DruM and BasS CorBinA RaDiO StatioN', '[Bitrate: 192]', 'http://85.21.79.93:8015', '', '', 0, 192, 3, 1, '2011-08-10', 185, 29, '2011-10-07 16:02:08', 0), \
-('Rooster Music Radio', '[Bitrate: 192]', 'http://178.33.115.155:8004', '', '', 0, 192, 0, 1, '2011-08-10', 186, 33, NULL, 0), \
-('DJ Wild Honey', '[Bitrate: 192]', 'http://64.34.170.177:17134', '', '', 46, 192, 0, 1, '2011-08-10', 187, 7, NULL, 0), \
-('Happy Rock Radio', 'Your Real and Only Rock and Album Station [Bitrate: 192] ', 'http://94.75.235.38:8259', '', '', 0, 192, 0, 1, '2011-08-10', 188, 36, NULL, 0), \
 ('Jukeboxradio', '[Bitrate: 192]', 'http://81.169.162.164:8080', '', '', 40, 192, 0, 1, '2011-08-10', 189, 43, NULL, 0), \
 ('Free For', '[Bitrate: 192]', 'http://88.198.24.237:8820', '', '', 0, 192, 0, 1, '2011-08-10', 190, 8, NULL, 0), \
 ('gewoonpiraten.nl', '[Bitrate: 192]', 'http://83.96.145.30:8554', '', '', 0, 192, 0, 1, '2011-08-10', 191, 6, NULL, 0), \
@@ -335,7 +295,6 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('[SYNERDATA]', '[Bitrate: 192] ', 'http://69.175.114.146:8235', '', '', 0, 192, 0, 1, '2011-08-10', 312, 7, NULL, 0), \
 ('RADIO MED', '[Bitrate: 192]', 'http://94.23.24.24:9050', '', '', 40, 192, 0, 1, '2011-08-10', 313, 4, NULL, 0), \
 ('Ramdammusique', '[Bitrate: 192]  ', 'http://88.191.53.74:8156', '', '', 4, 192, 0, 1, '2011-08-10', 314, 9, NULL, 0), \
-('Bij Brilliant Radio', '[Bitrate: 192]  ', 'http://91.198.106.18:8002', '', '', 0, 192, 2, 1, '2011-08-10', 315, 4, NULL, 0), \
 ('pulse-radio', '[Bitrate: 192]  ', 'http://62.212.132.9:8566', '', '', 46, 192, 0, 1, '2011-08-10', 316, 6, NULL, 0), \
 ('Nu Live: DJ-Flashback', '[Bitrate: 192]', 'http://83.96.145.30:8574', '', '', 46, 192, 0, 1, '2011-08-10', 317, 6, NULL, 0), \
 ('Nightwalker Radio', '[Bitrate: 192]  ', 'http://174.36.237.118:9024', '', '', 46, 192, 0, 1, '2011-08-10', 318, 7, NULL, 0), \
@@ -355,7 +314,6 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('Luister lekker', '[Bitrate: 192]  ', 'http://178.19.114.43:50034', '', '', 46, 192, 0, 1, '2011-08-10', 332, 22, NULL, 0), \
 ('Dubplate.fm Urban Boogie', 'RickToxic-ClassicHouse.mp3  [Bitrate: 192]  ', 'http://199.87.240.18:5000/Electro/192', '', '', 0, 192, 0, 1, '2011-08-10', 333, 7, NULL, 0), \
 ('Defecks', '[Bitrate: 192]  ', 'http://178.32.86.183:8008', '', '', 46, 192, 0, 1, '2011-08-10', 334, 33, NULL, 0), \
-('Athena auf', '[Bitrate: 192] ', 'http://85.25.71.117:30706', '', '', 0, 192, 1, 1, '2011-08-10', 335, 9, '2011-09-02 17:15:59', 0), \
 ('HAPPYFAMILIERADIO', '[Bitrate: 192]  ', 'http://46.231.87.21:8320', '', '', 0, 192, 0, 1, '2011-08-10', 336, 30, NULL, 0), \
 ('Radio Carpediem Op Zomertoer', '[Bitrate: 192]', 'http://46.17.6.28:8532', '', '', 46, 192, 0, 1, '2011-08-10', 337, 44, NULL, 0), \
 ('Chosen Players Radio (CPR)', '[Bitrate: 192] ', 'http://184.172.153.2:80/stream/44/', '', '', 0, 192, 0, 1, '2011-08-10', 338, 7, NULL, 0), \
@@ -378,7 +336,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Elevate Radio', '[Bitrate: 192]', 'http://173.244.194.212:8035', '', '', 13, 192, 1, 1, '2011-08-10', 351, 37, '2011-08-28 17:55:49', 0), \
 ('JAN  ZLD', '[Bitrate: 192]', 'http://85.25.84.200:8060', '', '', 46, 192, 0, 1, '2011-08-10', 352, 8, NULL, 0), \
 ('DJ De NachtTijger', '[Bitrate: 192]  ', 'http://62.212.154.170:8506', '', '', 0, 192, 0, 1, '2011-08-10', 354, 6, NULL, 0), \
-('Soundsbad Music Radio', '[Bitrate: 192]  ', 'http://89.167.228.195:8000', '', '', 47, 192, 1, 1, '2011-08-10', 355, 9, NULL, 0), \
 ('Cool Label Radio', '[Bitrate: 192]  ', 'http://208.109.205.114:8002', '', '', 0, 192, 0, 1, '2011-08-10', 356, 7, NULL, 0), \
 ('NetBeatz BurnWeb', '[Bitrate: 192]', 'http://87.118.109.60:4444', '', '', 0, 192, 0, 1, '2011-08-10', 357, 8, NULL, 1), \
 ('Frequence Orange ', '[Bitrate: 192] ', 'http://94.23.213.103:8000', '', '', 0, 192, 0, 1, '2011-08-10', 358, 37, NULL, 1), \
@@ -466,8 +423,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('STOP RADIO', 'SMS/TEL: 0620-588-1554 [Bitrate: 192]  ', 'http://91.82.85.44:9082', '', '', 0, 192, 0, 1, '2011-08-10', 443, 50, NULL, 0), \
 ('Radio Delta [www.radiodelta.nl', '24/7 [Bitrate: 192]   ', 'http://62.212.132.9:8574', '', '', 0, 192, 0, 1, '2011-08-10', 444, 6, NULL, 0), \
 ('The Best of Euphoric Radio', '[Bitrate: 192]', 'http://72.233.114.183:8162', '', '', 0, 192, 0, 1, '2011-08-10', 445, 7, NULL, 0), \
-('ATLAS FM', '  [Bitrate: 192] ', 'http://89.39.182.4:8005', '', '', 40, 192, 2, 1, '2011-08-10', 446, 41, NULL, 0), \
-('Liste Musicale de CamCountry', 'Caroline Levasseur - Emmnes-moi vivre auprs de toi  [Bitrate: 192]   ', 'http://94.23.5.40:8000', '', '', 46, 192, 0, 1, '2011-08-10', 447, 4, NULL, 0), \
 ('The Hot Fm', '[Bitrate: 192]', 'http://174.37.194.139:8337', '', '', 4, 192, 0, 1, '2011-08-10', 448, 7, NULL, 0), \
 ('O R A N G E - L I N E', '[Bitrate: 192]  ', 'http://43.244.132.201:8000', '', '', 16, 192, 1, 1, '2011-08-10', 449, 47, NULL, 0), \
 ('Party Vibe Radio', '[Bitrate: 192]', 'http://173.193.228.66:8002', '', '', 0, 192, 0, 1, '2011-08-10', 450, 7, NULL, 0), \
@@ -487,7 +442,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radiomusictime', '[Bitrate: 192]', 'http://78.159.97.159:8030', '', '', 46, 192, 0, 1, '2011-08-10', 465, 8, NULL, 0), \
 ('Dynamicradio', '[Bitrate: 192]  ', 'http://188.142.48.37:8040', '', '', 0, 192, 0, 1, '2011-08-10', 466, 7, NULL, 0), \
 ('Polaris', '[Bitrate: 192]', 'http://174.140.161.236:8000', '', '', 46, 192, 0, 1, '2011-08-10', 467, 7, NULL, 0), \
-('Fun FM Danceradio ', '- Danceclassics & Dancehits From The Netherlands  [Bitrate: 192]  ', 'http://46.231.87.20:8138', '', '', 4, 192, 6, 1, '2011-08-10', 468, 30, NULL, 0), \
 ('Replay Radio Stream', '[Bitrate: 192]  ', 'http://46.23.68.186:8034', '', '', 0, 192, 0, 1, '2011-08-10', 471, 31, NULL, 0), \
 ('radio642 nonstop', '[Bitrate: 192]', 'http://62.212.154.170:8810', '', '', 46, 192, 0, 1, '2011-08-10', 472, 6, NULL, 0), \
 ('ALLRock', '[Bitrate: 192]  ', 'http://91.206.143.80:9296', '', '', 1, 192, 0, 1, '2011-08-10', 473, 6, NULL, 0), \
@@ -513,7 +467,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('MagnifiQue', '[Bitrate: 192]', 'http://77.243.236.170:8062', '', '', 45, 192, 0, 1, '2011-08-10', 493, 6, NULL, 0), \
 ('Radio Aktiv FM100', 'nvsbmix2010vol001  [Bitrate: 192]', 'http://91.82.85.44:9002', '', '', 45, 192, 0, 1, '2011-08-10', 494, 50, NULL, 0), \
 ('ClubDV.FM', '[Bitrate: 192]', 'http://91.143.80.179:10070', '', '', 41, 192, 0, 1, '2011-08-10', 495, 8, NULL, 0), \
-('Danceparc mit Auto DJ', '[Bitrate: 192]', 'http://78.46.221.112:8006', '', '', 4, 192, 6, 1, '2011-08-10', 496, 8, NULL, 0), \
 ('SMILE FM 89.9 ', '[Bitrate: 192]', 'http://87.229.111.68:8010', '', '', 0, 192, 0, 1, '2011-08-10', 498, 29, NULL, 0), \
 ('ELEKTROWAVE.ORG Radio', '[Bitrate: 192]  ', 'http://62.149.25.110:8192', '', '', 0, 192, 1, 1, '2011-08-10', 499, 49, NULL, 0), \
 ('Exiled Radio', '[Bitrate: 192]', 'http://173.244.221.95:8000', '', '', 46, 192, 0, 1, '2011-08-10', 500, 27, NULL, 0), \
@@ -587,7 +540,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Wheee.FM ', '[Bitrate: 192]   ', 'http://87.106.162.127:8000/bitrate/192_aac', '', '', 0, 192, 0, 1, '2011-08-10', 584, 8, NULL, 0), \
 ('TNG 24H Radio ', '[Bitrate: 192]   ', 'http://94.23.58.185:9000', '', '', 0, 192, 0, 1, '2011-08-10', 585, 4, NULL, 0), \
 ('RadioYeah ', '[Bitrate: 192]   ', 'http://88.222.146.47:8000/listen.aac', '', '', 0, 192, 0, 1, '2011-08-10', 586, 54, NULL, 0), \
-('107.8 Radio Jackie Finesse', 'Radio Jackie  [Bitrate: 192]', 'http://95.154.211.15:5873', '', '', 0, 192, 0, 1, '2011-08-10', 587, 9, NULL, 0), \
 ('Infernal Sunshine Inc. Radio ', '[Bitrate: 192]  ', 'http://85.216.128.209:15881', '', '', 44, 192, 2, 1, '2011-08-10', 588, 25, NULL, 0), \
 ('HXOPAMA 93.3 FM GREEK MAINSTREAM ', '[Bitrate: 192]   ', 'http://78.46.46.214:7058', '', '', 0, 192, 0, 1, '2011-08-10', 589, 8, NULL, 0), \
 ('Wheee.FM - electronic music radio ', '[Bitrate: 192]', 'http://87.106.162.127:8000/bitrate/192_mp3', '', '', 30, 192, 0, 1, '2011-08-10', 594, 8, NULL, 0), \
@@ -720,7 +672,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('105.4 Cascais FM ', '  [Bitrate: 128]  ', 'http://195.8.58.150:35012', '', '', 45, 128, 0, 1, '2011-08-11', 1079, 38, NULL, 0), \
 ('Demented Radio ', '[Bitrate: 128]  ', 'http://204.93.180.90:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1080, 7, NULL, 0), \
 ('Fun80s.fm', '[Bitrate: 128]', 'http://85.214.78.214:80', '', '', 0, 128, 0, 1, '2011-08-11', 1081, 8, NULL, 0), \
-('Atlantic 252', 'Email Atlantic252@inbox.com  [Bitrate: 128]', 'http://66.90.103.144:8886', '', '', 0, 128, 1, 1, '2011-08-11', 1082, 7, NULL, 0), \
 ('POWER FM', '[Bitrate: 128]  ', 'http://46.20.4.42:8090', '', '', 45, 128, 0, 1, '2011-08-11', 1083, 58, NULL, 0), \
 ('Ill Street Lounge', ' playful exotica and vintage music of tomorrow. [SomaFM] ', 'http://74.63.47.82:8504', '', '', 0, 128, 0, 1, '2011-08-11', 1084, 7, NULL, 0), \
 ('TurntableTendencies.com', ' Dope', 'http://99.198.101.250:80', '', '', 0, 128, 0, 1, '2011-08-11', 1085, 7, NULL, 0), \
@@ -857,7 +808,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('Chileprende Radio', '[Bitrate: 128] Max Listeners: 200]', 'http://184.82.156.122:9090', '', '', 0, 128, 0, 1, '2011-08-11', 1245, 37, NULL, 0), \
 ('Radio-Aroma-Natural', 'Q-sign live(tumba hubenil) - homber mahos  [Bitrate: 128]  ', 'http://46.17.6.28:8506', '', '', 0, 128, 0, 1, '2011-08-11', 1246, 44, NULL, 0), \
 ('DUBSTEP.FM', '[Live!] RogueDub Radio with FSTZ  [Bitrate: 128]  ', 'http://72.232.2.83:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1247, 28, NULL, 0), \
-('Viseu House FM', 'SUMMER IS BACK 2011 [Sinfonia 2012 / Pitbull feat. Ne - Yo', 'http://109.71.44.7:9994', '', '', 4, 128, 11, 1, '2011-08-11', 1248, 38, '2011-09-16 01:13:06', 0), \
 ('BOB FM', 'Bill Medley/Jennifer Warnes - I`ve Had The Time Of My life  [Bitrate: 128]  ', 'http://184.154.125.18:8255', '', '', 40, 128, 0, 1, '2011-08-11', 1249, 39, NULL, 0), \
 ('Radio Adidas Originals', '  [Bitrate: 128]  ', 'http://78.159.112.254:9370', '', '', 0, 128, 0, 1, '2011-08-11', 1250, 8, NULL, 0), \
 ('AAN RETRO ZONE ', 'Seduction - Heartbeat SWISS RADIO  [Bitrate: 128]', 'http://76.10.222.237:9010', '', '', 0, 128, 0, 1, '2011-08-11', 1251, 7, NULL, 0), \
@@ -889,7 +839,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('Digital Jazz', '[Bitrate: 128] [Max Listeners: 550]', 'http://184.107.209.66:6040', '', '', 9, 128, 1, 1, '2011-08-11', 1277, 28, NULL, 0), \
 ('Radio Horyzont.pl', 'Co jest grane - zobacz na www.radiohoryzont.pl  [Bitrate: 128]  ', 'http://94.23.192.24:9050', '', '', 0, 128, 0, 1, '2011-08-11', 1278, 33, NULL, 0), \
 ('Nu Perception - Old Skool 24/7', 'LOCKEY SWIFTY & TREASURE LIVE  [Bitrate: 128]  ', 'http://65.60.19.42:80', '', '', 0, 128, 0, 1, '2011-08-11', 1279, 7, NULL, 0), \
-('Absolute Alternative', '[Bitrate: 128]  ', 'http://209.9.238.4:9160', '', '', 7, 128, 5, 1, '2011-08-11', 1280, 7, '2011-09-15 15:35:09', 0), \
 ('WFMU - Freeform Radio', 'Your DJ speaks on WFMU on The Cherry Blossom Clinic  [Bitrate: 128] ', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1053', '', '', 0, 128, 0, 1, '2011-08-11', 1281, 7, NULL, 0), \
 ('Radio Twilight', 'Live vanuit Heusden met DJ Jo en Coba Flamingo  [Bitrate: 128]  ', 'http://81.18.165.234:8000', 'www.radio-twilight.nl', '', 0, 128, 0, 1, '2011-08-11', 1282, 6, NULL, 0), \
 ('Rock Radio WULP HD', '[Bitrate: 128] [Max Listeners: 999]', 'http://174.37.61.69:8974', '', '', 0, 128, 0, 1, '2011-08-11', 1283, 7, NULL, 0), \
@@ -969,7 +918,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('GotRadio - Native American', 'R. Carlos Nakai - Shaman`s Call  [Bitrate: 128] ', 'http://64.202.109.64:80', '', '', 0, 128, 0, 1, '2011-08-11', 1357, 7, NULL, 0), \
 ('GotRadio - R&B Classics', '[Bitrate: 128]  ', 'http://64.202.109.100:80', '', '', 0, 128, 0, 1, '2011-08-11', 1358, 7, NULL, 0), \
 ('Radio Intens Romania', '[Bitrate: 128]  ', 'http://94.23.232.141:8070', '', '', 0, 128, 0, 1, '2011-08-11', 1359, 37, NULL, 0), \
-('Love Songs', '[Bitrate: 128]', 'http://67.159.5.57:9538', '', '', 13, 128, 4, 1, '2011-08-11', 1360, 7, '2011-09-15 15:34:34', 0), \
 ('KEK DUNA TATABANYA', '[Bitrate: 128] ', 'http://212.92.23.237:8002', '', '', 45, 128, 0, 1, '2011-08-11', 1361, 42, NULL, 0), \
 ('TheRadio FM', '[Bitrate: 128]  ', 'http://76.191.126.97:8000', '', '', 1, 128, 0, 1, '2011-08-11', 1362, 7, NULL, 0), \
 ('Radio Mela', 'Radio Mela  [Bitrate: 128]  ', 'http://91.121.192.14:8016', '', '', 0, 128, 0, 1, '2011-08-11', 1363, 4, NULL, 0), \
@@ -980,7 +928,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('TRAFFIC 91.8 FM', '  [Bitrate: 128]  ', 'http://85.17.122.212:8506', '', '', 4, 128, 1, 1, '2011-08-11', 1368, 6, NULL, 0), \
 ('RADIO ANGLO LATINA', '  [Bitrate: 128]  ', 'http://64.120.170.53:80', '', '', 45, 128, 0, 1, '2011-08-11', 1369, 7, NULL, 0), \
 ('Ganamradio', '[Bitrate: 128]  ', 'http://89.238.146.160:7104', '', '', 0, 128, 0, 1, '2011-08-11', 1370, 9, NULL, 0), \
-('ABC Seventies Dublin', '[Bitrate: 128]  ', 'http://173.192.22.204:8102', '', '', 0, 128, 0, 1, '2011-08-11', 1371, 27, NULL, 0), \
 ('THE HITS STATION', '[Bitrate: 128]', 'http://208.67.180.110:9982', '', '', 0, 128, 0, 1, '2011-08-11', 1372, 7, NULL, 0), \
 ('Dubstep Hype Worldwide 24/7 Radio', 'Diddy Feat Skylar Grey - I m Coming Home Arion Dubstep Remix  [Bitrate: 128]  ', 'http://204.45.8.170:8022', '', '', 0, 128, 0, 1, '2011-08-11', 1373, 7, NULL, 0), \
 ('WATERSTAD FM', '[Bitrate: 128]  ', 'http://178.19.127.7:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1374, 22, NULL, 0), \
@@ -1035,7 +982,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('RantRadio Punk', '[Bitrate: 128]  ', 'http://64.69.71.211:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1417, 27, NULL, 0), \
 ('dublab.com', '[Bitrate: 128]  ', 'http://205.188.215.225:8008', '', '', 0, 128, 0, 1, '2011-08-11', 1418, 7, NULL, 0), \
 ('Emmy_EXC Live!', 'Emmy_EXC live on air!  [Bitrate: 128]  ', 'http://85.25.191.21:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1419, 8, NULL, 0), \
-('Hits Fm - Madrid - .: http://www.hitsfm.org :.', 'George McCrae (Florida', 'http://85.214.110.148:8004', '', '', 0, 128, 0, 1, '2011-08-11', 1420, 7, NULL, 0), \
 ('East Village Radio', '[Bitrate: 128]  ', 'http://98.129.38.2:8010', '', '', 0, 128, 0, 1, '2011-08-11', 1421, 7, NULL, 0), \
 ('Zakaria Music Radio', '[Bitrate: 128]  ', 'http://109.123.89.7:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1422, 31, NULL, 0), \
 ('Radio Stubica', '  [Bitrate: 128]  ', 'http://88.198.24.237:7008', '', '', 45, 128, 0, 1, '2011-08-11', 1423, 8, NULL, 0), \
@@ -1058,7 +1004,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('Sky DJ Schlumpf', '[Bitrate: 128]  ', 'http://78.46.214.2:13000', '', '', 0, 128, 0, 1, '2011-08-11', 1440, 8, NULL, 0), \
 ('RADIO POOL ', '[Bitrate: 128]  ', 'http://208.115.213.242:8010', '', '', 0, 128, 0, 1, '2011-08-11', 1441, 7, NULL, 0), \
 ('IDN - Italian Dance Network', 'http://www.facebook.com/italodance  [Bitrate: 128]  ', 'http://91.121.153.17:9999', '', '', 0, 128, 0, 1, '2011-08-11', 1442, 4, NULL, 0), \
-('ABC Sixties Dublin', '[Bitrate: 128]  ', 'http://76.10.222.237:8064', '', '', 0, 128, 0, 1, '2011-08-11', 1443, 7, NULL, 0), \
 ('RADYO FENOMEN', '[Bitrate: 128]  ', 'http://46.20.4.50:8060', '', '', 0, 128, 0, 1, '2011-08-11', 1444, 58, NULL, 0), \
 ('MKM URBAN', '[Bitrate: 128]  ', 'http://88.190.21.83:8050', '', '', 0, 128, 0, 1, '2011-08-11', 1445, 4, NULL, 0), \
 ('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://91.121.164.186:5300', '', '', 0, 128, 0, 1, '2011-08-11', 1446, 22, NULL, 0), \
@@ -1091,7 +1036,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('CLASS FM', 'SMS:+36(30)645-0000 Tel:06(1)555-5500 Email:classfm@classfm.hu  [Bitrate: 128]  ', 'http://91.82.85.44:9120', '', '', 0, 128, 1, 1, '2011-08-11', 1473, 50, NULL, 0), \
 ('WELLE 1 Salzburg 106', '2 128k stereo mp3 ', 'http://217.196.146.129:8128', '', '', 0, 128, 0, 1, '2011-08-11', 1474, 12, NULL, 0), \
 ('Eazyfm105.5', '[Bitrate: 128]', 'http://202.44.54.180:8228', '', '', 0, 128, 0, 1, '2011-08-11', 1475, 33, NULL, 0), \
-('Dance HIT Radio', 'Afrojack', 'http://178.159.0.80:7172', '', '', 4, 128, 17, 1, '2011-08-11', 1476, 34, '2011-09-11 00:07:40', 0), \
 ('Skype: radiosense.bg', '[Bitrate: 128]  ', 'http://79.143.177.205:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1477, 39, NULL, 0), \
 ('Smooth & Easy', '[Bitrate: 128]  ', 'http://208.110.69.125:8026', '', '', 0, 128, 0, 1, '2011-08-11', 1478, 7, NULL, 0), \
 ('POLSKASTACJA .PL', ' mp3 ', 'http://91.121.89.153:7100', '', '', 0, 128, 0, 1, '2011-08-11', 1479, 4, NULL, 0), \
@@ -1131,7 +1075,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('DEEP HOUSE LOUNGE', '[Bitrate: 128]', 'http://68.68.28.166:8038', '', '', 0, 128, 0, 1, '2011-08-11', 1514, 7, NULL, 0), \
 ('Digital 80', 'Radio Digital 80  [Bitrate: 128]', 'http://184.107.209.66:6004', '', '', 13, 128, 0, 1, '2011-08-11', 1515, 28, NULL, 0), \
 ('Feverpitch', '[Bitrate: 128]  ', 'http://77.243.225.62:8048', '', '', 0, 128, 0, 1, '2011-08-11', 1516, 6, NULL, 0), \
-('AscenDance Radio', '[Bitrate: 128]  ', 'http://174.136.62.67:8080', '', '', 4, 128, 7, 1, '2011-08-11', 1517, 7, '2011-09-13 10:53:08', 0), \
 ('Pagan Radio Network HIFI', '[Bitrate: 128] [Max Listeners: 75]', 'http://208.85.242.184:8090', '', '', 0, 128, 0, 1, '2011-08-11', 1518, 7, NULL, 0), \
 ('Bide&Musique', '[Bitrate: 128]  ', 'http://94.23.60.38:9100', '', '', 0, 128, 0, 1, '2011-08-11', 1519, 4, NULL, 0), \
 ('KLUB - RADIOSFERA', 'Farrel 8', 'http://87.98.217.17:7084', '', '', 0, 128, 0, 1, '2011-08-11', 1520, 4, NULL, 0), \
@@ -1146,12 +1089,10 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('RF-Radio', '[Bitrate: 128]  ', 'http://87.106.136.228:8070', 'www.Russian-Fiesta.com', '', 0, 128, 0, 1, '2011-08-11', 1529, 7, NULL, 0), \
 ('GotRadio - Bluegrass', '[Bitrate: 128] ', 'http://64.62.164.196:3064', '', '', 0, 128, 0, 1, '2011-08-11', 1530, 7, NULL, 0), \
 ('FullVibes', '[Bitrate: 128]  ', 'http://91.121.10.156:8023', '', '', 0, 128, 0, 1, '2011-08-11', 1531, 4, NULL, 0), \
-('Hitsfm ', '[Bitrate: 128]  ', 'http://94.23.30.114:9996', '', '', 40, 128, 3, 1, '2011-08-11', 1532, 4, NULL, 0), \
 ('Dancefoxhoelle - Discofox', ' Dancefox', 'http://83.169.2.183:8100', '', '', 31, 128, 0, 1, '2011-08-11', 1533, 17, NULL, 0), \
 ('Trancemission.FM Radio', '[Bitrate: 128]  ', 'http://87.230.21.161:6667', '', '', 0, 128, 0, 1, '2011-08-11', 1534, 12, NULL, 0), \
 ('Memories der 50s', ' 60s & 70s ', 'http://85.214.146.14:8010', '', '', 0, 128, 0, 1, '2011-08-11', 1535, 8, NULL, 0), \
 ('Wild West Radio', ' Low Protein Radio - 94.5% Saturated Fat ', 'http://209.212.144.156:7430', '', '', 0, 128, 0, 1, '2011-08-11', 1536, 7, NULL, 0), \
-('181.FM - Classic Buzz ', '[Bitrate: 128]', 'http://38.107.220.162:8038', '', '181.fm.png', 9, 128, 0, 1, '2011-08-11', 1537, 7, NULL, 0), \
 ('EllinadikoFm Mono Epityxies', 'Studio DjGrigoris 306  [Bitrate: 128] ', 'http://208.43.115.44:9844', '', '', 0, 128, 0, 1, '2011-08-11', 1538, 7, NULL, 0), \
 ('RantRadio Industrial', '[Bitrate: 128]  ', 'http://64.69.71.211:8888', '', '', 0, 128, 0, 1, '2011-08-11', 1539, 27, NULL, 0), \
 ('AfterhoursDJs.org', ' all the time. ', 'http://207.200.96.230:8004', '', '', 0, 128, 0, 1, '2011-08-11', 1540, 7, NULL, 0), \
@@ -1179,7 +1120,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('Ik wil Bolletje!', '[Bitrate: 128] ', 'http://62.212.154.170:8532', '', '', 0, 128, 0, 1, '2011-08-11', 1562, 6, NULL, 0), \
 ('PUREGOLD ROCK N ROLL', 'US [Bitrate: 128]  ', 'http://173.201.33.63:9026', '', '', 1, 128, 0, 1, '2011-08-11', 1563, 7, NULL, 0), \
 ('RADIO ORO MARBELLA EN DIRECTO', '[Bitrate: 128]  ', 'http://92.48.107.35:8004', '', '', 0, 128, 0, 1, '2011-08-11', 1564, 16, NULL, 0), \
-('105 FM', ' [Bitrate: 128]  ', 'http://212.40.5.105:7000', '', '', 1, 128, 1, 1, '2011-08-11', 1565, 24, NULL, 0), \
 ('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://94.23.220.75:6100', '', '', 0, 128, 1, 1, '2011-08-11', 1566, 22, NULL, 0), \
 ('100Hitz - The Mix', '[Bitrate: 128] ', 'http://216.218.147.40:3038', '', '', 0, 128, 2, 1, '2011-08-11', 1567, 7, NULL, 0), \
 ('GotRadio - The Big Score', '[Bitrate: 128] ', 'http://64.62.164.196:2352', '', '', 0, 128, 0, 1, '2011-08-11', 1568, 7, NULL, 0), \
@@ -1193,7 +1133,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('Album Rock [LifeJive.com]', '[Bitrate: 128] [Max Listeners: 250]', 'http://208.53.138.125:8138', '', '', 0, 128, 0, 1, '2011-08-11', 1576, 7, NULL, 0), \
 ('RTS FM LA RADIO DU SUD', '[Bitrate: 128]  ', 'http://94.23.20.204:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1577, 4, NULL, 0), \
 ('HPR4: Bluegrass Gospel', '[Bitrate: 128] ', 'http://130.166.82.14:8014', '', '', 0, 128, 0, 1, '2011-08-11', 1578, 7, NULL, 0), \
-('105.7 Radio', '[Bitrate: 128] [Max Listeners: 700]', 'http://87.106.216.88:8000', '', '', 4, 128, 1, 1, '2011-08-11', 1579, 28, NULL, 0), \
 ('Pacific.FM', '[Bitrate: 128]', 'http://91.121.89.221:8135', '', '', 0, 128, 0, 1, '2011-08-11', 1580, 4, NULL, 0), \
 ('Escuchas', '[Bitrate: 128] ', 'http://38.96.148.21:8400', '', '', 0, 128, 0, 1, '2011-08-11', 1581, 7, NULL, 0), \
 ('www.dasliveradio.net', '[Bitrate: 128]', 'http://85.25.184.110:13598', '', '', 0, 128, 0, 1, '2011-08-11', 1582, 8, NULL, 0), \
@@ -1210,11 +1149,9 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('All Hits 7890 Radio', '[Bitrate: 128]  ', 'http://69.175.114.146:8217', '', '', 40, 128, 0, 1, '2011-08-11', 1593, 7, NULL, 0), \
 ('RADIO ORANJE NATIONAAL', '[Bitrate: 128]  ', 'http://178.19.114.48:50019', '', '', 45, 128, 0, 1, '2011-08-11', 1594, 22, NULL, 0), \
 ('Scratch Radio', '[Bitrate: 128]  ', 'http://70.68.0.236:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1595, 27, NULL, 0), \
-('Hot Hits ..', '[Bitrate: 128]  ', 'http://83.170.104.91:30115', '', '', 40, 128, 22, 1, '2011-08-11', 1596, 31, '2011-09-18 19:19:33', 0), \
 ('iROCK109', '[Bitrate: 128]  ', 'http://209.197.30.214:9066', '', '', 1, 128, 0, 1, '2011-08-11', 1597, 7, NULL, 0), \
 ('SOUL GOLD RADIO', '[Bitrate: 128]  ', 'http://67.18.252.210:7533', '', '', 0, 128, 0, 1, '2011-08-11', 1598, 7, NULL, 0), \
 ('Clubbin', '[Bitrate: 128]  ', 'http://195.242.153.98:8018', '', '', 4, 128, 2, 1, '2011-08-11', 1599, 34, NULL, 0), \
-('181.FM - Lite 90''s', '[Bitrate: 128]  ', 'http://38.107.220.162:8048', '', '181.fm.png', 14, 128, 2, 1, '2011-08-11', 1600, 7, '2011-09-17 17:58:12', 0), \
 ('Chroma NewAge', '[Bitrate: 128] ', 'http://217.118.24.169:8006', '', '', 0, 128, 0, 1, '2011-08-11', 1601, 8, NULL, 0), \
 ('MEGASHUFFLE.com', '[Bitrate: 128]  ', 'http://216.59.35.35:8006', '', '', 0, 128, 0, 1, '2011-08-11', 1602, 7, NULL, 0), \
 ('ENERGY FM', '[Bitrate: 128]  ', 'http://193.105.54.135:7005', '', '', 0, 128, 0, 1, '2011-08-11', 1603, 9, NULL, 0), \
@@ -1276,7 +1213,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('Mittelalterklang', 'Folk', 'http://85.25.149.212:8050', '', '', 0, 128, 0, 1, '2011-08-11', 1659, 8, NULL, 0), \
 ('Goldradio Network', '[Bitrate: 128]  ', 'http://208.79.238.78:8030', '', '', 0, 128, 0, 1, '2011-08-11', 1660, 7, NULL, 0), \
 ('Secret Agent', '[Bitrate: 128]  ', 'http://74.63.47.82:9010', '', '', 0, 128, 0, 1, '2011-08-11', 1661, 7, NULL, 0), \
-('181.FM - Smooth AC', '[Bitrate: 128]  [Max Listeners: 2100]', 'http://38.107.220.162:8094', '', '181.fm.png', 0, 128, 2, 1, '2011-08-11', 1662, 7, '2011-10-04 21:30:39', 0), \
 ('Superfun Radio Schlager', '[Bitrate: 128]  ', 'http://88.198.3.15:11950', '', '', 0, 128, 0, 1, '2011-08-11', 1663, 8, NULL, 0), \
 ('SUNLIGHT RADIO AMERICA', '[Bitrate: 128]  ', 'http://216.59.35.40:8070', '', '', 0, 128, 0, 1, '2011-08-11', 1664, 7, NULL, 0), \
 ('M2 MIX : ONLY DJs & ELECTRO', '[Bitrate: 128]  ', 'http://91.121.140.217:9000', 'www.m2radio.fr', '', 0, 128, 0, 1, '2011-08-11', 1665, 4, NULL, 0), \
@@ -1318,11 +1254,9 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('Yabiladi Radio - 100% Maroc', '[Bitrate: 128]  ', 'http://91.121.212.48:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1701, 4, NULL, 0), \
 ('Dinamo 103.8', '[Bitrate: 128]  ', 'http://85.17.136.174:80', '', '', 7, 128, 0, 1, '2011-08-11', 1702, 23, NULL, 0), \
 ('GotRadio - Forever Fifties', '[Bitrate: 128] ', 'http://64.62.164.196:3056', '', '', 0, 128, 0, 1, '2011-08-11', 1703, 7, NULL, 0), \
-('Houseradio needs more help urgently', 'check our website!!!  Houseradio deep tech house HIFI 2 ', 'http://75.125.130.122:8200', '', '', 16, 128, 7, 1, '2011-08-11', 1704, 7, '2011-10-06 16:56:40', 0), \
 ('Foxwahn Radio', '', 'http://80.237.159.17:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1705, 8, NULL, 0), \
 ('Bassdrive - Worldwide Drum and Bass Radio', 'Hangover Hotline w/DJ Lamebrane LIVE! AIM:lamebrane78  [Bitrate: 128]', 'http://205.188.215.226:8008', '', '', 50, 128, 1, 1, '2011-08-11', 1706, 7, NULL, 0), \
 ('ANYWHORADIO.com - Remixes of Top 40', '[Bitrate: 128]  ', 'http://216.59.35.41:8104', '', '', 0, 128, 1, 1, '2011-08-11', 1707, 7, NULL, 0), \
-('181.FM - 90''s Country', '[Bitrate: 128]', 'http://38.107.220.162:8050', '', '181.fm.png', 6, 128, 2, 1, '2011-08-11', 1708, 7, '2011-09-17 17:58:00', 0), \
 ('Axe Radio', '[Bitrate: 128]', 'http://184.95.62.170:8022', '', '', 1, 128, 0, 1, '2011-08-11', 1709, 7, NULL, 0), \
 ('Public Domain', '[Bitrate: 128] [Max Listeners: 900]', 'http://82.197.165.137:80', '', '', 0, 128, 0, 1, '2011-08-11', 1710, 24, NULL, 0), \
 ('Radio Nunta', ' Chisinau', 'http://88.191.81.31:9098', '', '', 0, 128, 0, 1, '2011-08-11', 1711, 4, NULL, 0), \
@@ -1351,7 +1285,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('FM5280 Smooth Contemporary Jazz', '[Bitrate: 128]  ', 'http://184.105.145.85:9000', '', '', 9, 128, 1, 1, '2011-08-11', 1734, 27, NULL, 0), \
 ('Lite Favorites', '[Bitrate: 128]', 'http://65.60.1.146:7012', '', '', 0, 128, 0, 1, '2011-08-11', 1735, 7, NULL, 0), \
 ('Radio Iubire FM Romania', '[Bitrate: 128]  ', 'http://89.45.194.55:7070', '', '', 0, 128, 0, 1, '2011-08-11', 1736, 41, NULL, 0), \
-('181.FM - Jammin 181', '[Bitrate: 128]  ', 'http://38.107.220.162:8042', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 1737, 7, NULL, 0), \
 ('Radio Index', '[Bitrate: 128]  ', 'http://77.105.36.58:8879', '', '', 0, 128, 0, 1, '2011-08-11', 1738, 6, NULL, 0), \
 ('Anuhea: Hawaii''s Refreshing Jazz', 'Funkee Boy - When Youre Mad  [Bitrate: 128]  ', 'http://173.201.33.63:9002', '', '', 9, 128, 1, 1, '2011-08-11', 1739, 7, NULL, 0), \
 ('ChillAUT.fm', '[Bitrate: 128]  ', 'http://83.169.3.95:1974', '', '', 0, 128, 0, 1, '2011-08-11', 1740, 12, NULL, 0), \
@@ -1402,13 +1335,10 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('XAMFM', '[Bitrate: 128]', 'http://72.13.81.34:19581', '', '', 0, 128, 0, 1, '2011-08-11', 1848, 7, NULL, 0), \
 ('LOLLIRADIO HAPPY STATION', '[Bitrate: 128]', 'http://94.23.206.43:8050', '', '', 0, 128, 0, 1, '2011-08-11', 1849, 37, NULL, 0), \
 ('Trackupdate', '[Bitrate: 128]  ', 'http://80.237.201.47:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1850, 8, NULL, 0), \
-('SG.House', 'House [Bitrate: 128]  ', 'http://85.17.26.75:80', '', '', 16, 128, 3, 1, '2011-08-11', 1851, 6, '2011-09-16 18:54:36', 0), \
 ('MjTunes.com', 'Only michael [Bitrate: 128]  ', 'http://94.23.28.101:8044', '', '', 21, 128, 0, 1, '2011-08-11', 1852, 4, NULL, 0), \
 ('CapitalFM Riga 94.9', '[Bitrate: 128]  ', 'http://87.226.84.14:8000', '', '', 45, 128, 0, 1, '2011-08-11', 1853, 14, NULL, 0), \
 ('Relax and Chillout', '[Bitrate: 128]  ', 'http://204.45.8.170:8091', '', '', 0, 128, 0, 1, '2011-08-11', 1854, 7, NULL, 0), \
 ('GoFM', '[Bitrate: 128]', 'http://67.19.90.154:8030', '', '', 0, 128, 0, 1, '2011-08-11', 1855, 7, NULL, 0), \
-('AfternoonMix by Vmix.fm', ' deephouse and soulful music live from Paris', 'http://213.251.171.213:8005', '', '', 16, 128, 1, 1, '2011-08-11', 1856, 6, NULL, 0), \
-('Global House Radio', '[Bitrate: 128]', 'http://67.212.179.138:7082', '', '', 16, 128, 4, 1, '2011-08-11', 1857, 7, '2011-08-30 10:59:03', 0), \
 ('Limbik Frequencies', '[Bitrate: 128]  ', 'http://205.188.215.225:8018', '', '', 0, 128, 0, 1, '2011-08-11', 1858, 7, NULL, 0), \
 ('Boystown Live Dance', '[Bitrate: 128]  ', 'http://208.53.183.37:6161', '', '', 0, 128, 0, 1, '2011-08-11', 1859, 7, NULL, 0), \
 ('DnBHeaven.com', 'Kabuki Ft. Jenna G - Just Hold On (Serum Remix)  [Bitrate: 128] ', 'http://188.165.254.170:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1860, 4, NULL, 0), \
@@ -1431,9 +1361,7 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('Recordandonet ', 'Recordando de verdade  [Bitrate: 128]  ', 'http://174.37.61.69:8150', '', '', 0, 128, 0, 1, '2011-08-11', 1877, 7, NULL, 0), \
 ('Star 107 The Hits Channel', '[Bitrate: 128]  ', 'http://173.244.206.120:9136', '', '', 0, 128, 0, 1, '2011-08-11', 1878, 7, NULL, 0), \
 ('More Fm - Classic Rock Radio', '[Bitrate: 128]  ', 'http://216.66.84.2:6320', '', '', 1, 128, 0, 1, '2011-08-11', 1879, 7, NULL, 0), \
-('247Polkaheaven ''The World''s Polka Network', 'The Worlds Polka Network  [Bitrate: 128] [Max Listeners: 250]', 'http://216.59.35.38:8046', '', '', 0, 128, 0, 1, '2011-08-11', 1880, 22, NULL, 0), \
 ('Webblaster Radio 2', '[Bitrate: 128]  ', 'http://91.121.194.238:8010', '', '', 0, 128, 0, 1, '2011-08-11', 1881, 4, NULL, 0), \
-('BHJMS-Radio', '[Bitrate: 128]  ', 'http://80.237.157.48:8000', '', '', 16, 128, 4, 1, '2011-08-11', 1882, 42, '2011-09-09 18:08:55', 0), \
 ('Radio Monte Carlo', '[Bitrate: 128]  ', 'http://212.40.13.22:11000', '', '', 1, 128, 0, 1, '2011-08-11', 1883, 24, NULL, 0), \
 ('Springsteenradio.com', '[Bitrate: 128]   ', 'http://67.212.166.178:9000', '', '', 21, 128, 0, 1, '2011-08-11', 1884, 7, NULL, 0), \
 ('STAR 107.9', '[Bitrate: 128]  ', 'http://67.212.174.226:10001', '', '', 13, 128, 0, 1, '2011-08-11', 1885, 7, NULL, 0), \
@@ -1468,7 +1396,6 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('GotRadio-Top 40 ', '[Bitrate: 128]', 'http://64.202.109.88:80', '', '', 0, 128, 0, 1, '2011-08-11', 1915, 7, NULL, 0), \
 ('RADIO MANGUEIRA DIGITAL', '[Bitrate: 128]  ', 'http://189.1.164.58:7186', '', '', 0, 128, 0, 1, '2011-08-11', 1916, 19, NULL, 0), \
 ('Passion Country Megantic', '[Bitrate: 128]  ', 'http://68.168.120.51:8000', '', '', 6, 128, 0, 1, '2011-08-11', 1917, 7, NULL, 0), \
-('181.FM - 70''s', '', 'http://38.107.220.162:8066', '', '181.fm.png', 12, 128, 2, 1, '2011-08-11', 1918, 7, '2011-10-04 23:20:12', 0), \
 ('PopTron', '[Bitrate: 128]  ', 'http://74.63.47.82:2200', '', '', 0, 128, 0, 1, '2011-08-11', 1919, 7, NULL, 0), \
 ('YCN ^BMbn', ' 44 KHz Stereo ', 'http://80.237.210.23:19310', '', '', 0, 128, 0, 1, '2011-08-11', 1920, 8, NULL, 0), \
 ('POLSKASTACJA .PL 80 90', '[Bitrate: 128] [Max Listeners: 310]', 'http://91.121.157.133:9200', '', '', 0, 128, 0, 1, '2011-08-11', 1921, 22, NULL, 0), \
@@ -1484,28 +1411,23 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('Sonic Universe', '[Bitrate: 128]  ', 'http://74.63.47.82:8600', '', '', 0, 128, 0, 1, '2011-08-11', 1931, 7, NULL, 0), \
 ('Smooth Jazz Expressions', '[Bitrate: 128]  ', 'http://174.46.222.71:8216', '', '', 0, 128, 0, 1, '2011-08-11', 1932, 7, NULL, 0), \
 ('411 Music.net', '[Bitrate: 128]', 'http://66.185.17.34:8080', '', '', 0, 128, 0, 1, '2011-08-11', 1933, 7, NULL, 0), \
-('GrooveFM', '[Bitrate: 128]  ', 'http://178.162.138.18:10028', '', 'GrooveFM.png', 0, 128, 1, 1, '2011-08-11', 1934, 45, NULL, 0), \
 ('Soft Classic Rock', '[Bitrate: 128]   ', 'http://64.71.133.122:8000', '', '', 1, 128, 0, 1, '2011-08-11', 1935, 7, NULL, 0), \
-('181.FM - The Point', '[Bitrate: 128] ', 'http://38.107.220.162:8010', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 1936, 7, '2011-09-06 17:25:17', 0), \
 ('Sofaspace', '[Bitrate: 128]  ', 'http://80.74.149.30:9999', '', '', 0, 128, 0, 1, '2011-08-11', 1937, 39, NULL, 0), \
 ('Radio Flo', '[Bitrate: 128]  [Max Listeners: 325]', 'http://89.238.146.140:7060', '', '', 4, 128, 0, 1, '2011-08-11', 1938, 9, NULL, 0), \
 ('Lekker veel Nederlandstalig', '  [Bitrate: 128]  ', 'http://91.213.69.159:7204', '', '', 0, 128, 0, 1, '2011-08-11', 1939, 6, NULL, 0), \
 ('Antena Krusevac Studio 1', '  [Bitrate: 128]  ', 'http://94.23.38.225:4560', '', '', 51, 128, 0, 1, '2011-08-11', 1940, 4, NULL, 0), \
 ('Radio Alpenmelodie', '[Bitrate: 128]  ', 'http://88.198.59.151:80', '', '', 0, 128, 0, 1, '2011-08-11', 1941, 8, NULL, 0), \
 ('ECHOES.gr NetRadio', '[Bitrate: 128] [Max Listeners: 2500]', 'http://78.129.245.33:80', '', '', 0, 128, 0, 1, '2011-08-11', 1942, 9, NULL, 0), \
-('181.FM - The Beatles Channel', '[Bitrate: 128] [Max Listeners: 2100]', 'http://38.107.220.162:8062', '', '181.fm.png', 3, 128, 2, 1, '2011-08-11', 1943, 7, '2011-09-18 16:12:01', 0), \
 ('MNdancechannel', '[Bitrate: 128]  ', 'http://80.237.155.20:8030', '', '', 0, 128, 0, 1, '2011-08-11', 1944, 42, NULL, 0), \
 ('BeirutNights.com', '[Bitrate: 128]   ', 'http://72.13.86.83:80', '', '', 0, 128, 0, 1, '2011-08-11', 1945, 7, NULL, 0), \
 ('Radio Taraf Romania', '[Bitrate: 128]  ', 'http://46.108.3.26:7100', '', '', 0, 128, 0, 1, '2011-08-11', 1946, 41, NULL, 0), \
 ('WebRadio Dj Paulo Pringles', '[Bitrate: 128] ', 'http://66.185.27.122:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1947, 7, NULL, 0), \
 ('Impacto Latino', '[Bitrate: 128] ', 'http://216.59.35.36:8014', '', '', 0, 128, 0, 1, '2011-08-11', 1948, 7, NULL, 0), \
 ('The Beat Norway', 'Norway  [Bitrate: 128]', 'http://89.105.32.12:8110', '', '', 40, 128, 1, 1, '2011-08-11', 1949, 21, NULL, 0), \
-('181.FM - Star 90', '[Bitrate: 128]', 'http://38.107.220.162:8012', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 1950, 7, '2011-09-27 17:59:03', 0), \
 ('Radio Planeta', '[Bitrate: 128]   ', 'http://95.211.22.17:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1951, 36, NULL, 0), \
 ('TRAFFIC RADIO STATION', '[Bitrate: 128]', 'http://212.25.58.220:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1952, 36, NULL, 0), \
 ('Radio Rivendell', '[Bitrate: 128] [Max Listeners: 850]', 'http://82.182.121.75:8003', '', '', 0, 128, 0, 1, '2011-08-11', 1953, 23, NULL, 0), \
-('DeepFM', '(DeepFM) [Bitrate: 128] ', 'http://195.66.134.40:80', '', '', 0, 128, 1, 1, '2011-08-11', 1954, 24, NULL, 0), \
-('181.FM - Classical Guitar', '[Bitrate: 128]   ', 'http://38.107.220.162:8020', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 1955, 7, NULL, 0), \
+('DeepFM', '(DeepFM) [Bitrate: 128] ', 'http://195.66.134.40:80', '', '', 0, 128, 1, 1, '2011-08-11', 1954, 24, NULL, 1), \
 ('Zeilsteen Alternative Radio', 'playing The Killers', 'http://87.195.42.193:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1956, 6, NULL, 0), \
 ('memoryradio', '[Bitrate: 128]  ', 'http://188.165.247.175:4000', '', '', 0, 128, 0, 1, '2011-08-11', 1957, 4, NULL, 0), \
 ('Soundic Radio', '[Bitrate: 128]  ', 'http://193.10.239.174:8080', '', '', 0, 128, 0, 1, '2011-08-11', 1958, 23, NULL, 0), \
@@ -1528,7 +1450,6 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('Pedroleouf ', '[Bitrate: 128]  ', 'http://88.191.61.12:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1975, 4, NULL, 0), \
 ('MUSIK.PROGRESSIVE', '[Bitrate: 128]', 'http://80.237.157.12:15000', '', '', 0, 128, 0, 1, '2011-08-11', 1976, 42, NULL, 0), \
 ('GotRadio', '[Bitrate: 128] ', 'http://64.62.164.196:2928', '', '', 0, 128, 0, 1, '2011-08-11', 1977, 7, NULL, 0), \
-('181.FM - Energy 93', '[Bitrate: 128]  ', 'http://38.107.220.162:8044', '', '181.fm.png', 0, 128, 2, 1, '2011-08-11', 1978, 7, '2011-09-16 19:00:28', 0), \
 ('Enjoy Radio Romania', '[Bitrate: 128] ', 'http://94.24.53.92:9326', '', '', 40, 128, 2, 1, '2011-08-11', 1979, 41, NULL, 0), \
 ('Radio Continu', 'Altijd Gezellig ::', 'http://178.19.112.20:7062', '', '', 0, 128, 0, 1, '2011-08-11', 1980, 22, NULL, 0), \
 ('Clube FM', '[Bitrate: 128]  ', 'http://187.17.67.228:9082', '', '', 13, 128, 1, 1, '2011-08-11', 1981, 19, NULL, 0), \
@@ -1543,15 +1464,10 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('jungletrain.net - 24/7 drum and bass', '[Bitrate: 128]', 'http://76.74.248.104:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1990, 7, NULL, 0), \
 ('Italian Graffiati - Musica anni 60 e 70 per gli italiani nel mondo', '[Bitrate: 128]', 'http://173.193.20.157:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1991, 7, NULL, 0), \
 ('4CLUBBERS', '[Bitrate: 128]', 'http://94.23.226.80:8500', '', '', 0, 128, 0, 1, '2011-08-11', 1992, 37, NULL, 0), \
-('181.fm - Real Country', '[Bitrate: 128]', 'http://38.107.220.162:8034', '', '181.fm.png', 6, 128, 2, 1, '2011-08-11', 1993, 7, '2011-09-18 16:12:08', 0), \
-('POLSKASTACJA.PL', '[Bitrate: 128]', 'http://188.165.20.29:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1994, 22, NULL, 0), \
-('181.FM - 90''s Alternative', '[Bitrate: 128]', 'http://38.107.220.162:8052', '', '181.fm.png', 14, 128, 2, 1, '2011-08-11', 1995, 7, NULL, 0), \
 ('ranceRadio.ch', ' Techno', 'http://46.4.77.21:10780', '', '', 50, 128, 0, 1, '2011-08-11', 1996, 8, NULL, 0), \
 ('Angel Fire Radio''s Classic Rock&Roll.FM ', '[Bitrate: 128] ', 'http://scfire-dtc-aa04.stream.aol.com:80/stream/1043', '', '', 1, 128, 0, 1, '2011-08-11', 1997, 7, NULL, 0), \
-('181.FM - **UK Top 40**', '[Bitrate: 128]', 'http://38.107.220.162:8070', '', '181.fm.png', 40, 128, 0, 1, '2011-08-11', 1998, 7, NULL, 0), \
 ('TOP 100', '[Bitrate: 128]', 'http://119.207.75.234:1040', '', '', 40, 128, 1, 1, '2011-08-11', 1999, 40, NULL, 0), \
 ('HAYATIN SESI', '[Bitrate: 128]', 'http://46.105.109.141:8008', '', '', 0, 128, 0, 1, '2011-08-11', 2000, 4, NULL, 0), \
-('181.FM - Lite 80', '[Bitrate: 128] ', 'http://38.107.220.162:8040', '', '181.fm.png', 13, 128, 0, 1, '2011-08-11', 2001, 7, NULL, 0), \
 ('Blues All Day', '[Bitrate: 128]', 'http://76.73.79.82:8688', '', '', 0, 128, 0, 1, '2011-08-11', 2002, 7, NULL, 0), \
 ('MUSIK.HOUSE (FUNKY)', '[Bitrate: 128]', 'http://80.237.157.12:13005', 'WWW.RAUTEMUSIK.FM', '', 0, 128, 0, 1, '2011-08-11', 2003, 42, NULL, 0), \
 ('Armitage''s Dimension ', 'Jpop/Jrock/Anime', 'http://143.51.142.148:8128', '', '', 0, 128, 0, 1, '2011-08-11', 2004, 43, NULL, 0), \
@@ -1569,9 +1485,6 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('HaZZard of Darkness', '[Bitrate: 128] ', 'http://87.230.57.21:6666', '', '', 0, 128, 0, 1, '2011-08-11', 2016, 8, NULL, 0), \
 ('BellyUp4Blues', '[Bitrate: 128]', 'http://64.62.252.136:5100', '', '', 0, 128, 0, 1, '2011-08-11', 2017, 7, NULL, 0), \
 ('Dogglounge Deep House', '[Bitrate: 128] ', 'http://66.165.191.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2018, 7, NULL, 0), \
-('AAN JAMZ', '[Bitrate: 128] ', 'http://76.10.222.237:9006', '', '', 0, 128, 1, 1, '2011-08-11', 2019, 24, NULL, 0), \
-('M2 LOVE', 'Live from france [Bitrate: 128] ', 'http://94.23.62.11:8000', '', '', 14, 128, 1, 1, '2011-08-11', 2020, 4, NULL, 0), \
-('1.FM - ReggaeTrade', '[Bitrate: 128] ', 'http://72.13.83.85:7000', '', '', 48, 128, 2, 1, '2011-08-11', 2021, 7, NULL, 0), \
 ('Technicolor Web of Sound', '[Bitrate: 128] ', 'http://209.51.162.182:2020', '', '', 0, 128, 0, 1, '2011-08-11', 2022, 7, NULL, 0), \
 ('Hard Rock Radio Live', '[Bitrate: 128]', 'http://66.90.103.189:8868', '', '', 1, 128, 0, 1, '2011-08-11', 2023, 7, NULL, 0), \
 ('ITAPOAN FM', '[Bitrate: 128]', 'http://208.115.209.70:8087', '', '', 0, 128, 0, 1, '2011-08-11', 2024, 7, NULL, 0), \
@@ -1590,11 +1503,9 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('www.agf-radio.com Der B fr euch', '[Bitrate: 128]', 'http://94.23.209.129:6939', '', '', 0, 128, 0, 1, '2011-08-11', 2037, 37, NULL, 0), \
 ('Suburbs of Goa', '[Bitrate: 128]', 'http://74.63.47.82:8850', '', '', 0, 128, 0, 1, '2011-08-11', 2038, 7, NULL, 0), \
 ('The Doo-Wop Express', '[Bitrate: 128]  ', 'http://64.20.42.58:8034', '', '', 0, 128, 0, 1, '2011-08-11', 2039, 7, NULL, 0), \
-('181.FM - 80''s', '[Bitrate: 128]  ', 'http://38.107.220.162:8014', '', '181.fm.png', 13, 128, 2, 1, '2011-08-11', 2040, 7, '2011-09-17 17:57:54', 0), \
 ('RTL Radio', '  [Bitrate: 128]  ', 'http://81.92.237.118:8080', '', '', 40, 128, 0, 1, '2011-08-11', 2041, 5, NULL, 0), \
 ('TrueHipHop.FM', '  [Bitrate: 128] ', 'http://78.46.19.67:9020', '', '', 0, 128, 0, 1, '2011-08-11', 2042, 8, NULL, 0), \
 ('Classical 96.3FM CFMZ', '[Bitrate: 128] ', 'http://199.27.180.216:8017', '', '', 8, 128, 0, 1, '2011-08-11', 2043, 28, NULL, 0), \
-('Beat Blender', '[Bitrate: 128] ', 'http://74.63.47.82:8384', '', '', 7, 128, 4, 1, '2011-08-11', 2044, 7, '2011-10-06 16:55:46', 0), \
 ('Antenne 50plus', '[Bitrate: 128] ', 'http://85.214.21.136:8510', '', '', 0, 128, 0, 1, '2011-08-11', 2045, 31, NULL, 0), \
 ('AUDIOGROOVES.NET', 'DEEP HOUSE [Bitrate: 128]', 'http://173.244.206.15:9004', '', '', 16, 128, 1, 1, '2011-08-11', 2046, 7, NULL, 0), \
 ('Radio Online Ponceo', '[Bitrate: 128] ', 'http://204.145.89.114:8010', '', '', 40, 128, 0, 1, '2011-08-11', 2047, 7, NULL, 0), \
@@ -1608,7 +1519,6 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radio Brocken', '[Bitrate: 128] ', 'http://80.237.156.39:80', '', '', 45, 128, 0, 1, '2011-08-11', 2055, 42, NULL, 0), \
 ('1.FM - Country', '[Bitrate: 128]', 'http://72.13.83.83:8020', '', '', 27, 128, 0, 1, '2011-08-11', 2056, 7, NULL, 0), \
 ('Suave 107.3 FM - Grupo Medrano - Santiago', ' R.D.', 'http://173.193.216.92:8060', '', '', 0, 128, 0, 1, '2011-08-11', 2057, 7, NULL, 0), \
-('181.fm - Rock 181', '[Bitrate: 128]', 'http://38.107.220.162:8008', '', '181.fm.png', 1, 128, 1, 1, '2011-08-11', 2058, 7, NULL, 0), \
 ('KEXP Live 128kbps', 'KEXP 90.3 FM [Bitrate: 128]', 'http://140.142.8.220:8000', '', '', 7, 128, 0, 1, '2011-08-11', 2059, 7, NULL, 0), \
 ('Ok Radio Server', '[Bitrate: 128] ', 'http://80.237.210.23:8052', '', '', 51, 128, 0, 1, '2011-08-11', 2060, 8, NULL, 0), \
 ('Danceradioglobal.com main', '[Bitrate: 128] ', 'http://94.23.55.74:8058', '', '', 4, 128, 0, 1, '2011-08-11', 2061, 4, NULL, 0), \
@@ -1641,9 +1551,7 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('COUNTRY 108', '[Bitrate: 128]   ', 'http://80.237.210.44:80', '', '', 6, 128, 0, 1, '2011-08-11', 2090, 8, NULL, 0), \
 ('Shanson 101.9 Kiev', '[Bitrate: 128] ', 'http://217.20.164.163:8002', '', '', 0, 128, 0, 1, '2011-08-11', 2091, 49, NULL, 0), \
 ('STAR FM Bln', '[Bitrate: 128] ', 'http://87.230.53.43:8000', '', '', 1, 128, 0, 1, '2011-08-11', 2092, 12, NULL, 0), \
-('181.fm - The Mix Channel 70s', ' 80s', 'http://38.107.220.162:8032', '', '181.fm.png', 13, 128, 1, 1, '2011-08-11', 2093, 7, NULL, 0), \
 ('Loca Fm Live', '[Bitrate: 128]', 'http://91.121.159.10:23500', '', '', 4, 128, 0, 1, '2011-08-11', 2094, 4, NULL, 0), \
-('181.fm - Rock 181 (Active Rock) ', '[Bitrate: 128] ', 'http://38.107.220.162:8064', '', '181.fm.png', 1, 128, 0, 1, '2011-08-11', 2095, 7, NULL, 0), \
 ('Radio 112', '[Bitrate: 128]', 'http://85.25.150.17:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2096, 8, NULL, 0), \
 ('Dumont FM', ' [Bitrate: 128]', 'http://174.37.16.245:8002', '', '', 0, 128, 0, 1, '2011-08-11', 2097, 7, NULL, 0), \
 ('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8010', '', '', 0, 128, 0, 1, '2011-08-11', 2098, 8, NULL, 0), \
@@ -1670,15 +1578,11 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Portofino Network', '[Bitrate: 128]', 'http://87.117.228.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2125, 13, NULL, 0), \
 ('Folk Alley', 'FolkAlley.com  [Bitrate: 128]', 'http://66.225.205.8:80', '', '', 51, 128, 0, 1, '2011-08-11', 2126, 7, NULL, 0), \
 ('Radio Juzni Vetae', '[Bitrate: 128] ', 'http://89.149.209.100:8003', '', '', 51, 128, 0, 1, '2011-08-11', 2127, 53, NULL, 0), \
-('181.FM - Soul', '[Bitrate: 128]', 'http://38.107.220.162:8058', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 2128, 7, NULL, 0), \
 ('COOL radio', '[Bitrate: 128] ', 'http://213.239.205.210:6020', '', '', 51, 128, 0, 1, '2011-08-11', 2129, 8, NULL, 0), \
-('181.fm - The Office', 'F**kin` Perfect (Radio Edit)  [Bitrate: 128] ', 'http://38.107.220.162:8002', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 2130, 7, NULL, 0), \
 ('HPR1', '[Bitrate: 128] ', 'http://130.166.82.14:8006', '', '', 6, 128, 1, 1, '2011-08-11', 2131, 7, '2011-09-07 13:41:37', 0), \
 ('METAL ONLY ', '24h Black Death Heavy Metal Rock', 'http://87.230.53.10:9480', '', '', 1, 128, 0, 1, '2011-08-11', 2132, 12, NULL, 0), \
 ('NERadio Sweden', 'SE [Bitrate: 128]', 'http://87.96.232.206:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2133, 23, NULL, 0), \
-('181.FM - Good Time Oldies', 'Beau Brummels - Laugh', 'http://38.107.220.162:8046', '', '181.fm.png', 3, 128, 0, 1, '2011-08-11', 2134, 7, NULL, 0), \
 ('Big R Radio - Warm 101.6 ', '[Bitrate: 128] ', 'http://173.193.14.170:8010', '', '', 0, 128, 0, 1, '2011-08-11', 2135, 27, NULL, 0), \
-('181.FM - The BOX', 'HipHop radio [Bitrate: 128]', 'http://38.107.220.162:8024', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2136, 7, NULL, 0), \
 ('Kuschel.FM', '[Bitrate: 128] ', 'http://84.19.184.95:8040', '', '', 0, 128, 0, 1, '2011-08-11', 2137, 8, NULL, 0), \
 ('JACK FM - ALL HIT RADIO', '[Bitrate: 128]', 'http://80.237.210.91:80', '', '', 0, 128, 0, 1, '2011-08-11', 2138, 8, NULL, 0), \
 ('Radio BN +38755228412', '[Bitrate: 128]', 'http://46.4.33.9:8522', '', '', 51, 128, 0, 1, '2011-08-11', 2139, 8, NULL, 0), \
@@ -1695,11 +1599,9 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Electro Radio', '[Bitrate: 128]', 'http://87.118.78.88:26630', '', '', 30, 128, 0, 1, '2011-08-11', 2150, 25, NULL, 0), \
 ('Sharmanka 104.0 Kiev', '[Bitrate: 128]', 'http://217.20.164.163:8006', '', '', 0, 128, 0, 1, '2011-08-11', 2151, 49, NULL, 0), \
 ('MUSIK.LOUNGE', '#Musik.Lounge - Track Update on www.RauteMusik.FM/lounge  [Bitrate: 128] ', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1080', '', '', 0, 128, 0, 1, '2011-08-11', 2152, 7, NULL, 0), \
-('Partyradio24', '[Bitrate: 128]', 'http://212.48.110.70:8070', '', '', 4, 128, 1, 1, '2011-08-11', 2153, 8, NULL, 0), \
 ('ElectricFM.com- America''s Real Dance!', '[Bitrate: 128] ', 'http://208.85.240.90:80', '', '', 30, 128, 0, 1, '2011-08-11', 2154, 7, NULL, 0), \
 ('LOLLIRADIO ITALIA ', '[Bitrate: 128]', 'http://94.23.67.172:8010', '', '', 0, 128, 0, 1, '2011-08-11', 2155, 26, NULL, 0), \
 ('Jemne Melodie: jemne melodie live', '[Bitrate: 128] ', 'http://93.184.69.143:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2156, 48, NULL, 0), \
-('181.fm - Awesome 80''s', '[Bitrate: 128] ', 'http://38.107.220.162:8000', '', '181.fm.png', 13, 128, 0, 1, '2011-08-11', 2157, 7, NULL, 0), \
 ('Music One', '[Bitrate: 128]', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1011', '', '', 0, 128, 0, 1, '2011-08-11', 2158, 7, NULL, 0), \
 ('TranceBase.FM - 24h Vocal', 'Progressive', 'http://85.17.26.106:80', '', '', 29, 128, 0, 1, '2011-08-11', 2159, 6, NULL, 0), \
 ('SwissGroove', 'jazz funk', 'http://82.197.165.141:80', '', '', 9, 128, 0, 1, '2011-08-11', 2160, 24, NULL, 0), \
@@ -1707,21 +1609,14 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('80s Planet.com', ' the 80s! ', 'http://67.213.220.36:8080', '', '', 50, 128, 0, 1, '2011-08-11', 2162, 7, NULL, 0), \
 ('DNBRADIO', ' Jungle (JDNB) 24/7 ', 'http://207.200.96.227:8016', '', '', 0, 128, 0, 1, '2011-08-11', 2163, 7, NULL, 0), \
 ('108.FM', '[Bitrate: 128] ', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1030', '', '', 0, 128, 0, 1, '2011-08-11', 2164, 7, NULL, 0), \
-('181.fm R&B', '[Bitrate: 128]', 'http://38.107.220.162:8022', '', '181.fm.png', 5, 128, 1, 1, '2011-08-11', 2165, 7, NULL, 0), \
 ('Radioseven - www.radioseven.se', 'Darude - Salmiakki Sessions 75  [Bitrate: 128] ', 'http://81.186.251.7:8500', '', '', 0, 128, 0, 1, '2011-08-11', 2166, 23, NULL, 0), \
-('181.FM - Highway 181', '[Bitrate: 128]', 'http://38.107.220.162:8018', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2167, 7, '2011-10-07 16:02:29', 0), \
-('Audiocream.com', 'Frank Ocean - Novacane  [Bitrate: 128]', 'http://scfire-ntc-aa03.stream.aol.com:80/stream/1038', '', '', 0, 128, 1, 1, '2011-08-11', 2168, 7, NULL, 0), \
 ('@80s I streamed', '[Bitrate: 128] ', 'http://87.230.55.93:4080', '', '', 13, 128, 0, 1, '2011-08-11', 2169, 42, NULL, 0), \
 ('Radio Gravity', ' Patrocinado por www.HispaSMS.Net [Bitrate: 128]', 'http://109.104.69.166:8002', '', '', 0, 128, 0, 1, '2011-08-11', 2170, 9, NULL, 0), \
-('181.fm - The Heart (All Love Songs)', '[Bitrate: 128]', 'http://38.107.220.162:8006', '', '181.fm.png', 54, 128, 1, 1, '2011-08-11', 2171, 7, NULL, 0), \
 ('RADIODISCOPOLO.FM', ' radio ZET', 'http://94.23.36.107:443', '', '', 0, 128, 0, 1, '2011-08-11', 2172, 4, NULL, 0), \
 ('HouseSection.FM', ' Austria House Music Radio - MusicBase.FM ~ [Bitrate: 128]', 'http://89.31.134.100:84', '', '', 16, 128, 0, 1, '2011-08-11', 2173, 12, NULL, 0), \
 ('Deep Mix Moscow', '[Bitrate: 128]', 'http://194.183.224.59:8128', '', '', 0, 128, 0, 1, '2011-08-11', 2174, 26, NULL, 0), \
 ('Radio animesPLUS ', '[Bitrate: 128]', 'http://76.73.80.34:9998', '', '', 0, 128, 0, 1, '2011-08-11', 2175, 7, NULL, 0), \
 ('CLASSICAL 102', '[Bitrate: 128]', 'http://80.237.210.39:80', '', '', 8, 128, 0, 1, '2011-08-11', 2176, 8, NULL, 0), \
-('MUSIK.HARDER', 'WWW.RAUTEMUSIK.FM [Bitrate: 128] ', 'http://80.237.157.15:22000', '', '', 0, 128, 1, 1, '2011-08-11', 2177, 42, NULL, 0), \
-('FREQUENCE3', '[Bitrate: 128]', 'http://193.222.128.174:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2178, 4, NULL, 0), \
-('Radio GANGSTA ', 'www.RadioGangsta.Ro [Bitrate: 128]', 'http://93.114.41.35:8800', '', '', 0, 128, 0, 1, '2011-08-11', 2179, 41, NULL, 0), \
 ('AngelsFox-Radio', '[Bitrate: 128]', 'http://89.149.226.128:80', '', 'AngelsFox-Radio.png', 0, 128, 0, 1, '2011-08-11', 2180, 8, NULL, 0), \
 ('Beste FM', '[Bitrate: 128]  ', 'http://85.25.176.122:14048', '', '', 0, 128, 0, 1, '2011-08-11', 2181, 8, NULL, 0), \
 ('1.FM - Dance Hits', '[Bitrate: 128]', 'http://64.62.194.11:8050', '', '', 40, 128, 0, 1, '2011-08-11', 2182, 7, NULL, 0), \
@@ -1738,9 +1633,7 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Bassdrive', '[Bitrate: 128]', 'http://205.188.215.226:8012', '', '', 50, 128, 0, 1, '2011-08-11', 2193, 7, NULL, 0), \
 ('La X Estereo', '[Bitrate: 128]', 'http://80.237.211.85:80', '', '', 0, 128, 0, 1, '2011-08-11', 2194, 8, NULL, 0), \
 ('HIT104', '[Bitrate: 128]', 'http://80.237.210.57:80', '', '', 40, 128, 0, 1, '2011-08-11', 2195, 8, NULL, 0), \
-('181.FM - Chilled', '[Bitrate: 128]', 'http://scfire-mtc-aa06.stream.aol.com:80/stream/1092', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2196, 7, '2011-10-04 21:14:47', 0), \
 ('MUSIK.BIGCITYBEATS', 'Track Update on www.RauteMusik.FM/bcb  [Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1082', '', '', 0, 128, 0, 1, '2011-08-11', 2197, 7, NULL, 0), \
-('181.FM - PARTY 181', '[Bitrate: 128] ', 'http://38.107.220.162:8036', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 2198, 7, NULL, 0), \
 ('LOUNGE-RADIO.COM ', '', 'http://195.141.102.212:8040', '', '', 0, 128, 0, 1, '2011-08-11', 2199, 9, NULL, 0), \
 ('Venice Classic', '[Bitrate: 128]  ', 'http://174.36.206.197:8000', '', '', 8, 128, 0, 1, '2011-08-11', 2200, 58, NULL, 0), \
 ('BlackBeats.FM ', 'finest in blackbeats [Bitrate: 128] ', 'http://212.95.42.65:80', '', '', 0, 128, 0, 1, '2011-08-11', 2201, 11, NULL, 0), \
@@ -1749,20 +1642,13 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Alesis', '[Bitrate: 128]', 'http://scfire-mtc-aa06.stream.aol.com:80/stream/1005', '', '', 0, 128, 0, 1, '2011-08-11', 2204, 7, NULL, 0), \
 ('Radio Paloma - 100% Deutscher Schlager!', '[Bitrate: 128]', 'http://80.237.184.23:80', '', '', 45, 128, 0, 1, '2011-08-11', 2205, 8, NULL, 0), \
 ('1.FM - 80s Channel', 'nonstop power80 2  [Bitrate: 128]', 'http://64.62.194.11:8095', '', '', 13, 128, 0, 1, '2011-08-11', 2206, 7, NULL, 0), \
-('181.FM - Energy 98', '[Bitrate: 128] ', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1093', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2207, 7, '2011-10-07 16:02:34', 0), \
 ('Radio Paradise', 'DJ-mixed modern & classic rock', 'http://scfire-ntc-aa08.stream.aol.com:80/stream/1049', '', '', 1, 128, 0, 1, '2011-08-11', 2208, 7, NULL, 0), \
-('181.fm - The Eagle', '[Bitrate: 128]  ', 'http://174.36.241.224:10108', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2209, 7, '2011-10-07 16:02:39', 0), \
-('181.FM - Kickin', '[Bitrate: 128]', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1075', '', '181.fm.png', 6, 128, 2, 1, '2011-08-11', 2210, 7, NULL, 0), \
-('FG DJ RADIO', 'FG DJ RADIO Save the world SWEDISH_HOUSE_MAFIA  [Bitrate: 128]', 'http://87.98.215.52:80', '', '', 4, 128, 2, 1, '2011-08-11', 2211, 4, NULL, 0), \
 ('friskyRadio', 'Trance', 'http://scfire-dtc-aa06.stream.aol.com:80/stream/1015', '', '', 29, 128, 0, 1, '2011-08-11', 2212, 7, NULL, 0), \
 ('HardBase.FM', ' Jumpstyle', 'http://78.159.104.162:80', '', '', 0, 128, 1, 1, '2011-08-11', 2213, 39, NULL, 0), \
 ('Techno4ever', '@ www.T4E.DJ [Bitrate: 128]', 'http://78.159.104.146:80', '', '', 50, 128, 0, 1, '2011-08-11', 2214, 39, NULL, 0), \
 ('HouseTime.FM', 'House & More', 'http://85.17.26.102:80', '', '', 16, 128, 0, 1, '2011-08-11', 2215, 6, NULL, 0), \
-('181.FM - Classic Hits', '[Bitrate: 128]', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1094', '', '181.fm.png', 40, 128, 0, 1, '2011-08-11', 2216, 7, NULL, 0), \
-('181.FM - POWER 181', '-=[: The Hitz Channel :]=- www.181.fm M.I.A. - Paper Planes (Radio Edit)  [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1023', '', '181.fm.png', 40, 128, 0, 1, '2011-08-11', 2217, 7, NULL, 0), \
 ('Ballermann Radio', '[Bitrate: 128]', 'http://83.169.61.46:5000', '', '', 0, 128, 0, 1, '2011-08-11', 2218, 28, NULL, 0), \
 ('1POWER ', 'www.powerhitz.com [Bitrate: 128]', 'http://scfire-dtc-aa03.stream.aol.com:80/stream/1044', '', '', 0, 128, 0, 1, '2011-08-11', 2219, 7, NULL, 0), \
-('181.FM - The Buzz ', '[Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1022', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 2220, 7, NULL, 0), \
 ('MUSIK.GOLDIES', '#Musik.Goldies - Track Update on www.RauteMusik.FM/goldies  [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1060', '', '', 0, 128, 0, 1, '2011-08-11', 2221, 7, NULL, 0), \
 ('MUSIK.MAIN ', '#Musik.Main [Bitrate: 128]', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1051', '', '', 0, 128, 0, 1, '2011-08-11', 2222, 7, NULL, 0), \
 ('MUSIK.HOUSE (FUNKY)', 'FUNK [Bitrate: 128]', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1058', '', '', 47, 128, 2, 1, '2011-08-11', 2223, 7, '2011-09-17 18:06:49', 0), \
@@ -1794,7 +1680,6 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('4Noises', 'PoP Rock Dance Gigaziggi.com', 'http://184.107.133.34:9820', '', '', 40, 320, 0, 1, '2011-08-16', 2249, 27, NULL, 0), \
 ('Ayeko.com', 'NetLabel Minimal Techno House', 'http://94.23.1.51:8000', '', '', 0, 320, 0, 1, '2011-08-16', 2250, 4, NULL, 0), \
 ('Renegade HD', 'dubstep, breaks, house, drum and bass, trance, electro', 'http://87.106.161.144:80/rlive.mp3', '', '', 16, 320, 0, 1, '2011-08-16', 2251, 7, NULL, 0), \
-('ARM FM', 'Dance', 'http://83.216.63.98:9000', '', '', 4, 320, 5, 1, '2011-08-16', 2252, 50, '2011-09-17 18:05:25', 0), \
 ('MakeAVoice Radio - Mix', 'Rock', 'http://174.122.26.34:8380', '', '', 1, 320, 0, 1, '2011-08-16', 2253, 7, NULL, 0), \
 ('Laser 80 - La Musique Des Annees 80', '80 s', 'http://188.165.32.218:9066', '', '', 13, 320, 0, 1, '2011-08-16', 2254, 26, NULL, 0), \
 ('Radio ELECTRO www.radiogora.ru', 'House', 'http://79.140.78.106:10060', '', '', 16, 320, 2, 1, '2011-08-16', 2255, 8, '2011-09-17 18:05:59', 0), \
@@ -1803,33 +1688,25 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Metro Oslo HD', 'Easy Listening', 'http://89.105.32.12:8124', '', '', 7, 320, 0, 1, '2011-08-16', 2258, 21, NULL, 0), \
 ('she', 'Misc', 'http://119.207.75.234:6970', '', '', 0, 320, 0, 0, '2011-08-16', 2259, 40, NULL, 0), \
 ('Top100 Single Charts', 'top40   charts   other   schla', 'http://184.107.168.138:9888', '', '', 40, 320, 0, 1, '2011-08-16', 2260, 27, NULL, 0), \
-('Beat HD', 'R&amp;B  R&amp;B  Urban  Hip  Hop  Rap', 'http://89.105.32.12:8122', '', '', 44, 320, 0, 1, '2011-08-16', 2261, 21, NULL, 0), \
 ('Raritan Bay Radio IN HIGH DEFINITION!!!', 'Oldies', 'http://68.195.207.45:8000', '', '', 3, 320, 0, 1, '2011-08-16', 2262, 7, NULL, 0), \
 ('Snakeices House of Beats', 'Rap  Hip Hop  R&amp;B  Jazz  Blues', 'http://64.113.122.205:8025', '', '', 5, 320, 2, 1, '2011-08-16', 2263, 7, '2011-09-16 18:54:04', 0), \
-('Electronic Music FM Radio', 'electronicmusic.fm  Deep House Minimal Tech House', 'http://82.196.128.108:8002', '', '', 16, 320, 0, 1, '2011-08-16', 2264, 29, NULL, 0), \
-('Electronic Music FM Radio', 'Deep House Minimal Tech House', 'http://82.196.128.108:8008', '', '', 16, 320, 12, 1, '2011-08-16', 2265, 29, '2011-10-06 16:56:24', 0), \
-('En ce moment', 'G n raliste', 'http://88.191.53.74:8142', '', '', 0, 320, 0, 1, '2011-08-16', 2266, 9, NULL, 0), \
-('DubRadio', 'Dubstep', 'http://76.72.17.228:8000', '', '', 7, 320, 3, 1, '2011-08-16', 2267, 7, '2011-09-16 19:00:04', 0), \
 ('WIAM RADIO LIVE REMOTE FEED', 'GOSPEL   INSPIRATIONAL   CHRIS', 'http://174.123.84.173:8000', '', '', 49, 320, 0, 1, '2011-08-16', 2268, 7, NULL, 0), \
 ('CANAL STREAM TOTALMIX', 'MIXED TRANCE SPIRIT', 'http://213.251.161.215:19000', '', '', 41, 320, 1, 1, '2011-08-16', 2269, 42, NULL, 0), \
-('DeepFM', 'House Dance', 'http://195.66.134.41:80', '', '', 16, 320, 8, 1, '2011-08-16', 2270, 24, '2011-10-06 16:56:33', 0), \
+('DeepFM', 'House Dance', 'http://195.66.134.41:80', '', '', 16, 320, 8, 1, '2011-08-16', 2270, 24, '2011-10-06 16:56:33', 1), \
 ('Rockhard Lossless Radio', 'Hard Rock &amp; Metal', 'http://85.17.90.12:8000', '', '', 1, 320, 0, 1, '2011-08-16', 2271, 38, NULL, 0), \
 ('AutoDJ - STN.LV Radio', 'All', 'http://94.30.245.193:8000', '', '', 0, 320, 0, 1, '2011-08-16', 2272, 14, NULL, 0), \
 ('Never Ending Muzik Sound ', 'New Style The Real Live Remix', 'http://119.207.75.237:1630', '', '', 0, 320, 0, 1, '2011-08-16', 2273, 40, NULL, 0), \
 ('Radio Halli Galli', 'World', 'http://184.107.168.138:9952', '', '', 0, 320, 0, 1, '2011-08-16', 2274, 27, NULL, 0), \
 ('TranceOnline radio', 'TRance   HardTrance   HardDanc', 'http://94.23.218.141:8000', '', '', 41, 320, 2, 1, '2011-08-16', 2275, 37, '2011-09-17 18:06:05', 0), \
-('Electronic Music FM Radio', 'Tech House Techno Minimal', 'http://82.196.128.108:8042', '', '', 50, 320, 0, 1, '2011-08-16', 2276, 29, NULL, 0), \
 ('The New England Jazz Express!', 'Jazz', 'http://75.69.53.115:8004', '', '', 9, 320, 0, 1, '2011-08-16', 2277, 7, NULL, 0), \
 ('Radio ATD www.radiogora.ru', 'Metal Rock', 'http://79.140.78.106:10610', '', '', 1, 320, 0, 1, '2011-08-16', 2278, 8, NULL, 0), \
 ('Goa World Psytrance Radio', 'Goa', 'http://195.198.242.249:8010', '', '', 7, 320, 0, 1, '2011-08-16', 2279, 23, NULL, 0), \
 ('Boerse.FM', 'News', 'http://184.107.168.138:9872', '', '', 0, 320, 0, 1, '2011-08-16', 2280, 27, NULL, 0), \
-('Radio Klub [Best Dance, House and Techno]', 'House  Techno  Dance', 'http://91.121.198.93:16000', '', '', 16, 320, 7, 1, '2011-08-16', 2281, 27, '2011-09-17 18:05:20', 0), \
 ('AutoDJ (WWMR Radio)', 'Unspecified', 'http://96.127.130.50:8200', '', '', 0, 320, 0, 1, '2011-08-16', 2282, 7, NULL, 0), \
 ('Vibeslinkfm96.1', 'Reggae', 'http://174.36.206.217:8557', '', '', 48, 320, 0, 1, '2011-08-16', 2283, 58, NULL, 0), \
 ('Italo Disco Radio', 'ItaloDisco  EuroDance  Hi NrG', 'http://78.159.97.159:8016', '', '', 31, 320, 0, 1, '2011-08-16', 2284, 8, NULL, 0), \
 ('FS - fullspectrumradio.com - DnB/Jungle/Bass/Electronic', 'Drum and Bass', 'http://67.230.191.211:8000', '', '', 53, 320, 0, 1, '2011-08-16', 2285, 7, NULL, 0), \
 ('Radio BassBeats Melodie', 'Various', 'http://184.107.133.34:9882', '', '', 0, 320, 0, 1, '2011-08-16', 2286, 27, NULL, 0), \
-('Need.fm', 'Dubstep and Drum and bass', 'http://109.254.39.37:8000', '', '', 7, 320, 4, 1, '2011-08-16', 2287, 8, NULL, 0), \
 ('Easymix - Radio', 'Easymix Radio', 'http://184.107.166.186:9864', '', '', 0, 320, 0, 1, '2011-08-16', 2288, 27, NULL, 0), \
 ('24 Stunden rund um die Uhr Musik', 'Genre', 'http://184.107.168.138:9848', '', '', 0, 320, 1, 1, '2011-08-16', 2289, 27, NULL, 0), \
 ('Egroove CH1: egroove.fm', 'electronic', 'http://87.238.194.30:9000', '', '', 30, 320, 1, 1, '2011-08-16', 2290, 8, NULL, 0), \
@@ -1870,14 +1747,9 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('WondeRadio', 'Hits of the 80s and 90s', 'http://184.107.133.34:9822', '', '', 40, 320, 0, 1, '2011-08-16', 2326, 27, NULL, 0), \
 ('www.gecelife.net', 'Turkce Turkish Pop Slow Remix', 'http://46.105.109.141:2026', '', '', 45, 320, 0, 1, '2011-08-16', 2327, 4, NULL, 0), \
 ('Radio Style FM', 'Manele Dance', 'http://95.130.10.81:8989', '', '', 40, 320, 0, 1, '2011-08-16', 2328, 30, NULL, 0), \
-('PowerTrance / Trance Forever', 'Trance', 'http://109.230.230.198:10800', '', '', 41, 320, 7, 1, '2011-08-16', 2329, 39, '2011-10-07 16:01:52', 0), \
-('Auto-DJ RADIO FUNKYTOWN', '', 'http://184.107.168.138:9814', '', '', 0, 320, 1, 1, '2011-08-16', 2330, 27, NULL, 0), \
 ('KWAX', '', 'http://128.223.175.195:9100/KWAX320.mp3', '', '', 0, 320, 0, 1, '2011-08-16', 2331, 7, NULL, 0), \
 ('AutoDJ', '', 'http://184.107.168.138:9794', '', '', 0, 320, 1, 1, '2011-08-16', 2332, 27, NULL, 0), \
-('BEST FM', 'Dance', 'http://188.173.252.152:1000', '', '', 4, 320, 1, 1, '2011-08-16', 2333, 9, '2011-09-17 18:06:26', 0), \
 ('Egroove CH1: egroove.fm', 'electronic', 'http://87.238.194.30:9020', '', '', 7, 320, 1, 1, '2011-08-16', 2334, 8, NULL, 0), \
-('RADIO PHR Den Telefonstream erreichst du unter 0345-483410821', 'Welt', 'http://184.107.133.34:9994', '', '', 0, 320, 0, 1, '2011-08-16', 2335, 27, NULL, 0), \
-('Live Broadcast Station', 'sverige', 'http://213.89.227.100:28040', '', '', 0, 320, 5, 1, '2011-08-16', 2336, 23, '2011-09-17 18:05:36', 0), \
 ('Auto Dj - Radio Romantik', 'gemischtes', 'http://184.107.166.194:9838', '', '', 0, 320, 0, 1, '2011-08-16', 2337, 27, NULL, 0), \
 ('Musikbox', '', 'http://184.107.168.138:9790', '', '', 0, 320, 0, 1, '2011-08-16', 2338, 27, NULL, 0), \
 ('reggaemusic.com.pa', 'pop reggae salsa tecno', 'http://69.73.178.165:6020', '', '', 4, 320, 0, 1, '2011-08-16', 2339, 7, NULL, 0), \
@@ -1951,7 +1823,6 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('Raj Radio', 'classical', 'http://178.198.181.225:8000', '', '', 8, 320, 0, 1, '2011-08-16', 2408, 24, NULL, 0), \
 ('Web RADIO', 'Electro   Techno   Hardcore an', 'http://88.191.119.125:42300', '', '', 4, 320, 1, 1, '2011-08-16', 2409, 7, NULL, 0), \
 ('SleepyEngineers.com', 'Demo server', 'http://96.31.83.86:8000', '', '', 0, 320, 0, 1, '2011-08-16', 2410, 7, NULL, 0), \
-('Auto-DJ', 'Top Music', 'http://184.107.166.194:9930', '', '', 45, 320, 0, 1, '2011-08-16', 2411, 27, NULL, 0), \
 ('2x2 Station', 'Trance', 'http://77.37.204.39:8000', '', '', 41, 320, 0, 1, '2011-08-16', 2412, 64, NULL, 0), \
 ('Powerlady-AutoDJ', '', 'http://184.107.168.138:9832', '', '', 12, 320, 5, 1, '2011-08-16', 2413, 27, '2011-10-06 14:08:45', 0), \
 ('Goldenlight Radio', 'Ht Music', 'http://195.56.193.240:8030', '', '', 40, 320, 0, 1, '2011-08-16', 2414, 50, NULL, 0), \
@@ -1974,9 +1845,7 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('AutoDJ', 'All', 'http://184.107.166.194:9872', '', '', 0, 320, 1, 1, '2011-08-16', 2431, 27, '2011-09-07 22:59:37', 0), \
 ('Danceukradio', 'Pop', 'http://217.114.63.157:8030', '', '', 45, 320, 0, 1, '2011-08-16', 2432, 7, NULL, 0), \
 ('Radio Mystica: Radio Mystica Auto DJ', 'Alternative', 'http://87.118.78.17:9200', '', '', 7, 320, 1, 1, '2011-08-16', 2433, 25, '2011-10-06 16:55:56', 0), \
-('Hausmeisterradio', 'Mix', 'http://184.107.166.194:9836', '', '', 52, 320, 2, 1, '2011-08-16', 2434, 27, '2011-09-17 18:05:53', 0), \
 ('AutoDJ', 'pop', 'http://184.107.166.194:9878', '', '', 45, 320, 0, 1, '2011-08-16', 2435, 27, NULL, 0), \
-('Es Luft der Auto-DJ von Radio-Hittmix', 'pop   club', 'http://184.107.166.186:9850', '', '', 45, 320, 0, 1, '2011-08-16', 2436, 27, NULL, 0), \
 ('Studio Rovako', 'Various', 'http://46.4.217.169:8500', '', '', 0, 320, 0, 1, '2011-08-16', 2437, 8, NULL, 0), \
 ('Auto DJ', 'mix max', 'http://184.107.166.194:9832', '', '', 0, 320, 0, 1, '2011-08-16', 2438, 27, NULL, 0), \
 ('B-klass', '', 'http://77.73.92.144:8000', '', '', 0, 320, 0, 1, '2011-08-16', 2439, 29, NULL, 0), \
@@ -1986,11 +1855,6 @@ const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `bes
 ('formula hit', 'Various', 'http://68.168.100.60:25641', '', '', 0, 320, 0, 1, '2011-08-16', 2443, 7, NULL, 0), \
 (' FM 97.75 Mhz ', 'World', 'http://103.22.182.102:8924', '', '', 0, 320, 0, 1, '2011-08-16', 2444, 7, NULL, 0), \
 ('Veliyev Stream', 'Pop', 'http://64.64.13.52:8036', '', '', 45, 320, 0, 1, '2011-08-16', 2445, 7, NULL, 0), \
-('BBC Radio 3', 'BBC 3', 'http://bbc.co.uk/radio/listen/live/r3.asx', '', '', 0, 0, 7, 1, '0000-00-00', 2446, 9, '2011-09-16 18:55:08', 0), \
-('BBC Radio 6 Music', 'Utopia [Bitrate: 128]', 'http://bbc.co.uk/radio/listen/live/r6.asx', '', '', 0, 0, 5, 1, '2011-09-05', 2447, 9, '2011-09-16 18:55:13', 0), \
-('BBC Radio 2', 'BBC 2', 'http://bbc.co.uk/radio/listen/live/r2.asx', 'bbc.com', '', 0, 0, 5, 1, '0000-00-00', 2448, 9, '2011-09-16 18:54:52', 0), \
-('BBC Radio 4', 'BBC 4', 'http://bbc.co.uk/radio/listen/live/r4.asx', '', '', 0, 0, 3, 1, '0000-00-00', 2449, 9, NULL, 0), \
-('BBC Radio 5 Live', 'BBC 5', 'http://bbc.co.uk/radio/listen/live/r5l.asx', '', '', 0, 0, 4, 1, '0000-00-00', 2450, 9, NULL, 0), \
 ('SomaFM: Mission Control ', 'San Francisco, CA Celebrating NASA and Space Explorers everywhere.', 'http://mp1.somafm.com:2020', 'http://somafm.com/missioncontrol/', '', 0, 128, 0, 1, '2011-10-09', 2451, 0, NULL, 0), \
 ('Apollo 11 Mission ', '', 'http://tunein.com/station/?StationId=107541', 'http://www.wechoosethemoon.org/#', '', 0, 128, 0, 1, '2011-10-09', 2452, 0, NULL, 0), \
 ('Tech Nation', 'Technology in our lives.', 'https://war.streamguys1.com:7031/kuaf1', '', '', 0, 128, 0, 1, '2011-10-09', 2453, 0, NULL, 0), \
@@ -2156,7 +2020,6 @@ const char *radio_station_setupsql6="REPLACE INTO `radio_stations` (`name`, `bes
 ('Heavy-D--The-Boyz', '', 'mms://live.cumulusstreaming.com/KFNC-FM', '', 'Heavy-D--The-Boyz.png', 0, 0, 0, 1, '2011-11-11', 2701, 0, '2017-01-01 00:00:00', 0), \
 ('Vanguard-Jazz-Orchestra', '', 'mms://live.cumulusstreaming.com/KFNC-FM', '', 'Vanguard-Jazz-Orchestra.png', 0, 0, 0, 1, '2011-11-11', 2702, 0, '2017-01-01 00:00:00', 0), \
 ('K-Hits-96-963', '', 'mms://live.cumulusstreaming.com/KFNC-FM', 'http://www.k-hits.com/', 'K-Hits-96-963.png', 0, 0, 0, 1, '2011-11-11', 2703, 0, '2017-01-01 00:00:00', 0), \
-('WEDO-810', 'The station&#39;s programming offerings consist of various Catholic, ethnic, oldies, and paid programs, not much different than when it first signed on the air back in 1947', 'http://asx.abacast.com/810inc-wedoam-64.pls', 'http://www.wedo810.com/', 'WEDO-810.png', 0, 0, 5, 1, '2011-11-11', 2704, 0, '2011-10-15 20:10:14', 0), \
 ('Take-Your-Health-to-Heart', '', 'http://franklin.tbo.net:8018', '', 'Take-Your-Health-to-Heart.png', 0, 0, 0, 1, '2011-11-11', 2705, 0, '2017-01-01 00:00:00', 0), \
 ('Family-Gospel-Music-Hour', '', 'http://asx.abacast.com/810inc-wedoam-64.pls', '', 'Family-Gospel-Music-Hour.png', 0, 0, 0, 1, '2011-11-11', 2706, 0, '2017-01-01 00:00:00', 0), \
 ('VRT-Studio-Brussel-1006', '', 'http://mp3.streampower.be/stubru-high.mp3', 'http://www.stubru.be/home', 'VRT-Studio-Brussel-1006.png', 0, 0, 2, 1, '2011-11-11', 2707, 0, '2011-10-14 15:50:22', 0), \
@@ -2169,7 +2032,6 @@ const char *radio_station_setupsql6="REPLACE INTO `radio_stations` (`name`, `bes
 ('WRMF-979', '', 'mms://streaming111.network1sports.com/kunf', 'http://www.wrmf.com/', 'WRMF-979.png', 0, 0, 0, 1, '2011-11-11', 2714, 0, '2017-01-01 00:00:00', 0), \
 ('BOB-FM-1049', 'Bob has thousands of CDs and one day he decided to play them all on the radio. You never know what Bob will play next.', 'http://icy2.abacast.com/qantummyrtlebeach-wynafm-32.m3u', 'http://www.1049bobfm.com/', 'BOB-FM-1049.png', 0, 0, 0, 1, '2011-11-11', 2715, 0, '2017-01-01 00:00:00', 0), \
 ('Fierce-Angel', '', 'http://icy2.abacast.com/qantummyrtlebeach-wynafm-32.m3u', '', 'Fierce-Angel.png', 0, 0, 0, 1, '2011-11-11', 2716, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Perth-720', '', 'http://abc.net.au/res/streaming/audio/aac/local_perth.pls', 'http://www.abc.net.au/perth/', 'ABC-Perth-720.png', 0, 0, 0, 1, '2011-11-11', 2717, 0, '2017-01-01 00:00:00', 0), \
 ('KRMS-1150', '', 'http://abc.net.au/res/streaming/audio/aac/local_perth.pls', 'http://www.1150krms.com/', 'KRMS-1150.png', 0, 0, 0, 1, '2011-11-11', 2718, 0, '2017-01-01 00:00:00', 0), \
 ('The-SOS-Band', '', 'http://abc.net.au/res/streaming/audio/aac/local_perth.pls', '', 'The-SOS-Band.png', 0, 0, 0, 1, '2011-11-11', 2719, 0, '2017-01-01 00:00:00', 0), \
 ('Pista Digital - Portal Disco Digital - www.discodigital.com.br ', 'www.pistadigital.com.br  [Bitrate: 128] [Max Listeners: 5100]', 'http://184.107.209.66:6016', '', '', 31, 128, 0, 1, '2011-08-11', 2720, 28, NULL, 0), \
@@ -2392,7 +2254,6 @@ const char *radio_station_setupsql7="REPLACE INTO `radio_stations` (`name`, `bes
 ('iFM-951', '', 'http://ss3.amfmph.com/ifmiloilo', 'http://ifmiloilo.net/', 'iFM-951.png', 0, 0, 0, 1, '2011-11-11', 3473, 0, '2017-01-01 00:00:00', 0), \
 ('Rich-Walters', '', 'http://ss3.amfmph.com/ifmiloilo', '', 'Rich-Walters.png', 0, 0, 0, 1, '2011-11-11', 3474, 0, '2017-01-01 00:00:00', 0), \
 ('MLB-Network-Radio', 'The world&#39;s first 24/7 channel dedicated exclusively to Major League Baseball.', 'http://ss3.amfmph.com/ifmiloilo', 'http://www.xmradio.com/mlbnetworkradio', 'MLB-Network-Radio.png', 0, 0, 0, 1, '2011-11-11', 3475, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Darwin-1057', '', 'http://abc.net.au/res/streaming/audio/aac/local_darwin.pls', 'http://www.abc.net.au/darwin/radio/', 'ABC-Darwin-1057.png', 0, 0, 0, 1, '2011-11-11', 3476, 0, '2017-01-01 00:00:00', 0), \
 ('The-Southern-Football-Kickoff-Show', '', 'http://abc.net.au/res/streaming/audio/aac/local_darwin.pls', '', 'The-Southern-Football-Kickoff-Show.png', 0, 0, 0, 1, '2011-11-11', 3477, 0, '2017-01-01 00:00:00', 0), \
 ('Radio Hardcast', 'radio_hardcast_..._18__www.hardcast.de  [Bitrate: 128] [Max Listeners: 6000]', 'http://94.23.242.179:10100', '', '', 7, 128, 0, 1, '2011-08-11', 3478, 37, NULL, 0), \
 ('The-BEAT-JAMZ-1011', '', 'http://abc.net.au/res/streaming/audio/aac/local_darwin.pls', 'http://www.101thebeat.com/', 'The-BEAT-JAMZ-1011.png', 0, 0, 0, 1, '2011-11-11', 3479, 0, '2017-01-01 00:00:00', 0), \
@@ -2510,7 +2371,6 @@ const char *radio_station_setupsql7="REPLACE INTO `radio_stations` (`name`, `bes
 ('KMZU-1007', '', 'http://asx.abacast.com/kanza-kanza1-64.asx', 'http://www.kmzu.com/', 'KMZU-1007.png', 0, 0, 0, 1, '2011-11-11', 3592, 0, '2017-01-01 00:00:00', 0), \
 ('The-EAGLE-951', '', 'http://asx.abacast.com/kanza-kanza1-64.asx', 'http://www.951theeagle.com/', 'The-EAGLE-951.png', 0, 0, 0, 1, '2011-11-11', 3593, 0, '2017-01-01 00:00:00', 0), \
 ('Marca-Motor', '', 'http://www.181.fm/winamp.pls?station=181-90salt&style=&description=90%27s%20Alternative', '', 'Marca-Motor.png', 0, 0, 0, 1, '2011-11-11', 3594, 0, '2017-01-01 00:00:00', 0), \
-('ABC-80S', '24/7 online 80s station', 'http://server2.reliastream.com/tunein.php/bgaffn01/playlist.pls', 'http://www.abc80s.ie', 'ABC-80S.png', 0, 0, 0, 1, '2011-11-11', 3595, 0, '2017-01-01 00:00:00', 0), \
 ('Jami-Caskey', '', 'http://media.on.net/radio/62.pls', '', 'Jami-Caskey.png', 0, 0, 0, 1, '2011-11-11', 3596, 0, '2017-01-01 00:00:00', 0), \
 ('House-Bomb-FN', '', 'http://stream.laut.fm/housebomb-fn', 'http://www.laut.fm/housebomb-fn', 'House-Bomb-FN.png', 0, 0, 0, 1, '2011-11-11', 3597, 0, '2017-01-01 00:00:00', 0), \
 ('KDON-FM-1025', '', 'http://www.radio-banovina.hr:8015', 'http://www.kdon.com/', 'KDON-FM-1025.png', 0, 0, 0, 1, '2011-11-11', 3598, 0, '2017-01-01 00:00:00', 0), \
@@ -2550,7 +2410,6 @@ const char *radio_station_setupsql7="REPLACE INTO `radio_stations` (`name`, `bes
 ('The-Buzz-1053', '', 'http://www.keizerstad.nl/streams/Nijmegen_aacplus.pls', 'http://www.1053thebuzz.com/', 'The-Buzz-1053.png', 0, 0, 0, 1, '2011-11-11', 3632, 0, '2017-01-01 00:00:00', 0), \
 ('Nasum', '', 'http://www.keizerstad.nl/streams/Nijmegen_aacplus.pls', '', 'Nasum.png', 0, 0, 0, 1, '2011-11-11', 3633, 0, '2017-01-01 00:00:00', 0), \
 ('A1Radio-80s', 'A1Radio 80s plays classic hits from the Eighties, 24 hours a day, alongside our sister station A1Radio.  Online, Anytime!', 'http://source.shoutcastunlimited.co.uk/tunein.php/richt/playlist.pls', 'http://www.a1radio.co.uk', 'A1Radio-80s.png', 0, 0, 0, 1, '2011-11-11', 3634, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Dance', 'ABC Dance', 'http://listen.radionomy.com/abc-dance', 'http://www.abcdanceradio.com/p/radio-1-electro-house.html', 'ABC-Dance.png', 0, 0, 0, 1, '2011-11-11', 3635, 0, '2017-01-01 00:00:00', 0), \
 ('Coast-1013', 'WHLG 101.3 FM.', 'mms://stream3.securenetsystems.net/WHLG', 'http://www.coast1013.com/', 'Coast-1013.png', 0, 0, 0, 1, '2011-11-11', 3636, 0, '2017-01-01 00:00:00', 0), \
 ('Rock-1045', 'We&#39;re your home for Bubba in the Morning,<BR>52 Minutes of Jacksonville&#39;s Best Rock Every Hour<BR>and the Commercial Free Drive at 5pm', 'mms://stream3.securenetsystems.net/WHLG', 'http://rock105i.com/', 'Rock-1045.png', 0, 0, 0, 1, '2011-11-11', 3637, 0, '2017-01-01 00:00:00', 0), \
 ('1st-Reformed-Church', '', 'mms://stream3.securenetsystems.net/WHLG', '', '1st-Reformed-Church.png', 0, 0, 0, 1, '2011-11-11', 3638, 0, '2017-01-01 00:00:00', 0), \
@@ -2598,7 +2457,6 @@ const char *radio_station_setupsql8="REPLACE INTO `radio_stations` (`name`, `bes
 ('Classic-and-Jazz', 'le meilleur de la musique classique et du jazz, sur une seule et m&#234;me radio. Classic And Jazz peut &#233;galement vous surprendre en sortant parfois des sentiers battus et en vous proposant quelq', 'http://www.laradiodesebb.com/stream/classicandjazz.pls', 'http://www.classicandjazz.net/', 'Classic-and-Jazz.png', 0, 0, 0, 1, '2011-11-11', 3677, 0, '2017-01-01 00:00:00', 0), \
 ('WLNI-1059', '', 'http://asx.abacast.com/centennial-wlni-48.asx', 'http://www.wlni.com/', 'WLNI-1059.png', 0, 0, 0, 1, '2011-11-11', 3678, 0, '2017-01-01 00:00:00', 0), \
 ('Sunday-Morning-Sports-Page', '', 'http://asx.abacast.com/centennial-wlni-48.asx', '', 'Sunday-Morning-Sports-Page.png', 0, 0, 0, 1, '2011-11-11', 3679, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Itinerant-1', '', 'http://abc.net.au/res/streaming/audio/aac/itinerant_one.pls', 'http://www.abc.net.au/', 'ABC-Itinerant-1.png', 0, 0, 0, 1, '2011-11-11', 3680, 0, '2017-01-01 00:00:00', 0), \
 ('The-Dodos', '', 'http://abc.net.au/res/streaming/audio/aac/itinerant_one.pls', '', 'The-Dodos.png', 0, 0, 0, 1, '2011-11-11', 3681, 0, '2017-01-01 00:00:00', 0), \
 ('Heartbeatzfm', 'Your number one slow music webradio station. We&#39;re known for 100% pure romance 24 hours a day seven days a week.', 'http://heartbeatz.fm:8008/', 'http://www.heartbeatz.fm/', 'Heartbeatzfm.png', 0, 0, 0, 1, '2011-11-11', 3682, 0, '2017-01-01 00:00:00', 0), \
 ('KONA-610', '', 'http://heartbeatz.fm:8008/', 'http://www.610KONA.com/', 'KONA-610.png', 0, 0, 0, 1, '2011-11-11', 3683, 0, '2017-01-01 00:00:00', 0), \
@@ -2659,8 +2517,7 @@ const char *radio_station_setupsql8="REPLACE INTO `radio_stations` (`name`, `bes
 ('HDRN---Hard-Drivin-Radio', 'The PREMIER station for Hard Rock, Alternative and Metal on the Internet!', 'http://harddrivinradio.com/hdr.pls', 'http://hdradionetwork.com/', 'HDRN---Hard-Drivin-Radio.png', 0, 0, 0, 1, '2011-11-11', 3738, 0, '2017-01-01 00:00:00', 0), \
 ('KWCK-FM-999', '', 'http://streamer.tcworks.net:8000/kwck', 'http://www.kwck999.com/', 'KWCK-FM-999.png', 0, 0, 0, 1, '2011-11-11', 3739, 0, '2017-01-01 00:00:00', 0), \
 ('923-The-Fan', '92.3 The Fan is a sports talk radio station based out of Cleveland, OH. 92.3 The Fan can be heard at radio.com', 'http://streamer.tcworks.net:8000/kwck', 'http://www.923thefan.com/', '923-The-Fan.png', 0, 0, 0, 1, '2011-11-11', 3740, 0, '2017-01-01 00:00:00', 0), \
-('Lit', '', 'http://streamer.tcworks.net:8000/kwck', '', 'Lit.png', 0, 0, 0, 1, '2011-11-11', 3741, 0, '2017-01-01 00:00:00', 0), \
-('93-JDX-933', '', 'http://streamer.tcworks.net:8000/kwck', 'http://www.theradionetwork.com/93jdx.html', '93-JDX-933.png', 0, 0, 0, 1, '2011-11-11', 3742, 0, '2017-01-01 00:00:00', 0), \
+('93-JDX-933', '', 'http://streamer.tcworks.net:8000/kwck', 'http://www.theradionetwork.com/93jdx.html', '93-JDX-933.png', 0, 0, 0, 1, '2011-11-11', 3742, 0, '2017-01-01 00:00:00', 1), \
 ('JMP-and-Pugh', '', 'http://streamer.tcworks.net:8000/kwck', '', 'JMP-and-Pugh.png', 0, 0, 0, 1, '2011-11-11', 3743, 0, '2017-01-01 00:00:00', 0), \
 ('Incubus', '', 'http://streamer.tcworks.net:8000/kwck', '', 'Incubus.png', 0, 0, 0, 1, '2011-11-11', 3744, 0, '2017-01-01 00:00:00', 0), \
 ('KPUA-670', 'KPUA is Hilo&#39;s news, sports and information source.  featuring up to date Hawaii News and the best live sports coverage on the island including UH athletics, SF Giants, SF 49ers, Monday Night Foot', 'http://streamer.tcworks.net:8000/kwck', 'http://www.kpua.net/', 'KPUA-670.png', 0, 0, 0, 1, '2011-11-11', 3745, 0, '2017-01-01 00:00:00', 0), \
@@ -2815,7 +2672,6 @@ const char *radio_station_setupsql8="REPLACE INTO `radio_stations` (`name`, `bes
 ('Agri-Business-Today', '', 'http://video.dr.dk/dr1', '', 'Agri-Business-Today.png', 0, 0, 0, 1, '2011-11-11', 3895, 0, '2017-01-01 00:00:00', 0), \
 ('Momento-Paddock', '', 'http://video.dr.dk/dr1', '', 'Momento-Paddock.png', 0, 0, 0, 1, '2011-11-11', 3896, 0, '2017-01-01 00:00:00', 0), \
 ('A-New-Beginning', '', 'http://video.dr.dk/dr1', '', 'A-New-Beginning.png', 0, 0, 0, 1, '2011-11-11', 3897, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Tok-Pisin)', '', 'http://www.abc.net.au/res/streaming/audio/windows/radio_australia_tpi.asx', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 3898, 0, '2017-01-01 00:00:00', 0), \
 ('mvyradio-927', 'WMVY 92.7 broadcasts rock, folk, blues, americana, jazz, alternative and then some! mvyradio', 'http://winmedia.voxcdn.net/3447-WMV-mvyradio-Push2', 'http://www.mvyradio.com/', 'mvyradio-927.png', 0, 0, 0, 1, '2011-11-11', 3899, 0, '2017-01-01 00:00:00', 0), \
 ('BEST80-Radio-Dance', '80&#39;s 100% DANCE, FUNK, DISCO and House', 'http://listen.radionomy.com/best80dance', 'http://www.best80radio.com', 'BEST80-Radio-Dance.png', 0, 0, 0, 1, '2011-11-11', 3900, 0, '2017-01-01 00:00:00', 0), \
 ('The-Chordettes', '', 'http://listen.radionomy.com/best80dance', '', 'The-Chordettes.png', 0, 0, 0, 1, '2011-11-11', 3901, 0, '2017-01-01 00:00:00', 0), \
@@ -2900,7 +2756,6 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('Futu-Radio-Dance', '', 'http://www.futuradios.com/ecoute/dance/320/thd-winamp.pls', 'http://www.futuradios.com/', 'Futu-Radio-Dance.png', 0, 0, 0, 1, '2011-11-11', 3978, 0, '2017-01-01 00:00:00', 0), \
 ('The-Buzz-1430', '', 'http://www.futuradios.com/ecoute/dance/320/thd-winamp.pls', 'http://www.1430thebuzz.com/', 'The-Buzz-1430.png', 0, 0, 0, 1, '2011-11-11', 3979, 0, '2017-01-01 00:00:00', 0), \
 ('Church-Programming', '', 'http://www.futuradios.com/ecoute/dance/320/thd-winamp.pls', '', 'Church-Programming.png', 0, 0, 0, 1, '2011-11-11', 3980, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---Vocal-Trance', '', 'http://icecast.audiocream.com/VocalTrance', 'http://www.audiocream.com/', 'Audio-Cream---Vocal-Trance.png', 0, 0, 0, 1, '2011-11-11', 3981, 0, '2017-01-01 00:00:00', 0), \
 ('Gold-FM', '', 'http://sc1.netstreamer.net:8060/', 'http://www.goldfm.de/', 'Gold-FM.png', 0, 0, 0, 1, '2011-11-11', 3982, 0, '2017-01-01 00:00:00', 0), \
 ('Rock-103-1027', '', 'http://sc1.netstreamer.net:8060/', 'http://www.rock103.com/', 'Rock-103-1027.png', 0, 0, 0, 1, '2011-11-11', 3983, 0, '2017-01-01 00:00:00', 0), \
 ('RTHK-Radio-5-994', '', 'http://stm1.rthk.hk/radio5', 'http://programme.rthk.org.hk/channel/radio/index.php?c=radio5', 'RTHK-Radio-5-994.png', 0, 0, 0, 1, '2011-11-11', 3984, 0, '2017-01-01 00:00:00', 0), \
@@ -3024,7 +2879,6 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4105, 8, NULL, 0), \
 ('Dumont FM', ' [Bitrate: 128]', 'http://174.37.16.245:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4106, 7, NULL, 0), \
 ('Radio 112', '[Bitrate: 128]', 'http://85.25.150.17:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4107, 8, NULL, 0), \
-('181.fm - Rock 181 (Active Rock) ', '[Bitrate: 128] ', 'http://38.107.220.162:8064', '', '181.fm.png', 1, 128, 1, 1, '2011-08-11', 4108, 7, '2011-10-14 15:55:01', 0), \
 ('Loca Fm Live', '[Bitrate: 128]', 'http://91.121.159.10:23500', '', '', 4, 128, 0, 1, '2011-08-11', 4109, 4, NULL, 0), \
 ('KGA-1510', '', 'http://ice1.securenetsystems.net:80/WWMS', 'http://www.1510kga.com/', 'KGA-1510.png', 0, 0, 0, 1, '2011-11-11', 4110, 0, '2017-01-01 00:00:00', 0), \
 ('Billy-Boy-on-Poison', '', 'http://ice1.securenetsystems.net:80/WWMS', '', 'Billy-Boy-on-Poison.png', 0, 0, 0, 1, '2011-11-11', 4111, 0, '2017-01-01 00:00:00', 0), \
@@ -3053,7 +2907,6 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('RTL Radio', '  [Bitrate: 128]  ', 'http://81.92.237.118:8080', '', '', 40, 128, 0, 1, '2011-08-11', 4136, 5, NULL, 0), \
 ('TrueHipHop.FM', '  [Bitrate: 128] ', 'http://78.46.19.67:9020', '', '', 0, 128, 0, 1, '2011-08-11', 4137, 8, NULL, 0), \
 ('Classical 96.3FM CFMZ', '[Bitrate: 128] ', 'http://199.27.180.216:8017', '', '', 8, 128, 0, 1, '2011-08-11', 4138, 28, NULL, 0), \
-('Beat Blender', '[Bitrate: 128] ', 'http://74.63.47.82:8384', '', '', 7, 128, 2, 1, '2011-08-11', 4139, 7, NULL, 0), \
 ('Antenne 50plus', '[Bitrate: 128] ', 'http://85.214.21.136:8510', '', '', 0, 128, 0, 1, '2011-08-11', 4140, 31, NULL, 0), \
 ('AUDIOGROOVES.NET', 'DEEP HOUSE [Bitrate: 128]', 'http://173.244.206.15:9004', '', '', 16, 128, 1, 1, '2011-08-11', 4141, 7, NULL, 0), \
 ('Radio Online Ponceo', '[Bitrate: 128] ', 'http://204.145.89.114:8010', '', '', 40, 128, 0, 1, '2011-08-11', 4142, 7, NULL, 0), \
@@ -3066,7 +2919,6 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radio Monte Teja Agira', '[Bitrate: 128]', 'http://222.122.131.58:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4149, 40, NULL, 0), \
 ('Radio Brocken', '[Bitrate: 128] ', 'http://80.237.156.39:80', '', '', 45, 128, 0, 1, '2011-08-11', 4150, 42, NULL, 0), \
 ('Suave 107.3 FM - Grupo Medrano - Santiago', ' R.D.', 'http://173.193.216.92:8060', '', '', 0, 128, 0, 1, '2011-08-11', 4152, 7, NULL, 0), \
-('181.fm - Rock 181', '[Bitrate: 128]', 'http://38.107.220.162:8008', '', '181.fm.png', 1, 128, 1, 1, '2011-08-11', 4153, 7, NULL, 0), \
 ('KEXP Live 128kbps', 'KEXP 90.3 FM [Bitrate: 128]', 'http://140.142.8.220:8000', '', '', 7, 128, 0, 1, '2011-08-11', 4154, 7, NULL, 0), \
 ('Ok Radio Server', '[Bitrate: 128] ', 'http://80.237.210.23:8052', '', '', 51, 128, 0, 1, '2011-08-11', 4155, 8, NULL, 0), \
 ('Danceradioglobal.com main', '[Bitrate: 128] ', 'http://94.23.55.74:8058', '', '', 4, 128, 0, 1, '2011-08-11', 4156, 4, NULL, 0), \
@@ -3097,11 +2949,10 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('COUNTRY 108', '[Bitrate: 128]   ', 'http://80.237.210.44:80', '', '', 6, 128, 0, 1, '2011-08-11', 4185, 8, NULL, 0), \
 ('Shanson 101.9 Kiev', '[Bitrate: 128] ', 'http://217.20.164.163:8002', '', '', 0, 128, 1, 1, '2011-08-11', 4186, 49, '2011-10-14 16:11:15', 0), \
 ('STAR FM Bln', '[Bitrate: 128] ', 'http://87.230.53.43:8000', '', '', 1, 128, 0, 1, '2011-08-11', 4187, 12, NULL, 0), \
-('181.fm - The Mix Channel 70s', ' 80s', 'http://38.107.220.162:8032', '', '181.fm.png', 13, 128, 1, 1, '2011-08-11', 4188, 7, NULL, 0), \
 ('Radio Planeta', '[Bitrate: 128]   ', 'http://95.211.22.17:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4189, 36, NULL, 0), \
 ('TRAFFIC RADIO STATION', '[Bitrate: 128]', 'http://212.25.58.220:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4190, 36, NULL, 0), \
 ('Radio Rivendell', '[Bitrate: 128] [Max Listeners: 850]', 'http://82.182.121.75:8003', '', '', 0, 128, 0, 1, '2011-08-11', 4191, 23, NULL, 0), \
-('DeepFM', '(DeepFM) [Bitrate: 128] ', 'http://195.66.134.40:80', '', '', 0, 128, 2, 1, '2011-08-11', 4192, 24, '2011-10-14 16:04:45', 0), \
+('DeepFM', '(DeepFM) [Bitrate: 128] ', 'http://195.66.134.40:80', '', '', 0, 128, 2, 1, '2011-08-11', 4192, 24, '2011-10-14 16:04:45', 1), \
 ('Zeilsteen Alternative Radio', 'playing The Killers', 'http://87.195.42.193:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4194, 6, NULL, 0), \
 ('memoryradio', '[Bitrate: 128]  ', 'http://188.165.247.175:4000', '', '', 0, 128, 0, 1, '2011-08-11', 4195, 4, NULL, 0), \
 ('Soundic Radio', '[Bitrate: 128]  ', 'http://193.10.239.174:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4196, 23, NULL, 0), \
@@ -3132,18 +2983,15 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('1.FM - Bay Smooth Jazz', '[Bitrate: 128] ', 'http://72.13.83.87:9010', '', '', 9, 128, 0, 1, '2011-08-11', 4227, 7, NULL, 0), \
 ('jungletrain.net - 24/7 drum and bass', '[Bitrate: 128]', 'http://76.74.248.104:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4228, 7, NULL, 0), \
 ('Italian Graffiati - Musica anni 60 e 70 per gli italiani nel mondo', '[Bitrate: 128]', 'http://173.193.20.157:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4229, 7, NULL, 0), \
-('4CLUBBERS', '[Bitrate: 128]', 'http://94.23.226.80:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4230, 37, NULL, 0), \
-('181.fm - Real Country', '[Bitrate: 128]', 'http://38.107.220.162:8034', '', '181.fm.png', 6, 128, 1, 1, '2011-08-11', 4231, 7, NULL, 0);";
+('4CLUBBERS', '[Bitrate: 128]', 'http://94.23.226.80:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4230, 37, NULL, 0);";
 
 
 
 const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('POLSKASTACJA.PL', '[Bitrate: 128]', 'http://188.165.20.29:9000', '', '', 0, 128, 0, 1, '2011-08-11', 4232, 22, NULL, 0), \
 ('ranceRadio.ch', ' Techno', 'http://46.4.77.21:10780', '', '', 50, 128, 0, 1, '2011-08-11', 4234, 8, NULL, 0), \
 ('Angel Fire Radio''s Classic Rock&Roll.FM ', '[Bitrate: 128] ', 'http://scfire-dtc-aa04.stream.aol.com:80/stream/1043', '', '', 1, 128, 0, 1, '2011-08-11', 4235, 7, NULL, 0), \
 ('TOP 100', '[Bitrate: 128]', 'http://119.207.75.234:1040', '', '', 40, 128, 1, 1, '2011-08-11', 4237, 40, NULL, 0), \
 ('HAYATIN SESI', '[Bitrate: 128]', 'http://46.105.109.141:8008', '', '', 0, 128, 0, 1, '2011-08-11', 4238, 4, NULL, 0), \
-('181.FM - Lite 80', '[Bitrate: 128] ', 'http://38.107.220.162:8040', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4239, 7, '2011-10-14 15:54:53', 0), \
 ('Blues All Day', '[Bitrate: 128]', 'http://76.73.79.82:8688', '', '', 0, 128, 0, 1, '2011-08-11', 4240, 7, NULL, 0), \
 ('MUSIK.HOUSE (FUNKY)', '[Bitrate: 128]', 'http://80.237.157.12:13005', 'WWW.RAUTEMUSIK.FM', '', 0, 128, 0, 1, '2011-08-11', 4241, 42, NULL, 0), \
 ('Armitage''s Dimension ', 'Jpop/Jrock/Anime', 'http://143.51.142.148:8128', '', '', 0, 128, 1, 1, '2011-08-11', 4242, 43, '2011-10-14 16:10:55', 0), \
@@ -3197,22 +3045,18 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('Sonic Universe', '[Bitrate: 128]  ', 'http://74.63.47.82:8600', '', '', 0, 128, 0, 1, '2011-08-11', 4296, 7, NULL, 0), \
 ('Smooth Jazz Expressions', '[Bitrate: 128]  ', 'http://174.46.222.71:8216', '', '', 0, 128, 0, 1, '2011-08-11', 4297, 7, NULL, 0), \
 ('411 Music.net', '[Bitrate: 128]', 'http://66.185.17.34:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4298, 7, NULL, 0), \
-('GrooveFM', '[Bitrate: 128]  ', 'http://178.162.138.18:10028', '', 'GrooveFM.png', 0, 128, 2, 1, '2011-08-11', 4299, 45, '2011-10-14 16:10:43', 0), \
 ('Soft Classic Rock', '[Bitrate: 128]   ', 'http://64.71.133.122:8000', '', '', 1, 128, 0, 1, '2011-08-11', 4300, 7, NULL, 0), \
-('181.FM - The Point', '[Bitrate: 128] ', 'http://38.107.220.162:8010', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4301, 7, '2011-09-06 17:25:17', 0), \
 ('Sofaspace', '[Bitrate: 128]  ', 'http://80.74.149.30:9999', '', '', 0, 128, 0, 1, '2011-08-11', 4302, 39, NULL, 0), \
 ('Radio Flo', '[Bitrate: 128]  [Max Listeners: 325]', 'http://89.238.146.140:7060', '', '', 4, 128, 0, 1, '2011-08-11', 4303, 9, NULL, 0), \
 ('Lekker veel Nederlandstalig', '  [Bitrate: 128]  ', 'http://91.213.69.159:7204', '', '', 0, 128, 0, 1, '2011-08-11', 4304, 6, NULL, 0), \
 ('Antena Krusevac Studio 1', '  [Bitrate: 128]  ', 'http://94.23.38.225:4560', '', '', 51, 128, 0, 1, '2011-08-11', 4305, 4, NULL, 0), \
 ('Radio Alpenmelodie', '[Bitrate: 128]  ', 'http://88.198.59.151:80', '', '', 0, 128, 0, 1, '2011-08-11', 4306, 8, NULL, 0), \
 ('ECHOES.gr NetRadio', '[Bitrate: 128] [Max Listeners: 2500]', 'http://78.129.245.33:80', '', '', 0, 128, 0, 1, '2011-08-11', 4307, 9, NULL, 0), \
-('181.FM - The Beatles Channel', '[Bitrate: 128] [Max Listeners: 2100]', 'http://38.107.220.162:8062', '', '181.fm.png', 3, 128, 1, 1, '2011-08-11', 4308, 7, NULL, 0), \
 ('MNdancechannel', '[Bitrate: 128]  ', 'http://80.237.155.20:8030', '', '', 0, 128, 0, 1, '2011-08-11', 4309, 42, NULL, 0), \
 ('BeirutNights.com', '[Bitrate: 128]   ', 'http://72.13.86.83:80', '', '', 0, 128, 0, 1, '2011-08-11', 4310, 7, NULL, 0), \
 ('Radio Taraf Romania', '[Bitrate: 128]  ', 'http://46.108.3.26:7100', '', '', 0, 128, 0, 1, '2011-08-11', 4311, 41, NULL, 0), \
 ('WebRadio Dj Paulo Pringles', '[Bitrate: 128] ', 'http://66.185.27.122:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4312, 7, NULL, 0), \
 ('The Beat Norway', 'Norway  [Bitrate: 128]', 'http://89.105.32.12:8110', '', '', 40, 128, 1, 1, '2011-08-11', 4314, 21, NULL, 0), \
-('181.FM - Star 90', '[Bitrate: 128]', 'http://38.107.220.162:8012', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4315, 7, '2011-10-14 15:55:09', 0), \
 ('M2 RADIO : ONLY HITS & DANCE - Live From Paris France - www.m2radio.fr', '[Bitrate: 128]  ', 'http://91.121.100.202:8000', '', '', 4, 128, 0, 1, '2011-08-11', 4316, 4, NULL, 0), \
 ('HAPPYDAY', '[Bitrate: 128]  ', 'http://222.122.131.69:8000', '', '', 0, 128, 1, 1, '2011-08-11', 4317, 40, NULL, 0), \
 ('RelaxingJazz.com', 'Jazz [Bitrate: 128] [Max Listeners: 752]', 'http://85.17.77.1:8080', '', '', 9, 128, 0, 1, '2011-08-11', 4318, 7, NULL, 0), \
@@ -3236,8 +3080,6 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('CapitalFM Riga 94.9', '[Bitrate: 128]  ', 'http://87.226.84.14:8000', '', '', 45, 128, 0, 1, '2011-08-11', 4338, 14, NULL, 0), \
 ('Relax and Chillout', '[Bitrate: 128]  ', 'http://204.45.8.170:8091', '', '', 0, 128, 0, 1, '2011-08-11', 4339, 7, NULL, 0), \
 ('GoFM', '[Bitrate: 128]', 'http://67.19.90.154:8030', '', '', 0, 128, 0, 1, '2011-08-11', 4340, 7, NULL, 0), \
-('AfternoonMix by Vmix.fm', ' deephouse and soulful music live from Paris', 'http://213.251.171.213:8005', '', '', 16, 128, 1, 1, '2011-08-11', 4341, 6, NULL, 0), \
-('Global House Radio', '[Bitrate: 128]', 'http://67.212.179.138:7082', '', '', 16, 128, 5, 1, '2011-08-11', 4342, 7, '2011-10-15 20:10:03', 0), \
 ('Limbik Frequencies', '[Bitrate: 128]  ', 'http://205.188.215.225:8018', '', '', 0, 128, 0, 1, '2011-08-11', 4343, 7, NULL, 0), \
 ('Boystown Live Dance', '[Bitrate: 128]  ', 'http://208.53.183.37:6161', '', '', 0, 128, 0, 1, '2011-08-11', 4344, 7, NULL, 0), \
 ('DnBHeaven.com', 'Kabuki Ft. Jenna G - Just Hold On (Serum Remix)  [Bitrate: 128] ', 'http://188.165.254.170:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4345, 4, NULL, 0), \
@@ -3268,11 +3110,7 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('WLMC-1470', '', 'http://live-icy.gss.dr.dk:8000/Channel12_HQ.mp3', '', 'WLMC-1470.png', 0, 0, 0, 1, '2011-11-11', 4371, 0, '2017-01-01 00:00:00', 0), \
 ('Gospel-Truth', '', 'http://rebelfm.com.au/listen/rebel_gc-logan.pls', '', 'Gospel-Truth.png', 0, 0, 0, 1, '2011-11-11', 4372, 0, '2017-01-01 00:00:00', 0), \
 ('Rosenstolz', '', 'http://war.str3am.com:7400/wnmu_event', '', 'Rosenstolz.png', 0, 0, 0, 1, '2011-11-11', 4373, 0, '2017-01-01 00:00:00', 0), \
-('BBC Radio 4', 'BBC 4', 'http://bbc.co.uk/radio/listen/live/r4.asx', '', '', 0, 0, 4, 1, '0000-00-00', 4374, 9, '2011-10-15 20:10:10', 0), \
-('BBC Radio 5 Live', 'BBC 5', 'http://bbc.co.uk/radio/listen/live/r5l.asx', '', '', 0, 0, 5, 1, '0000-00-00', 4375, 9, '2011-10-15 20:09:39', 0), \
-('BBC Radio 2', 'BBC 2', 'http://bbc.co.uk/radio/listen/live/r2.asx', 'bbc.com', '', 0, 0, 5, 1, '0000-00-00', 4376, 9, '2011-10-15 20:09:35', 0), \
-('BBC Radio 3', 'BBC 3', 'http://bbc.co.uk/radio/listen/live/r3.asx', '', '', 0, 0, 6, 1, '0000-00-00', 4378, 9, NULL, 0), \
-(' FM 97.75 Mhz ', 'World', 'http://103.22.182.102:8924', '', '', 0, 320, 0, 1, '2011-08-16', 4379, 7, NULL, 0), \
+('FM 97.75 Mhz ', 'World', 'http://103.22.182.102:8924', '', '', 0, 320, 0, 1, '2011-08-16', 4379, 7, NULL, 0), \
 ('Veliyev Stream', 'Pop', 'http://64.64.13.52:8036', '', '', 45, 320, 0, 1, '2011-08-16', 4380, 7, NULL, 0), \
 ('formula hit', 'Various', 'http://68.168.100.60:25641', '', '', 0, 320, 0, 1, '2011-08-16', 4381, 7, NULL, 0), \
 ('kops.nu Radio Dj Bot', 'Various', 'http://83.233.111.254:2020', '', '', 0, 320, 0, 1, '2011-08-16', 4382, 23, NULL, 0), \
@@ -3281,8 +3119,6 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('Auto DJ', 'mix max', 'http://184.107.166.194:9832', '', '', 0, 320, 0, 1, '2011-08-16', 4386, 27, NULL, 0), \
 ('Studio Rovako', 'Various', 'http://46.4.217.169:8500', '', '', 0, 320, 0, 1, '2011-08-16', 4387, 8, NULL, 0), \
 ('AutoDJ', 'pop', 'http://184.107.166.194:9878', '', '', 45, 320, 0, 1, '2011-08-16', 4388, 27, NULL, 0), \
-('Es Luft der Auto-DJ von Radio-Hittmix', 'pop   club', 'http://184.107.166.186:9850', '', '', 45, 320, 0, 1, '2011-08-16', 4389, 27, NULL, 0), \
-('Hausmeisterradio', 'Mix', 'http://184.107.166.194:9836', '', '', 52, 320, 1, 1, '2011-08-16', 4390, 27, NULL, 0), \
 ('Radio Mystica: Radio Mystica Auto DJ', 'Alternative', 'http://87.118.78.17:9200', '', '', 7, 320, 0, 1, '2011-08-16', 4391, 25, NULL, 0), \
 ('Danceukradio', 'Pop', 'http://217.114.63.157:8030', '', '', 45, 320, 0, 1, '2011-08-16', 4392, 7, NULL, 0), \
 ('AutoDJ', 'All', 'http://184.107.166.194:9872', '', '', 0, 320, 1, 1, '2011-08-16', 4393, 27, '2011-09-07 22:59:37', 0), \
@@ -3304,7 +3140,6 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('Goldenlight Radio', 'Ht Music', 'http://195.56.193.240:8030', '', '', 40, 320, 1, 1, '2011-08-16', 4410, 50, '2011-10-14 16:11:22', 0), \
 ('Powerlady-AutoDJ', '', 'http://184.107.168.138:9832', '', '', 12, 320, 1, 1, '2011-08-16', 4411, 27, NULL, 0), \
 ('2x2 Station', 'Trance', 'http://77.37.204.39:8000', '', '', 41, 320, 0, 1, '2011-08-16', 4412, 64, NULL, 0), \
-('Auto-DJ', 'Top Music', 'http://184.107.166.194:9930', '', '', 45, 320, 0, 1, '2011-08-16', 4413, 27, NULL, 0), \
 ('SleepyEngineers.com', 'Demo server', 'http://96.31.83.86:8000', '', '', 0, 320, 0, 1, '2011-08-16', 4414, 7, NULL, 0), \
 ('Raj Radio', 'classical', 'http://178.198.181.225:8000', '', '', 8, 320, 0, 1, '2011-08-16', 4415, 24, NULL, 0), \
 ('Web RADIO', 'Electro   Techno   Hardcore an', 'http://88.191.119.125:42300', '', '', 4, 320, 1, 1, '2011-08-16', 4416, 7, NULL, 0), \
@@ -3376,14 +3211,11 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('DJ BENNIE', 'Various', 'http://87.117.203.166:27505', '', '', 0, 320, 0, 1, '2011-08-16', 4484, 9, NULL, 0), \
 ('reggaemusic.com.pa', 'pop reggae salsa tecno', 'http://69.73.178.165:6020', '', '', 4, 320, 0, 1, '2011-08-16', 4485, 7, NULL, 0), \
 ('Musikbox', '', 'http://184.107.168.138:9790', '', '', 0, 320, 0, 1, '2011-08-16', 4486, 27, NULL, 0), \
-('Live Broadcast Station', 'sverige', 'http://213.89.227.100:28040', '', '', 0, 320, 4, 1, '2011-08-16', 4488, 23, '2011-10-15 20:10:20', 0), \
 ('RADIO PHR Den Telefonstream erreichst du unter 0345-483410821', 'Welt', 'http://184.107.133.34:9994', '', '', 0, 320, 0, 1, '2011-08-16', 4489, 27, NULL, 0), \
 ('Egroove CH1: egroove.fm', 'electronic', 'http://87.238.194.30:9020', '', '', 7, 320, 2, 1, '2011-08-16', 4490, 8, '2011-10-14 16:04:58', 0), \
 ('BEST FM', 'Dance', 'http://188.173.252.152:1000', '', '', 4, 320, 0, 1, '2011-08-16', 4491, 9, NULL, 0), \
 ('AutoDJ', '', 'http://184.107.168.138:9794', '', '', 0, 320, 1, 1, '2011-08-16', 4492, 27, NULL, 0), \
 ('KWAX', '', 'http://128.223.175.195:9100/KWAX320.mp3', '', '', 0, 320, 0, 1, '2011-08-16', 4493, 7, NULL, 0), \
-('Auto-DJ RADIO FUNKYTOWN', '', 'http://184.107.168.138:9814', '', '', 0, 320, 1, 1, '2011-08-16', 4494, 27, NULL, 0), \
-('PowerTrance / Trance Forever', 'Trance', 'http://109.230.230.198:10800', '', '', 41, 320, 4, 1, '2011-08-16', 4495, 39, NULL, 0), \
 ('Radio Style FM', 'Manele Dance', 'http://95.130.10.81:8989', '', '', 40, 320, 0, 1, '2011-08-16', 4496, 30, NULL, 0), \
 ('www.gecelife.net', 'Turkce Turkish Pop Slow Remix', 'http://46.105.109.141:2026', '', '', 45, 320, 0, 1, '2011-08-16', 4497, 4, NULL, 0), \
 ('WondeRadio', 'Hits of the 80s and 90s', 'http://184.107.133.34:9822', '', '', 40, 320, 0, 1, '2011-08-16', 4498, 27, NULL, 0), \
@@ -3431,20 +3263,12 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('Goa World Psytrance Radio', 'Goa', 'http://195.198.242.249:8010', '', '', 7, 320, 0, 1, '2011-08-16', 4545, 23, NULL, 0), \
 ('Radio ATD www.radiogora.ru', 'Metal Rock', 'http://79.140.78.106:10610', '', '', 1, 320, 0, 1, '2011-08-16', 4546, 8, NULL, 0), \
 ('The New England Jazz Express!', 'Jazz', 'http://75.69.53.115:8004', '', '', 9, 320, 0, 1, '2011-08-16', 4547, 7, NULL, 0), \
-('Electronic Music FM Radio', 'Tech House Techno Minimal', 'http://82.196.128.108:8042', '', '', 50, 320, 0, 1, '2011-08-16', 4548, 29, NULL, 0), \
 ('TranceOnline radio', 'TRance   HardTrance   HardDanc', 'http://94.23.218.141:8000', '', '', 41, 320, 1, 1, '2011-08-16', 4549, 37, NULL, 0), \
 ('Radio Halli Galli', 'World', 'http://184.107.168.138:9952', '', '', 0, 320, 0, 1, '2011-08-16', 4550, 27, NULL, 0), \
 ('Never Ending Muzik Sound ', 'New Style The Real Live Remix', 'http://119.207.75.237:1630', '', '', 0, 320, 0, 1, '2011-08-16', 4551, 40, NULL, 0), \
 ('Rockhard Lossless Radio', 'Hard Rock &amp; Metal', 'http://85.17.90.12:8000', '', '', 1, 320, 0, 1, '2011-08-16', 4553, 38, NULL, 0), \
-('WIAM RADIO LIVE REMOTE FEED', 'GOSPEL   INSPIRATIONAL   CHRIS', 'http://174.123.84.173:8000', '', '', 49, 320, 0, 1, '2011-08-16', 4556, 7, NULL, 0), \
-('DubRadio', 'Dubstep', 'http://76.72.17.228:8000', '', '', 7, 320, 2, 1, '2011-08-16', 4557, 7, '2011-09-07 13:41:55', 0), \
-('En ce moment', 'G n raliste', 'http://88.191.53.74:8142', '', '', 0, 320, 0, 1, '2011-08-16', 4558, 9, NULL, 0), \
-('Electronic Music FM Radio', 'Deep House Minimal Tech House', 'http://82.196.128.108:8008', '', '', 16, 320, 7, 1, '2011-08-16', 4559, 29, NULL, 0), \
-('Electronic Music FM Radio', 'electronicmusic.fm  Deep House Minimal Tech House', 'http://82.196.128.108:8002', '', '', 16, 320, 0, 1, '2011-08-16', 4560, 29, NULL, 0), \
 ('Snakeices House of Beats', 'Rap  Hip Hop  R&amp;B  Jazz  Blues', 'http://64.113.122.205:8025', '', '', 5, 320, 1, 1, '2011-08-16', 4561, 7, NULL, 0), \
 ('Raritan Bay Radio IN HIGH DEFINITION!!!', 'Oldies', 'http://68.195.207.45:8000', '', '', 3, 320, 0, 1, '2011-08-16', 4562, 7, NULL, 0), \
-('Beat HD', 'R&amp;B  R&amp;B  Urban  Hip  Hop  Rap', 'http://89.105.32.12:8122', '', '', 44, 320, 0, 1, '2011-08-16', 4563, 21, NULL, 0), \
-('Top100 Single Charts', 'top40   charts   other   schla', 'http://184.107.168.138:9888', '', '', 40, 320, 0, 1, '2011-08-16', 4564, 27, NULL, 0), \
 ('she', 'Misc', 'http://119.207.75.234:6970', '', '', 0, 320, 0, 1, '2011-08-16', 4565, 40, NULL, 0), \
 ('Metro Oslo HD', 'Easy Listening', 'http://89.105.32.12:8124', '', '', 7, 320, 0, 1, '2011-08-16', 4566, 21, NULL, 0), \
 ('TURNTABLES24.com', 'House  Techno  Electronic', 'http://87.230.57.50:9400', '', '', 16, 320, 3, 1, '2011-08-16', 4567, 8, '2011-10-15 20:10:41', 0), \
@@ -3480,17 +3304,12 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('MUSIK.HOUSE (FUNKY)', 'FUNK [Bitrate: 128]', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1058', '', '', 47, 128, 1, 1, '2011-08-11', 4601, 7, NULL, 0), \
 ('MUSIK.MAIN ', '#Musik.Main [Bitrate: 128]', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1051', '', '', 0, 128, 0, 1, '2011-08-11', 4602, 7, NULL, 0), \
 ('MUSIK.GOLDIES', '#Musik.Goldies - Track Update on www.RauteMusik.FM/goldies  [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1060', '', '', 0, 128, 0, 1, '2011-08-11', 4603, 7, NULL, 0), \
-('181.FM - The Buzz ', '[Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1022', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 4604, 7, NULL, 0), \
 ('1POWER ', 'www.powerhitz.com [Bitrate: 128]', 'http://scfire-dtc-aa03.stream.aol.com:80/stream/1044', '', '', 0, 128, 0, 1, '2011-08-11', 4605, 7, NULL, 0), \
 ('Ballermann Radio', '[Bitrate: 128]', 'http://83.169.61.46:5000', '', '', 0, 128, 0, 1, '2011-08-11', 4606, 28, NULL, 0), \
-('181.FM - POWER 181', '-=[: The Hitz Channel :]=- www.181.fm M.I.A. - Paper Planes (Radio Edit)  [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1023', '', '181.fm.png', 40, 128, 1, 1, '2011-08-11', 4607, 7, '2011-10-14 15:54:59', 0), \
 ('HouseTime.FM', 'House & More', 'http://85.17.26.102:80', '', '', 16, 128, 0, 1, '2011-08-11', 4609, 6, NULL, 0), \
 ('Techno4ever', '@ www.T4E.DJ [Bitrate: 128]', 'http://78.159.104.146:80', '', '', 50, 128, 0, 1, '2011-08-11', 4610, 39, NULL, 0), \
 ('HardBase.FM', ' Jumpstyle', 'http://78.159.104.162:80', '', '', 0, 128, 3, 1, '2011-08-11', 4611, 39, '2011-10-14 16:05:21', 0), \
 ('friskyRadio', 'Trance', 'http://scfire-dtc-aa06.stream.aol.com:80/stream/1015', '', '', 29, 128, 0, 1, '2011-08-11', 4612, 7, NULL, 0), \
-('FG DJ RADIO', 'FG DJ RADIO Save the world SWEDISH_HOUSE_MAFIA  [Bitrate: 128]', 'http://87.98.215.52:80', '', '', 4, 128, 2, 1, '2011-08-11', 4613, 4, NULL, 0), \
-('181.FM - Kickin', '[Bitrate: 128]', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1075', '', '181.fm.png', 6, 128, 2, 1, '2011-08-11', 4614, 7, NULL, 0), \
-('181.fm - The Eagle', '[Bitrate: 128]  ', 'http://174.36.241.224:10108', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 4615, 7, NULL, 0), \
 ('Radio Paradise', 'DJ-mixed modern & classic rock', 'http://scfire-ntc-aa08.stream.aol.com:80/stream/1049', '', '', 1, 128, 0, 1, '2011-08-11', 4616, 7, NULL, 0), \
 ('1.FM - 80s Channel', 'nonstop power80 2  [Bitrate: 128]', 'http://64.62.194.11:8095', '', '', 13, 128, 0, 1, '2011-08-11', 4618, 7, NULL, 0), \
 ('Radio Paloma - 100% Deutscher Schlager!', '[Bitrate: 128]', 'http://80.237.184.23:80', '', '', 45, 128, 0, 1, '2011-08-11', 4619, 8, NULL, 0), \
@@ -3500,7 +3319,6 @@ const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `be
 ('BlackBeats.FM ', 'finest in blackbeats [Bitrate: 128] ', 'http://212.95.42.65:80', '', '', 0, 128, 0, 1, '2011-08-11', 4623, 11, NULL, 0), \
 ('Venice Classic', '[Bitrate: 128]  ', 'http://174.36.206.197:8000', '', '', 8, 128, 0, 1, '2011-08-11', 4624, 58, NULL, 0), \
 ('LOUNGE-RADIO.COM ', '', 'http://195.141.102.212:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4625, 9, NULL, 0), \
-('181.FM - PARTY 181', '[Bitrate: 128] ', 'http://38.107.220.162:8036', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4626, 7, '2011-10-14 15:54:56', 0), \
 ('MUSIK.BIGCITYBEATS', 'Track Update on www.RauteMusik.FM/bcb  [Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1082', '', '', 0, 128, 0, 1, '2011-08-11', 4627, 7, NULL, 0), \
 ('HIT104', '[Bitrate: 128]', 'http://80.237.210.57:80', '', '', 40, 128, 0, 1, '2011-08-11', 4629, 8, NULL, 0), \
 ('La X Estereo', '[Bitrate: 128]', 'http://80.237.211.85:80', '', '', 0, 128, 0, 1, '2011-08-11', 4630, 8, NULL, 0), \
@@ -3522,15 +3340,12 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('AngelsFox-Radio', '[Bitrate: 128]', 'http://89.149.226.128:80', '', 'AngelsFox-Radio.png', 0, 128, 0, 1, '2011-08-11', 4644, 8, NULL, 0), \
 ('Radio GANGSTA ', 'www.RadioGangsta.Ro [Bitrate: 128]', 'http://93.114.41.35:8800', '', '', 0, 128, 0, 1, '2011-08-11', 4645, 41, NULL, 0), \
 ('FREQUENCE3', '[Bitrate: 128]', 'http://193.222.128.174:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4646, 4, NULL, 0), \
-('MUSIK.HARDER', 'WWW.RAUTEMUSIK.FM [Bitrate: 128] ', 'http://80.237.157.15:22000', '', '', 0, 128, 1, 1, '2011-08-11', 4647, 42, NULL, 0), \
 ('CLASSICAL 102', '[Bitrate: 128]', 'http://80.237.210.39:80', '', '', 8, 128, 0, 1, '2011-08-11', 4648, 8, NULL, 0), \
 ('Radio animesPLUS ', '[Bitrate: 128]', 'http://76.73.80.34:9998', '', '', 0, 128, 0, 1, '2011-08-11', 4649, 7, NULL, 0), \
 ('RADIODISCOPOLO.FM', ' radio ZET', 'http://94.23.36.107:443', '', '', 0, 128, 0, 1, '2011-08-11', 4652, 4, NULL, 0), \
-('181.fm - The Heart (All Love Songs)', '[Bitrate: 128]', 'http://38.107.220.162:8006', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4653, 7, NULL, 0), \
 ('Radio Gravity', ' Patrocinado por www.HispaSMS.Net [Bitrate: 128]', 'http://109.104.69.166:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4654, 9, NULL, 0), \
 ('@80s I streamed', '[Bitrate: 128] ', 'http://87.230.55.93:4080', '', '', 13, 128, 2, 1, '2011-08-11', 4655, 42, '2011-10-14 16:10:58', 0), \
 ('Radioseven - www.radioseven.se', 'Darude - Salmiakki Sessions 75  [Bitrate: 128] ', 'http://81.186.251.7:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4658, 23, NULL, 0), \
-('181.fm R&B', '[Bitrate: 128]', 'http://38.107.220.162:8022', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4659, 7, NULL, 0), \
 ('108.FM', '[Bitrate: 128] ', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1030', '', '', 0, 128, 0, 1, '2011-08-11', 4660, 7, NULL, 0), \
 ('80s Planet.com', ' the 80s! ', 'http://67.213.220.36:8080', '', '', 50, 128, 0, 1, '2011-08-11', 4662, 7, NULL, 0), \
 ('BreakZ.us', '[Bitrate: 128]', 'http://212.117.161.15:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4663, 5, NULL, 0), \
@@ -3540,7 +3355,6 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('Jemne Melodie: jemne melodie live', '[Bitrate: 128] ', 'http://93.184.69.143:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4668, 48, NULL, 0), \
 ('LOLLIRADIO ITALIA ', '[Bitrate: 128]', 'http://94.23.67.172:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4669, 26, NULL, 0), \
 ('ElectricFM.com- America''s Real Dance!', '[Bitrate: 128] ', 'http://208.85.240.90:80', '', '', 30, 128, 0, 1, '2011-08-11', 4670, 7, NULL, 0), \
-('Partyradio24', '[Bitrate: 128]', 'http://212.48.110.70:8070', '', '', 4, 128, 1, 1, '2011-08-11', 4671, 8, NULL, 0), \
 ('MUSIK.LOUNGE', '#Musik.Lounge - Track Update on www.RauteMusik.FM/lounge  [Bitrate: 128] ', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1080', '', '', 0, 128, 0, 1, '2011-08-11', 4672, 7, NULL, 0), \
 ('Sharmanka 104.0 Kiev', '[Bitrate: 128]', 'http://217.20.164.163:8006', '', '', 0, 128, 1, 1, '2011-08-11', 4673, 49, '2011-10-14 16:11:19', 0), \
 ('Electro Radio', '[Bitrate: 128]', 'http://87.118.78.88:26630', '', '', 30, 128, 0, 1, '2011-08-11', 4674, 25, NULL, 0), \
@@ -3556,21 +3370,16 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio BN +38755228412', '[Bitrate: 128]', 'http://46.4.33.9:8522', '', '', 51, 128, 0, 1, '2011-08-11', 4685, 8, NULL, 0), \
 ('Kuschel.FM', '[Bitrate: 128] ', 'http://84.19.184.95:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4686, 8, NULL, 0), \
 ('JACK FM - ALL HIT RADIO', '[Bitrate: 128]', 'http://80.237.210.91:80', '', '', 0, 128, 0, 1, '2011-08-11', 4687, 8, NULL, 0), \
-('181.FM - The BOX', 'HipHop radio [Bitrate: 128]', 'http://38.107.220.162:8024', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4688, 7, NULL, 0), \
 ('Big R Radio - Warm 101.6 ', '[Bitrate: 128] ', 'http://173.193.14.170:8010', '', '', 0, 128, 1, 1, '2011-08-11', 4689, 27, '2011-10-14 16:04:03', 0), \
-('181.FM - Good Time Oldies', 'Beau Brummels - Laugh', 'http://38.107.220.162:8046', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4690, 7, '2011-10-14 15:54:48', 0), \
 ('NERadio Sweden', 'SE [Bitrate: 128]', 'http://87.96.232.206:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4691, 23, NULL, 0), \
 ('METAL ONLY ', '24h Black Death Heavy Metal Rock', 'http://87.230.53.10:9480', '', '', 1, 128, 0, 1, '2011-08-11', 4692, 12, NULL, 0), \
 ('HPR1', '[Bitrate: 128] ', 'http://130.166.82.14:8006', '', '', 6, 128, 1, 1, '2011-08-11', 4693, 7, '2011-09-07 13:41:37', 0), \
-('181.fm - The Office', 'F**kin` Perfect (Radio Edit)  [Bitrate: 128] ', 'http://38.107.220.162:8002', '', '181.fm.png', 0, 128, 0, 1, '2011-08-11', 4694, 7, NULL, 0), \
-('181.FM - Soul', '[Bitrate: 128]', 'http://38.107.220.162:8058', '', '181.fm.png', 55, 128, 1, 1, '2011-08-11', 4696, 7, '2011-10-14 15:55:06', 0), \
 ('Radio Juzni Vetae', '[Bitrate: 128] ', 'http://89.149.209.100:8003', '', '', 51, 128, 0, 1, '2011-08-11', 4697, 53, NULL, 0), \
 ('Folk Alley', 'FolkAlley.com  [Bitrate: 128]', 'http://66.225.205.8:80', '', '', 51, 128, 0, 1, '2011-08-11', 4698, 7, NULL, 0), \
 ('Portofino Network', '[Bitrate: 128]', 'http://87.117.228.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4699, 13, NULL, 0), \
 ('Nirvana Radio', ' - Music for Meditation and Relaxation The Best Meditation Music for all gentle-minded and elevated souls.  [Bitrate: 128]', 'http://91.121.72.50:9106', '', '', 0, 128, 0, 1, '2011-08-11', 4700, 4, NULL, 0), \
 ('CROOZE', 'R&B', 'http://193.227.114.74:2580', '', '', 0, 128, 0, 1, '2011-08-11', 4701, 26, NULL, 0), \
 ('Raggakings the 24/7', 'Bersenbrueck ReggaeJam 2011 - Ranking Joe  [Bitrate: 128] ', 'http://64.202.98.51:7970', '', '', 0, 128, 0, 1, '2011-08-11', 4702, 7, NULL, 0), \
-('181.fm - The Breeze', '[Bitrate: 128]', 'http://38.107.220.162:8004', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 4703, 7, NULL, 0), \
 ('M2 ANALOG www.m2radio.fr', '[Bitrate: 128]', 'http://91.121.140.217:9080', '', '', 0, 128, 0, 1, '2011-08-11', 4704, 4, NULL, 0), \
 ('MegaFox24 netzradio.fm', '[Bitrate: 128]', 'http://89.149.254.138:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4705, 8, NULL, 0), \
 ('RaDioTEENTAAL.com 100%', '', 'http://91.121.155.39:8128', '', '', 0, 128, 0, 1, '2011-08-11', 4706, 4, NULL, 0), \
@@ -3591,18 +3400,11 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('Itapoan FM', '[Bitrate: 128]', 'http://68.233.243.9:8001', '', '', 0, 128, 0, 1, '2011-08-11', 4723, 7, NULL, 0), \
 ('247Polkaheaven ''The World''s Polka Network', 'The Worlds Polka Network  [Bitrate: 128] [Max Listeners: 250]', 'http://216.59.35.38:8046', '', '', 0, 128, 0, 1, '2011-08-11', 4724, 22, NULL, 0), \
 ('Webblaster Radio 2', '[Bitrate: 128]  ', 'http://91.121.194.238:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4725, 4, NULL, 0), \
-('BHJMS-Radio', '[Bitrate: 128]  ', 'http://80.237.157.48:8000', '', '', 16, 128, 4, 1, '2011-08-11', 4726, 42, '2011-10-14 16:10:49', 0), \
 ('Radio Monte Carlo', '[Bitrate: 128]  ', 'http://212.40.13.22:11000', '', '', 1, 128, 0, 1, '2011-08-11', 4727, 24, NULL, 0), \
 ('Springsteenradio.com', '[Bitrate: 128]   ', 'http://67.212.166.178:9000', '', '', 21, 128, 0, 1, '2011-08-11', 4728, 7, NULL, 0), \
 ('STAR 107.9', '[Bitrate: 128]  ', 'http://67.212.174.226:10001', '', '', 13, 128, 0, 1, '2011-08-11', 4729, 7, NULL, 0), \
 ('Soulful Bits', '[Bitrate: 128]  ', 'http://88.191.137.70:80', '', '', 0, 128, 0, 1, '2011-08-11', 4730, 4, NULL, 0), \
 ('Golden Hits Radio', '[Bitrate: 128]  ', 'http://77.67.106.2:10157', '', '', 3, 128, 0, 1, '2011-08-11', 4731, 30, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128] [Max Listeners: 260]', 'http://91.121.157.138:9100', '', '', 0, 128, 0, 1, '2011-08-11', 4732, 22, NULL, 0), \
-('Swiss Internet Radio', '', 'http://82.197.167.139:80', '', '', 0, 128, 0, 1, '2011-08-11', 4733, 23, NULL, 0), \
-('Split Infinity Radio', '[Bitrate: 128]  ', 'http://46.4.120.170:80', '', '', 0, 128, 0, 1, '2011-08-11', 4734, 8, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://91.121.103.183:6200', '', '', 0, 128, 0, 1, '2011-08-11', 4735, 22, NULL, 0), \
-('POLSKASTACJA.PL', '[Bitrate: 128] [Max Listeners: 220]', 'http://91.121.116.107:9400', '', '', 0, 128, 0, 1, '2011-08-11', 4736, 22, NULL, 0), \
-('Final Fantasy Radio', '[Bitrate: 128]  ', 'http://69.175.89.82:8227', '', '', 0, 128, 1, 1, '2011-08-11', 4737, 7, NULL, 0), \
 ('Frequence India', 'India radio [Bitrate: 128]', 'http://94.23.120.121:80', '', '', 0, 128, 0, 1, '2011-08-11', 4738, 27, NULL, 0), \
 ('VOLKSMUSIKNET', ' [Bitrate: 128]  ', 'http://208.53.158.48:8188', '', '', 51, 128, 0, 1, '2011-08-11', 4739, 7, NULL, 0), \
 ('Radio MilleniuM Manele', '[Bitrate: 128]  ', 'http://195.60.77.239:9000', '', '', 0, 128, 0, 1, '2011-08-11', 4740, 29, NULL, 0), \
@@ -3630,14 +3432,12 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('Technolovers.net', '[Bitrate: 128]', 'http://109.230.252.254:2010', '', '', 0, 128, 0, 1, '2011-08-11', 4766, 39, NULL, 0), \
 ('Revolution Live', 'HarderRadio Hands Up Mix August 2009  [Bitrate: 128]', 'http://92.51.132.244:9999', '', '', 0, 128, 0, 1, '2011-08-11', 4767, 8, NULL, 0), \
 ('GotRadio - Guitar Genius', '[Bitrate: 128] ', 'http://64.202.109.63:80', '', '', 0, 128, 0, 1, '2011-08-11', 4768, 7, NULL, 0), \
-('Houseradio needs more help urgently', ' check our website!!! Houseradio deep tech house HIFI 1 ', 'http://78.129.250.9:8052', '', '', 16, 128, 5, 1, '2011-08-11', 4769, 9, '2011-10-15 20:09:53', 0), \
 ('Soundset Plavi', '[Bitrate: 128]  ', 'http://92.48.127.99:9800', '', '', 0, 128, 0, 1, '2011-08-11', 4770, 27, NULL, 0), \
 ('98 A Radio Rock', '98 A Radio Rock  [Bitrate: 128]  ', 'http://184.172.134.4:9400', '', '', 1, 128, 0, 1, '2011-08-11', 4771, 7, NULL, 0), \
 ('Cavo Paradiso Radio', 'Sorry', 'http://85.17.122.212:8488', '', '', 0, 128, 0, 1, '2011-08-11', 4773, 6, NULL, 0), \
 ('Hot Mix Radio', 'http://www.hotmixradiodance.fr [Bitrate: 128]', 'http://213.218.147.24:80', '', '', 0, 128, 0, 1, '2011-08-11', 4774, 4, NULL, 0), \
 ('THE BLAZE', '[Bitrate: 128]  ', 'http://204.45.8.170:8057', '', '', 0, 128, 0, 1, '2011-08-11', 4775, 7, NULL, 0), \
 ('Stryper', '[Bitrate: 128] [Max Listeners: 240]', 'http://207.210.88.138:5108', '', '', 0, 128, 0, 1, '2011-08-11', 4778, 27, NULL, 0), \
-('San-Francisco-49ers-at-Detroit-Lions-Oct-16-2011', '', 'http://stream-01.pleinair.net:8110', '', 'San-Francisco-49ers-at-Detroit-Lions-Oct-16-2011.png', 0, 0, 0, 1, '2011-11-11', 4779, 0, '2017-01-01 00:00:00', 0), \
 ('Your-Money', '', 'http://stream-01.pleinair.net:8110', '', 'Your-Money.png', 0, 0, 0, 1, '2011-11-11', 4780, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Plein-Air-991', '', 'http://stream-01.pleinair.net:8110', 'http://www.pleinair.net/', 'Radio-Plein-Air-991.png', 0, 0, 0, 1, '2011-11-11', 4781, 0, '2017-01-01 00:00:00', 0), \
 ('Michael-Wolff', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Michael-Wolff.png', 0, 0, 0, 1, '2011-11-11', 4782, 0, '2017-01-01 00:00:00', 0), \
@@ -3757,7 +3557,6 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('WDCB-909', 'Chicago&#39;s jazz station!  WDCB 90.9fm Public Radio broadcasts 24/7: jazz, blues, acoustic/Americana music and news to Chicago, Northeastern Illinois and the world via our iTunes and Windows Media P', 'http://wdcb-ice.streamguys.org/wdcb.m3u', 'http://www.wdcb.org/', 'WDCB-909.png', 0, 0, 0, 1, '2011-11-11', 4899, 0, '2017-01-01 00:00:00', 0), \
 ('System-of-a-Down', '', 'http://wdcb-ice.streamguys.org/wdcb.m3u', '', 'System-of-a-Down.png', 0, 0, 0, 1, '2011-11-11', 4900, 0, '2017-01-01 00:00:00', 0), \
 ('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 4901, 0, '2011-10-14 16:00:16', 0), \
-('ABC-Extra', '', 'http://abc.net.au/res/streaming/audio/aac/extra.pls', 'http://www.abc.net.au/', 'ABC-Extra.png', 0, 0, 0, 1, '2011-11-11', 4902, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Stotis-1008', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.raduga.lt/', 'Radio-Stotis-1008.png', 0, 0, 0, 1, '2011-11-11', 4903, 0, '2017-01-01 00:00:00', 0), \
 ('Q1047', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.q1047.com/', 'Q1047.png', 0, 0, 0, 1, '2011-11-11', 4904, 0, '2017-01-01 00:00:00', 0), \
 ('Jokoan', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Jokoan.png', 0, 0, 0, 1, '2011-11-11', 4905, 0, '2017-01-01 00:00:00', 0), \
@@ -3780,8 +3579,6 @@ const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `be
 ('Minnie-Riperton', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Minnie-Riperton.png', 0, 0, 0, 1, '2011-11-11', 4922, 0, '2017-01-01 00:00:00', 0), \
 ('Tony-Dibbin', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Tony-Dibbin.png', 0, 0, 0, 1, '2011-11-11', 4923, 0, '2017-01-01 00:00:00', 0), \
 ('KJQS-1230', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.thefansports.com/', 'KJQS-1230.png', 0, 0, 0, 1, '2011-11-11', 4924, 0, '2017-01-01 00:00:00', 0), \
-('1071-The-Z', '', 'http://stream3.securenetsystems.net:80/WZVN', 'http://www.z1071.com/', '1071-The-Z.png', 0, 0, 0, 1, '2011-11-11', 4925, 0, '2017-01-01 00:00:00', 0), \
-('The-Coyote-1027', '', 'http://stream3.securenetsystems.net:80/WZVN', 'http://www.1027thecoyote.com/', 'The-Coyote-1027.png', 0, 0, 0, 1, '2011-11-11', 4926, 0, '2017-01-01 00:00:00', 0), \
 ('Ben-E-King', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Ben-E-King.png', 0, 0, 0, 1, '2011-11-11', 4927, 0, '2017-01-01 00:00:00', 0), \
 ('Les-McCann', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Les-McCann.png', 0, 0, 0, 1, '2011-11-11', 4928, 0, '2017-01-01 00:00:00', 0), \
 ('Decapitated', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Decapitated.png', 0, 0, 0, 1, '2011-11-11', 4929, 0, '2017-01-01 00:00:00', 0), \
@@ -3881,7 +3678,6 @@ const char *radio_station_setupsql12="REPLACE INTO `radio_stations` (`name`, `be
 ('WDCB-909', 'Chicago&#39;s jazz station!  WDCB 90.9fm Public Radio broadcasts 24/7: jazz, blues, acoustic/Americana music and news to Chicago, Northeastern Illinois and the world via our iTunes and Windows Media P', 'http://wdcb-ice.streamguys.org/wdcb.m3u', 'http://www.wdcb.org/', 'WDCB-909.png', 0, 0, 0, 1, '2011-11-11', 5024, 0, '2017-01-01 00:00:00', 0), \
 ('System-of-a-Down', '', 'http://wdcb-ice.streamguys.org/wdcb.m3u', '', 'System-of-a-Down.png', 0, 0, 0, 1, '2011-11-11', 5025, 0, '2017-01-01 00:00:00', 0), \
 ('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 5026, 0, '2011-10-14 16:00:11', 0), \
-('ABC-Extra', '', 'http://abc.net.au/res/streaming/audio/aac/extra.pls', 'http://www.abc.net.au/', 'ABC-Extra.png', 0, 0, 0, 1, '2011-11-11', 5027, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Stotis-1008', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.raduga.lt/', 'Radio-Stotis-1008.png', 0, 0, 0, 1, '2011-11-11', 5028, 0, '2017-01-01 00:00:00', 0), \
 ('Q1047', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.q1047.com/', 'Q1047.png', 0, 0, 0, 1, '2011-11-11', 5029, 0, '2017-01-01 00:00:00', 0), \
 ('Jokoan', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Jokoan.png', 0, 0, 0, 1, '2011-11-11', 5030, 0, '2017-01-01 00:00:00', 0), \
@@ -4045,7 +3841,6 @@ const char *radio_station_setupsql12="REPLACE INTO `radio_stations` (`name`, `be
 ('Michael-Wolff', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Michael-Wolff.png', 0, 0, 0, 1, '2011-11-11', 5194, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Plein-Air-991', '', 'http://stream-01.pleinair.net:8110', 'http://www.pleinair.net/', 'Radio-Plein-Air-991.png', 0, 0, 0, 1, '2011-11-11', 5195, 0, '2017-01-01 00:00:00', 0), \
 ('Your-Money', '', 'http://stream-01.pleinair.net:8110', '', 'Your-Money.png', 0, 0, 0, 1, '2011-11-11', 5196, 0, '2017-01-01 00:00:00', 0), \
-('San-Francisco-49ers-at-Detroit-Lions-Oct-16-2011', '', 'http://stream-01.pleinair.net:8110', '', 'San-Francisco-49ers-at-Detroit-Lions-Oct-16-2011.png', 0, 0, 0, 1, '2011-11-11', 5197, 0, '2017-01-01 00:00:00', 0), \
 ('MISS-98-975', '', 'http://ice1.securenetsystems.net:80/WWMS', 'http://www.miss98.net/', 'MISS-98-975.png', 0, 0, 0, 1, '2011-11-11', 5198, 0, '2017-01-01 00:00:00', 0), \
 ('Sunny-107-1069', '', 'http://www.klamathradio.com/Sunnyindex.asx', 'http://www.klamathradio.com/sunny107/index.html', 'Sunny-107-1069.png', 0, 0, 0, 1, '2011-11-11', 5199, 0, '2017-01-01 00:00:00', 0), \
 ('KECH-FM-953', '', 'http://www.klamathradio.com/Sunnyindex.asx', 'http://www.kech95.com/', 'KECH-FM-953.png', 0, 0, 0, 1, '2011-11-11', 5200, 0, '2017-01-01 00:00:00', 0), \
@@ -4177,7 +3972,6 @@ const char *radio_station_setupsql13="REPLACE INTO `radio_stations` (`name`, `be
 ('Cheche-80S--90S-Rock-Hits', 'Esta es una emisora especializada en clasicos, especialmente de las decadas 80&#180;s y 90&#180;s. La programacion abarca los diversos subgeneros del rock. Escucharas las bandas, grupos y artistas con', 'http://listen.radionomy.com/cheche-international-radio', 'http://www.elcheche.net', 'Cheche-80S--90S-Rock-Hits.png', 0, 0, 0, 1, '2011-11-11', 5324, 0, '2017-01-01 00:00:00', 0), \
 ('The-Late-Show', '', 'http://listen.radionomy.com/cheche-international-radio', '', 'The-Late-Show.png', 0, 0, 0, 1, '2011-11-11', 5325, 0, '2017-01-01 00:00:00', 0), \
 ('Sports-Talk', '', 'http://listen.radionomy.com/cheche-international-radio', '', 'Sports-Talk.png', 0, 0, 0, 1, '2011-11-11', 5326, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Western-Plains-657', '', 'http://listen.radionomy.com/cheche-international-radio', 'http://abc.net.au/westernplains/', 'ABC-Western-Plains-657.png', 0, 0, 1, 1, '2011-11-11', 5327, 0, '2011-10-14 15:58:57', 0), \
 ('JPopsuki-Radio', 'The stations that features J-POP, Japanese TV programs, etc.', 'http://188.40.119.11:8000/', 'http://www.jpopsuki.eu/', 'JPopsuki-Radio.png', 0, 0, 0, 1, '2011-11-11', 5328, 0, '2017-01-01 00:00:00', 0), \
 ('The-Planet-927', '', 'http://188.40.119.11:8000/', 'http://www.planet927.com/', 'The-Planet-927.png', 0, 0, 0, 1, '2011-11-11', 5329, 0, '2017-01-01 00:00:00', 0), \
 ('WCSV-1490', '', 'http://188.40.119.11:8000/', 'http://www.1490wcsv.com/', 'WCSV-1490.png', 0, 0, 0, 1, '2011-11-11', 5330, 0, '2017-01-01 00:00:00', 0), \
@@ -4233,7 +4027,6 @@ const char *radio_station_setupsql13="REPLACE INTO `radio_stations` (`name`, `be
 ('Real-Estate-Edge', '', 'http://streampoint.radioio.com/streams/237/46f28fc4c4be5/listen.pls', '', 'Real-Estate-Edge.png', 0, 0, 0, 1, '2011-11-11', 5381, 0, '2017-01-01 00:00:00', 0), \
 ('Martini-In-The-Morning', 'It&#39;s not your parents&#39; standards station! From Frank Sinatra and Dean Martin to Rod Stewart and Michael Buble...it swings, it sways, it&#39;s The Lounge Sound!', 'http://s4.voscast.com:7464', 'http://www.martiniinthemorning.com/', 'Martini-In-The-Morning.png', 0, 0, 0, 1, '2011-11-11', 5382, 0, '2017-01-01 00:00:00', 0), \
 ('Q-985-FM', '', 'http://s4.voscast.com:7464', 'http://www.q985fm.com/', 'Q-985-FM.png', 0, 0, 0, 1, '2011-11-11', 5383, 0, '2017-01-01 00:00:00', 0), \
-('Radio-ABC', '', 'http://netradio.radioabc.dk', 'http://www.radioabc.dk/', 'Radio-ABC.png', 0, 0, 0, 1, '2011-11-11', 5384, 0, '2017-01-01 00:00:00', 0), \
 ('RTL-1043', '', 'http://vipicecast.yacast.net/rtl.m3u', 'http://www.rtl.fr/', 'RTL-1043.png', 0, 0, 0, 1, '2011-11-11', 5385, 0, '2017-01-01 00:00:00', 0), \
 ('Wales-and-the-Olympics---One-Year-to-Go', '', 'http://vipicecast.yacast.net/rtl.m3u', '', 'Wales-and-the-Olympics---One-Year-to-Go.png', 0, 0, 0, 1, '2011-11-11', 5386, 0, '2017-01-01 00:00:00', 0), \
 ('Qfm-943', 'La programaci&#243;n de esta emisora es multilengual, con diarios programas musicales presentados en espa&#241;ol, ingl&#233;s, alem&#225;n e italiano. La informaci&#243;n cultural local y regional es', 'http://www.reliastream.com/cast/tunein.php/bharriso/playlist.pls', 'http://www.qmusica.com/', 'Qfm-943.png', 0, 0, 0, 1, '2011-11-11', 5387, 0, '2017-01-01 00:00:00', 0), \
@@ -4262,7 +4055,6 @@ const char *radio_station_setupsql13="REPLACE INTO `radio_stations` (`name`, `be
 ('SportsCenter-Sunday', '', 'http://media-ice.musicradio.com/HeartWestMidsMP3', '', 'SportsCenter-Sunday.png', 0, 0, 0, 1, '2011-11-11', 5410, 0, '2017-01-01 00:00:00', 0), \
 ('Think-About-It', '', 'http://media-ice.musicradio.com/HeartWestMidsMP3', '', 'Think-About-It.png', 0, 0, 0, 1, '2011-11-11', 5411, 0, '2017-01-01 00:00:00', 0), \
 ('CMMMorningStar-Radio', 'CMM and MorningStar have merged forces for this strategic time to unite our hearts for the nations.  John 17 is coming to pass!', 'http://208.85.240.102:80/385.64.mp3', 'http://www.loudcaster.com/channels/385-cmm-morningstar-radio', 'CMMMorningStar-Radio.png', 0, 0, 0, 1, '2011-11-11', 5412, 0, '2017-01-01 00:00:00', 0), \
-('New-Orleans-Hornets-Play-by-Play', '', 'http://208.85.240.102:80/385.64.mp3', '', 'New-Orleans-Hornets-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 5413, 0, '2017-01-01 00:00:00', 0), \
 ('City-Dance-Radio', 'City Pop Radio&#169; la emisora online en Valencia (Espa&#241;a) que te har&#225; disfrutar de todos los &#233;xitos del pop latino e internacional desde los 80 hasta la actualidad, con una variad&#23', 'http://listen.radionomy.com/city-dance-radio', 'http://www.citypopradio.es/', 'City-Dance-Radio.png', 0, 0, 0, 1, '2011-11-11', 5414, 0, '2017-01-01 00:00:00', 0), \
 ('KFXR-1190', '', 'http://listen.radionomy.com/city-dance-radio', 'http://www.dfw1190am.com/', 'KFXR-1190.png', 0, 0, 0, 1, '2011-11-11', 5415, 0, '2017-01-01 00:00:00', 0), \
 ('Kameme-FM-1011', '', 'http://stream2.netro.ca/kamemefm', 'http://www.kameme.co.ke/', 'Kameme-FM-1011.png', 0, 0, 0, 1, '2011-11-11', 5416, 0, '2017-01-01 00:00:00', 0), \
@@ -4372,7 +4164,6 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('Europop-FM-Dance', '', 'http://www.europop.fm/winamp.pls', 'http://www.europop.fm/', 'Europop-FM-Dance.png', 0, 0, 0, 1, '2011-11-11', 5515, 0, '2017-01-01 00:00:00', 0), \
 ('K-Vet-981', '', 'http://www.europop.fm/winamp.pls', 'http://www.kvet.com/', 'K-Vet-981.png', 0, 0, 0, 1, '2011-11-11', 5516, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Queen', '', 'http://static.abradio.cz/data/s/23/playlist/queen32ss.asx', 'http://www.abradio.cz/radio/23/radio-queen/', 'Radio-Queen.png', 0, 0, 0, 1, '2011-11-11', 5517, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Polskie---Party', '', 'http://188.165.23.150:8500/', 'http://www.polskastacja.pl/', 'Radio-Polskie---Party.png', 0, 0, 0, 1, '2011-11-11', 5518, 0, '2017-01-01 00:00:00', 0), \
 ('Mix-941', 'Mix 94.1 is Las Vegas&#39; premiere radio station with listener&#39;s favorite morning show, Mark and Mercedes in the Morning.', 'http://188.165.23.150:8500/', 'http://www.mix941.fm', 'Mix-941.png', 0, 0, 0, 1, '2011-11-11', 5519, 0, '2017-01-01 00:00:00', 0), \
 ('Z-1007', '', 'http://streamer.tcworks.net:8000/keaz', 'http://www.eazy1007.com/', 'Z-1007.png', 0, 0, 0, 1, '2011-11-11', 5520, 0, '2017-01-01 00:00:00', 0), \
 ('Patriots-Replay', '', 'http://streamer.tcworks.net:8000/keaz', '', 'Patriots-Replay.png', 0, 0, 0, 1, '2011-11-11', 5521, 0, '2017-01-01 00:00:00', 0), \
@@ -4432,17 +4223,6 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('BusinessWeek-Innovation-of-the-Week-Podcast', '', 'http://www.181.fm/winamp.pls?station=181-lite80s&style=&description=Lite%2080%27s', '', '', 0, 0, 0, 1, '2011-11-11', 5577, 0, '2017-01-01 00:00:00', 0), \
 ('Ace-of-Base', '', 'http://www.181.fm/winamp.pls?station=181-lite80s&style=&description=Lite%2080%27s', '', 'Ace-of-Base.png', 0, 0, 0, 1, '2011-11-11', 5578, 0, '2017-01-01 00:00:00', 0), \
 ('The-Dan-LeBatard-Show-with-Stugotz', '', 'http://www.181.fm/winamp.pls?station=181-lite80s&style=&description=Lite%2080%27s', '', 'The-Dan-LeBatard-Show-with-Stugotz.png', 0, 0, 0, 1, '2011-11-11', 5579, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---Electro', '', 'http://icecast.audiocream.com/Electro', 'http://www.audiocream.com/', 'Audio-Cream---Electro.png', 0, 0, 0, 1, '2011-11-11', 5580, 0, '2017-01-01 00:00:00', 0), \
-('WFRF-News-and-Music', '', 'http://icecast.audiocream.com/Electro', '', 'WFRF-News-and-Music.png', 0, 0, 0, 1, '2011-11-11', 5581, 0, '2017-01-01 00:00:00', 0), \
-('Duffy', '', 'http://icecast.audiocream.com/Electro', '', 'Duffy.png', 0, 0, 0, 1, '2011-11-11', 5582, 0, '2017-01-01 00:00:00', 0), \
-('Psycroptic', '', 'http://icecast.audiocream.com/Electro', '', 'Psycroptic.png', 0, 0, 0, 1, '2011-11-11', 5583, 0, '2017-01-01 00:00:00', 0), \
-('Donovan', '', 'http://icecast.audiocream.com/Electro', '', 'Donovan.png', 0, 0, 0, 1, '2011-11-11', 5584, 0, '2017-01-01 00:00:00', 0), \
-('Global-Roots', '', 'http://icecast.audiocream.com/Electro', '', 'Global-Roots.png', 0, 0, 0, 1, '2011-11-11', 5585, 0, '2017-01-01 00:00:00', 0), \
-('KALE-960', '', 'http://icecast.audiocream.com/Electro', 'http://www.am960.com/', 'KALE-960.png', 0, 0, 0, 1, '2011-11-11', 5586, 0, '2017-01-01 00:00:00', 0), \
-('Sportsound-Rugby', '', 'http://icecast.audiocream.com/Electro', '', 'Sportsound-Rugby.png', 0, 0, 0, 1, '2011-11-11', 5587, 0, '2017-01-01 00:00:00', 0), \
-('Just-Music', '', 'http://icecast.audiocream.com/Electro', '', 'Just-Music.png', 0, 0, 0, 1, '2011-11-11', 5588, 0, '2017-01-01 00:00:00', 0), \
-('Eric-Clapton', '', 'http://icecast.audiocream.com/Electro', '', 'Eric-Clapton.png', 0, 0, 0, 1, '2011-11-11', 5589, 0, '2017-01-01 00:00:00', 0), \
-('Crash-Test-Dummies', '', 'http://icecast.audiocream.com/Electro', '', 'Crash-Test-Dummies.png', 0, 0, 0, 1, '2011-11-11', 5590, 0, '2017-01-01 00:00:00', 0), \
 ('Laid-Back-Radio', 'Laid Back Radio (LDBK) plays everything from Soul, Funk, Jazz, Psych Rock, Disco and Latin music to Hip Hop and much more.', 'http://listen.radionomy.com/Laid-Back-Radio', 'http://www.laid-back.be/', 'Laid-Back-Radio.png', 0, 0, 0, 1, '2011-11-11', 5591, 0, '2017-01-01 00:00:00', 0), \
 ('945-XKR', '', 'mms://live.cumulusstreaming.com/WXKR-FM', 'http://www.wxkr.com/', '945-XKR.png', 0, 0, 0, 1, '2011-11-11', 5592, 0, '2017-01-01 00:00:00', 0), \
 ('961-FM-STEREO', '', 'mms://live.cumulusstreaming.com/WXKR-FM', '', '961-FM-STEREO.png', 0, 0, 0, 1, '2011-11-11', 5593, 0, '2017-01-01 00:00:00', 0), \
@@ -4458,7 +4238,6 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('Key-103-1030', '', 'http://streamingpulse.info/sc8/tunein.php/samstout/playlist.pls', 'http://www.key103.co.uk/', 'Key-103-1030.png', 0, 0, 0, 1, '2011-11-11', 5603, 0, '2017-01-01 00:00:00', 0), \
 ('KVSF-1400', '', 'http://streamingpulse.info/sc8/tunein.php/samstout/playlist.pls', '', 'KVSF-1400.png', 0, 0, 0, 1, '2011-11-11', 5604, 0, '2017-01-01 00:00:00', 0), \
 ('Star-1013', '', 'http://streamingpulse.info/sc8/tunein.php/samstout/playlist.pls', 'http://www.star1013fm.com/', 'Star-1013.png', 0, 0, 0, 1, '2011-11-11', 5605, 0, '2017-01-01 00:00:00', 0), \
-('ABC-News-Radio-1026', '', 'http://abc.net.au/res/streaming/audio/mp3/news_radio.pls', 'http://www.abc.net.au/newsradio/', 'ABC-News-Radio-1026.png', 0, 0, 0, 1, '2011-11-11', 5606, 0, '2017-01-01 00:00:00', 0), \
 ('Beirut-Nights-Radio', 'Just recently, BeirutNights.com became a part of ByBlos Media, LLC  , Texas. For many years it was a personal broadcast. DJ Sami is in love with the Beirut Nights kind of music and in broadcasting it ', 'http://community.loudcity.com/stations/beirut-nights-radio/files/show/live.pls', 'http://www.beirutnights.com/', 'Beirut-Nights-Radio.png', 0, 0, 0, 1, '2011-11-11', 5607, 0, '2017-01-01 00:00:00', 0), \
 ('Europe', '', 'http://community.loudcity.com/stations/beirut-nights-radio/files/show/live.pls', '', 'Europe.png', 0, 0, 0, 1, '2011-11-11', 5608, 0, '2017-01-01 00:00:00', 0), \
 ('6640-with-Chuck-Missler', '', 'http://community.loudcity.com/stations/beirut-nights-radio/files/show/live.pls', '', '6640-with-Chuck-Missler.png', 0, 0, 0, 1, '2011-11-11', 5609, 0, '2017-01-01 00:00:00', 0), \
@@ -4532,7 +4311,6 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('Carmen-McRae', '', 'http://www.kwve.com/listen/kwve-128.pls', '', 'Carmen-McRae.png', 0, 0, 0, 1, '2011-11-11', 5678, 0, '2017-01-01 00:00:00', 0), \
 ('Oklahoma-City-Thunder-Play-by-Play', '', 'http://www.kwve.com/listen/kwve-128.pls', '', 'Oklahoma-City-Thunder-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 5679, 0, '2017-01-01 00:00:00', 0), \
 ('Q-94-945', '', 'http://www.kwve.com/listen/kwve-128.pls', 'http://www.wrvq94.com/', 'Q-94-945.png', 0, 0, 0, 1, '2011-11-11', 5680, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Polskie---Jazz', '', 'http://www.polskastacja.pl/play/aac_jazz.pls', 'http://www.polskastacja.pl/', 'Radio-Polskie---Jazz.png', 0, 0, 0, 1, '2011-11-11', 5681, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Ishinomaki-764', '', 'http://www.simulradio.jp/asx/RadioIshinomaki.asx', 'http://www.fm764.jp/', 'Radio-Ishinomaki-764.png', 0, 0, 0, 1, '2011-11-11', 5682, 0, '2017-01-01 00:00:00', 0), \
 ('104-5-WSNX-1045', '', 'http://www.simulradio.jp/asx/RadioIshinomaki.asx', 'http://www.wsnx.com/', '104-5-WSNX-1045.png', 0, 0, 0, 1, '2011-11-11', 5683, 0, '2017-01-01 00:00:00', 0), \
 ('Radiko-Tsukuba-842', '', 'mms://ir298.com/IRTsukuba/radiotsukuba.asx', 'http://radio-tsukuba.net/', 'Radiko-Tsukuba-842.png', 0, 0, 0, 1, '2011-11-11', 5684, 0, '2017-01-01 00:00:00', 0), \
@@ -4560,20 +4338,8 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('DR Mama', '', 'http://live-icy.gss.dr.dk:8000/A/A18H.mp3', 'http://www.dr.dk/mama/radio', 'DR-Mama.png', 0, 0, 0, 1, '2011-11-11', 5706, 0, '2017-01-01 00:00:00', 0), \
 ('SAM-1073', '', 'http://live-icy.gss.dr.dk:8000/Channel18_HQ.mp3', 'http://www.knuj.net/', 'SAM-1073.png', 0, 0, 0, 1, '2011-11-11', 5707, 0, '2017-01-01 00:00:00', 0), \
 ('The-Catholic-Forum', '', 'http://live-icy.gss.dr.dk:8000/Channel18_HQ.mp3', '', 'The-Catholic-Forum.png', 0, 0, 0, 1, '2011-11-11', 5708, 0, '2017-01-01 00:00:00', 0), \
-('WKDK-1240', '', 'mms://stream.netro.ca/wkdk', 'http://www.wkdk.com/', 'WKDK-1240.png', 0, 0, 0, 1, '2011-11-11', 5709, 0, '2017-01-01 00:00:00', 0), \
-('Joan-Jett-and-the-Blackhearts', '', 'mms://stream.netro.ca/wkdk', '', 'Joan-Jett-and-the-Blackhearts.png', 0, 0, 0, 1, '2011-11-11', 5710, 0, '2017-01-01 00:00:00', 0), \
-('Cool-941', '', 'mms://stream.netro.ca/wkdk', '', 'Cool-941.png', 0, 0, 0, 1, '2011-11-11', 5711, 0, '2017-01-01 00:00:00', 0), \
-('Super-Request', '', 'mms://stream.netro.ca/wkdk', '', 'Super-Request.png', 0, 0, 0, 1, '2011-11-11', 5712, 0, '2017-01-01 00:00:00', 0), \
-('KCWH-1023', '', 'mms://stream.netro.ca/wkdk', 'http://www.kcwhfm.com/', 'KCWH-1023.png', 0, 0, 0, 1, '2011-11-11', 5713, 0, '2017-01-01 00:00:00', 0), \
-('Gospell-Trax', '', 'mms://stream.netro.ca/wkdk', '', 'Gospell-Trax.png', 0, 0, 0, 1, '2011-11-11', 5714, 0, '2017-01-01 00:00:00', 0), \
-('Nas', '', 'mms://stream.netro.ca/wkdk', '', 'Nas.png', 0, 0, 0, 1, '2011-11-11', 5715, 0, '2017-01-01 00:00:00', 0), \
-('The-Addy-And-Gabe-Show', '', 'mms://stream.netro.ca/wkdk', '', 'The-Addy-And-Gabe-Show.png', 0, 0, 0, 1, '2011-11-11', 5716, 0, '2017-01-01 00:00:00', 0), \
 ('Radiomiaminet-Barcelona', 'Radiomiami.net from Los Angeles, Miami and Barcelona. Radiomiami.net coast to coast in USA and around the world by internet.', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', 'http://www.radiomiami.net/', 'Radiomiaminet-Barcelona.png', 0, 0, 0, 1, '2011-11-11', 5717, 0, '2017-01-01 00:00:00', 0), \
 ('Elvis-Duran-Channel', '', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', 'http://www.elvisduran.com/', 'Elvis-Duran-Channel.png', 0, 0, 0, 1, '2011-11-11', 5718, 0, '2017-01-01 00:00:00', 0), \
-('Bouncing-Souls', '', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', '', 'Bouncing-Souls.png', 0, 0, 0, 1, '2011-11-11', 5719, 0, '2017-01-01 00:00:00', 0), \
-('Studio-360', '', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', '', 'Studio-360.png', 0, 0, 0, 1, '2011-11-11', 5720, 0, '2017-01-01 00:00:00', 0), \
-('Static-X', '', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', '', 'Static-X.png', 0, 0, 0, 1, '2011-11-11', 5721, 0, '2017-01-01 00:00:00', 0), \
-('Y101-1011', '', 'http://www.radiomiami.net/RadiomiamiBarcelona.asx', 'http://www.y101hits.com/', 'Y101-1011.png', 0, 0, 0, 1, '2011-11-11', 5722, 0, '2017-01-01 00:00:00', 0), \
 ('WABE-901', '', 'http://pba-ice.streamguys.org/wabe.m3u', 'http://www.pba.org/', 'WABE-901.png', 0, 0, 0, 1, '2011-11-11', 5723, 0, '2017-01-01 00:00:00', 0), \
 ('Brian-J-Walker', '', 'http://pba-ice.streamguys.org/wabe.m3u', '', 'Brian-J-Walker.png', 0, 0, 0, 1, '2011-11-11', 5724, 0, '2017-01-01 00:00:00', 0), \
 ('KISS-951', 'KISS 95.1, THE #1 HIT MUSIC STATION IN THE CAROLINAS.  LISTEN ONLINE AT KISS951.COM AND WIN CONCERT TICKETS, CASH AND OTHER GREAT PRIZES EVERYDAY.', 'http://pba-ice.streamguys.org/wabe.m3u', 'http://www.kiss951.com/', 'KISS-951.png', 0, 0, 0, 1, '2011-11-11', 5725, 0, '2017-01-01 00:00:00', 0), \
@@ -4587,25 +4353,12 @@ const char *radio_station_setupsql14="REPLACE INTO `radio_stations` (`name`, `be
 ('Magic-977', 'Magic 98.3 WGMT is a radio station in the Northeast Kingdom of Vermont which plays a selection from the 70&#39;s, 80&#39;s and 90&#39;s.', 'http://www.magic977.com:8000', 'http://www.magic977.com/', 'Magic-977.png', 0, 0, 0, 1, '2011-11-11', 5733, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-HRN-680', '', 'http://emisorasunidas.hn/files/HRNmovil-EDGE.m3u', 'http://emisorasunidas.hn/', 'Radio-HRN-680.png', 0, 0, 0, 1, '2011-11-11', 5734, 0, '2017-01-01 00:00:00', 0), \
 ('1045-The-Zone', '104-5 the Zone is THE Sports Station, middle Tennessee&#39;s home for sports&#39; biggest names and Nashville&#39;s biggest games.', 'http://emisorasunidas.hn/files/HRNmovil-EDGE.m3u', 'http://www.1045thezone.com/', '1045-The-Zone.png', 0, 0, 0, 1, '2011-11-11', 5735, 0, '2017-01-01 00:00:00', 0), \
-('Taio-Cruz', '', 'mms://streaming117.network1newstalk.com/wack', '', 'Taio-Cruz.png', 0, 0, 0, 1, '2011-11-11', 6266, 0, '2017-01-01 00:00:00', 0), \
-('Charlie-Rich', '', 'mms://streaming117.network1newstalk.com/wack', '', 'Charlie-Rich.png', 0, 0, 0, 1, '2011-11-11', 6267, 0, '2017-01-01 00:00:00', 0), \
-('Toronto-Maple-Leafs-Pre-Game-Show', '', 'mms://streaming117.network1newstalk.com/wack', '', 'Toronto-Maple-Leafs-Pre-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 6268, 0, '2017-01-01 00:00:00', 0), \
-('Sabados-Ecuatorianisima-and-Jarabe-For-the-Soul', '', 'mms://streaming117.network1newstalk.com/wack', '', 'Sabados-Ecuatorianisima-and-Jarabe-For-the-Soul.png', 0, 0, 0, 1, '2011-11-11', 6269, 0, '2017-01-01 00:00:00', 0), \
-('Papa-Roach', '', 'mms://streaming117.network1newstalk.com/wack', '', 'Papa-Roach.png', 0, 0, 0, 1, '2011-11-11', 6270, 0, '2017-01-01 00:00:00', 0), \
-('WPTB-850', '', 'mms://streaming117.network1newstalk.com/wack', '', 'WPTB-850.png', 0, 0, 0, 1, '2011-11-11', 6271, 0, '2017-01-01 00:00:00', 0), \
-('Real-Country-969', '', 'mms://nick9.surfernetwork.com/WSIG', 'http://www.969wsig.com/', 'Real-Country-969.png', 0, 0, 0, 1, '2011-11-11', 6272, 0, '2017-01-01 00:00:00', 0), \
-('KSGF-1260', '', 'mms://nick9.surfernetwork.com/WSIG', 'http://www.ksgf.com/', 'KSGF-1260.png', 0, 0, 0, 1, '2011-11-11', 6274, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-1051', '', 'mms://nick9.surfernetwork.com/WSIG', 'http://www.q1051.com/', 'Oldies-1051.png', 0, 0, 0, 1, '2011-11-11', 6275, 0, '2017-01-01 00:00:00', 0), \
-('WBAB-1023', '30+ years of rocking Long Island!', 'mms://nick9.surfernetwork.com/WSIG', 'http://wbab.com/', 'WBAB-1023.png', 0, 0, 0, 1, '2011-11-11', 6276, 0, '2017-01-01 00:00:00', 0), \
-('B103-1031', 'AC Music mixed with John Tesh Radio Show, variety of best hits and much more!', 'mms://nick9.surfernetwork.com/WSIG', 'http://www.b103fm.com/', 'B103-1031.png', 0, 0, 0, 1, '2011-11-11', 6277, 0, '2017-01-01 00:00:00', 0), \
 ('BR-KLASSIK-1032', 'BR-KLASSIK', 'http://streams.br-online.de/br-klassik_2.m3u', 'http://www.br-online.de/br-klassik/', 'BR-KLASSIK-1032.png', 0, 0, 0, 1, '2011-11-11', 6278, 0, '2017-01-01 00:00:00', 0), \
 ('Better-Golf', '', 'http://streams.br-online.de/br-klassik_2.m3u', '', 'Better-Golf.png', 0, 0, 0, 1, '2011-11-11', 6279, 0, '2017-01-01 00:00:00', 0), \
 ('Modern-Music-and-More', '', 'http://streams.br-online.de/br-klassik_2.m3u', '', 'Modern-Music-and-More.png', 0, 0, 0, 1, '2011-11-11', 6280, 0, '2017-01-01 00:00:00', 0), \
 ('Cities-97-971', '', 'http://streams.br-online.de/br-klassik_2.m3u', 'http://www.cities97.com/', 'Cities-97-971.png', 0, 0, 0, 1, '2011-11-11', 6281, 0, '2017-01-01 00:00:00', 0), \
-('Mixnation-Radio-1045', 'MixNation ist einzigartig und spielt Re-Mixe aus dem Bereich Pop, Rock, R&#39;n&#39;B und Hip-Hop. MixNation bietet dir ein exklusives Angebot an Uptempo-Songs und Remixen von bekannten Stars wie Beyo', 'http://sc1.netstreamer.net:8090', 'http://www.mixnation.de/', 'Mixnation-Radio-1045.png', 0, 0, 0, 1, '2011-11-11', 6282, 0, '2017-01-01 00:00:00', 0), \
-('Wings', '', 'http://sc1.netstreamer.net:8090', '', 'Wings.png', 0, 0, 0, 1, '2011-11-11', 6283, 0, '2017-01-01 00:00:00', 0), \
-('DJ-Encore', '', 'http://sc1.netstreamer.net:8090', '', 'DJ-Encore.png', 0, 0, 1, 1, '2011-11-11', 6284, 0, '2011-10-17 23:43:59', 0), \
-('RadioIO-80s-New-Wave', 'Enjoy the post-punk and electronic sounds from the decade that made synthesizers as popular as guitars, with bands that inspired a new form of fashion and hairdos.', 'http://streampoint.radioio.com/streams/38/46f28fc4c4be5/listen.pls', 'http://www.radioio.com/channels/80s-new-wave', 'RadioIO-80s-New-Wave.png', 0, 0, 0, 1, '2011-11-11', 6285, 0, '2017-01-01 00:00:00', 0), \
+('Mixnation-Radio-1045', 'MixNation ist einzigartig und spielt Re-Mixe aus dem Bereich Pop, Rock, R&#39;n&#39;B und Hip-Hop.', 'http://sc1.netstreamer.net:8090', 'http://www.mixnation.de/', 'Mixnation-Radio-1045.png', 0, 0, 0, 1, '2011-11-11', 6282, 0, '2017-01-01 00:00:00', 1), \
+('Wings', '', 'http://sc1.netstreamer.net:8090', '', 'Wings.png', 0, 0, 0, 1, '2011-11-11', 6283, 0, '2017-01-01 00:00:00', 1), \
 ('Guns-N-Roses', '', 'http://streampoint.radioio.com/streams/38/46f28fc4c4be5/listen.pls', '', 'Guns-N-Roses.png', 0, 0, 0, 1, '2011-11-11', 6286, 0, '2017-01-01 00:00:00', 0), \
 ('Lazer-105-9-1059', '', 'mms://2.uni2.sa.streamaudio.com/KLZR_FM', 'http://www.lazer.com/', 'Lazer-105-9-1059.png', 0, 0, 0, 1, '2011-11-11', 6287, 0, '2017-01-01 00:00:00', 0);";
 
@@ -4633,48 +4386,10 @@ const char *radio_station_setupsql15="REPLACE INTO `radio_stations` (`name`, `be
 ('Power-1035', '', 'http://crystalout.surfernetwork.com:8001/KVSP_MP3', 'http://www.kvsp.com/', 'Power-1035.png', 0, 0, 0, 1, '2011-11-11', 6307, 0, '2017-01-01 00:00:00', 0), \
 ('Gospel-Caravan', '', 'http://crystalout.surfernetwork.com:8001/KVSP_MP3', '', 'Gospel-Caravan.png', 0, 0, 0, 1, '2011-11-11', 6308, 0, '2017-01-01 00:00:00', 0), \
 ('WAVU-630', '', 'mms://97.67.54.205:8080/', 'http://www.wavuam.com/', 'WAVU-630.png', 0, 0, 0, 1, '2011-11-11', 6309, 0, '2017-01-01 00:00:00', 0), \
-('GoodHope-FM-940', 'Good Hope FM is a Cape Town based 24 hour, regional, Commercial Music Station, which broadcasts within a CHR (Contemporary Hit Radio) Rhythmic format providing a music mix of R&amp;B, Ballads, Pop, Hi', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', 'http://www.goodhopefm.co.za/', 'GoodHope-FM-940.png', 0, 0, 0, 1, '2011-11-11', 6310, 0, '2017-01-01 00:00:00', 0), \
-('WMCR-FM-1063', '', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', 'http://www.wmcronline.com/', 'WMCR-FM-1063.png', 0, 0, 0, 1, '2011-11-11', 6311, 0, '2017-01-01 00:00:00', 0), \
-('Funny-850', '', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', 'http://www.funny850.com/', 'Funny-850.png', 0, 0, 0, 1, '2011-11-11', 6312, 0, '2017-01-01 00:00:00', 0), \
-('WPVQ-953', '', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', 'http://www.bear953.com/', 'WPVQ-953.png', 0, 0, 0, 1, '2011-11-11', 6313, 0, '2017-01-01 00:00:00', 0), \
-('The-Jazz-Breakfast', '', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', '', 'The-Jazz-Breakfast.png', 0, 0, 0, 1, '2011-11-11', 6314, 0, '2017-01-01 00:00:00', 0), \
-('Hits-1055', '', 'http://www.antfarm.co.za/clients/goodhopefm/goodhopefm_22.asx', 'http://www.hits1055.com', 'Hits-1055.png', 0, 0, 0, 1, '2011-11-11', 6315, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1230', '', 'mms://live.cumulusstreaming.com/WFOM-AM', '', 'ESPN-1230.png', 0, 0, 0, 1, '2011-11-11', 6316, 0, '2017-01-01 00:00:00', 0), \
-('KRNT-1350', '', 'mms://live.cumulusstreaming.com/WFOM-AM', 'http://www.1350krnt.com/', 'KRNT-1350.png', 0, 0, 0, 1, '2011-11-11', 6317, 0, '2017-01-01 00:00:00', 0), \
-('KOAN-1020', '', 'http://sc1.abacast.com:9130', 'http://1020koan.com', 'KOAN-1020.png', 0, 0, 0, 1, '2011-11-11', 6318, 0, '2017-01-01 00:00:00', 0), \
-('The-Sighlent-Storm', '', 'http://sc1.abacast.com:9130', '', 'The-Sighlent-Storm.png', 0, 0, 0, 1, '2011-11-11', 6319, 0, '2017-01-01 00:00:00', 0), \
-('Benise', '', 'http://sc1.abacast.com:9130', '', 'Benise.png', 0, 0, 0, 1, '2011-11-11', 6320, 0, '2017-01-01 00:00:00', 0), \
-('Connections', '', 'http://sc1.abacast.com:9130', '', 'Connections.png', 0, 0, 0, 1, '2011-11-11', 6321, 0, '2017-01-01 00:00:00', 0), \
-('Robbie-Vincent-Show', '', 'http://sc1.abacast.com:9130', '', 'Robbie-Vincent-Show.png', 0, 0, 0, 1, '2011-11-11', 6322, 0, '2017-01-01 00:00:00', 0), \
-('KVOL-1330', '', 'http://sc1.abacast.com:9130', 'http://www.kvol1330.com/', 'KVOL-1330.png', 0, 0, 0, 1, '2011-11-11', 6323, 0, '2017-01-01 00:00:00', 0), \
-('Klaus-Doldinger', '', 'http://sc1.abacast.com:9130', '', 'Klaus-Doldinger.png', 0, 0, 0, 1, '2011-11-11', 6324, 0, '2017-01-01 00:00:00', 0), \
-('KC-and-The-Sunshine-Band', '', 'http://sc1.abacast.com:9130', '', 'KC-and-The-Sunshine-Band.png', 0, 0, 0, 1, '2011-11-11', 6325, 0, '2017-01-01 00:00:00', 0), \
 ('971-The-River', '', 'http://sc1.abacast.com:9130', 'http://971theriver.com/', '971-The-River.png', 0, 0, 0, 1, '2011-11-11', 6326, 0, '2017-01-01 00:00:00', 0), \
-('WSIB-939', '', 'http://sc1.abacast.com:9130', 'http://www.gracebroadcasting.com/', 'WSIB-939.png', 0, 0, 0, 1, '2011-11-11', 6327, 0, '2017-01-01 00:00:00', 0), \
-('Eric-Prydz', '', 'http://sc1.abacast.com:9130', '', 'Eric-Prydz.png', 0, 0, 0, 1, '2011-11-11', 6328, 0, '2017-01-01 00:00:00', 0), \
-('The-EDGE-96ONE-961', '', 'http://icecast.arn.com.au/961.aac.m3u', 'http://www.961.com.au/', 'The-EDGE-96ONE-961.png', 0, 0, 0, 1, '2011-11-11', 6329, 0, '2017-01-01 00:00:00', 0), \
-('WQAM-560', '', 'http://icecast.arn.com.au/961.aac.m3u', 'http://www.wqam.com/', 'WQAM-560.png', 0, 0, 0, 1, '2011-11-11', 6330, 0, '2017-01-01 00:00:00', 0), \
-('XX-1090', '', 'http://icecast.arn.com.au/961.aac.m3u', 'http://www.xx1090sandiego.com/', 'XX-1090.png', 0, 0, 0, 1, '2011-11-11', 6331, 0, '2017-01-01 00:00:00', 0), \
-('Radio-88---Retro-88-954', '', 'http://stream1.radio88.hu:8300/', 'http://www.radio88.hu/', 'Radio-88---Retro-88-954.png', 0, 0, 0, 1, '2011-11-11', 6332, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Duna-897', '', 'http://sc.grupodial.net:8088', 'http://www.duna.cl/', 'Radio-Duna-897.png', 0, 0, 0, 1, '2011-11-11', 6333, 0, '2017-01-01 00:00:00', 0), \
-('Scott-Stapp', '', 'http://sc.grupodial.net:8088', '', 'Scott-Stapp.png', 0, 0, 0, 1, '2011-11-11', 6334, 0, '2017-01-01 00:00:00', 0), \
-('Becky-Taylor', '', 'http://sc.grupodial.net:8088', '', 'Becky-Taylor.png', 0, 0, 0, 1, '2011-11-11', 6335, 0, '2017-01-01 00:00:00', 0), \
-('Roots-N-All', '', 'http://sc.grupodial.net:8088', '', 'Roots-N-All.png', 0, 0, 0, 1, '2011-11-11', 6336, 0, '2017-01-01 00:00:00', 0), \
-('Dwight-Yoakam', '', 'http://sc.grupodial.net:8088', '', 'Dwight-Yoakam.png', 0, 0, 0, 1, '2011-11-11', 6337, 0, '2017-01-01 00:00:00', 0), \
-('96-X-961', '', 'http://sc.grupodial.net:8088', 'http://www.kktx.com/', '96-X-961.png', 0, 0, 0, 1, '2011-11-11', 6338, 0, '2017-01-01 00:00:00', 0), \
-('Junior-Kimbrough', '', 'http://sc.grupodial.net:8088', '', 'Junior-Kimbrough.png', 0, 0, 0, 1, '2011-11-11', 6339, 0, '2017-01-01 00:00:00', 0), \
-('RFM-Night-Fever', 'Retrouvez une s&#233;lection des meilleurs tubes disco funk !', 'http://vipicecast.yacast.net/rfm_webradio02', 'http://www.rfm.fr/', 'RFM-Night-Fever.png', 0, 0, 0, 1, '2011-11-11', 6340, 0, '2017-01-01 00:00:00', 0), \
-('Al-Jarreau', '', 'http://vipicecast.yacast.net/rfm_webradio02', '', 'Al-Jarreau.png', 0, 0, 0, 1, '2011-11-11', 6341, 0, '2017-01-01 00:00:00', 0), \
-('Chic', '', 'http://vipicecast.yacast.net/rfm_webradio02', '', 'Chic.png', 0, 0, 0, 1, '2011-11-11', 6342, 0, '2017-01-01 00:00:00', 0), \
-('WONE-980', '', 'http://vipicecast.yacast.net/rfm_webradio02', 'http://www.wone.com/', 'WONE-980.png', 0, 0, 0, 1, '2011-11-11', 6343, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Schleswig-Holstein-1024', '', 'http://stream.hoerradar.de/rsh128.m3u', 'http://www.rsh.de/', 'Radio-Schleswig-Holstein-1024.png', 0, 0, 0, 1, '2011-11-11', 6344, 0, '2017-01-01 00:00:00', 0), \
-('1067-The-Beat', '', 'http://stream.hoerradar.de/rsh128.m3u', 'http://www.1067thebeat.com', '1067-The-Beat.png', 0, 0, 0, 1, '2011-11-11', 6345, 0, '2017-01-01 00:00:00', 0), \
-('La-Kalle-951', '', 'http://stream.hoerradar.de/rsh128.m3u', 'http://www.univision.com/content/channel.jhtml?chid=9711&amp;schid=9823', 'La-Kalle-951.png', 0, 0, 0, 1, '2011-11-11', 6346, 0, '2017-01-01 00:00:00', 0), \
-('All-60s-All-The-Time', '', 'http://69.4.238.127/', 'http://www.keepfreemusic.com/60s/', 'All-60s-All-The-Time.png', 0, 0, 0, 1, '2011-11-11', 6347, 0, '2017-01-01 00:00:00', 0), \
-('Sunday-of-Praise', '', 'http://69.4.238.127/', '', 'Sunday-of-Praise.png', 0, 0, 0, 1, '2011-11-11', 6348, 0, '2017-01-01 00:00:00', 0), \
-('Toucher-and-Rich', '', 'http://69.4.238.127/', '', 'Toucher-and-Rich.png', 0, 0, 0, 1, '2011-11-11', 6349, 0, '2017-01-01 00:00:00', 0), \
-('KDLM-1340', 'KDLM is community-focused programming with full-time local on-air talent and a full-time news director. Other programming includes overnight national talk shows and afternoon programming from the Twin', 'http://sc1.abacast.com:9166', 'http://www.1340kdlm.com/', 'KDLM-1340.png', 0, 0, 0, 1, '2011-11-11', 6350, 0, '2017-01-01 00:00:00', 0), \
-('Best-Childrens-Songs', '', 'http://sc1.abacast.com:9166', '', 'Best-Childrens-Songs.png', 0, 0, 0, 1, '2011-11-11', 6351, 0, '2017-01-01 00:00:00', 0), \
+('Radio-88---Retro-88-954', '', 'http://stream1.radio88.hu:8300/', 'http://www.radio88.hu/', 'Radio-88---Retro-88-954.png', 0, 0, 0, 1, '2011-11-11', 6332, 0, '2017-01-01 00:00:00', 1), \
+('Radio-Schleswig-Holstein-1024', '', 'http://stream.hoerradar.de:80/rsh128', 'http://www.rsh.de/', 'Radio-Schleswig-Holstein-1024.png', 0, 0, 0, 1, '2011-11-11', 6344, 0, '2017-01-01 00:00:00', 1), \
+('1067-The-Beat', '', 'http://stream.hoerradar.de/rsh128.m3u', 'http://www.1067thebeat.com', '1067-The-Beat.png', 0, 0, 0, 1, '2011-11-11', 6345, 0, '2017-01-01 00:00:00', 1), \
 ('Dari-And-Mel', '', 'http://sc1.abacast.com:9166', '', 'Dari-And-Mel.png', 0, 0, 0, 1, '2011-11-11', 6352, 0, '2017-01-01 00:00:00', 0), \
 ('KFRO-1370', '', 'http://sc1.abacast.com:9166', 'http://theranch.fm/', 'KFRO-1370.png', 0, 0, 0, 1, '2011-11-11', 6353, 0, '2017-01-01 00:00:00', 0), \
 ('WHCR-FM-903', '', 'http://whcr.org/whcrstream.m3u', 'http://www.whcr.org/', 'WHCR-FM-903.png', 0, 0, 0, 1, '2011-11-11', 6354, 0, '2017-01-01 00:00:00', 0), \
@@ -4727,7 +4442,6 @@ const char *radio_station_setupsql15="REPLACE INTO `radio_stations` (`name`, `be
 ('Mix-Mornings-with-Brig-and-Lehmo', '', 'http://173.236.29.50:8730/', '', 'Mix-Mornings-with-Brig-and-Lehmo.png', 0, 0, 0, 1, '2011-11-11', 6401, 0, '2017-01-01 00:00:00', 0), \
 ('Kiss-985', '', 'http://173.236.29.50:8730/', 'http://www.kiss985.com/', 'Kiss-985.png', 0, 0, 0, 1, '2011-11-11', 6402, 0, '2017-01-01 00:00:00', 0), \
 ('The-Summer-Obsession', '', 'http://173.236.29.50:8730/', '', 'The-Summer-Obsession.png', 0, 0, 0, 1, '2011-11-11', 6403, 0, '2017-01-01 00:00:00', 0), \
-('Slow-Radio', 'Online radio,the best love songs and easy listening 24/24', 'http://94.23.7.16/', 'http://www.slowradio.com/', 'Slow-Radio.png', 0, 0, 0, 1, '2011-11-11', 6404, 0, '2017-01-01 00:00:00', 0), \
 ('Haysi-Fantayzee', '', 'http://94.23.7.16/', '', 'Haysi-Fantayzee.png', 0, 0, 0, 1, '2011-11-11', 6405, 0, '2017-01-01 00:00:00', 0), \
 ('Golden-Hit-Radio-Italia', 'ogni ora dalle 8.00 alle 19.00 il giornaleradio flash, intrattenimento con speaker nazionali e un cocktail musicale dagli anni 80 ad oggi.', 'http://87.117.203.226:8014', 'http://www.goldenradio.it/', 'Golden-Hit-Radio-Italia.png', 0, 0, 0, 1, '2011-11-11', 6406, 0, '2017-01-01 00:00:00', 0), \
 ('Johnnie-Walkers-Sounds-of-the-70s', '', 'http://87.117.203.226:8014', '', 'Johnnie-Walkers-Sounds-of-the-70s.png', 0, 0, 0, 1, '2011-11-11', 6407, 0, '2017-01-01 00:00:00', 0), \
@@ -4850,8 +4564,6 @@ const char *radio_station_setupsql15="REPLACE INTO `radio_stations` (`name`, `be
 ('Saybia', '', 'http://87.118.64.201:8050', '', 'Saybia.png', 0, 0, 0, 1, '2011-11-11', 6524, 0, '2017-01-01 00:00:00', 0), \
 ('Portland-Trail-Blazers-Play-by-Play', '', 'http://87.118.64.201:8050', '', 'Portland-Trail-Blazers-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 6525, 0, '2017-01-01 00:00:00', 0), \
 ('GotRadio-Classic-Country', 'Put on your kickers and take a trip back to the days when Country was King', 'http://www.gotradio.com/itunes/ClassicCountry.pls', 'http://www.gotradio.com/', 'GotRadio-Classic-Country.png', 0, 0, 0, 1, '2011-11-11', 6526, 0, '2017-01-01 00:00:00', 0), \
-('WMID-1340', '', 'mms://nick9.surfernetwork.com/WMID', 'http://www.classicoldieswmid.com/', 'WMID-1340.png', 0, 0, 0, 1, '2011-11-11', 6527, 0, '2017-01-01 00:00:00', 0), \
-('WAZZ-1490', '', 'mms://nick9.surfernetwork.com/WMID', 'http://www.am1490wazz.com/', 'WAZZ-1490.png', 0, 0, 0, 1, '2011-11-11', 6528, 0, '2017-01-01 00:00:00', 0), \
 ('The-Point-941', '', 'http://ice1.securenetsystems.net/KKPTM', 'http://www.point941.com/', 'The-Point-941.png', 0, 0, 0, 1, '2011-11-11', 6529, 0, '2017-01-01 00:00:00', 0), \
 ('Adam-Kuperstein', '', 'http://ice1.securenetsystems.net/KKPTM', '', 'Adam-Kuperstein.png', 0, 0, 0, 1, '2011-11-11', 6530, 0, '2017-01-01 00:00:00', 0), \
 ('Coyote-Cafe', '', 'http://ice1.securenetsystems.net/KKPTM', '', 'Coyote-Cafe.png', 0, 0, 0, 1, '2011-11-11', 6531, 0, '2017-01-01 00:00:00', 0), \
@@ -4859,21 +4571,13 @@ const char *radio_station_setupsql15="REPLACE INTO `radio_stations` (`name`, `be
 ('WCMD-1230', '', 'http://ice1.securenetsystems.net/KKPTM', 'http://www.1230espnam.com/', 'WCMD-1230.png', 0, 0, 0, 1, '2011-11-11', 6533, 0, '2017-01-01 00:00:00', 0), \
 ('The-Fox-951', '', 'mms://live.cumulusstreaming.com/WXFX-FM', 'http://www.wxfx.com/', 'The-Fox-951.png', 0, 0, 0, 1, '2011-11-11', 6534, 0, '2017-01-01 00:00:00', 0), \
 ('WXFN-1340', '', 'mms://live.cumulusstreaming.com/WXFX-FM', '', 'WXFN-1340.png', 0, 0, 0, 1, '2011-11-11', 6535, 0, '2017-01-01 00:00:00', 0), \
-('Tote-Sports-Radio', '', 'mms://203.47.33.152/radioTOTETaz', 'http://www.thetote.com.au/', 'Tote-Sports-Radio.png', 0, 0, 0, 1, '2011-11-11', 6536, 0, '2017-01-01 00:00:00', 0), \
-('1061-New-Orleans', '', 'mms://203.47.33.152/radioTOTETaz', 'http://www.1061neworleans.com/', '1061-New-Orleans.png', 0, 0, 0, 1, '2011-11-11', 6537, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-1031-FM', '', 'mms://203.47.33.152/radioTOTETaz', 'http://www.kiss-1031.com/', 'Kiss-1031-FM.png', 0, 0, 0, 1, '2011-11-11', 6538, 0, '2017-01-01 00:00:00', 0), \
-('KISW-999', '', 'mms://203.47.33.152/radioTOTETaz', 'http://www.kisw.com/', 'KISW-999.png', 0, 0, 0, 1, '2011-11-11', 6539, 0, '2017-01-01 00:00:00', 0), \
 ('Yazoo', '', 'mms://203.47.33.152/radioTOTETaz', '', 'Yazoo.png', 0, 0, 0, 1, '2011-11-11', 6540, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Ithaca-1160', '', 'mms://203.47.33.152/radioTOTETaz', 'http://www.1160wpie.com/', 'ESPN-Ithaca-1160.png', 0, 0, 0, 1, '2011-11-11', 6541, 0, '2017-01-01 00:00:00', 0), \
-('Cheryl-LaFrance', '', 'mms://203.47.33.152/radioTOTETaz', '', 'Cheryl-LaFrance.png', 0, 0, 0, 1, '2011-11-11', 6542, 0, '2017-01-01 00:00:00', 0), \
-('Tool', '', 'mms://203.47.33.152/radioTOTETaz', '', 'Tool.png', 0, 0, 0, 1, '2011-11-11', 6543, 0, '2017-01-01 00:00:00', 0), \
 ('GotRadio-Hip-Hop-Stop', 'There&#39;s no holding back with non-stop hip hop and rap', 'http://www.gotradio.com/itunes/Hip_Hop_Stop.pls', 'http://www.gotradio.com/', 'GotRadio-Hip-Hop-Stop.png', 0, 0, 0, 1, '2011-11-11', 6544, 0, '2017-01-01 00:00:00', 0), \
 ('KS1075-1075', '', 'http://www.gotradio.com/itunes/Hip_Hop_Stop.pls', 'http://www.ks1075.com/', 'KS1075-1075.png', 0, 0, 0, 1, '2011-11-11', 6545, 0, '2017-01-01 00:00:00', 0), \
 ('The-Stephen-A-Smith-Show', '', 'http://www.gotradio.com/itunes/Hip_Hop_Stop.pls', '', 'The-Stephen-A-Smith-Show.png', 0, 0, 0, 1, '2011-11-11', 6546, 0, '2017-01-01 00:00:00', 0), \
 ('Jim-Diamond', '', 'http://www.gotradio.com/itunes/Hip_Hop_Stop.pls', '', 'Jim-Diamond.png', 0, 0, 0, 1, '2011-11-11', 6547, 0, '2017-01-01 00:00:00', 0), \
 ('Gen-X-Radio-1005', '', 'http://www.gotradio.com/itunes/Hip_Hop_Stop.pls', 'http://www.genxlouisville.com/', 'Gen-X-Radio-1005.png', 0, 0, 0, 1, '2011-11-11', 6548, 0, '2017-01-01 00:00:00', 0), \
 ('WMPR-901', '', 'mms://streamer3.securenetsystems.net/WMPR', 'http://www.wmpr901.com/', 'WMPR-901.png', 0, 0, 0, 1, '2011-11-11', 6549, 0, '2017-01-01 00:00:00', 0), \
-('HOT-1073-Jamz', '', 'mms://streamer3.securenetsystems.net/WMPR', 'http://www.hot1073jamz.com/', 'HOT-1073-Jamz.png', 0, 0, 0, 1, '2011-11-11', 6550, 0, '2017-01-01 00:00:00', 0), \
 ('TDI-Radio---Love', '', 'http://streaming.tdiradio.com:9444/', 'http://www.tdiradio.com/', 'TDI-Radio---Love.png', 0, 0, 0, 1, '2011-11-11', 6551, 0, '2017-01-01 00:00:00', 0), \
 ('Randy-Crawford', '', 'http://streaming.tdiradio.com:9444/', '', 'Randy-Crawford.png', 0, 0, 0, 1, '2011-11-11', 6552, 0, '2017-01-01 00:00:00', 0), \
 ('Wingz-1049', '', 'http://streaming.tdiradio.com:9444/', 'http://www.wngz.com/', 'Wingz-1049.png', 0, 0, 0, 1, '2011-11-11', 6553, 0, '2017-01-01 00:00:00', 0), \
@@ -4997,7 +4701,6 @@ const char *radio_station_setupsql16="REPLACE INTO `radio_stations` (`name`, `be
 ('News-Obituaries-Weather--Sports', '', 'http://rts.ipradio.rs:8006', '', 'News-Obituaries-Weather--Sports.png', 0, 0, 0, 1, '2011-11-11', 6668, 0, '2017-01-01 00:00:00', 0), \
 ('WSKE-1043', '', 'http://rts.ipradio.rs:8006', '', 'WSKE-1043.png', 0, 0, 0, 1, '2011-11-11', 6669, 0, '2017-01-01 00:00:00', 0), \
 ('John-Denver', '', 'http://rts.ipradio.rs:8006', '', 'John-Denver.png', 0, 0, 0, 1, '2011-11-11', 6670, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Vietnamese)', '', 'http://www.abc.net.au/res/streaming/audio/windows/radio_australia_vie.asx', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 6671, 0, '2017-01-01 00:00:00', 0), \
 ('Ladytron', '', 'http://www.abc.net.au/res/streaming/audio/windows/radio_australia_vie.asx', '', 'Ladytron.png', 0, 0, 0, 1, '2011-11-11', 6672, 0, '2017-01-01 00:00:00', 0), \
 ('Star-1057', '', 'http://www.abc.net.au/res/streaming/audio/windows/radio_australia_vie.asx', 'http://www.star1057fm.com/', 'Star-1057.png', 0, 0, 0, 1, '2011-11-11', 6673, 0, '2017-01-01 00:00:00', 0), \
 ('ROCK-ANTENNE-879', '', 'http://www.rockantenne.de/webradio/rockantenne.aac.pls', 'http://www.rockantenne.de/', 'ROCK-ANTENNE-879.png', 0, 0, 0, 1, '2011-11-11', 6674, 0, '2017-01-01 00:00:00', 0), \
@@ -5018,7 +4721,6 @@ const char *radio_station_setupsql16="REPLACE INTO `radio_stations` (`name`, `be
 ('Tony-Bennett-Presents-The-Great-American-Songbook', '', 'http://www.rockantenne.de/webradio/rockantenne.aac.pls', '', 'Tony-Bennett-Presents-The-Great-American-Songbook.png', 0, 0, 0, 1, '2011-11-11', 6689, 0, '2017-01-01 00:00:00', 0), \
 ('SMOOTH--RELAX', 'Musique apaisante &#224; tendance jazz-electro', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', 'http://www.smoothandrelax.net', 'SMOOTH--RELAX.png', 0, 0, 0, 1, '2011-11-11', 6690, 0, '2017-01-01 00:00:00', 0), \
 ('KFAQ-1170', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', 'http://www.1170kfaq.com/', 'KFAQ-1170.png', 0, 0, 0, 1, '2011-11-11', 6691, 0, '2017-01-01 00:00:00', 0), \
-('570-News', 'CKGL (NewsTalk 570) is all-news radio for Kitchener with news, weather, traffic and sports around the clock.', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', 'http://www.570news.com/', '570-News.png', 0, 0, 1, 1, '2011-11-11', 6692, 0, '2011-10-14 15:55:53', 0), \
 ('Froggy-981', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', 'http://www.froggy981.com/', 'Froggy-981.png', 0, 0, 0, 1, '2011-11-11', 6693, 0, '2017-01-01 00:00:00', 0), \
 ('Elvis-Presley', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', '', 'Elvis-Presley.png', 0, 0, 0, 1, '2011-11-11', 6694, 0, '2017-01-01 00:00:00', 0), \
 ('Boyz-II-Men', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', '', 'Boyz-II-Men.png', 0, 0, 0, 1, '2011-11-11', 6695, 0, '2017-01-01 00:00:00', 0), \
@@ -5030,8 +4732,6 @@ const char *radio_station_setupsql16="REPLACE INTO `radio_stations` (`name`, `be
 ('KLite-1063', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', 'http://www.kkli.com/', 'KLite-1063.png', 0, 0, 0, 1, '2011-11-11', 6701, 0, '2017-01-01 00:00:00', 0), \
 ('The-Rifles', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', '', 'The-Rifles.png', 0, 0, 0, 1, '2011-11-11', 6702, 0, '2017-01-01 00:00:00', 0), \
 ('Alkaline-Trio', '', 'http://smoothandrelax.ice.infomaniak.ch/smoothandrelax-128.mp3', '', 'Alkaline-Trio.png', 0, 0, 0, 1, '2011-11-11', 6703, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---Euro-Dance', 'Euro Dance! Here&#39;s where you&#39;ll hear the the best dance beats that those wild n&#39; wacky Europeans shake it to. Upbeat, sweet, causing you to move your feet and put your hand in the air and ', 'http://icecast.audiocream.com/EuroDance', 'http://www.audiocream.com/', 'Audio-Cream---Euro-Dance.png', 0, 0, 0, 1, '2011-11-11', 6704, 0, '2017-01-01 00:00:00', 0), \
-('AM-1700-The-Champ', '', 'http://icecast.audiocream.com/EuroDance', 'http://www.1700thechamp.com/', 'AM-1700-The-Champ.png', 0, 0, 0, 1, '2011-11-11', 6705, 0, '2017-01-01 00:00:00', 0), \
 ('WDAY-970', 'With its NewsTalk format, 970 WDAY offers local news, weather and sports mixed with local, regional, and national opinion talk shows.', 'http://38.96.175.21:8564/', 'http://www.wday.com/', 'WDAY-970.png', 0, 0, 0, 1, '2011-11-11', 6706, 0, '2017-01-01 00:00:00', 0), \
 ('mc-chris', '', 'http://38.96.175.21:8564/', '', 'mc-chris.png', 0, 0, 0, 1, '2011-11-11', 6707, 0, '2017-01-01 00:00:00', 0), \
 ('KIIS-FM-1027', '', 'http://38.96.175.21:8564/', 'http://www.kiisfm.com/', 'KIIS-FM-1027.png', 0, 0, 0, 1, '2011-11-11', 6708, 0, '2017-01-01 00:00:00', 0), \
@@ -5044,7 +4744,6 @@ const char *radio_station_setupsql16="REPLACE INTO `radio_stations` (`name`, `be
 ('Paramore', '', 'http://asx.abacast.com/magnumbroadcasting-waun-32.asx', '', 'Paramore.png', 0, 0, 0, 1, '2011-11-11', 6715, 0, '2017-01-01 00:00:00', 0), \
 ('Freddie-The-Frog', '', 'http://asx.abacast.com/magnumbroadcasting-waun-32.asx', '', 'Freddie-The-Frog.png', 0, 0, 0, 1, '2011-11-11', 6716, 0, '2017-01-01 00:00:00', 0), \
 ('KODL-1440', '', 'http://ice3.securenetsystems.net:80/KODL', 'http://www.kodl.com/', 'KODL-1440.png', 0, 0, 0, 1, '2011-11-11', 6717, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Western-Queensland-540', '', 'http://ice3.securenetsystems.net:80/KODL', 'http://abc.net.au/westqld/', 'ABC-Western-Queensland-540.png', 0, 0, 0, 1, '2011-11-11', 6718, 0, '2017-01-01 00:00:00', 0), \
 ('KJLL-1330', '', 'http://66.181.245.178:8000/listen.pls', 'http://www.tucsonsjolt.com/', 'KJLL-1330.png', 0, 0, 0, 1, '2011-11-11', 6719, 0, '2017-01-01 00:00:00', 0), \
 ('Bloc-Party', '', 'http://66.181.245.178:8000/listen.pls', '', 'Bloc-Party.png', 0, 0, 0, 1, '2011-11-11', 6720, 0, '2017-01-01 00:00:00', 0), \
 ('WOMC-1043', '104.3 Detroit&#39;s Greatest Hits Station - Classic Hits from the 60&#39;s , 70&#39;s and 80&#39;s', 'http://66.181.245.178:8000/listen.pls', 'http://www.womc.com/', 'WOMC-1043.png', 0, 0, 0, 1, '2011-11-11', 6721, 0, '2017-01-01 00:00:00', 0), \
@@ -5112,7 +4811,6 @@ const char *radio_station_setupsql16="REPLACE INTO `radio_stations` (`name`, `be
 ('1CLUBFM--90s-Hip-Hop--RnB', 'The rap and hip-hop of the 90s. Visit our website for videos and more.', 'http://wms-19.streamsrus.com/90spoprhythmic-aac', 'http://www.1club.fm/', '1CLUBFM--90s-Hip-Hop--RnB.png', 0, 0, 0, 1, '2011-11-11', 6784, 0, '2017-01-01 00:00:00', 0), \
 ('P5-Trondheim-1022', '', 'http://mms-live.online.no/P5_Trondheim', 'http://www.p5.no/', 'P5-Trondheim-1022.png', 0, 0, 0, 1, '2011-11-11', 6785, 0, '2017-01-01 00:00:00', 0), \
 ('Attacks-Radio', '', 'http://listen.radionomy.com/attacks-radio', 'http://www.radionomy.com/en/radio/attacks-radio', 'Attacks-Radio.png', 0, 0, 0, 1, '2011-11-11', 6786, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Polskie---Italia', '', 'http://91.121.157.133:5000', 'http://www.polskastacja.pl/', 'Radio-Polskie---Italia.png', 0, 0, 0, 1, '2011-11-11', 6787, 0, '2017-01-01 00:00:00', 0), \
 ('Outdoor-Talk', '', 'http://91.121.157.133:5000', '', 'Outdoor-Talk.png', 0, 0, 0, 1, '2011-11-11', 6788, 0, '2017-01-01 00:00:00', 0), \
 ('Necrophagist', '', 'http://91.121.157.133:5000', '', 'Necrophagist.png', 0, 0, 0, 1, '2011-11-11', 6789, 0, '2017-01-01 00:00:00', 0), \
 ('97-Rock-971', '', 'http://91.121.157.133:5000', 'http://www.97rockonline.com/', '97-Rock-971.png', 0, 0, 0, 1, '2011-11-11', 6790, 0, '2017-01-01 00:00:00', 0), \
@@ -5214,7 +4912,6 @@ const char *radio_station_setupsql17="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio-Brocken-935', 'Kulthits, aktuelle Hits, Infos und mehr!', 'http://mp3.radiobrocken.de', 'http://www.brocken.de/', 'Radio-Brocken-935.png', 0, 0, 0, 1, '2011-11-11', 6882, 0, '2017-01-01 00:00:00', 0), \
 ('Antenne-50-Plus', 'Der Sender f&#252;r die aktiven Menschen ab 50. Radio Antenne 50plus ist ein bundesweites Internetradio aus N&#252;rnberg. Auf dem Programm stehen Hits f&#252;r Schlager- und Oldiefreunde.<BR><BR>Ante', 'http://antenne50plus.de:8500', 'http://antenne50plus.de/', 'Antenne-50-Plus.png', 0, 0, 0, 1, '2011-11-11', 6883, 0, '2017-01-01 00:00:00', 0), \
 ('Transamrica-Internacional', '', 'mms://transastream.dyndns.org/transapop', 'http://www.transanet.fm/', 'Transamrica-Internacional-795.png', 0, 0, 0, 1, '2011-11-11', 6884, 0, '2017-01-01 00:00:00', 0), \
-('BBC-Radio-4-Extra', 'Your digital radio entertainment station showcasing the best in comedy and drama. With recent favourites from BBC Radio 4.', 'http://www.bbc.co.uk/radio/listen/live/r4x_aaclca.pls', 'http://www.bbc.co.uk/radio4extra/', 'BBC-Radio-4-Extra.png', 0, 0, 0, 1, '2011-11-11', 6885, 0, '2017-01-01 00:00:00', 0), \
 ('WCPT-820', '', 'http://www.bbc.co.uk/radio/listen/live/r4x_aaclca.pls', 'http://www.chicagoprogressivetalk.com/', 'WCPT-820.png', 0, 0, 0, 1, '2011-11-11', 6886, 0, '2017-01-01 00:00:00', 0), \
 ('The-Fan-999', '', 'http://www.bbc.co.uk/radio/listen/live/r4x_aaclca.pls', 'http://www.espntriangle.com/', 'The-Fan-999.png', 0, 0, 0, 1, '2011-11-11', 6887, 0, '2017-01-01 00:00:00', 0), \
 ('Cornelius-Brothers--Sister-Rose', '', 'http://www.bbc.co.uk/radio/listen/live/r4x_aaclca.pls', '', 'Cornelius-Brothers--Sister-Rose.png', 0, 0, 0, 1, '2011-11-11', 6888, 0, '2017-01-01 00:00:00', 0), \
@@ -5241,7 +4938,6 @@ const char *radio_station_setupsql17="REPLACE INTO `radio_stations` (`name`, `be
 ('K-FOX-985', 'KFOX is the Bay Area&#39;s Classic Rock Experience featuring the best loved rock from The Beatles, Eagles, Stones, AC/DC, Tom Petty and more, spanning the late 60&#39;s through the early 90&#39;s.   C', 'mms://live.sciencetv.kr/sciencetv/', 'http://www.kfox.com/', 'K-FOX-985.png', 0, 0, 0, 1, '2011-11-11', 6909, 0, '2017-01-01 00:00:00', 0), \
 ('Mary-Mary', '', 'mms://live.sciencetv.kr/sciencetv/', '', 'Mary-Mary.png', 0, 0, 0, 1, '2011-11-11', 6910, 0, '2017-01-01 00:00:00', 0), \
 ('ESPN-1021', '', 'mms://live.cumulusstreaming.com/WZAT-FM', 'http://www.espn1021.com/', 'ESPN-1021.png', 0, 0, 0, 1, '2011-11-11', 6911, 0, '2017-01-01 00:00:00', 0), \
-('1073-JAMZ', '', 'mms://live.cumulusstreaming.com/WZAT-FM', 'http://www.1073jamz.com/', '1073-JAMZ.png', 0, 0, 0, 1, '2011-11-11', 6912, 0, '2017-01-01 00:00:00', 0), \
 ('ESPN-Radio-560', '', 'mms://live.cumulusstreaming.com/WZAT-FM', 'http://www.webc560.com/', 'ESPN-Radio-560.png', 0, 0, 0, 1, '2011-11-11', 6913, 0, '2017-01-01 00:00:00', 0), \
 ('Movies-About-Girls', 'We love girls. We love movies. It all adds up. Every week our cabal of misfits and cretins get together and discuss the finest examples of female pulchritude on film. Plus: heartless antics, obscure r', 'http://208.85.240.102:80/214.64.mp3', 'http://www.loudcaster.com/channels/214-movies-about-girls', 'Movies-About-Girls.png', 0, 0, 0, 1, '2011-11-11', 6914, 0, '2017-01-01 00:00:00', 0), \
 ('The-Gas-Light-Club', '', 'http://208.85.240.102:80/214.64.mp3', '', 'The-Gas-Light-Club.png', 0, 0, 0, 1, '2011-11-11', 6915, 0, '2017-01-01 00:00:00', 0), \
@@ -5310,927 +5006,40 @@ const char *radio_station_setupsql17="REPLACE INTO `radio_stations` (`name`, `be
 ('101ru---NRJ-90s-Dance', 'Dr.Alban, Maxx, Haddaway, Samira, Ice MC , Mo-Do ', 'http://www.101.ru/new101.php?uid=74&bit=2', 'http://www.101.ru/', '101ru---NRJ-90s-Dance.png', 0, 0, 0, 1, '2011-11-11', 6978, 0, '2017-01-01 00:00:00', 0), \
 ('Ridin-Dirty', '', 'http://www.101.ru/new101.php?uid=74&bit=2', '', 'Ridin-Dirty.png', 0, 0, 0, 1, '2011-11-11', 6979, 0, '2017-01-01 00:00:00', 0), \
 ('WZXL-1007', '', 'mms://nick9.surfernetwork.com/WZXL', 'http://www.wzxl.com/', 'WZXL-1007.png', 0, 0, 0, 1, '2011-11-11', 6980, 0, '2017-01-01 00:00:00', 0), \
-('Soulful-Bits-Radio', 'Soulful Bits Radio playing Soul Funk &amp; Groove', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.soulfulbits.com/', 'Soulful-Bits-Radio.png', 0, 0, 0, 1, '2011-11-11', 6981, 0, '2017-01-01 00:00:00', 0), \
-('MTV-Weekend-Countdown-(CHRPop)', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'MTV-Weekend-Countdown-(CHRPop).png', 0, 0, 0, 1, '2011-11-11', 6982, 0, '2017-01-01 00:00:00', 0), \
-('Classical-24-with-Lynn-Warfel', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Classical-24-with-Lynn-Warfel.png', 0, 0, 0, 1, '2011-11-11', 6983, 0, '2017-01-01 00:00:00', 0), \
-('KISS-FM-939', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.939kissfm.com/', 'KISS-FM-939.png', 0, 0, 0, 1, '2011-11-11', 6984, 0, '2017-01-01 00:00:00', 0), \
-('Slager-Dinner', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Slager-Dinner.png', 0, 0, 0, 1, '2011-11-11', 6985, 0, '2017-01-01 00:00:00', 0), \
-('Weezer', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Weezer.png', 0, 0, 0, 1, '2011-11-11', 6986, 0, '2017-01-01 00:00:00', 0), \
-('KLNT-1490', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espnlaredo.com', 'KLNT-1490.png', 0, 0, 0, 1, '2011-11-11', 6987, 0, '2017-01-01 00:00:00', 0), \
-('WHUC-1230', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1230whuc.com/', 'WHUC-1230.png', 0, 0, 0, 1, '2011-11-11', 6988, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Als-880', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioals.dk/', 'Radio-Als-880.png', 0, 0, 0, 1, '2011-11-11', 6989, 0, '2017-01-01 00:00:00', 0), \
-('Kronehit-Dance', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kronehit.at/', 'Kronehit-Dance.png', 0, 0, 0, 1, '2011-11-11', 6990, 0, '2017-01-01 00:00:00', 0), \
-('Q-96-961', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wqqb.com/', 'Q-96-961.png', 0, 0, 0, 1, '2011-11-11', 6991, 0, '2017-01-01 00:00:00', 0), \
-('Lawyer-in-Blue-Jeans', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Lawyer-in-Blue-Jeans.png', 0, 0, 0, 1, '2011-11-11', 6992, 0, '2017-01-01 00:00:00', 0), \
-('Q955', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.krrq.com/', 'Q955.png', 0, 0, 0, 1, '2011-11-11', 6993, 0, '2017-01-01 00:00:00', 0), \
-('54-House-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.54house.fm/', '54-House-FM.png', 0, 0, 1, 1, '2011-11-11', 6994, 0, '2011-10-14 15:55:47', 0), \
-('Money-Radio-1510', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.moneyradio1510.com/', 'Money-Radio-1510.png', 0, 0, 0, 1, '2011-11-11', 6995, 0, '2017-01-01 00:00:00', 0), \
-('The-Path-903', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thepath.fm/', 'The-Path-903.png', 0, 0, 0, 1, '2011-11-11', 6996, 0, '2017-01-01 00:00:00', 0), \
-('The-Teebox', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Teebox.png', 0, 0, 0, 1, '2011-11-11', 6997, 0, '2017-01-01 00:00:00', 0), \
-('Freddie-Jackson', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Freddie-Jackson.png', 0, 0, 0, 1, '2011-11-11', 6998, 0, '2017-01-01 00:00:00', 0), \
-('For-children', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'For-children.png', 0, 0, 0, 1, '2011-11-11', 6999, 0, '2017-01-01 00:00:00', 0), \
 ('DR P4 Nordjylland', '', 'http://live-icy.gss.dr.dk:8000/A/A10H.mp3', 'http://www.dr.dk/p4/nord/', 'DR-P4-Nordjylland-981.png', 0, 0, 0, 1, '2011-11-11', 7000, 0, '2017-01-01 00:00:00', 0), \
-('The-Georgia-Mass-Choir', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Georgia-Mass-Choir.png', 0, 0, 0, 1, '2011-11-11', 7001, 0, '2017-01-01 00:00:00', 0), \
-('Sunday-Inspirations', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sunday-Inspirations.png', 0, 0, 0, 1, '2011-11-11', 7002, 0, '2017-01-01 00:00:00', 0), \
-('KAOK-1400', 'KAOK is Super Talk 1400 AM broadcasting News and Talk programming from Lake Charles, Louisiana.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kaok.com/', 'KAOK-1400.png', 0, 0, 0, 1, '2011-11-11', 7003, 0, '2017-01-01 00:00:00', 0), \
-('radio-harmonyfm-941', 'Die meisten 70er und 80er - Hessens Greatest Hits.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.harmonyfm.de/', 'radio-harmonyfm-941.png', 0, 0, 0, 1, '2011-11-11', 7004, 0, '2017-01-01 00:00:00', 0), \
-('Love-Radio', 'Le meilleur des chansons d&#39;amour et des slows.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.love-radio.fr/', 'Love-Radio.png', 0, 0, 0, 1, '2011-11-11', 7005, 0, '2017-01-01 00:00:00', 0), \
-('DI-Chillout-Dreams', 'Relax to the sounds of dream and ibiza style chillout', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.di.fm/chilloutdreams', 'DI-Chillout-Dreams.png', 0, 0, 0, 1, '2011-11-11', 7007, 0, '2017-01-01 00:00:00', 0), \
-('Cannonball-Adderley', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cannonball-Adderley.png', 0, 0, 0, 1, '2011-11-11', 7008, 0, '2017-01-01 00:00:00', 0), \
-('KHLS-963', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://thundercountry963.com/', 'KHLS-963.png', 0, 0, 0, 1, '2011-11-11', 7009, 0, '2017-01-01 00:00:00', 0), \
-('Sixpence-None-the-Richer', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sixpence-None-the-Richer.png', 0, 0, 0, 1, '2011-11-11', 7010, 0, '2017-01-01 00:00:00', 0), \
-('Altar-Of-Plagues', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Altar-Of-Plagues.png', 0, 0, 0, 1, '2011-11-11', 7011, 0, '2017-01-01 00:00:00', 0), \
-('KITZ-1400', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kitz1400.com/', 'KITZ-1400.png', 0, 0, 0, 1, '2011-11-11', 7012, 0, '2017-01-01 00:00:00', 0), \
-('SKYFM-Classic-Rap', 'The best in classic rap and hip hop!!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sky.fm/classicrap', 'SKYFM-Classic-Rap.png', 0, 0, 0, 1, '2011-11-11', 7013, 0, '2017-01-01 00:00:00', 0), \
-('The-Daysleepers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Daysleepers.png', 0, 0, 0, 1, '2011-11-11', 7014, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Swiss-Classic', 'A classical music station aiming to play the most beautiful and popular works from the world of classical music', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioswissclassic.ch/', 'Radio-Swiss-Classic.png', 0, 0, 0, 1, '2011-11-11', 7015, 0, '2017-01-01 00:00:00', 0), \
-('KIKI-990', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kikiradio.com/', 'KIKI-990.png', 0, 0, 0, 1, '2011-11-11', 7016, 0, '2017-01-01 00:00:00', 0), \
-('Weather-Report', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Weather-Report.png', 0, 0, 0, 1, '2011-11-11', 7017, 0, '2017-01-01 00:00:00', 0), \
-('Gin-Blossoms', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Gin-Blossoms.png', 0, 0, 0, 1, '2011-11-11', 7018, 0, '2017-01-01 00:00:00', 0), \
-('RadioIO-Lovesongs', 'This selection of feel-good love songs and easy, heartfelt favorites from the 70s to the present is not just relaxing, it&#39;s mood enhancing - and great for romancing.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioio.com/channels/lovesongs', 'RadioIO-Lovesongs.png', 0, 0, 0, 1, '2011-11-11', 7019, 0, '2017-01-01 00:00:00', 0), \
-('WXNT-1430', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.newstalk1430.com/', 'WXNT-1430.png', 0, 0, 0, 1, '2011-11-11', 7020, 0, '2017-01-01 00:00:00', 0), \
-('Daytime-with-Parksy', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Daytime-with-Parksy.png', 0, 0, 0, 1, '2011-11-11', 7021, 0, '2017-01-01 00:00:00', 0), \
-('Madcon', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Madcon.png', 0, 0, 0, 1, '2011-11-11', 7022, 0, '2017-01-01 00:00:00', 0), \
-('Big-Band-Special', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Big-Band-Special.png', 0, 0, 0, 1, '2011-11-11', 7023, 0, '2017-01-01 00:00:00', 0), \
-('Rod-Stewart', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Rod-Stewart.png', 0, 0, 0, 1, '2011-11-11', 7024, 0, '2017-01-01 00:00:00', 0), \
-('Bob-Baldwin', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bob-Baldwin.png', 0, 0, 0, 1, '2011-11-11', 7025, 0, '2017-01-01 00:00:00', 0), \
-('Centro-Suono-Sport-1015', 'punto di riferimento nel panorama delle radio locali per i tifosi della Roma calcio', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.centrosuonosport.com/', 'Centro-Suono-Sport-1015.png', 0, 0, 0, 1, '2011-11-11', 7026, 0, '2017-01-01 00:00:00', 0), \
-('Z104-1045', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.z104.com/', 'Z104-1045.png', 0, 0, 0, 1, '2011-11-11', 7027, 0, '2017-01-01 00:00:00', 0), \
-('Tom-Deacon', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Tom-Deacon.png', 0, 0, 0, 1, '2011-11-11', 7028, 0, '2017-01-01 00:00:00', 0), \
-('RTL-1025', 'Tutta la migliore musica di oggi e di ieri, ma anche intrattenimento, informazione, sport, grandi eventi con l&#39;immancabile partecipazione degli ascoltatori.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rtl.it/', 'RTL-1025.png', 0, 0, 0, 1, '2011-11-11', 7029, 0, '2017-01-01 00:00:00', 0), \
-('Wild-Country-965', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.country965.com/', 'Wild-Country-965.png', 0, 0, 0, 1, '2011-11-11', 7030, 0, '2017-01-01 00:00:00', 0), \
-('WFRB-560', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.talkradio560.com/', 'WFRB-560.png', 0, 0, 0, 1, '2011-11-11', 7031, 0, '2017-01-01 00:00:00', 0), \
-('Ronnie-Dunn', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ronnie-Dunn.png', 0, 0, 0, 1, '2011-11-11', 7032, 0, '2017-01-01 00:00:00', 0), \
-('Radio-RMF-Gold', 'RMFOn.pl to kilkadziesiat tematycznych stacji radiowych, dedykowanych gatunkom, dekadom, krajom a nawet artystom. Wybierz radio internetowe i znajdz muzyke dla siebie.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.miastomuzyki.pl/', 'Radio-RMF-Gold.png', 0, 0, 0, 1, '2011-11-11', 7033, 0, '2017-01-01 00:00:00', 0), \
-('XS-Sports-961', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://xs961.com/', 'XS-Sports-961.png', 0, 0, 0, 1, '2011-11-11', 7034, 0, '2017-01-01 00:00:00', 0), \
-('WJXY-FM-939', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.teammyrtlebeach.com/', 'WJXY-FM-939.png', 0, 0, 0, 1, '2011-11-11', 7035, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Wimbledon-Court-1', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wimbledon.com/en_GB/interactive/radio/index.html', 'Radio-Wimbledon-Court-1.png', 0, 0, 0, 1, '2011-11-11', 7036, 0, '2017-01-01 00:00:00', 0), \
-('WNES-1050', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WNES-1050.png', 0, 0, 0, 1, '2011-11-11', 7037, 0, '2017-01-01 00:00:00', 0), \
-('Countdown', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Countdown.png', 0, 0, 0, 1, '2011-11-11', 7038, 0, '2017-01-01 00:00:00', 0), \
-('The-Cat-Radio', 'The Cat is the local radio station for Crewe and Nantwich broadcasting 24/7 at thisisthecat.com.Find us on Facebook at facebook.com/thisisthecat. This is your local community radio station - get invol', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thisisthecat.com/', 'The-Cat-Radio.png', 0, 0, 0, 1, '2011-11-11', 7039, 0, '2017-01-01 00:00:00', 0), \
-('Kat-987', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.katradio.com/', 'Kat-987.png', 0, 0, 0, 1, '2011-11-11', 7040, 0, '2017-01-01 00:00:00', 0), \
-('Handsome-Furs', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Handsome-Furs.png', 0, 0, 0, 1, '2011-11-11', 7041, 0, '2017-01-01 00:00:00', 0), \
-('WXYC-893', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wxyc.org/', 'WXYC-893.png', 0, 0, 0, 1, '2011-11-11', 7042, 0, '2017-01-01 00:00:00', 0), \
-('95bFM-950', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.95bfm.co.nz/', '95bFM-950.png', 0, 0, 1, 1, '2011-11-11', 7043, 0, '2011-10-14 16:10:02', 0), \
-('WIMZ-FM-1035', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wimz.com/', 'WIMZ-FM-1035.png', 0, 0, 0, 1, '2011-11-11', 7044, 0, '2017-01-01 00:00:00', 0), \
-('971-ZHT', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.971zht.com/', '971-ZHT.png', 0, 0, 0, 1, '2011-11-11', 7045, 0, '2017-01-01 00:00:00', 0), \
-('Absolute-Classic-Rock', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Absolute-Classic-Rock.png', 0, 0, 0, 1, '2011-11-11', 7046, 0, '2017-01-01 00:00:00', 0), \
-('WBLL-1390', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.peakofohio.com/', 'WBLL-1390.png', 0, 0, 0, 1, '2011-11-11', 7047, 0, '2017-01-01 00:00:00', 0), \
-('BBC-Radio-2-891', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.bbc.co.uk/radio2/', 'BBC-Radio-2-891.png', 0, 0, 0, 1, '2011-11-11', 7048, 0, '2017-01-01 00:00:00', 0), \
-('Coast-933', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wncv.com/', 'Coast-933.png', 0, 0, 0, 1, '2011-11-11', 7049, 0, '2017-01-01 00:00:00', 0), \
-('KWAT-950', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://watertownsdradio.com/', 'KWAT-950.png', 0, 0, 0, 1, '2011-11-11', 7050, 0, '2017-01-01 00:00:00', 0), \
-('Damageplan', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Damageplan.png', 0, 0, 1, 1, '2011-11-11', 7051, 0, '2011-10-17 23:42:56', 0), \
-('VirtualMk2-Mix-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://virtualmk2.yolasite.com/', 'VirtualMk2-Mix-Radio.png', 0, 0, 0, 1, '2011-11-11', 7052, 0, '2017-01-01 00:00:00', 0), \
-('The-Castle-925', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.z925.com/', 'The-Castle-925.png', 0, 0, 0, 1, '2011-11-11', 7053, 0, '2017-01-01 00:00:00', 0), \
-('WLRB-1510', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiomacomb.com/stations/wlrb.htm', 'WLRB-1510.png', 0, 0, 0, 1, '2011-11-11', 7054, 0, '2017-01-01 00:00:00', 0), \
-('KIMM-1150', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KIMM-1150.png', 0, 0, 0, 1, '2011-11-11', 7055, 0, '2017-01-01 00:00:00', 0), \
-('John-Tesh-Radio-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'John-Tesh-Radio-Show.png', 0, 0, 0, 1, '2011-11-11', 7056, 0, '2017-01-01 00:00:00', 0), \
-('Two-Lochs-Radio-1066', 'The UK&#39;s smallest independent radio station, broadcasting on 106 and 106.6FM. The objective of Two Lochs Radio is to offer residents of the Gairloch, Loch Ewe and Loch Maree areas the choice of a ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.2lr.co.uk/', 'Two-Lochs-Radio-1066.png', 0, 0, 0, 1, '2011-11-11', 7057, 0, '2017-01-01 00:00:00', 0), \
-('BBC-Radio-5-live-909', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.bbc.co.uk/fivelive/', 'BBC-Radio-5-live-909.png', 0, 0, 0, 1, '2011-11-11', 7058, 0, '2017-01-01 00:00:00', 0), \
-('KOLA-999', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kolafm.com/', 'KOLA-999.png', 0, 0, 0, 1, '2011-11-11', 7059, 0, '2017-01-01 00:00:00', 0), \
-('Waylon-Jennings', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Waylon-Jennings.png', 0, 0, 0, 1, '2011-11-11', 7060, 0, '2017-01-01 00:00:00', 0), \
-('Amy-Winehouse', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Amy-Winehouse.png', 0, 0, 0, 1, '2011-11-11', 7061, 0, '2017-01-01 00:00:00', 0), \
-('Radio-ENERGY-(NRJ)-1042', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.energyfm.ru/', 'Radio-ENERGY-(NRJ)-1042.png', 0, 0, 0, 1, '2011-11-11', 7062, 0, '2017-01-01 00:00:00', 0), \
-('Open-House-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.laut.fm/openhouse', 'Open-House-FM.png', 0, 0, 0, 1, '2011-11-11', 7063, 0, '2017-01-01 00:00:00', 0), \
-('WNKU-897', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wnku.org/', 'WNKU-897.png', 0, 0, 0, 1, '2011-11-11', 7064, 0, '2017-01-01 00:00:00', 0), \
-('Southern-Sports', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Southern-Sports.png', 0, 0, 0, 1, '2011-11-11', 7065, 0, '2017-01-01 00:00:00', 0), \
-('Todays-1065', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kosy.com/', 'Todays-1065.png', 0, 0, 0, 1, '2011-11-11', 7066, 0, '2017-01-01 00:00:00', 0), \
 ('Tineke-Postma', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Tineke-Postma.png', 0, 0, 0, 1, '2011-11-11', 7067, 0, '2017-01-01 00:00:00', 0);";
 
 
 const char *radio_station_setupsql18="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('WMSG-1050', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wmsg.com/', 'WMSG-1050.png', 0, 0, 0, 1, '2011-11-11', 7069, 0, '2017-01-01 00:00:00', 0), \
-('Jonathan-Park', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jonathan-Park.png', 0, 0, 0, 1, '2011-11-11', 7071, 0, '2017-01-01 00:00:00', 0), \
-('Kirsten-Dam', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kirsten-Dam.png', 0, 0, 0, 1, '2011-11-11', 7072, 0, '2017-01-01 00:00:00', 0), \
-('La-Tropa-Vallenata', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'La-Tropa-Vallenata.png', 0, 0, 0, 1, '2011-11-11', 7073, 0, '2017-01-01 00:00:00', 0), \
-('The-Mix-1067', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kppv.com/', 'The-Mix-1067.png', 0, 0, 0, 1, '2011-11-11', 7074, 0, '2017-01-01 00:00:00', 0), \
-('WSVG-790', 'CBS News at the top of the hour and Virginia News at the bottom.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wsvgradio.com', 'WSVG-790.png', 0, 0, 0, 1, '2011-11-11', 7075, 0, '2017-01-01 00:00:00', 0), \
-('The-Erik-Kuselias-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Erik-Kuselias-Show.png', 0, 0, 0, 1, '2011-11-11', 7076, 0, '2017-01-01 00:00:00', 0), \
-('WQDR-570', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://countrylegends570.com/', 'WQDR-570.png', 0, 0, 0, 1, '2011-11-11', 7077, 0, '2017-01-01 00:00:00', 0), \
-('Ibiza-Radio-Club', 'Vous n&#39;avez pas la chance de sortir et vous voulez passer une magnifique soir&#233;e ?<BR>Soyez donc les bienvenus sur Ibiza Radio Club, votre radio discoth&#232;que qui diffuse de la musique de q', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ibizaradioclub.be/', 'Ibiza-Radio-Club.png', 0, 0, 0, 1, '2011-11-11', 7078, 0, '2017-01-01 00:00:00', 0), \
-('Jay-Sean', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jay-Sean.png', 0, 0, 0, 1, '2011-11-11', 7079, 0, '2017-01-01 00:00:00', 0), \
-('KDWB-FM-1013', '101.3 KDWB is the Twin Cities Hit Music Station with Dave Ryan in the Morning and commerical free hours all day long.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kdwb.com/', 'KDWB-FM-1013.png', 0, 0, 0, 1, '2011-11-11', 7080, 0, '2017-01-01 00:00:00', 0), \
-('Shine-FM-1059', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.cjry.ca/', 'Shine-FM-1059.png', 0, 0, 0, 1, '2011-11-11', 7081, 0, '2017-01-01 00:00:00', 0), \
-('1990s', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '1990s.png', 0, 0, 1, 1, '2011-11-11', 7082, 0, '2011-10-14 15:55:14', 0), \
-('Manfred-Manns-Earth-Band', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Manfred-Manns-Earth-Band.png', 0, 0, 0, 1, '2011-11-11', 7083, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Live', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Gospel-Live.png', 0, 0, 0, 1, '2011-11-11', 7084, 0, '2017-01-01 00:00:00', 0), \
-('Talk-Radio-1410', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.syix.com/kmyc/main.htm', 'Talk-Radio-1410.png', 0, 0, 0, 1, '2011-11-11', 7085, 0, '2017-01-01 00:00:00', 0), \
-('WTRP-620', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wtrp620.com/', 'WTRP-620.png', 0, 0, 0, 1, '2011-11-11', 7086, 0, '2017-01-01 00:00:00', 0), \
-('Bulls-Radio-885', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://bullsradio.org', 'Bulls-Radio-885.png', 0, 0, 0, 1, '2011-11-11', 7087, 0, '2017-01-01 00:00:00', 0), \
-('1250-WTMA', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wtma.com/', '1250-WTMA.png', 0, 0, 0, 1, '2011-11-11', 7088, 0, '2017-01-01 00:00:00', 0), \
-('KYRS-899', 'KYRS-Thin Air Community Radio is a volunteer-powered, non-commercial, listener-supported, Low Power FM community radio station in Spokane, WA serving the area with unique programming for un-served and', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kyrs.org/', 'KYRS-899.png', 0, 0, 0, 1, '2011-11-11', 7089, 0, '2017-01-01 00:00:00', 0), \
-('The-Marvelettes', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Marvelettes.png', 0, 0, 0, 1, '2011-11-11', 7090, 0, '2017-01-01 00:00:00', 0), \
-('Latina-1003', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.latina1003fm.com', 'Latina-1003.png', 0, 0, 0, 1, '2011-11-11', 7091, 0, '2017-01-01 00:00:00', 0), \
-('The-Buzz-1003', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.buzzardrocks.com/', 'The-Buzz-1003.png', 0, 0, 0, 1, '2011-11-11', 7092, 0, '2017-01-01 00:00:00', 0), \
-('949-WHOM-Continous-Light-Rock', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.949whom.com/', '949-WHOM-Continous-Light-Rock.png', 0, 0, 1, 1, '2011-11-11', 7093, 0, '2011-10-14 15:57:37', 0), \
-('WBUR-FM-909', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbur.org/', 'WBUR-FM-909.png', 0, 0, 0, 1, '2011-11-11', 7094, 0, '2017-01-01 00:00:00', 0), \
-('Conversations', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Conversations.png', 0, 0, 0, 1, '2011-11-11', 7095, 0, '2017-01-01 00:00:00', 0), \
-('Dixie-Country-1067', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dixiecountry.com/', 'Dixie-Country-1067.png', 0, 0, 0, 1, '2011-11-11', 7096, 0, '2017-01-01 00:00:00', 0), \
-('The-Shark-1053', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.shark1053.com/', 'The-Shark-1053.png', 0, 0, 0, 1, '2011-11-11', 7097, 0, '2017-01-01 00:00:00', 0), \
-('Ibiza-Global-Radio-976', 'Ibiza Global Radio ::: 97.6 FM - THINK GLOBAL - LISTEN GLOBAL - BEST CLUBSOUND YOU CAN GET ! IBIZA DANCE, HOUSEVIBES, MELODIAS PARA TU SOFA, SECUENCIAS, LA CAPTURA DEL SONIDO, AUDIO4ALL - house, chill', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ibizaglobalradio.com/', 'Ibiza-Global-Radio-976.png', 0, 0, 0, 1, '2011-11-11', 7098, 0, '2017-01-01 00:00:00', 0), \
-('KWRD-1470', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kwrdonline.com', 'KWRD-1470.png', 0, 0, 0, 1, '2011-11-11', 7099, 0, '2017-01-01 00:00:00', 0), \
-('Seattle-Seahawks-at-New-York-Giants-Oct-9-2011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Seattle-Seahawks-at-New-York-Giants-Oct-9-2011.png', 0, 0, 0, 1, '2011-11-11', 7100, 0, '2017-01-01 00:00:00', 0), \
-('Skid-Row', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Skid-Row.png', 0, 0, 0, 1, '2011-11-11', 7101, 0, '2017-01-01 00:00:00', 0), \
-('The-Communards', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Communards.png', 0, 0, 0, 1, '2011-11-11', 7102, 0, '2017-01-01 00:00:00', 0), \
-('Aerosmith', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Aerosmith.png', 0, 0, 0, 1, '2011-11-11', 7103, 0, '2017-01-01 00:00:00', 0), \
-('181FM-Good-Time-Oldies', '', 'http://163.172.126.155:80/1', 'http://www.181.fm/', '181FM-Good-Time-Oldies.png', 0, 0, 0, 1, '2011-11-11', 7104, 0, '2017-01-01 00:00:00', 1), \
-('Lake-FM-945', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.945lakefm.com/', 'Lake-FM-945.png', 0, 0, 0, 1, '2011-11-11', 7105, 0, '2017-01-01 00:00:00', 0), \
-('PFW-In-Progress', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'PFW-In-Progress.png', 0, 0, 0, 1, '2011-11-11', 7106, 0, '2017-01-01 00:00:00', 0), \
-('Investtalk', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Investtalk.png', 0, 0, 0, 1, '2011-11-11', 7107, 0, '2017-01-01 00:00:00', 0), \
-('KKSA-1260', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kksa-am.com/', 'KKSA-1260.png', 0, 0, 0, 1, '2011-11-11', 7108, 0, '2017-01-01 00:00:00', 0), \
-('ABC-North-West-(WA)-702', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.abc.net.au/northwestwa/', '', 0, 0, 0, 1, '2011-11-11', 7109, 0, '2017-01-01 00:00:00', 0), \
-('WEGP-1390', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wegp.net/', 'WEGP-1390.png', 0, 0, 0, 1, '2011-11-11', 7110, 0, '2017-01-01 00:00:00', 0), \
-('Horse-Talk', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Horse-Talk.png', 0, 0, 0, 1, '2011-11-11', 7111, 0, '2017-01-01 00:00:00', 0), \
-('Priebe-Investment-Plans', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Priebe-Investment-Plans.png', 0, 0, 0, 1, '2011-11-11', 7112, 0, '2017-01-01 00:00:00', 0), \
-('Alan-Brazil-Breakfast-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Alan-Brazil-Breakfast-Show.png', 0, 0, 0, 1, '2011-11-11', 7113, 0, '2017-01-01 00:00:00', 0), \
-('Soulwax', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Soulwax.png', 0, 0, 0, 1, '2011-11-11', 7115, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Alborz--Persian', 'Local radio in Aarhus and environs in Persian. Since 1998, Radio Alborz in Aarhus broadcast every Saturday and Sunday broadcasts of news, music, stories and cultural programs in Persian', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.iraninfo.dk/', 'Radio-Alborz--Persian.png', 0, 0, 0, 1, '2011-11-11', 7116, 0, '2017-01-01 00:00:00', 0), \
-('Phoenix-967FM', 'Phoenix FM is Calderdales only community radio station', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.phoenixfm.co.uk/', 'Phoenix-967FM.png', 0, 0, 0, 1, '2011-11-11', 7117, 0, '2017-01-01 00:00:00', 0), \
-('GenX-Stream', 'We are a 24/7 streaming Internet Radio station. Join the party at GenX-Stream.net! Go to www.genx-stream.net to make a request today. It&#39;s easy and all requests go to the top of the list. Spread t', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.genx-stream.net/playing.html', 'GenX-Stream.png', 0, 0, 0, 1, '2011-11-11', 7118, 0, '2017-01-01 00:00:00', 0), \
-('Rich-Eisen-Podcast', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Rich-Eisen-Podcast.png', 0, 0, 0, 1, '2011-11-11', 7119, 0, '2017-01-01 00:00:00', 0), \
-('WZEP-1460', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wzep1460.com/', 'WZEP-1460.png', 0, 0, 0, 1, '2011-11-11', 7120, 0, '2017-01-01 00:00:00', 0), \
-('Mountain-Radio-Verbier-966', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mountainradioverbier.com/', 'Mountain-Radio-Verbier-966.png', 0, 0, 0, 1, '2011-11-11', 7121, 0, '2017-01-01 00:00:00', 0), \
-('Go-Gos', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Go-Gos.png', 0, 0, 0, 1, '2011-11-11', 7122, 0, '2017-01-01 00:00:00', 0), \
-('The-Verve', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Verve.png', 0, 0, 0, 1, '2011-11-11', 7123, 0, '2017-01-01 00:00:00', 0), \
-('WRUF-850', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.am850.com/', 'WRUF-850.png', 0, 0, 0, 1, '2011-11-11', 7124, 0, '2017-01-01 00:00:00', 0), \
-('Saturday-Sports-Talk', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Saturday-Sports-Talk.png', 0, 0, 0, 1, '2011-11-11', 7125, 0, '2017-01-01 00:00:00', 0), \
-('Public-Domain-Jazz', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://en.publicdomainproject.org/index.php/Public_Domain_Jazz', 'Public-Domain-Jazz.png', 0, 0, 0, 1, '2011-11-11', 7126, 0, '2017-01-01 00:00:00', 0), \
-('Toni-Basil', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Toni-Basil.png', 0, 0, 0, 1, '2011-11-11', 7127, 0, '2017-01-01 00:00:00', 0), \
-('Kronehit-90s-Dance', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kronehit.at/', 'Kronehit-90s-Dance.png', 0, 0, 0, 1, '2011-11-11', 7128, 0, '2017-01-01 00:00:00', 0), \
-('Red-Zone-Media-Channel-13', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.redzonemedia.com', 'Red-Zone-Media-Channel-13.png', 0, 0, 0, 1, '2011-11-11', 7129, 0, '2017-01-01 00:00:00', 0), \
-('Kevin-Devine', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kevin-Devine.png', 0, 0, 0, 1, '2011-11-11', 7130, 0, '2017-01-01 00:00:00', 0), \
-('Tele-Radio-Stereo-927', 'storica emittente radiofonica del centro Italia', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.teleradiostereo.it/', 'Tele-Radio-Stereo-927.png', 0, 0, 0, 1, '2011-11-11', 7131, 0, '2017-01-01 00:00:00', 0), \
-('The-Zone-1300', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sportsradio1300.com/', 'The-Zone-1300.png', 0, 0, 0, 1, '2011-11-11', 7132, 0, '2017-01-01 00:00:00', 0), \
-('Fooding-Around-Restaurants-and-Inns', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Fooding-Around-Restaurants-and-Inns.png', 0, 0, 0, 1, '2011-11-11', 7133, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---1978-Hits', 'This is when 8-track was king and lime-green shag carpet was the coooool thing. We&#39;ve got all the huge hits from the decade that brought you Led Zeppelin, AC/DC, Aerosmith,The Doobie Brothers, ABB', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.audiocream.com/', 'Audio-Cream---1978-Hits.png', 0, 0, 0, 1, '2011-11-11', 7134, 0, '2017-01-01 00:00:00', 0), \
-('Bucketts-Radio-1041', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.gloucesterfm.com.au/', 'Bucketts-Radio-1041.png', 0, 0, 0, 1, '2011-11-11', 7135, 0, '2017-01-01 00:00:00', 0), \
-('Classic-Jazz-on-JAZZRADIOcom', 'Jazz from where it began. Hot jazz, early swing, and the solo greats.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.jazzradio.com/', 'Classic-Jazz-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 7136, 0, '2017-01-01 00:00:00', 0), \
-('Steve-Perry', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Steve-Perry.png', 0, 0, 0, 1, '2011-11-11', 7137, 0, '2017-01-01 00:00:00', 0), \
-('1000-Homo-DJs', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '1000-Homo-DJs.png', 0, 0, 0, 1, '2011-11-11', 7138, 0, '2017-01-01 00:00:00', 0), \
-('RMF-MAXXX-967', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rmfmaxxx.pl/', 'RMF-MAXXX-967.png', 0, 0, 0, 1, '2011-11-11', 7139, 0, '2017-01-01 00:00:00', 0), \
-('WEAA-889', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.weaa.org/', 'WEAA-889.png', 0, 0, 0, 1, '2011-11-11', 7140, 0, '2017-01-01 00:00:00', 0), \
-('The-Riff-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://the-riff-radio.playtheradio.com/', 'The-Riff-Radio.png', 0, 0, 0, 1, '2011-11-11', 7141, 0, '2017-01-01 00:00:00', 0), \
-('Sweet-Sensation', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sweet-Sensation.png', 0, 0, 0, 1, '2011-11-11', 7142, 0, '2017-01-01 00:00:00', 0), \
-('93-X-KXXR-937', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.93x.com/', '93-X-KXXR-937.png', 0, 0, 0, 1, '2011-11-11', 7143, 0, '2017-01-01 00:00:00', 0), \
-('Breezy-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.breezyradio.org/', 'Breezy-Radio.png', 0, 0, 0, 1, '2011-11-11', 7144, 0, '2017-01-01 00:00:00', 0), \
-('Third-Day', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Third-Day.png', 0, 0, 0, 1, '2011-11-11', 7145, 0, '2017-01-01 00:00:00', 0), \
-('Chris-Brown', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Chris-Brown.png', 0, 0, 0, 1, '2011-11-11', 7146, 0, '2017-01-01 00:00:00', 0), \
-('KNTR-980', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kntram.com/', 'KNTR-980.png', 0, 0, 0, 1, '2011-11-11', 7147, 0, '2017-01-01 00:00:00', 0), \
-('KPTX-983', 'KPTX FM98 and KIUN AM Radio Pecos, Tx. Serving the Trans-Pecos Region with the Best in Rock and Roll, News, Sports and Weather Information', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.98xfm.com/', 'KPTX-983.png', 0, 0, 0, 1, '2011-11-11', 7148, 0, '2017-01-01 00:00:00', 0), \
-('1031-The-Buzz', 'It&#39;s simple.  103.1 The Buzz is the only station that really ROCKS in South Florida.  Papa Roach, White Zombie, ACDC, Linkin Park, Guns N&#39; Roses, Shinedown, Tool.  You&#39;ll find them all her', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.buzz103.com/', '1031-The-Buzz.png', 0, 0, 0, 1, '2011-11-11', 7149, 0, '2017-01-01 00:00:00', 0), \
-('Gianluca-Grignani', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Gianluca-Grignani.png', 0, 0, 0, 1, '2011-11-11', 7150, 0, '2017-01-01 00:00:00', 0), \
-('Heaven-97-970', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.khvnam.com/', 'Heaven-97-970.png', 0, 0, 0, 1, '2011-11-11', 7151, 0, '2017-01-01 00:00:00', 0), \
-('WTIB-1037', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wtibfm.com/', 'WTIB-1037.png', 0, 0, 0, 1, '2011-11-11', 7152, 0, '2017-01-01 00:00:00', 0), \
-('Toronto-Maple-Leafs-at-Boston-Bruins-Oct-20-2011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Toronto-Maple-Leafs-at-Boston-Bruins-Oct-20-2011.png', 0, 0, 0, 1, '2011-11-11', 7153, 0, '2017-01-01 00:00:00', 0), \
-('The-Raspberries', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Raspberries.png', 0, 0, 0, 1, '2011-11-11', 7154, 0, '2017-01-01 00:00:00', 0), \
-('WJDB-630', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WJDB-630.png', 0, 0, 0, 1, '2011-11-11', 7155, 0, '2017-01-01 00:00:00', 0), \
-('KSDN-FM-941', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hubcityradio.com/therock', 'KSDN-FM-941.png', 0, 0, 0, 1, '2011-11-11', 7156, 0, '2017-01-01 00:00:00', 0), \
-('The-X-995', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wxnr.com/', 'The-X-995.png', 0, 0, 0, 1, '2011-11-11', 7157, 0, '2017-01-01 00:00:00', 0), \
-('Ol-Daves-Jukebox', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ol-Daves-Jukebox.png', 0, 0, 0, 1, '2011-11-11', 7158, 0, '2017-01-01 00:00:00', 0), \
-('Andrew-Peterson', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Andrew-Peterson.png', 0, 0, 0, 1, '2011-11-11', 7159, 0, '2017-01-01 00:00:00', 0), \
-('Stolen-Moments', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Stolen-Moments.png', 0, 0, 0, 1, '2011-11-11', 7160, 0, '2017-01-01 00:00:00', 0), \
-('Life-Perspectives', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Life-Perspectives.png', 0, 0, 0, 1, '2011-11-11', 7161, 0, '2017-01-01 00:00:00', 0), \
-('Amazing-80s', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.amazing80s.com/', 'Amazing-80s.png', 0, 0, 0, 1, '2011-11-11', 7162, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Pepito', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiopepito.com/', 'Radio-Pepito.png', 0, 0, 0, 1, '2011-11-11', 7163, 0, '2017-01-01 00:00:00', 0), \
-('Q-92-925', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.q92radio.com/', 'Q-92-925.png', 0, 0, 0, 1, '2011-11-11', 7164, 0, '2017-01-01 00:00:00', 0), \
-('OPB-Music-915', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://opbmusic.org/', 'OPB-Music-915.png', 0, 0, 0, 1, '2011-11-11', 7165, 0, '2017-01-01 00:00:00', 0), \
-('Mega-1075', 'La Nueva Mega #1 en Exitos - Mega 107.5 Dallas-Fort Worth, Texas', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mega1075.com/', 'Mega-1075.png', 0, 0, 0, 1, '2011-11-11', 7166, 0, '2017-01-01 00:00:00', 0), \
-('Journey', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Journey.png', 0, 0, 0, 1, '2011-11-11', 7167, 0, '2017-01-01 00:00:00', 0), \
-('WILE-1270', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.yourradioplace.com/', 'WILE-1270.png', 0, 0, 0, 1, '2011-11-11', 7168, 0, '2017-01-01 00:00:00', 0), \
-('Da-Hool', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Da-Hool.png', 0, 0, 0, 1, '2011-11-11', 7169, 0, '2017-01-01 00:00:00', 0), \
-('Dan-Scott-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dan-Scott-Show.png', 0, 0, 0, 1, '2011-11-11', 7170, 0, '2017-01-01 00:00:00', 0), \
-('Love-FM', 'A Love FM', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.lovefm.com.br/', 'Love-FM.png', 0, 0, 0, 1, '2011-11-11', 7171, 0, '2017-01-01 00:00:00', 0), \
-('1069-Fox-Sports-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '1069-Fox-Sports-Radio.png', 0, 0, 0, 1, '2011-11-11', 7172, 0, '2017-01-01 00:00:00', 0), \
-('The-Doo-Wop-Express', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thedoowopexpress.com/', 'The-Doo-Wop-Express.png', 0, 0, 0, 1, '2011-11-11', 7173, 0, '2017-01-01 00:00:00', 0), \
-('SportsJuice Texas-Tornado', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://sportsjuice.com/', 'SportsJuice---Texas-Tornado.png', 0, 0, 0, 1, '2011-11-11', 7174, 0, '2017-01-01 00:00:00', 0), \
-('Deming-Radio-1230', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.demingradio.com/', 'Deming-Radio-1230.png', 0, 0, 0, 1, '2011-11-11', 7175, 0, '2017-01-01 00:00:00', 0), \
-('Punk-Show-with-Mike-Davies', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Punk-Show-with-Mike-Davies.png', 0, 0, 0, 1, '2011-11-11', 7176, 0, '2017-01-01 00:00:00', 0), \
-('FM-96-963', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.fm96.ca/', 'FM-96-963.png', 0, 0, 0, 1, '2011-11-11', 7177, 0, '2017-01-01 00:00:00', 0), \
-('Bayern-1-Am-Nachmittag', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bayern-1-Am-Nachmittag.png', 0, 0, 1, 1, '2011-11-11', 7178, 0, '2011-10-14 16:02:57', 0), \
-('WISN-1130', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.newstalk1130.com/', 'WISN-1130.png', 0, 0, 0, 1, '2011-11-11', 7179, 0, '2017-01-01 00:00:00', 0), \
-('The-Marsalis-Family', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Marsalis-Family.png', 0, 0, 0, 1, '2011-11-11', 7180, 0, '2017-01-01 00:00:00', 0), \
-('WSUL-983', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wsulfm.com/', 'WSUL-983.png', 0, 0, 0, 1, '2011-11-11', 7181, 0, '2017-01-01 00:00:00', 0), \
-('941-KMPS', '94.1 KMPS-FM  has been the Northwest&#39;s #1 Country Station for more than 35 years.   You can now enjoy Today&#39;s Country on KMPS-FM, in crystal clear HD Radio or streaming online at kmps.com.  We', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kmps.com/', '941-KMPS.png', 0, 0, 0, 1, '2011-11-11', 7182, 0, '2017-01-01 00:00:00', 0), \
-('Acoustic-Sunrise', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Acoustic-Sunrise.png', 0, 0, 0, 1, '2011-11-11', 7183, 0, '2017-01-01 00:00:00', 0), \
-('KAZM-780', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kazmradio.com/', 'KAZM-780.png', 0, 0, 0, 1, '2011-11-11', 7184, 0, '2017-01-01 00:00:00', 0), \
-('Anthony-Gomes', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Anthony-Gomes.png', 0, 0, 0, 1, '2011-11-11', 7185, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Trinidad-TBC-730', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiotrinidad.co.tt/', 'Radio-Trinidad-TBC-730.png', 0, 0, 0, 1, '2011-11-11', 7186, 0, '2017-01-01 00:00:00', 0), \
-('Blu-Cantrell', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Blu-Cantrell.png', 0, 0, 0, 1, '2011-11-11', 7187, 0, '2017-01-01 00:00:00', 0), \
-('Uplifting-Music-All-Day-and-Night', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Uplifting-Music-All-Day-and-Night.png', 0, 0, 0, 1, '2011-11-11', 7188, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Radio-630', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.am630.net/', 'ESPN-Radio-630.png', 0, 0, 0, 1, '2011-11-11', 7189, 0, '2017-01-01 00:00:00', 0), \
-('WTLA-1200', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WTLA-1200.png', 0, 0, 0, 1, '2011-11-11', 7190, 0, '2017-01-01 00:00:00', 0), \
-('KDKB-933', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kdkb.com/', 'KDKB-933.png', 0, 0, 0, 1, '2011-11-11', 7191, 0, '2017-01-01 00:00:00', 0), \
-('Kungfu-World', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kungfu-World.png', 0, 0, 0, 1, '2011-11-11', 7192, 0, '2017-01-01 00:00:00', 0), \
-('The-Huddle', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Huddle.png', 0, 0, 0, 1, '2011-11-11', 7193, 0, '2017-01-01 00:00:00', 0), \
-('KOGO-600', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kogo.com/', 'KOGO-600.png', 0, 0, 0, 1, '2011-11-11', 7194, 0, '2017-01-01 00:00:00', 0), \
-('Ana-b¡rbara', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ana-B¡rbara.png', 0, 0, 0, 1, '2011-11-11', 7195, 0, '2017-01-01 00:00:00', 0), \
-('WMEL-1300', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://1300WMEL.com', 'WMEL-1300.png', 0, 0, 0, 1, '2011-11-11', 7196, 0, '2017-01-01 00:00:00', 0), \
-('Ashby', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ashby.png', 0, 0, 0, 1, '2011-11-11', 7197, 0, '2017-01-01 00:00:00', 0), \
-('Wild-Flag', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Wild-Flag.png', 0, 0, 0, 1, '2011-11-11', 7198, 0, '2017-01-01 00:00:00', 0), \
-('Sudden-Death-Overtime', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sudden-Death-Overtime.png', 0, 0, 0, 1, '2011-11-11', 7199, 0, '2017-01-01 00:00:00', 0), \
-('Matariki-FM-999', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.matarikifm.co.ck/', 'Matariki-FM-999.png', 0, 0, 0, 1, '2011-11-11', 7200, 0, '2017-01-01 00:00:00', 0), \
-('Zen-Radio', 'Une radio web &#224; la musique douce et apaisante pour relaxer les esprits...', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.zenradio.fm/', 'Zen-Radio.png', 0, 0, 0, 1, '2011-11-11', 7201, 0, '2017-01-01 00:00:00', 0), \
-('FFH-Digital---Top-40', 'FFH Digital - Top 40: Nonstop die aktuellsten Hits. Nur die Allerbesten: Bei FFH Top 40 h&#246;ren Sie die offiziellen deutschen Verkaufscharts - im Stundentakt. Jede Woche neu, immer aktuell. FFH Top', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ffh.de/webfun/webradio_index.php', 'FFH-Digital---Top-40.png', 0, 0, 0, 1, '2011-11-11', 7202, 0, '2017-01-01 00:00:00', 0), \
-('974-Rock-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rockfm.co.uk/', '974-Rock-FM.png', 0, 0, 0, 1, '2011-11-11', 7203, 0, '2017-01-01 00:00:00', 0), \
-('The-Point-997', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.997point.com/', 'The-Point-997.png', 0, 0, 0, 1, '2011-11-11', 7204, 0, '2017-01-01 00:00:00', 0), \
-('Gilles-Peterson', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Gilles-Peterson.png', 0, 0, 0, 1, '2011-11-11', 7205, 0, '2017-01-01 00:00:00', 0), \
-('KCJC-FM-1023', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rivercountrykcjc.com/', 'KCJC-FM-1023.png', 0, 0, 0, 1, '2011-11-11', 7206, 0, '2017-01-01 00:00:00', 0), \
-('KTHN-921', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KTHN-921.png', 0, 0, 0, 1, '2011-11-11', 7207, 0, '2017-01-01 00:00:00', 0), \
-('NERadio-Sweden', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.neradio.se/', 'NERadio-Sweden.png', 0, 0, 0, 1, '2011-11-11', 7208, 0, '2017-01-01 00:00:00', 0), \
-('Midnight-Classics-with-Helen-Mayhew', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Midnight-Classics-with-Helen-Mayhew.png', 0, 0, 0, 1, '2011-11-11', 7209, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Central-Victoria-1079', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://abc.net.au/centralvic/', 'ABC-Central-Victoria-1079.png', 0, 0, 0, 1, '2011-11-11', 7210, 0, '2017-01-01 00:00:00', 0), \
-('Moshiach-in-the-Air', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Moshiach-in-the-Air.png', 0, 0, 0, 1, '2011-11-11', 7211, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Formula-983', 'La programaci&#243;n de Formula hit est&#225; basada principalmente en m&#250;sica comercial nacional, internacional y dance.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.formulahitcastellon.com/', 'Radio-Formula-983.png', 0, 0, 0, 1, '2011-11-11', 7212, 0, '2017-01-01 00:00:00', 0), \
-('TheJazzGroovecom', 'recordings which make up the almost infinite body of work that is jazz', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://thejazzgroove.com/', 'TheJazzGroovecom.png', 0, 0, 0, 1, '2011-11-11', 7213, 0, '2017-01-01 00:00:00', 0), \
-('Planet-1023', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.planet1023.com/', 'Planet-1023.png', 0, 0, 0, 1, '2011-11-11', 7214, 0, '2017-01-01 00:00:00', 0), \
-('WHAM-1180', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wham1180.com/', 'WHAM-1180.png', 0, 0, 0, 1, '2011-11-11', 7215, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Radio-910', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.910theteam.net/', 'ESPN-Radio-910.png', 0, 0, 0, 1, '2011-11-11', 7216, 0, '2017-01-01 00:00:00', 0), \
-('Yes', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Yes.png', 0, 0, 0, 1, '2011-11-11', 7217, 0, '2017-01-01 00:00:00', 0), \
-('Dirty-Projectors', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dirty-Projectors.png', 0, 0, 0, 1, '2011-11-11', 7218, 0, '2017-01-01 00:00:00', 0), \
-('WTLX-1005', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espnmadison.com/', 'WTLX-1005.png', 0, 0, 0, 1, '2011-11-11', 7219, 0, '2017-01-01 00:00:00', 0), \
-('The-BusinessMakers-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-BusinessMakers-Show.png', 0, 0, 0, 1, '2011-11-11', 7220, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Scorpio-1060', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioscorpio.be/', 'Radio-Scorpio-1060.png', 0, 0, 0, 1, '2011-11-11', 7221, 0, '2017-01-01 00:00:00', 0), \
-('KPAY-1290', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://newstalk1290.wordpress.com/', 'KPAY-1290.png', 0, 0, 0, 1, '2011-11-11', 7222, 0, '2017-01-01 00:00:00', 0), \
-('Train', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Train.png', 0, 0, 0, 1, '2011-11-11', 7223, 0, '2017-01-01 00:00:00', 0), \
-('Bad-Dog-Blues', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bad-Dog-Blues.png', 0, 0, 0, 1, '2011-11-11', 7224, 0, '2017-01-01 00:00:00', 0), \
-('WMSK-FM-1013', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wmskamfm.com', 'WMSK-FM-1013.png', 0, 0, 0, 1, '2011-11-11', 7225, 0, '2017-01-01 00:00:00', 0), \
-('Toledo-Rockets-at-Bowling-Green-Falcons-Oct-15-2011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Toledo-Rockets-at-Bowling-Green-Falcons-Oct-15-2011.png', 0, 0, 0, 1, '2011-11-11', 7226, 0, '2017-01-01 00:00:00', 0), \
-('The-Range-953', 'Best Texas &amp; Americana Music Around', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.khyi.com/', 'The-Range-953.png', 0, 0, 0, 1, '2011-11-11', 7227, 0, '2017-01-01 00:00:00', 0), \
-('Just-Jack', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Just-Jack.png', 0, 0, 0, 1, '2011-11-11', 7228, 0, '2017-01-01 00:00:00', 0), \
-('Pearl-Jam-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.pearljam.com/', 'Pearl-Jam-Radio.png', 0, 0, 0, 1, '2011-11-11', 7229, 0, '2017-01-01 00:00:00', 0), \
-('Big-Bill-Morganfield', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Big-Bill-Morganfield.png', 0, 0, 0, 1, '2011-11-11', 7230, 0, '2017-01-01 00:00:00', 0), \
-('Jim-Croce', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jim-Croce.png', 0, 0, 0, 1, '2011-11-11', 7231, 0, '2017-01-01 00:00:00', 0), \
-('KUJ-1420', 'KUJ AM has been serving the Walla Walla since 1928.<BR>Catch all the Seattle Seahawks &amp; University of Washington Huskies games.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kujam.com', 'KUJ-1420.png', 0, 0, 0, 1, '2011-11-11', 7232, 0, '2017-01-01 00:00:00', 0), \
-('Kurt-Carr--The-Kurt-Carr-Singers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kurt-Carr--The-Kurt-Carr-Singers.png', 0, 0, 0, 1, '2011-11-11', 7233, 0, '2017-01-01 00:00:00', 0), \
-('The-Current-893', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://minnesota.publicradio.org/radio/services/the_current/', 'The-Current-893.png', 0, 0, 0, 1, '2011-11-11', 7234, 0, '2017-01-01 00:00:00', 0), \
-('WQAH-FM-1057', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wqah.com/', 'WQAH-FM-1057.png', 0, 0, 0, 1, '2011-11-11', 7235, 0, '2017-01-01 00:00:00', 0), \
-('KFLS-1450', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.klamathradio.com/kfls/newkflsindexpage.htm', 'KFLS-1450.png', 0, 0, 0, 1, '2011-11-11', 7236, 0, '2017-01-01 00:00:00', 0), \
-('The-Clash', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Clash.png', 0, 0, 0, 1, '2011-11-11', 7237, 0, '2017-01-01 00:00:00', 0), \
-('KLIV-1590', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kliv.com/', 'KLIV-1590.png', 0, 0, 0, 1, '2011-11-11', 7238, 0, '2017-01-01 00:00:00', 0), \
-('WBAZ-1025', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbaz.com/', 'WBAZ-1025.png', 0, 0, 0, 1, '2011-11-11', 7239, 0, '2017-01-01 00:00:00', 0), \
-('Intentional-Living', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Intentional-Living.png', 0, 0, 0, 1, '2011-11-11', 7240, 0, '2017-01-01 00:00:00', 0), \
-('CMT-Radio-Insider', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'CMT-Radio-Insider.png', 0, 0, 0, 1, '2011-11-11', 7241, 0, '2017-01-01 00:00:00', 0), \
-('Lyle-Lovett', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Lyle-Lovett.png', 0, 0, 0, 1, '2011-11-11', 7242, 0, '2017-01-01 00:00:00', 0), \
-('WQCT-1520', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbno-wqct.com/WQCT/index.htm', 'WQCT-1520.png', 0, 0, 0, 1, '2011-11-11', 7243, 0, '2017-01-01 00:00:00', 0), \
-('975-Bob-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.975bobfm.com/', '975-Bob-FM.png', 0, 0, 1, 1, '2011-11-11', 7244, 0, '2011-10-14 15:57:53', 0), \
-('Mongo-Santamara', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Mongo-Santamara.png', 0, 0, 0, 1, '2011-11-11', 7245, 0, '2017-01-01 00:00:00', 0), \
-('Govorit-Moskva-920', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://govoritmoskva.ru/', 'Govorit-Moskva-920.png', 0, 0, 0, 1, '2011-11-11', 7246, 0, '2017-01-01 00:00:00', 0), \
-('Sylvia', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sylvia.png', 0, 0, 0, 1, '2011-11-11', 7247, 0, '2017-01-01 00:00:00', 0), \
-('Moore-Lions-Football', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.moorelions.com/', 'Moore-Lions-Football.png', 0, 0, 0, 1, '2011-11-11', 7248, 0, '2017-01-01 00:00:00', 0), \
-('The-Main-Ingredient', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Main-Ingredient.png', 0, 0, 0, 1, '2011-11-11', 7249, 0, '2017-01-01 00:00:00', 0), \
-('Roger-Shah', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Roger-Shah.png', 0, 0, 0, 1, '2011-11-11', 7250, 0, '2017-01-01 00:00:00', 0), \
-('WSAR-1480', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wsar.com/', 'WSAR-1480.png', 0, 0, 0, 1, '2011-11-11', 7251, 0, '2017-01-01 00:00:00', 0), \
-('Classic-Hits-Radio-(Canada)', 'This is the home of REAL CLASSIC ROCK. The 70s, 80s and newer classics!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://classichitsradio.weebly.com/', '', 0, 0, 0, 1, '2011-11-11', 7252, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-FM-1065', 'KISS FM', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://kissfm.ua/', 'Kiss-FM-1065.png', 0, 0, 0, 1, '2011-11-11', 7253, 0, '2017-01-01 00:00:00', 0), \
-('Boston-Spaceships', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Boston-Spaceships.png', 0, 0, 0, 1, '2011-11-11', 7254, 0, '2017-01-01 00:00:00', 0), \
-('Dean-Martins-Gold-Requests', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dean-Martins-Gold-Requests.png', 0, 0, 0, 1, '2011-11-11', 7255, 0, '2017-01-01 00:00:00', 0), \
-('Doc-Jeff-and-Heather', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Doc-Jeff-and-Heather.png', 0, 0, 0, 1, '2011-11-11', 7256, 0, '2017-01-01 00:00:00', 0), \
-('Drive-By-Truckers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Drive-By-Truckers.png', 0, 0, 0, 1, '2011-11-11', 7257, 0, '2017-01-01 00:00:00', 0), \
-('Real-Estate-Riches', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Real-Estate-Riches.png', 0, 0, 0, 1, '2011-11-11', 7258, 0, '2017-01-01 00:00:00', 0), \
-('News-Radio-980', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kmbz.com/', 'News-Radio-980.png', 0, 0, 0, 1, '2011-11-11', 7259, 0, '2017-01-01 00:00:00', 0), \
-('DJ-Pledge', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'DJ-Pledge.png', 0, 0, 0, 1, '2011-11-11', 7260, 0, '2017-01-01 00:00:00', 0), \
-('Todays-Hottest-Hits', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.todayshottesthits.com/', 'Todays-Hottest-Hits.png', 0, 0, 0, 1, '2011-11-11', 7261, 0, '2017-01-01 00:00:00', 0), \
-('Ma', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ma.png', 0, 0, 0, 1, '2011-11-11', 7262, 0, '2017-01-01 00:00:00', 0), \
-('WHUR-World-963', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.whurworld.com/', 'WHUR-World-963.png', 0, 0, 0, 1, '2011-11-11', 7263, 0, '2017-01-01 00:00:00', 0), \
-('TI', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'TI.png', 0, 0, 0, 1, '2011-11-11', 7264, 0, '2017-01-01 00:00:00', 0), \
-('Hot-975', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kvegas.com/', 'Hot-975.png', 0, 0, 0, 1, '2011-11-11', 7265, 0, '2017-01-01 00:00:00', 0), \
-('KWAK-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KWAK-1240.png', 0, 0, 0, 1, '2011-11-11', 7266, 0, '2017-01-01 00:00:00', 0), \
-('947-WLS-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.947trueoldies.com/', '947-WLS-FM.png', 0, 0, 1, 1, '2011-11-11', 7267, 0, '2011-10-14 15:57:41', 0), \
-('Nickodemus', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Nickodemus.png', 0, 0, 0, 1, '2011-11-11', 7268, 0, '2017-01-01 00:00:00', 0), \
-('WAAI-1009', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://mtslive.com/WAAI.htm', 'WAAI-1009.png', 0, 0, 0, 1, '2011-11-11', 7269, 0, '2017-01-01 00:00:00', 0), \
-('Tr', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Tr.png', 0, 0, 0, 1, '2011-11-11', 7270, 0, '2017-01-01 00:00:00', 0), \
-('celtic-rock-music', 'Verbindung von keltischem Folk mit Rock und Punk', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.celtic-rock.de/', 'celtic-rock-music.png', 0, 0, 0, 1, '2011-11-11', 7271, 0, '2017-01-01 00:00:00', 0), \
-('RealRadio-I-94', 'Playing the hits from the 80s to today!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.realradioi94.com/', 'RealRadio-I-94.png', 0, 0, 0, 1, '2011-11-11', 7272, 0, '2017-01-01 00:00:00', 0), \
-('WVIP-935', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wvipfm.com/', 'WVIP-935.png', 0, 0, 0, 1, '2011-11-11', 7273, 0, '2017-01-01 00:00:00', 0), \
-('FM-949-949', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.fm949sd.com/', 'FM-949-949.png', 0, 0, 0, 1, '2011-11-11', 7274, 0, '2017-01-01 00:00:00', 0), \
-('B-95-949', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.b95forlife.com/', 'B-95-949.png', 0, 0, 0, 1, '2011-11-11', 7275, 0, '2017-01-01 00:00:00', 0), \
-('The-Team-1430', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1430theteam.com/', 'The-Team-1430.png', 0, 0, 0, 1, '2011-11-11', 7276, 0, '2017-01-01 00:00:00', 0), \
-('WKUZ-959', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wkuz.com/', 'WKUZ-959.png', 0, 0, 0, 1, '2011-11-11', 7278, 0, '2017-01-01 00:00:00', 0), \
-('The-Late-Lounge', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Late-Lounge.png', 0, 0, 0, 1, '2011-11-11', 7279, 0, '2017-01-01 00:00:00', 0), \
-('WCXZ-740', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.74wcxz.com/', 'WCXZ-740.png', 0, 0, 0, 1, '2011-11-11', 7280, 0, '2017-01-01 00:00:00', 0), \
-('Jimmie-Rodgers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jimmie-Rodgers.png', 0, 0, 0, 1, '2011-11-11', 7281, 0, '2017-01-01 00:00:00', 0), \
-('Dave-Moreland-Mornings', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dave-Moreland-Mornings.png', 0, 0, 0, 1, '2011-11-11', 7282, 0, '2017-01-01 00:00:00', 0), \
-('InMe', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'InMe.png', 0, 0, 0, 1, '2011-11-11', 7283, 0, '2017-01-01 00:00:00', 0), \
-('Bag-Raiders', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bag-Raiders.png', 0, 0, 0, 1, '2011-11-11', 7284, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-South-Jersey-973', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.973espn.com/', 'ESPN-South-Jersey-973.png', 0, 0, 0, 1, '2011-11-11', 7285, 0, '2017-01-01 00:00:00', 0), \
-('Triple-M-1055', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1055triplem.com/', 'Triple-M-1055.png', 0, 0, 0, 1, '2011-11-11', 7286, 0, '2017-01-01 00:00:00', 0), \
-('Vanessa-Freeman', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Vanessa-Freeman.png', 0, 0, 0, 1, '2011-11-11', 7287, 0, '2017-01-01 00:00:00', 0), \
-('Let-My-People-Think', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Let-My-People-Think.png', 0, 0, 0, 1, '2011-11-11', 7288, 0, '2017-01-01 00:00:00', 0), \
-('Jazz-with-Bob-Parlocha', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jazz-with-Bob-Parlocha.png', 0, 0, 0, 1, '2011-11-11', 7289, 0, '2017-01-01 00:00:00', 0), \
-('Spagna', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Spagna.png', 0, 0, 0, 1, '2011-11-11', 7290, 0, '2017-01-01 00:00:00', 0), \
-('NASCAR-Today', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'NASCAR-Today.png', 0, 0, 0, 1, '2011-11-11', 7291, 0, '2017-01-01 00:00:00', 0), \
-('Houseschuh', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://radio.houseschuh.com/', 'Houseschuh.png', 0, 0, 0, 1, '2011-11-11', 7292, 0, '2017-01-01 00:00:00', 0), \
-('MercyMe', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'MercyMe.png', 0, 0, 0, 1, '2011-11-11', 7293, 0, '2017-01-01 00:00:00', 0), \
-('Leaving-The-Yard', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Leaving-The-Yard.png', 0, 0, 0, 1, '2011-11-11', 7294, 0, '2017-01-01 00:00:00', 0), \
-('WWNS-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WWNS-1240.png', 0, 0, 0, 1, '2011-11-11', 7295, 0, '2017-01-01 00:00:00', 0), \
-('Y-102-1025', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wrfy.com/', 'Y-102-1025.png', 0, 0, 0, 1, '2011-11-11', 7296, 0, '2017-01-01 00:00:00', 0), \
-('Supertramp', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Supertramp.png', 0, 0, 0, 1, '2011-11-11', 7297, 0, '2017-01-01 00:00:00', 0), \
-('All-Hitz-977', 'WLER-FM is an Adult Contemporary radio station that officially can be heard in Butler County, Pennsylvania, but can also be heard in parts of northern Allegheny County, including Pittsburgh.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wlerfm.com/', 'All-Hitz-977.png', 0, 0, 1, 1, '2011-11-11', 7298, 0, '2011-10-15 20:11:51', 0), \
-('Hole', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Hole.png', 0, 0, 0, 1, '2011-11-11', 7299, 0, '2017-01-01 00:00:00', 0), \
-('Ganga', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ganga.png', 0, 0, 0, 1, '2011-11-11', 7300, 0, '2017-01-01 00:00:00', 0), \
-('KKEE-1230', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kkee1230.com/', 'KKEE-1230.png', 0, 0, 0, 1, '2011-11-11', 7301, 0, '2017-01-01 00:00:00', 0), \
-('Wild-101-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wild101fm.com/', 'Wild-101-1011.png', 0, 0, 0, 1, '2011-11-11', 7302, 0, '2017-01-01 00:00:00', 0), \
-('943-WCYY', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wcyy.com/', '943-WCYY.png', 0, 0, 5, 1, '2011-11-11', 7303, 0, '2011-10-15 20:10:04', 0);";
+('All-Hitz-977', 'WLER-FM is an Adult Contemporary radio station that officially can be heard in Butler County, Pennsylvania, but can also be heard in parts of northern Allegheny County, including Pittsburgh.', 'http://163.172.126.155:80/1', 'http://www.wlerfm.com/', 'All-Hitz-977.png', 0, 0, 1, 1, '2011-11-11', 7298, 0, '2011-10-15 20:11:51', 1), \
+('Hole', '', 'http://163.172.126.155:80/1', '', 'Hole.png', 0, 0, 0, 1, '2011-11-11', 7299, 0, '2017-01-01 00:00:00', 1), \
+('Ganga', '', 'http://163.172.126.155:80/1', '', 'Ganga.png', 0, 0, 0, 1, '2011-11-11', 7300, 0, '2017-01-01 00:00:00', 1), \
+('KKEE-1230', '', 'http://163.172.126.155:80/1', 'http://www.kkee1230.com/', 'KKEE-1230.png', 0, 0, 0, 1, '2011-11-11', 7301, 0, '2017-01-01 00:00:00', 1);";
 
 
 const char *radio_station_setupsql19="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('AccuRadio-Classic-Soul', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.accuradio.com/soul/', 'AccuRadio-Classic-Soul.png', 0, 0, 0, 1, '2011-11-11', 7304, 0, '2017-01-01 00:00:00', 0), \
-('Ronnie-Laws', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ronnie-Laws.png', 0, 0, 0, 1, '2011-11-11', 7305, 0, '2017-01-01 00:00:00', 0), \
-('The-Beat-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.energyarizonafm.com/', 'The-Beat-1011.png', 0, 0, 0, 1, '2011-11-11', 7306, 0, '2017-01-01 00:00:00', 0), \
-('K-945-945', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.k945.com/', 'K-945-945.png', 0, 0, 0, 1, '2011-11-11', 7307, 0, '2017-01-01 00:00:00', 0), \
-('Echoesgr---Netradio', 'The 1st 24H webradio from Thessaloniki with the best Chill Out, Lounge, Ambient &amp; Electro downtempo music scene.<BR>Relax &amp; Enjoy It... Just Listen !', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.echoes.gr/', 'Echoesgr---Netradio.png', 0, 0, 0, 1, '2011-11-11', 7308, 0, '2017-01-01 00:00:00', 0), \
-('Chayanne', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Chayanne.png', 0, 0, 0, 1, '2011-11-11', 7309, 0, '2017-01-01 00:00:00', 0), \
 ('Dekadance-Radio-Network', 'INTERNET RADIO WITH THE ULTIMATE IN VARIETY<BR>MUSIC, HUMOR, NEWS AND ENTERTAINMENT<BR>THE BEST RADIO PERSONALITIES FOR THE<BR>SERIOUS RADIO LISTENER FEATURING ROCK, BLUES, COUNTRY, DANCE AND EVERYTHI', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dekadance-radio.com/', 'Dekadance-Radio-Network.png', 0, 0, 0, 1, '2011-11-11', 7310, 0, '2017-01-01 00:00:00', 0), \
-('The-Lake-961', '96.1 The Lake -- Broadcasting from Lake Geneva, Wisconsin -- bringing YOU all of the music that matters!  Check us out on the web at www.wlkg.com!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wlkg.com/', 'The-Lake-961.png', 0, 0, 0, 1, '2011-11-11', 7311, 0, '2017-01-01 00:00:00', 0), \
-('VeggieTales', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'VeggieTales.png', 0, 0, 0, 1, '2011-11-11', 7312, 0, '2017-01-01 00:00:00', 0), \
-('DragonForce', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'DragonForce.png', 0, 0, 0, 1, '2011-11-11', 7313, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-NORA-970', 'Vollprogramm f&#252;r die Zielgruppe der &#252;ber 35-j&#228;hrigen mit Hits und Oldies. Radio NORA ist ein privater Radiosender in Schleswig-Holstein. Der Name NORA ist ein Akronym und steht f&#252;r', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radionora.de/', 'Radio-NORA-970.png', 0, 0, 0, 1, '2011-11-11', 7314, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Acadie-887', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.krvs.org/', 'Radio-Acadie-887.png', 0, 0, 0, 1, '2011-11-11', 7315, 0, '2017-01-01 00:00:00', 0), \
-('Bob-Marley--The-Wailers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bob-Marley--The-Wailers.png', 0, 0, 0, 1, '2011-11-11', 7316, 0, '2017-01-01 00:00:00', 0), \
-('Silversun-Pickups', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Silversun-Pickups.png', 0, 0, 0, 1, '2011-11-11', 7317, 0, '2017-01-01 00:00:00', 0), \
-('DWBL-1242', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://dwbl-am.mellow947.fm/', 'DWBL-1242.png', 0, 0, 0, 1, '2011-11-11', 7318, 0, '2017-01-01 00:00:00', 0), \
-('Banda-El-Recodo', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Banda-El-Recodo.png', 0, 0, 0, 1, '2011-11-11', 7319, 0, '2017-01-01 00:00:00', 0), \
-('KNST-790', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.790KNST.com', 'KNST-790.png', 0, 0, 0, 1, '2011-11-11', 7320, 0, '2017-01-01 00:00:00', 0), \
-('The-Voice-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.whiznews.com/am/', 'The-Voice-1240.png', 0, 0, 0, 1, '2011-11-11', 7321, 0, '2017-01-01 00:00:00', 0), \
-('WONW-Local-Worship', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WONW-Local-Worship.png', 0, 0, 0, 1, '2011-11-11', 7322, 0, '2017-01-01 00:00:00', 0), \
-('Foreigner', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Foreigner.png', 0, 0, 0, 1, '2011-11-11', 7323, 0, '2017-01-01 00:00:00', 0), \
-('957-The-KAR', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.957thekar.com/', '957-The-KAR.png', 0, 0, 0, 1, '2011-11-11', 7324, 0, '2017-01-01 00:00:00', 0), \
-('Sunday-Sermon', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sunday-Sermon.png', 0, 0, 0, 1, '2011-11-11', 7325, 0, '2017-01-01 00:00:00', 0), \
-('WBAL-Religion--Public-Service', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WBAL-Religion--Public-Service.png', 0, 0, 0, 1, '2011-11-11', 7326, 0, '2017-01-01 00:00:00', 0), \
-('The-Killer-B-1071', 'Best of classic hits. WKCB-FM also broadcasts from the following frequency: W299AS 107.7 FM.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wkcb.com/', 'The-Killer-B-1071.png', 0, 0, 0, 1, '2011-11-11', 7327, 0, '2017-01-01 00:00:00', 0), \
-('KGYM-1600', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1600espn.com/', 'KGYM-1600.png', 0, 0, 0, 1, '2011-11-11', 7328, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Casares-Irratia-1074', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.casaresirratia.com/', 'Radio-Casares-Irratia-1074.png', 0, 0, 0, 1, '2011-11-11', 7329, 0, '2017-01-01 00:00:00', 0), \
-('The-Brew-947', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.947thebrew.com', 'The-Brew-947.png', 0, 0, 0, 1, '2011-11-11', 7330, 0, '2017-01-01 00:00:00', 0), \
 ('DR Klassisk', '', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'http://www.dr.dk/radio/', 'DR-Klassisk.png', 0, 0, 0, 1, '2011-11-11', 7331, 0, '2017-01-01 00:00:00', 0), \
-('MGMT', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'MGMT.png', 0, 0, 0, 1, '2011-11-11', 7332, 0, '2017-01-01 00:00:00', 0), \
-('Autobahn-Radio', '24/7 The Best of Electronic Music. Electro, Progressive, Minimal, Techo.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://autobahnradio.blogspot.com/', 'Autobahn-Radio.png', 0, 0, 0, 1, '2011-11-11', 7333, 0, '2017-01-01 00:00:00', 0), \
-('US-977', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.us977.com/', 'US-977.png', 0, 0, 0, 1, '2011-11-11', 7334, 0, '2017-01-01 00:00:00', 0), \
-('Hot-Country-1065', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kmcx.com/', 'Hot-Country-1065.png', 0, 0, 0, 1, '2011-11-11', 7335, 0, '2017-01-01 00:00:00', 0), \
-('Russell-Davies', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Russell-Davies.png', 0, 0, 0, 1, '2011-11-11', 7336, 0, '2017-01-01 00:00:00', 0), \
-('Sondagspop', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sondagspop.png', 0, 0, 0, 1, '2011-11-11', 7337, 0, '2017-01-01 00:00:00', 0), \
-('WMYF-1380', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wmyf.com/', 'WMYF-1380.png', 0, 0, 0, 1, '2011-11-11', 7338, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-FM-1033', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1033kissfm.com/', 'Kiss-FM-1033.png', 0, 0, 0, 1, '2011-11-11', 7339, 0, '2017-01-01 00:00:00', 0), \
-('WYMC-1430', 'The hometown connection for local news, high school sports, and other events', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://mywymc.com/', 'WYMC-1430.png', 0, 0, 0, 1, '2011-11-11', 7340, 0, '2017-01-01 00:00:00', 0), \
-('The-Brewing-Network', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thebrewingnetwork.com/', 'The-Brewing-Network.png', 0, 0, 0, 1, '2011-11-11', 7341, 0, '2017-01-01 00:00:00', 0), \
-('Cream', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cream.png', 0, 0, 0, 1, '2011-11-11', 7342, 0, '2017-01-01 00:00:00', 0), \
-('KHVH-830', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.khvh830am.com/', 'KHVH-830.png', 0, 0, 0, 1, '2011-11-11', 7343, 0, '2017-01-01 00:00:00', 0), \
-('Lite-1029', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wlyt.com/', 'Lite-1029.png', 0, 0, 0, 1, '2011-11-11', 7344, 0, '2017-01-01 00:00:00', 0), \
-('Sunny-1031', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sunny1031.com', 'Sunny-1031.png', 0, 0, 0, 1, '2011-11-11', 7345, 0, '2017-01-01 00:00:00', 0), \
-('Star-FM-888', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.star888.gr/', 'Star-FM-888.png', 0, 0, 0, 1, '2011-11-11', 7346, 0, '2017-01-01 00:00:00', 0), \
 ('1029-LITE-FM', '102.9 LiteFM is your station for Continuous Lite Rock! Listen to 102.9 LiteFM on your FM Dial and online at www.1029litefm.com. Get your day started with the LiteFM Morning Show with Cindy Barton. The', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1029litefm.com', '1029-LITE-FM.png', 0, 0, 0, 1, '2011-11-11', 7347, 0, '2017-01-01 00:00:00', 0), \
-('1059-The-Big-Talker', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1059thebigtalker.com/', '1059-The-Big-Talker.png', 0, 0, 0, 1, '2011-11-11', 7348, 0, '2017-01-01 00:00:00', 0), \
-('1079-Mix-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mix1079.net/', '1079-Mix-FM.png', 0, 0, 0, 1, '2011-11-11', 7349, 0, '2017-01-01 00:00:00', 0), \
-('Groove-Salad', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Groove-Salad.png', 0, 0, 0, 1, '2011-11-11', 7350, 0, '2017-01-01 00:00:00', 0), \
-('10-IN-A-ROW', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '10-IN-A-ROW.png', 0, 0, 1, 1, '2011-11-11', 7351, 0, '2011-10-18 18:35:56', 0), \
-('10000-Maniacs', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '10000-Maniacs.png', 0, 0, 0, 1, '2011-11-11', 7352, 0, '2017-01-01 00:00:00', 0), \
-('soulfulbits', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '', 0, 0, 0, 1, '2011-11-11', 7353, 0, '2017-01-01 00:00:00', 0), \
-('Garbage', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Garbage.png', 0, 0, 0, 1, '2011-11-11', 7354, 0, '2017-01-01 00:00:00', 0), \
-('Sports-Radio-1400', 'Local, Regional and National Sports Talk.  Plus Orioles baseball, Redskins football, Virginia Tech football and basketball, local high school football and basketball.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wkav.com/', 'Sports-Radio-1400.png', 0, 0, 0, 1, '2011-11-11', 7355, 0, '2017-01-01 00:00:00', 0), \
-('Andy-Grammer', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Andy-Grammer.png', 0, 0, 0, 1, '2011-11-11', 7356, 0, '2017-01-01 00:00:00', 0), \
-('Candlemass', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Candlemass.png', 0, 0, 0, 1, '2011-11-11', 7357, 0, '2017-01-01 00:00:00', 0), \
-('Paula-Abdul', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Paula-Abdul.png', 0, 0, 0, 1, '2011-11-11', 7358, 0, '2017-01-01 00:00:00', 0), \
-('DC101-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dc101.com/', 'DC101-1011.png', 0, 0, 0, 1, '2011-11-11', 7359, 0, '2017-01-01 00:00:00', 0), \
-('Divine-Heresy', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Divine-Heresy.png', 0, 0, 0, 1, '2011-11-11', 7360, 0, '2017-01-01 00:00:00', 0), \
 ('WMSA-1340', 'Sandy Cook &amp; The Extraveganza Morning Show!<BR><BR>CBS National News, WMSA Local &amp; Regional News with Bob LaRue, Precision Weather with Kevin Williams, Marketwatch, Lottery Numbers, Lunch Menu', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1340wmsa.com/', 'WMSA-1340.png', 0, 0, 0, 1, '2011-11-11', 7361, 0, '2017-01-01 00:00:00', 0), \
-('1CLUBFM--Freestyle-Express', 'All the classics from George Lamond, Stevie B, Expose&#39;, Cover Girls, mixes from Tim Spinnin&#39; Schommer, Kenny Jammin&#39; Jason and more.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1club.fm/', '1CLUBFM--Freestyle-Express.png', 0, 0, 0, 1, '2011-11-11', 7363, 0, '2017-01-01 00:00:00', 0), \
-('PBC-FM-101-1010', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www1.radio.gov.pk/fm', 'PBC-FM-101-1010.png', 0, 0, 0, 1, '2011-11-11', 7364, 0, '2017-01-01 00:00:00', 0), \
-('IPad-Today', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'IPad-Today.png', 0, 0, 0, 1, '2011-11-11', 7365, 0, '2017-01-01 00:00:00', 0), \
-('David-Axelrod', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'David-Axelrod.png', 0, 0, 0, 1, '2011-11-11', 7366, 0, '2017-01-01 00:00:00', 0), \
-('Best-Dance-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.bestdance.co.cc/', 'Best-Dance-Radio.png', 0, 0, 0, 1, '2011-11-11', 7367, 0, '2017-01-01 00:00:00', 0), \
-('WTLC-FM-1067', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wtlc.com/', 'WTLC-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 7368, 0, '2017-01-01 00:00:00', 0), \
-('SuperTalk-930', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'SuperTalk-930.png', 0, 0, 0, 1, '2011-11-11', 7369, 0, '2017-01-01 00:00:00', 0), \
-('Ulita-Knaus', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ulita-Knaus.png', 0, 0, 0, 1, '2011-11-11', 7370, 0, '2017-01-01 00:00:00', 0), \
-('SomaFM-Underground-80s', 'Only from SomaFM.com.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://somafm.com/u80s/', 'SomaFM-Underground-80s.png', 0, 0, 0, 1, '2011-11-11', 7371, 0, '2017-01-01 00:00:00', 0), \
-('KFMJ-999', 'KFMJ 99.9 FM - Alaska&#39;s Home of Good-Time Rock &#39;n Roll Oldies. Streaming live audio 24 hours a day.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kfmj.com/', 'KFMJ-999.png', 0, 0, 0, 1, '2011-11-11', 7372, 0, '2017-01-01 00:00:00', 0), \
-('KCMC-740', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kcmc740.com/', 'KCMC-740.png', 0, 0, 0, 1, '2011-11-11', 7373, 0, '2017-01-01 00:00:00', 0), \
-('eFA-Radio', 'eFA League&#39;s own radio station broadcasting games live as well as the UK Top 40 Singles each week.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.electronicFA.com', 'eFA-Radio.png', 0, 0, 0, 1, '2011-11-11', 7374, 0, '2017-01-01 00:00:00', 0), \
-('WTYE-1017', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wtyefm.com', 'WTYE-1017.png', 0, 0, 0, 1, '2011-11-11', 7375, 0, '2017-01-01 00:00:00', 0), \
-('Scrum-V', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Scrum-V.png', 0, 0, 0, 1, '2011-11-11', 7376, 0, '2017-01-01 00:00:00', 0), \
-('NetRadioShow', 'THE ROCK STATION! NetRadioShow WARNING EXPLICIT LANGUAGE!! New and Classic Rock Hitz Live From Toronto Canada!!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'NetRadioShow.png', 0, 0, 0, 1, '2011-11-11', 7377, 0, '2017-01-01 00:00:00', 0), \
-('Sports-Radio-1440', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thebigjab.com/', 'Sports-Radio-1440.png', 0, 0, 0, 1, '2011-11-11', 7378, 0, '2017-01-01 00:00:00', 0), \
-('SKYFM-Indie-Rock', 'Indie, Alternative, and Underground Rock!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sky.fm/indierock', 'SKYFM-Indie-Rock.png', 0, 0, 0, 1, '2011-11-11', 7379, 0, '2017-01-01 00:00:00', 0), \
-('The-V-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-V-Show.png', 0, 0, 0, 1, '2011-11-11', 7380, 0, '2017-01-01 00:00:00', 0), \
-('K100-999', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.k100country.com/', 'K100-999.png', 0, 0, 0, 1, '2011-11-11', 7381, 0, '2017-01-01 00:00:00', 0), \
-('Steve-Holy', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Steve-Holy.png', 0, 0, 0, 1, '2011-11-11', 7382, 0, '2017-01-01 00:00:00', 0), \
-('Fly-921', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.fly921.com/', 'Fly-921.png', 0, 0, 0, 1, '2011-11-11', 7383, 0, '2017-01-01 00:00:00', 0), \
-('Sports-Radio-1310', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1310bigwise.com/', 'Sports-Radio-1310.png', 0, 0, 0, 1, '2011-11-11', 7384, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Sex-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiosexfm.ru/', 'Radio-Sex-FM.png', 0, 0, 0, 1, '2011-11-11', 7385, 0, '2017-01-01 00:00:00', 0), \
-('CIBL-1015-Radio-Montral', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.cibl1015.com/', '', 0, 0, 0, 1, '2011-11-11', 7386, 0, '2017-01-01 00:00:00', 0), \
-('Daylights-for-the-Birds', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Daylights-for-the-Birds.png', 0, 0, 0, 1, '2011-11-11', 7387, 0, '2017-01-01 00:00:00', 0), \
-('The-Mighty-1630', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1630kcjj.com/', 'The-Mighty-1630.png', 0, 0, 0, 1, '2011-11-11', 7388, 0, '2017-01-01 00:00:00', 0), \
-('WKBN-570', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.570wkbn.com/', 'WKBN-570.png', 0, 0, 0, 1, '2011-11-11', 7389, 0, '2017-01-01 00:00:00', 0), \
-('WUKY-913', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wuky.org/', 'WUKY-913.png', 0, 0, 0, 1, '2011-11-11', 7390, 0, '2017-01-01 00:00:00', 0), \
-('The-Beat-1037', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thebeat1037.com/', 'The-Beat-1037.png', 0, 0, 0, 1, '2011-11-11', 7391, 0, '2017-01-01 00:00:00', 0), \
-('ABC-David-Guetta', 'ABC David Guetta offre une programmation musicale de tendance &#233;lectro bien s&#251;re ! House, dance et electronica se m&#234;lent pour une ambiance club garantie !', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'ABC-David-Guetta.png', 0, 0, 0, 1, '2011-11-11', 7392, 0, '2017-01-01 00:00:00', 0), \
-('Marcy-Playground', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Marcy-Playground.png', 0, 0, 0, 1, '2011-11-11', 7393, 0, '2017-01-01 00:00:00', 0), \
-('Fuel-Radio', 'Fuel radio rocks 24/7 with the best in Christian indie, hardcore, metalcore, screamo, thrash and death metal as well as modern hard rock.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.fuelradio.fm', 'Fuel-Radio.png', 0, 0, 0, 1, '2011-11-11', 7394, 0, '2017-01-01 00:00:00', 0), \
-('Swiss-Dance-Nation', 'Swiss Dance Nation ist das interaktive Dance Radio der Schweiz!<BR>Bei uns h&#246;rst du nicht einfach nur Radio - bei uns bist du gleich Musikchef. In unserem Musikarchiv findest du eine riesige, imm', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.swissdancenation.ch/', 'Swiss-Dance-Nation.png', 0, 0, 0, 1, '2011-11-11', 7395, 0, '2017-01-01 00:00:00', 0), \
-('Fox-Sports-Radio-1340', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wsbm.com/', 'Fox-Sports-Radio-1340.png', 0, 0, 0, 1, '2011-11-11', 7396, 0, '2017-01-01 00:00:00', 0), \
-('Saving-Abel', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Saving-Abel.png', 0, 0, 0, 1, '2011-11-11', 7397, 0, '2017-01-01 00:00:00', 0), \
-('Thunder', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Thunder.png', 0, 0, 0, 1, '2011-11-11', 7398, 0, '2017-01-01 00:00:00', 0), \
-('WCRC-957', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wcrc957.com/', 'WCRC-957.png', 0, 0, 0, 1, '2011-11-11', 7399, 0, '2017-01-01 00:00:00', 0), \
-('5-live-Baseball', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '5-live-Baseball.png', 0, 0, 1, 1, '2011-11-11', 7400, 0, '2011-10-14 15:55:36', 0), \
-('Toto', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Toto.png', 0, 0, 0, 1, '2011-11-11', 7401, 0, '2017-01-01 00:00:00', 0), \
-('Naestved-Naerradio-1045', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.nnradio.dk/', 'Naestved-Naerradio-1045.png', 0, 0, 0, 1, '2011-11-11', 7402, 0, '2017-01-01 00:00:00', 0), \
-('WJMO-1300', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://praisecleveland.com/', 'WJMO-1300.png', 0, 0, 0, 1, '2011-11-11', 7403, 0, '2017-01-01 00:00:00', 0), \
-('WCON-1450', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wconfm.com/', 'WCON-1450.png', 0, 0, 0, 1, '2011-11-11', 7404, 0, '2017-01-01 00:00:00', 0), \
-('Soca-Nation-2', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.socanation.com/', 'Soca-Nation-2.png', 0, 0, 0, 1, '2011-11-11', 7406, 0, '2017-01-01 00:00:00', 0), \
-('Semisonic', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Semisonic.png', 0, 0, 0, 1, '2011-11-11', 7407, 0, '2017-01-01 00:00:00', 0), \
-('VirtualDJ-Radio-Urban-(Ch-2-The-Grind)', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://radio.virtualdj.com/live2/', 'VirtualDJ-Radio-Urban-(Ch-2-The-Grind).png', 0, 0, 0, 1, '2011-11-11', 7408, 0, '2017-01-01 00:00:00', 0), \
-('guia-Dourada-FM-875', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.aguiadouradafm.com.br/', 'guia-Dourada-FM-875.png', 0, 0, 0, 1, '2011-11-11', 7409, 0, '2017-01-01 00:00:00', 0), \
-('The-Pledge-1260', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1260ThePledge.com/', 'The-Pledge-1260.png', 0, 0, 0, 1, '2011-11-11', 7410, 0, '2017-01-01 00:00:00', 0), \
-('DI-Hardcore', 'DJ mixes, hard dance and NuNRG', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.di.fm/hardcore', 'DI-Hardcore.png', 0, 0, 0, 1, '2011-11-11', 7411, 0, '2017-01-01 00:00:00', 0), \
-('Twin-Sister', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Twin-Sister.png', 0, 0, 0, 1, '2011-11-11', 7412, 0, '2017-01-01 00:00:00', 0), \
-('939-MIA', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.939mia.com/', '939-MIA.png', 0, 0, 0, 1, '2011-11-11', 7413, 0, '2017-01-01 00:00:00', 0), \
-('The-Jim-Rome-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Jim-Rome-Show.png', 0, 0, 0, 1, '2011-11-11', 7414, 0, '2017-01-01 00:00:00', 0), \
-('GotRadio-Soft-Rock-n-Classic-Hits', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.gotradio.com/', 'GotRadio-Soft-Rock-n-Classic-Hits.png', 0, 0, 0, 1, '2011-11-11', 7415, 0, '2017-01-01 00:00:00', 0), \
-('New-Life-Church-of-God', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'New-Life-Church-of-God.png', 0, 0, 0, 1, '2011-11-11', 7416, 0, '2017-01-01 00:00:00', 0), \
-('The-Heat-1009', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.theheat1009.com/', 'The-Heat-1009.png', 0, 0, 0, 1, '2011-11-11', 7417, 0, '2017-01-01 00:00:00', 0), \
-('101ru---Lullaby', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.101.ru/', '101ru---Lullaby.png', 0, 0, 0, 1, '2011-11-11', 7418, 0, '2017-01-01 00:00:00', 0), \
-('Jammin-1077', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.jammin1077.com/', 'Jammin-1077.png', 0, 0, 0, 1, '2011-11-11', 7419, 0, '2017-01-01 00:00:00', 0), \
-('The-River-961', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.961theriver.com/', 'The-River-961.png', 0, 0, 0, 1, '2011-11-11', 7420, 0, '2017-01-01 00:00:00', 0), \
-('Triple-J-with-The-Doctor', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Triple-J-with-The-Doctor.png', 0, 0, 0, 1, '2011-11-11', 7421, 0, '2017-01-01 00:00:00', 0), \
-('The-Pathways', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Pathways.png', 0, 0, 0, 1, '2011-11-11', 7422, 0, '2017-01-01 00:00:00', 0), \
-('Hold-Ya-Horses', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Hold-Ya-Horses.png', 0, 0, 0, 1, '2011-11-11', 7423, 0, '2017-01-01 00:00:00', 0), \
-('KVCL-FM-921', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KVCL-FM-921.png', 0, 0, 0, 1, '2011-11-11', 7424, 0, '2017-01-01 00:00:00', 0), \
-('Keith-Urban', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Keith-Urban.png', 0, 0, 0, 1, '2011-11-11', 7425, 0, '2017-01-01 00:00:00', 0), \
-('iDance-Techno-fm', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://idanceradio.fm/', 'iDance-Techno-fm.png', 0, 0, 0, 1, '2011-11-11', 7426, 0, '2017-01-01 00:00:00', 0), \
-('The-Platters', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Platters.png', 0, 0, 0, 1, '2011-11-11', 7427, 0, '2017-01-01 00:00:00', 0), \
-('Greg-Piccolo', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Greg-Piccolo.png', 0, 0, 0, 1, '2011-11-11', 7428, 0, '2017-01-01 00:00:00', 0), \
-('Dierks-Bentley', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dierks-Bentley.png', 0, 0, 0, 1, '2011-11-11', 7429, 0, '2017-01-01 00:00:00', 0), \
-('Distortion-Radio', 'Distortion Radio broadcasts the best in alternative, rock, punk, and metal live and commercial-free 24/7. We are listener-supported and fully dedicated to promoting independent and unsigned artists. C', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.distortionradio.com/', 'Distortion-Radio.png', 0, 0, 0, 1, '2011-11-11', 7430, 0, '2017-01-01 00:00:00', 0), \
-('Raphael-Saadiq', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Raphael-Saadiq.png', 0, 0, 0, 1, '2011-11-11', 7431, 0, '2017-01-01 00:00:00', 0), \
-('Rare-Earth', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Rare-Earth.png', 0, 0, 0, 1, '2011-11-11', 7432, 0, '2017-01-01 00:00:00', 0), \
-('Tuck--Patti', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Tuck--Patti.png', 0, 0, 0, 1, '2011-11-11', 7433, 0, '2017-01-01 00:00:00', 0), \
-('Hank-Williams-Jr', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Hank-Williams-Jr.png', 0, 0, 0, 1, '2011-11-11', 7434, 0, '2017-01-01 00:00:00', 0), \
-('Grizzly-Bear', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Grizzly-Bear.png', 0, 0, 0, 1, '2011-11-11', 7435, 0, '2017-01-01 00:00:00', 0), \
-('SKYFM-Oldies', 'Three decades of great oldies on www.sky.fm', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sky.fm/oldies', 'SKYFM-Oldies.png', 0, 0, 0, 1, '2011-11-11', 7436, 0, '2017-01-01 00:00:00', 0), \
-('CBN-(Rio-de-Janeiro)-860', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://cbn.globoradio.globo.com/home/HOME.htm', '', 0, 0, 0, 1, '2011-11-11', 7437, 0, '2017-01-01 00:00:00', 0), \
-('Randy-Newman', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Randy-Newman.png', 0, 0, 0, 1, '2011-11-11', 7438, 0, '2017-01-01 00:00:00', 0), \
-('Acoustic-Cafe', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Acoustic-Cafe.png', 0, 0, 0, 1, '2011-11-11', 7439, 0, '2017-01-01 00:00:00', 0), \
-('The-Fan-1001', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thefanfm.com/', 'The-Fan-1001.png', 0, 0, 0, 1, '2011-11-11', 7440, 0, '2017-01-01 00:00:00', 0), \
-('Day-of-Fire', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Day-of-Fire.png', 0, 0, 1, 1, '2011-11-11', 7441, 0, '2011-10-17 23:43:09', 0), \
-('1Dance-FM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1dance.fm/', '1Dance-FM.png', 0, 0, 0, 1, '2011-11-11', 7442, 0, '2017-01-01 00:00:00', 0), \
-('The-Weekend-Sports-Breakfast', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Weekend-Sports-Breakfast.png', 0, 0, 0, 1, '2011-11-11', 7443, 0, '2017-01-01 00:00:00', 0), \
-('Reading', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Reading.png', 0, 0, 0, 1, '2011-11-11', 7444, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Catedral-FM-1067', 'A Miss&#227;o da R&#225;dio Catedral &#233; informar, educar, comunicar, integrar e evangelizar, despertando cada vez mais ouvintes (cat&#243;licos ou n&#227;o) para uma rela&#231;&#227;o &#237;ntima ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiocatedral.org.br/', 'Radio-Catedral-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 7445, 0, '2017-01-01 00:00:00', 0), \
-('The-Slackers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Slackers.png', 0, 0, 0, 1, '2011-11-11', 7446, 0, '2017-01-01 00:00:00', 0), \
-('MAJIC-1023', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://mymajicdc.com/', 'MAJIC-1023.png', 0, 0, 0, 1, '2011-11-11', 7447, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-943', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.oldies943fm.com/', 'Oldies-943.png', 0, 0, 0, 1, '2011-11-11', 7448, 0, '2017-01-01 00:00:00', 0), \
-('ArmadaFM', 'Streaming in HD Digital - We Play All the Hits 24/7', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.armadafm.com/', 'ArmadaFM.png', 0, 0, 0, 1, '2011-11-11', 7449, 0, '2017-01-01 00:00:00', 0), \
-('All-Things-Legal', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'All-Things-Legal.png', 0, 0, 1, 1, '2011-11-11', 7450, 0, '2011-10-15 20:12:02', 0), \
-('K-Buck-1055', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1055kbuck.com/', 'K-Buck-1055.png', 0, 0, 0, 1, '2011-11-11', 7451, 0, '2017-01-01 00:00:00', 0), \
-('Mando-Diao', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Mando-Diao.png', 0, 0, 0, 1, '2011-11-11', 7452, 0, '2017-01-01 00:00:00', 0), \
-('WOW-FM-1025', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1025wowcountry.com/', 'WOW-FM-1025.png', 0, 0, 0, 1, '2011-11-11', 7453, 0, '2017-01-01 00:00:00', 0), \
-('Walts-Oldies-But-Goody-(WOBG)', 'Oldies,50&#39;s,60&#39;s,70&#39;s,Doo Wop,R&amp;B, Motown,Carolina Beach Music,', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.loudcaster.com/channels/315-walts-oldies-but-goody', 'Walts-Oldies-But-Goody-(WOBG).png', 0, 0, 0, 1, '2011-11-11', 7454, 0, '2017-01-01 00:00:00', 0), \
-('Pink-Floyd', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Pink-Floyd.png', 0, 0, 0, 1, '2011-11-11', 7455, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-941', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kodj.com/', 'Oldies-941.png', 0, 0, 0, 1, '2011-11-11', 7456, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Hoogland-885', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Radio-Hoogland-885.png', 0, 0, 0, 1, '2011-11-11', 7457, 0, '2017-01-01 00:00:00', 0), \
-('Upstate-New-Yorks-Best-Rock', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Upstate-New-Yorks-Best-Rock.png', 0, 0, 0, 1, '2011-11-11', 7458, 0, '2017-01-01 00:00:00', 0), \
-('Avril-Lavigne', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Avril-Lavigne.png', 0, 0, 0, 1, '2011-11-11', 7459, 0, '2017-01-01 00:00:00', 0), \
-('Fox-Sports-Radio-AM-1370', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.foxsportschattanooga.com/', 'Fox-Sports-Radio-AM-1370.png', 0, 0, 0, 1, '2011-11-11', 7460, 0, '2017-01-01 00:00:00', 0), \
-('Los-Tigres-del-Norte', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Los-Tigres-del-Norte.png', 0, 0, 0, 1, '2011-11-11', 7461, 0, '2017-01-01 00:00:00', 0), \
-('KCOH-1430', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kcohradio.com/', 'KCOH-1430.png', 0, 0, 0, 1, '2011-11-11', 7462, 0, '2017-01-01 00:00:00', 0), \
-('Seven-Mary-Three', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Seven-Mary-Three.png', 0, 0, 0, 1, '2011-11-11', 7463, 0, '2017-01-01 00:00:00', 0), \
-('Jose-981', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.jose981.com/', 'Jose-981.png', 0, 0, 0, 1, '2011-11-11', 7464, 0, '2017-01-01 00:00:00', 0), \
-('The-Buzz-620', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espntriangle.com/', 'The-Buzz-620.png', 0, 0, 0, 1, '2011-11-11', 7465, 0, '2017-01-01 00:00:00', 0), \
-('DWIZ-882', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dwiz882.com/', 'DWIZ-882.png', 0, 0, 0, 1, '2011-11-11', 7466, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1130', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1130theoffice.com/', 'ESPN-1130.png', 0, 0, 0, 1, '2011-11-11', 7467, 0, '2017-01-01 00:00:00', 0), \
-('Natalie-Cole', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Natalie-Cole.png', 0, 0, 0, 1, '2011-11-11', 7468, 0, '2017-01-01 00:00:00', 0), \
-('The-Wake-Up-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Wake-Up-Show.png', 0, 0, 0, 1, '2011-11-11', 7469, 0, '2017-01-01 00:00:00', 0), \
-('XFM-London-1049', 'Xfm believes that our listeners want the best new music and they want to hear it first. From our specialist shows with expert presenters to exclusive sessions from the biggest and future stars to our ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.xfm.co.uk/london', 'XFM-London-1049.png', 0, 0, 0, 1, '2011-11-11', 7470, 0, '2017-01-01 00:00:00', 0), \
-('Weve-Only-Just-Begun', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Weve-Only-Just-Begun.png', 0, 0, 0, 1, '2011-11-11', 7471, 0, '2017-01-01 00:00:00', 0), \
-('The-Third-Man-In', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Third-Man-In.png', 0, 0, 0, 1, '2011-11-11', 7472, 0, '2017-01-01 00:00:00', 0), \
-('Omel-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.spiceislander.com/omel/', 'Omel-Radio.png', 0, 0, 0, 1, '2011-11-11', 7473, 0, '2017-01-01 00:00:00', 0), \
-('Stephen-Stills', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Stephen-Stills.png', 0, 0, 0, 1, '2011-11-11', 7474, 0, '2017-01-01 00:00:00', 0), \
-('Your-Country-935', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kbfc.com/', 'Your-Country-935.png', 0, 0, 0, 1, '2011-11-11', 7475, 0, '2017-01-01 00:00:00', 0), \
-('Zac-Brown-Band', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Zac-Brown-Band.png', 0, 0, 0, 1, '2011-11-11', 7476, 0, '2017-01-01 00:00:00', 0), \
-('On-the-way-forward', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'On-the-way-forward.png', 0, 0, 0, 1, '2011-11-11', 7477, 0, '2017-01-01 00:00:00', 0), \
-('WBEE-FM-925', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbee.com/', 'WBEE-FM-925.png', 0, 0, 0, 1, '2011-11-11', 7478, 0, '2017-01-01 00:00:00', 0), \
-('Future-Exchange', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Future-Exchange.png', 0, 0, 0, 1, '2011-11-11', 7479, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Sport-National-927', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sport927.com.au/', 'Radio-Sport-National-927.png', 0, 0, 0, 1, '2011-11-11', 7480, 0, '2017-01-01 00:00:00', 0), \
-('Converge', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Converge.png', 0, 0, 0, 1, '2011-11-11', 7481, 0, '2017-01-01 00:00:00', 0), \
-('High-Valley', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'High-Valley.png', 0, 0, 0, 1, '2011-11-11', 7482, 0, '2017-01-01 00:00:00', 0), \
-('Halsns-Retro', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Halsns-Retro.png', 0, 0, 0, 1, '2011-11-11', 7483, 0, '2017-01-01 00:00:00', 0), \
-('Plus-Morning', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Plus-Morning.png', 0, 0, 0, 1, '2011-11-11', 7484, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Vision-917', 'Radio Visi&#243;n es un medio de comunicaci&#243;n colectiva con un enfoque editorial, de opini&#243;n orientadora, sobre un amplio espectro de temas que van desde la pol&#237;tica, pasando por la vid', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiovision.com.ec/', 'Radio-Vision-917.png', 0, 0, 0, 1, '2011-11-11', 7485, 0, '2017-01-01 00:00:00', 0), \
-('Red-Zone-Media-Channel-9', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.redzonemedia.com', 'Red-Zone-Media-Channel-9.png', 0, 0, 0, 1, '2011-11-11', 7486, 0, '2017-01-01 00:00:00', 0), \
-('Alice-1059', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.alice1059.com/', 'Alice-1059.png', 0, 0, 1, 1, '2011-11-11', 7487, 0, '2011-10-15 20:11:27', 0), \
-('KMA-FM-991', 'Earl May started KMA 960 AM to help promote his seed and nursery business. KMA hit the ariwaves on August 12, 1925.<BR><BR>May built the station headquarters and Mayfair Auditorium (demolished in 1964', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kmaland.com/', 'KMA-FM-991.png', 0, 0, 0, 1, '2011-11-11', 7488, 0, '2017-01-01 00:00:00', 0), \
-('Lifestyles-Unlimited', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Lifestyles-Unlimited.png', 0, 0, 0, 1, '2011-11-11', 7489, 0, '2017-01-01 00:00:00', 0), \
-('The-Vodafone-Freebees-Big-Top-40', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Vodafone-Freebees-Big-Top-40.png', 0, 0, 0, 1, '2011-11-11', 7490, 0, '2017-01-01 00:00:00', 0), \
-('The-Voice-700', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ksevradio.com/', 'The-Voice-700.png', 0, 0, 0, 1, '2011-11-11', 7491, 0, '2017-01-01 00:00:00', 0), \
-('Radio-WDON', 'WDON is now on-air 24/7 playing a random selection of music. We hope shortly to have regular scheduled music shows presented by Dons fans to cater for different musical tastes. If you can regularly su', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wdon.com/', 'Radio-WDON.png', 0, 0, 0, 1, '2011-11-11', 7492, 0, '2017-01-01 00:00:00', 0), \
-('Byblos-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.byblosradio.com/', 'Byblos-Radio.png', 0, 0, 0, 1, '2011-11-11', 7493, 0, '2017-01-01 00:00:00', 0), \
-('Sunday-Morning-Celebration-with-Matt-Lisi', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sunday-Morning-Celebration-with-Matt-Lisi.png', 0, 0, 0, 1, '2011-11-11', 7494, 0, '2017-01-01 00:00:00', 0), \
-('Coal-Country-965', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wxccfm.com/', 'Coal-Country-965.png', 0, 0, 0, 1, '2011-11-11', 7495, 0, '2017-01-01 00:00:00', 0), \
-('KOKY-1021', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.koky.com/', 'KOKY-1021.png', 0, 0, 0, 1, '2011-11-11', 7496, 0, '2017-01-01 00:00:00', 0), \
-('Z100-1001', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.zchannelradio.com/', 'Z100-1001.png', 0, 0, 0, 1, '2011-11-11', 7497, 0, '2017-01-01 00:00:00', 0), \
-('Dr-Dre', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dr-Dre.png', 0, 0, 0, 1, '2011-11-11', 7498, 0, '2017-01-01 00:00:00', 0), \
-('WERQ-FM-923', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://92q.com/', 'WERQ-FM-923.png', 0, 0, 0, 1, '2011-11-11', 7499, 0, '2017-01-01 00:00:00', 0), \
-('Stevie-Nicks', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Stevie-Nicks.png', 0, 0, 0, 1, '2011-11-11', 7500, 0, '2017-01-01 00:00:00', 0), \
-('The-McCoys', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-McCoys.png', 0, 0, 0, 1, '2011-11-11', 7501, 0, '2017-01-01 00:00:00', 0), \
-('BJ-Thomas', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'BJ-Thomas.png', 0, 0, 0, 1, '2011-11-11', 7502, 0, '2017-01-01 00:00:00', 0), \
-('Elvis-vs-JXL', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Elvis-vs-JXL.png', 0, 0, 0, 1, '2011-11-11', 7503, 0, '2017-01-01 00:00:00', 0), \
-('The-Temper-Trap', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Temper-Trap.png', 0, 0, 0, 1, '2011-11-11', 7504, 0, '2017-01-01 00:00:00', 0), \
-('KJOY-983', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kjoy.com/', 'KJOY-983.png', 0, 0, 0, 1, '2011-11-11', 7505, 0, '2017-01-01 00:00:00', 0), \
-('Utah-Jazz-Play-by-Play', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Utah-Jazz-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 7506, 0, '2017-01-01 00:00:00', 0), \
-('US-995', 'US99.5, America&#39;s Country Station, is the exclusive country radio station in Chicago with an amazing 28 years of heritage. US99.5 is one of the most listened to country radio station in America!  ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.us99.com/', 'US-995.png', 0, 0, 0, 1, '2011-11-11', 7507, 0, '2017-01-01 00:00:00', 0), \
-('KEEL-710', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://710keel.com/', 'KEEL-710.png', 0, 0, 0, 1, '2011-11-11', 7508, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Showcase', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Gospel-Showcase.png', 0, 0, 0, 1, '2011-11-11', 7509, 0, '2017-01-01 00:00:00', 0), \
-('KPLY-630', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KPLY-630.png', 0, 0, 0, 1, '2011-11-11', 7510, 0, '2017-01-01 00:00:00', 0), \
-('Jazz-Beat', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jazz-Beat.png', 0, 0, 0, 1, '2011-11-11', 7511, 0, '2017-01-01 00:00:00', 0), \
-('Femi-Kuti', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Femi-Kuti.png', 0, 0, 0, 1, '2011-11-11', 7512, 0, '2017-01-01 00:00:00', 0), \
-('Michael-Bolton', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Michael-Bolton.png', 0, 0, 0, 1, '2011-11-11', 7513, 0, '2017-01-01 00:00:00', 0), \
-('Iris-DeMent', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Iris-DeMent.png', 0, 0, 0, 1, '2011-11-11', 7514, 0, '2017-01-01 00:00:00', 0), \
-('Radyo-Pop', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radyopop.com/', 'Radyo-Pop.png', 0, 0, 0, 1, '2011-11-11', 7515, 0, '2017-01-01 00:00:00', 0), \
-('One-FM-881', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.onefm.com.my/', 'One-FM-881.png', 0, 0, 0, 1, '2011-11-11', 7516, 0, '2017-01-01 00:00:00', 0), \
-('XHGTS-1073', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.digital1073.com/', 'XHGTS-1073.png', 0, 0, 0, 1, '2011-11-11', 7517, 0, '2017-01-01 00:00:00', 0), \
-('WKYK-940', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wkyk.com/', 'WKYK-940.png', 0, 0, 0, 1, '2011-11-11', 7518, 0, '2017-01-01 00:00:00', 0), \
-('GenX-1049', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.genx1049.com/', 'GenX-1049.png', 0, 0, 0, 1, '2011-11-11', 7519, 0, '2017-01-01 00:00:00', 0), \
-('Adrienne-Brooks', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Adrienne-Brooks.png', 0, 0, 0, 1, '2011-11-11', 7520, 0, '2017-01-01 00:00:00', 0), \
-('WYAB-1039', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wyab.com/', 'WYAB-1039.png', 0, 0, 0, 1, '2011-11-11', 7521, 0, '2017-01-01 00:00:00', 0), \
-('The-Like', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Like.png', 0, 0, 0, 1, '2011-11-11', 7522, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Fantasy-Focus-Baseball-Podcast', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'ESPN-Fantasy-Focus-Baseball-Podcast.png', 0, 0, 0, 1, '2011-11-11', 7523, 0, '2017-01-01 00:00:00', 0), \
-('Alternation-Rock-889', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rock889.org/', 'Alternation-Rock-889.png', 0, 0, 0, 1, '2011-11-11', 7524, 0, '2017-01-01 00:00:00', 0), \
-('Patti-LaBelle', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Patti-LaBelle.png', 0, 0, 0, 1, '2011-11-11', 7525, 0, '2017-01-01 00:00:00', 0), \
-('WRSW-1073', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wrsw.net/', 'WRSW-1073.png', 0, 0, 0, 1, '2011-11-11', 7526, 0, '2017-01-01 00:00:00', 0), \
-('The-Rembrandts', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Rembrandts.png', 0, 0, 0, 1, '2011-11-11', 7527, 0, '2017-01-01 00:00:00', 0), \
-('The-Sports-Animal-971', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sportsanimaltulsa.com/', 'The-Sports-Animal-971.png', 0, 0, 0, 1, '2011-11-11', 7528, 0, '2017-01-01 00:00:00', 0), \
-('Adam-Fendrich', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Adam-Fendrich.png', 0, 0, 0, 1, '2011-11-11', 7529, 0, '2017-01-01 00:00:00', 0), \
-('Classic-Rock-Lounge', 'advertising-free rock music &amp; live requests', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.classicrocklounge.com', 'Classic-Rock-Lounge.png', 0, 0, 0, 1, '2011-11-11', 7530, 0, '2017-01-01 00:00:00', 0), \
-('Ed-FM-1051', 'Serving southern Ontario and Western NY', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1051edfm.com', 'Ed-FM-1051.png', 0, 0, 0, 1, '2011-11-11', 7531, 0, '2017-01-01 00:00:00', 0), \
-('95X-957', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.waqx.com/', '95X-957.png', 0, 0, 0, 1, '2011-11-11', 7532, 0, '2017-01-01 00:00:00', 0), \
-('Eclectic-24', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Eclectic-24.png', 0, 0, 0, 1, '2011-11-11', 7533, 0, '2017-01-01 00:00:00', 0), \
-('WBIW-1340', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbiw.com/', 'WBIW-1340.png', 0, 0, 0, 1, '2011-11-11', 7534, 0, '2017-01-01 00:00:00', 0), \
-('KEST-1450', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kestradio.com/', 'KEST-1450.png', 0, 0, 0, 1, '2011-11-11', 7535, 0, '2017-01-01 00:00:00', 0), \
-('Depeche-Mode-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.depechemode.be/', 'Depeche-Mode-Radio.png', 0, 0, 0, 1, '2011-11-11', 7536, 0, '2017-01-01 00:00:00', 0), \
-('The-Ticket-790', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.790theticket.com/', 'The-Ticket-790.png', 0, 0, 0, 1, '2011-11-11', 7537, 0, '2017-01-01 00:00:00', 0);";
-
-
+('US-995', 'US99.5, America&#39;s Country Station, is the exclusive country radio station in Chicago with an amazing 28 years of heritage. US99.5 is one of the most listened to country radio station in America!  ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.us99.com/', 'US-995.png', 0, 0, 0, 1, '2011-11-11', 7507, 0, '2017-01-01 00:00:00', 0);";
 
 const char *radio_station_setupsql20="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('Nightrage', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Nightrage.png', 0, 0, 0, 1, '2011-11-11', 7538, 0, '2017-01-01 00:00:00', 0), \
-('Sarah-McLachlan', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sarah-McLachlan.png', 0, 0, 0, 1, '2011-11-11', 7539, 0, '2017-01-01 00:00:00', 0), \
-('AVRO-Steenen-Tijdperk-Fifties', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.avro.nl/web/webradio/', 'AVRO-Steenen-Tijdperk-Fifties.png', 0, 0, 1, 1, '2011-11-11', 7540, 0, '2011-10-14 16:01:26', 0), \
-('Q-935', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Q-935.png', 0, 0, 0, 1, '2011-11-11', 7541, 0, '2017-01-01 00:00:00', 0), \
-('Post-Rocking', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.postrocking.com/', 'Post-Rocking.png', 0, 0, 0, 1, '2011-11-11', 7542, 0, '2017-01-01 00:00:00', 0), \
-('WPRB-1033', 'WPRB is a commercial, non-profit radio station located in scenic Princeton, New Jersey. Operated by the students of Princeton University, WPRB offers the widest selection of music on the radio today; ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wprb.com/', 'WPRB-1033.png', 0, 0, 0, 1, '2011-11-11', 7543, 0, '2017-01-01 00:00:00', 0), \
-('KHMB-995', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.qliteradio.com/', 'KHMB-995.png', 0, 0, 0, 1, '2011-11-11', 7544, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Polskie---House-Progressive', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.polskastacja.pl/', 'Radio-Polskie---House-Progressive.png', 0, 0, 0, 1, '2011-11-11', 7545, 0, '2017-01-01 00:00:00', 0), \
-('The-Wolf-1049', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1049thewolf.com/', 'The-Wolf-1049.png', 0, 0, 0, 1, '2011-11-11', 7546, 0, '2017-01-01 00:00:00', 0), \
-('The-Connection', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Connection.png', 0, 0, 0, 1, '2011-11-11', 7547, 0, '2017-01-01 00:00:00', 0), \
-('Contemporary-Adult', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Contemporary-Adult.png', 0, 0, 0, 1, '2011-11-11', 7548, 0, '2017-01-01 00:00:00', 0), \
-('De-La-Soul', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'De-La-Soul.png', 0, 0, 0, 1, '2011-11-11', 7549, 0, '2017-01-01 00:00:00', 0), \
-('Steven-Curtis-Chapman', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Steven-Curtis-Chapman.png', 0, 0, 0, 1, '2011-11-11', 7550, 0, '2017-01-01 00:00:00', 0), \
-('Radio-eXtra', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioextra.net/', 'Radio-eXtra.png', 0, 0, 0, 1, '2011-11-11', 7551, 0, '2017-01-01 00:00:00', 0), \
-('Monolith-Deathcult-The', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Monolith-Deathcult-The.png', 0, 0, 0, 1, '2011-11-11', 7552, 0, '2017-01-01 00:00:00', 0), \
-('Don-Omar', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Don-Omar.png', 0, 0, 0, 1, '2011-11-11', 7553, 0, '2017-01-01 00:00:00', 0), \
-('Sacred-Music--Hymns', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sacred-Music--Hymns.png', 0, 0, 0, 1, '2011-11-11', 7554, 0, '2017-01-01 00:00:00', 0), \
-('Magic-973', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://magic973.com/', 'Magic-973.png', 0, 0, 0, 1, '2011-11-11', 7555, 0, '2017-01-01 00:00:00', 0), \
-('DASDING-908', 'DASDING - Das junge Programm f&#252;r Musik und Lifestyle vom SWR.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dasding.de/', 'DASDING-908.png', 0, 0, 0, 1, '2011-11-11', 7556, 0, '2017-01-01 00:00:00', 0), \
-('WPIAL---MSA-Sports-Scoreboard-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WPIAL---MSA-Sports-Scoreboard-Show.png', 0, 0, 0, 1, '2011-11-11', 7557, 0, '2017-01-01 00:00:00', 0), \
-('98-PXY-979', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.98pxy.com/', '98-PXY-979.png', 0, 0, 0, 1, '2011-11-11', 7558, 0, '2017-01-01 00:00:00', 0), \
-('Big-1059', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.big1059.com/', 'Big-1059.png', 0, 0, 0, 1, '2011-11-11', 7559, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Deluxe-with-John-Pizzarelli', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Radio-Deluxe-with-John-Pizzarelli.png', 0, 0, 0, 1, '2011-11-11', 7560, 0, '2017-01-01 00:00:00', 0), \
-('Bernie-Miklasz', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bernie-Miklasz.png', 0, 0, 0, 1, '2011-11-11', 7561, 0, '2017-01-01 00:00:00', 0), \
-('Always-80s', 'Always 80&#39;s, la webradio qui diffuse les ann&#233;es 80 en non stop .', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.always80s.net/', 'Always-80s.png', 0, 0, 0, 1, '2011-11-11', 7562, 0, '2017-01-01 00:00:00', 0), \
-('Common-Bond', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Common-Bond.png', 0, 0, 0, 1, '2011-11-11', 7563, 0, '2017-01-01 00:00:00', 0), \
-('Urquia-FM-975', 'Emissora Deportiva de Los Teques', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.urquiafm.net/', 'Urquia-FM-975.png', 0, 0, 0, 1, '2011-11-11', 7564, 0, '2017-01-01 00:00:00', 0), \
-('In-Fisherman-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'In-Fisherman-Radio.png', 0, 0, 0, 1, '2011-11-11', 7565, 0, '2017-01-01 00:00:00', 0), \
-('Delbert-McClinton', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Delbert-McClinton.png', 0, 0, 0, 1, '2011-11-11', 7566, 0, '2017-01-01 00:00:00', 0), \
-('WIL-FM-923', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wil92.com/', 'WIL-FM-923.png', 0, 0, 0, 1, '2011-11-11', 7567, 0, '2017-01-01 00:00:00', 0), \
-('KWHN-1320', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kwhn.com/', 'KWHN-1320.png', 0, 0, 0, 1, '2011-11-11', 7568, 0, '2017-01-01 00:00:00', 0), \
-('WAMY-1580', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.fm95radio.com/', 'WAMY-1580.png', 0, 0, 0, 1, '2011-11-11', 7569, 0, '2017-01-01 00:00:00', 0), \
-('Contact-with-the-truth', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Contact-with-the-truth.png', 0, 0, 0, 1, '2011-11-11', 7570, 0, '2017-01-01 00:00:00', 0), \
-('The-Rebel-953', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.953therebel.com/', 'The-Rebel-953.png', 0, 0, 0, 1, '2011-11-11', 7571, 0, '2017-01-01 00:00:00', 0), \
-('KZRK-1550', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KZRK-1550.png', 0, 0, 0, 1, '2011-11-11', 7572, 0, '2017-01-01 00:00:00', 0), \
-('Trevor-Hall', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Trevor-Hall.png', 0, 0, 0, 1, '2011-11-11', 7573, 0, '2017-01-01 00:00:00', 0), \
-('MAGIC-1053', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://magic1053.com/', 'MAGIC-1053.png', 0, 0, 0, 1, '2011-11-11', 7574, 0, '2017-01-01 00:00:00', 0), \
-('The-River-939', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wrsi.com/', 'The-River-939.png', 0, 0, 0, 1, '2011-11-11', 7575, 0, '2017-01-01 00:00:00', 0), \
-('Festive-Friday', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Festive-Friday.png', 0, 0, 0, 1, '2011-11-11', 7576, 0, '2017-01-01 00:00:00', 0), \
-('KRMG-740', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.krmg.com/', 'KRMG-740.png', 0, 0, 0, 1, '2011-11-11', 7577, 0, '2017-01-01 00:00:00', 0), \
-('Best-Of-Mike-and-Mike-In-The-Morning', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Best-Of-Mike-and-Mike-In-The-Morning.png', 0, 0, 0, 1, '2011-11-11', 7578, 0, '2017-01-01 00:00:00', 0), \
-('Woods', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Woods.png', 0, 0, 0, 1, '2011-11-11', 7579, 0, '2017-01-01 00:00:00', 0), \
-('Comedy-Pipe-Radio-Network', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.comedypipe.com/', 'Comedy-Pipe-Radio-Network.png', 0, 0, 0, 1, '2011-11-11', 7581, 0, '2017-01-01 00:00:00', 0), \
-('Jazz-in-the-City', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jazz-in-the-City.png', 0, 0, 0, 1, '2011-11-11', 7582, 0, '2017-01-01 00:00:00', 0), \
-('Talking-Cricket', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Talking-Cricket.png', 0, 0, 0, 1, '2011-11-11', 7583, 0, '2017-01-01 00:00:00', 0), \
-('The-Jayhawks', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Jayhawks.png', 0, 0, 0, 1, '2011-11-11', 7584, 0, '2017-01-01 00:00:00', 0), \
-('KDMA-1460', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KDMA-1460.png', 0, 0, 0, 1, '2011-11-11', 7585, 0, '2017-01-01 00:00:00', 0), \
-('STAR-1073', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'STAR-1073.png', 0, 0, 0, 1, '2011-11-11', 7586, 0, '2017-01-01 00:00:00', 0), \
-('Edwyn-Collins', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Edwyn-Collins.png', 0, 0, 0, 1, '2011-11-11', 7587, 0, '2017-01-01 00:00:00', 0), \
-('XTRA-Sports-910', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.xtra910.com/', 'XTRA-Sports-910.png', 0, 0, 0, 1, '2011-11-11', 7588, 0, '2017-01-01 00:00:00', 0), \
-('Smokin-Joe-Bacon', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Smokin-Joe-Bacon.png', 0, 0, 0, 1, '2011-11-11', 7589, 0, '2017-01-01 00:00:00', 0), \
-('Money-Talk', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Money-Talk.png', 0, 0, 0, 1, '2011-11-11', 7590, 0, '2017-01-01 00:00:00', 0), \
-('WNHT-963', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wild963.com/', 'WNHT-963.png', 0, 0, 0, 1, '2011-11-11', 7591, 0, '2017-01-01 00:00:00', 0), \
-('KREI-800', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mymoinfo.com/pages/4195005.php?', 'KREI-800.png', 0, 0, 0, 1, '2011-11-11', 7592, 0, '2017-01-01 00:00:00', 0), \
-('Inside-Golf', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Inside-Golf.png', 0, 0, 0, 1, '2011-11-11', 7593, 0, '2017-01-01 00:00:00', 0), \
-('Mickeys-Magic-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://magicalplace.fr/', 'Mickeys-Magic-Radio.png', 0, 0, 0, 1, '2011-11-11', 7594, 0, '2017-01-01 00:00:00', 0), \
-('Magic-1047', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.knek.com/', 'Magic-1047.png', 0, 0, 0, 1, '2011-11-11', 7595, 0, '2017-01-01 00:00:00', 0), \
-('WQIC-1001', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WQIC-1001.png', 0, 0, 0, 1, '2011-11-11', 7596, 0, '2017-01-01 00:00:00', 0), \
-('Modern-Music-and-More', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Modern-Music-and-More.png', 0, 0, 0, 1, '2011-11-11', 7597, 0, '2017-01-01 00:00:00', 0), \
-('Romantic-Radio', 'Ausschlie&#223;lich romantische und sanfte Kl&#228;nge, Kuschelmusik und die sch&#246;nsten Love Songs aller Zeiten, garantiert ohne Schlager und ohne Unterbrechung. Du bringst die Kerzen, wir sorgen ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hello-city.de/index.php?option=com_content&amp;view=article&amp;id=47:romantic-radio&amp;catid=25:das-projekt&amp;Itemid=37', 'Romantic-Radio.png', 0, 0, 0, 1, '2011-11-11', 7598, 0, '2017-01-01 00:00:00', 0), \
-('Lux-FM-1031', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.lux.fm/', 'Lux-FM-1031.png', 0, 0, 0, 1, '2011-11-11', 7599, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Dobre-Vibracije-989', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://dobrevibracije.dk/', 'Radio-Dobre-Vibracije-989.png', 0, 0, 0, 1, '2011-11-11', 7600, 0, '2017-01-01 00:00:00', 0), \
-('Nostalgie-60', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.nostalgie.be/', 'Nostalgie-60.png', 0, 0, 0, 1, '2011-11-11', 7601, 0, '2017-01-01 00:00:00', 0), \
-('Rock-101-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wroq.com/', 'Rock-101-1011.png', 0, 0, 0, 1, '2011-11-11', 7602, 0, '2017-01-01 00:00:00', 0), \
-('WTCA-1050', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.am1050.com/', 'WTCA-1050.png', 0, 0, 0, 1, '2011-11-11', 7603, 0, '2017-01-01 00:00:00', 0), \
-('Choice', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Choice.png', 0, 0, 0, 1, '2011-11-11', 7604, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1300', 'ESPN 1300 is a Sports, Talk radio station based in Baltimore, MD.  ESPN 1300 can be heard at radio.com', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espn1300.com/', 'ESPN-1300.png', 0, 0, 0, 1, '2011-11-11', 7605, 0, '2017-01-01 00:00:00', 0), \
-('Barnhart--Durham', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Barnhart--Durham.png', 0, 0, 0, 1, '2011-11-11', 7606, 0, '2017-01-01 00:00:00', 0), \
-('Spire-FM-1020', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.spirefm.co.uk/', 'Spire-FM-1020.png', 0, 0, 0, 1, '2011-11-11', 7607, 0, '2017-01-01 00:00:00', 0), \
-('The-Health-Wyze-Report', 'Investigative information about corruption in the medical industry, research into alternatives and forgotten methodologies, and the poor man&#39;s guide to health.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.healthwyze.org/', 'The-Health-Wyze-Report.png', 0, 0, 0, 1, '2011-11-11', 7608, 0, '2017-01-01 00:00:00', 0), \
-('WCAT-1390', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wcat1390.com/', 'WCAT-1390.png', 0, 0, 0, 1, '2011-11-11', 7609, 0, '2017-01-01 00:00:00', 0), \
-('The-Paul-Finebaum-Radio-Network', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Paul-Finebaum-Radio-Network.png', 0, 0, 0, 1, '2011-11-11', 7610, 0, '2017-01-01 00:00:00', 0), \
-('Boston-Bruins-Pre-Game-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Boston-Bruins-Pre-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 7611, 0, '2017-01-01 00:00:00', 0), \
-('913-SportFM', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sportfm.com.au/', '913-SportFM.png', 0, 0, 1, 1, '2011-11-11', 7612, 0, '2011-10-14 15:57:12', 0), \
-('KRCU-Indie', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.semo.edu/sepr/programming/local_elliotpotter.htm', 'KRCU-Indie.png', 0, 0, 0, 1, '2011-11-11', 7613, 0, '2017-01-01 00:00:00', 0), \
-('QYX-931', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.qyxfm.com/', 'QYX-931.png', 0, 0, 0, 1, '2011-11-11', 7614, 0, '2017-01-01 00:00:00', 0), \
-('Sun-1031', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sun103.com/', 'Sun-1031.png', 0, 0, 0, 1, '2011-11-11', 7615, 0, '2017-01-01 00:00:00', 0), \
-('Nick-Colionne', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Nick-Colionne.png', 0, 0, 0, 1, '2011-11-11', 7616, 0, '2017-01-01 00:00:00', 0), \
-('GotRadio-Alternative-Rock', 'Fast, furious and forever alternative', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.gotradio.com/', 'GotRadio-Alternative-Rock.png', 0, 0, 0, 1, '2011-11-11', 7617, 0, '2017-01-01 00:00:00', 0), \
-('ROCK-ANTENNE-Classic-Perlen', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rockantenne.de/', 'ROCK-ANTENNE-Classic-Perlen.png', 0, 0, 0, 1, '2011-11-11', 7618, 0, '2017-01-01 00:00:00', 0), \
-('CNN-Radio-1450', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiowins.com/', 'CNN-Radio-1450.png', 0, 0, 0, 1, '2011-11-11', 7619, 0, '2017-01-01 00:00:00', 0), \
-('Word-of-Life-Weekend', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Word-of-Life-Weekend.png', 0, 0, 0, 1, '2011-11-11', 7620, 0, '2017-01-01 00:00:00', 0), \
-('Music-Plus-Pop-Rock', 'Radio web d&#233;di&#233;e &#224; votre musique pop/rock pr&#233;f&#233;r&#233;e. Que des tubes !', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.musicpluslaradio.com/', 'Music-Plus-Pop-Rock.png', 0, 0, 0, 1, '2011-11-11', 7621, 0, '2017-01-01 00:00:00', 0), \
-('K-Country-937', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.937kcountry.com/', 'K-Country-937.png', 0, 0, 0, 1, '2011-11-11', 7622, 0, '2017-01-01 00:00:00', 0), \
-('Liverpool-Revolution-Live', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Liverpool-Revolution-Live.png', 0, 0, 0, 1, '2011-11-11', 7623, 0, '2017-01-01 00:00:00', 0), \
-('Coroner', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Coroner.png', 0, 0, 0, 1, '2011-11-11', 7624, 0, '2017-01-01 00:00:00', 0), \
-('Live-105-1051', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.live105.ca/', 'Live-105-1051.png', 0, 0, 0, 1, '2011-11-11', 7625, 0, '2017-01-01 00:00:00', 0), \
-('ABC', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'ABC.png', 0, 0, 0, 1, '2011-11-11', 7626, 0, '2017-01-01 00:00:00', 0), \
-('rockXradio', 'rockxradio features some of the best Rock, Hard Rock and Metal music 24/7. Mostly commercial free, live radio shows and an automated request system. Hear bands like Metallica, Avenged Sevenfold and Di', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rockxradio.com/', 'rockXradio.png', 0, 0, 0, 1, '2011-11-11', 7627, 0, '2017-01-01 00:00:00', 0), \
-('NRJ-Energy-Stuttgart-1007', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.energy.de', 'NRJ-Energy-Stuttgart-1007.png', 0, 0, 0, 1, '2011-11-11', 7628, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Beatles', 'Les Beatles, rien que les Beatles !', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radionomy.com/en/radio/abc-beatles', 'ABC-Beatles.png', 0, 0, 0, 1, '2011-11-11', 7629, 0, '2017-01-01 00:00:00', 0), \
-('Cain-Memorial', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cain-Memorial.png', 0, 0, 0, 1, '2011-11-11', 7630, 0, '2017-01-01 00:00:00', 0), \
-('KNRY-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.knry.com/', 'KNRY-1240.png', 0, 0, 0, 1, '2011-11-11', 7631, 0, '2017-01-01 00:00:00', 0), \
-('J9-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.j9-radio.com/', 'J9-Radio.png', 0, 0, 0, 1, '2011-11-11', 7632, 0, '2017-01-01 00:00:00', 0), \
-('The-Doors', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Doors.png', 0, 0, 0, 1, '2011-11-11', 7633, 0, '2017-01-01 00:00:00', 0), \
-('KSON-973', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kson.com/', 'KSON-973.png', 0, 0, 0, 1, '2011-11-11', 7634, 0, '2017-01-01 00:00:00', 0), \
-('Sister-Hazel', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sister-Hazel.png', 0, 0, 0, 1, '2011-11-11', 7635, 0, '2017-01-01 00:00:00', 0), \
-('Maximize-Your-Money', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Maximize-Your-Money.png', 0, 0, 0, 1, '2011-11-11', 7636, 0, '2017-01-01 00:00:00', 0), \
-('Bernard-Fanning', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bernard-Fanning.png', 0, 0, 0, 1, '2011-11-11', 7637, 0, '2017-01-01 00:00:00', 0), \
-('True-Hip-Hop-FM', 'Der Name ist Programm, wir verstehen uns als Stimme der Basis:<BR>HipHop ist Weltsprache, keine schnelle Geldmache. Deshalb steht Qualit&#228;t statt Quantit&#228;t<BR>bei uns an oberster Stelle.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.truehiphopfm.de/', 'True-Hip-Hop-FM.png', 0, 0, 0, 1, '2011-11-11', 7638, 0, '2017-01-01 00:00:00', 0), \
-('Stick-to-Your-Guns', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Stick-to-Your-Guns.png', 0, 0, 0, 1, '2011-11-11', 7639, 0, '2017-01-01 00:00:00', 0), \
-('Warren-G', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Warren-G.png', 0, 0, 0, 1, '2011-11-11', 7640, 0, '2017-01-01 00:00:00', 0), \
-('America-on-the-Road', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'America-on-the-Road.png', 0, 0, 0, 1, '2011-11-11', 7641, 0, '2017-01-01 00:00:00', 0), \
-('Hymn-Time', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Hymn-Time.png', 0, 0, 0, 1, '2011-11-11', 7642, 0, '2017-01-01 00:00:00', 0), \
-('Modern-Music-and-More', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Modern-Music-and-More.png', 0, 0, 0, 1, '2011-11-11', 7643, 0, '2017-01-01 00:00:00', 0), \
-('Mbc-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.maccablog.com/', 'Mbc-Radio.png', 0, 0, 0, 1, '2011-11-11', 7644, 0, '2017-01-01 00:00:00', 0), \
-('News-Radio-1290', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wnbf.com/', 'News-Radio-1290.png', 0, 0, 0, 1, '2011-11-11', 7645, 0, '2017-01-01 00:00:00', 0), \
-('Dallas-Mavericks-Play-by-Play', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Dallas-Mavericks-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 7646, 0, '2017-01-01 00:00:00', 0), \
-('WFNR-FM-Regular-Programming', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WFNR-FM-Regular-Programming.png', 0, 0, 0, 1, '2011-11-11', 7647, 0, '2017-01-01 00:00:00', 0), \
-('Mix-1029', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mix1029.com/', 'Mix-1029.png', 0, 0, 0, 1, '2011-11-11', 7648, 0, '2017-01-01 00:00:00', 0), \
-('Sandra', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sandra.png', 0, 0, 0, 1, '2011-11-11', 7649, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Bop-60s', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://radiobop60s.com/', 'Radio-Bop-60s.png', 0, 0, 0, 1, '2011-11-11', 7650, 0, '2017-01-01 00:00:00', 0), \
-('The-Notorious-BIG', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Notorious-BIG.png', 0, 0, 0, 1, '2011-11-11', 7651, 0, '2017-01-01 00:00:00', 0), \
-('The-TEAM-1270', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wnls.com/', 'The-TEAM-1270.png', 0, 0, 0, 1, '2011-11-11', 7652, 0, '2017-01-01 00:00:00', 0), \
-('LinasJazz', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.linasjazz.net/', 'LinasJazz.png', 0, 0, 0, 1, '2011-11-11', 7653, 0, '2017-01-01 00:00:00', 0), \
-('Yo-La-Tengo', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Yo-La-Tengo.png', 0, 0, 0, 1, '2011-11-11', 7654, 0, '2017-01-01 00:00:00', 0), \
-('Rev-FM-927', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.927rev.com/', 'Rev-FM-927.png', 0, 0, 0, 1, '2011-11-11', 7655, 0, '2017-01-01 00:00:00', 0), \
-('WMCA-Ministry-Spotlight', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WMCA-Ministry-Spotlight.png', 0, 0, 0, 1, '2011-11-11', 7656, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-FM-1021', 'O projeto Kiss FM em S&#227;o Paulo, colocado no ar na freq&#252;&#234;ncia 102,1 MHz, em 13 de Julho de 2001, n&#227;o por acaso, Dia Mundial do Rock, se tornou sucesso sempre tocando o melhor do roc', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kissfm.com.br/', 'Kiss-FM-1021.png', 0, 0, 0, 1, '2011-11-11', 7657, 0, '2017-01-01 00:00:00', 0), \
-('Rock-1053', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rock1053.com/', 'Rock-1053.png', 0, 0, 0, 1, '2011-11-11', 7658, 0, '2017-01-01 00:00:00', 0), \
-('WFPK-919', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wfpk.org/', 'WFPK-919.png', 0, 0, 0, 1, '2011-11-11', 7659, 0, '2017-01-01 00:00:00', 0), \
-('WNOG-1270', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.925foxnews.com', 'WNOG-1270.png', 0, 0, 0, 1, '2011-11-11', 7661, 0, '2017-01-01 00:00:00', 0), \
-('After-the-Fire', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'After-the-Fire.png', 0, 0, 0, 1, '2011-11-11', 7662, 0, '2017-01-01 00:00:00', 0), \
-('WCBT-1230', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WCBT-1230.png', 0, 0, 0, 1, '2011-11-11', 7664, 0, '2017-01-01 00:00:00', 0), \
-('CFRN-1260', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.theteam1260.com/', 'CFRN-1260.png', 0, 0, 0, 1, '2011-11-11', 7665, 0, '2017-01-01 00:00:00', 0), \
-('Its-Prophecy-Time', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Its-Prophecy-Time.png', 0, 0, 0, 1, '2011-11-11', 7666, 0, '2017-01-01 00:00:00', 0), \
-('Bryan-Adams', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bryan-Adams.png', 0, 0, 0, 1, '2011-11-11', 7667, 0, '2017-01-01 00:00:00', 0), \
-('Silencer', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Silencer.png', 0, 0, 0, 1, '2011-11-11', 7668, 0, '2017-01-01 00:00:00', 0), \
-('Kate-Bush', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kate-Bush.png', 0, 0, 0, 1, '2011-11-11', 7669, 0, '2017-01-01 00:00:00', 0), \
-('Thunder-1045', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thunder1045.com/', 'Thunder-1045.png', 0, 0, 0, 1, '2011-11-11', 7670, 0, '2017-01-01 00:00:00', 0), \
-('WDAE-620', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.620wdae.com/', 'WDAE-620.png', 0, 0, 0, 1, '2011-11-11', 7671, 0, '2017-01-01 00:00:00', 0), \
-('The-Public-Square', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Public-Square.png', 0, 0, 0, 1, '2011-11-11', 7672, 0, '2017-01-01 00:00:00', 0), \
-('The-Pretenders', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Pretenders.png', 0, 0, 0, 1, '2011-11-11', 7673, 0, '2017-01-01 00:00:00', 0), \
-('Bill-Charlap', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bill-Charlap.png', 0, 0, 0, 1, '2011-11-11', 7674, 0, '2017-01-01 00:00:00', 0), \
-('Prambors-1022', 'Since 1971, Prambors as #1 radio in Indonesia for 15-24 youth segment, AB which exists to entertain and inspire young creative. The main strength of the radio is supported by online media, mobile (pho', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://pramborsfm.com/new/', 'Prambors-1022.png', 0, 0, 0, 1, '2011-11-11', 7675, 0, '2017-01-01 00:00:00', 0), \
-('KGON-923', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kgon.com/', 'KGON-923.png', 0, 0, 0, 1, '2011-11-11', 7676, 0, '2017-01-01 00:00:00', 0), \
-('Midnight-Oil', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Midnight-Oil.png', 0, 0, 0, 1, '2011-11-11', 7678, 0, '2017-01-01 00:00:00', 0), \
-('The-End-1079', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.endonline.com/', 'The-End-1079.png', 0, 0, 0, 1, '2011-11-11', 7679, 0, '2017-01-01 00:00:00', 0), \
-('Bleeding-Orange', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bleeding-Orange.png', 0, 0, 0, 1, '2011-11-11', 7680, 0, '2017-01-01 00:00:00', 0), \
-('Voice-of-Hope', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Voice-of-Hope.png', 0, 0, 0, 1, '2011-11-11', 7681, 0, '2017-01-01 00:00:00', 0), \
-('Nummer-1-Oldies', 'Klasse Musik zum Entspannen oder Mitsingen', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.laut.fm/nummer_1_oldies', 'Nummer-1-Oldies.png', 0, 0, 0, 1, '2011-11-11', 7683, 0, '2017-01-01 00:00:00', 0), \
-('Kevin-Eubanks', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Kevin-Eubanks.png', 0, 0, 0, 1, '2011-11-11', 7684, 0, '2017-01-01 00:00:00', 0), \
-('Thunder-945', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thunder945.com/', 'Thunder-945.png', 0, 0, 0, 1, '2011-11-11', 7685, 0, '2017-01-01 00:00:00', 0), \
-('Big-Organ-Trio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Big-Organ-Trio.png', 0, 0, 0, 1, '2011-11-11', 7686, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---60s-Hits', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.audiocream.com/', 'Audio-Cream---60s-Hits.png', 0, 0, 0, 1, '2011-11-11', 7687, 0, '2017-01-01 00:00:00', 0), \
-('KLPX-961', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.klpx.com/', 'KLPX-961.png', 0, 0, 0, 1, '2011-11-11', 7688, 0, '2017-01-01 00:00:00', 0), \
-('Janice-Long', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Janice-Long.png', 0, 0, 0, 1, '2011-11-11', 7689, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Fiesta', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Radio-Fiesta.png', 0, 0, 0, 1, '2011-11-11', 7690, 0, '2017-01-01 00:00:00', 0), \
-('WIGM-1490', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.k99wigm.com/', 'WIGM-1490.png', 0, 0, 0, 1, '2011-11-11', 7691, 0, '2017-01-01 00:00:00', 0), \
-('The-Jazz-Glide-Home', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Jazz-Glide-Home.png', 0, 0, 0, 1, '2011-11-11', 7692, 0, '2017-01-01 00:00:00', 0), \
-('WCIR-FM-1037', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.103cir.com/', 'WCIR-FM-1037.png', 0, 0, 0, 1, '2011-11-11', 7693, 0, '2017-01-01 00:00:00', 0), \
-('Coyote-Country-999', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thebig999coyotecountry.com/', 'Coyote-Country-999.png', 0, 0, 0, 1, '2011-11-11', 7694, 0, '2017-01-01 00:00:00', 0), \
-('Martina-McBride', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Martina-McBride.png', 0, 0, 0, 1, '2011-11-11', 7695, 0, '2017-01-01 00:00:00', 0), \
-('KABL', 'Great easy listening music from the Big Bands, Sinatra, Sammy and all your favorite stars of the 1940s, 1950s and 1960s.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://kabl.bayarearadio.org/', 'KABL.png', 0, 0, 0, 1, '2011-11-11', 7696, 0, '2017-01-01 00:00:00', 0), \
-('Heart-Dorset-1023', 'Heart 102.3 with Jules and Bunker at breakfast covers Bournemouth, Poole, Boscombe, Christchurch and Milford on Sea', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.heartdorset.co.uk/', 'Heart-Dorset-1023.png', 0, 0, 0, 1, '2011-11-11', 7697, 0, '2017-01-01 00:00:00', 0), \
-('POD', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'POD.png', 0, 0, 0, 1, '2011-11-11', 7698, 0, '2017-01-01 00:00:00', 0), \
-('INXS', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'INXS.png', 0, 0, 0, 1, '2011-11-11', 7699, 0, '2017-01-01 00:00:00', 0), \
-('Breakfast', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Breakfast.png', 0, 0, 0, 1, '2011-11-11', 7700, 0, '2017-01-01 00:00:00', 0), \
-('Weekly-Topic', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Weekly-Topic.png', 0, 0, 0, 1, '2011-11-11', 7701, 0, '2017-01-01 00:00:00', 0), \
-('Radio-RMF-Party', 'RMFOn.pl to kilkadziesiat tematycznych stacji radiowych, dedykowanych gatunkom, dekadom, krajom a nawet artystom. Wybierz radio internetowe i znajdz muzyke dla siebie.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.miastomuzyki.pl/', 'Radio-RMF-Party.png', 0, 0, 0, 1, '2011-11-11', 7702, 0, '2017-01-01 00:00:00', 0), \
-('WLOB-1310', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wlobradio.com/', 'WLOB-1310.png', 0, 0, 0, 1, '2011-11-11', 7704, 0, '2017-01-01 00:00:00', 0), \
-('Josh--Will', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Josh--Will.png', 0, 0, 0, 1, '2011-11-11', 7705, 0, '2017-01-01 00:00:00', 0), \
-('BBC-Radio-1-England-988', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.bbc.co.uk/radio1/', 'BBC-Radio-1-England-988.png', 0, 0, 0, 1, '2011-11-11', 7706, 0, '2017-01-01 00:00:00', 0), \
-('WWOZ-907', 'WWOZ 90.7 FM is the New Orleans Jazz and Heritage Station, a community radio station currently operating out of the French Market Corporation Offices in New Orleans, Louisiana. <BR><BR>We are a listen', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wwoz.org/', 'WWOZ-907.png', 0, 0, 0, 1, '2011-11-11', 7707, 0, '2017-01-01 00:00:00', 0), \
-('Sound-Lab', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sound-Lab.png', 0, 0, 0, 1, '2011-11-11', 7708, 0, '2017-01-01 00:00:00', 0), \
-('The-Rock-1069', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wccc.com/', 'The-Rock-1069.png', 0, 0, 0, 1, '2011-11-11', 7710, 0, '2017-01-01 00:00:00', 0), \
-('Nerdist-Writers-Panel-Podcast', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Nerdist-Writers-Panel-Podcast.png', 0, 0, 0, 1, '2011-11-11', 7711, 0, '2017-01-01 00:00:00', 0), \
-('G-105-1051', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.g105.com/', 'G-105-1051.png', 0, 0, 0, 1, '2011-11-11', 7712, 0, '2017-01-01 00:00:00', 0), \
-('Lite-975', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.lite975.com/', 'Lite-975.png', 0, 0, 0, 1, '2011-11-11', 7713, 0, '2017-01-01 00:00:00', 0), \
-('Rammstein', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Rammstein.png', 0, 0, 0, 1, '2011-11-11', 7714, 0, '2017-01-01 00:00:00', 0), \
-('Grace-Kelly', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Grace-Kelly.png', 0, 0, 0, 1, '2011-11-11', 7715, 0, '2017-01-01 00:00:00', 0), \
-('The-Spirit-1250', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wkdx.net/', 'The-Spirit-1250.png', 0, 0, 0, 1, '2011-11-11', 7716, 0, '2017-01-01 00:00:00', 0), \
-('Storytime-with-Uncle-Charlie', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Storytime-with-Uncle-Charlie.png', 0, 0, 0, 1, '2011-11-11', 7717, 0, '2017-01-01 00:00:00', 0), \
-('Jackson-Browne', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jackson-Browne.png', 0, 0, 0, 1, '2011-11-11', 7718, 0, '2017-01-01 00:00:00', 0), \
-('The-RIVER-995', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wrve.com/', 'The-RIVER-995.png', 0, 0, 0, 1, '2011-11-11', 7719, 0, '2017-01-01 00:00:00', 0), \
-('NewsRadio-1120-KMOX', 'KMOX has been St. Louis&#39; most listened to radio station for 40 years. KMOX is heard worldwide on 1120 AM, KMOX 1120 HD, and streaming on www.kmox.com. The KMOX website offers the very latest local', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://kmox.cbslocal.com/', 'NewsRadio-1120-KMOX.png', 0, 0, 0, 1, '2011-11-11', 7720, 0, '2017-01-01 00:00:00', 0), \
-('B-101-FM-1011', 'We are B101 and we play Barrie&#39;s Hit Music! We play Katy Perry, Enrique Iglesias, Rihanna, Britney Spears, Usher, Black Eyed Peas, Adam Lambert, Ke$ha, P!nk, Lady Gaga, Taylor Swift, Kelly Clarkso', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.b101fm.com/', 'B-101-FM-1011.png', 0, 0, 0, 1, '2011-11-11', 7721, 0, '2017-01-01 00:00:00', 0), \
-('WSPO-1390', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wsposports.com', 'WSPO-1390.png', 0, 0, 0, 1, '2011-11-11', 7722, 0, '2017-01-01 00:00:00', 0), \
-('East-Coast-Radio-940', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ecr.co.za/', 'East-Coast-Radio-940.png', 0, 0, 0, 1, '2011-11-11', 7723, 0, '2017-01-01 00:00:00', 0), \
-('65daysofstatic', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', '65daysofstatic.png', 0, 0, 0, 1, '2011-11-11', 7725, 0, '2017-01-01 00:00:00', 0), \
-('Innerpartysystem', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Innerpartysystem.png', 0, 0, 0, 1, '2011-11-11', 7726, 0, '2017-01-01 00:00:00', 0), \
-('ACDC', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'ACDC.png', 0, 0, 1, 1, '2011-11-11', 7727, 0, '2011-10-17 23:41:12', 0), \
-('Country-959', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wtwx.com/', 'Country-959.png', 0, 0, 0, 1, '2011-11-11', 7728, 0, '2017-01-01 00:00:00', 0), \
-('UC-TV', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.uctv.tv/', 'UC-TV.png', 0, 0, 0, 1, '2011-11-11', 7729, 0, '2017-01-01 00:00:00', 0), \
-('Blues-Club', '24h Rock &amp; Blues von Heavy bis Soft! Rocking The Blues &amp; Hot Guitars: Rock, Classic - Rock, Blues, Instrumentals!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.laut.fm/bluesclub', 'Blues-Club.png', 0, 0, 0, 1, '2011-11-11', 7730, 0, '2017-01-01 00:00:00', 0), \
-('Mike-FM-1017', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1017mikefm.com/', 'Mike-FM-1017.png', 0, 0, 0, 1, '2011-11-11', 7731, 0, '2017-01-01 00:00:00', 0), \
-('The-Sports-Brothers', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Sports-Brothers.png', 0, 0, 0, 1, '2011-11-11', 7732, 0, '2017-01-01 00:00:00', 0), \
-('Loose-Fur', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Loose-Fur.png', 0, 0, 0, 1, '2011-11-11', 7733, 0, '2017-01-01 00:00:00', 0), \
-('Word-in-Worship', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Word-in-Worship.png', 0, 0, 0, 1, '2011-11-11', 7734, 0, '2017-01-01 00:00:00', 0), \
-('Classic-Country-1630', 'CLASSIC COUNTRY 1630 is the place where fans go to hear the greatest Country Music of the past 50 years.  From Hank Williams and Patsy Cline to Tim McGraw and Shania Twain, your Country favorites are ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.classiccountry1630.org/', 'Classic-Country-1630.png', 0, 0, 0, 1, '2011-11-11', 7735, 0, '2017-01-01 00:00:00', 0), \
-('Fred-Hammond', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Fred-Hammond.png', 0, 0, 0, 1, '2011-11-11', 7736, 0, '2017-01-01 00:00:00', 0), \
-('KBUN-1450', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KBUN-1450.png', 0, 0, 0, 1, '2011-11-11', 7737, 0, '2017-01-01 00:00:00', 0), \
-('Lewis-Avenue-Baptist-Church', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Lewis-Avenue-Baptist-Church.png', 0, 0, 0, 1, '2011-11-11', 7738, 0, '2017-01-01 00:00:00', 0), \
-('Blah-Talk-Radio', 'Talk radio from Columbus, Ohio.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://blahtalkradio.com/', 'Blah-Talk-Radio.png', 0, 0, 0, 1, '2011-11-11', 7739, 0, '2017-01-01 00:00:00', 0), \
-('The-Eagle-1035', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://1035theeagle.com/', 'The-Eagle-1035.png', 0, 0, 0, 1, '2011-11-11', 7740, 0, '2017-01-01 00:00:00', 0), \
-('Bobby-Goldsboro', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bobby-Goldsboro.png', 0, 0, 0, 1, '2011-11-11', 7741, 0, '2017-01-01 00:00:00', 0), \
-('Latina-FM-986', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.reinalatinafm.com/', 'Latina-FM-986.png', 0, 0, 0, 1, '2011-11-11', 7742, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Tropical-North-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.abc.net.au/tropic/', 'ABC-Tropical-North-1011.png', 0, 0, 1, 1, '2011-11-11', 7743, 0, '2011-10-14 15:58:52', 0), \
-('The-Let-Out', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Let-Out.png', 0, 0, 0, 1, '2011-11-11', 7744, 0, '2017-01-01 00:00:00', 0), \
-('House-of-Blues-Radio-Hour', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'House-of-Blues-Radio-Hour.png', 0, 0, 0, 1, '2011-11-11', 7745, 0, '2017-01-01 00:00:00', 0), \
-('The-Radio-2-Arts-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Radio-2-Arts-Show.png', 0, 0, 0, 1, '2011-11-11', 7746, 0, '2017-01-01 00:00:00', 0), \
-('NHL-Play-by-Play', 'The puck drops every day on the world&#39;s fastest sport on the world&#39;s first hockey channel.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.xmradio.com/', 'NHL-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 7747, 0, '2017-01-01 00:00:00', 0), \
-('Macca-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.macca-central.com/maccaradio/', 'Macca-Radio.png', 0, 0, 0, 1, '2011-11-11', 7749, 0, '2017-01-01 00:00:00', 0), \
-('WNRA-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WNRA-1240.png', 0, 0, 0, 1, '2011-11-11', 7750, 0, '2017-01-01 00:00:00', 0), \
-('radio-ffn-1031', '&quot;Na denn...ffn!&quot; - der Radiosender sorgt mit den neusten Hits und seinen Comedy-Shows f&#252;r gute Laune.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ffn.de/', 'radio-ffn-1031.png', 0, 0, 0, 1, '2011-11-11', 7751, 0, '2017-01-01 00:00:00', 0), \
-('Star-947-947', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.star947tt.com', 'Star-947-947.png', 0, 0, 0, 1, '2011-11-11', 7752, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Hollandio---Noordoost-Brabant', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hollandio.nl', 'Radio-Hollandio---Noordoost-Brabant.png', 0, 0, 0, 1, '2011-11-11', 7753, 0, '2017-01-01 00:00:00', 0), \
-('Macabre', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Macabre.png', 0, 0, 0, 1, '2011-11-11', 7754, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Skive-1043', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radioskive.dk/', 'Radio-Skive-1043.png', 0, 0, 0, 1, '2011-11-11', 7755, 0, '2017-01-01 00:00:00', 0), \
-('Unshackled', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Unshackled.png', 0, 0, 0, 1, '2011-11-11', 7756, 0, '2017-01-01 00:00:00', 0), \
-('Jay-Z', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jay-Z.png', 0, 0, 0, 1, '2011-11-11', 7757, 0, '2017-01-01 00:00:00', 0), \
-('Harness-Racing-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Harness-Racing-Show.png', 0, 0, 0, 1, '2011-11-11', 7758, 0, '2017-01-01 00:00:00', 0), \
-('Happy-Hill-Church', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Happy-Hill-Church.png', 0, 0, 0, 1, '2011-11-11', 7759, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Dig-Music', 'The ABC&#39;s internet radio station. DiG has a continuous music stream for a diverse mix of great sounds - blues, soul, country, roots, world music, jazz, rock and more. The site also provides progra', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://abcdigmusic.net.au/', 'ABC-Dig-Music.png', 0, 0, 0, 1, '2011-11-11', 7760, 0, '2017-01-01 00:00:00', 0), \
-('Bozo-Criminal-Report', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bozo-Criminal-Report.png', 0, 0, 0, 1, '2011-11-11', 7761, 0, '2017-01-01 00:00:00', 0), \
-('Beach-House', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Beach-House.png', 0, 0, 0, 1, '2011-11-11', 7762, 0, '2017-01-01 00:00:00', 0), \
-('Sam-FM-983', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sam-FM-983.png', 0, 0, 0, 1, '2011-11-11', 7763, 0, '2017-01-01 00:00:00', 0), \
-('Algoa-FM-942', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.algoafm.co.za', 'Algoa-FM-942.png', 0, 0, 0, 1, '2011-11-11', 7764, 0, '2017-01-01 00:00:00', 0), \
-('DR Evergreen', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dr.dk/', 'DR-Evergreen.png', 0, 0, 1, 1, '2011-11-11', 7766, 0, '2011-10-14 16:08:14', 0), \
-('New-Politics', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'New-Politics.png', 0, 0, 0, 1, '2011-11-11', 7767, 0, '2017-01-01 00:00:00', 0), \
-('R-Kelly', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'R-Kelly.png', 0, 0, 0, 1, '2011-11-11', 7768, 0, '2017-01-01 00:00:00', 0), \
-('Cold-War-Kids', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cold-War-Kids.png', 0, 0, 0, 1, '2011-11-11', 7769, 0, '2017-01-01 00:00:00', 0), \
-('WBBQ-FM-1043', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wbbq.com/', 'WBBQ-FM-1043.png', 0, 0, 0, 1, '2011-11-11', 7770, 0, '2017-01-01 00:00:00', 0), \
-('Truth-for-Life', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Truth-for-Life.png', 0, 0, 0, 1, '2011-11-11', 7771, 0, '2017-01-01 00:00:00', 0), \
-('bigFM-895', 'Die angesagtesten Hits mit bigFM.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mybigfm.de/', 'bigFM-895.png', 0, 0, 0, 1, '2011-11-11', 7772, 0, '2017-01-01 00:00:00', 0), \
-('Vancouver-Canucks-Post-Game-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Vancouver-Canucks-Post-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 7773, 0, '2017-01-01 00:00:00', 0), \
-('Pure-X', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Pure-X.png', 0, 0, 0, 1, '2011-11-11', 7774, 0, '2017-01-01 00:00:00', 0), \
-('The-Safe-Money-Retirement-Show', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Safe-Money-Retirement-Show.png', 0, 0, 0, 1, '2011-11-11', 7775, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-1041', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://kiss1041fm.com/', 'Kiss-1041.png', 0, 0, 0, 1, '2011-11-11', 7776, 0, '2017-01-01 00:00:00', 0), \
 ('Dragonland-Radio-960', 'Das Dragonland-Radio sorgt mit der Partynight, dem Kaffeeklatsch, dem Spa&#223; am Mittag und anderen Sendungen f&#252;r Ihre musikalische Unterhaltung.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.dragonland-radio.de/', 'Dragonland-Radio-960.png', 0, 0, 0, 1, '2011-11-11', 7777, 0, '2017-01-01 00:00:00', 0), \
-('Graham-Norton', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Graham-Norton.png', 0, 0, 0, 1, '2011-11-11', 7778, 0, '2017-01-01 00:00:00', 0), \
-('R101-Anni-90', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.r101.it/', 'R101-Anni-90.png', 0, 0, 0, 1, '2011-11-11', 7779, 0, '2017-01-01 00:00:00', 0), \
 ('Patriotscom-Radio', 'Official online radio station of the New England Patriots, featuring shows such as PFW in Progress, The Pete Sheppard Show, Patriots Playbook, Patriots Monday, Patriots Friday, Fantasy Lowe Down, and ', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.patriots.com/', 'Patriotscom-Radio.png', 0, 0, 0, 1, '2011-11-11', 7780, 0, '2017-01-01 00:00:00', 0), \
-('Matt-Nathanson', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Matt-Nathanson.png', 0, 0, 0, 1, '2011-11-11', 7781, 0, '2017-01-01 00:00:00', 0), \
-('Community-Chronicle', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Community-Chronicle.png', 0, 0, 0, 1, '2011-11-11', 7782, 0, '2017-01-01 00:00:00', 0), \
-('WIZE-1340', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'WIZE-1340.png', 0, 0, 0, 1, '2011-11-11', 7783, 0, '2017-01-01 00:00:00', 0), \
-('WYVE-1280', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wyve.com/wyve.html', 'WYVE-1280.png', 0, 0, 0, 1, '2011-11-11', 7784, 0, '2017-01-01 00:00:00', 0), \
 ('Mietta', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Mietta.png', 0, 0, 0, 1, '2011-11-11', 7785, 0, '2017-01-01 00:00:00', 0);";
 
 
 const char *radio_station_setupsql21="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('The-Kills', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Kills.png', 0, 0, 0, 1, '2011-11-11', 7786, 0, '2017-01-01 00:00:00', 0), \
-('Florida-Roundtable', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Florida-Roundtable.png', 0, 0, 0, 1, '2011-11-11', 7787, 0, '2017-01-01 00:00:00', 0), \
-('Journey100-1007', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.journey100fm.com', 'Journey100-1007.png', 0, 0, 0, 1, '2011-11-11', 7788, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-1480', 'Great Oldies from the 50&#39;s &amp; 60&#39;s with fun personalities, Mike Huckabee 4 times a day and more!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.oldies1480.net', 'Oldies-1480.png', 0, 0, 0, 1, '2011-11-11', 7789, 0, '2017-01-01 00:00:00', 0), \
-('Wiz-Khalifa', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Wiz-Khalifa.png', 0, 0, 0, 1, '2011-11-11', 7790, 0, '2017-01-01 00:00:00', 0), \
-('Two-by-Faith-Ministries', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Two-by-Faith-Ministries.png', 0, 0, 0, 1, '2011-11-11', 7791, 0, '2017-01-01 00:00:00', 0), \
-('Power-Play', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Power-Play.png', 0, 0, 0, 1, '2011-11-11', 7792, 0, '2017-01-01 00:00:00', 0), \
-('Naer-Mataron', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Naer-Mataron.png', 0, 0, 0, 1, '2011-11-11', 7793, 0, '2017-01-01 00:00:00', 0), \
-('Pure-Pop-Hits', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.purepophits.com/', 'Pure-Pop-Hits.png', 0, 0, 0, 1, '2011-11-11', 7794, 0, '2017-01-01 00:00:00', 0), \
-('The-Jam', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Jam.png', 0, 0, 0, 1, '2011-11-11', 7795, 0, '2017-01-01 00:00:00', 0), \
 ('Soft-Rock-Radio', 'Musique rock douce et romantique diffus&#233;e en continu en direct de la r&#233;gion parisienne.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radionomy.com/en/radio/soft-rock', 'Soft-Rock-Radio.png', 0, 0, 0, 1, '2011-11-11', 7796, 0, '2017-01-01 00:00:00', 0), \
 ('SoFlo-Radio', 'SoFloRadio.Com is South Florida only talk station.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.sofloradio.com/', 'SoFlo-Radio.png', 0, 0, 0, 1, '2011-11-11', 7797, 0, '2017-01-01 00:00:00', 0), \
 ('Caribou', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Caribou.png', 0, 0, 0, 1, '2011-11-11', 7798, 0, '2017-01-01 00:00:00', 0), \
 ('Romantica-900am', 'Rom&#225;ntica 900am entertains and informs audiences with the best Spanish-language adult contemporary music playing today&#39;s top hits as well as popular music from the eighties and nineties', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://washington.holaciudad.com/contenidos/romantica900.html', 'Romantica-900am.png', 0, 0, 0, 1, '2011-11-11', 7799, 0, '2017-01-01 00:00:00', 0), \
-('Modern-Music-and-More', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Modern-Music-and-More.png', 0, 0, 0, 1, '2011-11-11', 7800, 0, '2017-01-01 00:00:00', 0), \
-('KRWZ-950', 'The oldies of the 50&#39;s and 60&#39;s', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.cruisinoldies950.com', 'KRWZ-950.png', 0, 0, 0, 1, '2011-11-11', 7802, 0, '2017-01-01 00:00:00', 0), \
-('Donald-Harrison', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Donald-Harrison.png', 0, 0, 0, 1, '2011-11-11', 7803, 0, '2017-01-01 00:00:00', 0), \
-('Tenpole-Tudor', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Tenpole-Tudor.png', 0, 0, 0, 1, '2011-11-11', 7805, 0, '2017-01-01 00:00:00', 0), \
-('Guy-Davis', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Guy-Davis.png', 0, 0, 0, 1, '2011-11-11', 7806, 0, '2017-01-01 00:00:00', 0), \
-('The-Wave-1059', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.lighthouseradio.com/kysj/', 'The-Wave-1059.png', 0, 0, 0, 1, '2011-11-11', 7807, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-FM-987', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.987kissfm.com/', 'Kiss-FM-987.png', 0, 0, 0, 1, '2011-11-11', 7808, 0, '2017-01-01 00:00:00', 0), \
-('Mix-1077', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wmmx.com/', 'Mix-1077.png', 0, 0, 0, 1, '2011-11-11', 7809, 0, '2017-01-01 00:00:00', 0), \
-('The-Journey', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Journey.png', 0, 0, 0, 1, '2011-11-11', 7810, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Sei-981', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.radiosei.it', 'Radio-Sei-981.png', 0, 0, 0, 1, '2011-11-11', 7811, 0, '2017-01-01 00:00:00', 0), \
-('Indie-Goes-To-Hollywood-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.indiegoestohollywood.com/', 'Indie-Goes-To-Hollywood-Radio.png', 0, 0, 0, 1, '2011-11-11', 7812, 0, '2017-01-01 00:00:00', 0), \
 ('1029-MGK', 'WMGK 102.9 FM is Philadelphia exclusive Classic Rock Station with a focus on 25-54 Adults balanced between male and female.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wmgk.com/', '1029-MGK.png', 0, 0, 0, 1, '2011-11-11', 7813, 0, '2017-01-01 00:00:00', 0), \
 ('Smooth-Vocals-on-JAZZRADIOcom', 'When only the best of vocal smooth jazz will do.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.jazzradio.com/', 'Smooth-Vocals-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 7814, 0, '2017-01-01 00:00:00', 0), \
 ('NME-Radio', 'NME Radio - the UK&#39;s national commercial new music station.<BR><BR>For the best Indie Alternatives both past and present with exclusive live sessions, interviews &amp; the latest music news.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.nme.com/radio', 'NME-Radio.png', 0, 0, 0, 1, '2011-11-11', 7815, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Southern-Queensland-747', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.abc.net.au/southqld/', 'ABC-Southern-Queensland-747.png', 0, 0, 1, 1, '2011-11-11', 7816, 0, '2011-10-14 15:58:46', 0), \
-('Food-For-Thought', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Food-For-Thought.png', 0, 0, 0, 1, '2011-11-11', 7817, 0, '2017-01-01 00:00:00', 0), \
-('Natalie-Imbruglia', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Natalie-Imbruglia.png', 0, 0, 0, 1, '2011-11-11', 7818, 0, '2017-01-01 00:00:00', 0), \
-('WVEK-FM-1027', 'Classic rock from the 70&#39;s and 80&#39;s.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.classichits1027.com', 'WVEK-FM-1027.png', 0, 0, 0, 1, '2011-11-11', 7819, 0, '2017-01-01 00:00:00', 0), \
-('The-Ticket-1290', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1290theticket.com/', 'The-Ticket-1290.png', 0, 0, 0, 1, '2011-11-11', 7820, 0, '2017-01-01 00:00:00', 0), \
-('KTIX-1240', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1240ktix.com/', 'KTIX-1240.png', 0, 0, 0, 1, '2011-11-11', 7821, 0, '2017-01-01 00:00:00', 0), \
-('Corinne-Bailey-Rae', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Corinne-Bailey-Rae.png', 0, 0, 0, 1, '2011-11-11', 7822, 0, '2017-01-01 00:00:00', 0), \
-('The-Walrus-FM-1057', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://walrusfm.com/', 'The-Walrus-FM-1057.png', 0, 0, 0, 1, '2011-11-11', 7823, 0, '2017-01-01 00:00:00', 0), \
-('Cookin-on-3-Burners', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cookin-on-3-Burners.png', 0, 0, 0, 1, '2011-11-11', 7824, 0, '2017-01-01 00:00:00', 0), \
-('Real-Country-965', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kbdn.com/', 'Real-Country-965.png', 0, 0, 0, 1, '2011-11-11', 7825, 0, '2017-01-01 00:00:00', 0), \
-('BBC-Radio-3-913', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.bbc.co.uk/radio3/', 'BBC-Radio-3-913.png', 0, 0, 0, 1, '2011-11-11', 7826, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-957', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.milwaukeeoldies.com', 'Oldies-957.png', 0, 0, 0, 1, '2011-11-11', 7827, 0, '2017-01-01 00:00:00', 0), \
-('Pheasant-Country-1037', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://hubcityradio.com/page/pc103', 'Pheasant-Country-1037.png', 0, 0, 0, 1, '2011-11-11', 7828, 0, '2017-01-01 00:00:00', 0), \
-('KISS', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'KISS.png', 0, 0, 0, 1, '2011-11-11', 7829, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Hawaii-850', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espnhawaii.com/', 'ESPN-Hawaii-850.png', 0, 0, 0, 1, '2011-11-11', 7831, 0, '2017-01-01 00:00:00', 0), \
-('Nelly', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Nelly.png', 0, 0, 0, 1, '2011-11-11', 7832, 0, '2017-01-01 00:00:00', 0), \
-('Hot-101-1011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hot101.com/', 'Hot-101-1011.png', 0, 0, 0, 1, '2011-11-11', 7833, 0, '2017-01-01 00:00:00', 0), \
-('Afterglow', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Afterglow.png', 0, 0, 0, 1, '2011-11-11', 7834, 0, '2017-01-01 00:00:00', 0), \
-('Celtica-Radio', 'From South Wales - Various output featuring an eclectic mix of new and unsigned music, specialist programmes and speech.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.celticaradio.com/', 'Celtica-Radio.png', 0, 0, 0, 1, '2011-11-11', 7835, 0, '2017-01-01 00:00:00', 0), \
-('Renato-Carosone', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Renato-Carosone.png', 0, 0, 0, 1, '2011-11-11', 7836, 0, '2017-01-01 00:00:00', 0), \
-('Clare-Teal', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Clare-Teal.png', 0, 0, 0, 1, '2011-11-11', 7837, 0, '2017-01-01 00:00:00', 0), \
-('Bruce-Springsteen--The-E-Street-Band', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bruce-Springsteen--The-E-Street-Band.png', 0, 0, 0, 1, '2011-11-11', 7838, 0, '2017-01-01 00:00:00', 0), \
-('Control-Mental-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.cmradio.com.ar/', 'Control-Mental-Radio.png', 0, 0, 0, 1, '2011-11-11', 7839, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-K-770', 'Radio K is the award-winning student-run radio station of the University of Minnesota, playing an eclectic variety of independent music both old and new.  <BR><BR>Radio K educates students, breaks gro', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://radiok.cce.umn.edu/', 'Radio-K-770.png', 0, 0, 0, 1, '2011-11-11', 7840, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Free-Lexington-881', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wrfl.fm/', 'Radio-Free-Lexington-881.png', 0, 0, 0, 1, '2011-11-11', 7841, 0, '2017-01-01 00:00:00', 0), \
-('The-Fox-1015', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.101thefox.com/', 'The-Fox-1015.png', 0, 0, 0, 1, '2011-11-11', 7842, 0, '2017-01-01 00:00:00', 0), \
-('100-HIT-radio', 'Todays top 100 hits on 100Hitradio. Super concentrated for an insatiable hunger for top hits !!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.100hitradio.net/', '100-HIT-radio.png', 0, 0, 1, 1, '2011-11-11', 7843, 0, '2011-10-18 18:35:49', 0), \
-('St-Louis-Rams-at-Green-Bay-Packers-Oct-16-2011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'St-Louis-Rams-at-Green-Bay-Packers-Oct-16-2011.png', 0, 0, 0, 1, '2011-11-11', 7844, 0, '2017-01-01 00:00:00', 0), \
-('Ryan-Adams', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Ryan-Adams.png', 0, 0, 0, 1, '2011-11-11', 7845, 0, '2017-01-01 00:00:00', 0), \
-('RTBF-Classic-21-80s', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rtbf.be/', 'RTBF-Classic-21-80s.png', 0, 0, 0, 1, '2011-11-11', 7846, 0, '2017-01-01 00:00:00', 0), \
-('Sheryl-Crow', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Sheryl-Crow.png', 0, 0, 0, 1, '2011-11-11', 7847, 0, '2017-01-01 00:00:00', 0), \
-('KRLD-NewsRadio-1080', 'KRLD NewsRadio is a News, Talk station based in Dalla, TX.  KRLD can be heard at radio.com', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.krld.com/', 'KRLD-NewsRadio-1080.png', 0, 0, 0, 1, '2011-11-11', 7848, 0, '2017-01-01 00:00:00', 0), \
-('Morricone-Youth-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Morricone-Youth-Radio.png', 0, 0, 0, 1, '2011-11-11', 7849, 0, '2017-01-01 00:00:00', 0), \
-('SPIN-1038-1038', 'SPIN 1038 is the Most Music Station with 10 SPIN Hits in a Row. We are always first for new music and the hottest giveaways in Dublin!<BR><BR>SPIN 1038 is the home of the No.1 drive-time show &#39;SPI', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.spin1038.com', 'SPIN-1038-1038.png', 0, 0, 0, 1, '2011-11-11', 7850, 0, '2017-01-01 00:00:00', 0), \
-('The-Gospel-Train', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Gospel-Train.png', 0, 0, 0, 1, '2011-11-11', 7851, 0, '2017-01-01 00:00:00', 0), \
-('Mix-961', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mix96wxym.com/', 'Mix-961.png', 0, 0, 0, 1, '2011-11-11', 7852, 0, '2017-01-01 00:00:00', 0), \
-('KOA-850', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.koaradio.com/', 'KOA-850.png', 0, 0, 0, 1, '2011-11-11', 7853, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Raukawa-906', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://raukawafm.co.nz/', 'Radio-Raukawa-906.png', 0, 0, 0, 1, '2011-11-11', 7854, 0, '2017-01-01 00:00:00', 0), \
-('Bobby-Brown', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Bobby-Brown.png', 0, 0, 0, 1, '2011-11-11', 7855, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Sonder-Grense-1015', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.rsg.co.za/', 'Radio-Sonder-Grense-1015.png', 0, 0, 0, 1, '2011-11-11', 7856, 0, '2017-01-01 00:00:00', 0), \
-('Cape-Fear-Sports-Report', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cape-Fear-Sports-Report.png', 0, 0, 0, 1, '2011-11-11', 7857, 0, '2017-01-01 00:00:00', 0), \
-('KUNC-915', 'KUNC is a community-licensed public radio station, operated by Community Radio for Northern Colorado, Inc., a 501 (c) 3, Colorado non-profit organization. CRNC came into existence in the winter of 200', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kunc.org/', 'KUNC-915.png', 0, 0, 0, 1, '2011-11-11', 7858, 0, '2017-01-01 00:00:00', 0), \
-('Cake', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cake.png', 0, 0, 0, 1, '2011-11-11', 7859, 0, '2017-01-01 00:00:00', 0), \
-('Jagged-Edge', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Jagged-Edge.png', 0, 0, 0, 1, '2011-11-11', 7860, 0, '2017-01-01 00:00:00', 0), \
-('The-Fox-1035', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thefox.com/', 'The-Fox-1035.png', 0, 0, 0, 1, '2011-11-11', 7861, 0, '2017-01-01 00:00:00', 0), \
-('Mix-941', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mix941.com/', 'Mix-941.png', 0, 0, 0, 1, '2011-11-11', 7862, 0, '2017-01-01 00:00:00', 0), \
-('No-Agenda', 'No Agenda, a podcast with Adam Curry and John C. Dvorak.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.noagendashow.com/', 'No-Agenda.png', 0, 0, 0, 1, '2011-11-11', 7863, 0, '2017-01-01 00:00:00', 0), \
-('The-Futureheads', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Futureheads.png', 0, 0, 0, 1, '2011-11-11', 7864, 0, '2017-01-01 00:00:00', 0), \
-('Rugby-606', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Rugby-606.png', 0, 0, 0, 1, '2011-11-11', 7865, 0, '2017-01-01 00:00:00', 0), \
-('Mix-1065-FM', 'Mix 106.5 FM is a Hot AC station based in Baltimore, MD.  Mix 106.5 FM can be heard at radio.com', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.mix1065.net', 'Mix-1065-FM.png', 0, 0, 0, 1, '2011-11-11', 7866, 0, '2017-01-01 00:00:00', 0), \
-('WTKA-1050', 'Sports Talk 1050 am WTKA is your home for Michigan Wolverines football, NASCAR, and Detroit Metro area sports talk and popular national sports talk from ESPN, Dan Patrick, Tony Bruno and JT The Brick.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.wtka.com/', 'WTKA-1050.png', 0, 0, 0, 1, '2011-11-11', 7867, 0, '2017-01-01 00:00:00', 0), \
-('Hard-Bop-on-JAZZRADIOcom', 'Serious head-bobbing charts from Art Blakey, Miles Davis, and more.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.jazzradio.com/', 'Hard-Bop-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 7868, 0, '2017-01-01 00:00:00', 0), \
-('Amazing-Ambient', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.amazingradio.co.uk/', 'Amazing-Ambient.png', 0, 0, 1, 1, '2011-11-11', 7869, 0, '2011-10-14 15:59:57', 0), \
-('Radio-RMF-RB', 'RMFOn.pl to kilkadziesiat tematycznych stacji radiowych, dedykowanych gatunkom, dekadom, krajom a nawet artystom. Wybierz radio internetowe i znajdz muzyke dla siebie.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.miastomuzyki.pl/', 'Radio-RMF-RB.png', 0, 0, 0, 1, '2011-11-11', 7870, 0, '2017-01-01 00:00:00', 0), \
-('1055-The-X-1055', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kqxx.net/', '1055-The-X-1055.png', 0, 0, 0, 1, '2011-11-11', 7871, 0, '2017-01-01 00:00:00', 0), \
-('Chicago-Blackhawks-Play-by-Play', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Chicago-Blackhawks-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 7872, 0, '2017-01-01 00:00:00', 0), \
-('RL-Burnside', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'RL-Burnside.png', 0, 0, 0, 1, '2011-11-11', 7873, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-101-1010', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.totalkiss.com/', 'Kiss-101-1010.png', 0, 0, 0, 1, '2011-11-11', 7875, 0, '2017-01-01 00:00:00', 0), \
-('B-955', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.b95.com/', 'B-955.png', 0, 0, 0, 1, '2011-11-11', 7876, 0, '2017-01-01 00:00:00', 0), \
-('KISS-FM-1067', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.1067kissfm.com/', 'KISS-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 7877, 0, '2017-01-01 00:00:00', 0), \
-('WJJH-967', 'WJJH (96.7 FM) is a radio station broadcasting a Classic rock format. Licensed to Ashland, Wisconsin, USA. The station is currently owned by Heartland Comm. License, LLC and features programing from A', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://wjjhfm.com/', 'WJJH-967.png', 0, 0, 0, 1, '2011-11-11', 7878, 0, '2017-01-01 00:00:00', 0), \
-('961-KXY', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kxy.com/', '961-KXY.png', 0, 0, 0, 1, '2011-11-11', 7879, 0, '2017-01-01 00:00:00', 0), \
-('Colts-Update-with-Bob-Lamey', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Colts-Update-with-Bob-Lamey.png', 0, 0, 0, 1, '2011-11-11', 7880, 0, '2017-01-01 00:00:00', 0), \
-('HBC-Radio-1287', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hbc.co.jp/radio/', 'HBC-Radio-1287.png', 0, 0, 0, 1, '2011-11-11', 7881, 0, '2017-01-01 00:00:00', 0), \
-('Stacey-Kent', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Stacey-Kent.png', 0, 0, 0, 1, '2011-11-11', 7882, 0, '2017-01-01 00:00:00', 0), \
-('Club-93', 'Von &quot;Abfahrt Records&quot; bis &quot;ZYX-Music&quot; - ein bunter Reigen der tanzbaren 90er. Einer Zeit, als Red Bull verboten und Rauchen in Discos noch erlaubt war... ;-)', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.laut.fm/club93', 'Club-93.png', 0, 0, 0, 1, '2011-11-11', 7883, 0, '2017-01-01 00:00:00', 0), \
-('Primitive-Radio-Gods', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Primitive-Radio-Gods.png', 0, 0, 0, 1, '2011-11-11', 7884, 0, '2017-01-01 00:00:00', 0), \
-('Shirley-Bassey', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Shirley-Bassey.png', 0, 0, 0, 1, '2011-11-11', 7885, 0, '2017-01-01 00:00:00', 0), \
-('The-Score-950', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://950thegame.com/', 'The-Score-950.png', 0, 0, 0, 1, '2011-11-11', 7886, 0, '2017-01-01 00:00:00', 0), \
-('KFQD-750', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.kfqd.com/', 'KFQD-750.png', 0, 0, 0, 1, '2011-11-11', 7887, 0, '2017-01-01 00:00:00', 0), \
-('WEKR-1240', 'ESPN.com provides comprehensive sports coverage.  Complete sports information including NFL, MLB, NBA, College Football, College Basketball scores and news.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://espn.go.com/', 'WEKR-1240.png', 0, 0, 0, 1, '2011-11-11', 7888, 0, '2017-01-01 00:00:00', 0), \
-('Tennessee-Sports-Radio-1180', '1180 Tennessee Sports Radio... Your source for sports!', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.espnradioknoxville.com/', 'Tennessee-Sports-Radio-1180.png', 0, 0, 0, 1, '2011-11-11', 7889, 0, '2017-01-01 00:00:00', 0), \
-('Cosmic-Gate', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cosmic-Gate.png', 0, 0, 0, 1, '2011-11-11', 7890, 0, '2017-01-01 00:00:00', 0), \
-('KHOP--95-1-951', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.khop.com/', 'KHOP--95-1-951.png', 0, 0, 0, 1, '2011-11-11', 7891, 0, '2017-01-01 00:00:00', 0), \
-('Live-9-Radio', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.live9.fr/', 'Live-9-Radio.png', 0, 0, 0, 1, '2011-11-11', 7892, 0, '2017-01-01 00:00:00', 0), \
-('The-Score-1079', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.thescore690.com/', 'The-Score-1079.png', 0, 0, 0, 1, '2011-11-11', 7893, 0, '2017-01-01 00:00:00', 0), \
-('Hot-1005', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hot1005.com/', 'Hot-1005.png', 0, 0, 0, 1, '2011-11-11', 7894, 0, '2017-01-01 00:00:00', 0), \
-('Free-Energy', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Free-Energy.png', 0, 0, 0, 1, '2011-11-11', 7895, 0, '2017-01-01 00:00:00', 0), \
-('Aaron-Lewis', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Aaron-Lewis.png', 0, 0, 0, 1, '2011-11-11', 7896, 0, '2017-01-01 00:00:00', 0), \
-('103Q-1033', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.my103q.com', '103Q-1033.png', 0, 0, 0, 1, '2011-11-11', 7897, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Nonsolosuoni', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.nonsolosuoni.it/', 'Radio-Nonsolosuoni.png', 0, 0, 0, 1, '2011-11-11', 7898, 0, '2017-01-01 00:00:00', 0), \
-('Folk-Alley-897', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.folkalley.com/', 'Folk-Alley-897.png', 0, 0, 0, 1, '2011-11-11', 7899, 0, '2017-01-01 00:00:00', 0), \
-('Aled-Jones-with-Good-Morning-Sunday', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Aled-Jones-with-Good-Morning-Sunday.png', 0, 0, 0, 1, '2011-11-11', 7900, 0, '2017-01-01 00:00:00', 0), \
-('Medi-1-996', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.medi1.com/', 'Medi-1-996.png', 0, 0, 0, 1, '2011-11-11', 7901, 0, '2017-01-01 00:00:00', 0), \
-('Montreal-Canadiens-Pre-Game', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Montreal-Canadiens-Pre-Game.png', 0, 0, 0, 1, '2011-11-11', 7902, 0, '2017-01-01 00:00:00', 0), \
-('San-Jose-Sharks-at-Boston-Bruins-Oct-22-2011', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'San-Jose-Sharks-at-Boston-Bruins-Oct-22-2011.png', 0, 0, 0, 1, '2011-11-11', 7903, 0, '2017-01-01 00:00:00', 0), \
-('The-Mix', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'The-Mix.png', 0, 0, 0, 1, '2011-11-11', 7904, 0, '2017-01-01 00:00:00', 0), \
-('Hit-Radio-N1-929', 'Wir spielen eure Lieblingshits.', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.hitradion1.de/', 'Hit-Radio-N1-929.png', 0, 0, 0, 1, '2011-11-11', 7905, 0, '2017-01-01 00:00:00', 0), \
-('John-Gibson', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'John-Gibson.png', 0, 0, 0, 1, '2011-11-11', 7906, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Pirata-999', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://pirata.biz/', 'Radio-Pirata-999.png', 0, 0, 0, 1, '2011-11-11', 7907, 0, '2017-01-01 00:00:00', 0), \
-('931-KTIK', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', 'http://www.ktik.com/', '931-KTIK.png', 0, 0, 0, 1, '2011-11-11', 7908, 0, '2017-01-01 00:00:00', 0), \
-('Cheap-Trick', '', 'http://www.soulfulbits.com/files/streaming/soulfulbits-radio.m3u', '', 'Cheap-Trick.png', 0, 0, 0, 1, '2011-11-11', 7909, 0, '2017-01-01 00:00:00', 0), \
 ('WMCA-Ministry-Spotlight', '', 'http://87.98.175.43:8020/', '', 'WMCA-Ministry-Spotlight.png', 0, 0, 0, 1, '2011-11-11', 7910, 0, '2017-01-01 00:00:00', 0), \
 ('Kiss-FM-1021', 'O projeto Kiss FM em S&#227;o Paulo, colocado no ar na freq&#252;&#234;ncia 102,1 MHz, em 13 de Julho de 2001, n&#227;o por acaso, Dia Mundial do Rock, se tornou sucesso sempre tocando o melhor do roc', 'http://75.126.86.2:8098', 'http://www.kissfm.com.br/', 'Kiss-FM-1021.png', 0, 0, 0, 1, '2011-11-11', 7911, 0, '2017-01-01 00:00:00', 0), \
 ('Yo-La-Tengo', '', 'http://87.98.175.43:8020/', '', 'Yo-La-Tengo.png', 0, 0, 0, 1, '2011-11-11', 7912, 0, '2017-01-01 00:00:00', 0), \
@@ -6287,15 +5096,6 @@ const char *radio_station_setupsql21="REPLACE INTO `radio_stations` (`name`, `be
 ('Kevin-Eubanks', '', 'http://stream.laut.fm/nummer_1_oldies', '', 'Kevin-Eubanks.png', 0, 0, 0, 1, '2011-11-11', 7963, 0, '2017-01-01 00:00:00', 0), \
 ('Thunder-945', '', 'http://stream.laut.fm/nummer_1_oldies', 'http://www.thunder945.com/', 'Thunder-945.png', 0, 0, 0, 1, '2011-11-11', 7964, 0, '2017-01-01 00:00:00', 0), \
 ('Big-Organ-Trio', '', 'http://stream.laut.fm/nummer_1_oldies', '', 'Big-Organ-Trio.png', 0, 0, 0, 1, '2011-11-11', 7965, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---60s-Hits', '', 'http://icecast.audiocream.com/60s', 'http://www.audiocream.com/', 'Audio-Cream---60s-Hits.png', 0, 0, 0, 1, '2011-11-11', 7966, 0, '2017-01-01 00:00:00', 0), \
-('KLPX-961', '', 'http://icecast.audiocream.com/60s', 'http://www.klpx.com/', 'KLPX-961.png', 0, 0, 0, 1, '2011-11-11', 7967, 0, '2017-01-01 00:00:00', 0), \
-('Janice-Long', '', 'http://icecast.audiocream.com/60s', '', 'Janice-Long.png', 0, 0, 0, 1, '2011-11-11', 7968, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Fiesta', '', 'http://icecast.audiocream.com/60s', '', 'Radio-Fiesta.png', 0, 0, 0, 1, '2011-11-11', 7969, 0, '2017-01-01 00:00:00', 0), \
-('WIGM-1490', '', 'http://icecast.audiocream.com/60s', 'http://www.k99wigm.com/', 'WIGM-1490.png', 0, 0, 0, 1, '2011-11-11', 7970, 0, '2017-01-01 00:00:00', 0), \
-('The-Jazz-Glide-Home', '', 'http://icecast.audiocream.com/60s', '', 'The-Jazz-Glide-Home.png', 0, 0, 0, 1, '2011-11-11', 7971, 0, '2017-01-01 00:00:00', 0), \
-('WCIR-FM-1037', '', 'http://icecast.audiocream.com/60s', 'http://www.103cir.com/', 'WCIR-FM-1037.png', 0, 0, 0, 1, '2011-11-11', 7972, 0, '2017-01-01 00:00:00', 0), \
-('Coyote-Country-999', '', 'http://icecast.audiocream.com/60s', 'http://www.thebig999coyotecountry.com/', 'Coyote-Country-999.png', 0, 0, 0, 1, '2011-11-11', 7973, 0, '2017-01-01 00:00:00', 0), \
-('Martina-McBride', '', 'http://icecast.audiocream.com/60s', '', 'Martina-McBride.png', 0, 0, 0, 1, '2011-11-11', 7974, 0, '2017-01-01 00:00:00', 0), \
 ('KABL', 'Great easy listening music from the Big Bands, Sinatra, Sammy and all your favorite stars of the 1940s, 1950s and 1960s.', 'http://208.53.158.48:9156', 'http://kabl.bayarearadio.org/', 'KABL.png', 0, 0, 0, 1, '2011-11-11', 7975, 0, '2017-01-01 00:00:00', 0), \
 ('Heart-Dorset-1023', 'Heart 102.3 with Jules and Bunker at breakfast covers Bournemouth, Poole, Boscombe, Christchurch and Milford on Sea', 'http://media-ice.musicradio.com/HeartDorsetMP3', 'http://www.heartdorset.co.uk/', 'Heart-Dorset-1023.png', 0, 0, 0, 1, '2011-11-11', 7976, 0, '2017-01-01 00:00:00', 0), \
 ('POD', '', 'http://media-ice.musicradio.com/HeartDorsetMP3', '', 'POD.png', 0, 0, 0, 1, '2011-11-11', 7977, 0, '2017-01-01 00:00:00', 0), \
@@ -6343,7 +5143,6 @@ const char *radio_station_setupsql21="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Eagle-1035', '', 'http://208.167.249.162:8060', 'http://1035theeagle.com/', 'The-Eagle-1035.png', 0, 0, 0, 1, '2011-11-11', 8019, 0, '2017-01-01 00:00:00', 0), \
 ('Bobby-Goldsboro', '', 'http://208.167.249.162:8060', '', 'Bobby-Goldsboro.png', 0, 0, 0, 1, '2011-11-11', 8020, 0, '2017-01-01 00:00:00', 0), \
 ('Latina-FM-986', '', 'http://hertz.todoexitos.com:8200/', 'http://www.reinalatinafm.com/', 'Latina-FM-986.png', 0, 0, 0, 1, '2011-11-11', 8021, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Tropical-North-1011', '', 'http://hertz.todoexitos.com:8200/', 'http://www.abc.net.au/tropic/', 'ABC-Tropical-North-1011.png', 0, 0, 2, 1, '2011-11-11', 8022, 0, '2011-10-17 15:51:11', 0), \
 ('The-Let-Out', '', 'http://hertz.todoexitos.com:8200/', '', 'The-Let-Out.png', 0, 0, 0, 1, '2011-11-11', 8023, 0, '2017-01-01 00:00:00', 0), \
 ('House-of-Blues-Radio-Hour', '', 'http://hertz.todoexitos.com:8200/', '', 'House-of-Blues-Radio-Hour.png', 0, 0, 0, 1, '2011-11-11', 8024, 0, '2017-01-01 00:00:00', 0), \
 ('The-Radio-2-Arts-Show', '', 'http://hertz.todoexitos.com:8200/', '', 'The-Radio-2-Arts-Show.png', 0, 0, 0, 1, '2011-11-11', 8025, 0, '2017-01-01 00:00:00', 0), \
@@ -6363,7 +5162,6 @@ const char *radio_station_setupsql22="REPLACE INTO `radio_stations` (`name`, `be
 ('Jay-Z', '', 'http://netradio.radioskive.dk', '', 'Jay-Z.png', 0, 0, 0, 1, '2011-11-11', 8036, 0, '2017-01-01 00:00:00', 0), \
 ('Harness-Racing-Show', '', 'http://netradio.radioskive.dk', '', 'Harness-Racing-Show.png', 0, 0, 0, 1, '2011-11-11', 8037, 0, '2017-01-01 00:00:00', 0), \
 ('Happy-Hill-Church', '', 'http://netradio.radioskive.dk', '', 'Happy-Hill-Church.png', 0, 0, 0, 1, '2011-11-11', 8038, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Dig-Music', 'The ABC&#39;s internet radio station. DiG has a continuous music stream for a diverse mix of great sounds - blues, soul, country, roots, world music, jazz, rock and more. The site also provides progra', 'http://abc.net.au/res/streaming/audio/mp3/dig_music.pls', 'http://abcdigmusic.net.au/', 'ABC-Dig-Music.png', 0, 0, 0, 1, '2011-11-11', 8039, 0, '2017-01-01 00:00:00', 0), \
 ('Bozo-Criminal-Report', '', 'http://abc.net.au/res/streaming/audio/mp3/dig_music.pls', '', 'Bozo-Criminal-Report.png', 0, 0, 0, 1, '2011-11-11', 8040, 0, '2017-01-01 00:00:00', 0), \
 ('Beach-House', '', 'http://abc.net.au/res/streaming/audio/mp3/dig_music.pls', '', 'Beach-House.png', 0, 0, 0, 1, '2011-11-11', 8041, 0, '2017-01-01 00:00:00', 0), \
 ('Sam-FM-983', '', 'http://abc.net.au/res/streaming/audio/mp3/dig_music.pls', '', 'Sam-FM-983.png', 0, 0, 0, 1, '2011-11-11', 8042, 0, '2017-01-01 00:00:00', 0), \
@@ -6418,7 +5216,6 @@ const char *radio_station_setupsql22="REPLACE INTO `radio_stations` (`name`, `be
 ('1029-MGK', 'WMGK 102.9 FM is Philadelphias exclusive Classic Rock', 'http://stream.laut.fm/indiegoestohollywood', 'http://www.wmgk.com/', '1029-MGK.png', 0, 0, 0, 1, '2011-11-11', 8092, 0, '2017-01-01 00:00:00', 0), \
 ('Smooth-Vocals-on-JAZZRADIOcom', 'When only the best of vocal smooth jazz will do.', 'http://listen.jazzradio.com/partner_aac/smoothvocals.pls', 'http://www.jazzradio.com/', 'Smooth-Vocals-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 8093, 0, '2017-01-01 00:00:00', 0), \
 ('NME-Radio', 'NME Radio - the UK&#39;s national commercial new music station.', 'http://tx.whatson.com/icecast.php?i=nmeradio.mp3', 'http://www.nme.com/radio', 'NME-Radio.png', 0, 0, 0, 1, '2011-11-11', 8094, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Southern-Queensland-747', '', 'http://tx.whatson.com/icecast.php?i=nmeradio.mp3', 'http://www.abc.net.au/southqld/', 'ABC-Southern-Queensland-747.png', 0, 0, 0, 1, '2011-11-11', 8095, 0, '2017-01-01 00:00:00', 0), \
 ('Food-For-Thought', '', 'http://tx.whatson.com/icecast.php?i=nmeradio.mp3', '', 'Food-For-Thought.png', 0, 0, 0, 1, '2011-11-11', 8096, 0, '2017-01-01 00:00:00', 0), \
 ('Natalie-Imbruglia', '', 'http://tx.whatson.com/icecast.php?i=nmeradio.mp3', '', 'Natalie-Imbruglia.png', 0, 0, 0, 1, '2011-11-11', 8097, 0, '2017-01-01 00:00:00', 0), \
 ('WVEK-FM-1027', 'Classic rock from the 70&#39;s and 80&#39;s.', 'http://tx.whatson.com/icecast.php?i=nmeradio.mp3', 'http://www.classichits1027.com', 'WVEK-FM-1027.png', 0, 0, 0, 1, '2011-11-11', 8098, 0, '2017-01-01 00:00:00', 0), \
@@ -6534,8 +5331,6 @@ const char *radio_station_setupsql22="REPLACE INTO `radio_stations` (`name`, `be
 ('Auto-Papo', '', 'http://listen.radionomy.com/radio-speeddance', '', 'Auto-Papo.png', 0, 0, 0, 1, '2011-11-11', 8217, 0, '2017-01-01 00:00:00', 0), \
 ('Bienvenue-en-Louisiane', 'All cajun, all zydeco, all the time ... tout les cadien, tout les zydeco, tout les temps', 'http://208.85.240.102:80/27.64.mp3', 'http://loudcaster.com/channels/27', 'Bienvenue-en-Louisiane.png', 0, 0, 1, 1, '2011-11-11', 8218, 0, '2011-10-14 16:03:52', 0), \
 ('Magic-1079', '', 'http://208.85.240.102:80/27.64.mp3', 'http://www.magic1079.com/main.html', 'Magic-1079.png', 0, 0, 0, 1, '2011-11-11', 8219, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Triple-J-Unearthed', '', 'http://www.abc.net.au/res/streaming/audio/aac/unearthed.pls', 'http://www.triplejunearthed.com/', 'ABC-Triple-J-Unearthed.png', 0, 0, 0, 1, '2011-11-11', 8220, 0, '2017-01-01 00:00:00', 0), \
-('La-Radio-de-los-Exitos', 'pop latinos, pop y rock de los 80s, classic rock hits', 'http://streaminghd.radioseninternetuy.com:2034', 'http://www.laradiodelosexitos.com/', 'La-Radio-de-los-Exitos.png', 0, 0, 0, 1, '2011-11-11', 8221, 0, '2017-01-01 00:00:00', 0), \
 ('Tiki-Bar-Radio', 'The Perfect Music Mix for your Tiki Bar', 'http://cast6.serverhostingcenter.com/tunein.php/ralber00/playlist.pls', 'http://www.tikibarradio.com/', 'Tiki-Bar-Radio.png', 0, 0, 0, 1, '2011-11-11', 8222, 0, '2017-01-01 00:00:00', 0), \
 ('Munichs-Hardest-Hits', '', 'http://www.munichshardesthits.com/ondem/mp3_high.pls', 'http://www.munichshardesthits.com/', 'Munichs-Hardest-Hits.png', 0, 0, 0, 1, '2011-11-11', 8223, 0, '2017-01-01 00:00:00', 0), \
 ('Evelyn-Champagne-King', '', 'http://www.munichshardesthits.com/ondem/mp3_high.pls', '', 'Evelyn-Champagne-King.png', 0, 0, 0, 1, '2011-11-11', 8224, 0, '2017-01-01 00:00:00', 0), \
@@ -6569,12 +5364,10 @@ const char *radio_station_setupsql22="REPLACE INTO `radio_stations` (`name`, `be
 ('Veronica-Top-1000-Aller-Tijden', '', 'mms://live.cumulusstreaming.com/KHAY-FM', 'http://www.radioveronica.nl/', 'Veronica-Top-1000-Aller-Tijden.png', 0, 0, 0, 1, '2011-11-11', 8252, 0, '2017-01-01 00:00:00', 0), \
 ('Heart-Bristol-963', 'Heart 96.3 with Bush, Troy and Paulina at breakfast covers Bristol.', 'http://media-ice.musicradio.com/HeartBristolMP3', 'http://www.heart.co.uk/bristol/', 'Heart-Bristol-963.png', 0, 0, 0, 1, '2011-11-11', 8253, 0, '2017-01-01 00:00:00', 0), \
 ('Connect2uFM', '', 'http://listen.radionomy.com/connect2ufm', 'http://www.radionomy.com/en/radio/connect2ufm', 'Connect2uFM.png', 0, 0, 0, 1, '2011-11-11', 8254, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Capricornia-837', '', 'http://listen.radionomy.com/connect2ufm', 'http://www.abc.net.au/centralqld/', 'ABC-Capricornia-837.png', 0, 0, 0, 1, '2011-11-11', 8255, 0, '2017-01-01 00:00:00', 0), \
 ('ENERGY-Berlin-Toastshow', '', 'http://listen.radionomy.com/connect2ufm', '', 'ENERGY-Berlin-Toastshow.png', 0, 0, 0, 1, '2011-11-11', 8256, 0, '2017-01-01 00:00:00', 0), \
 ('KIQN-1069', '', 'http://listen.radionomy.com/connect2ufm', '', 'KIQN-1069.png', 0, 0, 0, 1, '2011-11-11', 8257, 0, '2017-01-01 00:00:00', 0), \
 ('ESPN-980', '', 'http://listen.radionomy.com/connect2ufm', 'http://www.espn980.com/', 'ESPN-980.png', 0, 0, 0, 1, '2011-11-11', 8258, 0, '2017-01-01 00:00:00', 0), \
 ('The-Mountain-969', '', 'http://listen.radionomy.com/connect2ufm', 'http://www.kmtnthemountain.com/', 'The-Mountain-969.png', 0, 0, 0, 1, '2011-11-11', 8259, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Canberra-666', '', 'http://abc.net.au/res/streaming/audio/aac/local_canberra.pls', 'http://www.abc.net.au/canberra/radio/', 'ABC-Canberra-666.png', 0, 0, 0, 1, '2011-11-11', 8260, 0, '2017-01-01 00:00:00', 0), \
 ('WKMC-1370', '', 'http://abc.net.au/res/streaming/audio/aac/local_canberra.pls', '', 'WKMC-1370.png', 0, 0, 0, 1, '2011-11-11', 8261, 0, '2017-01-01 00:00:00', 0), \
 ('Homecoming-Radio', '', 'http://abc.net.au/res/streaming/audio/aac/local_canberra.pls', '', 'Homecoming-Radio.png', 0, 0, 0, 1, '2011-11-11', 8262, 0, '2017-01-01 00:00:00', 0), \
 ('Pipe-Dreams', '', 'http://streamingpulse.info/sc8/tunein.php/healthradio/playlist.pls', '', 'Pipe-Dreams.png', 0, 0, 0, 1, '2011-11-11', 8264, 0, '2017-01-01 00:00:00', 0), \
@@ -6636,7 +5429,6 @@ const char *radio_station_setupsql23="REPLACE INTO `radio_stations` (`name`, `be
 ('WHIE-1320', '', 'http://208.85.240.102:80/362.64.mp3', '', 'WHIE-1320.png', 0, 0, 0, 1, '2011-11-11', 8317, 0, '2017-01-01 00:00:00', 0), \
 ('MY-925', '', 'http://208.85.240.102:80/362.64.mp3', 'http://www.my925radio.com/', 'MY-925.png', 0, 0, 0, 1, '2011-11-11', 8318, 0, '2017-01-01 00:00:00', 0), \
 ('KNOX-1310', '', 'http://208.85.240.102:80/362.64.mp3', 'http://www.knoxradio.com/', 'KNOX-1310.png', 0, 0, 0, 1, '2011-11-11', 8319, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Cricket-Interviews-Podcast', '', 'http://208.85.240.102:80/362.64.mp3', '', 'ABC-Cricket-Interviews-Podcast.png', 0, 0, 0, 1, '2011-11-11', 8320, 0, '2017-01-01 00:00:00', 0), \
 ('Mike-DuBord', '', 'http://208.85.240.102:80/362.64.mp3', '', 'Mike-DuBord.png', 0, 0, 0, 1, '2011-11-11', 8321, 0, '2017-01-01 00:00:00', 0), \
 ('Blues-Brunch', '', 'http://208.85.240.102:80/362.64.mp3', '', 'Blues-Brunch.png', 0, 0, 0, 1, '2011-11-11', 8322, 0, '2017-01-01 00:00:00', 0), \
 ('Virgin-Radio-994', '', 'http://radio2.cdntr.com/virgin_.pls', 'http://www.virginradioturkiye.com/', 'Virgin-Radio-994.png', 0, 0, 0, 1, '2011-11-11', 8323, 0, '2017-01-01 00:00:00', 0), \
@@ -6776,7 +5568,6 @@ const char *radio_station_setupsql23="REPLACE INTO `radio_stations` (`name`, `be
 ('Love-105-FM-1051', '', 'http://listen.radionomy.com/alternativeradio', 'http://www.love105.fm/', 'Love-105-FM-1051.png', 0, 0, 0, 1, '2011-11-11', 8458, 0, '2017-01-01 00:00:00', 0), \
 ('KPNW-Infomercials', '', 'http://listen.radionomy.com/alternativeradio', '', 'KPNW-Infomercials.png', 0, 0, 0, 1, '2011-11-11', 8460, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-City-967', '', 'http://listen.radionomy.com/alternativeradio', 'http://www.radiocity.co.uk/', 'Radio-City-967.png', 0, 0, 0, 1, '2011-11-11', 8461, 0, '2017-01-01 00:00:00', 0), \
-('Asempa-947FM', '', 'http://67.159.60.45:8006/', 'http://www.asempaonline.com/', 'Asempa-947FM.png', 0, 0, 1, 1, '2011-11-11', 8462, 0, '2011-10-17 23:42:16', 0), \
 ('Sunrise-Radio', '', 'http://maulino.servemp3.com:7012', 'http://www.la91fmchile.cl/', 'Sunrise-Radio.png', 0, 0, 0, 1, '2011-11-11', 8463, 0, '2017-01-01 00:00:00', 0), \
 ('Oldies-Q1067', '', 'http://66.90.111.155:7700', 'http://www.oldiessuperstation.com/', 'Oldies-Q1067.png', 0, 0, 0, 1, '2011-11-11', 8464, 0, '2017-01-01 00:00:00', 0), \
 ('WABB-1480', '', 'http://66.90.111.155:7700', 'http://www.wabbam.com', 'WABB-1480.png', 0, 0, 0, 1, '2011-11-11', 8465, 0, '2017-01-01 00:00:00', 0), \
@@ -6800,7 +5591,6 @@ const char *radio_station_setupsql23="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Best-of-Dr-Joy-Browne', '', 'http://amber.streamguys.com:5220/xstream', '', 'The-Best-of-Dr-Joy-Browne.png', 0, 0, 0, 1, '2011-11-11', 8483, 0, '2017-01-01 00:00:00', 0), \
 ('State-of-Things', '', 'http://amber.streamguys.com:5220/xstream', '', 'State-of-Things.png', 0, 0, 0, 1, '2011-11-11', 8484, 0, '2017-01-01 00:00:00', 0), \
 ('Hit-Oldies', '', 'http://174.37.110.72:8040', 'http://www.hitoldies.com/', 'Hit-Oldies.png', 0, 0, 0, 1, '2011-11-11', 8485, 0, '2017-01-01 00:00:00', 0), \
-('49ers', '', 'http://174.37.110.72:8040', '', '49ers.png', 0, 0, 1, 1, '2011-11-11', 8486, 0, '2011-10-17 23:40:21', 0), \
 ('Rock-105-1051', '', 'http://174.37.110.72:8040', 'http://www.rock1051fm.com/', 'Rock-105-1051.png', 0, 0, 0, 1, '2011-11-11', 8487, 0, '2017-01-01 00:00:00', 0), \
 ('KWTX-1230', '', 'http://174.37.110.72:8040', 'http://www.newstalk1230.com/', 'KWTX-1230.png', 0, 0, 0, 1, '2011-11-11', 8488, 0, '2017-01-01 00:00:00', 0), \
 ('Love-FM-Puglia-967', 'La Radio pensata per chi preferisce la parole in musica alle parole e basta,dedicata a chi, ascoltandola, vuole sognare', 'http://www.streamsolution.it/onair/lovefm.asx', 'http://www.lovefm.it/', 'Love-FM-Puglia-967.png', 0, 0, 0, 1, '2011-11-11', 8489, 0, '2017-01-01 00:00:00', 0), \
@@ -6841,8 +5631,6 @@ const char *radio_station_setupsql23="REPLACE INTO `radio_stations` (`name`, `be
 ('VHS-or-Beta', '', 'http://listen.radionomy.com/radio-mondello', '', 'VHS-or-Beta.png', 0, 0, 0, 1, '2011-11-11', 8524, 0, '2017-01-01 00:00:00', 0), \
 ('Arkaik', '', 'http://listen.radionomy.com/radio-mondello', '', 'Arkaik.png', 0, 0, 0, 1, '2011-11-11', 8525, 0, '2017-01-01 00:00:00', 0), \
 ('1049-The-River', '', 'http://stream.1049theriver.com/WCVO_64k', 'http://www.1049theriver.com/', '1049-The-River.png', 0, 0, 0, 1, '2011-11-11', 8526, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Western-Victoria-594', '', 'http://stream.1049theriver.com/WCVO_64k', 'http://abc.net.au/westernvic/', 'ABC-Western-Victoria-594.png', 0, 0, 0, 1, '2011-11-11', 8527, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Midwest--Wheatbelt-828', '', 'http://stream.1049theriver.com/WCVO_64k', 'http://www.abc.net.au/wheatbelt/', 'ABC-Midwest--Wheatbelt-828.png', 0, 0, 0, 1, '2011-11-11', 8528, 0, '2017-01-01 00:00:00', 0), \
 ('Cal-Football-Pre-Game-Show', '', 'http://stream.1049theriver.com/WCVO_64k', '', 'Cal-Football-Pre-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 8529, 0, '2017-01-01 00:00:00', 0), \
 ('WGGO-1590', '', 'http://stream.1049theriver.com/WCVO_64k', '', 'WGGO-1590.png', 0, 0, 0, 1, '2011-11-11', 8530, 0, '2017-01-01 00:00:00', 0), \
 ('Soft-Rock-989', '', 'http://stream.1049theriver.com/WCVO_64k', 'http://www.softrock989.com/', 'Soft-Rock-989.png', 0, 0, 0, 1, '2011-11-11', 8531, 0, '2017-01-01 00:00:00', 0), \
@@ -6859,7 +5647,6 @@ const char *radio_station_setupsql23="REPLACE INTO `radio_stations` (`name`, `be
 ('Thompson-Twins', '', 'http://stream1.shoutatme.com:7034', '', 'Thompson-Twins.png', 0, 0, 0, 1, '2011-11-11', 8542, 0, '2017-01-01 00:00:00', 0), \
 ('Ring-Side', '', 'http://stream1.shoutatme.com:7034', '', 'Ring-Side.png', 0, 0, 0, 1, '2011-11-11', 8543, 0, '2017-01-01 00:00:00', 0), \
 ('WJJQ-810', 'WJJQ: A Northern Wisconsin Information and Entertainment Station.', 'http://ice2.securenetsystems.net/WJJQM.m3u', 'http://www.wjjq.com/', 'WJJQ-810.png', 0, 0, 0, 1, '2011-11-11', 8544, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Polskie---Hot-House', '', 'http://91.121.89.198:7700', 'http://www.polskastacja.pl/', 'Radio-Polskie---Hot-House.png', 0, 0, 0, 1, '2011-11-11', 8545, 0, '2017-01-01 00:00:00', 0), \
 ('KUSC-915', '', 'http://915.kuscstream.org:8000/kuscaudio128.mp3', 'http://www.kusc.org', 'KUSC-915.png', 0, 0, 0, 1, '2011-11-11', 8546, 0, '2017-01-01 00:00:00', 0), \
 ('Joy-Division', '', 'http://915.kuscstream.org:8000/kuscaudio128.mp3', '', 'Joy-Division.png', 0, 0, 0, 1, '2011-11-11', 8547, 0, '2017-01-01 00:00:00', 0), \
 ('WKRD-790', '', 'http://915.kuscstream.org:8000/kuscaudio128.mp3', 'http://www.790wkrd.com/', 'WKRD-790.png', 0, 0, 0, 1, '2011-11-11', 8548, 0, '2017-01-01 00:00:00', 0), \
@@ -6899,7 +5686,6 @@ const char *radio_station_setupsql24="REPLACE INTO `radio_stations` (`name`, `be
 ('Casa-FM-887', '', 'http://41.205.209.130:8000', 'http://www.radiocasafm.ma/accueil', 'Casa-FM-887.png', 0, 0, 0, 1, '2011-11-11', 8578, 0, '2017-01-01 00:00:00', 0), \
 ('Youth-Fever-Radio-HD', 'YouthFever Radio is a 70% music in combination of 30% live shows. We bring you the latest in modern music where ever you are on your cellphone or on your pc.', 'http://sc1.24server.com:12260/', 'http://www.youthfever.com/', 'Youth-Fever-Radio-HD.png', 0, 0, 0, 1, '2011-11-11', 8579, 0, '2017-01-01 00:00:00', 0), \
 ('WS-Radio-Studio-A', 'wsRadio.com produces over 80 internet talk radio shows including eBay Radio, The Entrepreneur Magazine Radio Network and HayHouse Radio. www.wsRadio.com', 'http://www.wsradio.com/wsradioprimary.asx', 'http://www.wsradio.com/', 'WS-Radio-Studio-A.png', 0, 0, 0, 1, '2011-11-11', 8580, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Broken-Hill-999', '', 'http://www.wsradio.com/wsradioprimary.asx', 'http://abc.net.au/brokenhill/', 'ABC-Broken-Hill-999.png', 0, 0, 0, 1, '2011-11-11', 8581, 0, '2017-01-01 00:00:00', 0), \
 ('Band-Scheiben-Vorfall', '', 'http://www.wsradio.com/wsradioprimary.asx', '', '', 0, 0, 0, 1, '2011-11-11', 8582, 0, '2017-01-01 00:00:00', 0), \
 ('Montreal-Canadiens-Play-by-Play-(English)', '', 'http://www.wsradio.com/wsradioprimary.asx', '', 'Montreal-Canadiens-Play-by-Play-(English).png', 0, 0, 0, 1, '2011-11-11', 8583, 0, '2017-01-01 00:00:00', 0), \
 ('Magic-1017', 'WLTB has had a pretty solid on-air line up in the last 10 years.', 'mms://stream1.securenetsystems.net/WLTB', 'http://www.magic1017fm.com/', 'Magic-1017.png', 0, 0, 0, 1, '2011-11-11', 8584, 0, '2017-01-01 00:00:00', 0), \
@@ -6977,13 +5763,6 @@ const char *radio_station_setupsql24="REPLACE INTO `radio_stations` (`name`, `be
 ('Golf-Show', '', 'http://listen.sky.fm/partner_mp3/nature.pls', '', 'Golf-Show.png', 0, 0, 0, 1, '2011-11-11', 8656, 0, '2017-01-01 00:00:00', 0), \
 ('Michelle-Branch', '', 'http://listen.sky.fm/partner_mp3/nature.pls', '', 'Michelle-Branch.png', 0, 0, 0, 1, '2011-11-11', 8657, 0, '2017-01-01 00:00:00', 0), \
 ('Charles-Mingus', '', 'http://listen.sky.fm/partner_mp3/nature.pls', '', 'Charles-Mingus.png', 0, 0, 0, 1, '2011-11-11', 8658, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---1958-Hits', '', 'http://icecast.audiocream.com/1958', 'http://www.audiocream.com/', 'Audio-Cream---1958-Hits.png', 0, 0, 0, 1, '2011-11-11', 8659, 0, '2017-01-01 00:00:00', 0), \
-('Zwan', '', 'http://icecast.audiocream.com/1958', '', 'Zwan.png', 0, 0, 0, 1, '2011-11-11', 8660, 0, '2017-01-01 00:00:00', 0), \
-('The-Hollies', '', 'http://icecast.audiocream.com/1958', '', 'The-Hollies.png', 0, 0, 0, 1, '2011-11-11', 8661, 0, '2017-01-01 00:00:00', 0), \
-('WKZQ-FM-961', '', 'http://icecast.audiocream.com/1958', 'http://wkzq.net/', 'WKZQ-FM-961.png', 0, 0, 0, 1, '2011-11-11', 8662, 0, '2017-01-01 00:00:00', 0), \
-('Dethklok', '', 'http://icecast.audiocream.com/1958', '', 'Dethklok.png', 0, 0, 0, 1, '2011-11-11', 8663, 0, '2017-01-01 00:00:00', 0), \
-('Michael-Martin-Murphey', '', 'http://icecast.audiocream.com/1958', '', 'Michael-Martin-Murphey.png', 0, 0, 0, 1, '2011-11-11', 8664, 0, '2017-01-01 00:00:00', 0), \
-('Nascar-Trivia', '', 'http://icecast.audiocream.com/1958', '', 'Nascar-Trivia.png', 0, 0, 0, 1, '2011-11-11', 8665, 0, '2017-01-01 00:00:00', 0), \
 ('Ry-Cooder', '', 'http://metafiles.gl-systemhaus.de/hr/hrinfo_2.m3u', '', 'Ry-Cooder.png', 0, 0, 0, 1, '2011-11-11', 8667, 0, '2017-01-01 00:00:00', 0), \
 ('Xtra-Sports-1360', '', 'http://metafiles.gl-systemhaus.de/hr/hrinfo_2.m3u', 'http://www.xtrasports1360.com', 'Xtra-Sports-1360.png', 0, 0, 0, 1, '2011-11-11', 8668, 0, '2017-01-01 00:00:00', 0), \
 ('B985-FM', '', 'http://metafiles.gl-systemhaus.de/hr/hrinfo_2.m3u', 'http://b985.com/', 'B985-FM.png', 0, 0, 0, 1, '2011-11-11', 8669, 0, '2017-01-01 00:00:00', 0), \
@@ -7194,7 +5973,6 @@ const char *radio_station_setupsql25="REPLACE INTO `radio_stations` (`name`, `be
 ('WSRS-961', '', 'http://dsl.german-gothic-radio.de:8046/', 'http://www.wsrs.com/', 'WSRS-961.png', 0, 0, 0, 1, '2011-11-11', 8874, 0, '2017-01-01 00:00:00', 0), \
 ('Afropop-Worldwide', '', 'http://dsl.german-gothic-radio.de:8046/', '', 'Afropop-Worldwide.png', 0, 0, 0, 1, '2011-11-11', 8875, 0, '2017-01-01 00:00:00', 0), \
 ('Football--5', '', 'http://dsl.german-gothic-radio.de:8046/', '', 'Football--5.png', 0, 0, 0, 1, '2011-11-11', 8876, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Chinese)', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_zho.pls', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 8877, 0, '2017-01-01 00:00:00', 0), \
 ('Classic-Rock-953', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_zho.pls', 'http://www.classicrockfm.com.au/953/', 'Classic-Rock-953.png', 0, 0, 0, 1, '2011-11-11', 8878, 0, '2017-01-01 00:00:00', 0), \
 ('937-Jack-FM', 'Call the Jack phone line at 332-JACK.  Log on to www.jackdotcom.com in addition to funny videos, pictures &amp; Sacramento events...you can listen to Jack on-line from anywhere in the world that you h', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_zho.pls', 'http://www.kqjk.com/', '937-Jack-FM.png', 0, 0, 0, 1, '2011-11-11', 8879, 0, '2017-01-01 00:00:00', 0), \
 ('The-Three-Degrees', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_zho.pls', '', 'The-Three-Degrees.png', 0, 0, 0, 1, '2011-11-11', 8880, 0, '2017-01-01 00:00:00', 0), \
@@ -7207,7 +5985,6 @@ const char *radio_station_setupsql25="REPLACE INTO `radio_stations` (`name`, `be
 ('WNYC-820', '', 'http://www.wnyc.org/stream/wnyc-am820/aac.pls', 'http://www.wnyc.org/', 'WNYC-820.png', 0, 0, 0, 1, '2011-11-11', 8887, 0, '2017-01-01 00:00:00', 0), \
 ('Saigon-Radio-1063', '', 'http://ice5.securenetsystems.net:80/KALI', 'http://www.saigonradio.com/', 'Saigon-Radio-1063.png', 0, 0, 0, 1, '2011-11-11', 8888, 0, '2017-01-01 00:00:00', 0), \
 ('Peace-Out-Radio', 'This Music Will Take You Back, To A Time When Peace &amp; Love Were The Ultimate Trip.', 'http://sc13.shoutcaststreaming.us:8094/', 'http://peaceoutradio.com', 'Peace-Out-Radio.png', 0, 0, 0, 1, '2011-11-11', 8889, 0, '2017-01-01 00:00:00', 0), \
-('1069-Rocks-1420', '', 'http://sc13.shoutcaststreaming.us:8094/', 'http://www.1069rocks.com', '1069-Rocks-1420.png', 0, 0, 0, 1, '2011-11-11', 8890, 0, '2017-01-01 00:00:00', 0), \
 ('Sleigh-Bells', '', 'http://sc12.1.fm:7058', '', 'Sleigh-Bells.png', 0, 0, 0, 1, '2011-11-11', 8892, 0, '2017-01-01 00:00:00', 0), \
 ('The-Beat-1043', '', 'http://sc12.1.fm:7058', 'http://www.1043thebeat.com', 'The-Beat-1043.png', 0, 0, 0, 1, '2011-11-11', 8893, 0, '2017-01-01 00:00:00', 0), \
 ('SportTalk-84-Sunday', '', 'http://sc12.1.fm:7058', '', 'SportTalk-84-Sunday.png', 0, 0, 0, 1, '2011-11-11', 8894, 0, '2017-01-01 00:00:00', 0), \
@@ -7291,7 +6068,6 @@ const char *radio_station_setupsql25="REPLACE INTO `radio_stations` (`name`, `be
 ('B-933', 'B-93 is Lethbridge&#39;s #1 Hit Music Station the Bee is Southern Alberta&#39;s only Top 40 radio station.', 'http://ophanim.net/cast/tunein.php/kgrgfm/playlist.pls', 'http://www.b93.fm/', 'B-933.png', 0, 0, 0, 1, '2011-11-11', 8972, 0, '2017-01-01 00:00:00', 0), \
 ('Radyo-Mydonose-1060', '', 'http://mydonose.radyolarburada.com:5255/', 'http://www.radyomydonose.com.tr/', 'Radyo-Mydonose-1060.png', 0, 0, 0, 1, '2011-11-11', 8973, 0, '2017-01-01 00:00:00', 0), \
 ('900-Country', '', 'http://mydonose.radyolarburada.com:5255/', 'http://www.wjth.com/', '900-Country.png', 0, 0, 0, 1, '2011-11-11', 8974, 0, '2017-01-01 00:00:00', 0), \
-('941-KQK', '', 'http://mydonose.radyolarburada.com:5255/', 'http://www.941kqk.com/', '941-KQK.png', 0, 0, 0, 1, '2011-11-11', 8975, 0, '2017-01-01 00:00:00', 0), \
 ('1059-SUNNY-FM', '1059 SUNNY FM plays Orlando&#39;s Greatest Hits! You can now enjoy Sunny live on your computer 24 hours a day 7 Sunny days a week on 1059sunnyfm.com.  It&#39;s always &quot;Sunny&quot; on 1059 SUNNY F', 'http://mydonose.radyolarburada.com:5255/', 'http://www.sunny1059.com', '1059-SUNNY-FM.png', 0, 0, 0, 1, '2011-11-11', 8976, 0, '2017-01-01 00:00:00', 0), \
 ('Sports-Radio-1340', '', 'http://mydonose.radyolarburada.com:5255/', 'http://1340thefan.com/', 'Sports-Radio-1340.png', 0, 0, 0, 1, '2011-11-11', 8977, 0, '2017-01-01 00:00:00', 0), \
 ('The-Blitz-997', '', 'http://1.ice1.sa.streamaudio.com:8000/wrkz_fm.aac.m3u', 'http://www.theblitz.com/', 'The-Blitz-997.png', 0, 0, 0, 1, '2011-11-11', 8978, 0, '2017-01-01 00:00:00', 0), \
@@ -7566,7 +6342,6 @@ const char *radio_station_setupsql26="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Jazz-of-Wiesbaden', 'Jazz-oriented radio, seasoned with a hot sauce from soul and blues.', 'http://www.laut.fm/user/thejazzofwiesbaden/stream.pls', 'http://www.laut.fm/thejazzofwiesbaden', 'The-Jazz-of-Wiesbaden.png', 0, 0, 0, 1, '2011-11-11', 9245, 0, '2017-01-01 00:00:00', 0), \
 ('Rugby-League-Super-League-Play-Offs---Highlights', '', 'http://www.laut.fm/user/thejazzofwiesbaden/stream.pls', '', 'Rugby-League-Super-League-Play-Offs---Highlights.png', 0, 0, 0, 1, '2011-11-11', 9246, 0, '2017-01-01 00:00:00', 0), \
 ('MotorCity-Vette', '', 'http://www.laut.fm/user/thejazzofwiesbaden/stream.pls', '', 'MotorCity-Vette.png', 0, 0, 0, 1, '2011-11-11', 9247, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Illawarra-973', '', 'http://www.laut.fm/user/thejazzofwiesbaden/stream.pls', 'http://www.abc.net.au/illawarra/', 'ABC-Illawarra-973.png', 0, 0, 0, 1, '2011-11-11', 9248, 0, '2017-01-01 00:00:00', 0), \
 ('670-The-Score', 'Chicago&#39;s Sports Radio 670 The Score has been the voice of the Chicago Sports Fan for over 16 years and also streams worldwide online. Subscribe to 670 The Scores free podcasts to stay up to date ', 'http://www.laut.fm/user/thejazzofwiesbaden/stream.pls', 'http://chicago.cbslocal.com/station/670-the-score/', '670-The-Score.png', 0, 0, 0, 1, '2011-11-11', 9249, 0, '2017-01-01 00:00:00', 0), \
 ('KZST-1001', '', 'http://asx.abacast.com/redwoodempire-kzstmp3-32.pls', 'http://www.kzst.com/', 'KZST-1001.png', 0, 0, 0, 1, '2011-11-11', 9250, 0, '2017-01-01 00:00:00', 0), \
 ('KTOM-FM-927', '', 'http://asx.abacast.com/redwoodempire-kzstmp3-32.pls', 'http://www.ktom.com/', 'KTOM-FM-927.png', 0, 0, 0, 1, '2011-11-11', 9251, 0, '2017-01-01 00:00:00', 0), \
@@ -7616,7 +6391,6 @@ const char *radio_station_setupsql26="REPLACE INTO `radio_stations` (`name`, `be
 ('Hit-FM-1067', '', 'http://online-hitfm.tavrmedia.ua:7000/HitFM', 'http://www.hitfm.ua/', 'Hit-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 9295, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-DeeGay', 'Il pi&#249; cool del nostro network con la musica pi&#249; nuova, l&#39;informazione, i programmi in voce e le dirette degli eventi pi&#249; importanti del mondo GLBT italiano.<BR>Le HIT dance e pop p', 'http://ss1.deegay.it:80/', 'http://www.deegay.it/', 'Radio-DeeGay.png', 0, 0, 0, 1, '2011-11-11', 9296, 0, '2017-01-01 00:00:00', 0), \
 ('Sirasa-FM-1065', '', 'http://76.73.5.190/sirasafm', 'http://www.sirasa.com/', 'Sirasa-FM-1065.png', 0, 0, 0, 1, '2011-11-11', 9297, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Khmer)', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_khm.pls', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 9298, 0, '2017-01-01 00:00:00', 0), \
 ('XO-1017-FM', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_khm.pls', 'http://www.xoradio1017.com/', 'XO-1017-FM.png', 0, 0, 0, 1, '2011-11-11', 9299, 0, '2017-01-01 00:00:00', 0), \
 ('Jock-987-FM', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_khm.pls', 'http://www.jock987.net/', 'Jock-987-FM.png', 0, 0, 0, 1, '2011-11-11', 9300, 0, '2017-01-01 00:00:00', 0), \
 ('I-81-Classic-Country-810', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_khm.pls', 'http://www.810wpin.com/', 'I-81-Classic-Country-810.png', 0, 0, 0, 1, '2011-11-11', 9301, 0, '2017-01-01 00:00:00', 0), \
@@ -7659,7 +6433,7 @@ const char *radio_station_setupsql27="REPLACE INTO `radio_stations` (`name`, `be
 ('Re-Flex', '', 'mms://live.cumulusstreaming.com/KRQN-FM', '', 'Re-Flex.png', 0, 0, 0, 1, '2011-11-11', 9335, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Caroline-319-Gold', '', 'http://www.rcgoldserver.eu:8192', 'http://www.radiocaroline319.eu/', 'Radio-Caroline-319-Gold.png', 0, 0, 0, 1, '2011-11-11', 9336, 0, '2017-01-01 00:00:00', 0), \
 ('WUPK-941', '', 'http://www.rcgoldserver.eu:8192', 'http://www.rockthebear.com/', 'WUPK-941.png', 0, 0, 0, 1, '2011-11-11', 9337, 0, '2017-01-01 00:00:00', 0), \
-('1069-KZY', '', 'http://www.rcgoldserver.eu:8192', 'http://www.1069kzy.com/', '1069-KZY.png', 0, 0, 0, 1, '2011-11-11', 9338, 0, '2017-01-01 00:00:00', 0), \
+('1069-KZY', '', 'http://www.rcgoldserver.eu:8192', 'http://www.1069kzy.com/', '1069-KZY.png', 0, 0, 0, 1, '2011-11-11', 9338, 0, '2017-01-01 00:00:00', 1), \
 ('WPLN-FM-903', 'Classical Music and your favorite NPR programs', 'http://wpln.streamguys.org/wplnfm.mp3.m3u', 'http://wpln.org/', 'WPLN-FM-903.png', 0, 0, 0, 1, '2011-11-11', 9339, 0, '2017-01-01 00:00:00', 0), \
 ('Sports-Xtra-1330-WTRX', '', 'http://wpln.streamguys.org/wplnfm.mp3.m3u', 'http://www.wtrxsports.com/', 'Sports-Xtra-1330-WTRX.png', 0, 0, 0, 1, '2011-11-11', 9340, 0, '2017-01-01 00:00:00', 0), \
 ('Capitals-Report', '', 'http://wpln.streamguys.org/wplnfm.mp3.m3u', '', 'Capitals-Report.png', 0, 0, 0, 1, '2011-11-11', 9341, 0, '2017-01-01 00:00:00', 0), \
@@ -7869,11 +6643,9 @@ const char *radio_station_setupsql27="REPLACE INTO `radio_stations` (`name`, `be
 ('Minster-FM-1047', 'Minster FM is the local radio station for York and North Yorkshire. We&#39;re the home of Marsden in the Morning - making sure you wake up with a smile of your face and of course our more Music Guaran', 'http://www.wmse.org/wmse128kMP3.pls', 'http://www.minsterfm.com/', 'Minster-FM-1047.png', 0, 0, 0, 1, '2011-11-11', 9547, 0, '2017-01-01 00:00:00', 0), \
 ('Charlie-Parker', '', 'http://www.wmse.org/wmse128kMP3.pls', '', 'Charlie-Parker.png', 0, 0, 0, 1, '2011-11-11', 9548, 0, '2017-01-01 00:00:00', 0), \
 ('KFLY-1015', 'KFLY 101.5 FM is Oregon&#39;s Real Rock Station featuring Bob &amp; Tom in the morning, The Donkey Show in the afternoon, and Oregon&#39;s Real Rock all day long.', 'http://www.wmse.org/wmse128kMP3.pls', 'http://www.kflyfm.com/', 'KFLY-1015.png', 0, 0, 0, 1, '2011-11-11', 9549, 0, '2017-01-01 00:00:00', 0), \
-('ABC-South-Coast-558', '', 'http://www.wmse.org/wmse128kMP3.pls', 'http://www.abc.net.au/southcoast/', 'ABC-South-Coast-558.png', 0, 0, 0, 1, '2011-11-11', 9550, 0, '2017-01-01 00:00:00', 0), \
 ('Specialized-Programming-KCMO', '', 'http://www.wmse.org/wmse128kMP3.pls', '', 'Specialized-Programming-KCMO.png', 0, 0, 0, 1, '2011-11-11', 9551, 0, '2017-01-01 00:00:00', 0), \
 ('The-Coast-983', '98.3 The Coast is a Hot AC radio station, playing the best mix of artists primarily for the female audience of Michigan&#39;s Great Southwest. Covering the 80s, 90s and today&#39;s newest music, we al', 'mms://nick9.surfernetwork.com/WCXT', 'http://www.983thecoast.com', 'The-Coast-983.png', 0, 0, 0, 1, '2011-11-11', 9552, 0, '2017-01-01 00:00:00', 0), \
 ('Capital-1063', '', 'mms://nick9.surfernetwork.com/WCXT', 'http://www.capital1063.com/', 'Capital-1063.png', 0, 0, 0, 1, '2011-11-11', 9553, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Riverland-1062', '', 'mms://nick9.surfernetwork.com/WCXT', 'http://www.abc.net.au/riverland/', 'ABC-Riverland-1062.png', 0, 0, 0, 1, '2011-11-11', 9554, 0, '2017-01-01 00:00:00', 0), \
 ('WIZS-1450', '', 'mms://nick9.surfernetwork.com/WCXT', 'http://www.wizs.com/', 'WIZS-1450.png', 0, 0, 0, 1, '2011-11-11', 9555, 0, '2017-01-01 00:00:00', 0), \
 ('Alter-Bridge', '', 'mms://nick9.surfernetwork.com/WCXT', '', 'Alter-Bridge.png', 0, 0, 0, 1, '2011-11-11', 9556, 0, '2017-01-01 00:00:00', 0), \
 ('Kazs-German-Bavarian', '', 'mms://nick9.surfernetwork.com/WCXT', '', 'Kazs-German-Bavarian.png', 0, 0, 0, 1, '2011-11-11', 9557, 0, '2017-01-01 00:00:00', 0), \
@@ -7892,7 +6664,6 @@ const char *radio_station_setupsql27="REPLACE INTO `radio_stations` (`name`, `be
 ('Martha-and-The-Vandellas', '', 'http://ic1.christiannetcast.com/kcbi-fm.m3u', '', 'Martha-and-The-Vandellas.png', 0, 0, 0, 1, '2011-11-11', 9570, 0, '2017-01-01 00:00:00', 0), \
 ('ABBA', '', 'http://ic1.christiannetcast.com/kcbi-fm.m3u', '', 'ABBA.png', 0, 0, 0, 1, '2011-11-11', 9571, 0, '2017-01-01 00:00:00', 0), \
 ('WATH-970', '', 'mms://66.109.160.3/WATH', 'http://www.970wath.com/', 'WATH-970.png', 0, 0, 0, 1, '2011-11-11', 9572, 0, '2017-01-01 00:00:00', 0), \
-('ABC-North-Queensland-630', 'North Queensland&#39;s top source of local information, and forum for discussing the issues that matter.', 'mms://66.109.160.3/WATH', 'http://abc.net.au/northqld/', 'ABC-North-Queensland-630.png', 0, 0, 0, 1, '2011-11-11', 9573, 0, '2017-01-01 00:00:00', 0), \
 ('Chart-Tipps', 'Das Beste aus den letzten 6 Jahren und die Charts von MORGEN !', 'http://stream.laut.fm/chart-tipps', 'http://www.chart-tipps.de/', 'Chart-Tipps.png', 0, 0, 0, 1, '2011-11-11', 9574, 0, '2017-01-01 00:00:00', 0), \
 ('KEXP-FM-903', 'Beginning as a tiny 10-watt station back in 1972, KEXP has grown over the years into an innovative, influential cultural force in the Seattle community and beyond.', 'http://kexp-mp3-2.cac.washington.edu:8000/', 'http://kexp.org/', 'KEXP-FM-903.png', 0, 0, 0, 1, '2011-11-11', 9575, 0, '2017-01-01 00:00:00', 0), \
 ('The-CAR-Show', '', 'http://kexp-mp3-2.cac.washington.edu:8000/', '', 'The-CAR-Show.png', 0, 0, 0, 1, '2011-11-11', 9576, 0, '2017-01-01 00:00:00', 0), \
@@ -7944,7 +6715,6 @@ const char *radio_station_setupsql28="REPLACE INTO `radio_stations` (`name`, `be
 ('Chaka-Demus--Pliers', '', 'http://mfile.akamai.com/13873/live/reflector:24137.asx?bkup=45931', '', 'Chaka-Demus--Pliers.png', 0, 0, 0, 1, '2011-11-11', 9618, 0, '2017-01-01 00:00:00', 0), \
 ('JPHiP-Radio', 'The latest in Jpop, Kpop, Cpop, HiP HoP.', 'http://radio.jphip.com:8800', 'http://jphip.com/radio.html', 'JPHiP-Radio.png', 0, 0, 0, 1, '2011-11-11', 9619, 0, '2017-01-01 00:00:00', 0), \
 ('NASCAR-Live', '', 'http://radio.jphip.com:8800', '', 'NASCAR-Live.png', 0, 0, 0, 1, '2011-11-11', 9620, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Central-Coast-925', '', 'http://radio.jphip.com:8800', 'http://www.abc.net.au/centralcoast/', 'ABC-Central-Coast-925.png', 0, 0, 0, 1, '2011-11-11', 9621, 0, '2017-01-01 00:00:00', 0), \
 ('Classic-Rap', 'Classic Rap est une Web radio, France.', 'http://listen.radionomy.com/classic-rap', 'http://classicrap.fr/', 'Classic-Rap.png', 0, 0, 0, 1, '2011-11-11', 9622, 0, '2017-01-01 00:00:00', 0), \
 ('KNZR-1560', '', 'http://listen.radionomy.com/classic-rap', 'http://www.knzr.com/', 'KNZR-1560.png', 0, 0, 0, 1, '2011-11-11', 9623, 0, '2017-01-01 00:00:00', 0), \
 ('Hengepartiet', '', 'http://listen.radionomy.com/classic-rap', '', 'Hengepartiet.png', 0, 0, 0, 1, '2011-11-11', 9624, 0, '2017-01-01 00:00:00', 0), \
@@ -8160,10 +6930,8 @@ const char *radio_station_setupsql28="REPLACE INTO `radio_stations` (`name`, `be
 ('Lite-Rock-99-9-999', '', 'http://sc838.c738.fast-serv.com/', 'http://www.lite999.com/', 'Lite-Rock-99-9-999.png', 0, 0, 0, 1, '2011-11-11', 9841, 0, '2017-01-01 00:00:00', 0);";
 
 
-
-
 const char *radio_station_setupsql29="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('ABCD-Black-Eyed-Peas', '', 'http://listen.radionomy.com/abcd-black-eyed-peas', 'http://www.abcdeurodance.com', 'ABCD-Black-Eyed-Peas.png', 0, 0, 1, 1, '2011-11-11', 9842, 0, '2011-10-14 15:59:07', 0), \
+('Black-Eyed-Peas', '', 'http://listen.radionomy.com/abcd-black-eyed-peas', 'http://www.abcdeurodance.com', 'ABCD-Black-Eyed-Peas.png', 0, 0, 1, 1, '2011-11-11', 9842, 0, '2011-10-14 15:59:07', 1), \
 ('KRCL-909', 'KRCL is to provide media exposure for music, ideas and viewpoints that are under-represented in mainstream commercial media. KRCL airs 56 different music programs and 27 public affairs programs each w', 'http://streamctl.krcl.org/krcl-high.m3u', 'http://www.krcl.org/', 'KRCL-909.png', 0, 0, 0, 1, '2011-11-11', 9843, 0, '2017-01-01 00:00:00', 0), \
 ('Hits-My-Music', 'e meilleur de la musique des ann&#233;es 90 &#224; aujourd&#39;hui.', 'http://listen.radionomy.com/hit-s-my-music', 'http://www.hitsmymusic.com/', 'Hits-My-Music.png', 0, 0, 0, 1, '2011-11-11', 9844, 0, '2017-01-01 00:00:00', 0), \
 ('The-Sutter-Buttes-Best-Country-All-Weekend', '', 'http://listen.radionomy.com/hit-s-my-music', '', 'The-Sutter-Buttes-Best-Country-All-Weekend.png', 0, 0, 0, 1, '2011-11-11', 9845, 0, '2017-01-01 00:00:00', 0), \
@@ -8206,7 +6974,6 @@ const char *radio_station_setupsql29="REPLACE INTO `radio_stations` (`name`, `be
 ('Mat-Kearney', '', 'http://www.warpradio.com/player/mediaserver.asp?id=4418&t=2&streamRate=', '', 'Mat-Kearney.png', 0, 0, 0, 1, '2011-11-11', 9883, 0, '2017-01-01 00:00:00', 0), \
 ('WUCF-FM-899', '', 'http://stream.wucf.org:8030', 'http://wucf.ucf.edu/', 'WUCF-FM-899.png', 0, 0, 0, 1, '2011-11-11', 9884, 0, '2017-01-01 00:00:00', 0), \
 ('KPRL-1230', '', 'mms://phonograph.tcsn.net/kprl', 'http://www.kprl.com/', 'KPRL-1230.png', 0, 0, 0, 1, '2011-11-11', 9885, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Gippsland-1007', '', 'mms://phonograph.tcsn.net/kprl', 'http://www.abc.net.au/gippsland/', 'ABC-Gippsland-1007.png', 0, 0, 0, 1, '2011-11-11', 9886, 0, '2017-01-01 00:00:00', 0), \
 ('Man¡', '', 'mms://phonograph.tcsn.net/kprl', '', 'Man¡.png', 0, 0, 0, 1, '2011-11-11', 9887, 0, '2017-01-01 00:00:00', 0), \
 ('Villagers', '', 'mms://phonograph.tcsn.net/kprl', '', 'Villagers.png', 0, 0, 0, 1, '2011-11-11', 9888, 0, '2017-01-01 00:00:00', 0), \
 ('KNEB-960', '', 'mms://phonograph.tcsn.net/kprl', 'http://www.kneb.com/', 'KNEB-960.png', 0, 0, 0, 1, '2011-11-11', 9889, 0, '2017-01-01 00:00:00', 0), \
@@ -8401,7 +7168,6 @@ const char *radio_station_setupsql29="REPLACE INTO `radio_stations` (`name`, `be
 
 const char *radio_station_setupsql30="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('Pete-Murray', '', 'http://rfe-r1.alldigital.net:8000/lmjc63', '', 'Pete-Murray.png', 0, 0, 0, 1, '2011-11-11', 10093, 0, '2017-01-01 00:00:00', 0), \
-('Dublins-ABC-943', 'ABC format was mainly to play pop music with a high content of oldies Memories from the 60s to the 90s', 'http://server2.reliastream.com/tunein.php/bgaffney/playlist.pls', 'http://www.dublinsabc.ie/', 'Dublins-ABC-943.png', 0, 0, 0, 1, '2011-11-11', 10094, 0, '2017-01-01 00:00:00', 0), \
 ('WTOS-FM-1051', '', 'http://server2.reliastream.com/tunein.php/bgaffney/playlist.pls', 'http://www.wtosfm.com/', 'WTOS-FM-1051.png', 0, 0, 0, 1, '2011-11-11', 10095, 0, '2017-01-01 00:00:00', 0), \
 ('KAOI-1110', '', 'http://server2.reliastream.com/tunein.php/bgaffney/playlist.pls', 'http://www.kaoi.net/', 'KAOI-1110.png', 0, 0, 0, 1, '2011-11-11', 10096, 0, '2017-01-01 00:00:00', 0), \
 ('Fox-News-Radio-1490', '', 'http://server2.reliastream.com/tunein.php/bgaffney/playlist.pls', 'http://vermilioncountyfirst.com/WDAN/2608934', 'Fox-News-Radio-1490.png', 0, 0, 0, 1, '2011-11-11', 10097, 0, '2017-01-01 00:00:00', 0), \
@@ -8429,7 +7195,6 @@ const char *radio_station_setupsql30="REPLACE INTO `radio_stations` (`name`, `be
 ('Meln-Diesel', '', 'http://sc2.spacialnet.com:25236', '', 'Meln-Diesel.png', 0, 0, 0, 1, '2011-11-11', 10119, 0, '2017-01-01 00:00:00', 0), \
 ('Nancy-LaMott', '', 'http://sc2.spacialnet.com:25236', '', 'Nancy-LaMott.png', 0, 0, 0, 1, '2011-11-11', 10120, 0, '2017-01-01 00:00:00', 0), \
 ('Q-945', '', 'http://sc2.spacialnet.com:25236', 'http://www.q945rocks.com/', 'Q-945.png', 0, 0, 0, 1, '2011-11-11', 10121, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Lounge-Music', 'ABC LOUNGE webradio invites you to laze in the sun of the French Riviera ! ABC Lounge vous invite au farniente sous le soleil de la French Riviera !', 'http://listen.radionomy.com/abc-lounge', 'http://www.abc-lounge.com/', 'ABC-Lounge-Music.png', 0, 0, 1, 1, '2011-11-11', 10122, 0, '2011-10-14 15:58:23', 0), \
 ('Magic-1073', '', 'http://listen.radionomy.com/abc-lounge', 'http://www.magic1017.com/', 'Magic-1073.png', 0, 0, 0, 1, '2011-11-11', 10123, 0, '2017-01-01 00:00:00', 0), \
 ('WPKY-1580', '', 'http://listen.radionomy.com/abc-lounge', '', 'WPKY-1580.png', 0, 0, 0, 1, '2011-11-11', 10124, 0, '2017-01-01 00:00:00', 0), \
 ('Juli', '', 'http://listen.radionomy.com/abc-lounge', '', 'Juli.png', 0, 0, 0, 1, '2011-11-11', 10125, 0, '2017-01-01 00:00:00', 0), \
@@ -8437,7 +7202,6 @@ const char *radio_station_setupsql30="REPLACE INTO `radio_stations` (`name`, `be
 ('Flogging-Molly', '', 'http://listen.radionomy.com/abc-lounge', '', 'Flogging-Molly.png', 0, 0, 0, 1, '2011-11-11', 10127, 0, '2017-01-01 00:00:00', 0), \
 ('World-Cup-Countdown', '', 'http://listen.radionomy.com/abc-lounge', '', 'World-Cup-Countdown.png', 0, 0, 0, 1, '2011-11-11', 10128, 0, '2017-01-01 00:00:00', 0), \
 ('1005-KI', '', 'http://listen.radionomy.com/abc-lounge', 'http://www.wwki.com/', '1005-KI.png', 0, 0, 0, 1, '2011-11-11', 10129, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Grandstand', '', 'http://www.abc.net.au/res/streaming/audio/mp3/grandstand.pls', 'http://www.abc.net.au/sport/', 'ABC-Grandstand.png', 0, 0, 0, 1, '2011-11-11', 10130, 0, '2017-01-01 00:00:00', 0), \
 ('News-Radio-1150', '', 'http://www.abc.net.au/res/streaming/audio/mp3/grandstand.pls', 'http://www.ksallink.com/ksal/', 'News-Radio-1150.png', 0, 0, 0, 1, '2011-11-11', 10131, 0, '2017-01-01 00:00:00', 0), \
 ('Marit-Larsen', '', 'http://www.abc.net.au/res/streaming/audio/mp3/grandstand.pls', '', 'Marit-Larsen.png', 0, 0, 0, 1, '2011-11-11', 10132, 0, '2017-01-01 00:00:00', 0), \
 ('Dov-Hikind-Show', '', 'http://www.abc.net.au/res/streaming/audio/mp3/grandstand.pls', '', 'Dov-Hikind-Show.png', 0, 0, 0, 1, '2011-11-11', 10133, 0, '2017-01-01 00:00:00', 0), \
@@ -8697,7 +7461,6 @@ const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `be
 ('Kiss-FM-969', '', 'http://96.31.83.86:8200/', 'http://www.969kissfm.com/', 'Kiss-FM-969.png', 0, 0, 0, 1, '2011-11-11', 10389, 0, '2017-01-01 00:00:00', 0), \
 ('KPRL-Religious-Programming', '', 'http://96.31.83.86:8200/', '', 'KPRL-Religious-Programming.png', 0, 0, 0, 1, '2011-11-11', 10390, 0, '2017-01-01 00:00:00', 0), \
 ('Juli', '', 'http://96.31.83.86:8200/', '', 'Juli.png', 0, 0, 0, 1, '2011-11-11', 10391, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Adelaide-891', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/adelaide/radio/', 'ABC-Adelaide-891.png', 0, 0, 0, 1, '2011-11-11', 10392, 0, '2017-01-01 00:00:00', 0), \
 ('Naughty-by-Nature', '', 'http://96.31.83.86:8200/', '', 'Naughty-by-Nature.png', 0, 0, 0, 1, '2011-11-11', 10393, 0, '2017-01-01 00:00:00', 0), \
 ('NC-General-Assembly-House', '', 'http://96.31.83.86:8200/', 'http://www.ncga.state.nc.us/', 'NC-General-Assembly-House.png', 0, 0, 0, 1, '2011-11-11', 10394, 0, '2017-01-01 00:00:00', 0), \
 ('La-Que-Buena-1600', '', 'http://96.31.83.86:8200/', 'http://www.wlaaradio.com/', 'La-Que-Buena-1600.png', 0, 0, 0, 1, '2011-11-11', 10395, 0, '2017-01-01 00:00:00', 0), \
@@ -8809,8 +7572,6 @@ const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `be
 ('BWitched', '', 'http://96.31.83.86:8200/', '', 'BWitched.png', 0, 0, 0, 1, '2011-11-11', 10506, 0, '2017-01-01 00:00:00', 0), \
 ('KBLJ-1400', '', 'http://96.31.83.86:8200/', '', 'KBLJ-1400.png', 0, 0, 0, 1, '2011-11-11', 10507, 0, '2017-01-01 00:00:00', 0), \
 ('Sid-Rosenberg', '', 'http://96.31.83.86:8200/', '', 'Sid-Rosenberg.png', 0, 0, 0, 1, '2011-11-11', 10508, 0, '2017-01-01 00:00:00', 0), \
-('10-Years', '', 'http://96.31.83.86:8200/', '', '10-Years.png', 0, 0, 1, 1, '2011-11-11', 10509, 0, '2011-10-18 18:35:53', 0), \
-('KRTN-1490', '', 'http://96.31.83.86:8200/', '', 'KRTN-1490.png', 0, 0, 0, 1, '2011-11-11', 10510, 0, '2017-01-01 00:00:00', 0), \
 ('Smooth-FM-1063', '', 'http://96.31.83.86:8200/', 'http://www.weibfm.com/', 'Smooth-FM-1063.png', 0, 0, 0, 1, '2011-11-11', 10511, 0, '2017-01-01 00:00:00', 0), \
 ('The-Zone-931', '', 'http://96.31.83.86:8200/', 'http://www.espncolumbia.com/', 'The-Zone-931.png', 0, 0, 0, 1, '2011-11-11', 10512, 0, '2017-01-01 00:00:00', 0), \
 ('Z92-921', '', 'http://96.31.83.86:8200/', 'http://www.z92online.com', 'Z92-921.png', 0, 0, 0, 1, '2011-11-11', 10513, 0, '2017-01-01 00:00:00', 0), \
@@ -8825,7 +7586,6 @@ const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio-Wien-899', '', 'http://96.31.83.86:8200/', 'http://wien.orf.at/', 'Radio-Wien-899.png', 0, 0, 0, 1, '2011-11-11', 10522, 0, '2017-01-01 00:00:00', 0), \
 ('CAFFE MOCHA', '', 'http://96.31.83.86:8200/', '', 'CAF-MOCHA.png', 0, 0, 0, 1, '2011-11-11', 10523, 0, '2017-01-01 00:00:00', 0), \
 ('SixxAM', '', 'http://96.31.83.86:8200/', '', 'SixxAM.png', 0, 0, 0, 1, '2011-11-11', 10524, 0, '2017-01-01 00:00:00', 0), \
-('937-The-Rockin-River', '', 'http://96.31.83.86:8200/', 'http://www.rockinriver.net/', '937-The-Rockin-River.png', 0, 0, 0, 1, '2011-11-11', 10525, 0, '2017-01-01 00:00:00', 0), \
 ('KMMO-FM-1029', 'Real Radio, KMMO is your Information Station for Mid-Missouri.  We provide up-to-date weather coverage; local, state, and national news; sports coverage; and agricultural information.', 'http://96.31.83.86:8200/', 'http://www.kmmo.com', 'KMMO-FM-1029.png', 0, 0, 0, 1, '2011-11-11', 10526, 0, '2017-01-01 00:00:00', 0), \
 ('Sunny-991', '', 'http://96.31.83.86:8200/', 'http://www.sunny99.com/', 'Sunny-991.png', 0, 0, 0, 1, '2011-11-11', 10527, 0, '2017-01-01 00:00:00', 0), \
 ('Siebenbergen', '', 'http://96.31.83.86:8200/', '', 'Siebenbergen.png', 0, 0, 0, 1, '2011-11-11', 10528, 0, '2017-01-01 00:00:00', 0), \
@@ -8855,7 +7615,6 @@ const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `be
 ('Kix-1029', '', 'http://96.31.83.86:8200/', 'http://www.kix1029.com/', 'Kix-1029.png', 0, 0, 0, 1, '2011-11-11', 10553, 0, '2017-01-01 00:00:00', 0), \
 ('The-Ric-Edelman-Show', '', 'http://96.31.83.86:8200/', '', 'The-Ric-Edelman-Show.png', 0, 0, 0, 1, '2011-11-11', 10554, 0, '2017-01-01 00:00:00', 0), \
 ('The-X-1059', '', 'http://96.31.83.86:8200/', 'http://www.1059thex.com/', 'The-X-1059.png', 0, 0, 0, 1, '2011-11-11', 10555, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Itinerant-3', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/', 'ABC-Itinerant-3.png', 0, 0, 0, 1, '2011-11-11', 10556, 0, '2017-01-01 00:00:00', 0), \
 ('J-Cole', '', 'http://96.31.83.86:8200/', '', 'J-Cole.png', 0, 0, 0, 1, '2011-11-11', 10557, 0, '2017-01-01 00:00:00', 0), \
 ('Frequence-Terre', '', 'http://96.31.83.86:8200/', 'http://www.frequenceterre.com/', 'Frequence-Terre.png', 0, 0, 0, 1, '2011-11-11', 10558, 0, '2017-01-01 00:00:00', 0), \
 ('WBER-905', '', 'http://96.31.83.86:8200/', 'http://wber.monroe.edu', 'WBER-905.png', 0, 0, 0, 1, '2011-11-11', 10559, 0, '2017-01-01 00:00:00', 0), \
@@ -8890,7 +7649,6 @@ const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `be
 ('AccuRadio-Decades-90s-Dance-Party', '', 'http://96.31.83.86:8200/', 'http://www.accuradio.com/decades/', 'AccuRadio-Decades-90s-Dance-Party.png', 0, 0, 0, 1, '2011-11-11', 10588, 0, '2017-01-01 00:00:00', 0), \
 ('KAZU-903', '', 'http://96.31.83.86:8200/', 'http://www.kazu.org/', 'KAZU-903.png', 0, 0, 0, 1, '2011-11-11', 10589, 0, '2017-01-01 00:00:00', 0), \
 ('The-Schnitt-Show', '', 'http://96.31.83.86:8200/', '', 'The-Schnitt-Show.png', 0, 0, 0, 1, '2011-11-11', 10590, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---90s-Hits', '', 'http://96.31.83.86:8200/', 'http://www.audiocream.com/', 'Audio-Cream---90s-Hits.png', 0, 0, 0, 1, '2011-11-11', 10591, 0, '2017-01-01 00:00:00', 0), \
 ('ESPN-Radio-Gross-Point-Blank-MMA-Podcast', '', 'http://96.31.83.86:8200/', '', 'ESPN-Radio-Gross-Point-Blank-MMA-Podcast.png', 0, 0, 0, 1, '2011-11-11', 10592, 0, '2017-01-01 00:00:00', 0), \
 ('Sunny-1015', '', 'http://96.31.83.86:8200/', 'http://www.sunny1015.com/', 'Sunny-1015.png', 0, 0, 0, 1, '2011-11-11', 10593, 0, '2017-01-01 00:00:00', 0), \
 ('Gloria-Gaynor', '', 'http://96.31.83.86:8200/', '', 'Gloria-Gaynor.png', 0, 0, 0, 1, '2011-11-11', 10594, 0, '2017-01-01 00:00:00', 0), \
@@ -9145,12 +7903,10 @@ const char *radio_station_setupsql32="REPLACE INTO `radio_stations` (`name`, `be
 ('GotRadio-PS-I-Love-You', 'The greatest power ballads and contemporary love songs of all time.  The perfect blend of sentimental rock and pop.', 'http://96.31.83.86:8200/', 'http://www.gotradio.com/', 'GotRadio-PS-I-Love-You.png', 0, 0, 0, 1, '2011-11-11', 10844, 0, '2017-01-01 00:00:00', 0), \
 ('Run-DMC', '', 'http://96.31.83.86:8200/', '', 'Run-DMC.png', 0, 0, 0, 1, '2011-11-11', 10845, 0, '2017-01-01 00:00:00', 0), \
 ('The-Beat-945', '', 'http://96.31.83.86:8200/', 'http://www.thebeat.com/', 'The-Beat-945.png', 0, 0, 0, 1, '2011-11-11', 10846, 0, '2017-01-01 00:00:00', 0), \
-('AA-Bondy', '', 'http://96.31.83.86:8200/', '', 'AA-Bondy.png', 0, 0, 1, 1, '2011-11-11', 10847, 0, '2011-10-17 23:40:55', 0), \
 ('The-Planet-1011', '', 'http://96.31.83.86:8200/', 'http://www.planet941.com/', 'The-Planet-1011.png', 0, 0, 0, 1, '2011-11-11', 10848, 0, '2017-01-01 00:00:00', 0), \
 ('Jacuzzi-Boys', '', 'http://96.31.83.86:8200/', '', 'Jacuzzi-Boys.png', 0, 0, 0, 1, '2011-11-11', 10849, 0, '2017-01-01 00:00:00', 0), \
 ('SportsRadio-610-WIP', '610 - WIP is where Philadelphian&#39;s come to talk about sports.  WIP is completely live and local with a special emphasis on Philly&#39;s sports teams.  The station features Angelo Cataldi mornings;', 'http://96.31.83.86:8200/', 'http://www.610wip.com/', 'SportsRadio-610-WIP.png', 0, 0, 0, 1, '2011-11-11', 10850, 0, '2017-01-01 00:00:00', 0), \
 ('Rudy-Paolangeli-Show', '', 'http://96.31.83.86:8200/', '', 'Rudy-Paolangeli-Show.png', 0, 0, 0, 1, '2011-11-11', 10851, 0, '2017-01-01 00:00:00', 0), \
-('1039-RXP', '', 'http://96.31.83.86:8200/', 'http://www.1039rxp.com/', '1039-RXP.png', 0, 0, 1, 1, '2011-11-11', 10852, 0, '2011-10-17 23:39:26', 0), \
 ('WTAG-580', '', 'http://96.31.83.86:8200/', 'http://www.wtag.com/', 'WTAG-580.png', 0, 0, 0, 1, '2011-11-11', 10853, 0, '2017-01-01 00:00:00', 0), \
 ('Various-Artists', '', 'http://96.31.83.86:8200/', '', 'Various-Artists.png', 0, 0, 0, 1, '2011-11-11', 10854, 0, '2017-01-01 00:00:00', 0), \
 ('USC-Football-Post-Game', '', 'http://96.31.83.86:8200/', '', 'USC-Football-Post-Game.png', 0, 0, 0, 1, '2011-11-11', 10855, 0, '2017-01-01 00:00:00', 0), \
@@ -9248,7 +8004,6 @@ const char *radio_station_setupsql33="REPLACE INTO `radio_stations` (`name`, `be
 ('931-Doug-FM', '', 'http://96.31.83.86:8200/', 'http://www.931dougfm.com/', '931-Doug-FM.png', 0, 0, 0, 1, '2011-11-11', 10946, 0, '2017-01-01 00:00:00', 0), \
 ('Homer-1350', '', 'http://96.31.83.86:8200/', 'http://www.kdza1350.com', 'Homer-1350.png', 0, 0, 0, 1, '2011-11-11', 10947, 0, '2017-01-01 00:00:00', 0), \
 ('Death-Cab-for-Cutie', '', 'http://96.31.83.86:8200/', '', 'Death-Cab-for-Cutie.png', 0, 0, 0, 1, '2011-11-11', 10948, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Brisbane-612', '612 ABC Brisbane is Brisbane&#39;s premier talk radio station, broadcasting live on air, online and on digital radio to the greater Brisbane region.', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/brisbane/', 'ABC-Brisbane-612.png', 0, 0, 0, 1, '2011-11-11', 10949, 0, '2017-01-01 00:00:00', 0), \
 ('Msica--Mega', '', 'http://96.31.83.86:8200/', '', 'Msica--Mega.png', 0, 0, 0, 1, '2011-11-11', 10950, 0, '2017-01-01 00:00:00', 0), \
 ('KLO-1430', '', 'http://96.31.83.86:8200/', 'http://www.kloradio.com/', 'KLO-1430.png', 0, 0, 0, 1, '2011-11-11', 10951, 0, '2017-01-01 00:00:00', 0), \
 ('Keene-Classics-991-1037', '', 'http://96.31.83.86:8200/', 'http://www.keeneclassics.com/', 'Keene-Classics-991-1037.png', 0, 0, 0, 1, '2011-11-11', 10952, 0, '2017-01-01 00:00:00', 0), \
@@ -9282,11 +8037,9 @@ const char *radio_station_setupsql33="REPLACE INTO `radio_stations` (`name`, `be
 ('Sports-Collectables-Hour', '', 'http://96.31.83.86:8200/', '', 'Sports-Collectables-Hour.png', 0, 0, 0, 1, '2011-11-11', 10982, 0, '2017-01-01 00:00:00', 0), \
 ('Froggy-999', 'Fargo-Moorhead&#39;s Station for New Country!', 'http://96.31.83.86:8200/', 'http://www.froggyweb.com/', 'Froggy-999.png', 0, 0, 0, 1, '2011-11-11', 10983, 0, '2017-01-01 00:00:00', 0), \
 ('Lipps-Inc', '', 'http://96.31.83.86:8200/', '', 'Lipps-Inc.png', 0, 0, 0, 1, '2011-11-11', 10984, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Northern-Tasmania-917', '', 'http://96.31.83.86:8200/', 'http://abc.net.au/northtas/', 'ABC-Northern-Tasmania-917.png', 0, 0, 0, 1, '2011-11-11', 10985, 0, '2017-01-01 00:00:00', 0), \
 ('Great-Songs---Great-Memories', '', 'http://96.31.83.86:8200/', '', 'Great-Songs---Great-Memories.png', 0, 0, 0, 1, '2011-11-11', 10986, 0, '2017-01-01 00:00:00', 0), \
 ('The-Wolf-1400', 'KWUF 1400 AM is country music and local talk radio at its very best: all the new country hits with a liberal sprinkling of classics, plus local topics on &quot;Good Morning Pagosa&quot; every weekday.', 'http://96.31.83.86:8200/', 'http://www.kwuf.com/', 'The-Wolf-1400.png', 0, 0, 0, 1, '2011-11-11', 10987, 0, '2017-01-01 00:00:00', 0), \
 ('The-Farm', '', 'http://96.31.83.86:8200/', '', 'The-Farm.png', 0, 0, 0, 1, '2011-11-11', 10988, 0, '2017-01-01 00:00:00', 0), \
-('933-FLZ', 'Home of The MJ Morning Show', 'http://96.31.83.86:8200/', 'http://www.933flz.com/', '933-FLZ.png', 0, 0, 0, 1, '2011-11-11', 10989, 0, '2017-01-01 00:00:00', 0), \
 ('WSLY-1049', '', 'http://96.31.83.86:8200/', 'http://www.espn1049.com/', 'WSLY-1049.png', 0, 0, 0, 1, '2011-11-11', 10990, 0, '2017-01-01 00:00:00', 0), \
 ('Whistle-Test-40', '', 'http://96.31.83.86:8200/', '', 'Whistle-Test-40.png', 0, 0, 0, 1, '2011-11-11', 10991, 0, '2017-01-01 00:00:00', 0), \
 ('Doctors-Orders', '', 'http://96.31.83.86:8200/', '', 'Doctors-Orders.png', 0, 0, 0, 1, '2011-11-11', 10992, 0, '2017-01-01 00:00:00', 0), \
@@ -9326,7 +8079,6 @@ const char *radio_station_setupsql33="REPLACE INTO `radio_stations` (`name`, `be
 ('Girls-Rock-Radio', '', 'http://96.31.83.86:8200/', 'http://www.girlsrockradio.com/', 'Girls-Rock-Radio.png', 0, 0, 0, 1, '2011-11-11', 11026, 0, '2017-01-01 00:00:00', 0), \
 ('My-995', '', 'http://96.31.83.86:8200/', 'http://www.my995fm.com/', 'My-995.png', 0, 0, 0, 1, '2011-11-11', 11027, 0, '2017-01-01 00:00:00', 0), \
 ('Lycoming-County-Church-Services', '', 'http://96.31.83.86:8200/', '', 'Lycoming-County-Church-Services.png', 0, 0, 0, 1, '2011-11-11', 11028, 0, '2017-01-01 00:00:00', 0), \
-('931-All-The-Hits', '', 'http://96.31.83.86:8200/', 'http://www.931allthehits.com/', '931-All-The-Hits.png', 0, 0, 0, 1, '2011-11-11', 11029, 0, '2017-01-01 00:00:00', 0), \
 ('WZIP-881', '', 'http://96.31.83.86:8200/', 'http://www.wzip.fm/', 'WZIP-881.png', 0, 0, 0, 1, '2011-11-11', 11030, 0, '2017-01-01 00:00:00', 0), \
 ('Maroon', '', 'http://96.31.83.86:8200/', '', 'Maroon.png', 0, 0, 0, 1, '2011-11-11', 11031, 0, '2017-01-01 00:00:00', 0), \
 ('WNAH-1360', '', 'http://96.31.83.86:8200/', 'http://www.wnah.com/', 'WNAH-1360.png', 0, 0, 0, 1, '2011-11-11', 11032, 0, '2017-01-01 00:00:00', 0), \
@@ -9593,7 +8345,6 @@ const char *radio_station_setupsql34="REPLACE INTO `radio_stations` (`name`, `be
 ('SKYFM-Relaxation', 'relaxing music for the mind and soul', 'http://96.31.83.86:8200/', 'http://www.sky.fm/relaxation', 'SKYFM-Relaxation.png', 0, 0, 0, 1, '2011-11-11', 11290, 0, '2017-01-01 00:00:00', 0), \
 ('Guilty-Pleasure', '', 'http://96.31.83.86:8200/', '', 'Guilty-Pleasure.png', 0, 0, 0, 1, '2011-11-11', 11291, 0, '2017-01-01 00:00:00', 0), \
 ('The-Penthouse', 'People of all ages are discovering the timeless music of &quot;The Great American Songbook&quot; as sung by an ever-increasing list of modern artists.  The Penthouse Radio takes this large group of &q', 'http://96.31.83.86:8200/', 'http://www.thepenthouse.fm/', 'The-Penthouse.png', 0, 0, 0, 1, '2011-11-11', 11292, 0, '2017-01-01 00:00:00', 0), \
-('Alice--973', 'Alice @ 97.3 is a local radio station in the San Francisco Bay Area. We&#39;re known for our music, our outrageous Morning Show and reckless abandon for art, film and all things that inspire. Alice Mu', 'http://96.31.83.86:8200/', 'http://www.radioalice.com', 'Alice--973.png', 0, 0, 1, 1, '2011-11-11', 11293, 0, '2011-10-15 20:11:22', 0), \
 ('Benassi-Bros', '', 'http://96.31.83.86:8200/', '', 'Benassi-Bros.png', 0, 0, 0, 1, '2011-11-11', 11294, 0, '2017-01-01 00:00:00', 0), \
 ('WNTM-710', '', 'http://96.31.83.86:8200/', 'http://www.newsradio710.com/', 'WNTM-710.png', 0, 0, 0, 1, '2011-11-11', 11295, 0, '2017-01-01 00:00:00', 0), \
 ('KNDA-1029', '', 'http://96.31.83.86:8200/', 'http://www.dabomb.com', 'KNDA-1029.png', 0, 0, 0, 1, '2011-11-11', 11296, 0, '2017-01-01 00:00:00', 0), \
@@ -9703,7 +8454,6 @@ const char *radio_station_setupsql34="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Trammps', '', 'http://96.31.83.86:8200/', '', 'The-Trammps.png', 0, 0, 0, 1, '2011-11-11', 11401, 0, '2017-01-01 00:00:00', 0), \
 ('The-Bled', '', 'http://96.31.83.86:8200/', '', 'The-Bled.png', 0, 0, 0, 1, '2011-11-11', 11402, 0, '2017-01-01 00:00:00', 0), \
 ('KZNX-1530', '', 'http://96.31.83.86:8200/', 'http://www.espnaustin.com/', 'KZNX-1530.png', 0, 0, 0, 1, '2011-11-11', 11403, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Goldfields-Esperance-648', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/goldfields/', 'ABC-Goldfields-Esperance-648.png', 0, 0, 0, 1, '2011-11-11', 11404, 0, '2017-01-01 00:00:00', 0), \
 ('Brian-McKnight', '', 'http://96.31.83.86:8200/', '', 'Brian-McKnight.png', 0, 0, 0, 1, '2011-11-11', 11405, 0, '2017-01-01 00:00:00', 0), \
 ('Anthrax', '', 'http://96.31.83.86:8200/', '', 'Anthrax.png', 0, 0, 0, 1, '2011-11-11', 11406, 0, '2017-01-01 00:00:00', 0), \
 ('Morgion', '', 'http://96.31.83.86:8200/', '', 'Morgion.png', 0, 0, 0, 1, '2011-11-11', 11407, 0, '2017-01-01 00:00:00', 0), \
@@ -9720,7 +8470,6 @@ const char *radio_station_setupsql34="REPLACE INTO `radio_stations` (`name`, `be
 ('Poster-Column', '', 'http://96.31.83.86:8200/', '', 'Poster-Column.png', 0, 0, 0, 1, '2011-11-11', 11418, 0, '2017-01-01 00:00:00', 0), \
 ('Nelly-Furtado', '', 'http://96.31.83.86:8200/', '', 'Nelly-Furtado.png', 0, 0, 0, 1, '2011-11-11', 11419, 0, '2017-01-01 00:00:00', 0), \
 ('WWNB-1490', 'Featuring the best in National and local sportstalk combined with play by play  broadcasts from the NFL, NBA, MLB, NCAA Football &amp; Basketball, Carolina Hurricanes hockey, Kinston Indians &amp; New', 'http://96.31.83.86:8200/', 'http://www.wwnb1490.com/', 'WWNB-1490.png', 0, 0, 0, 1, '2011-11-11', 11420, 0, '2017-01-01 00:00:00', 0), \
-('ABC-North-and-West-639', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/northandwest/', 'ABC-North-and-West-639.png', 0, 0, 0, 1, '2011-11-11', 11421, 0, '2017-01-01 00:00:00', 0), \
 ('News-Radio-950', '', 'http://96.31.83.86:8200/', 'http://www.kwos.com/', 'News-Radio-950.png', 0, 0, 0, 1, '2011-11-11', 11422, 0, '2017-01-01 00:00:00', 0), \
 ('Hot-967', '', 'http://96.31.83.86:8200/', 'http://www.star96fm.com/', 'Hot-967.png', 0, 0, 0, 1, '2011-11-11', 11423, 0, '2017-01-01 00:00:00', 0), \
 ('ROCK-104-9-1049', '', 'http://96.31.83.86:8200/', 'http://www.rock1049.net/', 'ROCK-104-9-1049.png', 0, 0, 0, 1, '2011-11-11', 11424, 0, '2017-01-01 00:00:00', 0), \
@@ -9766,7 +8515,6 @@ const char *radio_station_setupsql34="REPLACE INTO `radio_stations` (`name`, `be
 ('Noel-Gallagher', '', 'http://96.31.83.86:8200/', '', 'Noel-Gallagher.png', 0, 0, 0, 1, '2011-11-11', 11464, 0, '2017-01-01 00:00:00', 0), \
 ('Leading-the-Way', '', 'http://96.31.83.86:8200/', '', 'Leading-the-Way.png', 0, 0, 0, 1, '2011-11-11', 11465, 0, '2017-01-01 00:00:00', 0), \
 ('Toni-Braxton', '', 'http://96.31.83.86:8200/', '', 'Toni-Braxton.png', 0, 0, 0, 1, '2011-11-11', 11466, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---50s-Hits', '', 'http://96.31.83.86:8200/', 'http://www.audiocream.com/', 'Audio-Cream---50s-Hits.png', 0, 0, 0, 1, '2011-11-11', 11467, 0, '2017-01-01 00:00:00', 0), \
 ('NiceNoise', 'A unique mix of Easy Listening', 'http://96.31.83.86:8200/', 'http://nicenoise.net/', 'NiceNoise.png', 0, 0, 0, 1, '2011-11-11', 11468, 0, '2017-01-01 00:00:00', 0), \
 ('Lifes-Hope', '', 'http://96.31.83.86:8200/', '', 'Lifes-Hope.png', 0, 0, 0, 1, '2011-11-11', 11469, 0, '2017-01-01 00:00:00', 0), \
 ('KCTunes---(Classic-Rock)', 'Classic Rock from the 60s, 70s', 'http://96.31.83.86:8200/', 'http://www.kctunes.com/Catalog/Classic%20Rock.htm', 'KCTunes---(Classic-Rock).png', 0, 0, 0, 1, '2011-11-11', 11470, 0, '2017-01-01 00:00:00', 0), \
@@ -10040,8 +8788,6 @@ const char *radio_station_setupsql35="REPLACE INTO `radio_stations` (`name`, `be
 ('KOPB-FM-915', '', 'http://96.31.83.86:8200/', 'http://www.opb.org/radio/', 'KOPB-FM-915.png', 0, 0, 0, 1, '2011-11-11', 11736, 0, '2017-01-01 00:00:00', 0), \
 ('Eric-Marienthal', '', 'http://96.31.83.86:8200/', '', 'Eric-Marienthal.png', 0, 0, 0, 1, '2011-11-11', 11737, 0, '2017-01-01 00:00:00', 0), \
 ('Stephen-Malkmus-and-the-Jicks', '', 'http://96.31.83.86:8200/', '', 'Stephen-Malkmus-and-the-Jicks.png', 0, 0, 0, 1, '2011-11-11', 11738, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Kids', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/broadbandkids/', 'ABC-Kids.png', 0, 0, 0, 1, '2011-11-11', 11739, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Gold-Coast-917', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/goldcoast/radio/', 'ABC-Gold-Coast-917.png', 0, 0, 0, 1, '2011-11-11', 11740, 0, '2017-01-01 00:00:00', 0), \
 ('WINE-940', '', 'http://96.31.83.86:8200/', 'http://www.i95rock.com/', 'WINE-940.png', 0, 0, 0, 1, '2011-11-11', 11741, 0, '2017-01-01 00:00:00', 0), \
 ('Martin-Solveig', '', 'http://96.31.83.86:8200/', '', 'Martin-Solveig.png', 0, 0, 0, 1, '2011-11-11', 11742, 0, '2017-01-01 00:00:00', 0), \
 ('KATX-977', 'Small market radio done right! Live morning show, call in show to buy, sell and trade and coverage of community events, high school and college sports and more.', 'http://96.31.83.86:8200/', 'http://www.hprnetwork.com/index_central.html', 'KATX-977.png', 0, 0, 0, 1, '2011-11-11', 11743, 0, '2017-01-01 00:00:00', 0), \
@@ -10118,7 +8864,6 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('NRJ-Hit-Music-Only', '', 'http://96.31.83.86:8200/', '', 'NRJ-Hit-Music-Only.png', 0, 0, 0, 1, '2011-11-11', 11811, 0, '2017-01-01 00:00:00', 0), \
 ('BBC-Radio-1s-Review-with-Nihal', '', 'http://96.31.83.86:8200/', '', 'BBC-Radio-1s-Review-with-Nihal.png', 0, 0, 0, 1, '2011-11-11', 11812, 0, '2017-01-01 00:00:00', 0), \
 ('New-Edition', '', 'http://96.31.83.86:8200/', '', 'New-Edition.png', 0, 0, 0, 1, '2011-11-11', 11813, 0, '2017-01-01 00:00:00', 0), \
-('93-BLX-929', '', 'http://96.31.83.86:8200/', 'http://www.thebigstation93blx.com/', '93-BLX-929.png', 0, 0, 0, 1, '2011-11-11', 11814, 0, '2017-01-01 00:00:00', 0), \
 ('NERadio-Nonstop', '', 'http://96.31.83.86:8200/', 'http://no.neradio.fm/', 'NERadio-Nonstop.png', 0, 0, 0, 1, '2011-11-11', 11815, 0, '2017-01-01 00:00:00', 0), \
 ('HighTimes-Radio', '', 'http://96.31.83.86:8200/', 'http://www.hightimesradio.org/', 'HighTimes-Radio.png', 0, 0, 0, 1, '2011-11-11', 11816, 0, '2017-01-01 00:00:00', 0), \
 ('Derti-FM-986', '', 'http://96.31.83.86:8200/', 'http://www.derti.gr/', 'Derti-FM-986.png', 0, 0, 0, 1, '2011-11-11', 11817, 0, '2017-01-01 00:00:00', 0), \
@@ -10143,9 +8888,7 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('SWR3-moose-radio-996', 'SWR3 ist die multimediale Pop- Musik- und Party-Events, Comedy-Touren sowie der TV-Show', 'http://96.31.83.86:8200/', 'http://www.swr3.de/', 'SWR3-moose-radio-996.png', 0, 0, 0, 1, '2011-11-11', 11836, 0, '2017-01-01 00:00:00', 0), \
 ('KQNK-FM-1067', '', 'http://96.31.83.86:8200/', 'http://www.kqnk.com/', 'KQNK-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 11837, 0, '2017-01-01 00:00:00', 0), \
 ('KCMO-FM-949', '', 'http://96.31.83.86:8200/', 'http://www.949kcmo.com/', 'KCMO-FM-949.png', 0, 0, 0, 1, '2011-11-11', 11838, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---1983-Hits', 'Like, what a totally awesome decade! Big hair (mullets ruled)', 'http://96.31.83.86:8200/', 'http://www.audiocream.com/', '', 0, 0, 0, 1, '2011-11-11', 11839, 0, '2017-01-01 00:00:00', 0), \
 ('RadioIO-80s-Pop', '80s pop hits from the musically transitional decade, which saw synthesizers, funk and the influence of music television creating a whole new pop', 'http://96.31.83.86:8200/', 'http://www.radioio.com/channels/80s/pop', 'RadioIO-80s-Pop.png', 0, 0, 0, 1, '2011-11-11', 11840, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---80s-Hits', '', 'http://96.31.83.86:8200/', 'http://www.audiocream.com/', 'Audio-Cream---80s-Hits.png', 0, 0, 0, 1, '2011-11-11', 11841, 0, '2017-01-01 00:00:00', 0), \
 ('Metro-Plus-Live-1044', 'Having Hong Kong as one of the most cosmopolitan City in the World, Metro Plus AM 1044 serves it listeners with the same concept.', 'http://96.31.83.86:8200/', 'http://www.metroradio.com.hk/1044/', 'Metro-Plus-Live-1044.png', 0, 0, 0, 1, '2011-11-11', 11842, 0, '2017-01-01 00:00:00', 0), \
 ('Gil-Scott-Heron', '', 'http://96.31.83.86:8200/', '', 'Gil-Scott-Heron.png', 0, 0, 0, 1, '2011-11-11', 11843, 0, '2017-01-01 00:00:00', 0), \
 ('Elvis-Costello', '', 'http://96.31.83.86:8200/', '', 'Elvis-Costello.png', 0, 0, 0, 1, '2011-11-11', 11844, 0, '2017-01-01 00:00:00', 0), \
@@ -10216,10 +8959,8 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('WKMM-967', '', 'http://96.31.83.86:8200/', 'http://www.wkmmfm.com/', 'WKMM-967.png', 0, 0, 0, 1, '2011-11-11', 11910, 0, '2017-01-01 00:00:00', 0), \
 ('Johnny-Lytle', '', 'http://96.31.83.86:8200/', '', 'Johnny-Lytle.png', 0, 0, 0, 1, '2011-11-11', 11911, 0, '2017-01-01 00:00:00', 0), \
 ('KXEO-1340', '', 'http://96.31.83.86:8200/', 'http://info.kxeo.com/', 'KXEO-1340.png', 0, 0, 0, 1, '2011-11-11', 11912, 0, '2017-01-01 00:00:00', 0), \
-('ABC-New-England-North-West-648', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/newengland/', 'ABC-New-England-North-West-648.png', 0, 0, 0, 1, '2011-11-11', 11913, 0, '2017-01-01 00:00:00', 0), \
 ('Deadmau5', '', 'http://96.31.83.86:8200/', '', 'Deadmau5.png', 0, 0, 0, 1, '2011-11-11', 11914, 0, '2017-01-01 00:00:00', 0), \
 ('The-Hoss-991', 'One Hoss of a station... New and Traditional Country with some Rebel Country, Southern Rock and Alternative Country Mixed In. We are also our area&#39;s community connection and THE PLACE for South Ce', 'http://96.31.83.86:8200/', 'http://www.thehoss.com/', 'The-Hoss-991.png', 0, 0, 0, 1, '2011-11-11', 11915, 0, '2017-01-01 00:00:00', 0), \
-('93-1-Da-Paina-931', '', 'http://96.31.83.86:8200/', 'http://931dapaina.com/', '93-1-Da-Paina-931.png', 0, 0, 0, 1, '2011-11-11', 11916, 0, '2017-01-01 00:00:00', 0), \
 ('Power-1043', '', 'http://96.31.83.86:8200/', 'http://power1043.com/', 'Power-1043.png', 0, 0, 0, 1, '2011-11-11', 11917, 0, '2017-01-01 00:00:00', 0), \
 ('Other-Lives', '', 'http://96.31.83.86:8200/', '', 'Other-Lives.png', 0, 0, 0, 1, '2011-11-11', 11918, 0, '2017-01-01 00:00:00', 0), \
 ('Texas-99-991', '', 'http://96.31.83.86:8200/', 'http://www.texas99.com/', 'Texas-99-991.png', 0, 0, 0, 1, '2011-11-11', 11919, 0, '2017-01-01 00:00:00', 0), \
@@ -10232,9 +8973,6 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('Bremen-Eins-938', 'Radio from Bremen', 'http://96.31.83.86:8200/', 'http://www.radiobremen.de/bremeneins/', 'Bremen-Eins-938.png', 0, 0, 0, 1, '2011-11-11', 11926, 0, '2017-01-01 00:00:00', 0), \
 ('Good-Charlotte', '', 'http://96.31.83.86:8200/', '', 'Good-Charlotte.png', 0, 0, 0, 1, '2011-11-11', 11927, 0, '2017-01-01 00:00:00', 0), \
 ('P4-Radio-Ballade', '', 'http://96.31.83.86:8200/', 'http://www.p4.no/', 'P4-Radio-Ballade.png', 0, 0, 0, 1, '2011-11-11', 11928, 0, '2017-01-01 00:00:00', 0), \
-('Hay-House-Radio', 'Hay House Radio presents your favorite Hay House authors on their weekly radio shows and special live online events. Listen in as our hosts speak about the importance of affirmations, self-love, grati', 'http://96.31.83.86:8200/', 'http://www.hayhouseradio.com/', 'Hay-House-Radio.png', 0, 0, 0, 1, '2011-11-11', 11929, 0, '2017-01-01 00:00:00', 0), \
-('Oldies-93-933', '', 'http://96.31.83.86:8200/', 'http://www.wbzd.com/', 'Oldies-93-933.png', 0, 0, 0, 1, '2011-11-11', 11930, 0, '2017-01-01 00:00:00', 0), \
-('Gerald-Albright', '', 'http://96.31.83.86:8200/', '', 'Gerald-Albright.png', 0, 0, 0, 1, '2011-11-11', 11931, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Fiesta', '', 'http://96.31.83.86:8200/', '', 'Radio-Fiesta.png', 0, 0, 0, 1, '2011-11-11', 11932, 0, '2017-01-01 00:00:00', 0), \
 ('The-Fox-1039', '', 'http://96.31.83.86:8200/', 'http://www.classicfox.com/', 'The-Fox-1039.png', 0, 0, 0, 1, '2011-11-11', 11933, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Limfjord', '', 'http://96.31.83.86:8200/', '', 'Radio-Limfjord.png', 0, 0, 0, 1, '2011-11-11', 11934, 0, '2017-01-01 00:00:00', 0), \
@@ -10270,7 +9008,6 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Sounds', '', 'http://96.31.83.86:8200/', '', 'The-Sounds.png', 0, 0, 0, 1, '2011-11-11', 11964, 0, '2017-01-01 00:00:00', 0), \
 ('Sermon', '', 'http://96.31.83.86:8200/', '', 'Sermon.png', 0, 0, 0, 1, '2011-11-11', 11965, 0, '2017-01-01 00:00:00', 0), \
 ('Fox-Oldies-1220', '', 'http://96.31.83.86:8200/', 'http://www.foxradio.net/', 'Fox-Oldies-1220.png', 0, 0, 0, 1, '2011-11-11', 11966, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(English-for-the-Pacific)', '', 'http://96.31.83.86:8200/', 'http://www.radioaustralia.net.au/', '', 0, 0, 0, 1, '2011-11-11', 11967, 0, '2017-01-01 00:00:00', 0), \
 ('Good-Evening-Kaybayan', '', 'http://96.31.83.86:8200/', '', 'Good-Evening-Kaybayan.png', 0, 0, 0, 1, '2011-11-11', 11968, 0, '2017-01-01 00:00:00', 0), \
 ('Ben-FM-957', '95.7 BEN-FM is Philadelphia&#39;s Adult Hits station with the largest music library in town. BEN-FM plays the best variety of music, including Tom Petty, Bon Jovi, Pink, Boston, 3 Doors Down, KC &amp;', 'http://96.31.83.86:8200/', 'http://www.ilikebenfm.com/', 'Ben-FM-957.png', 0, 0, 0, 1, '2011-11-11', 11969, 0, '2017-01-01 00:00:00', 0), \
 ('WCBS-FM-1011', '101.1 WCBS FM, playing New York Greatest Hits of the 60 classic hits station in New York!', 'http://96.31.83.86:8200/', 'http://www.wcbsfm.com/', 'WCBS-FM-1011.png', 0, 0, 0, 1, '2011-11-11', 11970, 0, '2017-01-01 00:00:00', 0), \
@@ -10299,7 +9036,6 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Arrow-937', '', 'http://96.31.83.86:8200/', 'http://www.kkrw.com/', 'The-Arrow-937.png', 0, 0, 0, 1, '2011-11-11', 11993, 0, '2017-01-01 00:00:00', 0), \
 ('Mix-107-9-1079', '', 'http://96.31.83.86:8200/', 'http://www.themix1079.com/', 'Mix-107-9-1079.png', 0, 0, 0, 1, '2011-11-11', 11994, 0, '2017-01-01 00:00:00', 0), \
 ('Kiss-FM-1027', '', 'http://96.31.83.86:8200/', 'http://www.wksb.com/', 'Kiss-FM-1027.png', 0, 0, 0, 1, '2011-11-11', 11995, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Melbourne-774', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/melbourne/radio/', 'ABC-Melbourne-774.png', 0, 0, 0, 1, '2011-11-11', 11996, 0, '2017-01-01 00:00:00', 0), \
 ('MSA-Sports-PIHL-Hockey-Channel-2', '', 'http://96.31.83.86:8200/', 'http://www.msasports.net', 'MSA-Sports-PIHL-Hockey-Channel-2.png', 0, 0, 0, 1, '2011-11-11', 11997, 0, '2017-01-01 00:00:00', 0), \
 ('Emerson-Drive', '', 'http://96.31.83.86:8200/', '', 'Emerson-Drive.png', 0, 0, 0, 1, '2011-11-11', 11998, 0, '2017-01-01 00:00:00', 0), \
 ('963-VIP', '', 'http://96.31.83.86:8200/', 'http://www.963vip.com/', '963-VIP.png', 0, 0, 0, 1, '2011-11-11', 11999, 0, '2017-01-01 00:00:00', 0), \
@@ -10333,8 +9069,7 @@ const char *radio_station_setupsql36="REPLACE INTO `radio_stations` (`name`, `be
 ('Miller-Lite-Big-Show', '', 'http://96.31.83.86:8200/', '', 'Miller-Lite-Big-Show.png', 0, 0, 0, 1, '2011-11-11', 12027, 0, '2017-01-01 00:00:00', 0), \
 ('In-Flames', '', 'http://96.31.83.86:8200/', '', 'In-Flames.png', 0, 0, 0, 1, '2011-11-11', 12028, 0, '2017-01-01 00:00:00', 0), \
 ('Golden-Hits-Radio', 'Golden Hits Radio plays 24/7 non-stop classic oldies from the 50s - 70s, commercial free, and hosted by legendary radio personalities Burt &amp;  Kurt.Golden Hits Radio plays 24/7 non-stop classic old', 'http://96.31.83.86:8200/', 'http://www.goldenhitsradio.com/', 'Golden-Hits-Radio.png', 0, 0, 0, 1, '2011-11-11', 12029, 0, '2017-01-01 00:00:00', 0), \
-('941-The-Loon', '', 'http://96.31.83.86:8200/', 'http://www.kkln.com/', '941-The-Loon.png', 0, 0, 0, 1, '2011-11-11', 12030, 0, '2017-01-01 00:00:00', 0), \
-('93-Q-929', '', 'http://96.31.83.86:8200/', 'http://thenew93q.com/', '93-Q-929.png', 0, 0, 0, 1, '2011-11-11', 12031, 0, '2017-01-01 00:00:00', 0);";
+('941-The-Loon', '', 'http://96.31.83.86:8200/', 'http://www.kkln.com/', '941-The-Loon.png', 0, 0, 0, 1, '2011-11-11', 12030, 0, '2017-01-01 00:00:00', 0);";
 
 
 const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
@@ -10353,7 +9088,6 @@ const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `be
 ('The-White-Stripes', '', 'http://96.31.83.86:8200/', '', 'The-White-Stripes.png', 0, 0, 0, 1, '2011-11-11', 12044, 0, '2017-01-01 00:00:00', 0), \
 ('Mannheim-Steamroller', '', 'http://96.31.83.86:8200/', '', 'Mannheim-Steamroller.png', 0, 0, 0, 1, '2011-11-11', 12045, 0, '2017-01-01 00:00:00', 0), \
 ('Westsound-FM-970', '', 'http://96.31.83.86:8200/', 'http://www.westsoundradio.com/', 'Westsound-FM-970.png', 0, 0, 0, 1, '2011-11-11', 12046, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Sydney-702', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/sydney/radio/', 'ABC-Sydney-702.png', 0, 0, 0, 1, '2011-11-11', 12047, 0, '2017-01-01 00:00:00', 0), \
 ('From-The-Press-Box-To-Press-Row', '', 'http://96.31.83.86:8200/', '', 'From-The-Press-Box-To-Press-Row.png', 0, 0, 0, 1, '2011-11-11', 12048, 0, '2017-01-01 00:00:00', 0), \
 ('KPOJ-620', '', 'http://96.31.83.86:8200/', 'http://www.620kpoj.com/', 'KPOJ-620.png', 0, 0, 0, 1, '2011-11-11', 12049, 0, '2017-01-01 00:00:00', 0), \
 ('DRS-2-990', '', 'http://96.31.83.86:8200/', 'http://www.drs2.ch/', 'DRS-2-990.png', 0, 0, 0, 1, '2011-11-11', 12050, 0, '2017-01-01 00:00:00', 0), \
@@ -10458,7 +9192,6 @@ const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `be
 ('Bakersfield-Blaze-Baseball-Network', '', 'http://96.31.83.86:8200/', '', 'Bakersfield-Blaze-Baseball-Network.png', 0, 0, 0, 1, '2011-11-11', 12150, 0, '2017-01-01 00:00:00', 0), \
 ('Q107-1073', 'Q107 Calgary, Alberta plays the greatest rock &#39;n roll ever made and promises to be unlike any classic rock station in North America. It puts the music first and plays more than just the hits, feat', 'http://96.31.83.86:8200/', 'http://www.q107fm.ca/', 'Q107-1073.png', 0, 0, 0, 1, '2011-11-11', 12151, 0, '2017-01-01 00:00:00', 0), \
 ('Paul-Anka', '', 'http://96.31.83.86:8200/', '', 'Paul-Anka.png', 0, 0, 0, 1, '2011-11-11', 12152, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Itinerant-2', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/', 'ABC-Itinerant-2.png', 0, 0, 0, 1, '2011-11-11', 12153, 0, '2017-01-01 00:00:00', 0), \
 ('GotRadio-Top-40', 'The freshest blend of today&#39;s Top hits', 'http://96.31.83.86:8200/', 'http://www.gotradio.com/', 'GotRadio-Top-40.png', 0, 0, 0, 1, '2011-11-11', 12154, 0, '2017-01-01 00:00:00', 0), \
 ('WVWI-Religious-Programming', '', 'http://96.31.83.86:8200/', '', 'WVWI-Religious-Programming.png', 0, 0, 0, 1, '2011-11-11', 12155, 0, '2017-01-01 00:00:00', 0), \
 ('Indians-at-Giants', '', 'http://96.31.83.86:8200/', '', 'Indians-at-Giants.png', 0, 0, 0, 1, '2011-11-11', 12156, 0, '2017-01-01 00:00:00', 0), \
@@ -10520,7 +9253,6 @@ const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `be
 ('KTSA-550', '', 'http://96.31.83.86:8200/', 'http://www.ktsa.com/', 'KTSA-550.png', 0, 0, 0, 1, '2011-11-11', 12212, 0, '2017-01-01 00:00:00', 0), \
 ('Country-1045', '', 'http://96.31.83.86:8200/', 'http://www.1045wsld.com/', 'Country-1045.png', 0, 0, 0, 1, '2011-11-11', 12213, 0, '2017-01-01 00:00:00', 0), \
 ('Positively-Wall-Street', '', 'http://96.31.83.86:8200/', '', 'Positively-Wall-Street.png', 0, 0, 0, 1, '2011-11-11', 12214, 0, '2017-01-01 00:00:00', 0), \
-('ABC-South-East-NSW-810', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/southeastnsw/', 'ABC-South-East-NSW-810.png', 0, 0, 0, 1, '2011-11-11', 12215, 0, '2017-01-01 00:00:00', 0), \
 ('Sash', '', 'http://96.31.83.86:8200/', '', 'Sash.png', 0, 0, 0, 1, '2011-11-11', 12216, 0, '2017-01-01 00:00:00', 0), \
 ('Thompson-Square', '', 'http://96.31.83.86:8200/', '', 'Thompson-Square.png', 0, 0, 0, 1, '2011-11-11', 12217, 0, '2017-01-01 00:00:00', 0), \
 ('KAAT-1031', '', 'http://96.31.83.86:8200/', 'http://www.kaat.com/', 'KAAT-1031.png', 0, 0, 0, 1, '2011-11-11', 12218, 0, '2017-01-01 00:00:00', 0), \
@@ -10573,7 +9305,6 @@ const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `be
 ('Rock-937', '', 'http://96.31.83.86:8200/', 'http://www.rock937fm.com/', 'Rock-937.png', 0, 0, 0, 1, '2011-11-11', 12265, 0, '2017-01-01 00:00:00', 0), \
 ('Alex-Lester', '', 'http://96.31.83.86:8200/', '', 'Alex-Lester.png', 0, 0, 0, 1, '2011-11-11', 12266, 0, '2017-01-01 00:00:00', 0), \
 ('12-Stones', '', 'http://96.31.83.86:8200/', '', '12-Stones.png', 0, 0, 0, 1, '2011-11-11', 12267, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Riverina-675', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/riverina/', 'ABC-Riverina-675.png', 0, 0, 0, 1, '2011-11-11', 12268, 0, '2017-01-01 00:00:00', 0), \
 ('Greg-Likens', '', 'http://96.31.83.86:8200/', '', 'Greg-Likens.png', 0, 0, 0, 1, '2011-11-11', 12269, 0, '2017-01-01 00:00:00', 0), \
 ('Obituary', '', 'http://96.31.83.86:8200/', '', 'Obituary.png', 0, 0, 0, 1, '2011-11-11', 12270, 0, '2017-01-01 00:00:00', 0), \
 ('Byron-Cage', '', 'http://96.31.83.86:8200/', '', 'Byron-Cage.png', 0, 0, 0, 1, '2011-11-11', 12271, 0, '2017-01-01 00:00:00', 0), \
@@ -10625,7 +9356,6 @@ const char *radio_station_setupsql37="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Breeze-937', '', 'http://96.31.83.86:8200/', 'http://www.wgylfm.com/', 'The-Breeze-937.png', 0, 0, 0, 1, '2011-11-11', 12318, 0, '2017-01-01 00:00:00', 0), \
 ('Three-Days-Grace', '', 'http://96.31.83.86:8200/', '', 'Three-Days-Grace.png', 0, 0, 0, 1, '2011-11-11', 12319, 0, '2017-01-01 00:00:00', 0), \
 ('Panda-Pop-Radio', 'Pandapopradio.com', 'http://96.31.83.86:8200/', 'http://www.pandapopradio.com/', 'Panda-Pop-Radio.png', 0, 0, 0, 1, '2011-11-11', 12320, 0, '2017-01-01 00:00:00', 0), \
-('ABC-MilduraSwan-Hill-1043', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/milduraswanhill/', 'ABC-MilduraSwan-Hill-1043.png', 0, 0, 0, 1, '2011-11-11', 12321, 0, '2017-01-01 00:00:00', 0), \
 ('95-Triple-X-955', '', 'http://96.31.83.86:8200/', 'http://www.95triplex.com/', '95-Triple-X-955.png', 0, 0, 0, 1, '2011-11-11', 12322, 0, '2017-01-01 00:00:00', 0), \
 ('KISS-981', '', 'http://96.31.83.86:8200/', 'http://www.literockkiss.com/', 'KISS-981.png', 0, 0, 0, 1, '2011-11-11', 12323, 0, '2017-01-01 00:00:00', 0), \
 ('Open-Mic-Live', '', 'http://96.31.83.86:8200/', '', 'Open-Mic-Live.png', 0, 0, 0, 1, '2011-11-11', 12324, 0, '2017-01-01 00:00:00', 0), \
@@ -10699,7 +9429,6 @@ const char *radio_station_setupsql38="REPLACE INTO `radio_stations` (`name`, `be
 ('Rock-92-923', 'Rock 92, has been rockin&#39; Carolina for over 25 years. Home of The 2 Guys Named Chris Show.', 'http://96.31.83.86:8200/', 'http://www.rock92.com/', 'Rock-92-923.png', 0, 0, 0, 1, '2011-11-11', 12389, 0, '2017-01-01 00:00:00', 0), \
 ('Xs-and-Os-with-the-Pros', '', 'http://96.31.83.86:8200/', '', 'Xs-and-Os-with-the-Pros.png', 0, 0, 0, 1, '2011-11-11', 12390, 0, '2017-01-01 00:00:00', 0), \
 ('Klassik-Radio-922', '', 'http://96.31.83.86:8200/', 'http://www.klassikradio.de/', 'Klassik-Radio-922.png', 0, 0, 0, 1, '2011-11-11', 12391, 0, '2017-01-01 00:00:00', 0), \
-('ABCD-Lady-Gaga', '', 'http://96.31.83.86:8200/', 'http://www.radionomy.com/nl/radio/abcd-lady-gaga', 'ABCD-Lady-Gaga.png', 0, 0, 0, 1, '2011-11-11', 12392, 0, '2017-01-01 00:00:00', 0), \
 ('Bonnie-Tyler', '', 'http://96.31.83.86:8200/', '', 'Bonnie-Tyler.png', 0, 0, 0, 1, '2011-11-11', 12393, 0, '2017-01-01 00:00:00', 0), \
 ('Jason-Mraz', '', 'http://96.31.83.86:8200/', '', 'Jason-Mraz.png', 0, 0, 0, 1, '2011-11-11', 12394, 0, '2017-01-01 00:00:00', 0), \
 ('Off-The-Field', '', 'http://96.31.83.86:8200/', '', 'Off-The-Field.png', 0, 0, 0, 1, '2011-11-11', 12395, 0, '2017-01-01 00:00:00', 0), \
@@ -10901,7 +9630,6 @@ const char *radio_station_setupsql38="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Valley-1009', '', 'http://96.31.83.86:8200/', 'http://www.wvly.com/', 'The-Valley-1009.png', 0, 0, 0, 1, '2011-11-11', 12594, 0, '2017-01-01 00:00:00', 0), \
 ('House-Music-Radio', 'Deep House, Soulful House, Funky House 24/7', 'http://96.31.83.86:8200/', 'http://beta.housemusicradio.pl/', 'House-Music-Radio.png', 0, 0, 0, 1, '2011-11-11', 12595, 0, '2017-01-01 00:00:00', 0), \
 ('Mara-Isabel', '', 'http://96.31.83.86:8200/', '', 'Mara-Isabel.png', 0, 0, 0, 1, '2011-11-11', 12596, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Cream---Hits-Now', '', 'http://96.31.83.86:8200/', 'http://www.audiocream.com/', 'Audio-Cream---Hits-Now.png', 0, 0, 0, 1, '2011-11-11', 12597, 0, '2017-01-01 00:00:00', 0), \
 ('Cow-97-971', '', 'http://96.31.83.86:8200/', 'http://www.cow97.com/', 'Cow-97-971.png', 0, 0, 0, 1, '2011-11-11', 12598, 0, '2017-01-01 00:00:00', 0), \
 ('KMND-1510', '', 'http://96.31.83.86:8200/', 'http://www.kmnd.com/', 'KMND-1510.png', 0, 0, 0, 1, '2011-11-11', 12599, 0, '2017-01-01 00:00:00', 0), \
 ('Rock-1045', '', 'http://96.31.83.86:8200/', 'http://www.kdot.com/', 'Rock-1045.png', 0, 0, 0, 1, '2011-11-11', 12600, 0, '2017-01-01 00:00:00', 0), \
@@ -11116,7 +9844,6 @@ const char *radio_station_setupsql39="REPLACE INTO `radio_stations` (`name`, `be
 ('Cassius', '', 'http://96.31.83.86:8200/', '', 'Cassius.png', 0, 0, 0, 1, '2011-11-11', 12812, 0, '2017-01-01 00:00:00', 0), \
 ('The-Mustard--Johnson-Show', '', 'http://96.31.83.86:8200/', '', 'The-Mustard--Johnson-Show.png', 0, 0, 0, 1, '2011-11-11', 12813, 0, '2017-01-01 00:00:00', 0), \
 ('Puma-Radio', '', 'http://96.31.83.86:8200/', 'http://www.radio-puma.de/', 'Puma-Radio.png', 0, 0, 0, 1, '2011-11-11', 12814, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Classic-FM-1059', 'Classical music can transform everyday moments into something magical. Whatever you&#39;re doing, wherever you are, ABC Classic FM provides the perfect soundtrack to your day.', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/classic/', 'ABC-Classic-FM-1059.png', 0, 0, 0, 1, '2011-11-11', 12815, 0, '2017-01-01 00:00:00', 0), \
 ('Thelma-Houston', '', 'http://96.31.83.86:8200/', '', 'Thelma-Houston.png', 0, 0, 0, 1, '2011-11-11', 12816, 0, '2017-01-01 00:00:00', 0), \
 ('Joe-Jackson', '', 'http://96.31.83.86:8200/', '', 'Joe-Jackson.png', 0, 0, 0, 1, '2011-11-11', 12817, 0, '2017-01-01 00:00:00', 0), \
 ('Swing--Big-Band-on-JAZZRADIOcom', 'The best sounds of the swing era of the 30s &amp; 40s.', 'http://96.31.83.86:8200/', 'http://www.jazzradio.com/', 'Swing--Big-Band-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 12818, 0, '2017-01-01 00:00:00', 0), \
@@ -11199,7 +9926,6 @@ const char *radio_station_setupsql39="REPLACE INTO `radio_stations` (`name`, `be
 
 
 const char *radio_station_setupsql40="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('Alice-1021', '', 'http://96.31.83.86:8200/', 'http://www.alice102.com/', 'Alice-1021.png', 0, 0, 1, 1, '2011-11-11', 12896, 0, '2011-10-15 20:11:24', 0), \
 ('Healthline', '', 'http://96.31.83.86:8200/', '', 'Healthline.png', 0, 0, 0, 1, '2011-11-11', 12897, 0, '2017-01-01 00:00:00', 0), \
 ('Reito-de-Viver', '', 'http://96.31.83.86:8200/', 'http://www.cliquecontraocancer.com.br/direitodeviver/', 'Radio-Direito-de-Viver.png', 0, 0, 0, 1, '2011-11-11', 12898, 0, '2017-01-01 00:00:00', 0), \
 ('80s-And-More', '80s Hits from the UK, USA, Aus &amp; Europe 24 hours a day', 'http://96.31.83.86:8200/', 'http://www.80sandmore.org.uk/', '80s-And-More.png', 0, 0, 0, 1, '2011-11-11', 12899, 0, '2017-01-01 00:00:00', 0), \
@@ -11213,7 +9939,6 @@ const char *radio_station_setupsql40="REPLACE INTO `radio_stations` (`name`, `be
 ('Sky-Racing-Radios-Inside-Running', '', 'http://96.31.83.86:8200/', '', 'Sky-Racing-Radios-Inside-Running.png', 0, 0, 0, 1, '2011-11-11', 12907, 0, '2017-01-01 00:00:00', 0), \
 ('973-The-Hawk', '', 'http://96.31.83.86:8200/', 'http://www.973thehawk.com/', '973-The-Hawk.png', 0, 0, 0, 1, '2011-11-11', 12908, 0, '2017-01-01 00:00:00', 0), \
 ('Sunday-Evening-Jazz-with-Erik-Troe', '', 'http://96.31.83.86:8200/', '', 'Sunday-Evening-Jazz-with-Erik-Troe.png', 0, 0, 0, 1, '2011-11-11', 12909, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Far-North-801', '', 'http://96.31.83.86:8200/', 'http://www.abc.net.au/farnorth/', 'ABC-Far-North-801.png', 0, 0, 0, 1, '2011-11-11', 12910, 0, '2017-01-01 00:00:00', 0), \
 ('Marc-Anthony', '', 'http://96.31.83.86:8200/', '', 'Marc-Anthony.png', 0, 0, 0, 1, '2011-11-11', 12911, 0, '2017-01-01 00:00:00', 0), \
 ('MUSIC-AND-SERVICE-ANNOUNCEMENTS', '', 'http://96.31.83.86:8200/', '', 'MUSIC-AND-SERVICE-ANNOUNCEMENTS.png', 0, 0, 0, 1, '2011-11-11', 12912, 0, '2017-01-01 00:00:00', 0), \
 ('Bridges-with-Africa', '', 'http://96.31.83.86:8200/', '', 'Bridges-with-Africa.png', 0, 0, 0, 1, '2011-11-11', 12913, 0, '2017-01-01 00:00:00', 0), \
@@ -11462,7 +10187,6 @@ const char *radio_station_setupsql40="REPLACE INTO `radio_stations` (`name`, `be
 ('Maysa', '', 'http://96.31.83.86:8200/', '', 'Maysa.png', 0, 0, 0, 1, '2011-11-11', 13159, 0, '2017-01-01 00:00:00', 0), \
 ('DR P4 København', '', 'http://live-icy.gss.dr.dk:8000/A/A08H.mp3', 'http://www.dr.dk/p4/kbh/', 'DR-P4-Koebenhavn-965.png', 0, 0, 0, 1, '2011-11-11', 13160, 0, '2017-01-01 00:00:00', 0), \
 ('MMA-Nation', '', 'http://96.31.83.86:8200/', '', 'MMA-Nation.png', 0, 0, 0, 1, '2011-11-11', 13161, 0, '2017-01-01 00:00:00', 0), \
-('92-5-KISS-FM-925', '', 'http://96.31.83.86:8200/', 'http://www.925kiss-fm.com/', '92-5-KISS-FM-925.png', 0, 0, 0, 1, '2011-11-11', 13162, 0, '2017-01-01 00:00:00', 0), \
 ('Big-Joe-Turner', '', 'http://96.31.83.86:8200/', '', 'Big-Joe-Turner.png', 0, 0, 0, 1, '2011-11-11', 13163, 0, '2017-01-01 00:00:00', 0), \
 ('Chris-Tomlin', '', 'http://96.31.83.86:8200/', '', 'Chris-Tomlin.png', 0, 0, 0, 1, '2011-11-11', 13164, 0, '2017-01-01 00:00:00', 0), \
 ('Esperanza-Spalding', '', 'http://96.31.83.86:8200/', '', 'Esperanza-Spalding.png', 0, 0, 1, 1, '2011-11-11', 13165, 0, '2011-10-14 16:07:17', 0), \
@@ -11591,7 +10315,6 @@ const char *radio_station_setupsql41="REPLACE INTO `radio_stations` (`name`, `be
 ('Cassius', '', 'http://icy2.abacast.com/threeeagles-mcwkglofm-32.m3u', '', 'Cassius.png', 0, 0, 0, 1, '2011-11-11', 13294, 0, '2017-01-01 00:00:00', 0), \
 ('The-Mustard--Johnson-Show', '', 'http://icy2.abacast.com/threeeagles-mcwkglofm-32.m3u', '', 'The-Mustard--Johnson-Show.png', 0, 0, 0, 1, '2011-11-11', 13295, 0, '2017-01-01 00:00:00', 0), \
 ('Puma-Radio', '', 'http://85.25.149.109:7000/', 'http://www.radio-puma.de/', 'Puma-Radio.png', 0, 0, 0, 1, '2011-11-11', 13296, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Classic-FM-1059', 'Classical music can transform everyday moments into something magical. Whatever you&#39;re doing, wherever you are, ABC Classic FM provides the perfect soundtrack to your day.', 'http://abc.net.au/res/streaming/audio/mp3/classic_fm.pls', 'http://www.abc.net.au/classic/', 'ABC-Classic-FM-1059.png', 0, 0, 0, 1, '2011-11-11', 13297, 0, '2017-01-01 00:00:00', 0), \
 ('Thelma-Houston', '', 'http://abc.net.au/res/streaming/audio/mp3/classic_fm.pls', '', 'Thelma-Houston.png', 0, 0, 0, 1, '2011-11-11', 13298, 0, '2017-01-01 00:00:00', 0), \
 ('Joe-Jackson', '', 'http://abc.net.au/res/streaming/audio/mp3/classic_fm.pls', '', 'Joe-Jackson.png', 0, 0, 0, 1, '2011-11-11', 13299, 0, '2017-01-01 00:00:00', 0), \
 ('Swing--Big-Band-on-JAZZRADIOcom', 'The best sounds of the swing era of the 30s &amp; 40s.', 'http://listen.jazzradio.com/partner_aac/swingnbigband.pls', 'http://www.jazzradio.com/', 'Swing--Big-Band-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 13300, 0, '2017-01-01 00:00:00', 0), \
@@ -11677,7 +10400,6 @@ const char *radio_station_setupsql41="REPLACE INTO `radio_stations` (`name`, `be
 ('Sky-Racing-Radios-Inside-Running', '', 'mms://streamer2.securenetsystems.net/KIKS', '', 'Sky-Racing-Radios-Inside-Running.png', 0, 0, 0, 1, '2011-11-11', 13388, 0, '2017-01-01 00:00:00', 0), \
 ('973-The-Hawk', '', 'mms://streamer2.securenetsystems.net/KIKS', 'http://www.973thehawk.com/', '973-The-Hawk.png', 0, 0, 0, 1, '2011-11-11', 13389, 0, '2017-01-01 00:00:00', 0), \
 ('Sunday-Evening-Jazz-with-Erik-Troe', '', 'mms://streamer2.securenetsystems.net/KIKS', '', 'Sunday-Evening-Jazz-with-Erik-Troe.png', 0, 0, 0, 1, '2011-11-11', 13390, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Far-North-801', '', 'mms://streamer2.securenetsystems.net/KIKS', 'http://www.abc.net.au/farnorth/', 'ABC-Far-North-801.png', 0, 0, 0, 1, '2011-11-11', 13391, 0, '2017-01-01 00:00:00', 0), \
 ('Marc-Anthony', '', 'mms://streamer2.securenetsystems.net/KIKS', '', 'Marc-Anthony.png', 0, 0, 0, 1, '2011-11-11', 13392, 0, '2017-01-01 00:00:00', 0), \
 ('MUSIC-AND-SERVICE-ANNOUNCEMENTS', '', 'mms://streamer2.securenetsystems.net/KIKS', '', 'MUSIC-AND-SERVICE-ANNOUNCEMENTS.png', 0, 0, 0, 1, '2011-11-11', 13393, 0, '2017-01-01 00:00:00', 0), \
 ('Bridges-with-Africa', '', 'mms://streamer2.securenetsystems.net/KIKS', '', 'Bridges-with-Africa.png', 0, 0, 0, 1, '2011-11-11', 13394, 0, '2017-01-01 00:00:00', 0), \
@@ -11922,7 +10644,6 @@ const char *radio_station_setupsql42="REPLACE INTO `radio_stations` (`name`, `be
 ('Praise-1047', '', 'http://streampoint.radioio.com/streams/20/46f28fc4c4be5/listen.pls', 'http://praiserichmond.com/', 'Praise-1047.png', 0, 0, 0, 1, '2011-11-11', 13639, 0, '2017-01-01 00:00:00', 0), \
 ('Maysa', '', 'http://streampoint.radioio.com/streams/20/46f28fc4c4be5/listen.pls', '', 'Maysa.png', 0, 0, 0, 1, '2011-11-11', 13640, 0, '2017-01-01 00:00:00', 0), \
 ('MMA-Nation', '', 'http://live-icy.gss.dr.dk:8000/Channel8_HQ.mp3', '', 'MMA-Nation.png', 0, 0, 0, 1, '2011-11-11', 13642, 0, '2017-01-01 00:00:00', 0), \
-('92-5-KISS-FM-925', '', 'http://live-icy.gss.dr.dk:8000/Channel8_HQ.mp3', 'http://www.925kiss-fm.com/', '92-5-KISS-FM-925.png', 0, 0, 1, 1, '2011-11-11', 13643, 0, '2011-10-14 15:56:12', 0), \
 ('Big-Joe-Turner', '', 'http://live-icy.gss.dr.dk:8000/Channel8_HQ.mp3', '', 'Big-Joe-Turner.png', 0, 0, 0, 1, '2011-11-11', 13644, 0, '2017-01-01 00:00:00', 0), \
 ('Chris-Tomlin', '', 'http://live-icy.gss.dr.dk:8000/Channel8_HQ.mp3', '', 'Chris-Tomlin.png', 0, 0, 0, 1, '2011-11-11', 13645, 0, '2017-01-01 00:00:00', 0), \
 ('Esperanza-Spalding', '', 'http://live-icy.gss.dr.dk:8000/Channel8_HQ.mp3', '', 'Esperanza-Spalding.png', 0, 0, 1, 1, '2011-11-11', 13646, 0, '2011-10-14 16:07:27', 0), \
@@ -12191,7 +10912,6 @@ const char *radio_station_setupsql43="REPLACE INTO `radio_stations` (`name`, `be
 ('Mix-973', '', 'mms://live.cumulusstreaming.com/KQHN-FM', 'http://www.mixfm973.com/', 'Mix-973.png', 0, 0, 0, 1, '2011-11-11', 13905, 0, '2017-01-01 00:00:00', 0), \
 ('1067-The-Fan', 'Sportsradio 106.7 The Fan is the new radio station for D.C. sports fans.', 'mms://live.cumulusstreaming.com/KQHN-FM', 'http://1067thefandc.com', '1067-The-Fan.png', 0, 0, 0, 1, '2011-11-11', 13906, 0, '2017-01-01 00:00:00', 0), \
 ('ZaycevFM-RnB', '', 'http://www.zaycev.fm:9002/rnb/ZaycevFM(256)', 'http://www.zaycev.fm', 'ZaycevFM-RnB.png', 0, 0, 0, 1, '2011-11-11', 13907, 0, '2017-01-01 00:00:00', 0), \
-('GrooveFM', 'Deutsches Webradio mit dem besten Jazz, Funk und Electronic von 6:00 morgens bis 3:00 in der Nacht', 'http://stream.groovefm.de:10028/', 'http://www.groovefm.de/', 'GrooveFM.png', 0, 0, 0, 1, '2011-11-11', 13908, 0, '2017-01-01 00:00:00', 0), \
 ('KOZZ-FM-1057', '', 'http://stream.groovefm.de:10028/', 'http://www.kozzradio.com/', 'KOZZ-FM-1057.png', 0, 0, 0, 1, '2011-11-11', 13909, 0, '2017-01-01 00:00:00', 0), \
 ('ESPN-Radio-1040', 'Tampa Bay&#39;s Sports Leader', 'mms://1.uni1.sa.streamaudio.com/WHBO_AM', 'http://www.espn1040.com/', 'ESPN-Radio-1040.png', 0, 0, 0, 1, '2011-11-11', 13910, 0, '2017-01-01 00:00:00', 0), \
 ('WHIP-1350', '', 'http://67.159.45.87:8204', 'http://www.carolinascene.com/w/whip/', 'WHIP-1350.png', 0, 0, 0, 1, '2011-11-11', 13911, 0, '2017-01-01 00:00:00', 0), \
@@ -12238,7 +10958,6 @@ const char *radio_station_setupsql43="REPLACE INTO `radio_stations` (`name`, `be
 ('923-NOW', 'Welcome to New Yorks new hit music channel,92.3 Now.', 'http://tx.sharp-stream.com/icecast.php?i=original106.mp3', 'http://www.923now.com', '923-NOW.png', 0, 0, 2, 1, '2011-11-11', 13952, 0, '2011-10-14 15:57:22', 0), \
 ('ESPN-SportsCenter', '', 'http://live-icy.gss.dr.dk:8000/Channel16_HQ.mp3', '', 'ESPN-SportsCenter.png', 0, 0, 0, 1, '2011-11-11', 13954, 0, '2017-01-01 00:00:00', 0), \
 ('Latinos-FM-1017', '', 'http://ns32380.ovh.net:6601/LISTEN.mp3', 'http://www.latinos.fm/', 'Latinos-FM-1017.png', 0, 0, 0, 1, '2011-11-11', 13955, 0, '2017-01-01 00:00:00', 0), \
-('ABC-South-West-(WA)-684', '', 'http://ns32380.ovh.net:6601/LISTEN.mp3', 'http://www.abc.net.au/southwestwa/', '', 0, 0, 0, 1, '2011-11-11', 13956, 0, '2017-01-01 00:00:00', 0), \
 ('KRUZ-975', '', 'mms://live.cumulusstreaming.com/KRUZ-FM', 'http://www.kruz.com/', 'KRUZ-975.png', 0, 0, 0, 1, '2011-11-11', 13957, 0, '2017-01-01 00:00:00', 0), \
 ('The-Good-Oil', '', 'mms://live.cumulusstreaming.com/KRUZ-FM', '', 'The-Good-Oil.png', 0, 0, 0, 1, '2011-11-11', 13958, 0, '2017-01-01 00:00:00', 0), \
 ('WKJC-1047', 'The voice of Northern Michigan.', 'http://ice1.securenetsystems.net:80/WKJCM', 'http://www.wkjc.com/', 'WKJC-1047.png', 0, 0, 0, 1, '2011-11-11', 13959, 0, '2017-01-01 00:00:00', 0), \
@@ -12295,8 +11014,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('KSL-News-Radio-1160', '', 'http://stream.ksl.com/kslradio.pls', 'http://www.ksl.com/index.php?nid=16', 'KSL-News-Radio-1160.png', 0, 0, 0, 1, '2011-11-11', 14005, 0, '2017-01-01 00:00:00', 0), \
 ('Miami-Dolphins-at-New-York-Jets-Oct-17-2011', '', 'http://stream.ksl.com/kslradio.pls', '', '', 0, 0, 0, 1, '2011-11-11', 14006, 0, '2017-01-01 00:00:00', 0), \
 ('Anaheim-Ducks-at-San-Jose-Sharks-Oct-17-2011', '', 'http://stream.ksl.com/kslradio.pls', '', '', 0, 0, 0, 1, '2011-11-11', 14007, 0, '2017-01-01 00:00:00', 0), \
-('AaRON', '', 'http://stream.ksl.com/kslradio.pls', '', 'AaRON.png', 0, 0, 0, 1, '2011-11-11', 14008, 0, '2017-01-01 00:00:00', 0), \
-('Jackson-5', '', 'http://stream.ksl.com/kslradio.pls', '', 'Jackson-5.png', 0, 0, 0, 1, '2011-11-11', 14009, 0, '2017-01-01 00:00:00', 0), \
 ('Bathory', '', 'http://stream.ksl.com/kslradio.pls', '', 'Bathory.png', 0, 0, 0, 1, '2011-11-11', 14010, 0, '2017-01-01 00:00:00', 0), \
 ('Poder-1110', '', 'http://stream.ksl.com/kslradio.pls', 'http://www.poder1110.com/', 'Poder-1110.png', 0, 0, 0, 1, '2011-11-11', 14011, 0, '2017-01-01 00:00:00', 0), \
 ('921', '70s Country Hits', 'http://stream.ksl.com/kslradio.pls', 'http://www.ilove921.com', '921.png', 0, 0, 0, 1, '2011-11-11', 14012, 0, '2017-01-01 00:00:00', 0), \
@@ -12310,7 +11027,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('KLBQ-987', '', 'http://www.live365.com/play/kclchd1', 'http://www.987klbq.com', 'KLBQ-987.png', 0, 0, 0, 1, '2011-11-11', 14020, 0, '2017-01-01 00:00:00', 0), \
 ('The-Orb', '', 'http://www.live365.com/play/kclchd1', '', 'The-Orb.png', 0, 0, 0, 1, '2011-11-11', 14021, 0, '2017-01-01 00:00:00', 0), \
 ('Martin-Rapp', '', 'http://www.live365.com/play/kclchd1', '', 'Martin-Rapp.png', 0, 0, 0, 1, '2011-11-11', 14022, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(French)', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_fra.pls', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 14023, 0, '2017-01-01 00:00:00', 0), \
 ('KISN-967', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_fra.pls', 'http://www.bozemanskissfm.com/', 'KISN-967.png', 0, 0, 0, 1, '2011-11-11', 14024, 0, '2017-01-01 00:00:00', 0), \
 ('KSJS-905', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_fra.pls', 'http://www.ksjs.org/', 'KSJS-905.png', 0, 0, 0, 1, '2011-11-11', 14025, 0, '2017-01-01 00:00:00', 0), \
 ('WFMB-FM-1045', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_fra.pls', 'http://www.wfmb.com/', 'WFMB-FM-1045.png', 0, 0, 0, 1, '2011-11-11', 14026, 0, '2017-01-01 00:00:00', 0), \
@@ -12321,7 +11037,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Tom-OBrien-Show', '', 'http://www.wdav.org/streams/WDAV-128k.m3u', '', 'The-Tom-OBrien-Show.png', 0, 0, 0, 1, '2011-11-11', 14031, 0, '2017-01-01 00:00:00', 0), \
 ('Sunday-Fun', '', 'http://www.wdav.org/streams/WDAV-128k.m3u', '', 'Sunday-Fun.png', 0, 0, 0, 1, '2011-11-11', 14032, 0, '2017-01-01 00:00:00', 0), \
 ('Level-42', '', 'http://www.wdav.org/streams/WDAV-128k.m3u', '', 'Level-42.png', 0, 0, 0, 1, '2011-11-11', 14033, 0, '2017-01-01 00:00:00', 0), \
-('ABC-North-West-1065', '', 'http://www.wdav.org/streams/WDAV-128k.m3u', 'http://abc.net.au/northwest/', 'ABC-North-West-1065.png', 0, 0, 0, 1, '2011-11-11', 14034, 0, '2017-01-01 00:00:00', 0), \
 ('WJCU-887', '', 'http://wjcu.jcu.edu:8001', 'http://www.wjcu.org/', 'WJCU-887.png', 0, 0, 0, 1, '2011-11-11', 14035, 0, '2017-01-01 00:00:00', 0), \
 ('Time-Out-with-TA', '', 'http://wjcu.jcu.edu:8001', '', 'Time-Out-with-TA.png', 0, 0, 0, 1, '2011-11-11', 14036, 0, '2017-01-01 00:00:00', 0), \
 ('Iggy-Pop', '', 'http://wjcu.jcu.edu:8001', '', 'Iggy-Pop.png', 0, 0, 0, 1, '2011-11-11', 14037, 0, '2017-01-01 00:00:00', 0), \
@@ -12338,9 +11053,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('WRGA-1470', 'WRGA is your home for NewsTalk including Neal Boortz, Clark Howard, Sean Hannity and local news for Floyd and surrounding counties throughout the day.', 'http://s7.myradiostream.com/27564.pls', 'http://www.wrgarome.com/', 'WRGA-1470.png', 0, 0, 0, 1, '2011-11-11', 14048, 0, '2017-01-01 00:00:00', 0), \
 ('Inspiration-Hour', '', 'http://s7.myradiostream.com/27564.pls', '', 'Inspiration-Hour.png', 0, 0, 0, 1, '2011-11-11', 14049, 0, '2017-01-01 00:00:00', 0), \
 ('Prime-Time-Radio', '', 'http://s7.myradiostream.com/27564.pls', '', 'Prime-Time-Radio.png', 0, 0, 0, 1, '2011-11-11', 14050, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Alice-Springs-783', '', 'http://s7.myradiostream.com/27564.pls', 'http://abc.net.au/alicesprings/', 'ABC-Alice-Springs-783.png', 0, 0, 0, 1, '2011-11-11', 14051, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Indonesian)', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_ind.pls', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 14052, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Radio-Australia-(Burmese)', '', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_mya.pls', 'http://www.abc.net.au/ra/', '', 0, 0, 0, 1, '2011-11-11', 14053, 0, '2017-01-01 00:00:00', 0), \
 ('1037-Lite-FM', '103.7 Lite-FM Today&#39;s Refreshing Lite Rock', 'http://www.abc.net.au/res/streaming/audio/aac/radio_australia_mya.pls', 'http://www.1037litefm.com/', '1037-Lite-FM.png', 0, 0, 0, 1, '2011-11-11', 14054, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-538-Nonstop-40', '', 'http://82.201.100.23/WEB02-538NonStop40.m3u', 'http://www.radio538.nl/', 'Radio-538-Nonstop-40.png', 0, 0, 0, 1, '2011-11-11', 14055, 0, '2017-01-01 00:00:00', 0), \
 ('Bonnie-Raitt', '', 'http://82.201.100.23/WEB02-538NonStop40.m3u', '', 'Bonnie-Raitt.png', 0, 0, 0, 1, '2011-11-11', 14056, 0, '2017-01-01 00:00:00', 0), \
@@ -12365,17 +11077,15 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('The-Undertones', '', 'http://pub5.radiotunes.com:80/radiotunes_urbanjamz', '', 'The-Undertones.png', 0, 0, 0, 1, '2011-11-11', 14076, 0, '2017-01-01 00:00:00', 0), \
 ('Slow-Jam', 'Une radio Slow Jam pour des France.', 'http://listen.radionomy.com/slow-jam', 'http://www.radionomy.com/en/radio/slow-jam', 'Slow-Jam.png', 0, 0, 0, 1, '2011-11-11', 14077, 0, '2017-01-01 00:00:00', 1), \
 ('Iron-Maiden', '', 'http://rclive.ath.cx:8282/mp3', '', 'Iron-Maiden.png', 0, 0, 0, 1, '2011-11-11', 14086, 0, '2017-01-01 00:00:00', 0), \
-('ABC-Goulburn-Murray-977', '', 'http://rclive.ath.cx:8282/mp3', 'http://abc.net.au/goulburnmurray/', 'ABC-Goulburn-Murray-977.png', 0, 0, 0, 1, '2011-11-11', 14087, 0, '2017-01-01 00:00:00', 0), \
 ('WBFG-965', '', 'http://rclive.ath.cx:8282/mp3', '', 'WBFG-965.png', 0, 0, 0, 1, '2011-11-11', 14088, 0, '2017-01-01 00:00:00', 0), \
 ('AlterNative-Voices', '', 'http://rclive.ath.cx:8282/mp3', '', 'AlterNative-Voices.png', 0, 0, 0, 1, '2011-11-11', 14089, 0, '2017-01-01 00:00:00', 0), \
 ('Antenne-Bayern-1030', 'Das beste aus den 80ern, 90ern und den Hits von heute.', 'http://www.antenne.de/webradio/antenne.aac.pls', 'http://www.antenne.de/', 'Antenne-Bayern-1030.png', 0, 0, 0, 1, '2011-11-11', 14090, 0, '2017-01-01 00:00:00', 0), \
 ('WWIS-1260', 'Tune to AM1260 to hear the best music from the 70&#39;s, 80&#39;s, 90&#39;s and today, including some from the 60&#39;s.  There&#39;s CBS News on the hour, most hours.<BR><BR>Be sure to listen Friday ', 'http://ice5.securenetsystems.net:80/WWISAM', 'http://www.wwisradio.com/', 'WWIS-1260.png', 0, 0, 0, 1, '2011-11-11', 14091, 0, '2017-01-01 00:00:00', 0), \
 ('The-Wallflowers', '', 'http://ice5.securenetsystems.net:80/WWISAM', '', 'The-Wallflowers.png', 0, 0, 0, 1, '2011-11-11', 14092, 0, '2017-01-01 00:00:00', 0), \
-('Bossa-Nova-on-JAZZRADIOcom', 'Sweet sounds of bossa nova and the flavors of Brazil.', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', 'http://www.jazzradio.com/', 'Bossa-Nova-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 14093, 0, '2017-01-01 00:00:00', 0), \
-('Jeremy-Vine', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Jeremy-Vine.png', 0, 0, 0, 1, '2011-11-11', 14094, 0, '2017-01-01 00:00:00', 0), \
-('Ralph-Tees-Luxury-Soul', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Ralph-Tees-Luxury-Soul.png', 0, 0, 0, 1, '2011-11-11', 14095, 0, '2017-01-01 00:00:00', 0), \
-('Frank-Fm-1011', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', 'http://www.capecodsfrankfm.com/', 'Frank-Fm-1011.png', 0, 0, 0, 1, '2011-11-11', 14096, 0, '2017-01-01 00:00:00', 0), \
-('Charlie-Winston', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Charlie-Winston.png', 0, 0, 0, 1, '2011-11-11', 14097, 0, '2017-01-01 00:00:00', 0), \
+('Bossa-Nova-on-JAZZRADIOcom', 'Sweet sounds of bossa nova and the flavors of Brazil.', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', 'http://www.jazzradio.com/', 'Bossa-Nova-on-JAZZRADIOcom.png', 0, 0, 0, 1, '2011-11-11', 14093, 0, '2017-01-01 00:00:00', 1), \
+('Jeremy-Vine', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Jeremy-Vine.png', 0, 0, 0, 1, '2011-11-11', 14094, 0, '2017-01-01 00:00:00', 1), \
+('Ralph-Tees-Luxury-Soul', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Ralph-Tees-Luxury-Soul.png', 0, 0, 0, 1, '2011-11-11', 14095, 0, '2017-01-01 00:00:00', 1), \
+('Charlie-Winston', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Charlie-Winston.png', 0, 0, 0, 1, '2011-11-11', 14097, 0, '2017-01-01 00:00:00', 1), \
 ('Christmas-Melody', '', 'http://www.xmasmelody.com/128.asx', 'http://www.xmasmelody.com/', 'Christmas-Melody.png', 0, 0, 0, 1, '2011-11-11', 14098, 0, '2017-01-01 00:00:00', 0), \
 ('Big-Country-1009', '', 'http://asx.abacast.com/eldorado-kxfm-64.pls', 'http://www.wwbr.com/', 'Big-Country-1009.png', 0, 0, 0, 1, '2011-11-11', 14100, 0, '2017-01-01 00:00:00', 0), \
 ('Christophe', '', 'http://static.abradio.cz/data/s/20/playlist/madonna64.asx', '', '', 0, 0, 0, 1, '2011-11-11', 14103, 0, '2017-01-01 00:00:00', 0), \
@@ -12390,11 +11100,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Rock-102-1021', '', 'http://amber.streamguys.com:4570', 'http://www.rock102.com/', 'Rock-102-1021.png', 0, 0, 0, 1, '2011-11-11', 14112, 0, '2017-01-01 00:00:00', 0), \
 ('KFBK-1530', '', 'http://amber.streamguys.com:4570', 'http://www.kfbk.com/', 'KFBK-1530.png', 0, 0, 0, 1, '2011-11-11', 14113, 0, '2017-01-01 00:00:00', 0), \
 ('WRBC-Smile-Radio', '', 'http://ss3.amfmph.com:82/smileradio', 'http://www.wrbcsmileradio.tk/', 'WRBC-Smile-Radio.png', 0, 0, 0, 1, '2011-11-11', 14114, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Azzurra-916', '', 'http://94.23.216.118:8022/', 'http://www.radioazzurranetwork.it/', 'Radio-Azzurra-916.png', 0, 0, 0, 1, '2011-11-11', 14115, 0, '2017-01-01 00:00:00', 0), \
-('Weathered-Steel', '', 'http://94.23.216.118:8022/', '', 'Weathered-Steel.png', 0, 0, 0, 1, '2011-11-11', 14116, 0, '2017-01-01 00:00:00', 0), \
-('The-Script', '', 'http://94.23.216.118:8022/', '', 'The-Script.png', 0, 0, 0, 1, '2011-11-11', 14117, 0, '2017-01-01 00:00:00', 0), \
-('Rodney-Atkins', '', 'http://94.23.216.118:8022/', '', 'Rodney-Atkins.png', 0, 0, 0, 1, '2011-11-11', 14118, 0, '2017-01-01 00:00:00', 0), \
-('Blake-Shelton', '', 'http://94.23.216.118:8022/', '', 'Blake-Shelton.png', 0, 0, 0, 1, '2011-11-11', 14119, 0, '2017-01-01 00:00:00', 0), \
 ('Fine-Young-Cannibals', '', 'http://94.23.216.118:8022/', '', 'Fine-Young-Cannibals.png', 0, 0, 0, 1, '2011-11-11', 14120, 0, '2017-01-01 00:00:00', 0), \
 ('Faithless', '', 'http://94.23.216.118:8022/', '', 'Faithless.png', 0, 0, 0, 1, '2011-11-11', 14121, 0, '2017-01-01 00:00:00', 0), \
 ('KGB-FM-1015', '', 'http://94.23.216.118:8022/', 'http://www.101kgb.com/', 'KGB-FM-1015.png', 0, 0, 0, 1, '2011-11-11', 14122, 0, '2017-01-01 00:00:00', 0), \
@@ -12411,8 +11116,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Howie-Day', '', 'http://us5.my-shoutcast.net:9090', '', 'Howie-Day.png', 0, 0, 0, 1, '2011-11-11', 14133, 0, '2017-01-01 00:00:00', 0), \
 ('Radio-Amor-1075', '', 'http://us5.my-shoutcast.net:9090', 'http://www.amor1075fm.com', 'Radio-Amor-1075.png', 0, 0, 0, 1, '2011-11-11', 14134, 0, '2017-01-01 00:00:00', 0), \
 ('The-Classic-1230', 'The day was the 18th of May when Orvall Burda and his original radio stars went on the air here at KDIX in 1947. In those days, they were indeed stars to the local public. Orvall Burda was the first M', 'http://www.live365.com/cgi-bin/wmp.asx?name_type=nam&station=kdixam', 'http://www.kdix.net/', 'The-Classic-1230.png', 0, 0, 0, 1, '2011-11-11', 14135, 0, '2017-01-01 00:00:00', 0), \
-('KOLM-1520', '', 'http://www.live365.com/cgi-bin/wmp.asx?name_type=nam&station=kdixam', 'http://www.1520theticket.com/', 'KOLM-1520.png', 0, 0, 0, 1, '2011-11-11', 14136, 0, '2017-01-01 00:00:00', 0), \
-('Peter-Fox', '', 'http://www.live365.com/cgi-bin/wmp.asx?name_type=nam&station=kdixam', '', 'Peter-Fox.png', 0, 0, 0, 1, '2011-11-11', 14137, 0, '2017-01-01 00:00:00', 0), \
 ('BBC-Radio-Wales-1039', '', 'http://bbc.co.uk/radio/listen/live/rw.asx', 'http://www.bbc.co.uk/wales/radiowales/', 'BBC-Radio-Wales-1039.png', 0, 0, 0, 1, '2011-11-11', 14138, 0, '2017-01-01 00:00:00', 0), \
 ('WFNR-710', '', 'mms://live.cumulusstreaming.com/WFNR-AM', 'http://www.710wfnr.com/', 'WFNR-710.png', 0, 0, 0, 1, '2011-11-11', 14139, 0, '2017-01-01 00:00:00', 0), \
 ('Life-1071', '', 'http://nwmedia-knwi.streamguys.com/knwi', 'http://www.desmoines.fm/', 'Life-1071.png', 0, 0, 0, 1, '2011-11-11', 14140, 0, '2017-01-01 00:00:00', 0), \
@@ -12421,11 +11124,7 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Joe-Goddard', '', 'mms://streamer3.securenetsystems.net/WSBR', '', 'Joe-Goddard.png', 0, 0, 0, 1, '2011-11-11', 14143, 0, '2017-01-01 00:00:00', 0), \
 ('KMMJ-750', '', 'http://69.10.0.2/kmmj', 'http://kmmj.org/', 'KMMJ-750.png', 0, 0, 0, 1, '2011-11-11', 14144, 0, '2017-01-01 00:00:00', 0), \
 ('Jaki-Graham', '', 'http://69.10.0.2/kmmj', '', 'Jaki-Graham.png', 0, 0, 0, 1, '2011-11-11', 14145, 0, '2017-01-01 00:00:00', 0), \
-('K-SOFT-1160', '', 'http://www.mainstreamnetwork.com/listen/dynamicuasx.asp?station=khpp-am', 'http://www.kneiradio.com', 'K-SOFT-1160.png', 0, 0, 0, 1, '2011-11-11', 14146, 0, '2017-01-01 00:00:00', 0), \
-('Plus-Breakfast', '', 'http://www.mainstreamnetwork.com/listen/dynamicuasx.asp?station=khpp-am', '', 'Plus-Breakfast.png', 0, 0, 0, 1, '2011-11-11', 14147, 0, '2017-01-01 00:00:00', 0), \
-('KBLX-FM-1029', '', 'http://www.mainstreamnetwork.com/listen/dynamicuasx.asp?station=khpp-am', 'http://www.kblx.com/', 'KBLX-FM-1029.png', 0, 0, 0, 1, '2011-11-11', 14148, 0, '2017-01-01 00:00:00', 0), \
-('Jens-Lekman', '', 'http://www.mainstreamnetwork.com/listen/dynamicuasx.asp?station=khpp-am', '', 'Jens-Lekman.png', 0, 0, 0, 1, '2011-11-11', 14149, 0, '2017-01-01 00:00:00', 0), \
-('DR P4 jylland', '', 'http://live-icy.gss.dr.dk:8000/A/A10H.mp3', 'http://www.dr.dk/p4/aarhus/', 'DR-P4-jylland-959.png', 0, 0, 5, 1, '2011-11-11', 14150, 0, '2011-10-14 16:08:24', 0), \
+('DR P4 jylland', '', 'http://live-icy.gss.dr.dk:8000/A/A10H.mp3', 'http://www.dr.dk/p4/aarhus/', 'DR-P4-jylland-959.png', 0, 0, 5, 1, '2011-11-11', 14150, 0, '2011-10-14 16:08:24', 1), \
 ('KTKS-951', '', 'mms://stream1.securenetsystems.net/KTKS', 'http://www.lakeradio.com/', 'KTKS-951.png', 0, 0, 0, 1, '2011-11-11', 14151, 0, '2017-01-01 00:00:00', 0), \
 ('WCQM-983', '', 'http://in.icy2.abacast.com/heartlandcom-wcqmfm-32.m3u', 'http://www.wcqm.com/', 'WCQM-983.png', 0, 0, 0, 1, '2011-11-11', 14152, 0, '2017-01-01 00:00:00', 0), \
 ('La-Raza-Rocks', '', 'http://in.icy2.abacast.com/heartlandcom-wcqmfm-32.m3u', '', 'La-Raza-Rocks.png', 0, 0, 0, 1, '2011-11-11', 14153, 0, '2017-01-01 00:00:00', 0), \
@@ -12502,7 +11201,6 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('KFMB-760', '', 'http://stream101.com/mcp/tunein.php/ksey/playlist.pls', 'http://www.760kfmb.com/', 'KFMB-760.png', 0, 0, 0, 1, '2011-11-11', 14227, 0, '2017-01-01 00:00:00', 0), \
 ('The-BUZZ-1300', '', 'http://stream101.com/mcp/tunein.php/ksey/playlist.pls', 'http://www.1300thebuzz.com/', 'The-BUZZ-1300.png', 0, 0, 0, 1, '2011-11-11', 14228, 0, '2017-01-01 00:00:00', 0), \
 ('The-Chameleons', '', 'http://stream101.com/mcp/tunein.php/ksey/playlist.pls', '', 'The-Chameleons.png', 0, 0, 0, 1, '2011-11-11', 14229, 0, '2017-01-01 00:00:00', 0), \
-('ABC-South-East-SA-1161', '', 'http://stream101.com/mcp/tunein.php/ksey/playlist.pls', 'http://www.abc.net.au/southeastsa/', 'ABC-South-East-SA-1161.png', 0, 0, 0, 1, '2011-11-11', 14230, 0, '2017-01-01 00:00:00', 0), \
 ('1FM Disco-Ball', '', 'http://sc8.1.fm:7020', 'http://www.1.fm/', '1FM---Disco-Ball.png', 0, 0, 0, 1, '2011-11-11', 14231, 0, '2017-01-01 00:00:00', 0), \
 ('Lite-Rock-105-1051', '', 'http://sc8.1.fm:7020', 'http://www.lite105.com/', 'Lite-Rock-105-1051.png', 0, 0, 0, 1, '2011-11-11', 14232, 0, '2017-01-01 00:00:00', 0), \
 ('URN-1350', 'The University of Nottinghams multi award-winning student radio station. We bring you music.', 'http://sc8.1.fm:7020', 'http://www.urn1350.net/', 'URN-1350.png', 0, 0, 0, 1, '2011-11-11', 14233, 0, '2017-01-01 00:00:00', 0), \
