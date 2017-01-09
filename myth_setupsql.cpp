@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <mysql.h>
@@ -123,129 +122,38 @@ const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landek
                                                                 ('Croatia', 67, 'Croatia.jpg'), \
                                                                 ('Czech Republic', 68, 'Czech Republic.jpg')";
 
-
-
-
-
 const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('P2 DK', 'Dansk radio', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'www.dr.dk/P2', 'DR-P2-1023.png', 1, 320, 62, 1, '2011-07-28', 1, 45, '2011-09-15 22:20:34', 1), \
 ('P3 DK', 'www.p3.dk Dansk radio.', 'http://live-icy.gss.dr.dk:8000/A/A05H.mp3', 'www.dr.dk', 'DR-P3-939.png', 1, 128, 77, 1, '2011-07-28', 2, 45, '2011-10-20 15:37:44', 1), \
 ('Kink FM Amsterdam', '[Bitrate: 128]', 'http://81.173.3.20:80/', 'kinkfm.com', '', 0, 128, 0, 1, '2011-08-01', 3, 6, NULL, 0), \
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 63, 1, '2011-07-29', 4, 45, '2011-09-16 21:50:41', 1), \
-('Rockland Radio - 107.9 FM', '', 'http://edge.live.mp3.mdn.newmedia.nacamar.net/ps-rocklandradio/livestream.mp3', '', '', 1, 0, 2, 1, '2011-08-02', 5, 45, NULL, 0), \
 ('DR P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 6, 45, '2011-09-29 13:40:49', 1), \
 ('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', '', 12, 0, 10, 1, '2011-08-02', 37, 4, '2011-10-02 02:25:35', 1), \
 ('Bay Radio', '[Bitrate: 128]', 'http://icy-e-01.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 0, 320, 1, 1, '2011-07-31', 7, 45, '2011-09-17 18:06:22', 1), \
 ('Sonic universe', 'Transcending the world of jazz with eclectic. [Bitrate: 128]', 'http://voxsc1.somafm.com:8600', '', '', 9, 128, 0, 1, '2011-07-31', 8, 7, NULL, 0), \
 ('Heat radio UK', '[Bitrate: 128] Denne radio er mega cool og spiller meget godt og blandet musik fra england. ', 'http://ams01.egihosting.com:9108/', '', 'Heat-Radio.png', 3, 128, 242, 1, '2011-07-31', 9, 9, '2011-10-21 15:23:52', 1),  \
-('Jazz FM', '[Bitrate: 128]', 'http://listen.onmyradio.net:8002/', '', '', 9, 128, 3, 1, '2011-07-31', 10, 31, NULL, 0), \
 ('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente værter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 11, 45, '2011-10-09 16:13:11', 1), \
 ('Radio Aura DK', 'DK', 'http://icecast.xstream.dk:80/aura', '', 'Radio-Aura-1054.png', 40, 128, 46, 1, '2011-08-02', 12, 45, '2011-10-11 23:05:02', 1), \
 ('Beat FM', 'Top 40-pop Tysk.', 'http://streamplus4.ameus.de:11434/', '', '', 40, 128, 0, 1, '2011-08-02', 14, 8, NULL, 0), \
 ('181FM', '', 'http://uplink.181.fm:8068/', '', '181.fm.png', 0, 128, 1, 1, '2011-08-02', 15, 7, '2011-09-27 17:58:45', 1), \
 ('Energy 93 Eurodance', '', 'http://uplink.181.fm:8044/', '', '181.fm.png', 4, 0, 5, 1, '2011-08-02', 16, 7, '2011-10-07 16:02:00', 1), \
 ('Just Hiphop', '', 'http://stream.laut.fm:80/justhiphop', '', '', 5, 0, 2, 1, '2011-08-02', 17, 29, '2011-09-13 10:53:29', 1), \
-('Lush radio', 'Broadcasting from the heart of the Percy Gee, LUSH Radio is the University of Leicester Student Radio Station.', 'http://streamer-ntc-aa01.somafm.com:80/stream/1073', '', '', 0, 128, 0, 1, '2011-07-31', 18, 7, NULL, 0), \
 ('Groove Salad', 'A nicely chilled plate of ambient/downtempo beats and grooves.', 'http://ice1.somafm.com/groovesalad-128-aac', '', '', 16, 128, 13, 1, '2011-07-31', 19, 7, '2011-10-07 15:58:57', 1), \
-('BBC 2', 'BBC The BBC is the largest broadcasting organisation in the world. Its mission is to enrich people''s lives with programmes that inform, educate and entertain.', 'http://mp32.bbc.streamuk.com:80/', '', '', 40, 128, 10, 1, '2011-07-31', 20, 9, '2011-10-02 15:17:55', 0), \
-('KCSM JASS', '', 'http://sc1.abacast.com:8240', '', 'KCSM JASS.png', 0, 64, 0, 1, '2011-07-31', 21, 7, NULL, 0), \
 ('Radio EFM', 'France', 'http://radioefm.ice.infomaniak.ch:80/radioefm-high.mp3', '', '', 0, 128, 6, 1, '2011-08-01', 22, 4, NULL, 1), \
 ('The voice DK', 'The voice denmark.', 'http://stream.thevoicemobil.dk:80/pop64', '', '', 40, 64, 5, 1, '2011-08-01', 23, 45, '2011-09-11 00:08:02', 0), \
-('108.FM - THE HITLIST', 'radio top40 rap hip hop pop rnb', 'http://scfire-ntc-aa03.stream.aol.com:80/stream/1030', 'http://www.108.fm/ ', '', 40, 0, 23, 1, '2011-08-01', 24, 7, '2011-10-17 17:08:39', 0), \
 ('Private Investigations', '', 'http://listen.radionomy.com/private-investigations', '', '', 21, 0, 0, 1, '2011-08-02', 25, 7, NULL, 1), \
-('Radio Veronica', 'Holand', 'http://www.radioveronica.nl/luister/online', 'http://www.radioveronica.nl', 'radio-Veronica-916.png', 0, 0, 0, 1, '2011-08-02', 26, 6, NULL, 0), \
-('Smooth jazz 24-7', '', 'http://80.94.69.106:6964/', '', '', 9, 128, 2, 1, '2011-08-02', 27, 10, NULL, 0), \
-('Sky FM Relaxation', '', 'http://80.94.69.106:6944/', '', '', 7, 64, 3, 1, '2011-08-02', 28, 29, NULL, 0), \
-('Sky FM Solo piano', '', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1004', '', 'SKYFM-World.png', 0, 96, 3, 1, '2011-08-02', 29, 7, NULL, 0), \
-('Sky FM Top hits', '', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1014', '', 'SKYFM-World.png', 40, 192, 11, 1, '2011-08-02', 30, 7, '2011-10-04 16:25:54', 0), \
-('Sky FM Dance hits', '', 'http://72.26.204.18:6844/', '', 'SKYFM-World.png', 4, 192, 2, 1, '2011-08-02', 31, 7, '2011-09-16 18:54:33', 0), \
-('Sky FM Love music', '', 'http://91.185.206.240:8000/', '', 'SKYFM-World.png', 3, 192, 0, 1, '2011-08-02', 32, 7, NULL, 0), \
-('Sky FM Hit 70''s', '', 'http://scfire-ntc-aa05.stream.aol.com:80/stream/1076', '', 'SKYFM-World.png', 12, 192, 0, 1, '2011-08-02', 33, 7, NULL, 0), \
-('Sky FM Reggae', '', 'http://scfire-ntc-aa05.stream.aol.com:80/stream/1017', '', 'SKYFM-World.png', 48, 192, 6, 1, '2011-08-02', 34, 7, '2011-10-07 16:01:57', 0), \
-('Sky FM Salsa', '', 'http://205.188.215.231:8010/', '', 'SKYFM-World.png', 0, 192, 2, 1, '2011-08-02', 35, 7, NULL, 0), \
-('Sky FM Beatles Tribute', '', 'http://72.26.204.18:6824/', '', 'SKYFM-World.png', 21, 192, 10, 1, '2011-08-02', 36, 7, '2011-09-28 14:38:24', 0), \
-('Hit Radio Veronica', 'Holand', 'http://5643.live.streamtheworld.com:80/HIT_RADIO_SC', 'hitradio.nl', '', 40, 192, 1, 1, '2011-08-05', 38, 6, NULL, 0), \
 ('Capital 95.8', '', 'http://media-ice.musicradio.com:80/CapitalMP3', '', '', 0, 192, 2, 1, '2011-08-05', 39, 9, NULL, 1), \
 ('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 0, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
-('RockRadio1', '', 'http://94.23.16.167:8000/', 'http://RockRadio1.Com', '', 1, 192, 0, 1, '2011-08-05', 41, 4, NULL, 0), \
-('BassDrive', '', 'http://arces.net.streams.bassdrive.com:8000', 'http://www.bassdrive.com/v2/', '', 16, 192, 16, 1, '2011-08-05', 42, 7, '2011-10-07 15:59:08', 0), \
 ('TechnoBase.FM', '', 'http://listen.technobase.fm/tunein-dsl-pls', 'http://TechnoBase.FM', '', 50, 192, 1, 0, '2011-08-05', 43, 8, NULL, 1), \
 ('Hitparty fr', '', 'http://87.98.129.202:443', 'http://www.hitparty.fr/', 'hit-Party-Radio.png', 40, 192, 92, 1, '2011-08-05', 44, 4, '2011-10-18 18:33:39', 1), \
-('Suave 107.3 FM', '', 'http://grupomedrano.com.do/suave107/suave107.asx', 'http://www.suave107.com/107/', '', 0, 192, 0, 1, '2011-08-05', 45, 7, NULL, 0), \
-('LOLLIRADIO HITS', 'Italy Italia', 'http://94.23.206.43:8080', 'http://www.lolliradio.net/hits', '', 0, 192, 2, 1, '2011-08-05', 46, 42, NULL, 0), \
-('Reggae141', '', 'http://184.107.197.154:8002', 'http://reggae141.com/', '', 48, 192, 0, 1, '2011-08-05', 47, 7, NULL, 0), \
-('Graceland Radio ', '', 'http://38.96.148.24:5222/', 'Webfetti.com 	 ', '', 21, 192, 1, 1, '2011-08-05', 48, 7, NULL, 0), \
-('Blitz Radio', '', 'http://listen.blitzradio.fm/listen.pls', 'http://www.blitzradio.fm/', '', 0, 192, 1, 1, '2011-08-05', 49, 45, NULL, 0), \
-('AH.FM', 'Leading Trance Radio', 'http://dk.ah.fm:9000', '', '', 41, 192, 1, 1, '2011-08-05', 50, 45, NULL, 0), \
 ('Slow Radio', '(Love Songs & Easy Listening)', 'http://stream2.slowradio.com', 'http://en.slowradio.com/', '', 54, 192, 1, 1, '2011-08-05', 51, 4, NULL, 1), \
-('U2 Radio', '', 'http://s1.voscast.com:7370/', 'http://u2radio.com/live/', '', 21, 192, 0, 0, '2011-08-05', 52, 31, NULL, 0), \
-('virlands', '', 'http://virlands.net/stream/listen7000.m3u', 'http://virlands.net/', '', 0, 192, 0, 1, '2011-08-05', 53, 45, NULL, 0), \
-('Pink Floyd Radio', 'Plays only Pink floyd', 'http://wjoe.piscitella.com:8000/', '', '', 21, 192, 24, 1, '2011-08-05', 54, 7, '2011-09-11 00:07:50', 0), \
-('Hot 108', 'HIphop', 'http://www.hot108.com/hot108jamz.asx', 'http://www.hot108.com/', '', 15, 192, 0, 1, '2011-08-05', 55, 7, NULL, 0), \
-('powerhitz', '', 'http://www.powerhitz.com/channels/wm/jam.asx', 'http://www.powerhitz.com', 'power-Hits-975.png', 40, 192, 66, 1, '2011-08-05', 56, 45, '2011-09-29 13:40:45', 0), \
-('KSSJ Smooth Jazz 94.7', '', 'http://2473.live.streamtheworld.com:80/KSSJFM_SC', '', '', 9, 192, 1, 1, '2011-08-05', 57, 7, NULL, 0), \
-('PulsRadio HandsUp', '', 'http://88.191.102.162:5000', '', '', 0, 192, 0, 1, '2011-08-10', 58, 4, NULL, 0), \
-('HITPARTY  Only Hits ', '[Bitrate: 192]', 'http://193.17.192.12:443', '', '', 40, 192, 0, 1, '2011-08-10', 59, 30, NULL, 0), \
-('DUBSTEP.FM', '[Bitrate: 192]', 'http://72.233.84.175:80', '', '', 0, 192, 0, 1, '2011-08-10', 60, 7, NULL, 0), \
 ('AnimeNfo Radio', '[Bitrate: 192]', 'http://69.60.255.236:8000', '', '', 0, 192, 1, 1, '2011-08-10', 61, 27, '2011-09-01 22:42:06', 1), \
-('Radio Face FM88.1', '[Bitrate: 192]', 'http://87.229.73.132:7000', '', '', 46, 192, 0, 1, '2011-08-10', 62, 42, NULL, 0), \
-('AH.FM - Leading Trance Radio', 'AH.FM  [Bitrate: 192]', 'http://91.82.84.111:9000', '', '', 41, 192, 1, 1, '2011-08-10', 63, 32, NULL, 0), \
-('Radio PlayMusic 24 Horas', '[Bitrate: 192] ', 'http://78.47.100.242:10008', '', '', 46, 192, 0, 1, '2011-08-10', 64, 4, NULL, 0), \
-('La Grosse Radio Reggae', '[Bitrate: 192]', 'http://188.165.229.164:8300', '', '', 0, 192, 0, 1, '2011-08-10', 65, 4, NULL,0), \
-('DrAgOnDeViL.DyNDnS.OrG', '[Bitrate: 192]', 'http://84.19.188.18:8080', '', '', 0, 192, 0, 1, '2011-08-10', 66, 8, NULL, 0), \
-('Mellesleg.FM - Fad', '[Bitrate: 192] ', 'http://94.125.250.112:8000', '', '', 0, 192, 0, 1, '2011-08-10', 67, 32, NULL, 0), \
-('mika.fm - fresh', ' Beats for YOU - www.mika.fm +++  [Bitrate: 192]  ', 'http://87.98.245.237:80', '', '', 0, 192, 4, 1, '2011-08-10', 68, 33, NULL, 0), \
-('PSYCHEDELIK.COM ', '[Bitrate: 192]', 'http://88.191.38.140:8002', '', '', 0, 192, 0, 1, '2011-08-10', 69, 4, NULL, 0), \
-('RADIO fresh80s', '[Bitrate: 192] ', 'http://87.118.64.201:8010', '', '', 0, 192, 1, 1, '2011-08-10', 70, 25, NULL, 0), \
-('item.FM FutureMusic', '[Bitrate: 192]', 'http://188.165.199.120:5100', '', '', 0, 192, 0, 1, '2011-08-10', 71, 33, NULL, 0), \
-('FILTH FM', '[Bitrate: 192] ', 'http://75.125.130.122:8062', '', '', 0, 192, 0, 1, '2011-08-10', 72, 7, NULL, 0), \
-('TheProyectSound Radio', '[Bitrate: 192] ', 'http://46.105.163.72:9998', '', '', 0, 192, 0, 1, '2011-08-10', 73, 4, NULL, 0), \
-('Radio88 Szeged FM 95.4 ', '[Bitrate: 192]  ', 'http://88.151.99.22:8000', '', '', 0, 192, 0, 1, '2011-08-10', 74, 32, NULL, 1), \
-('Human-Nation-FM 24h Gay Dance Charts', 'TOP100 Discofox [Bitrate: 192]', 'http://178.77.67.179:8344', '', '', 40, 192, 1, 1, '2011-08-10', 75, 35, NULL, 0), \
-('HARD.fm!', '[Bitrate: 192] ', 'http://95.211.80.69:8000', '', '', 0, 192, 0, 1, '2011-08-10', 76, 8, NULL, 0), \
-('Radio 1', '[Bitrate: 192] ', 'http://145.58.33.95:8100', '', '', 42, 192, 8, 1, '2011-08-10', 77, 34, '2011-09-09 10:00:01', 0), \
-('PSYCHEDELIK.COM', 'Trance [Bitrate: 192]', 'http://88.191.38.140:8010', '', 'PSYCHEDELIK.COM.png', 41, 192, 0, 1, '2011-08-10', 78, 4, NULL, 0), \
-('Radio SonDelaZone - RADIO SDZ', '[Bitrate: 192]  ', 'http://91.121.29.128:8000', '', '', 44, 192, 0, 1, '2011-08-10', 79, 4, NULL, 0), \
+('Radio88 Szeged FM 95.4 ', '[Bitrate: 192]', 'http://88.151.99.22:8000', '', '', 0, 192, 0, 1, '2011-08-10', 74, 32, NULL, 1), \
 ('RADIOORANJE', 'www.radiooranje.nl bij verzoekjes  [Bitrate: 192] ', 'http://79.170.91.205:8000', '', '', 0, 192, 0, 1, '2011-08-10', 80, 21, NULL, 1), \
-('SLAM 101 FM ', '[Bitrate: 192] ', 'http://216.59.35.34:8120', '', '', 0, 192, 0, 1, '2011-08-10', 81, 7, NULL, 0), \
-('3fm Serious Radio', '[Bitrate: 192]   ', 'http://145.58.33.95:8104', '', '', 45, 192, 1, 1, '2011-08-10', 82, 34, NULL, 0), \
-('RMNrelax', '[Bitrate: 192]   ', 'http://91.121.176.177:8023', '', '', 0, 192, 0, 1, '2011-08-10', 83, 4, NULL, 0), \
-('Sunshine- Live', '[Bitrate: 192] ', 'http://213.251.187.145:8030', '', '', 0, 192, 0, 1, '2011-08-10', 84, 4, NULL, 0), \
-('Kink ClassX (www.kinkclassx.com)', '[Bitrate: 192]  ', 'http://81.173.3.24:80', '', '', 45, 192, 0, 1, '2011-08-10', 85, 23, NULL, 0), \
-('Piratenhits Internetradio', '[Bitrate: 192] ', 'http://91.121.82.176:8000', '', '', 0, 192, 0, 1, '2011-08-10', 86, 4, NULL, 0), \
-('Ultra Dark Radio', '[Bitrate: 192]  ', 'http://91.194.84.35:3026', '', 'Ultra Dark Radio.png', 0, 192, 0, 1, '2011-08-10', 87, 8, NULL, 0), \
-('wunschradio.fm Schlager', '[Bitrate: 192]  ', 'http://80.237.156.39:8000', '', '', 0, 192, 0, 1, '2011-08-10', 88, 42, NULL, 0), \
-('Germany-Stream', '[Bitrate: 192] ', 'http://83.169.61.67:5700', '', '', 46, 192, 0, 1, '2011-08-10', 89, 8, NULL, 0), \
-('LUXFUNK RADIO', 'BIG MO & DJ [Bitrate: 192]', 'http://87.229.45.44:8200', '', '', 47, 192, 13, 1, '2011-08-10', 90, 42, '2011-10-01 18:52:51', 0), \
-('PSYCHEDELIK.COM', '[Bitrate: 192] ', 'http://88.191.38.140:8000', '', 'PSYCHEDELIK.COM.png', 0, 192, 0, 1, '2011-08-10', 91, 4, NULL, 0), \
-('Radio ZamZam', 'Abdelbasset - Houd 113 - Youssef 93  [Bitrate: 192] ', 'http://188.165.99.157:8220', '', '', 0, 192, 0, 1, '2011-08-10', 92, 4, NULL, 0), \
-('DJ Herman ', '[Bitrate: 192] ', 'http://62.212.154.170:8578', '', '', 0, 192, 0, 1, '2011-08-10', 93, 6, NULL, 0), \
-('La Grosse Radio Metal', '[Bitrate: 192]', 'http://213.186.60.187:8200', '', '', 0, 192, 0, 1, '2011-08-10', 94, 4, NULL, 0), \
-('WoH Radio', '[Bitrate: 192] ', 'http://85.25.120.36:27015', '', '', 16, 192, 0, 1, '2011-08-10', 95, 8, NULL, 0), \
-('WackenRadio.com ', '[Bitrate: 192]', 'http://62.141.50.223:8001', '', '', 43, 192, 0, 1, '2011-08-10', 96, 25, NULL, 0), \
-('Radio Zwiebel', '[Bitrate: 192] ', 'http://80.237.208.92:20050', '', '', 0, 192, 0, 1, '2011-08-10', 97, 8, NULL, 0), \
-('Radio Sunshine ', '[Bitrate: 192] ', 'http://62.75.143.87:8000', '', '', 0, 192, 1, 1, '2011-08-10', 98, 42, NULL, 0), \
-('NERadio Hardstyle', 'Trackupdate @ www.hardstyle.nu  [Bitrate: 192] ', 'http://87.98.145.139:443', '', '', 0, 192, 0, 1, '2011-08-10', 99, 37, NULL, 0), \
-('Station MaD', '[Bitrate: 192]  ', 'http://195.242.153.122:8024', '', '', 8, 192, 0, 1, '2011-08-10', 100, 34, NULL, 0), \
-('Radio Hollandio [West Brabant]', '[Bitrate: 192]  ', 'http://62.212.132.9:8808', '', '', 0, 192, 3, 1, '2011-08-10', 101, 6, NULL, 1), \
-('antenne mallorca', '[Bitrate: 192]  ', 'http://85.25.17.199:9020', '', '', 0, 192, 0, 1, '2011-08-10', 102, 8, NULL, 0), \
-('Radio 2', '[Bitrate: 192] ', 'http://145.58.33.95:8102', '', '', 0, 192, 0, 1, '2011-08-10', 103, 6, NULL, 0), \
-('1Mix Radio', 'Trance [Bitrate: 192]', 'http://91.121.193.30:8000', '', '', 41, 192, 6, 1, '2011-08-10', 104, 4, NULL, 0), \
-('Nashville FM', 'Nashville FM == 24/7 Nonstop Country Music (www.nashvillefm.be)  [Bitrate: 192]  ', 'http://62.212.132.26:8300', '', '', 27, 192, 0, 1, '2011-08-10', 105, 6, NULL, 0), \
-('POLSKIE RADIO LONDYN', '[Bitrate: 192]   ', 'http://94.23.43.136:8192', '', '', 0, 192, 1, 1, '2011-08-10', 106, 22, NULL, 0), \
-('BNN.FM', '[Bitrate: 192] ', 'http://145.58.33.95:8012', '', '', 45, 192, 1, 1, '2011-08-10', 107, 34, NULL, 0), \
-('Deep House Network', '[Bitrate: 192]', 'http://91.121.162.46:8000', '', '', 16, 192, 1, 1, '2011-08-10', 108, 4, NULL, 0), \
-('963 Happy Radio Monique Gold', '[Bitrate: 192]', 'http://94.75.235.38:8963', '', '', 0, 192, 0, 1, '2011-08-10', 109, 36, NULL, 0), \
-('LINASJAZZ | www.linasjazz.fr', '[Bitrate: 192]  ', 'http://87.98.175.43:8020', '', '', 9, 192, 0, 1, '2011-08-10', 110, 4, NULL, 0), \
-('24/7 A STATE OF TRANCE', '[Bitrate: 192]', 'http://109.228.22.76:80/Trance1', '', '', 41, 192, 1, 1, '2011-08-10', 111, 23, NULL, 0), \
-('Beatdance FM', '[Bitrate: 192]', 'http://87.118.78.2:8050', '', '', 0, 192, 1, 1, '2011-08-10', 112, 25, '2011-10-03 19:18:51', 0), \
-('RADIO MUNDUS', '[Bitrate: 192]', 'http://85.25.141.128:8010', '', '', 0, 192, 2, 1, '2011-08-10', 113, 9, '2011-09-15 18:30:33', 0), \
-('Caraibean Radio', '[Bitrate: 192]', 'http://188.165.237.140:8000', '', '', 0, 192, 0, 1, '2011-08-10', 114, 33, NULL, 0), \
-('SUB.FM', '[Bitrate: 192] ', 'http://72.233.84.175:8529', '', '', 0, 192, 0, 1, '2011-08-10', 115, 7, NULL, 0), \
-('Metal Refinement', '[Bitrate: 192]', 'http://80.86.84.141:8088', '', '', 1, 192, 0, 1, '2011-08-10', 116, 8, NULL, 0), \
-('DUBTHUGZ Radio', '[Bitrate: 192]  ', 'http://77.92.68.221:15634', '', '', 0, 192, 1, 1, '2011-08-10', 117, 31, '2011-10-17 23:44:32', 0), \
-('Powerstation Buddha', '[Bitrate: 192]  ', 'http://95.211.3.147:8850', '', '', 0, 192, 0, 1, '2011-08-10', 118, 36, NULL, 0), \
-('La Grosse Radio', '[Bitrate: 192]', 'http://213.186.60.187:8500', '', '', 1, 192, 0, 1, '2011-08-10', 119, 4, NULL, 0), \
+('Radio Sunshine ', '[Bitrate: 192] ', 'http://62.75.143.87:8000', '', '', 0, 192, 1, 1, '2011-08-10', 98, 42, NULL, 1), \
+('Radio Hollandio [West Brabant]', '[Bitrate: 192]', 'http://62.212.132.9:8808', '', '', 0, 192, 3, 1, '2011-08-10', 101, 6, NULL, 1), \
+('Beatdance FM', '[Bitrate: 192]', 'http://87.118.78.2:8050', '', '', 0, 192, 1, 1, '2011-08-10', 112, 25, '2011-10-03 19:18:51', 1), \
+('RADIO MUNDUS', '[Bitrate: 192]', 'http://85.25.141.128:8010', '', '', 0, 192, 2, 1, '2011-08-10', 113, 9, '2011-09-15 18:30:33', 1), \
 ('AnimeAMAZE', 'MIQ - Setsuna  [Bitrate: 192]  ', 'http://72.233.93.160:10007', '', '', 45, 192, 0, 1, '2011-08-10', 120, 7, NULL, 0), \
 ('Ashdown FM Classic Hits', '[Bitrate: 192]  ', 'http://75.126.73.136:9060', '', '', 0, 192, 0, 1, '2011-08-10', 121, 7, NULL, 0), \
 ('Underground Eighties', '[Bitrate: 192]', 'http://74.63.47.82:8884', '', '', 0, 192, 0, 1, '2011-08-10', 122, 7, NULL, 0), \
@@ -343,22 +251,9 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('Dj Benny live vanuit Budel', 'www.muziekmolen.nl [Bitrate: 192]', 'http://46.17.4.36:8516', '', '', 0, 192, 0, 1, '2011-08-10', 215, 44, NULL, 0), \
 ('TD1 Radio', '[Bitrate: 192]  ', 'http://77.92.68.221:15004', '', '', 0, 192, 0, 1, '2011-08-10', 216, 31, NULL, 0), \
 ('www.gezelligheidsradio.nl', '[Bitrate: 192]', 'http://178.20.171.32:8032', '', '', 0, 192, 0, 1, '2011-08-10', 217, 3, NULL, 0), \
-('Radio 8FM [Noordoost Brabant]', 'Radio 8FM Classics & Hits [Bitrate: 192]', 'http://46.231.87.21:8802', '', '', 0, 192, 0, 1, '2011-08-10', 218, 30, NULL, 0), \
-('Radio+ Dans', '[Bitrate: 192]  ', 'http://89.105.32.12:8130', '', '', 40, 192, 0, 1, '2011-08-10', 219, 21, NULL, 0), \
-('PSR', '[Bitrate: 192]   ', 'http://64.34.170.177:18068', '', '', 46, 192, 0, 1, '2011-08-10', 220, 7, NULL, 0), \
-('Radio 3 Norge - Mer musikk!', '[Bitrate: 192] ', 'http://212.62.227.4:2018', '', '', 40, 192, 0, 1, '2011-08-10', 221, 21, NULL, 0), \
-('Mexico FM', 'Mexico FM www.radio-toppers.nl [Bitrate: 192]  ', 'http://62.212.132.9:8586', '', '', 0, 192, 0, 1, '2011-08-10', 222, 6, NULL, 0), \
-('PsychoMed Jazz', '[Bitrate: 192]  ', 'http://78.129.196.90:80', '', '', 9, 192, 0, 1, '2011-08-10', 223, 9, NULL, 0), \
 ('Radio-Sun.de', '[Bitrate: 192]', 'http://62.141.58.105:6100', '', '', 46, 192, 0, 1, '2011-08-10', 224, 25, NULL, 0), \
-('MajorUrsa', 'More Playlist on http://www.majorursa.eu/  [Bitrate: 192]', 'http://87.118.78.17:2410', '', '', 0, 192, 0, 1, '2011-08-10', 225, 25, NULL, 0), \
-('radioterranova', '[Bitrate: 192]', 'http://62.212.154.170:8522', '', '', 46, 192, 0, 1, '2011-08-10', 226, 6, NULL, 0), \
-('radio decadas', '[Bitrate: 192]', 'http://174.37.194.139:8316', '', '', 46, 192, 0, 1, '2011-08-10', 227, 7, NULL, 0), \
-('Nashville FM', '[Bitrate: 192]', 'http://46.231.87.21:8300', '', '', 27, 192, 0, 1, '2011-08-10', 228, 30, NULL, 0), \
-('Radio Byte', 'byteradio.net [Bitrate: 192]', 'http://94.198.99.148:8085', '', '', 0, 192, 0, 1, '2011-08-10', 229, 42, NULL, 0), \
-('Party Vibe Radio', '[Bitrate: 192]', 'http://173.193.228.66:8010', '', '', 0, 192, 0, 1, '2011-08-10', 230, 7, NULL, 0), \
-('WWW.NEVADATEAM.NL', 'WWW.NEVADATEAM.NL [Bitrate: 192]', 'http://91.121.82.176:8020', '', '', 7, 192, 1, 1, '2011-08-10', 231, 4, '2011-09-16 19:00:13', 0), \
-('Overijssel Radio', '[Bitrate: 192]', 'http://195.242.153.122:8034', '', '', 0, 192, 0, 1, '2011-08-10', 232, 34, NULL, 0), \
-('DJ Henk DJ Tiesto Request', '[Bitrate: 192]', 'http://213.148.243.128:8020', '', '', 41, 192, 1, 1, '2011-08-10', 233, 6, NULL, 0), \
+('radio decadas', '[Bitrate: 192]', 'http://174.37.194.139:8316', '', '', 46, 192, 0, 1, '2011-08-10', 227, 7, NULL, 1), \
+('Nashville FM', '[Bitrate: 192]', 'http://46.231.87.21:8300', '', '', 27, 192, 0, 1, '2011-08-10', 228, 30, NULL, 1), \
 ('V-Radio', '[Bitrate: 192]  ', 'http://81.173.3.26:80', '', '', 0, 192, 0, 1, '2011-08-10', 234, 23, NULL, 0), \
 ('Mellesleg.FM ', '[Bitrate: 192]  ', 'http://94.125.250.112:8020', '', '', 0, 192, 0, 1, '2011-08-10', 235, 32, NULL, 0), \
 ('100.5 - TatarRadiosi Kazan', '[Bitrate: 192]  ', 'http://89.111.189.3:6210', '', '', 1, 192, 0, 1, '2011-08-10', 236, 29, NULL, 0), \
@@ -559,8 +454,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radio 3 Norge', '[Bitrate: 192]   ', 'http://212.62.227.4:8100', '', '', 0, 192, 0, 1, '2011-08-10', 429, 21, NULL, 0), \
 ('VKRS Internet Radio Electronic Vibes 24/7', 'Double Trouble - Approaching  [Bitrate: 192]   ', 'http://87.117.201.161:80', '', '', 0, 192, 0, 1, '2011-08-10', 430, 5, NULL, 0), \
 ('Radio-Plus', 'Phil@ ~ Spring (22 avril 2010)  [Bitrate: 192]  ', 'http://91.121.107.190:8080', '', '', 0, 192, 0, 1, '2011-08-10', 431, 7, NULL, 0), \
-('JUICE FM', '- Broadcasting 24 Hours Bringing You The Best Music [Bitrate: 192]  ', 'http://91.121.145.104:8702', '', '', 0, 192, 0, 1, '2011-08-10', 432, 4, NULL, 0), \
-('Radio Chantre TWO', '[Bitrate: 192]  ', 'http://62.75.220.151:8050', '', '', 0, 192, 0, 1, '2011-08-10', 433, 41, NULL, 0), \
 ('HRVATSKI RADIO VALPOVSTINA', '[Bitrate: 192]  ', 'http://82.193.192.20:8900', '', '', 0, 192, 0, 1, '2011-08-10', 434, 22, NULL, 0), \
 ('Radio Expansie', 'Wolfgang Petry - Verliebt Verloren Vergessen Verzeihen  [Bitrate: 192]  ', 'http://62.212.132.9:8932', '', '', 46, 192, 0, 1, '2011-08-10', 435, 6, NULL, 0), \
 ('GrooveSkool 24/7', 'Hash Wednesdays - Hash Wednesdays Vol.26  [Bitrate: 192]  ', 'http://109.108.129.75:8102', '', '', 7, 192, 1, 1, '2011-08-10', 436, 6, NULL, 0), \
@@ -590,7 +483,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radio Fantasy', '[Bitrate: 192] ', 'http://91.213.69.178:8030', '', '', 0, 192, 0, 1, '2011-08-10', 460, 6, NULL, 0), \
 ('Kolokol', '[Bitrate: 192]', 'http://94.181.181.242:8092', '', '', 0, 192, 0, 1, '2011-08-10', 461, 29, NULL, 0), \
 ('lightningradio nonstop', '[Bitrate: 192]   ', 'http://78.159.97.159:8112', '', '', 0, 192, 0, 1, '2011-08-10', 462, 8, NULL, 0), \
-('Dream Radio', '*[Bitrate: 192]', 'http://76.73.2.51:9512', '', '', 0, 192, 0, 1, '2011-08-10', 463, 7, NULL, 0), \
 ('103 The VIBE', '[Bitrate: 192]', 'http://76.73.2.50:9842', '', '', 0, 192, 0, 1, '2011-08-10', 464, 7, NULL, 0), \
 ('Radiomusictime', '[Bitrate: 192]', 'http://78.159.97.159:8030', '', '', 46, 192, 0, 1, '2011-08-10', 465, 8, NULL, 0), \
 ('Dynamicradio', '[Bitrate: 192]  ', 'http://188.142.48.37:8040', '', '', 0, 192, 0, 1, '2011-08-10', 466, 7, NULL, 0), \
@@ -690,22 +582,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('Radio Westerkwartier', '[Bitrate: 192]   ', 'http://85.25.147.233:8098', '', '', 45, 192, 0, 1, '2011-08-10', 563, 41, NULL, 0), \
 ('Tamil Rise', '[Bitrate: 192]  ', 'http://72.233.47.226:8028', '', '', 0, 192, 0, 1, '2011-08-10', 564, 7, NULL, 0), \
 ('Radio-Muckebude', '[Bitrate: 192]   ', 'http://184.107.166.186:9898', '', '', 46, 192, 0, 1, '2011-08-10', 565, 27, NULL, 0), \
-('Spiked Tea Radio', 'Tune In - http://spikedtearadio.gotdns.org:80  [Bitrate: 192]', 'http://91.121.28.115:8000', '', '', 1, 192, 0, 1, '2011-08-10', 566, 4, NULL, 0), \
-('KATAKALOS RADIO ', '[Bitrate: 192]   ', 'http://46.4.27.51:7037', '', '', 0, 192, 0, 1, '2011-08-10', 567, 8, NULL, 0), \
-('u luisterd', '[Bitrate: 192]  ', 'http://178.19.114.74:10036', '', '', 46, 192, 0, 1, '2011-08-10', 568, 22, NULL, 0), \
-('DIGITAAL', '[Bitrate: 192]   ', 'http://85.17.141.170:8024', '', '', 1, 192, 0, 1, '2011-08-10', 569, 6, NULL, 0), \
-('CaseFm.com ', '[Bitrate: 192] ', 'http://212.127.171.64:8000', '', '', 0, 192, 0, 1, '2011-08-10', 570, 6, NULL, 0), \
-('PrimeFM ', '[Bitrate: 192]', 'http://91.83.236.51:8100', '', '', 16, 192, 1, 1, '2011-08-10', 571, 9, NULL, 0), \
-('MNML-Station.de', '[Bitrate: 192]', 'http://217.114.211.131:9050', '', '', 0, 192, 0, 1, '2011-08-10', 572, 8, NULL, 0), \
-('The industry Non Stop', '[Bitrate: 192]  ', 'http://88.159.162.38:8000', '', '', 46, 192, 0, 1, '2011-08-10', 573, 6, NULL, 0), \
-('Kenisis Radio', '[Bitrate: 192]  ', 'http://68.168.100.60:12318', '', '', 0, 192, 0, 1, '2011-08-10', 574, 7, NULL, 0), \
-('Fan Live 247 ', '  [Bitrate: 192]   ', 'http://86.55.112.161:8000', '', '', 0, 192, 0, 1, '2011-08-10', 575, 41, NULL, 0), \
-('Dit is Radio Ortega', '[Bitrate: 192]  ', 'http://85.25.84.200:8080', '', '', 0, 192, 0, 1, '2011-08-10', 576, 8, NULL, 0), \
-('Europoort Radio 102.4', '[Bitrate: 192]', 'http://46.23.68.186:8084', '', '', 0, 192, 0, 1, '2011-08-10', 577, 31, NULL, 0), \
-('Radio 68 ', '[Bitrate: 192]   ', 'http://85.25.106.160:8500', '', '', 0, 192, 0, 1, '2011-08-10', 578, 8, NULL, 0), \
-('Vermont Internet Radio', '[Bitrate: 192]   ', 'http://204.77.222.2:8037', '', '', 0, 192, 0, 1, '2011-08-10', 579, 7, NULL, 0), \
-('Flimmer Hjem ', '[Bitrate: 192]   ', 'http://46.182.121.123:8000', '', '', 46, 192, 0, 1, '2011-08-10', 580, 22, NULL, 0), \
-('Nicolawaai ', '[Bitrate: 192]   ', 'http://81.92.184.84:8080', '', '', 45, 192, 0, 1, '2011-08-10', 581, 6, NULL, 0), \
 ('Radio Amore Mio Vanuit Arnhem', '[Bitrate: 192]', 'http://77.251.77.122:8016', '', '', 0, 192, 0, 1, '2011-08-10', 582, 6, NULL, 0), \
 ('Rodos Hotradio Stream ', '[Bitrate: 192]', 'http://199.16.186.36:8491', '', '', 0, 192, 0, 1, '2011-08-10', 583, 7, NULL, 0), \
 ('Wheee.FM ', '[Bitrate: 192]   ', 'http://87.106.162.127:8000/bitrate/192_aac', '', '', 0, 192, 0, 1, '2011-08-10', 584, 8, NULL, 0), \
@@ -714,10 +590,6 @@ const char *radio_station_setupsql1="REPLACE INTO `radio_stations` (`name`, `bes
 ('107.8 Radio Jackie Finesse', 'Radio Jackie  [Bitrate: 192]', 'http://95.154.211.15:5873', '', '', 0, 192, 0, 1, '2011-08-10', 587, 9, NULL, 0), \
 ('Infernal Sunshine Inc. Radio ', '[Bitrate: 192]  ', 'http://85.216.128.209:15881', '', '', 44, 192, 2, 1, '2011-08-10', 588, 25, NULL, 0), \
 ('HXOPAMA 93.3 FM GREEK MAINSTREAM ', '[Bitrate: 192]   ', 'http://78.46.46.214:7058', '', '', 0, 192, 0, 1, '2011-08-10', 589, 8, NULL, 0), \
-('South Sight Radio', 'Wdh. 12-02-11 - Set up Sector Die House & Technoparty mit Norbert Gast Sebastian Fuchs  [Bitrate: 192]', 'http://85.25.73.248:22048', '', '', 50, 192, 0, 1, '2011-08-10', 590, 8, NULL, 0), \
-('My Station name', '[Bitrate: 192]  ', 'http://93.155.227.45:8000', '', '', 46, 192, 0, 1, '2011-08-10', 591, 36, NULL, 0), \
-('Enjoy  FM HD AUDIO STREAM', '[Bitrate: 192]   ', 'http://94.23.56.173:8000', '', '', 40, 192, 3, 1, '2011-08-10', 592, 4, NULL, 0), \
-('Radio El Triunfo De La Fe', '[Bitrate: 192]   ', 'http://174.36.206.217:8624', '', '', 0, 192, 0, 1, '2011-08-10', 593, 58, NULL, 0), \
 ('Wheee.FM - electronic music radio ', '[Bitrate: 192]', 'http://87.106.162.127:8000/bitrate/192_mp3', '', '', 30, 192, 0, 1, '2011-08-10', 594, 8, NULL, 0), \
 ('KamiScraps.com', '[Bitrate: 192]  ', 'http://208.53.158.48:9246', '', '', 0, 192, 0, 1, '2011-08-10', 595, 7, NULL, 0), \
 ('DEDICADO IQUIQUE', '[Bitrate: 192]   ', 'http://190.82.80.162:8052', '', '', 46, 192, 0, 1, '2011-08-10', 596, 46, NULL, 0), \
@@ -833,7 +705,6 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('Webradio TechnoBeat', '[Bitrate: 128]', 'http://85.214.138.204:9000', '', '', 50, 128, 0, 1, '2011-08-11', 1063, 8, NULL, 0), \
 ('Pure Jazz Radio', '', 'http://71.125.12.37:8000', '', '', 9, 128, 0, 1, '2011-08-11', 1064, 7, NULL, 0), \
 ('echno-Students', '[Bitrate: 128]', 'http://62.75.187.158:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1065, 8, NULL, 0), \
-('MixRadio', '+36 70 501-93-04 [Bitrate: 128] [Max Listeners: 3000]', 'http://87.229.73.132:8450', '', '', 0, 128, 0, 1, '2011-08-11', 1066, 42, NULL, 0), \
 ('Party Central Radio', '[Bitrate: 128]', 'http://208.85.240.210:80', '', '', 0, 128, 0, 1, '2011-08-11', 1067, 7, NULL, 0), \
 ('TopFM - S.Miguel', '[Bitrate: 128]', 'http://195.8.58.150:35006', '', '', 40, 128, 0, 1, '2011-08-11', 1068, 38, NULL, 0), \
 ('WKSK 105.5 The Heat (GA)', '[Bitrate: 128]', 'http://174.36.223.9:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1069, 7, NULL, 0), \
@@ -868,38 +739,9 @@ const char *radio_station_setupsql2="REPLACE INTO `radio_stations` (`name`, `bes
 ('Antenne-AC ', '  [Bitrate: 128] [Max Listeners: 250]', 'http://46.4.80.116:9000', '', '', 40, 128, 0, 1, '2011-08-11', 1098, 8, NULL, 0), \
 ('Welkom Bij witte-parel-radio', 'Nu Live Vanuit Studui Schijndel Dj Roel & Dj Tamara  [Bitrate: 128]  ', 'http://62.212.132.26:8736', '', '', 0, 128, 0, 1, '2011-08-11', 1099, 6, NULL, 0), \
 ('Studio Kiel', '[Bitrate: 128] [Max Listeners: 75]', 'http://46.4.78.207:26290', '', '', 0, 128, 0, 1, '2011-08-11', 1100, 8, NULL, 0), \
-('GuggliFox (Stream)', '[Bitrate: 128]  ', 'http://46.4.77.21:27160', '', '', 0, 128, 0, 1, '2011-08-11', 1101, 8, NULL, 0), \
-('SmoothJazz.com.pl', 'The European Home of Smooth Jazz  [Bitrate: 128]  ', 'http://91.121.95.34:8032', '', '', 9, 128, 0, 1, '2011-08-11', 1102, 4, NULL, 0), \
-('BeatBase.at', '[Bitrate: 128]', 'http://85.25.236.38:17840', '', '', 0, 128, 0, 1, '2011-08-11', 1103, 8, NULL, 0), \
-('Sunrise-Radio.net', 'DJ Reddy on Air  [Bitrate: 128]  ''  ', 'http://94.23.28.116:1598', '', '', 0, 128, 0, 1, '2011-08-11', 1104, 4, NULL, 0), \
-('ANDYS 80S', '[Bitrate: 128]  ', 'http://209.9.238.4:9844', '', '', 0, 128, 0, 1, '2011-08-11', 1105, 7, NULL, 0), \
-('FoxRadioEuropa', 'Fox Radio Europa  [Bitrate: 128]  ', 'http://85.25.120.98:18210', '', '', 0, 128, 0, 1, '2011-08-11', 1106, 8, NULL, 0), \
-('Radio FunStar DSL-Stream 128kBit ', '[Bitrate: 128]  ', 'http://83.169.38.88:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1107, 17, NULL, 0), \
-('PsyMusic UK', ' Progressive', 'http://91.121.122.118:8010', '', '', 29, 128, 0, 1, '2011-08-11', 1108, 4, NULL, 0), \
-('SUPREME RADIO', 'IT [Bitrate: 128]  ', 'http://94.23.206.43:8020', '', '', 0, 128, 0, 1, '2011-08-11', 1109, 37, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://91.121.77.187:6510', '', '', 0, 128, 0, 1, '2011-08-11', 1110, 22, NULL, 0), \
-('HirschmilchRadio-Electronic', '[Bitrate: 128]  ', 'http://188.40.70.137:9080', '', '', 7, 128, 0, 1, '2011-08-11', 1111, 8, NULL, 0), \
-('HKGFM.net', '[Bitrate: 128]  ', 'http://68.68.100.50:8014', '', '', 0, 128, 0, 1, '2011-08-11', 1112, 7, NULL, 0), \
-('Rude FM.com', '[Bitrate: 128]  ', 'http://78.129.159.205:8034', '', '', 0, 128, 0, 1, '2011-08-11', 1113, 9, NULL, 0), \
-('Radio Free Phoenix', '[Bitrate: 128]  ', 'http://68.178.199.78:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1114, 7, NULL, 0), \
-('Radio UnArt', '[Bitrate: 128]  ', 'http://80.190.246.70:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1115, 8, NULL, 0), \
-('TROPICALISIMA', 'SUAVE http://www.tropicalisima.fm [Bitrate: 128]  ', 'http://67.159.60.125:8012', '', '', 0, 128, 0, 1, '2011-08-11', 1116, 7, NULL, 0), \
-('None', '[Bitrate: 128]', 'http://194.208.21.29:8100', '', '', 45, 128, 0, 1, '2011-08-11', 1117, 12, NULL, 0), \
-('HKGFM.net', '[Bitrate: 128]  ', 'http://68.68.100.50:8010', '', '', 0, 128, 0, 1, '2011-08-11', 1118, 7, NULL, 0), \
-('Electro Sound Radio', ' [Bitrate: 128]  ', 'http://87.98.216.208:8030', '', '', 50, 128, 0, 1, '2011-08-11', 1119, 4, NULL, 0), \
-('Salsa Bacana @ Klan1 Network', '[Bitrate: 128]  ', 'http://184.107.128.202:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1120, 27, NULL, 0), \
-('LiveDNB Atmosphere', '[Bitrate: 128]  ', 'http://173.236.56.82:8006', '', '', 0, 128, 0, 1, '2011-08-11', 1121, 7, NULL, 0), \
-('EXA FM 106.9 ENSENADA', '[Bitrate: 128]  ', 'http://74.54.222.111:24000', '', '', 0, 128, 0, 1, '2011-08-11', 1122, 7, NULL, 0), \
-('rentse Piratencombinatie', 'Studio Alpenjager  [Bitrate: 128]  ', 'http://195.242.153.122:8052', '', '', 0, 128, 0, 1, '2011-08-11', 1123, 34, NULL, 0), \
-('THREETEN RADIO', '70 music [Bitrate: 128]', 'http://67.202.79.8:7890', '', '', 0, 128, 0, 1, '2011-08-11', 1124, 7, NULL, 0), \
-('stlhiphop Radio', '[Bitrate: 128]  ', 'http://213.246.51.97:8032', '', '', 0, 128, 0, 1, '2011-08-11', 1125, 4, NULL, 0), \
-('Kanal6Norge.no', '[Bitrate: 128]  ', 'http://212.62.227.4:8060', '', '', 0, 128, 0, 1, '2011-08-11', 1126, 21, NULL, 0), \
-('radio.XES - Gothic', 'Darkwave', 'http://85.25.149.212:8030', '', '', 0, 128, 0, 1, '2011-08-11', 1127, 8, NULL, 0), \
-('Phantom 105.2', '[Bitrate: 128]  ', 'http://85.159.16.83:80', '', '', 1, 128, 0, 1, '2011-08-11', 1128, 18, NULL, 0), \
-('Radioportugas', '[Bitrate: 128]  ', 'http://88.190.21.109:9996', '', '', 0, 128, 0, 1, '2011-08-11', 1129, 4, NULL, 0), \
-('Beats by Emrah Is', '[Bitrate: 128]  ', 'http://85.195.108.126:8000', '', '', 4, 128, 3, 1, '2011-08-11', 1130, 7, '2011-09-13 10:53:16', 0), \
-('AutoDJ', '[Bitrate: 128]  ', 'http://96.44.148.135:8847', '', '', 0, 128, 0, 1, '2011-08-11', 1131, 9, NULL, 0), \
-('Radio No Limit Hartiesti', '[Bitrate: 128]  ', 'http://89.45.194.132:7280', '', '', 0, 128, 0, 1, '2011-08-11', 1132, 41, NULL, 0), \
+('GuggliFox (Stream)', '[Bitrate: 128]  ', 'http://46.4.77.21:27160', '', '', 0, 128, 0, 1, '2011-08-11', 1101, 8, NULL, 1), \
+('ANDYS 80S', '[Bitrate: 128]  ', 'http://209.9.238.4:9844', '', '', 0, 128, 0, 1, '2011-08-11', 1105, 7, NULL, 1), \
+('Radio Free Phoenix', '[Bitrate: 128]  ', 'http://68.178.199.78:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1114, 7, NULL, 1), \
 ('Clubbers Fm', '[Bitrate: 128]  ', 'http://77.36.67.168:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1133, 41, NULL, 0), \
 ('Somehow Jazz', '[Bitrate: 128]  ', 'http://70.38.25.166:80', '', '', 9, 128, 0, 1, '2011-08-11', 1134, 7, NULL, 0), \
 ('DANCE RADIO', '[Bitrate: 128]  ', 'http://188.165.197.40:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1135, 26, NULL, 0), \
@@ -1275,7 +1117,6 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 ('MegarockRadio.Net', '[Bitrate: 128]  ', 'http://205.188.215.228:8012', '', '', 1, 128, 0, 1, '2011-08-11', 1499, 7, NULL, 0), \
 ('megaclub.fm', '[Bitrate: 128]  ', 'http://89.149.254.138:8250', '', '', 0, 128, 0, 1, '2011-08-11', 1500, 8, NULL, 0), \
 ('HardRockin80s.com', 'The best 80s rock and metal ', 'http://205.188.215.227:8018', '', '', 1, 128, 0, 1, '2011-08-11', 1501, 7, NULL, 0), \
-('AMPED FM FLASHBACK', '[Bitrate: 128]  ', 'http://173.192.22.204:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1502, 27, NULL, 0), \
 ('Power 104.7 Baltimore', '[Bitrate: 128]', 'http://72.13.81.34:5614', '', '', 0, 128, 0, 1, '2011-08-11', 1503, 7, NULL, 0), \
 ('Big Beat radio', '[Bitrate: 128]  ', 'http://85.21.79.93:9054', '', '', 4, 128, 0, 1, '2011-08-11', 1504, 29, NULL, 0), \
 ('ChroniX Metal Masters (beta)', '[Bitrate: 128] ', 'http://173.192.45.18:10300', '', '', 1, 128, 0, 1, '2011-08-11', 1505, 27, NULL, 0), \
@@ -1525,89 +1366,23 @@ const char *radio_station_setupsql3="REPLACE INTO `radio_stations` (`name`, `bes
 
 
 const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('ALL RUSH RADIO', '[Bitrate: 128]  ', 'http://205.188.215.229:8010', '', '', 1, 128, 0, 1, '2011-08-11', 1749, 7, NULL, 0), \
-('Radio Hardcast', 'radio_hardcast_..._18__www.hardcast.de  [Bitrate: 128] [Max Listeners: 6000]', 'http://94.23.242.179:10100', '', '', 7, 128, 0, 1, '2011-08-11', 1750, 37, NULL, 0), \
-('Autobot', '[Bitrate: 128] [Max Listeners: 8265]', 'http://46.137.74.223:8099', '', '', 0, 128, 0, 1, '2011-08-11', 1751, 8, NULL, 0), \
-('RADIO ACTIV ROMANIA', '[Bitrate: 128]  ', 'http://88.191.143.216:7000', '', '', 0, 128, 0, 1, '2011-08-11', 1752, 4, NULL, 0), \
-('MainSection.FM', '[Bitrate: 128]  ', 'http://212.95.42.64:86', '', '', 40, 128, 0, 1, '2011-08-11', 1753, 11, NULL, 0), \
-('AccentMix by Vmix.fm', ' electronic grooves from Paris', 'http://213.251.171.213:8000', '', '', 30, 128, 0, 1, '2011-08-11', 1754, 6, NULL, 0), \
-('RADIO MAMBO', '[Bitrate: 128]', 'http://91.121.103.187:8062', '', '', 0, 128, 0, 1, '2011-08-11', 1755, 4, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://188.165.23.150:9710', '', '', 31, 128, 1, 1, '2011-08-11', 1756, 22, NULL, 0), \
-('HIPER FM // AGARRA A TUA MUSICA!', '[Bitrate: 128]  ', 'http://109.71.41.250:8158', '', '', 40, 128, 1, 1, '2011-08-11', 1757, 38, NULL, 0), \
-('Radio Popular Romania', '', 'http://195.254.135.90:7777', '', '', 0, 128, 0, 1, '2011-08-11', 1758, 41, NULL, 0), \
-('Star FM NBG', '[Bitrate: 128]  ', 'http://87.230.53.43:8004', '', '', 1, 128, 0, 1, '2011-08-11', 1759, 12, NULL, 0), \
-('ClubbersRadio.com', '[Bitrate: 128]  ', 'http://66.45.246.202:8636', '', '', 0, 128, 0, 1, '2011-08-11', 1760, 7, NULL, 0), \
-('Breezy Radio', '[Bitrate: 128]  ', 'http://173.193.20.157:7780', '', '', 9, 128, 1, 1, '2011-08-11', 1761, 7, NULL, 0), \
-('Big R Radio', '[Bitrate: 128]  ', 'http://173.193.14.170:8012', '', '', 0, 128, 0, 1, '2011-08-11', 1762, 27, NULL, 0), \
-('192 Radio', '[Bitrate: 128] ', 'http://46.17.4.36:8520', '', '', 3, 128, 0, 1, '2011-08-11', 1763, 44, NULL, 0), \
-('Sukson Radio 24', '[Bitrate: 128]  ', 'http://210.1.61.7:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1764, 33, NULL, 0), \
-('1.FM - Afterbeat Electronica', 'Hardsoul', 'http://72.13.83.100:8250', '', '', 30, 128, 1, 1, '2011-08-11', 1765, 7, NULL, 0), \
-('GotRadio - Celtic', '[Bitrate: 128] ', 'http://64.62.164.196:3000', '', '', 0, 128, 0, 1, '2011-08-11', 1766, 7, NULL, 0), \
-('Radiofruz- E Zonido zuiver riba internet! ', '[Bitrate: 128] [Max Listeners: 250]', 'http://93.190.141.109:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1767, 7, NULL, 0), \
-('RADiO LuDNiCA', '[Bitrate: 128]  ', 'http://65.60.19.42:8222', '', '', 0, 128, 0, 1, '2011-08-11', 1768, 7, NULL, 0), \
-('AnimeNfo Radio', '[Bitrate: 128]  ', 'http://213.166.184.162:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1769, 34, NULL, 0), \
-('Pista Digital - Portal Disco Digital - www.discodigital.com.br ', 'www.pistadigital.com.br  [Bitrate: 128] [Max Listeners: 5100]', 'http://184.107.209.66:6016', '', '', 31, 128, 0, 1, '2011-08-11', 1770, 28, NULL, 0), \
-('FG DJRADIO USA', '[Bitrate: 128]  ', 'http://87.98.215.44:80', '', '', 50, 128, 0, 1, '2011-08-11', 1771, 4, NULL, 0), \
-('Radio Jodlerwirt- Volksmusik', '[Bitrate: 128]  ', 'http://80.252.100.128:9580', '', '', 0, 128, 0, 1, '2011-08-11', 1772, 8, NULL, 0), \
-('BunkerTV', 'Techno DJ-Sets on www.bunkertv.de  [Bitrate: 128]  ', 'http://213.133.111.143:8000', '', '', 50, 128, 0, 1, '2011-08-11', 1773, 8, NULL, 0), \
-('Munichs Hardest Hits', 'elodic Rock & AOR', 'http://84.19.188.7:8010', '', '', 40, 128, 0, 1, '2011-08-11', 1774, 8, NULL, 0), \
-('From hell', '[Bitrate: 128]', 'http://87.230.53.43:7000', '', '', 1, 128, 0, 1, '2011-08-11', 1775, 12, NULL, 0), \
-('Radio Party Manele ', 'Nek', 'http://46.108.143.243:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1776, 41, NULL, 0), \
-('Jazz FM - Brian Parker', '[Bitrate: 128]  ', 'http://91.121.143.111:8010', '', '', 9, 128, 1, 1, '2011-08-11', 1777, 4, NULL, 0), \
-('Alouette', '[Bitrate: 128]  ', 'http://91.197.138.3:80', '', '', 45, 128, 0, 1, '2011-08-11', 1778, 4, NULL, 0), \
-('DJ Eli2011 @ ARR4U ', '[Bitrate: 128]  ', 'http://208.85.242.124:80', '', '', 0, 128, 0, 1, '2011-08-11', 1779, 7, NULL, 0), \
-('Japan-A-Radio', '[Bitrate: 128]  ', 'http://64.62.194.40:9010', '', '', 0, 128, 0, 1, '2011-08-11', 1780, 7, NULL, 0), \
-('Classic Country 1630', '[Bitrate: 128]  ', 'http://173.193.20.157:7380', '', '', 6, 128, 0, 1, '2011-08-11', 1781, 7, NULL, 0), \
-('Digital Relax', '[Bitrate: 128]  ', 'http://184.107.209.66:6030', '', '', 0, 128, 0, 1, '2011-08-11', 1782, 28, NULL, 0), \
-('Jovem Pan - Floripa', '[Bitrate: 128]  ', 'http://187.17.67.228:9024', '', '', 0, 128, 0, 1, '2011-08-11', 1783, 19, NULL, 0), \
-('Hot Mix Radio', 'http://www.hotmixradiodance.fr [Bitrate: 128]', 'http://213.218.147.24:80', '', '', 0, 128, 0, 1, '2011-08-11', 1784, 4, NULL, 0), \
-('THE BLAZE', '[Bitrate: 128]  ', 'http://204.45.8.170:8057', '', '', 0, 128, 0, 1, '2011-08-11', 1785, 7, NULL, 0), \
-('Eldoradio', '[Bitrate: 128]  ', 'http://81.92.238.54:80', '', '', 7, 128, 0, 1, '2011-08-11', 1786, 5, NULL, 0), \
-('1.FM - LuxuriaMusic', ' Lounge', 'http://64.62.252.136:3142', '', '', 3, 128, 1, 1, '2011-08-11', 1787, 7, NULL, 0), \
-('Stryper', '[Bitrate: 128] [Max Listeners: 240]', 'http://207.210.88.138:5108', '', '', 0, 128, 0, 1, '2011-08-11', 1788, 27, NULL, 0), \
-('Split Infinity Radio', '[Bitrate: 128]  ', 'http://46.4.120.170:80', '', '', 0, 128, 0, 1, '2011-08-11', 1789, 8, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://91.121.103.183:6200', '', '', 0, 128, 0, 1, '2011-08-11', 1790, 22, NULL, 0), \
-('POLSKASTACJA.PL', '[Bitrate: 128] [Max Listeners: 220]', 'http://91.121.116.107:9400', '', '', 0, 128, 0, 1, '2011-08-11', 1791, 22, NULL, 0), \
-('Final Fantasy Radio', '[Bitrate: 128]  ', 'http://69.175.89.82:8227', '', '', 0, 128, 1, 1, '2011-08-11', 1792, 7, NULL, 0), \
-('Frequence India', 'India radio [Bitrate: 128]', 'http://94.23.120.121:80', '', '', 0, 128, 0, 1, '2011-08-11', 1793, 27, NULL, 0), \
-('VOLKSMUSIKNET', ' [Bitrate: 128]  ', 'http://208.53.158.48:8188', '', '', 51, 128, 0, 1, '2011-08-11', 1794, 7, NULL, 0), \
-('Radio MilleniuM Manele', '[Bitrate: 128]  ', 'http://195.60.77.239:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1795, 29, NULL, 0), \
-('DANCEGROOVE.RADIO', '[Bitrate: 128]', 'http://46.4.78.207:12160', '', '', 4, 128, 0, 1, '2011-08-11', 1796, 8, NULL, 0), \
-('ByblosRadio.com', '[Bitrate: 128]  ', 'http://72.13.86.83:443', '', '', 0, 128, 0, 1, '2011-08-11', 1797, 7, NULL, 0), \
-('1.FM - Trance', '[Bitrate: 128]', 'http://72.13.83.70:8040', '', '', 41, 128, 0, 1, '2011-08-11', 1798, 7, NULL, 0), \
-('GotRadio - New Age', '[Bitrate: 128] ', 'http://64.62.164.196:2348', '', '', 0, 128, 0, 1, '2011-08-11', 1799, 7, NULL, 0), \
+('HIPER FM // AGARRA A TUA MUSICA!', '[Bitrate: 128]', 'http://109.71.41.250:8158', '', '', 40, 128, 1, 1, '2011-08-11', 1757, 38, NULL, 1), \
+('Star FM NBG', '[Bitrate: 128]', 'http://87.230.53.43:8004', '', '', 1, 128, 0, 1, '2011-08-11', 1759, 12, NULL, 1), \
+('Munichs Hardest Hits', 'elodic Rock & AOR', 'http://84.19.188.7:8010', '', '', 40, 128, 0, 1, '2011-08-11', 1774, 8, NULL, 1), \
+('From hell', '[Bitrate: 128]', 'http://87.230.53.43:7000', '', '', 1, 128, 0, 1, '2011-08-11', 1775, 12, NULL, 1), \
+('Alouette', '[Bitrate: 128]', 'http://91.197.138.3:80', '', '', 45, 128, 0, 1, '2011-08-11', 1778, 4, NULL, 1), \
+('Japan-A-Radio', '[Bitrate: 128]', 'http://64.62.194.40:9010', '', '', 0, 128, 0, 1, '2011-08-11', 1780, 7, NULL, 1), \
+('Split Infinity Radio', '[Bitrate: 128]', 'http://46.4.120.170:80', '', '', 0, 128, 0, 1, '2011-08-11', 1789, 8, NULL, 1), \
 ('CLUBsoundz.FM WEBRADIO - HOUSE', ' TRANCE', 'http://87.118.112.38:8000', '', '', 41, 128, 0, 1, '2011-08-11', 1800, 8, NULL, 0), \
 ('GotRadio - Classic Country', '[Bitrate: 128] ', 'http://64.202.109.70:80', '', '', 0, 128, 0, 1, '2011-08-11', 1801, 7, NULL, 0), \
 ('CroLive Radio', '[Bitrate: 128]  ', 'http://85.25.135.86:23575', '', '', 0, 128, 0, 1, '2011-08-11', 1802, 27, NULL, 0), \
 ('Only1', 'IN HOUSE WE TRUST - aux platines Damien J Carter  [Bitrate: 128]  ', 'http://88.191.64.200:9000', '', '', 0, 128, 0, 1, '2011-08-11', 1803, 4, NULL, 0), \
 ('simply electronica', 'fresh musique 360 with deep phunk (27-05-2011) part 2  [Bitrate: 128]  ', 'http://62.146.7.155:8240', '', '', 0, 128, 0, 1, '2011-08-11', 1804, 8, NULL, 0), \
-('MixoTeka Radio', '[Bitrate: 128] [Max Listeners: 250]', 'http://88.198.44.24:8888', '', '', 0, 128, 0, 1, '2011-08-11', 1805, 8, NULL, 0), \
-('Renessans 94.2', '[Bitrate: 128] [Max Listeners: 800]', 'http://217.20.164.163:8014', '', '', 9, 128, 0, 1, '2011-08-11', 1806, 49, NULL, 0), \
-('Discofoxhimmel', '[Bitrate: 128] [Max Listeners: 550]', 'http://87.230.101.29:8000', '', '', 0, 128, 1, 1, '2011-08-11', 1807, 42, NULL, 0), \
-('Expressiv Fm', 'www.iaumuzica.com  [Bitrate: 128]  ', 'http://89.45.194.87:8000', '', '', 4, 128, 3, 1, '2011-08-11', 1808, 41, NULL, 0), \
-('ETN.fm ch2: House Stream', '[Bitrate: 128]  ', 'http://scfire-ntc-aa06.stream.aol.com:80/stream/1079', '', '', 0, 128, 0, 1, '2011-08-11', 1809, 7, NULL, 0), \
-('Antena Radio', '[Bitrate: 128]  ', 'http://94.23.38.225:7005', '', '', 0, 128, 0, 1, '2011-08-11', 1810, 4, NULL, 0), \
-('Najbolji Radio', 'radio-dijaspora.com ', 'http://188.40.107.251:9000', '', '', 51, 128, 0, 1, '2011-08-11', 1811, 8, NULL, 0), \
-('p s y r a d i o * f m - chillchannel', '[Bitrate: 128] [Max Listeners: 410]', 'http://81.88.36.42:8020', '', '', 0, 128, 0, 1, '2011-08-11', 1812, 8, NULL, 0), \
-('Cvrcak', '[Bitrate: 128]  ', 'http://46.4.113.188:8800', '', '', 51, 128, 0, 1, '2011-08-11', 1813, 8, NULL, 0), \
-('Radio Wish', 'Live Deejay Razvy  [Bitrate: 128]  ', 'http://195.60.77.201:6200', '', '', 4, 128, 0, 1, '2011-08-11', 1814, 29, NULL, 0), \
-('1055 ROCK - THESSALONIKI - GREECE', '  [Bitrate: 128]  ', 'http://85.17.122.212:8078', '', '', 1, 128, 0, 1, '2011-08-11', 1815, 6, NULL, 0), \
-('Radio Eska Bydgoszcz - 94', '4 FM - transmisje zapewnia firma MPI.PL ', 'http://91.121.166.33:9440', '', '', 0, 128, 0, 1, '2011-08-11', 1816, 4, NULL, 0), \
-('RTL Radio  Die besten Hits aller Zeiten', '  [Bitrate: 128] [Max Listeners: 205]', 'http://81.92.237.123:8080', '', '', 45, 128, 0, 1, '2011-08-11', 1817, 5, NULL, 0), \
-('Radio Beograd 1', '[Bitrate: 128] [Max Listeners: 2000]', 'http://195.252.107.194:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1818, 3, NULL, 0), \
-('Sodazaa Radio', '[Bitrate: 128]  ', 'http://103.22.181.124:8620', '', '', 45, 128, 0, 1, '2011-08-11', 1819, 7, NULL, 0), \
-('EBM Radio', 'Invincible Limit', 'http://87.106.138.241:7000', '', '', 0, 128, 0, 1, '2011-08-11', 1820, 7, NULL, 0), \
-('Technolovers.net', '[Bitrate: 128]', 'http://109.230.252.254:2010', '', '', 0, 128, 0, 1, '2011-08-11', 1821, 39, NULL, 0), \
-('Revolution Live', 'HarderRadio Hands Up Mix August 2009  [Bitrate: 128]', 'http://92.51.132.244:9999', '', '', 0, 128, 0, 1, '2011-08-11', 1822, 8, NULL, 0), \
-('GotRadio - Guitar Genius', '[Bitrate: 128] ', 'http://64.202.109.63:80', '', '', 0, 128, 0, 1, '2011-08-11', 1823, 7, NULL, 0), \
-('Houseradio needs more help urgently', ' check our website!!! Houseradio deep tech house HIFI 1 ', 'http://78.129.250.9:8052', '', '', 16, 128, 5, 1, '2011-08-11', 1824, 9, '2011-09-11 00:08:04', 0), \
-('Soundset Plavi', '[Bitrate: 128]  ', 'http://92.48.127.99:9800', '', '', 0, 128, 0, 1, '2011-08-11', 1825, 27, NULL, 0), \
-('98 A Radio Rock', '98 A Radio Rock  [Bitrate: 128]  ', 'http://184.172.134.4:9400', '', '', 1, 128, 0, 1, '2011-08-11', 1826, 7, NULL, 0), \
-('181.fm - Rock 40', '[Bitrate: 128] [Max Listeners: 2100]', 'http://38.107.220.162:8028', '', '181.fm.png', 1, 128, 0, 1, '2011-08-11', 1827, 7, NULL, 0), \
-('Cavo Paradiso Radio', 'Sorry', 'http://85.17.122.212:8488', '', '', 0, 128, 0, 1, '2011-08-11', 1828, 6, NULL, 0), \
-('IBC Tamil', 'IBC Tamil  [Bitrate: 128]  ', 'http://38.96.148.80:6176', '', '', 8, 128, 0, 1, '2011-08-11', 1829, 7, NULL, 0), \
-('MortalFm Dancefloor Radio', '  [Bitrate: 128]  ', 'http://91.121.139.150:8044', '', '', 4, 128, 0, 1, '2011-08-11', 1830, 4, NULL, 0), \
-('M2 RADIO : ONLY HITS & DANCE - Live From Paris France - www.m2radio.fr', '[Bitrate: 128]  ', 'http://91.121.100.202:8000', '', '', 4, 128, 0, 1, '2011-08-11', 1831, 4, NULL, 0), \
+('Renessans 94.2', '[Bitrate: 128]', 'http://217.20.164.163:8014', '', '', 9, 128, 0, 1, '2011-08-11', 1806, 49, NULL, 1), \
+('Antena Radio', 'chillchannel [Bitrate: 128]  ', 'http://94.23.38.225:7005', '', '', 0, 128, 0, 1, '2011-08-11', 1810, 4, NULL, 1), \
+('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8020', '', '', 0, 128, 0, 1, '2011-08-11', 1812, 8, NULL, 1), \
+('Radio Beograd 1', '[Bitrate: 128]', 'http://195.252.107.194:8002', '', '', 0, 128, 0, 1, '2011-08-11', 1818, 3, NULL, 1), \
+('EBM Radio', 'Invincible Limit', 'http://87.106.138.241:7000', '', '', 0, 128, 0, 1, '2011-08-11', 1820, 7, NULL, 1), \
 ('HAPPYDAY', '[Bitrate: 128]  ', 'http://222.122.131.69:8000', '', '', 0, 128, 1, 1, '2011-08-11', 1832, 40, NULL, 0), \
 ('RelaxingJazz.com', 'Jazz [Bitrate: 128] [Max Listeners: 752]', 'http://85.17.77.1:8080', '', '', 9, 128, 0, 1, '2011-08-11', 1833, 7, NULL, 0), \
 ('Boystown Live Dance Radio - Chicago', '[Bitrate: 128]  ', 'http://204.45.6.58:8046', '', '', 0, 128, 0, 1, '2011-08-11', 1834, 7, NULL, 0), \
@@ -1844,8 +1619,6 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 ('Dinner Jazz Excursion', '[Bitrate: 128]  ', 'http://174.46.222.71:8240', '', '', 9, 128, 0, 1, '2011-08-11', 2066, 7, NULL, 0), \
 ('POLSKASTACJA .PL', '[Bitrate: 128] ', 'http://188.165.23.150:5910', '', '', 0, 128, 0, 1, '2011-08-11', 2067, 22, NULL, 0), \
 ('KEXP Live 128kbps', 'KEXP 90.3 FM [Bitrate: 128]', 'http://140.142.8.207:8000', '', '', 7, 128, 0, 1, '2011-08-11', 2068, 7, NULL, 0), \
-('Lush: Mostly female vocals with an electronic influence. [SomaFM] ', '[Bitrate: 128] ', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1073', '', '', 0, 128, 0, 1, '2011-08-11', 2069, 7, NULL, 0), \
-('DigitalGunfire.com', ' Hard Hitting! ', 'http://129.16.159.82:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2070, 23, NULL, 0), \
 ('AAN HITS - Todays Hottest Hits Played 24/7', 'SWISS RADIO  [Bitrate: 128]  ', 'http://76.10.222.237:9004', '', '', 40, 128, 0, 1, '2011-08-11', 2071, 7, NULL, 0), \
 ('Boot Liquor', '[SomaFM] ', 'http://207.200.96.230:8014', '', '', 0, 128, 0, 1, '2011-08-11', 2072, 7, NULL, 0), \
 ('AnimeRadio.SU', '[Bitrate: 128]  ', 'http://78.46.91.38:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2073, 8, NULL, 0), \
@@ -1892,17 +1665,7 @@ const char *radio_station_setupsql4="REPLACE INTO `radio_stations` (`name`, `bes
 
 
 const char *radio_station_setupsql5="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('PONdENDS.COM', 'DjFranz HipHop_NOV_part2  [Bitrate: 128] ', 'http://178.159.0.80:7098', '', '', 0, 128, 0, 1, '2011-08-11', 2113, 34, NULL, 0), \
-('shoutcast3', '[Bitrate: 128] ', 'http://87.117.198.86:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2114, 9, NULL, 0), \
-('AAN COUNTRY', '[Bitrate: 128] ', 'http://76.10.222.237:9002', '', '', 6, 128, 0, 1, '2011-08-11', 2115, 7, NULL, 0), \
-('Radio Pro-B Romania', '[Bitrate: 128] ', 'http://89.38.207.242:9999', '', '', 0, 128, 0, 1, '2011-08-11', 2116, 41, NULL, 0), \
-('ROCKY FM - Today''s Best Rock!', '[Bitrate: 128]  ', 'http://80.237.210.81:80', '', '', 1, 128, 0, 1, '2011-08-11', 2117, 8, NULL, 0), \
-('RaDioTEENTAAL.com 100%', '', 'http://91.121.155.39:8128', '', '', 0, 128, 0, 1, '2011-08-11', 2118, 4, NULL, 0), \
-('MegaFox24 netzradio.fm', '[Bitrate: 128]', 'http://89.149.254.138:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2119, 8, NULL, 0), \
-('M2 ANALOG www.m2radio.fr', '[Bitrate: 128]', 'http://91.121.140.217:9080', '', '', 0, 128, 0, 1, '2011-08-11', 2120, 4, NULL, 0), \
-('181.fm - The Breeze', '[Bitrate: 128]', 'http://38.107.220.162:8004', '', '181.fm.png', 0, 128, 1, 1, '2011-08-11', 2121, 7, NULL, 0), \
-('CROOZE', 'R&B', 'http://193.227.114.74:2580', '', '', 0, 128, 0, 1, '2011-08-11', 2122, 26, NULL, 0), \
-('Raggakings the 24/7', 'Bersenbrueck ReggaeJam 2011 - Ranking Joe  [Bitrate: 128] ', 'http://64.202.98.51:7970', '', '', 0, 128, 0, 1, '2011-08-11', 2123, 7, NULL, 0), \
+('Raggakings the 24-7', 'Bersenbrueck ReggaeJam 2011 - Ranking Joe [Bitrate: 128]', 'http://64.202.98.51:7970', '', '', 0, 128, 0, 1, '2011-08-11', 2123, 7, NULL, 1), \
 ('Nirvana Radio', ' - Music for Meditation and Relaxation The Best Meditation Music for all gentle-minded and elevated souls.  [Bitrate: 128]', 'http://91.121.72.50:9106', '', '', 0, 128, 0, 1, '2011-08-11', 2124, 4, NULL, 0), \
 ('Portofino Network', '[Bitrate: 128]', 'http://87.117.228.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 2125, 13, NULL, 0), \
 ('Folk Alley', 'FolkAlley.com  [Bitrate: 128]', 'http://66.225.205.8:80', '', '', 51, 128, 0, 1, '2011-08-11', 2126, 7, NULL, 0), \
@@ -12592,24 +12355,15 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('pure-fm-972', '97.2 pure fm - berlins dance radio spielt den Beat der Hauptstadt - house, electro, dance, pop und disco. 97.2 pure fm spielt den Sound der Metropole', 'http://www.radiostream.de/stream/37472.pls', 'http://www.purefm.de', 'pure-fm-972.png', 0, 0, 0, 1, '2011-11-11', 14065, 0, '2017-01-01 00:00:00', 0), \
 ('Ukcountryradiocom', '', 'http://ukcountryradio.com/ukcr.m3u', 'http://ukcountryradio.com/', 'Ukcountryradiocom.png', 0, 0, 0, 1, '2011-11-11', 14066, 0, '2017-01-01 00:00:00', 0), \
 ('Super-Estrella-1071', '', 'http://ukcountryradio.com/ukcr.m3u', 'http://www.superestrella.com/', 'Super-Estrella-1071.png', 0, 0, 0, 1, '2011-11-11', 14067, 0, '2017-01-01 00:00:00', 0), \
-('News-Talk-1380-WAOK', 'News-Talk 1380 WAOK is a News, Talk radio station based in Atlanta, GA.  News-Talk 1380 WAOK can be heard at radio.com', 'http://ukcountryradio.com/ukcr.m3u', 'http://www.waok.com/', 'News-Talk-1380-WAOK.png', 0, 0, 0, 1, '2011-11-11', 14068, 0, '2017-01-01 00:00:00', 0), \
 ('MIX-1051', 'MIX105.1 plays the best music mix from the 80&#39;s, 90&#39;s &amp; today. Visit mix1051.com to subscribe to the MIX Plus e-mail club and to listen live! MIX105.1 supports numerous community events su', 'http://ukcountryradio.com/ukcr.m3u', 'http://www.mix1051.com', 'MIX-1051.png', 0, 0, 0, 1, '2011-11-11', 14069, 0, '2017-01-01 00:00:00', 0), \
 ('WKVT-FM-927', 'Brattleboro&#39;s, Keene&#39;s and Greenfield&#39;s choice for Classic Rock.', 'http://ukcountryradio.com/ukcr.m3u', 'http://www.wkvt.com/', 'WKVT-FM-927.png', 0, 0, 0, 1, '2011-11-11', 14070, 0, '2017-01-01 00:00:00', 0), \
 ('SKYFM-Urban-Jamz', 'Kickin&#39; with the baddest beats on the &#39;net', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', 'http://www.sky.fm/urbanjamz', 'SKYFM-Urban-Jamz.png', 0, 0, 0, 1, '2011-11-11', 14071, 0, '2017-01-01 00:00:00', 0), \
 ('The-Score-1400', '', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', '', 'The-Score-1400.png', 0, 0, 0, 1, '2011-11-11', 14072, 0, '2017-01-01 00:00:00', 0), \
 ('Robert-Cray', '', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', '', 'Robert-Cray.png', 0, 0, 0, 1, '2011-11-11', 14073, 0, '2017-01-01 00:00:00', 0), \
 ('The-Bobby-Jones-Gospel-Countdown', '', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', '', 'The-Bobby-Jones-Gospel-Countdown.png', 0, 0, 0, 1, '2011-11-11', 14074, 0, '2017-01-01 00:00:00', 0), \
-('Talk-Radio-1270', '', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', 'http://www.wgsv.com/', 'Talk-Radio-1270.png', 0, 0, 0, 1, '2011-11-11', 14075, 0, '2017-01-01 00:00:00', 0), \
-('The-Undertones', '', 'http://listen.sky.fm/partner_mp3/urbanjamz.pls', '', 'The-Undertones.png', 0, 0, 0, 1, '2011-11-11', 14076, 0, '2017-01-01 00:00:00', 0), \
-('Slow-Jam', 'Une radio Slow Jam pour des m&#233;lodies R&amp;B et Soul aux tempos lents et aux paroles romantiques, diffus&#233;e en direct de Paris, France.', 'http://listen.radionomy.com/slow-jam', 'http://www.radionomy.com/en/radio/slow-jam', 'Slow-Jam.png', 0, 0, 0, 1, '2011-11-11', 14077, 0, '2017-01-01 00:00:00', 0), \
-('Sunny-999', '', 'http://listen.radionomy.com/slow-jam', 'http://www.sunny999fm.com/', 'Sunny-999.png', 0, 0, 0, 1, '2011-11-11', 14078, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Guerrilla-948', '', 'http://live.eliberadio.ro:8002', 'http://www.radioguerrilla.ro/', 'Radio-Guerrilla-948.png', 0, 0, 0, 1, '2011-11-11', 14079, 0, '2017-01-01 00:00:00', 0), \
-('Texas-FM-1061', '', 'http://wm9.spacialnet.com/kbalfm140666', 'http://www.sansabaradio.com/', 'Texas-FM-1061.png', 0, 0, 0, 1, '2011-11-11', 14080, 0, '2017-01-01 00:00:00', 0), \
-('Kringvarp-roya', '', 'http://media-http.internet.fo/uf96', 'http://www.kringvarp.fo', 'Kringvarp-roya.png', 0, 0, 0, 1, '2011-11-11', 14081, 0, '2017-01-01 00:00:00', 0), \
-('WIBQ-985', '', 'http://media-http.internet.fo/uf96', 'http://www.wibqfm.com', 'WIBQ-985.png', 0, 0, 0, 1, '2011-11-11', 14082, 0, '2017-01-01 00:00:00', 0), \
-('Academy-Records', '', 'http://media-http.internet.fo/uf96', '', 'Academy-Records.png', 0, 0, 0, 1, '2011-11-11', 14083, 0, '2017-01-01 00:00:00', 0), \
-('94-Rock-943', '', 'http://media-http.internet.fo/uf96', 'http://www.wrlf.com/', '94-Rock-943.png', 0, 0, 0, 1, '2011-11-11', 14084, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Centar-Studio-Porec-896', '', 'http://rclive.ath.cx:8282/mp3', 'http://www.radiocentar.hr/', 'Radio-Centar-Studio-Porec-896.png', 0, 0, 0, 1, '2011-11-11', 14085, 0, '2017-01-01 00:00:00', 0), \
+('Talk-Radio-1270', '', 'http://pub5.radiotunes.com:80/radiotunes_urbanjamz', 'http://www.wgsv.com/', 'Talk-Radio-1270.png', 0, 0, 0, 1, '2011-11-11', 14075, 0, '2017-01-01 00:00:00', 1), \
+('The-Undertones', '', 'http://pub5.radiotunes.com:80/radiotunes_urbanjamz', '', 'The-Undertones.png', 0, 0, 0, 1, '2011-11-11', 14076, 0, '2017-01-01 00:00:00', 0), \
+('Slow-Jam', 'Une radio Slow Jam pour des France.', 'http://listen.radionomy.com/slow-jam', 'http://www.radionomy.com/en/radio/slow-jam', 'Slow-Jam.png', 0, 0, 0, 1, '2011-11-11', 14077, 0, '2017-01-01 00:00:00', 1), \
 ('Iron-Maiden', '', 'http://rclive.ath.cx:8282/mp3', '', 'Iron-Maiden.png', 0, 0, 0, 1, '2011-11-11', 14086, 0, '2017-01-01 00:00:00', 0), \
 ('ABC-Goulburn-Murray-977', '', 'http://rclive.ath.cx:8282/mp3', 'http://abc.net.au/goulburnmurray/', 'ABC-Goulburn-Murray-977.png', 0, 0, 0, 1, '2011-11-11', 14087, 0, '2017-01-01 00:00:00', 0), \
 ('WBFG-965', '', 'http://rclive.ath.cx:8282/mp3', '', 'WBFG-965.png', 0, 0, 0, 1, '2011-11-11', 14088, 0, '2017-01-01 00:00:00', 0), \
@@ -12623,10 +12377,7 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Frank-Fm-1011', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', 'http://www.capecodsfrankfm.com/', 'Frank-Fm-1011.png', 0, 0, 0, 1, '2011-11-11', 14096, 0, '2017-01-01 00:00:00', 0), \
 ('Charlie-Winston', '', 'http://listen.jazzradio.com/partner_aac/bossanova.pls', '', 'Charlie-Winston.png', 0, 0, 0, 1, '2011-11-11', 14097, 0, '2017-01-01 00:00:00', 0), \
 ('Christmas-Melody', '', 'http://www.xmasmelody.com/128.asx', 'http://www.xmasmelody.com/', 'Christmas-Melody.png', 0, 0, 0, 1, '2011-11-11', 14098, 0, '2017-01-01 00:00:00', 0), \
-('The-FOX-991', '', 'http://asx.abacast.com/eldorado-kxfm-64.pls', 'http://www.991thefox.com/', 'The-FOX-991.png', 0, 0, 0, 1, '2011-11-11', 14099, 0, '2017-01-01 00:00:00', 0), \
 ('Big-Country-1009', '', 'http://asx.abacast.com/eldorado-kxfm-64.pls', 'http://www.wwbr.com/', 'Big-Country-1009.png', 0, 0, 0, 1, '2011-11-11', 14100, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Madonna-ABradio', 'Madonna radio', 'http://static.abradio.cz/data/s/20/playlist/madonna64.asx', 'http://www.abradio.cz/radio/20/radio-madonna/', 'Radio-Madonna---ABradio.png', 0, 0, 0, 1, '2011-11-11', 14101, 0, '2017-01-01 00:00:00', 0), \
-('OneRepublic', '', 'http://static.abradio.cz/data/s/20/playlist/madonna64.asx', '', 'OneRepublic.png', 0, 0, 0, 1, '2011-11-11', 14102, 0, '2017-01-01 00:00:00', 0), \
 ('Christophe', '', 'http://static.abradio.cz/data/s/20/playlist/madonna64.asx', '', '', 0, 0, 0, 1, '2011-11-11', 14103, 0, '2017-01-01 00:00:00', 0), \
 ('Evening-Jazz-(KCSM)', '', 'http://static.abradio.cz/data/s/20/playlist/madonna64.asx', '', 'Evening-Jazz-(KCSM).png', 0, 0, 0, 1, '2011-11-11', 14104, 0, '2017-01-01 00:00:00', 0), \
 ('WSMN-1590', '', 'http://amber.streamguys.com:4570', 'http://www.wsmnradio.com/', 'WSMN-1590.png', 0, 0, 0, 1, '2011-11-11', 14105, 0, '2017-01-01 00:00:00', 0), \
@@ -12837,32 +12588,17 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('Wren-Golden-Hurricanes-at-Woodmont-Oct-7-2011', '', 'http://relay.radioreference.com:80/ca_sonoma', '', 'Wren-Golden-Hurricanes-at-Woodmont-Oct-7-2011.png', 0, 0, 0, 1, '2011-11-11', 14317, 0, '2017-01-01 00:00:00', 0), \
 ('KHNR-690', '', 'http://relay.radioreference.com:80/ca_sonoma', 'http://www.khnr.com', 'KHNR-690.png', 0, 0, 0, 1, '2011-11-11', 14318, 0, '2017-01-01 00:00:00', 0), \
 ('Sous-les-couvertures', '', 'http://relay.radioreference.com:80/ca_sonoma', '', 'Sous-les-couvertures.png', 0, 0, 0, 1, '2011-11-11', 14319, 0, '2017-01-01 00:00:00', 0), \
-('Survivor', '', 'http://relay.radioreference.com:80/ca_sonoma', '', 'Survivor.png', 0, 0, 0, 1, '2011-11-11', 14320, 0, '2017-01-01 00:00:00', 0), \
-('WVOC-560', '', 'http://relay.radioreference.com:80/ca_sonoma', 'http://www.wvoc.com/', 'WVOC-560.png', 0, 0, 0, 1, '2011-11-11', 14321, 0, '2017-01-01 00:00:00', 0), \
-('MNN-Culture', '', 'http://relay.radioreference.com:80/ca_sonoma', 'http://www.mnn.org/', 'MNN-Culture.png', 0, 0, 0, 1, '2011-11-11', 14322, 0, '2017-01-01 00:00:00', 0), \
-('WSTC-1400', '', 'http://relay.radioreference.com:80/ca_sonoma', 'http://wstcwnlk.com/', 'WSTC-1400.png', 0, 0, 0, 1, '2011-11-11', 14323, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Deejay', '', 'http://live.radiodeejay.hr:7002', 'http://www.radiodeejay.hr/', 'Radio-Deejay.png', 0, 0, 0, 1, '2011-11-11', 14324, 0, '2017-01-01 00:00:00', 0), \
-('WLNG-921', 'Serving The Hamptons, The North Fork and the Connecticut Shoreline, The original oldies station, Click Here to Listen To WLNG&#39;s Live Broadcast on The Web, Sag Harbor, Long Island, New York', 'http://www.wlng.com/wlng.pls', 'http://www.wlng.com/', 'WLNG-921.png', 0, 0, 0, 1, '2011-11-11', 14325, 0, '2017-01-01 00:00:00', 0), \
-('Wang-Chung', '', 'http://www.wlng.com/wlng.pls', '', 'Wang-Chung.png', 0, 0, 0, 1, '2011-11-11', 14326, 0, '2017-01-01 00:00:00', 0), \
-('Power-94-943', '', 'http://www.wlng.com/wlng.pls', 'http://www.power94.com/', 'Power-94-943.png', 0, 0, 0, 1, '2011-11-11', 14327, 0, '2017-01-01 00:00:00', 0), \
-('AccuRadio-HitKast-Pop', '', 'http://www.accuradio.com/shoutcast/links/hitkast.pls', 'http://www.accuradio.com/hitkast/', 'AccuRadio-HitKast-Pop.png', 0, 0, 0, 1, '2011-11-11', 14328, 0, '2017-01-01 00:00:00', 0), \
-('Y108-1079', 'WDSY - Y108 has been Pittsburgh&#39;s leading country music station for 40 years and is now streaming on-line at y108.com Subscribe to the Y108 Loyal Listener Club for insider information on the lates', 'http://www.accuradio.com/shoutcast/links/hitkast.pls', 'http://www.y108.com/', 'Y108-1079.png', 0, 0, 0, 1, '2011-11-11', 14329, 0, '2017-01-01 00:00:00', 0), \
+('Radio-Deejay', '', 'http://live.radiodeejay.hr:7002', 'http://www.radiodeejay.hr/', 'Radio-Deejay.png', 0, 0, 0, 1, '2011-11-11', 14324, 0, '2017-01-01 00:00:00', 1), \
 ('The-Bull-1057', '', 'http://www.accuradio.com/shoutcast/links/hitkast.pls', 'http://www.1057thebull.com/', 'The-Bull-1057.png', 0, 0, 0, 1, '2011-11-11', 14330, 0, '2017-01-01 00:00:00', 0), \
 ('The-KHOP-Weekend-Rewind', '', 'hhttp://d1qg6pckcqcdk0.cloudfront.net/chr/coldplay_ha200821_02_vivalavida.m4a', '', 'The-KHOP-Weekend-Rewind.png', 0, 0, 0, 1, '2011-11-11', 14331, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Manhattan-998', '', 'http://sc.freecast.pl:8048/', 'http://www.radiomanhattan.pl/', 'Radio-Manhattan-998.png', 0, 0, 0, 1, '2011-11-11', 14332, 0, '2017-01-01 00:00:00', 0), \
-('Radio-America-Network', '', 'http://sc.freecast.pl:8048/', 'http://www.radioamerica.org', 'Radio-America-Network.png', 0, 0, 0, 1, '2011-11-11', 14336, 0, '2017-01-01 00:00:00', 0), \
+('Radio-Manhattan', '', 'http://www.radionylive.com/listen/mp3', 'http://www.radiomanhattan.pl/', 'Radio-Manhattan-998.png', 0, 0, 0, 1, '2011-11-11', 14332, 0, '2017-01-01 00:00:00', 1), \
 ('Since-October', '', 'http://sc.freecast.pl:8048/', '', 'Since-October.png', 0, 0, 0, 1, '2011-11-11', 14337, 0, '2017-01-01 00:00:00', 0), \
 ('2WD-1013', '', 'http://sc.freecast.pl:8048/', 'http://www.2wd.com/', '2WD-1013.png', 0, 0, 0, 1, '2011-11-11', 14338, 0, '2017-01-01 00:00:00', 0), \
-('101ru Blues', '', 'http://www.101.ru/new101.php?bit=2&uid=76&serv=', 'http://www.101.ru/', '101ru---Blues.png', 0, 0, 0, 1, '2011-11-11', 14339, 0, '2017-01-01 00:00:00', 0), \
-('Victory-Assembly-of-God', '', 'http://www.101.ru/new101.php?bit=2&uid=76&serv=', '', 'Victory-Assembly-of-God.png', 0, 0, 0, 1, '2011-11-11', 14340, 0, '2017-01-01 00:00:00', 0), \
-('K-Ocean-1051', '', 'http://www.101.ru/new101.php?bit=2&uid=76&serv=', 'http://www.kocn1051.com/', 'K-Ocean-1051.png', 0, 0, 0, 1, '2011-11-11', 14341, 0, '2017-01-01 00:00:00', 0), \
-('The-Big-Couch', '', 'http://www.101.ru/new101.php?bit=2&uid=76&serv=', '', 'The-Big-Couch.png', 0, 0, 0, 1, '2011-11-11', 14342, 0, '2017-01-01 00:00:00', 0), \
 ('WSDS-1480', 'Es la &#250;nica radio en idioma Espa&#241;ol que transmite 24/7 en el &#225;rea metropolitana de Detroit, Michigan con 10 a&#241;os de experiencia en el mercado', 'http://69.162.66.178:5038', 'http://www.explosiva1480.com', 'WSDS-1480.png', 0, 0, 0, 1, '2011-11-11', 14343, 0, '2017-01-01 00:00:00', 0), \
 ('Money-and-the-People-You-Love', '', 'http://69.162.66.178:5038', '', 'Money-and-the-People-You-Love.png', 0, 0, 0, 1, '2011-11-11', 14344, 0, '2017-01-01 00:00:00', 0), \
 ('Edwin-McCain', '', 'http://69.162.66.178:5038', '', 'Edwin-McCain.png', 0, 0, 0, 1, '2011-11-11', 14345, 0, '2017-01-01 00:00:00', 0), \
 ('Hallam-FM-974', '', 'http://69.162.66.178:5038', 'http://www.hallamfm.co.uk/', 'Hallam-FM-974.png', 0, 0, 0, 1, '2011-11-11', 14346, 0, '2017-01-01 00:00:00', 0), \
 ('Chroma-Radio-Top40', '', 'http://s2.netstreaming.gr/radio/tunein.php/chr_top40/playlist.pls', 'http://www.chromaradio.net/', 'Chroma-Radio-Top40.png', 0, 0, 0, 1, '2011-11-11', 14347, 0, '2017-01-01 00:00:00', 0), \
-('The-MIX-1019', '', 'http://s2.netstreaming.gr/radio/tunein.php/chr_top40/playlist.pls', 'http://www.wtmx.com/', 'The-MIX-1019.png', 0, 0, 0, 1, '2011-11-11', 14348, 0, '2017-01-01 00:00:00', 0), \
 ('COOL-93-Fahrenheit-930', '', 'http://203.150.224.142:8000/', 'http://www.cool93.net/', 'COOL-93-Fahrenheit-930.png', 0, 0, 0, 1, '2011-11-11', 14349, 0, '2017-01-01 00:00:00', 0), \
 ('Discofox-Radio', 'Hier gibt es Deutsche und Internationale Discofox-Scheiben.', 'http://stream.laut.fm/discofox', 'http://www.dj-willy.de/', 'Discofox-Radio.png', 0, 0, 0, 1, '2011-11-11', 14350, 0, '2017-01-01 00:00:00', 0), \
 ('WTKS-1290', '', 'http://stream.laut.fm/discofox', 'http://www.newsradio1290wtks.com/', 'WTKS-1290.png', 0, 0, 0, 1, '2011-11-11', 14351, 0, '2017-01-01 00:00:00', 0), \
@@ -12874,9 +12610,7 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('News-957', 'News95.7', 'mms://nick9.surfernetwork.com/WEZY', 'http://www.news957.com/', 'News-957.png', 0, 0, 0, 1, '2011-11-11', 14357, 0, '2017-01-01 00:00:00', 0), \
 ('Baby-D', '', 'mms://nick9.surfernetwork.com/WEZY', '', 'Baby-D.png', 0, 0, 0, 1, '2011-11-11', 14358, 0, '2017-01-01 00:00:00', 0), \
 ('The-Wolf-1077', 'Real Country Variety less repetition of Top 40 more Greatest Hits!', 'http://ice3.securenetsystems.net:80/WPFX', 'http://www.1077wolf.com/', 'The-Wolf-1077.png', 0, 0, 0, 1, '2011-11-11', 14359, 0, '2017-01-01 00:00:00', 0), \
-('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 0)";
-
-
+('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
 
 const char *radio_station_setupsql46="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('DR P5', '', 'http://live-icy.gss.dr.dk:8000/A/A25H.mp3.m3u', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 14362, 0, '2017-01-01 00:00:00', 1), \
