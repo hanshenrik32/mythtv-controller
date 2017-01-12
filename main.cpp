@@ -3169,7 +3169,7 @@ void display(void) {
                     ERRCHECK(result,rknapnr);
                     //result = sound->getOpenState(&openstate,&percent,&starving,false);
                     //result = sndsystem->createSound(aktivplay_music_path, FMOD_HARDWARE | FMOD_2D | FMOD_CREATESTREAM | FMOD_NONBLOCKING , 0, &sound);
-                    ERRCHECK(result,rknapnr);
+                    //ERRCHECK(result,rknapnr);
                     if ((result==FMOD_OK) && (openstate!=FMOD_OPENSTATE_CONNECTING)) {
                         if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
                         //ERRCHECK(result,do_play_music_aktiv_table_nr);

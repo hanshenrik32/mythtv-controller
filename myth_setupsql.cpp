@@ -490,11 +490,6 @@ const char *radio_station_setupsql8="REPLACE INTO `radio_stations` (`name`, `bes
 ('The-Chordettes', '', 'http://listen.radionomy.com/best80dance', '', 'The-Chordettes.png', 0, 0, 0, 1, '2011-11-11', 3901, 0, '2017-01-01 00:00:00', 1), \
 ('Race-Day-on-Fox', '', 'http://listen.radionomy.com/best80dance', '', 'Race-Day-on-Fox.png', 0, 0, 0, 1, '2011-11-11', 3902, 0, '2017-01-01 00:00:00', 1);";
 
-
-
-// check radio her fra og frem
-
-
 const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('KLSU-911', '', 'http://130.39.238.143:8002/listen.pls', 'http://www.klsu.fm/', 'KLSU-911.png', 0, 0, 0, 1, '2011-11-11', 3926, 0, '2017-01-01 00:00:00', 1), \
 ('WKCT-930', '', 'http://130.39.238.143:8002/listen.pls', 'http://www.93wkct.com/', 'WKCT-930.png', 0, 0, 0, 1, '2011-11-11', 3927, 0, '2017-01-01 00:00:00', 1), \
@@ -528,980 +523,102 @@ const char *radio_station_setupsql9="REPLACE INTO `radio_stations` (`name`, `bes
 ('Q1063', '', 'http://www.limfjordnetradio.dk/limfjordplus.m3u', 'http://www.q106.com/', 'Q1063.png', 0, 0, 0, 1, '2011-11-11', 4016, 0, '2017-01-01 00:00:00', 1), \
 ('WKHG-1049', '', 'http://crystalout.surfernetwork.com:8001/WKHG_MP3', 'http://www.k105.com/', 'WKHG-1049.png', 0, 0, 0, 1, '2011-11-11', 4040, 0, '2017-01-01 00:00:00', 1), \
 ('Vox-Angeli', '', 'http://crystalout.surfernetwork.com:8001/WKHG_MP3', '', 'Vox-Angeli.png', 0, 0, 0, 1, '2011-11-11', 4041, 0, '2017-01-01 00:00:00', 1), \
-('XESV-1370', '', 'http://xesv.webos.com.mx:8310', '', 'XESV-1370.png', 0, 0, 0, 1, '2011-11-11', 4042, 0, '2017-01-01 00:00:00', 0), \
-('The-Verizon-Pit-Reporters', '', 'http://xesv.webos.com.mx:8310', '', 'The-Verizon-Pit-Reporters.png', 0, 0, 0, 1, '2011-11-11', 4043, 0, '2017-01-01 00:00:00', 0), \
-('Train-Strong', '', 'http://xesv.webos.com.mx:8310', '', 'Train-Strong.png', 0, 0, 0, 1, '2011-11-11', 4044, 0, '2017-01-01 00:00:00', 0), \
-('WYBC-FM-943', '', 'http://xesv.webos.com.mx:8310', 'http://943wybc.com/', 'WYBC-FM-943.png', 0, 0, 0, 1, '2011-11-11', 4045, 0, '2017-01-01 00:00:00', 0), \
-('West-Virginia-Mountaineers-at-Syracuse-Orange-Oct-21-2011', '', 'http://xesv.webos.com.mx:8310', '', 'West-Virginia-Mountaineers-at-Syracuse-Orange-Oct-21-2011.png', 0, 0, 0, 1, '2011-11-11', 4046, 0, '2017-01-01 00:00:00', 0), \
-('Brazil-Flavored', '', 'http://usa1-vn.mixstream.net:9206', 'http://www.brazilflavored.com/', 'Brazil-Flavored.png', 0, 0, 0, 1, '2011-11-11', 4047, 0, '2017-01-01 00:00:00', 0), \
-('WUSF-897', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.wusf.usf.edu/wusf-fm/', 'WUSF-897.png', 0, 0, 0, 1, '2011-11-11', 4048, 0, '2017-01-01 00:00:00', 0), \
-('Joe-Satriani', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', '', 'Joe-Satriani.png', 0, 0, 0, 1, '2011-11-11', 4049, 0, '2017-01-01 00:00:00', 0), \
-('Rewind-Columbus-1035', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.rewindcolumbus.com', 'Rewind-Columbus-1035.png', 0, 0, 0, 1, '2011-11-11', 4050, 0, '2017-01-01 00:00:00', 0), \
-('WTQR-1041', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.wtqr.com/', 'WTQR-1041.png', 0, 0, 0, 1, '2011-11-11', 4051, 0, '2017-01-01 00:00:00', 0), \
-('ZRock-993', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.zrock993.com/', 'ZRock-993.png', 0, 0, 0, 1, '2011-11-11', 4052, 0, '2017-01-01 00:00:00', 0), \
-('KQMS-1400', '', 'mms://69.10.172.67:15264/', 'http://kqms.com/', 'KQMS-1400.png', 0, 0, 0, 1, '2011-11-11', 4053, 0, '2017-01-01 00:00:00', 0), \
-('WCLT-1430', '', 'mms://69.10.172.67:15264/', 'http://www.wcltam.com/am/index.cfm', 'WCLT-1430.png', 0, 0, 0, 1, '2011-11-11', 4054, 0, '2017-01-01 00:00:00', 0), \
-('K-Jewel-993', '', 'http://sc1.christiannetcast.com:9160', 'http://www.kjwl.com/', 'K-Jewel-993.png', 0, 0, 0, 1, '2011-11-11', 4055, 0, '2017-01-01 00:00:00', 0), \
-('The-Offspring', '', 'http://sc1.christiannetcast.com:9160', '', 'The-Offspring.png', 0, 0, 0, 1, '2011-11-11', 4056, 0, '2017-01-01 00:00:00', 0), \
-('Rock-1057', '', 'http://sc1.christiannetcast.com:9160', 'http://wtbkradio.com/', 'Rock-1057.png', 0, 0, 0, 1, '2011-11-11', 4057, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1440', '', 'mms://live.cumulusstreaming.com/WGLD-AM', 'http://espn1440.com/', 'ESPN-1440.png', 0, 0, 0, 1, '2011-11-11', 4058, 0, '2017-01-01 00:00:00', 0), \
-('Lisa-Nilsson', '', 'mms://live.cumulusstreaming.com/WGLD-AM', '', 'Lisa-Nilsson.png', 0, 0, 0, 1, '2011-11-11', 4059, 0, '2017-01-01 00:00:00', 0), \
-('David-Bromberg', '', 'mms://live.cumulusstreaming.com/WGLD-AM', '', 'David-Bromberg.png', 0, 0, 0, 1, '2011-11-11', 4060, 0, '2017-01-01 00:00:00', 0), \
-('2011-with-Richard-Kingsmill', '', 'mms://live.cumulusstreaming.com/WGLD-AM', '', '2011-with-Richard-Kingsmill.png', 0, 0, 0, 1, '2011-11-11', 4061, 0, '2017-01-01 00:00:00', 0), \
-('More-Music', '', 'mms://live.cumulusstreaming.com/WGLD-AM', '', 'More-Music.png', 0, 0, 0, 1, '2011-11-11', 4062, 0, '2017-01-01 00:00:00', 0), \
-('KTAR-FM-923', '', 'mms://live.cumulusstreaming.com/WGLD-AM', 'http://www.ktar.com/', 'KTAR-FM-923.png', 0, 0, 0, 1, '2011-11-11', 4063, 0, '2017-01-01 00:00:00', 0), \
-('Capital-South--West-Yorkshire-1051', 'The brand-new Capital Network from London, Scotland, the North East, Yorkshire, Manchester', 'http://media-ice.musicradio.com/CapitalYorkshireSouthWestMP3', 'http://www.capitalfm.com/yorkshiresouthwest/', 'Capital-South--West-Yorkshire-1051.png', 0, 0, 0, 1, '2011-11-11', 4064, 0, '2017-01-01 00:00:00', 0), \
-('Sonrise', '', 'http://media-ice.musicradio.com/CapitalYorkshireSouthWestMP3', '', 'Sonrise.png', 0, 0, 0, 1, '2011-11-11', 4065, 0, '2017-01-01 00:00:00', 0), \
-('WGPR-1075', '', 'mms://streamer3.securenetsystems.net/WGPR', 'http://www.wgprdetroit.com/', 'WGPR-1075.png', 0, 0, 0, 1, '2011-11-11', 4066, 0, '2017-01-01 00:00:00', 0), \
-('The-Black-Keys', '', 'mms://streamer3.securenetsystems.net/WGPR', '', 'The-Black-Keys.png', 0, 0, 0, 1, '2011-11-11', 4067, 0, '2017-01-01 00:00:00', 0), \
-('Bob-Dylan', '', 'http://sc12.1.fm:7024', '', 'Bob-Dylan.png', 0, 0, 0, 1, '2011-11-11', 4069, 0, '2017-01-01 00:00:00', 0), \
-('FOXY-955', '', 'http://sc12.1.fm:7024', 'http://foxy955stl.com/', 'FOXY-955.png', 0, 0, 0, 1, '2011-11-11', 4070, 0, '2017-01-01 00:00:00', 0), \
-('Evanescence', '', 'http://sc12.1.fm:7024', '', 'Evanescence.png', 0, 0, 0, 1, '2011-11-11', 4071, 0, '2017-01-01 00:00:00', 0), \
-('Charles-Bradley', '', 'http://sc12.1.fm:7024', '', 'Charles-Bradley.png', 0, 0, 0, 1, '2011-11-11', 4072, 0, '2017-01-01 00:00:00', 0), \
-('The-Fox-1069', '', 'http://sc12.1.fm:7024', 'http://www.1069thefox.com/', 'The-Fox-1069.png', 0, 0, 0, 1, '2011-11-11', 4073, 0, '2017-01-01 00:00:00', 0), \
-('PMD-Radio', 'We play the best 80&#39;s and 90&#39;s hits The best movie tunes and the best Disney music from the movies and the parks around the world.<BR><BR>Want your favorite song on PMD-Radio than send us an e', 'http://listen.radionomy.com/pmd-radio', 'http://www.radionomy.com/pmd-radio', 'PMD-Radio.png', 0, 0, 0, 1, '2011-11-11', 4074, 0, '2017-01-01 00:00:00', 0), \
-('LandesWelle-Thueringen-1042', 'LandesWelle - Th&#252;ringens Rock und Pop Radio. Die meiste Abwechslung mit den besten Songs aller Zeiten. LandesWelle ist in Th&#252;ringen zuhause. Wir senden ein frisches Radioprogramm von Th&#252', 'http://stream.hoerradar.de/lwtmp3', 'http://www.landeswelle.de/', 'LandesWelle-Thueringen-1042.png', 0, 0, 0, 1, '2011-11-11', 4075, 0, '2017-01-01 00:00:00', 0), \
-('Sponge', '', 'http://stream.hoerradar.de/lwtmp3', '', 'Sponge.png', 0, 0, 0, 1, '2011-11-11', 4076, 0, '2017-01-01 00:00:00', 0), \
-('News-Talk-930', '', 'http://stream.hoerradar.de/lwtmp3', 'http://www.wlssradio.com/', 'News-Talk-930.png', 0, 0, 0, 1, '2011-11-11', 4077, 0, '2017-01-01 00:00:00', 0), \
-('WSOY-1340', '', 'mms://stream3.securenetsystems.net/WSYO', 'http://www.wsoyam.com/', 'WSOY-1340.png', 0, 0, 0, 1, '2011-11-11', 4078, 0, '2017-01-01 00:00:00', 0), \
-('Tell-It-From-Calvary', '', 'mms://stream3.securenetsystems.net/WSYO', '', 'Tell-It-From-Calvary.png', 0, 0, 0, 1, '2011-11-11', 4079, 0, '2017-01-01 00:00:00', 0), \
-('Peter-Buffett', '', 'mms://stream3.securenetsystems.net/WSYO', '', 'Peter-Buffett.png', 0, 0, 0, 1, '2011-11-11', 4080, 0, '2017-01-01 00:00:00', 0), \
-('Dance-Pop-USA', 'DancePopUSA -Broadcasting America&#39;s Hits Worldwide.', 'http://listen.radionomy.com/dance-pop-usa', 'http://www.dancepopusa.com/', 'Dance-Pop-USA.png', 0, 0, 0, 1, '2011-11-11', 4081, 0, '2017-01-01 00:00:00', 0), \
-('The-Beat-985', '', 'http://listen.radionomy.com/dance-pop-usa', 'http://www.thebeatsa.com', 'The-Beat-985.png', 0, 0, 0, 1, '2011-11-11', 4082, 0, '2017-01-01 00:00:00', 0), \
-('KSLD-Countdown', '', 'http://listen.radionomy.com/dance-pop-usa', '', 'KSLD-Countdown.png', 0, 0, 0, 1, '2011-11-11', 4083, 0, '2017-01-01 00:00:00', 0), \
-('Antena-2-650', 'Antena2 es la Cadena de los grandes eventos deportivos en Colombia. Todos los protagonistas del deporte en Colombia pasan por nuestros microfonos.', 'http://virtualcolombia.net/cast/tunein.php/ante2rcn/playlist.pls', 'http://www.antena2.com.co/', '', 0, 0, 0, 1, '2011-11-11', 4084, 0, '2017-01-01 00:00:00', 0), \
-('Q93-931', '', 'http://virtualcolombia.net/cast/tunein.php/ante2rcn/playlist.pls', 'http://q93country.com/', 'Q93-931.png', 0, 0, 0, 1, '2011-11-11', 4085, 0, '2017-01-01 00:00:00', 0), \
-('US-105-1055', '', 'mms://live.cumulusstreaming.com/KUSJ-FM', 'http://www.myus105.com/', 'US-105-1055.png', 0, 0, 0, 1, '2011-11-11', 4086, 0, '2017-01-01 00:00:00', 0), \
-('Kissy-Sell-Out', '', 'mms://live.cumulusstreaming.com/KUSJ-FM', '', 'Kissy-Sell-Out.png', 0, 0, 0, 1, '2011-11-11', 4087, 0, '2017-01-01 00:00:00', 0), \
-('Public-Reality-Radio-1680', 'Public Reality Radio, listener supported radio station dedicated to providing quality educational programming to the public.', 'mms://live.cumulusstreaming.com/KUSJ-FM', 'http://www.publicrealityradio.org', 'Public-Reality-Radio-1680.png', 0, 0, 0, 1, '2011-11-11', 4088, 0, '2017-01-01 00:00:00', 0), \
-('KWSN-1230', '', 'mms://live.cumulusstreaming.com/KUSJ-FM', 'http://www.kwsn.com/', 'KWSN-1230.png', 0, 0, 0, 1, '2011-11-11', 4089, 0, '2017-01-01 00:00:00', 0), \
-('New-Orleans-Saints-at-Tampa-Bay-Buccaneers-Oct-16-2011', '', 'mms://live.cumulusstreaming.com/KUSJ-FM', '', 'New-Orleans-Saints-at-Tampa-Bay-Buccaneers-Oct-16-2011.png', 0, 0, 0, 1, '2011-11-11', 4090, 0, '2017-01-01 00:00:00', 0), \
-('SKYFM-American-Songbook', 'Classic standard voices from the likes of Mel Torme &amp; Nat King Cole', 'http://listen.sky.fm/partner_mp3/americansongbook.pls', 'http://www.sky.fm/americansongbook', 'SKYFM-American-Songbook.png', 0, 0, 0, 1, '2011-11-11', 4091, 0, '2017-01-01 00:00:00', 0), \
-('WSIP-1490', '', 'http://listen.sky.fm/partner_mp3/americansongbook.pls', 'http://www.wsipfm.com/', 'WSIP-1490.png', 0, 0, 0, 1, '2011-11-11', 4092, 0, '2017-01-01 00:00:00', 0), \
-('WGAN-560', '', 'http://listen.sky.fm/partner_mp3/americansongbook.pls', 'http://www.wgan.com/', 'WGAN-560.png', 0, 0, 0, 1, '2011-11-11', 4093, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Radio-1450', '', 'http://listen.sky.fm/partner_mp3/americansongbook.pls', 'http://www.country102fm.com/', 'ESPN-Radio-1450.png', 0, 0, 0, 1, '2011-11-11', 4094, 0, '2017-01-01 00:00:00', 0), \
-('KKNW-1150', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', 'http://www.1150kknw.com/', 'KKNW-1150.png', 0, 0, 0, 1, '2011-11-11', 4095, 0, '2017-01-01 00:00:00', 0), \
-('Dave-Mason', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Dave-Mason.png', 0, 0, 0, 1, '2011-11-11', 4096, 0, '2017-01-01 00:00:00', 0), \
-('Bob-Frantz', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Bob-Frantz.png', 0, 0, 0, 1, '2011-11-11', 4097, 0, '2017-01-01 00:00:00', 0), \
-('Two-Door-Cinema-Club', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Two-Door-Cinema-Club.png', 0, 0, 0, 1, '2011-11-11', 4098, 0, '2017-01-01 00:00:00', 0), \
-('CruiseOne', '', 'http://tdcat.com/cruiseone.asx', 'http://www.tdcat.com/', 'CruiseOne.png', 0, 0, 0, 1, '2011-11-11', 4099, 0, '2017-01-01 00:00:00', 0), \
-('The-Surgery-with-Aled', '', 'http://tdcat.com/cruiseone.asx', '', 'The-Surgery-with-Aled.png', 0, 0, 0, 1, '2011-11-11', 4100, 0, '2017-01-01 00:00:00', 0), \
-('Cascada', '', 'http://tdcat.com/cruiseone.asx', '', 'Cascada.png', 0, 0, 0, 1, '2011-11-11', 4101, 0, '2017-01-01 00:00:00', 0), \
-('KONO-1011', '', 'http://tdcat.com/cruiseone.asx', 'http://kono101.com/', 'KONO-1011.png', 0, 0, 0, 1, '2011-11-11', 4102, 0, '2017-01-01 00:00:00', 0), \
-('Radio VIP Romania', '(((= =:::DEDICATII cu Dj STYLE:::= =)))  [Bitrate: 128]', 'http://195.60.77.233:8969', '', '', 0, 128, 0, 1, '2011-08-11', 4103, 29, NULL, 0), \
-('LA X 103.9FM', '[Bitrate: 128]', 'http://66.240.202.106:8074', '', '', 0, 128, 0, 1, '2011-08-11', 4104, 7, NULL, 0), \
-('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4105, 8, NULL, 0), \
-('Dumont FM', ' [Bitrate: 128]', 'http://174.37.16.245:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4106, 7, NULL, 0), \
-('Radio 112', '[Bitrate: 128]', 'http://85.25.150.17:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4107, 8, NULL, 0), \
-('Loca Fm Live', '[Bitrate: 128]', 'http://91.121.159.10:23500', '', '', 4, 128, 0, 1, '2011-08-11', 4109, 4, NULL, 0), \
-('KGA-1510', '', 'http://ice1.securenetsystems.net:80/WWMS', 'http://www.1510kga.com/', 'KGA-1510.png', 0, 0, 0, 1, '2011-11-11', 4110, 0, '2017-01-01 00:00:00', 0), \
-('Billy-Boy-on-Poison', '', 'http://ice1.securenetsystems.net:80/WWMS', '', 'Billy-Boy-on-Poison.png', 0, 0, 0, 1, '2011-11-11', 4111, 0, '2017-01-01 00:00:00', 0), \
-('BellyUp4Blues', '[Bitrate: 128]', 'http://64.62.252.136:5100', '', '', 0, 128, 0, 1, '2011-08-11', 4112, 7, NULL, 0), \
-('Dogglounge Deep House', '[Bitrate: 128] ', 'http://66.165.191.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4113, 7, NULL, 0), \
-('M2 LOVE', 'Live from france [Bitrate: 128] ', 'http://94.23.62.11:8000', '', '', 14, 128, 1, 1, '2011-08-11', 4115, 4, NULL, 0), \
-('1.FM - ReggaeTrade', '[Bitrate: 128] ', 'http://72.13.83.85:7000', '', '', 48, 128, 2, 1, '2011-08-11', 4116, 7, NULL, 0), \
-('Technicolor Web of Sound', '[Bitrate: 128] ', 'http://209.51.162.182:2020', '', '', 0, 128, 0, 1, '2011-08-11', 4117, 7, NULL, 0), \
-('Hard Rock Radio Live', '[Bitrate: 128]', 'http://66.90.103.189:8868', '', '', 1, 128, 0, 1, '2011-08-11', 4118, 7, NULL, 0), \
-('ITAPOAN FM', '[Bitrate: 128]', 'http://208.115.209.70:8087', '', '', 0, 128, 0, 1, '2011-08-11', 4119, 7, NULL, 0), \
-('www.filmyRadio.com', '[Bitrate: 128]  ', 'http://173.192.224.123:8270', '', '', 0, 128, 0, 1, '2011-08-11', 4120, 39, NULL, 0), \
-('LOLLIRADIO SOFT - Lovely Radio! - Italy Italia', '', 'http://188.165.202.221:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4121, 4, NULL, 0), \
-('Discofox24', '[Bitrate: 128]', 'http://85.25.152.127:8000', '', '', 31, 128, 2, 1, '2011-08-11', 4122, 39, '2011-10-14 16:04:48', 0), \
-('ChristianRock.Net', '[Bitrate: 128]', 'http://207.210.88.138:5112', '', '', 0, 128, 0, 1, '2011-08-11', 4123, 27, NULL, 0), \
-('MUSIK.ORIENTAL', '[Bitrate: 128]  ', 'http://80.237.157.12:17000', '', '', 0, 128, 0, 1, '2011-08-11', 4124, 42, NULL, 0), \
-('Reggae Radio RastaMusic.com', '[Bitrate: 128] ', 'http://66.225.205.4:80', '', '', 48, 128, 0, 1, '2011-08-11', 4125, 7, NULL, 0), \
-('RadioDarvish.com', '[Bitrate: 128] ', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1031', '', '', 0, 128, 0, 1, '2011-08-11', 4126, 7, NULL, 0), \
-('EXA FM 104.9 MEXICO D.F.', '[Bitrate: 128] ', 'http://74.54.222.111:40000', '', '', 0, 128, 0, 1, '2011-08-11', 4127, 7, NULL, 0), \
-('SMOOTHJAZZTAMPABAY.COM', '[Bitrate: 128]', 'http://216.59.35.34:8068', '', '', 9, 128, 0, 1, '2011-08-11', 4128, 7, NULL, 0), \
-('A Romantica', '[Bitrate: 128]', 'http://184.107.209.66:6010', '', '', 0, 128, 1, 1, '2011-08-11', 4129, 28, '2011-10-14 15:58:07', 0), \
-('Die Schlagergarage', '[Bitrate: 128]', 'http://87.118.112.14:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4130, 8, NULL, 0), \
-('Radio HiT Romania', '[Bitrate: 128]', 'http://212.117.164.99:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4131, 5, NULL, 0), \
-('www.agf-radio.com Der B fr euch', '[Bitrate: 128]', 'http://94.23.209.129:6939', '', '', 0, 128, 0, 1, '2011-08-11', 4132, 37, NULL, 0), \
-('Suburbs of Goa', '[Bitrate: 128]', 'http://74.63.47.82:8850', '', '', 0, 128, 0, 1, '2011-08-11', 4133, 7, NULL, 0), \
-('The Doo-Wop Express', '[Bitrate: 128]  ', 'http://64.20.42.58:8034', '', '', 0, 128, 0, 1, '2011-08-11', 4134, 7, NULL, 0), \
-('RTL Radio', '  [Bitrate: 128]  ', 'http://81.92.237.118:8080', '', '', 40, 128, 0, 1, '2011-08-11', 4136, 5, NULL, 0), \
-('TrueHipHop.FM', '  [Bitrate: 128] ', 'http://78.46.19.67:9020', '', '', 0, 128, 0, 1, '2011-08-11', 4137, 8, NULL, 0), \
-('Classical 96.3FM CFMZ', '[Bitrate: 128] ', 'http://199.27.180.216:8017', '', '', 8, 128, 0, 1, '2011-08-11', 4138, 28, NULL, 0), \
-('Antenne 50plus', '[Bitrate: 128] ', 'http://85.214.21.136:8510', '', '', 0, 128, 0, 1, '2011-08-11', 4140, 31, NULL, 0), \
-('AUDIOGROOVES.NET', 'DEEP HOUSE [Bitrate: 128]', 'http://173.244.206.15:9004', '', '', 16, 128, 1, 1, '2011-08-11', 4141, 7, NULL, 0), \
-('Radio Online Ponceo', '[Bitrate: 128] ', 'http://204.145.89.114:8010', '', '', 40, 128, 0, 1, '2011-08-11', 4142, 7, NULL, 0), \
-('KCRW ECLECTIC24', '[Bitrate: 128]', 'http://scfire-dtc-aa03.stream.aol.com:80/stream/1045', '', '', 0, 128, 0, 1, '2011-08-11', 4143, 7, NULL, 0), \
-('shoutcast', '[Bitrate: 128]', 'http://87.117.198.91:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4144, 9, NULL, 0), \
-('shoutcast', '[Bitrate: 128]', 'http://87.117.198.86:8400', '', '', 0, 128, 0, 1, '2011-08-11', 4145, 0, NULL, 0), \
-('Big R Radio - 100.7 The Mix', '[Bitrate: 128]', 'http://173.193.14.170:8020', '', '', 0, 128, 0, 1, '2011-08-11', 4146, 27, NULL, 0), \
-('wWw.ExclusivRadiomc.Net', '[Bitrate: 128]', 'http://195.60.77.219:7551', '', '', 0, 128, 0, 1, '2011-08-11', 4147, 29, NULL, 0), \
-('1.FM - Channel X', '[Bitrate: 128]', 'http://209.51.161.54:8072', '', '', 7, 128, 0, 1, '2011-08-11', 4148, 7, NULL, 0), \
-('Radio Monte Teja Agira', '[Bitrate: 128]', 'http://222.122.131.58:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4149, 40, NULL, 0), \
-('Radio Brocken', '[Bitrate: 128] ', 'http://80.237.156.39:80', '', '', 45, 128, 0, 1, '2011-08-11', 4150, 42, NULL, 0), \
-('Suave 107.3 FM - Grupo Medrano - Santiago', ' R.D.', 'http://173.193.216.92:8060', '', '', 0, 128, 0, 1, '2011-08-11', 4152, 7, NULL, 0), \
-('KEXP Live 128kbps', 'KEXP 90.3 FM [Bitrate: 128]', 'http://140.142.8.220:8000', '', '', 7, 128, 0, 1, '2011-08-11', 4154, 7, NULL, 0), \
-('Ok Radio Server', '[Bitrate: 128] ', 'http://80.237.210.23:8052', '', '', 51, 128, 0, 1, '2011-08-11', 4155, 8, NULL, 0), \
-('Danceradioglobal.com main', '[Bitrate: 128] ', 'http://94.23.55.74:8058', '', '', 4, 128, 0, 1, '2011-08-11', 4156, 4, NULL, 0), \
-('Radio Morava', '[Bitrate: 128]  ', 'http://87.117.204.38:8100', '', '', 0, 128, 0, 1, '2011-08-11', 4158, 9, NULL, 0), \
-('Radio: TOPradio (MPEG-3)', '[Bitrate: 128] ', 'http://77.93.23.12:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4159, 14, NULL, 0), \
-('AAN CLASSIC ROCK', '[Bitrate: 128]  ', 'http://76.10.222.237:9000', '', '', 1, 128, 0, 1, '2011-08-11', 4160, 7, NULL, 0), \
-('Dinner Jazz Excursion', '[Bitrate: 128]  ', 'http://174.46.222.71:8240', '', '', 9, 128, 0, 1, '2011-08-11', 4161, 7, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128] ', 'http://188.165.23.150:5910', '', '', 0, 128, 0, 1, '2011-08-11', 4162, 22, NULL, 0), \
-('KEXP Live 128kbps', 'KEXP 90.3 FM [Bitrate: 128]', 'http://140.142.8.207:8000', '', '', 7, 128, 0, 1, '2011-08-11', 4163, 7, NULL, 0), \
-('Lush: Mostly female vocals with an electronic influence. [SomaFM] ', '[Bitrate: 128] ', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1073', '', '', 0, 128, 0, 1, '2011-08-11', 4164, 7, NULL, 0), \
-('DigitalGunfire.com', ' Hard Hitting! ', 'http://129.16.159.82:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4165, 23, NULL, 0), \
-('Boot Liquor', '[SomaFM] ', 'http://207.200.96.230:8014', '', '', 0, 128, 0, 1, '2011-08-11', 4167, 7, NULL, 0), \
-('AnimeRadio.SU', '[Bitrate: 128]  ', 'http://78.46.91.38:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4168, 8, NULL, 0), \
-('GOLD FM', '', 'http://212.45.104.34:8060', '', '', 3, 128, 0, 1, '2011-08-11', 4169, 20, NULL, 0), \
-('MKM CARAIBES', '[Bitrate: 128] ', 'http://88.190.21.83:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4170, 4, NULL, 0), \
-('Russian Radio [Germany]', '[Bitrate: 128]', 'http://92.51.171.8:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4171, 8, NULL, 0), \
-('Lenz Radio', '[Bitrate: 128] ', 'http://87.118.122.176:80', '', '', 0, 128, 0, 1, '2011-08-11', 4172, 8, NULL, 0), \
-('LATINO FM EN DIRECTO', '[Bitrate: 128] ', 'http://92.48.107.35:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4174, 16, NULL, 0), \
-('KICKRADIO', ' 80''s & 90''s Hits ', 'http://173.193.202.87:9000', '', '', 13, 128, 1, 1, '2011-08-11', 4175, 58, NULL, 0), \
-('Bollywood & Beyond', '[Bitrate: 128] ', 'http://205.188.215.230:8024', '', '', 0, 128, 0, 1, '2011-08-11', 4176, 7, NULL, 0), \
-('ZenRadio.FM: ZenRadio.FM(tm)', '[Bitrate: 128]', 'http://46.105.105.24:8800', '', '', 0, 128, 0, 1, '2011-08-11', 4177, 4, NULL, 0), \
-('Space Station Soma: Tune in', ' turn on', 'http://74.63.47.82:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4178, 7, NULL, 0), \
-('shoutcast', 'live  [Bitrate: 128]  ', 'http://87.117.198.88:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4179, 9, NULL, 0), \
-('Public Domain Jazz', '[Bitrate: 128] ', 'http://82.197.165.138:80', '', '', 0, 128, 0, 1, '2011-08-11', 4180, 24, NULL, 0), \
-('C89.5', '[Bitrate: 128] ', 'http://208.76.152.74:8000', '', '', 4, 128, 0, 1, '2011-08-11', 4181, 7, NULL, 0), \
-('Radio Banovina Glina', '  [Bitrate: 128]  ', 'http://178.63.76.216:8005', '', '', 0, 128, 0, 1, '2011-08-11', 4182, 8, NULL, 0), \
-('POLSKASTACJA .PL - Muzyka na TOPIE (Polskie Radio)', '[Bitrate: 128]   ', 'http://188.165.22.29:9310', '', '', 0, 128, 0, 1, '2011-08-11', 4183, 22, NULL, 0), \
-('COUNTRY 108', '[Bitrate: 128]   ', 'http://80.237.210.44:80', '', '', 6, 128, 0, 1, '2011-08-11', 4185, 8, NULL, 0), \
-('Shanson 101.9 Kiev', '[Bitrate: 128] ', 'http://217.20.164.163:8002', '', '', 0, 128, 1, 1, '2011-08-11', 4186, 49, '2011-10-14 16:11:15', 0), \
-('STAR FM Bln', '[Bitrate: 128] ', 'http://87.230.53.43:8000', '', '', 1, 128, 0, 1, '2011-08-11', 4187, 12, NULL, 0), \
-('Radio Planeta', '[Bitrate: 128]   ', 'http://95.211.22.17:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4189, 36, NULL, 0), \
-('TRAFFIC RADIO STATION', '[Bitrate: 128]', 'http://212.25.58.220:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4190, 36, NULL, 0), \
-('Radio Rivendell', '[Bitrate: 128] [Max Listeners: 850]', 'http://82.182.121.75:8003', '', '', 0, 128, 0, 1, '2011-08-11', 4191, 23, NULL, 0), \
+('WUSF-897', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.wusf.usf.edu/wusf-fm/', 'WUSF-897.png', 0, 0, 0, 1, '2011-11-11', 4048, 0, '2017-01-01 00:00:00', 1), \
+('Joe-Satriani', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', '', 'Joe-Satriani.png', 0, 0, 0, 1, '2011-11-11', 4049, 0, '2017-01-01 00:00:00', 1), \
+('Rewind-Columbus-1035', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.rewindcolumbus.com', 'Rewind-Columbus-1035.png', 0, 0, 0, 1, '2011-11-11', 4050, 0, '2017-01-01 00:00:00', 1), \
+('WTQR-1041', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.wtqr.com/', 'WTQR-1041.png', 0, 0, 0, 1, '2011-11-11', 4051, 0, '2017-01-01 00:00:00', 1), \
+('ZRock-993', '', 'http://mp3.wusf.usf.edu:8000/listen.pls', 'http://www.zrock993.com/', 'ZRock-993.png', 0, 0, 0, 1, '2011-11-11', 4052, 0, '2017-01-01 00:00:00', 1), \
+('Capital-South--West-Yorkshire-1051', 'The brand-new Capital Network from London, Scotland, the North East, Yorkshire, Manchester', 'http://media-ice.musicradio.com/CapitalYorkshireSouthWestMP3', 'http://www.capitalfm.com/yorkshiresouthwest/', 'Capital-South--West-Yorkshire-1051.png', 0, 0, 0, 1, '2011-11-11', 4064, 0, '2017-01-01 00:00:00', 1), \
+('Sonrise', '', 'http://media-ice.musicradio.com/CapitalYorkshireSouthWestMP3', '', 'Sonrise.png', 0, 0, 0, 1, '2011-11-11', 4065, 0, '2017-01-01 00:00:00', 1), \
+('PMD-Radio', 'We play the best 80&#39;s and 90&#39;s hits The best movie tunes and the best Disney music from the movies and the parks around the world.<BR><BR>Want your favorite song on PMD-Radio than send us an e', 'http://listen.radionomy.com/pmd-radio', 'http://www.radionomy.com/pmd-radio', 'PMD-Radio.png', 0, 0, 0, 1, '2011-11-11', 4074, 0, '2017-01-01 00:00:00', 1), \
+('LandesWelle-Thueringen-1042', 'LandesWelle - Th&#252;ringens Rock und Pop Radio. Die meiste Abwechslung mit den besten Songs aller Zeiten. LandesWelle ist in Th&#252;ringen zuhause. Wir senden ein frisches Radioprogramm von Th&#252', 'http://stream.hoerradar.de/lwtmp3', 'http://www.landeswelle.de/', 'LandesWelle-Thueringen-1042.png', 0, 0, 0, 1, '2011-11-11', 4075, 0, '2017-01-01 00:00:00', 1), \
+('Sponge', '', 'http://stream.hoerradar.de/lwtmp3', '', 'Sponge.png', 0, 0, 0, 1, '2011-11-11', 4076, 0, '2017-01-01 00:00:00', 1), \
+('News-Talk-930', '', 'http://stream.hoerradar.de/lwtmp3', 'http://www.wlssradio.com/', 'News-Talk-930.png', 0, 0, 0, 1, '2011-11-11', 4077, 0, '2017-01-01 00:00:00', 1), \
+('KKNW-1150', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', 'http://www.1150kknw.com/', 'KKNW-1150.png', 0, 0, 0, 1, '2011-11-11', 4095, 0, '2017-01-01 00:00:00', 1), \
+('Dave-Mason', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Dave-Mason.png', 0, 0, 0, 1, '2011-11-11', 4096, 0, '2017-01-01 00:00:00', 1), \
+('Bob-Frantz', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Bob-Frantz.png', 0, 0, 0, 1, '2011-11-11', 4097, 0, '2017-01-01 00:00:00', 1), \
+('Two-Door-Cinema-Club', '', 'http://den-a.plr.liquidcompass.net/pls/KKNWAMMP3.pls', '', 'Two-Door-Cinema-Club.png', 0, 0, 0, 1, '2011-11-11', 4098, 0, '2017-01-01 00:00:00', 1), \
+('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4105, 8, NULL, 1), \
+('Reggae Radio RastaMusic.com', '[Bitrate: 128] ', 'http://66.225.205.4:80', '', '', 48, 128, 0, 1, '2011-08-11', 4125, 7, NULL, 1), \
+('AnimeRadio.SU', '[Bitrate: 128]  ', 'http://78.46.91.38:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4168, 8, NULL, 1), \
+('Public Domain Jazz', '[Bitrate: 128] ', 'http://82.197.165.138:80', '', '', 0, 128, 0, 1, '2011-08-11', 4180, 24, NULL, 1), \
+('COUNTRY 108', '[Bitrate: 128]   ', 'http://80.237.210.44:80', '', '', 6, 128, 0, 1, '2011-08-11', 4185, 8, NULL, 1), \
+('Shanson 101.9 Kiev', '[Bitrate: 128] ', 'http://217.20.164.163:8002', '', '', 0, 128, 1, 1, '2011-08-11', 4186, 49, '2011-10-14 16:11:15', 1), \
+('STAR FM Bln', '[Bitrate: 128] ', 'http://87.230.53.43:8000', '', '', 1, 128, 0, 1, '2011-08-11', 4187, 12, NULL, 1), \
 ('DeepFM', '(DeepFM) [Bitrate: 128] ', 'http://195.66.134.40:80', '', '', 0, 128, 2, 1, '2011-08-11', 4192, 24, '2011-10-14 16:04:45', 1), \
-('Zeilsteen Alternative Radio', 'playing The Killers', 'http://87.195.42.193:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4194, 6, NULL, 0), \
-('memoryradio', '[Bitrate: 128]  ', 'http://188.165.247.175:4000', '', '', 0, 128, 0, 1, '2011-08-11', 4195, 4, NULL, 0), \
-('Soundic Radio', '[Bitrate: 128]  ', 'http://193.10.239.174:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4196, 23, NULL, 0), \
-('Gay Internet Radio Live', '[Bitrate: 128]  ', 'http://69.16.239.12:8004', '', '', 0, 128, 0, 1, '2011-08-11', 4197, 7, NULL, 0), \
-('3mp3.ru: :: Stars Radio', '[Bitrate: 128] [Max Listeners: 730]', 'http://79.98.108.138:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4198, 10, NULL, 0), \
-('BORN AGAIN RADIO', '[Bitrate: 128] [Max Listeners: 700]', 'http://68.68.104.115:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4199, 7, NULL, 0), \
-('THE BEST GENMAN', '[Bitrate: 128] ', 'http://81.3.51.2:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4201, 8, NULL, 0), \
-('4U Classic Rock', 'Classic Rock Station  [Bitrate: 128]  ', 'http://217.114.200.100:80', '', '', 0, 128, 0, 1, '2011-08-11', 4202, 29, NULL, 0), \
-('BirdsongRadio.com', 'Birdsongradio.com [Bitrate: 128] ', 'http://78.129.197.56:1156', '', '', 0, 128, 0, 1, '2011-08-11', 4203, 42, NULL, 0), \
-('Interativa FM 94.9', 'Brasil [Bitrate: 128]', 'http://187.45.214.161:8100', '', '', 45, 128, 0, 1, '2011-08-11', 4205, 31, NULL, 0), \
-('KOQX Blues Radio', '[Bitrate: 128] ', 'http://69.94.13.5:8000', '', '', 2, 128, 0, 1, '2011-08-11', 4206, 7, NULL, 0), \
-('NERadio Nonstop', ' [Bitrate: 128] [Max Listeners: 435]', 'http://87.96.232.136:443', '', '', 0, 128, 0, 1, '2011-08-11', 4207, 23, NULL, 0), \
-('POWER FM', '[Bitrate: 128]  ', 'http://46.20.4.42:8130', '', '', 40, 128, 0, 1, '2011-08-11', 4208, 58, NULL, 0), \
-('U1 TiroL', '[Bitrate: 128]  ', 'http://87.230.59.14:10406', '', '', 0, 128, 0, 1, '2011-08-11', 4209, 8, NULL, 0), \
-('Flower Power Radio', '[Bitrate: 128]  ', 'http://216.66.84.3:5050', '', '', 0, 128, 0, 1, '2011-08-11', 4210, 7, NULL, 0), \
-('24x7 Live Shows-NSBRadio.co.uk', '[Bitrate: 128]  ', 'http://83.133.123.34:7904', '', '', 0, 128, 0, 1, '2011-08-11', 4211, 7, NULL, 0), \
-('Pedroleouf ', '[Bitrate: 128]  ', 'http://88.191.61.12:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4213, 4, NULL, 0), \
-('MUSIK.PROGRESSIVE', '[Bitrate: 128]', 'http://80.237.157.12:15000', '', '', 0, 128, 0, 1, '2011-08-11', 4214, 42, NULL, 0), \
-('GotRadio', '[Bitrate: 128] ', 'http://64.62.164.196:2928', '', '', 0, 128, 0, 1, '2011-08-11', 4215, 7, NULL, 0), \
-('Radio Continu', 'Altijd Gezellig ::', 'http://178.19.112.20:7062', '', '', 0, 128, 0, 1, '2011-08-11', 4218, 22, NULL, 0), \
-('Clube FM', '[Bitrate: 128]  ', 'http://187.17.67.228:9082', '', '', 13, 128, 1, 1, '2011-08-11', 4219, 19, NULL, 0), \
-('Eventradio.fm', '[Bitrate: 128]  ', 'http://178.77.122.97:19918', '', '', 0, 128, 0, 1, '2011-08-11', 4220, 8, NULL, 0), \
-('item.FM FutureMusic', 'PunktPunkt @ Maschinenmusik (08.2010)  [Bitrate: 128] ', 'http://212.227.136.168:7100', '', '', 0, 128, 0, 1, '2011-08-11', 4221, 8, NULL, 0), \
-('Kalasam.com', '[Bitrate: 128]  ', 'http://173.192.207.51:8084', '', '', 0, 128, 0, 1, '2011-08-11', 4222, 7, NULL, 0), \
-('Radio FIESTA Manele Romania - wWw.RadioFiesta.Ro', '((( Manele Radio Stations ! )))  [Bitrate: 128]  ', 'http://195.60.77.235:7200', '', '', 0, 128, 0, 1, '2011-08-11', 4223, 29, NULL, 0), \
-('Cosmoradio 95.1', '[Bitrate: 128]  ', 'http://212.117.162.47:8130', '', '', 45, 128, 0, 1, '2011-08-11', 4224, 5, NULL, 0), \
-('IranianRadio.com', 'Your Radio! - High-Speed ', 'http://213.73.255.244:10500', '', '', 0, 128, 0, 1, '2011-08-11', 4226, 6, NULL, 0), \
-('1.FM - Bay Smooth Jazz', '[Bitrate: 128] ', 'http://72.13.83.87:9010', '', '', 9, 128, 0, 1, '2011-08-11', 4227, 7, NULL, 0), \
-('jungletrain.net - 24/7 drum and bass', '[Bitrate: 128]', 'http://76.74.248.104:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4228, 7, NULL, 0), \
-('Italian Graffiati - Musica anni 60 e 70 per gli italiani nel mondo', '[Bitrate: 128]', 'http://173.193.20.157:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4229, 7, NULL, 0), \
-('4CLUBBERS', '[Bitrate: 128]', 'http://94.23.226.80:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4230, 37, NULL, 0);";
-
-
+('memoryradio', '[Bitrate: 128]  ', 'http://188.165.247.175:4000', '', '', 0, 128, 0, 1, '2011-08-11', 4195, 4, NULL, 1), \
+('Kalasam.com', '[Bitrate: 128]  ', 'http://173.192.207.51:8084', '', '', 0, 128, 0, 1, '2011-08-11', 4222, 7, NULL, 1);";
 
 const char *radio_station_setupsql10="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('ranceRadio.ch', ' Techno', 'http://46.4.77.21:10780', '', '', 50, 128, 0, 1, '2011-08-11', 4234, 8, NULL, 0), \
-('Angel Fire Radio''s Classic Rock&Roll.FM ', '[Bitrate: 128] ', 'http://scfire-dtc-aa04.stream.aol.com:80/stream/1043', '', '', 1, 128, 0, 1, '2011-08-11', 4235, 7, NULL, 0), \
-('TOP 100', '[Bitrate: 128]', 'http://119.207.75.234:1040', '', '', 40, 128, 1, 1, '2011-08-11', 4237, 40, NULL, 0), \
-('HAYATIN SESI', '[Bitrate: 128]', 'http://46.105.109.141:8008', '', '', 0, 128, 0, 1, '2011-08-11', 4238, 4, NULL, 0), \
-('Blues All Day', '[Bitrate: 128]', 'http://76.73.79.82:8688', '', '', 0, 128, 0, 1, '2011-08-11', 4240, 7, NULL, 0), \
-('MUSIK.HOUSE (FUNKY)', '[Bitrate: 128]', 'http://80.237.157.12:13005', 'WWW.RAUTEMUSIK.FM', '', 0, 128, 0, 1, '2011-08-11', 4241, 42, NULL, 0), \
-('Armitage''s Dimension ', 'Jpop/Jrock/Anime', 'http://143.51.142.148:8128', '', '', 0, 128, 1, 1, '2011-08-11', 4242, 43, '2011-10-14 16:10:55', 0), \
-('Turbo 98.3 FM', 'R.D. ', 'http://173.193.216.92:6050', '', 'Turbo 98.3 FM.png', 0, 128, 0, 1, '2011-08-11', 4243, 7, NULL, 0), \
-('100Hitz 40 Hitz', '[Bitrate: 128]', 'http://64.202.109.91:80', '', '', 40, 128, 0, 1, '2011-08-11', 4244, 7, NULL, 0), \
-('PULS FM!', '[Bitrate: 128]  ', 'http://212.45.104.50:8080', '', '', 4, 128, 0, 1, '2011-08-11', 4245, 20, NULL, 0), \
-('MASTRADIO.COM', 'Urdu', 'http://66.96.216.215:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4246, 7, NULL, 0), \
-('NAXI RADIO 96', '9MHz - Beograd - www.naxi.rs ', 'http://193.243.169.34:9150', '', '', 0, 128, 1, 1, '2011-08-11', 4247, 45, '2011-10-14 16:11:02', 0), \
-('heartbeatz.fm', '[Bitrate: 128]  ', 'http://87.118.90.58:8008', '', '', 0, 128, 1, 1, '2011-08-11', 4248, 8, NULL, 0), \
-('Real Industrial Radio', '[Bitrate: 128] ', 'http://66.154.99.198:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4249, 63, NULL, 0), \
-('radio-fx.com', '[Bitrate: 128]  ', 'http://72.13.82.11:26368', '', '', 40, 128, 0, 1, '2011-08-11', 4250, 7, NULL, 0), \
-('Dieters Schlager Radio', '[Bitrate: 128] ', 'http://87.118.78.3:2070', '', '', 0, 128, 0, 1, '2011-08-11', 4251, 25, NULL, 0), \
-('zonemix', '[Bitrate: 128] ', 'http://87.98.215.41:9088', '', '', 0, 128, 0, 1, '2011-08-11', 4252, 4, NULL, 0), \
-('HaZZard of Darkness', '[Bitrate: 128] ', 'http://87.230.57.21:6666', '', '', 0, 128, 0, 1, '2011-08-11', 4254, 8, NULL, 0), \
-('Radio-Exit: Radio Exit', '[Bitrate: 128]  ', 'http://85.187.16.190:3333', '', '', 0, 128, 0, 1, '2011-08-11', 4255, 36, NULL, 0), \
-('AnimeID Radio', '[Bitrate: 128]  ', 'http://95.211.115.197:8141', '', '', 0, 128, 0, 1, '2011-08-11', 4256, 23, NULL, 0), \
-('Golden Hit Radio', '[Bitrate: 128]', 'http://87.117.203.226:8014', '', '', 0, 128, 0, 1, '2011-08-11', 4257, 9, NULL, 0), \
-('Beach House Radio', '[Bitrate: 128]  ', 'http://69.175.122.202:8248', '', '', 0, 128, 0, 1, '2011-08-11', 4258, 7, NULL, 0), \
-('Vox Noctem', '[Bitrate: 128]  ', 'http://94.23.30.26:9213', '', '', 0, 128, 0, 1, '2011-08-11', 4259, 4, NULL, 0), \
-('1.FM - Classic Country', '[Bitrate: 128]  ', 'http://72.13.83.74:7806', '', '', 6, 128, 2, 1, '2011-08-11', 4260, 7, '2011-10-15 20:10:54', 0), \
-('psyradio*fm-psychannel', '[Bitrate: 128] [Max Listeners: 410]', 'http://81.88.36.44:8030', '', '', 0, 128, 0, 1, '2011-08-11', 4261, 8, NULL, 0), \
-('The Bluegrass Mix', '[Bitrate: 128] [Max Listeners: 250]', 'http://216.59.4.130:8024', '', '', 2, 128, 0, 1, '2011-08-11', 4263, 7, NULL, 0), \
-('SSRadio Deep and Soulut?', 'Absolute Attitude  [Bitrate: 128] ', 'http://94.23.201.109:9044', '', '', 0, 128, 0, 1, '2011-08-11', 4264, 37, NULL, 0), \
-('Radio Luxembourg', '[Bitrate: 128]  ', 'http://89.238.146.145:7050', '', 'Radio Luxembourg.png', 0, 128, 0, 1, '2011-08-11', 4265, 9, NULL, 0), \
-('Netrock101 Rock Metal Hair 80s 90s', '[Bitrate: 128]  ', 'http://76.73.107.66:8418', '', '', 1, 128, 0, 1, '2011-08-11', 4266, 7, NULL, 0), \
-('sunsetpop.inlive.co.kr', 'http://sunsetpop.inlive.co.kr  [Bitrate: 128]  ', 'http://119.207.75.233:7900', '', '', 0, 128, 0, 1, '2011-08-11', 4269, 40, NULL, 0), \
-('Web Rdio Funk Neurtico', 'wWw.FunkNeurotico.net[Bitrate: 128]  ', 'http://184.82.132.226:8268', '', '', 47, 128, 1, 1, '2011-08-11', 4270, 7, NULL, 0), \
-('AMPED FM', '[Bitrate: 128]  ', 'http://72.233.50.50:8015', '', '', 0, 128, 0, 1, '2011-08-11', 4271, 7, NULL, 0), \
-('SomaFM presents', '[Bitrate: 128] [Max Listeners: 800]', 'http://74.63.47.82:8090', '', '', 0, 128, 0, 1, '2011-08-11', 4272, 7, NULL, 0), \
-('Folk Radio UK', '[Bitrate: 128] [Max Listeners: 230]', 'http://92.48.107.38:6966', '', '', 51, 128, 0, 1, '2011-08-11', 4273, 9, NULL, 0), \
-('ETN.fm ch1', '[Bitrate: 128]  ', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1078', '', '', 0, 128, 0, 1, '2011-08-11', 4274, 7, NULL, 0), \
-('WKSU Classical', 'WKSU Classical: Ludwig van Beethoven - Piano Sonata No. 31  [Bitrate: 128] [Max Listeners: 2000]', 'http://66.225.205.8:8030', '', '', 8, 128, 0, 1, '2011-08-11', 4275, 7, NULL, 0), \
-('Radio Manele', ' mynele tv', 'http://93.114.41.220:8170', '', '', 0, 128, 0, 1, '2011-08-11', 4276, 41, NULL, 0), \
-('wing FM - 101.2 / Limoges', 'Hiawatha : Michel Pastre  [Bitrate: 128]  ', 'http://92.243.30.152:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4277, 4, NULL, 0), \
-('RADIO DEEGAY', '[Bitrate: 128]  ', 'http://91.121.154.148:80', '', '', 0, 128, 0, 1, '2011-08-11', 4278, 4, NULL, 0), \
-('Radio Stad', '[Willie And The Hand Jive]  [Bitrate: 128] ', 'http://81.173.3.250:80', '', '', 0, 128, 0, 1, '2011-08-11', 4279, 23, NULL, 0), \
-('GotRadio-Top 40 ', '[Bitrate: 128]', 'http://64.202.109.88:80', '', '', 0, 128, 0, 1, '2011-08-11', 4280, 7, NULL, 0), \
-('RADIO MANGUEIRA DIGITAL', '[Bitrate: 128]  ', 'http://189.1.164.58:7186', '', '', 0, 128, 0, 1, '2011-08-11', 4281, 19, NULL, 0), \
-('Passion Country Megantic', '[Bitrate: 128]  ', 'http://68.168.120.51:8000', '', '', 6, 128, 0, 1, '2011-08-11', 4282, 7, NULL, 0), \
-('PopTron', '[Bitrate: 128]  ', 'http://74.63.47.82:2200', '', '', 0, 128, 0, 1, '2011-08-11', 4284, 7, NULL, 0), \
-('YCN ^BMbn', ' 44 KHz Stereo ', 'http://80.237.210.23:19310', '', '', 0, 128, 0, 1, '2011-08-11', 4285, 8, NULL, 0), \
-('POLSKASTACJA .PL 80 90', '[Bitrate: 128] [Max Listeners: 310]', 'http://91.121.157.133:9200', '', '', 0, 128, 0, 1, '2011-08-11', 4286, 22, NULL, 0), \
-('WKCR - Columbia University', '  [Bitrate: 128]  ', 'http://128.59.222.11:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4287, 7, NULL, 0), \
-('POLSKASTACJA .PL', '[Bitrate: 128]  ', 'http://91.121.89.153:9900', '', '', 0, 128, 0, 1, '2011-08-11', 4288, 22, NULL, 0), \
-('AMPED FM CLASSIC ROCK', '[Bitrate: 128]  ', 'http://173.192.22.204:8018', '', '', 1, 128, 0, 1, '2011-08-11', 4289, 27, NULL, 0), \
-('SLOW JAMZ For Lovers', '[Bitrate: 128] ', 'http://85.25.16.7:8028', '', '', 0, 128, 0, 1, '2011-08-11', 4290, 8, NULL, 0), \
-('Scansat', 'Scansat Trondheim  [Bitrate: 128]  ', 'http://212.62.227.4:2049', '', '', 0, 128, 0, 1, '2011-08-11', 4291, 21, NULL, 0), \
-('GotRadio - Hip Hop Stop', '[Bitrate: 128] ', 'http://64.202.109.75:80', '', '', 0, 128, 0, 1, '2011-08-11', 4293, 7, NULL, 0), \
-('NERadio House & Trance', 'France [Bitrate: 128] ', 'http://87.98.145.139:80', '', '', 16, 128, 0, 1, '2011-08-11', 4294, 37, NULL, 0), \
-('Golden Radio Italia', '[Bitrate: 128] ', 'http://87.117.203.226:8008', '', '', 0, 128, 0, 1, '2011-08-11', 4295, 9, NULL, 0), \
-('Sonic Universe', '[Bitrate: 128]  ', 'http://74.63.47.82:8600', '', '', 0, 128, 0, 1, '2011-08-11', 4296, 7, NULL, 0), \
-('Smooth Jazz Expressions', '[Bitrate: 128]  ', 'http://174.46.222.71:8216', '', '', 0, 128, 0, 1, '2011-08-11', 4297, 7, NULL, 0), \
-('411 Music.net', '[Bitrate: 128]', 'http://66.185.17.34:8080', '', '', 0, 128, 0, 1, '2011-08-11', 4298, 7, NULL, 0), \
-('Soft Classic Rock', '[Bitrate: 128]   ', 'http://64.71.133.122:8000', '', '', 1, 128, 0, 1, '2011-08-11', 4300, 7, NULL, 0), \
-('Sofaspace', '[Bitrate: 128]  ', 'http://80.74.149.30:9999', '', '', 0, 128, 0, 1, '2011-08-11', 4302, 39, NULL, 0), \
-('Radio Flo', '[Bitrate: 128]  [Max Listeners: 325]', 'http://89.238.146.140:7060', '', '', 4, 128, 0, 1, '2011-08-11', 4303, 9, NULL, 0), \
-('Lekker veel Nederlandstalig', '  [Bitrate: 128]  ', 'http://91.213.69.159:7204', '', '', 0, 128, 0, 1, '2011-08-11', 4304, 6, NULL, 0), \
-('Antena Krusevac Studio 1', '  [Bitrate: 128]  ', 'http://94.23.38.225:4560', '', '', 51, 128, 0, 1, '2011-08-11', 4305, 4, NULL, 0), \
-('Radio Alpenmelodie', '[Bitrate: 128]  ', 'http://88.198.59.151:80', '', '', 0, 128, 0, 1, '2011-08-11', 4306, 8, NULL, 0), \
-('ECHOES.gr NetRadio', '[Bitrate: 128] [Max Listeners: 2500]', 'http://78.129.245.33:80', '', '', 0, 128, 0, 1, '2011-08-11', 4307, 9, NULL, 0), \
-('MNdancechannel', '[Bitrate: 128]  ', 'http://80.237.155.20:8030', '', '', 0, 128, 0, 1, '2011-08-11', 4309, 42, NULL, 0), \
-('BeirutNights.com', '[Bitrate: 128]   ', 'http://72.13.86.83:80', '', '', 0, 128, 0, 1, '2011-08-11', 4310, 7, NULL, 0), \
-('Radio Taraf Romania', '[Bitrate: 128]  ', 'http://46.108.3.26:7100', '', '', 0, 128, 0, 1, '2011-08-11', 4311, 41, NULL, 0), \
-('WebRadio Dj Paulo Pringles', '[Bitrate: 128] ', 'http://66.185.27.122:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4312, 7, NULL, 0), \
-('The Beat Norway', 'Norway  [Bitrate: 128]', 'http://89.105.32.12:8110', '', '', 40, 128, 1, 1, '2011-08-11', 4314, 21, NULL, 0), \
-('M2 RADIO : ONLY HITS & DANCE - Live From Paris France - www.m2radio.fr', '[Bitrate: 128]  ', 'http://91.121.100.202:8000', '', '', 4, 128, 0, 1, '2011-08-11', 4316, 4, NULL, 0), \
-('HAPPYDAY', '[Bitrate: 128]  ', 'http://222.122.131.69:8000', '', '', 0, 128, 1, 1, '2011-08-11', 4317, 40, NULL, 0), \
-('RelaxingJazz.com', 'Jazz [Bitrate: 128] [Max Listeners: 752]', 'http://85.17.77.1:8080', '', '', 9, 128, 0, 1, '2011-08-11', 4318, 7, NULL, 0), \
-('Radio Jimbo', '-M- - Matchistador  [Bitrate: 128]  ', 'http://91.121.104.120:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4322, 7, NULL, 0), \
-('BPM.FM - House', ' Dance', 'http://173.242.122.162:80', '', '', 0, 128, 0, 1, '2011-08-11', 4323, 7, NULL, 0), \
-('MOROW', '[Bitrate: 128]  ', 'http://213.251.186.110:9090', '', '', 0, 128, 0, 1, '2011-08-11', 4325, 4, NULL, 0), \
-('LaEstacionDelAmor.net', 'laestaciondelamor.net [Bitrate: 128]  ', 'http://174.36.60.193:6142', '', '', 0, 128, 0, 1, '2011-08-11', 4326, 7, NULL, 0), \
-('GotRadio Bit Blues', '[Bitrate: 128] ', 'http://64.202.109.111:80', '', '', 2, 128, 0, 1, '2011-08-11', 4327, 7, NULL, 0), \
-('Canadian Forces Network', 'CFN Europe - RFC Europe  [Bitrate: 128]  ', 'http://82.94.204.71:4070', '', '', 0, 128, 0, 1, '2011-08-11', 4328, 6, NULL, 0), \
-('Radio Beograd 202', '[Bitrate: 128] [Max Listeners: 2000]', 'http://195.252.107.194:8006', '', '', 0, 128, 0, 1, '2011-08-11', 4349, 3, NULL, 0), \
-('My Hitz Radio (HD)', 'Top40', 'http://24.9.182.176:8022', '', '', 40, 320, 0, 1, '2011-08-16', 4476, 7, NULL, 0), \
-('www.radiosoundcity.net', 'alternative rock pop', 'http://91.121.65.105:3276', '', '', 1, 320, 0, 1, '2011-08-16', 4477, 4, NULL, 0), \
-('Partyradion.se', 'Various', 'http://91.123.194.49:80', '', '', 4, 320, 8, 1, '2011-08-16', 4478, 23, NULL, 0), \
-('FM96.25MHz.  ', 'Soundtrack', 'http://103.22.182.103:8214', '', '', 0, 320, 0, 1, '2011-08-16', 4479, 7, NULL, 0), \
-('NSR - netsoundradio', 'Mixed', 'http://46.4.93.218:8000', '', '', 52, 320, 1, 1, '2011-08-16', 4480, 8, NULL, 0), \
-('Auto DJ Sound OF Germany', '', 'http://184.107.166.194:9824', '', '', 0, 320, 1, 1, '2011-08-16', 4481, 27, NULL, 0), \
-('Puls Fm', 'classical', 'http://24.155.168.246:8000/test.aac', '', '', 8, 320, 0, 1, '2011-08-16', 4482, 7, NULL, 0), \
-('2Scandalus Radio', 'Rnb   Dance   Disco   Rock', 'http://199.16.186.36:8489', '', '', 31, 320, 0, 1, '2011-08-16', 4483, 7, NULL, 0), \
-('DJ BENNIE', 'Various', 'http://87.117.203.166:27505', '', '', 0, 320, 0, 1, '2011-08-16', 4484, 9, NULL, 0), \
-('reggaemusic.com.pa', 'pop reggae salsa tecno', 'http://69.73.178.165:6020', '', '', 4, 320, 0, 1, '2011-08-16', 4485, 7, NULL, 0), \
-('Musikbox', '', 'http://184.107.168.138:9790', '', '', 0, 320, 0, 1, '2011-08-16', 4486, 27, NULL, 0), \
-('RADIO PHR Den Telefonstream erreichst du unter 0345-483410821', 'Welt', 'http://184.107.133.34:9994', '', '', 0, 320, 0, 1, '2011-08-16', 4489, 27, NULL, 0), \
-('Egroove CH1: egroove.fm', 'electronic', 'http://87.238.194.30:9020', '', '', 7, 320, 2, 1, '2011-08-16', 4490, 8, '2011-10-14 16:04:58', 0), \
-('BEST FM', 'Dance', 'http://188.173.252.152:1000', '', '', 4, 320, 0, 1, '2011-08-16', 4491, 9, NULL, 0), \
-('AutoDJ', '', 'http://184.107.168.138:9794', '', '', 0, 320, 1, 1, '2011-08-16', 4492, 27, NULL, 0), \
-('KWAX', '', 'http://128.223.175.195:9100/KWAX320.mp3', '', '', 0, 320, 0, 1, '2011-08-16', 4493, 7, NULL, 0), \
-('Radio Style FM', 'Manele Dance', 'http://95.130.10.81:8989', '', '', 40, 320, 0, 1, '2011-08-16', 4496, 30, NULL, 0), \
-('www.gecelife.net', 'Turkce Turkish Pop Slow Remix', 'http://46.105.109.141:2026', '', '', 45, 320, 0, 1, '2011-08-16', 4497, 4, NULL, 0), \
-('WondeRadio', 'Hits of the 80s and 90s', 'http://184.107.133.34:9822', '', '', 40, 320, 0, 1, '2011-08-16', 4498, 27, NULL, 0), \
-('Studio Amsterdam Radio', 'www.Studio-Amsterdam-Radio.com Mixed', 'http://87.118.78.3:5010', '', '', 52, 320, 0, 1, '2011-08-16', 4499, 25, NULL, 0), \
-('Webradio192', 'oldies pop', 'http://91.213.69.178:8020', '', '', 12, 320, 0, 1, '2011-08-16', 4500, 6, NULL, 0), \
-('Delfinas Auto DJ', 'Schlager  Fox', 'http://184.107.168.138:9944', '', '', 0, 320, 0, 1, '2011-08-16', 4501, 27, NULL, 0), \
-('Frenzes Auto Dj', '', 'http://184.107.166.186:9906', '', '', 0, 320, 0, 1, '2011-08-16', 4502, 27, NULL, 0), \
-('Osiriens-Radio-World - Querbeet', 'Alternative', 'http://87.118.78.20:9100', '', '', 7, 320, 0, 1, '2011-08-16', 4503, 25, NULL, 0), \
-('Silverflash-Radio....24 Stunden Non Stop Musik', 'Discofox  Schlager  Ballermann', 'http://184.107.166.194:9924', '', '', 31, 320, 0, 1, '2011-08-16', 4504, 27, NULL, 0), \
-('Radio Station Name: AutoDJ', 'Pop  Techno', 'http://62.75.164.224:8010', '', '', 4, 320, 0, 1, '2011-08-16', 4505, 8, NULL, 0), \
-('soundraum-radio.com', 'mixed', 'http://184.107.166.186:9942', '', '', 52, 320, 1, 1, '2011-08-16', 4507, 27, NULL, 0), \
-('Radio-Wolfsbau', 'Misc', 'http://188.138.91.101:8060', '', '', 40, 320, 0, 1, '2011-08-16', 4508, 41, NULL, 0), \
-('RPS', 'international Power', 'http://184.107.166.186:9974', '', '', 0, 320, 0, 1, '2011-08-16', 4509, 27, NULL, 0), \
-('Radiomusicpee - Its my life', 'Rmb   Club', 'http://184.107.166.194:9970', '', '', 0, 320, 0, 1, '2011-08-16', 4510, 27, NULL, 0), \
-('1RaumRadio-MellowMix', 'Electronic', 'http://184.107.166.186:9980', '', '', 30, 320, 1, 1, '2011-08-16', 4511, 27, NULL, 0), \
-('Anime Plus', 'Anime OST', 'http://78.30.193.236:8200', '', '', 0, 320, 0, 1, '2011-08-16', 4512, 3, NULL, 0), \
-('RSN Auto Dj', '', 'http://184.107.133.34:9858', '', '', 0, 320, 0, 1, '2011-08-16', 4513, 27, NULL, 0), \
-('Hits4Fun-Radio', '', 'http://184.107.168.138:9938', '', '', 45, 320, 0, 1, '2011-08-16', 4514, 27, NULL, 0), \
-('KosRadio DJ', 'Various', 'http://94.229.74.211:8199', '', '', 0, 320, 0, 1, '2011-08-16', 4515, 42, NULL, 0), \
-('LIVE FM GERMANY', 'POP ROCK CHARTS', 'http://85.214.50.139:8000', '', '', 1, 320, 0, 1, '2011-08-16', 4516, 4, NULL, 0), \
-('Canadian Music Radio.com StreamCanadianMusicRadio', 'Unspecified', 'http://96.31.83.86:8036', '', '', 0, 320, 0, 1, '2011-08-16', 4517, 7, NULL, 0), \
-('FANATICSOUNDS.COM: FanaticRadio', 'Techno', 'http://93.190.137.65:8000', '', '', 50, 320, 0, 1, '2011-08-16', 4518, 6, NULL, 0), \
-('RADIO SERVICE', '', 'http://91.121.198.93:46100', '', '', 0, 320, 0, 1, '2011-08-16', 4519, 27, NULL, 0), \
-('Richards Golden Stream', 'Mostly Classical Rock', 'http://108.64.168.117:9000', '', '', 1, 320, 0, 1, '2011-08-16', 4520, 7, NULL, 0), \
-('MakeAVoice Radio', 'Metal Rock Punk', 'http://174.142.97.228:8390', '', '', 1, 320, 0, 1, '2011-08-16', 4522, 7, NULL, 0), \
-('PINKI RADIO', 'Folk', 'http://87.118.94.56:8090', '', '', 51, 320, 0, 1, '2011-08-16', 4523, 25, NULL, 0), \
-('This is my server name', 'Rock', 'http://81.26.214.145:6116', '', '', 1, 320, 0, 1, '2011-08-16', 4524, 6, NULL, 0), \
-('zenSyndicate.com Radio', 'Techno House Electro', 'http://91.121.112.86:8000', '', '', 50, 320, 0, 1, '2011-08-16', 4525, 4, NULL, 0), \
-('RADIO THERMAIKOS', 'Various', 'http://78.129.142.4:8002', '', '', 0, 320, 0, 1, '2011-08-16', 4526, 51, NULL, 0), \
-('Radio Cathie www.radiocathie24.ru', '', 'http://95.68.240.56:8000', '', '', 0, 320, 0, 1, '2011-08-16', 4527, 59, NULL, 0), \
-('St. Joseph Music Foundation Hi', 'College', 'http://99.21.19.121:100', '', '', 0, 320, 0, 1, '2011-08-16', 4528, 7, NULL, 0), \
-('KWAX', '', 'http://128.223.175.195:9100/KWAX320.aac', '', '', 0, 320, 0, 1, '2011-08-16', 4529, 7, NULL, 0), \
-('House of Funk', 'house progressive minimal elec', 'http://89.68.0.2:666', '', '', 16, 320, 0, 1, '2011-08-16', 4530, 8, NULL, 0), \
-('United Friends Radio', 'Schlager Popschlager', 'http://184.107.168.138:9788', '', '', 0, 320, 0, 1, '2011-08-16', 4531, 27, NULL, 0), \
-('PMVibes: PMVibes Mixes', 'Trance', 'http://88.198.39.130:8000', '', '', 41, 320, 1, 1, '2011-08-16', 4532, 8, NULL, 0), \
-('24 Stunden rund um die Uhr Musik', 'Genre', 'http://184.107.168.138:9848', '', '', 0, 320, 1, 1, '2011-08-16', 4535, 27, NULL, 0), \
-('Easymix - Radio', 'Easymix Radio', 'http://184.107.166.186:9864', '', '', 0, 320, 0, 1, '2011-08-16', 4536, 27, NULL, 0), \
-('Radio BassBeats Melodie', 'Various', 'http://184.107.133.34:9882', '', '', 0, 320, 0, 1, '2011-08-16', 4538, 27, NULL, 0), \
-('FS - fullspectrumradio.com - DnB/Jungle/Bass/Electronic', 'Drum and Bass', 'http://67.230.191.211:8000', '', '', 53, 320, 0, 1, '2011-08-16', 4539, 7, NULL, 0), \
-('Italo Disco Radio', 'ItaloDisco  EuroDance  Hi NrG', 'http://78.159.97.159:8016', '', '', 31, 320, 0, 1, '2011-08-16', 4540, 8, NULL, 0), \
-('Vibeslinkfm96.1', 'Reggae', 'http://174.36.206.217:8557', '', '', 48, 320, 0, 1, '2011-08-16', 4541, 58, NULL, 0), \
-('AutoDJ (WWMR Radio)', 'Unspecified', 'http://96.127.130.50:8200', '', '', 0, 320, 0, 1, '2011-08-16', 4542, 7, NULL, 0), \
-('Radio Klub [Best Dance, House and Techno]', 'House  Techno  Dance', 'http://91.121.198.93:16000', '', '', 16, 320, 6, 1, '2011-08-16', 4543, 27, '2011-10-15 20:10:04', 0), \
-('Boerse.FM', 'News', 'http://184.107.168.138:9872', '', '', 0, 320, 0, 1, '2011-08-16', 4544, 27, NULL, 0), \
-('Goa World Psytrance Radio', 'Goa', 'http://195.198.242.249:8010', '', '', 7, 320, 0, 1, '2011-08-16', 4545, 23, NULL, 0), \
-('Radio ATD www.radiogora.ru', 'Metal Rock', 'http://79.140.78.106:10610', '', '', 1, 320, 0, 1, '2011-08-16', 4546, 8, NULL, 0), \
-('The New England Jazz Express!', 'Jazz', 'http://75.69.53.115:8004', '', '', 9, 320, 0, 1, '2011-08-16', 4547, 7, NULL, 0), \
-('TranceOnline radio', 'TRance   HardTrance   HardDanc', 'http://94.23.218.141:8000', '', '', 41, 320, 1, 1, '2011-08-16', 4549, 37, NULL, 0), \
-('Radio Halli Galli', 'World', 'http://184.107.168.138:9952', '', '', 0, 320, 0, 1, '2011-08-16', 4550, 27, NULL, 0), \
-('Never Ending Muzik Sound ', 'New Style The Real Live Remix', 'http://119.207.75.237:1630', '', '', 0, 320, 0, 1, '2011-08-16', 4551, 40, NULL, 0), \
-('Rockhard Lossless Radio', 'Hard Rock &amp; Metal', 'http://85.17.90.12:8000', '', '', 1, 320, 0, 1, '2011-08-16', 4553, 38, NULL, 0), \
-('Snakeices House of Beats', 'Rap  Hip Hop  R&amp;B  Jazz  Blues', 'http://64.113.122.205:8025', '', '', 5, 320, 1, 1, '2011-08-16', 4561, 7, NULL, 0), \
-('Raritan Bay Radio IN HIGH DEFINITION!!!', 'Oldies', 'http://68.195.207.45:8000', '', '', 3, 320, 0, 1, '2011-08-16', 4562, 7, NULL, 0), \
-('she', 'Misc', 'http://119.207.75.234:6970', '', '', 0, 320, 0, 1, '2011-08-16', 4565, 40, NULL, 0), \
-('Metro Oslo HD', 'Easy Listening', 'http://89.105.32.12:8124', '', '', 7, 320, 0, 1, '2011-08-16', 4566, 21, NULL, 0), \
-('TURNTABLES24.com', 'House  Techno  Electronic', 'http://87.230.57.50:9400', '', '', 16, 320, 3, 1, '2011-08-16', 4567, 8, '2011-10-15 20:10:41', 0), \
-('MakeAVoice Radio', 'Top 40', 'http://67.212.173.250:8440', '', '', 40, 320, 0, 1, '2011-08-16', 4568, 7, NULL, 0), \
-('Radio ELECTRO www.radiogora.ru', 'House', 'http://79.140.78.106:10060', '', '', 16, 320, 1, 1, '2011-08-16', 4569, 8, NULL, 0), \
-('Laser 80 - La Musique Des Annees 80', '80 s', 'http://188.165.32.218:9066', '', '', 13, 320, 0, 1, '2011-08-16', 4570, 26, NULL, 0), \
-('MakeAVoice Radio - Mix', 'Rock', 'http://174.122.26.34:8380', '', '', 1, 320, 0, 1, '2011-08-16', 4571, 7, NULL, 0), \
-('ARM FM', 'Dance', 'http://83.216.63.98:9000', '', '', 4, 320, 3, 1, '2011-08-16', 4572, 50, NULL, 0), \
-('Renegade HD', 'dubstep, breaks, house, drum and bass, trance, electro', 'http://87.106.161.144:80/rlive.mp3', '', '', 16, 320, 0, 1, '2011-08-16', 4573, 7, NULL, 0), \
-('4Noises', 'PoP Rock Dance Gigaziggi.com', 'http://184.107.133.34:9820', '', '', 40, 320, 0, 1, '2011-08-16', 4575, 27, NULL, 0), \
-('963 Happy Radio Monique Gold', 'Rock Oldies 60s 70s 80s', 'http://94.75.235.38:8199', '', '', 13, 320, 0, 1, '2011-08-16', 4576, 36, NULL, 0), \
-('259 Happy Rock Radio Caroline Gold', 'Classic Rock   80s  70s  90s', 'http://94.75.235.38:8253', '', '', 1, 320, 0, 1, '2011-08-16', 4577, 36, NULL, 0), \
-('DJ Otto :: Instant Requests @ :: STRadio.org', 'ST Eclectic &amp; Electric', 'http://208.43.121.155:8000', '', '', 50, 320, 0, 1, '2011-08-16', 4578, 7, NULL, 0), \
-('MOSORadio.com', 'Default genre', 'http://202.162.79.143:4032', '', '', 0, 320, 0, 1, '2011-08-16', 4579, 28, NULL, 0), \
-('AVRO Light Classical High Definition', 'classical', 'http://145.58.33.95:8096', '', '', 8, 320, 1, 1, '2011-08-16', 4580, 34, NULL, 0), \
-('Deepvibes Radio U.K.', 'Electronica house deephouse', 'http://72.233.48.190:8010', '', '', 16, 320, 2, 1, '2011-08-16', 4581, 28, NULL, 0), \
-('idobi Radio', '[Bitrate: 128]', 'http://76.73.94.84:80', '', '', 0, 128, 0, 1, '2011-08-11', 4584, 7, NULL, 0), \
-('top 100 station', ' - Germanys No.1 Web Hit Station [Bitrate: 128]', 'http://188.72.209.74:80', '', '', 40, 128, 0, 1, '2011-08-11', 4585, 8, NULL, 0), \
-('TechnoBase.FM', ' Dance', 'http://80.237.155.73:80', '', '', 4, 128, 1, 1, '2011-08-11', 4586, 42, '2011-09-06 13:00:45', 0), \
-('HOT 108 JAMZ', 'HIP HOP [Bitrate: 128]', 'http://scfire-ntc-aa05.stream.aol.com:80/stream/1071', '', '', 5, 128, 1, 1, '2011-08-11', 4587, 7, NULL, 0), \
-('Radio Paradise', ' world', 'http://scfire-mtc-aa04.stream.aol.com:80/stream/1048', '', '', 0, 128, 0, 1, '2011-08-11', 4588, 7, NULL, 0), \
-('DEFJAY.DE', '100% R&B! (GERMANY) [Bitrate: 128]', 'http://87.230.82.15:80', '', '', 45, 128, 0, 1, '2011-08-11', 4589, 8, NULL, 0), \
-('French Kiss FM', '[Bitrate: 128]', 'http://88.190.234.239:80', '', '', 0, 128, 0, 1, '2011-08-11', 4590, 4, NULL, 0), \
-('WWW.RAUTEMUSIK.FM', '24H OLDIES CLASSIC ROCK 60S 70S 80S [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1081', '', '', 1, 128, 0, 1, '2011-08-11', 4591, 7, NULL, 0), \
-('977 The Hitz Channel', '[Bitrate: 128]', 'http://scfire-ntc-aa08.stream.aol.com:80/stream/1074', '', '', 40, 128, 0, 1, '2011-08-11', 4592, 7, NULL, 0), \
-('I Love Radio - Interaktives', '(www.iloveradio.de) ', 'http://87.118.100.119:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4593, 25, NULL, 0), \
-('ENJOYSTATION.NET France Vichy!', 'From paris', 'http://91.121.116.35:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4594, 4, NULL, 0), \
-('MUSIK.JAM', 'Musik.JaM - Track Update on www.RauteMusik.FM/jam  [Bitrate: 128]', 'http://scfire-mtc-aa06.stream.aol.com:80/stream/1054', '', '', 0, 128, 3, 1, '2011-08-11', 4595, 7, '2011-10-15 20:10:34', 0), \
-('Schlagerhoelle', '[Bitrate: 128]', 'http://84.19.184.27:30842', '', '', 0, 128, 0, 1, '2011-08-11', 4596, 8, NULL, 0), \
-('disco by pop-stream.de', '[Bitrate: 128]', 'http://80.237.159.25:4060', '', '', 40, 128, 0, 1, '2011-08-11', 4597, 8, NULL, 0), \
-('charts by pop-stream.de', '[Bitrate: 128]', 'http://83.169.61.47:4050', '', '', 40, 128, 2, 1, '2011-08-11', 4598, 8, NULL, 0), \
-('Radio KWEJK.FM', '[Bitrate: 128]', 'http://188.165.15.48:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4599, 33, NULL, 0), \
-('MUSIK.HOUSE (FUNKY)', 'FUNK [Bitrate: 128]', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1058', '', '', 47, 128, 1, 1, '2011-08-11', 4601, 7, NULL, 0), \
-('MUSIK.MAIN ', '#Musik.Main [Bitrate: 128]', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1051', '', '', 0, 128, 0, 1, '2011-08-11', 4602, 7, NULL, 0), \
-('MUSIK.GOLDIES', '#Musik.Goldies - Track Update on www.RauteMusik.FM/goldies  [Bitrate: 128]', 'http://scfire-mtc-aa03.stream.aol.com:80/stream/1060', '', '', 0, 128, 0, 1, '2011-08-11', 4603, 7, NULL, 0), \
-('1POWER ', 'www.powerhitz.com [Bitrate: 128]', 'http://scfire-dtc-aa03.stream.aol.com:80/stream/1044', '', '', 0, 128, 0, 1, '2011-08-11', 4605, 7, NULL, 0), \
-('Ballermann Radio', '[Bitrate: 128]', 'http://83.169.61.46:5000', '', '', 0, 128, 0, 1, '2011-08-11', 4606, 28, NULL, 0), \
-('HouseTime.FM', 'House & More', 'http://85.17.26.102:80', '', '', 16, 128, 0, 1, '2011-08-11', 4609, 6, NULL, 0), \
-('Techno4ever', '@ www.T4E.DJ [Bitrate: 128]', 'http://78.159.104.146:80', '', '', 50, 128, 0, 1, '2011-08-11', 4610, 39, NULL, 0), \
-('HardBase.FM', ' Jumpstyle', 'http://78.159.104.162:80', '', '', 0, 128, 3, 1, '2011-08-11', 4611, 39, '2011-10-14 16:05:21', 0), \
-('friskyRadio', 'Trance', 'http://scfire-dtc-aa06.stream.aol.com:80/stream/1015', '', '', 29, 128, 0, 1, '2011-08-11', 4612, 7, NULL, 0), \
-('Radio Paradise', 'DJ-mixed modern & classic rock', 'http://scfire-ntc-aa08.stream.aol.com:80/stream/1049', '', '', 1, 128, 0, 1, '2011-08-11', 4616, 7, NULL, 0), \
-('1.FM - 80s Channel', 'nonstop power80 2  [Bitrate: 128]', 'http://64.62.194.11:8095', '', '', 13, 128, 0, 1, '2011-08-11', 4618, 7, NULL, 0), \
-('Radio Paloma - 100% Deutscher Schlager!', '[Bitrate: 128]', 'http://80.237.184.23:80', '', '', 45, 128, 0, 1, '2011-08-11', 4619, 8, NULL, 0), \
-('Alesis', '[Bitrate: 128]', 'http://scfire-mtc-aa06.stream.aol.com:80/stream/1005', '', '', 0, 128, 0, 1, '2011-08-11', 4620, 7, NULL, 0), \
-('MUSIK.EXTREME', '#Musik.eXTreMe [Bitrate: 128] ', 'http://scfire-dtc-aa03.stream.aol.com:80/stream/1052', '', '', 0, 128, 1, 1, '2011-08-11', 4621, 7, NULL, 0), \
-('89.0 RTL', '[Bitrate: 128] ', 'http://80.237.210.29:80', '', '', 0, 128, 0, 1, '2011-08-11', 4622, 8, NULL, 0), \
-('BlackBeats.FM ', 'finest in blackbeats [Bitrate: 128] ', 'http://212.95.42.65:80', '', '', 0, 128, 0, 1, '2011-08-11', 4623, 11, NULL, 0), \
-('Venice Classic', '[Bitrate: 128]  ', 'http://174.36.206.197:8000', '', '', 8, 128, 0, 1, '2011-08-11', 4624, 58, NULL, 0), \
-('LOUNGE-RADIO.COM ', '', 'http://195.141.102.212:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4625, 9, NULL, 0), \
-('MUSIK.BIGCITYBEATS', 'Track Update on www.RauteMusik.FM/bcb  [Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1082', '', '', 0, 128, 0, 1, '2011-08-11', 4627, 7, NULL, 0), \
-('HIT104', '[Bitrate: 128]', 'http://80.237.210.57:80', '', '', 40, 128, 0, 1, '2011-08-11', 4629, 8, NULL, 0), \
-('La X Estereo', '[Bitrate: 128]', 'http://80.237.211.85:80', '', '', 0, 128, 0, 1, '2011-08-11', 4630, 8, NULL, 0), \
-('Bassdrive', '[Bitrate: 128]', 'http://205.188.215.226:8012', '', '', 50, 128, 0, 1, '2011-08-11', 4631, 7, NULL, 0), \
-('RMNradio....Music Fun and More!', '[Bitrate: 128]', 'http://80.237.201.92:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4632, 8, NULL, 0), \
-('POWERTURK', '[Bitrate: 128]', 'http://46.20.4.58:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4633, 58, NULL, 0), \
-('RadioMv.com', '[Bitrate: 128]', 'http://65.19.173.132:2204', '', '', 0, 128, 0, 1, '2011-08-11', 4634, 7, NULL, 0), \
-('RADIONL', '[Bitrate: 128]', 'http://178.19.127.3:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4635, 22, NULL, 0), \
-('Beatles Radio.com', 'Solos', 'http://64.40.99.2:8088', '', '', 21, 128, 0, 1, '2011-08-11', 4637, 27, NULL, 0);";
-
-
+('NAXI RADIO 96', '9MHz - Beograd - www.naxi.rs ', 'http://193.243.169.34:9150', '', '', 0, 128, 1, 1, '2011-08-11', 4247, 45, '2011-10-14 16:11:02', 1), \
+('WKSU Classical', 'WKSU Classical: Ludwig van Beethoven - Piano Sonata No. 31  [Bitrate: 128] [Max Listeners: 2000]', 'http://66.225.205.8:8030', '', '', 8, 128, 0, 1, '2011-08-11', 4275, 7, NULL, 1), \
+('Radio Stad', '[Willie And The Hand Jive]  [Bitrate: 128] ', 'http://81.173.3.250:80', '', '', 0, 128, 0, 1, '2011-08-11', 4279, 23, NULL, 1), \
+('SLOW JAMZ For Lovers', '[Bitrate: 128] ', 'http://85.25.16.7:8028', '', '', 0, 128, 0, 1, '2011-08-11', 4290, 8, NULL, 1), \
+('Scansat', 'Scansat Trondheim  [Bitrate: 128]  ', 'http://212.62.227.4:2049', '', '', 0, 128, 0, 1, '2011-08-11', 4291, 21, NULL, 1), \
+('Antena Krusevac Studio 1', '  [Bitrate: 128]  ', 'http://94.23.38.225:4560', '', '', 51, 128, 0, 1, '2011-08-11', 4305, 4, NULL, 1), \
+('HAPPYDAY', '[Bitrate: 128]  ', 'http://222.122.131.69:8000', '', '', 0, 128, 1, 1, '2011-08-11', 4317, 40, NULL, 1), \
+('Radio Beograd 202', '[Bitrate: 128] [Max Listeners: 2000]', 'http://195.252.107.194:8006', '', '', 0, 128, 0, 1, '2011-08-11', 4349, 3, NULL, 1), \
+('fullspectrumradio.com', 'Drum and Bass', 'http://67.230.191.211:8000', '', '', 53, 320, 0, 1, '2011-08-16', 4539, 7, NULL, 1), \
+('Schlagerhoelle', '[Bitrate: 128]', 'http://84.19.184.27:30842', '', '', 0, 128, 0, 1, '2011-08-11', 4596, 8, NULL, 1), \
+('Radio Paloma - 100% Deutscher Schlager!', '[Bitrate: 128]', 'http://80.237.184.23:80', '', '', 45, 128, 0, 1, '2011-08-11', 4619, 8, NULL, 1), \
+('Venice Classic', '[Bitrate: 128]  ', 'http://174.36.206.197:8000', '', '', 8, 128, 0, 1, '2011-08-11', 4624, 58, NULL, 1), \
+('HIT104', '[Bitrate: 128]', 'http://80.237.210.57:80', '', '', 40, 128, 0, 1, '2011-08-11', 4629, 8, NULL, 1), \
+('La X Estereo', '[Bitrate: 128]', 'http://80.237.211.85:80', '', '', 0, 128, 0, 1, '2011-08-11', 4630, 8, NULL, 1), \
+('RMNradio', '[Bitrate: 128]', 'http://80.237.201.92:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4632, 8, NULL, 1), \
+('RadioMv.com', '[Bitrate: 128]', 'http://65.19.173.132:2204', '', '', 0, 128, 0, 1, '2011-08-11', 4634, 7, NULL, 1), \
+('Beatles Radio.com', 'Solos', 'http://64.40.99.2:8088', '', '', 21, 128, 0, 1, '2011-08-11', 4637, 27, NULL, 1);";
 
 const char *radio_station_setupsql11="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('radio cream.fm', '[Bitrate: 128] ', 'http://87.118.78.19:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4638, 25, NULL, 0), \
-('RADYO FENOMEN ', '[Bitrate: 128]', 'http://46.20.4.50:8090', '', '', 0, 128, 0, 1, '2011-08-11', 4639, 58, NULL, 0), \
-('Drone Zone', '[Bitrate: 128]', 'http://scfire-ntc-aa02.stream.aol.com:80/stream/1032', '', '', 0, 128, 0, 1, '2011-08-11', 4640, 7, NULL, 0), \
-('Radio Schwarze Welle ', 'Das Radio mit dem besten dunklen Liedern  [Bitrate: 128]', 'http://188.138.34.43:7500', '', '', 0, 128, 0, 1, '2011-08-11', 4641, 8, NULL, 0), \
-('Beste FM', '[Bitrate: 128]  ', 'http://85.25.176.122:14048', '', '', 0, 128, 0, 1, '2011-08-11', 4643, 8, NULL, 0), \
-('AngelsFox-Radio', '[Bitrate: 128]', 'http://89.149.226.128:80', '', 'AngelsFox-Radio.png', 0, 128, 0, 1, '2011-08-11', 4644, 8, NULL, 0), \
-('Radio GANGSTA ', 'www.RadioGangsta.Ro [Bitrate: 128]', 'http://93.114.41.35:8800', '', '', 0, 128, 0, 1, '2011-08-11', 4645, 41, NULL, 0), \
-('FREQUENCE3', '[Bitrate: 128]', 'http://193.222.128.174:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4646, 4, NULL, 0), \
-('CLASSICAL 102', '[Bitrate: 128]', 'http://80.237.210.39:80', '', '', 8, 128, 0, 1, '2011-08-11', 4648, 8, NULL, 0), \
-('Radio animesPLUS ', '[Bitrate: 128]', 'http://76.73.80.34:9998', '', '', 0, 128, 0, 1, '2011-08-11', 4649, 7, NULL, 0), \
-('RADIODISCOPOLO.FM', ' radio ZET', 'http://94.23.36.107:443', '', '', 0, 128, 0, 1, '2011-08-11', 4652, 4, NULL, 0), \
-('Radio Gravity', ' Patrocinado por www.HispaSMS.Net [Bitrate: 128]', 'http://109.104.69.166:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4654, 9, NULL, 0), \
-('@80s I streamed', '[Bitrate: 128] ', 'http://87.230.55.93:4080', '', '', 13, 128, 2, 1, '2011-08-11', 4655, 42, '2011-10-14 16:10:58', 0), \
-('Radioseven - www.radioseven.se', 'Darude - Salmiakki Sessions 75  [Bitrate: 128] ', 'http://81.186.251.7:8500', '', '', 0, 128, 0, 1, '2011-08-11', 4658, 23, NULL, 0), \
-('108.FM', '[Bitrate: 128] ', 'http://scfire-ntc-aa04.stream.aol.com:80/stream/1030', '', '', 0, 128, 0, 1, '2011-08-11', 4660, 7, NULL, 0), \
-('80s Planet.com', ' the 80s! ', 'http://67.213.220.36:8080', '', '', 50, 128, 0, 1, '2011-08-11', 4662, 7, NULL, 0), \
-('BreakZ.us', '[Bitrate: 128]', 'http://212.117.161.15:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4663, 5, NULL, 0), \
-('SwissGroove', 'jazz funk', 'http://82.197.165.141:80', '', '', 9, 128, 0, 1, '2011-08-11', 4664, 24, NULL, 0), \
-('TranceBase.FM - 24h Vocal', 'Progressive', 'http://85.17.26.106:80', '', '', 29, 128, 0, 1, '2011-08-11', 4665, 6, NULL, 0), \
-('Music One', '[Bitrate: 128]', 'http://scfire-ntc-aa07.stream.aol.com:80/stream/1011', '', '', 0, 128, 0, 1, '2011-08-11', 4666, 7, NULL, 0), \
-('Jemne Melodie: jemne melodie live', '[Bitrate: 128] ', 'http://93.184.69.143:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4668, 48, NULL, 0), \
-('LOLLIRADIO ITALIA ', '[Bitrate: 128]', 'http://94.23.67.172:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4669, 26, NULL, 0), \
-('ElectricFM.com- America''s Real Dance!', '[Bitrate: 128] ', 'http://208.85.240.90:80', '', '', 30, 128, 0, 1, '2011-08-11', 4670, 7, NULL, 0), \
-('MUSIK.LOUNGE', '#Musik.Lounge - Track Update on www.RauteMusik.FM/lounge  [Bitrate: 128] ', 'http://scfire-dtc-aa02.stream.aol.com:80/stream/1080', '', '', 0, 128, 0, 1, '2011-08-11', 4672, 7, NULL, 0), \
-('Sharmanka 104.0 Kiev', '[Bitrate: 128]', 'http://217.20.164.163:8006', '', '', 0, 128, 1, 1, '2011-08-11', 4673, 49, '2011-10-14 16:11:19', 0), \
-('Electro Radio', '[Bitrate: 128]', 'http://87.118.78.88:26630', '', '', 30, 128, 0, 1, '2011-08-11', 4674, 25, NULL, 0), \
-('BigUpRadio Dancehall Reggae', '[Bitrate: 128]', 'http://66.90.104.65:8000', '', '', 48, 128, 0, 1, '2011-08-11', 4676, 7, NULL, 0), \
-('[www.ponteatope.com] Radio 24 Horas', '(www flowhot net)  [Bitrate: 128] ', 'http://46.105.113.8:8010', '', '', 4, 128, 0, 1, '2011-08-11', 4677, 4, NULL, 0), \
-('CLASS FM', '[Bitrate: 128]', 'http://91.82.85.71:9216', '', '', 1, 128, 1, 1, '2011-08-11', 4678, 50, NULL, 0), \
-('ChroniX Aggression', 'CHECK OUT METAL MASTERS (CLASSIC METAL HARDROCK) www.chronixradio.com  [Bitrate: 128]', 'http://scfire-mtc-aa04.stream.aol.com:80/stream/1039', '', '', 1, 128, 0, 1, '2011-08-11', 4679, 7, NULL, 0), \
-('Fusion Radio.', '[Bitrate: 128]', 'http://208.100.1.113:8004', '', '', 0, 128, 0, 1, '2011-08-11', 4680, 0, NULL, 0), \
-('Smoothbeats.com', '[Bitrate: 128]  ', 'http://scfire-mtc-aa01.stream.aol.com:80/stream/1012', '', '', 0, 128, 0, 1, '2011-08-11', 4681, 7, NULL, 0), \
-('Proton Radio', ' [Bitrate: 128]', 'http://scfire-mtc-aa05.stream.aol.com:80/stream/1041', '', '', 0, 128, 0, 1, '2011-08-11', 4682, 7, NULL, 0), \
-('@Schlager I streamed by pop-stream.de', '[Bitrate: 128]', 'http://87.230.55.91:4090', '', '', 0, 128, 0, 1, '2011-08-11', 4683, 8, NULL, 0), \
-('Chromanova.fm ', '[Bitrate: 128]', 'http://85.25.86.69:8100', '', '', 0, 128, 0, 1, '2011-08-11', 4684, 8, NULL, 0), \
-('Radio BN +38755228412', '[Bitrate: 128]', 'http://46.4.33.9:8522', '', '', 51, 128, 0, 1, '2011-08-11', 4685, 8, NULL, 0), \
-('Kuschel.FM', '[Bitrate: 128] ', 'http://84.19.184.95:8040', '', '', 0, 128, 0, 1, '2011-08-11', 4686, 8, NULL, 0), \
-('JACK FM - ALL HIT RADIO', '[Bitrate: 128]', 'http://80.237.210.91:80', '', '', 0, 128, 0, 1, '2011-08-11', 4687, 8, NULL, 0), \
-('Big R Radio - Warm 101.6 ', '[Bitrate: 128] ', 'http://173.193.14.170:8010', '', '', 0, 128, 1, 1, '2011-08-11', 4689, 27, '2011-10-14 16:04:03', 0), \
-('NERadio Sweden', 'SE [Bitrate: 128]', 'http://87.96.232.206:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4691, 23, NULL, 0), \
-('METAL ONLY ', '24h Black Death Heavy Metal Rock', 'http://87.230.53.10:9480', '', '', 1, 128, 0, 1, '2011-08-11', 4692, 12, NULL, 0), \
-('HPR1', '[Bitrate: 128] ', 'http://130.166.82.14:8006', '', '', 6, 128, 1, 1, '2011-08-11', 4693, 7, '2011-09-07 13:41:37', 0), \
-('Radio Juzni Vetae', '[Bitrate: 128] ', 'http://89.149.209.100:8003', '', '', 51, 128, 0, 1, '2011-08-11', 4697, 53, NULL, 0), \
-('Folk Alley', 'FolkAlley.com  [Bitrate: 128]', 'http://66.225.205.8:80', '', '', 51, 128, 0, 1, '2011-08-11', 4698, 7, NULL, 0), \
-('Portofino Network', '[Bitrate: 128]', 'http://87.117.228.94:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4699, 13, NULL, 0), \
-('Nirvana Radio', ' - Music for Meditation and Relaxation The Best Meditation Music for all gentle-minded and elevated souls.  [Bitrate: 128]', 'http://91.121.72.50:9106', '', '', 0, 128, 0, 1, '2011-08-11', 4700, 4, NULL, 0), \
-('CROOZE', 'R&B', 'http://193.227.114.74:2580', '', '', 0, 128, 0, 1, '2011-08-11', 4701, 26, NULL, 0), \
-('Raggakings the 24/7', 'Bersenbrueck ReggaeJam 2011 - Ranking Joe  [Bitrate: 128] ', 'http://64.202.98.51:7970', '', '', 0, 128, 0, 1, '2011-08-11', 4702, 7, NULL, 0), \
-('M2 ANALOG www.m2radio.fr', '[Bitrate: 128]', 'http://91.121.140.217:9080', '', '', 0, 128, 0, 1, '2011-08-11', 4704, 4, NULL, 0), \
-('MegaFox24 netzradio.fm', '[Bitrate: 128]', 'http://89.149.254.138:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4705, 8, NULL, 0), \
-('RaDioTEENTAAL.com 100%', '', 'http://91.121.155.39:8128', '', '', 0, 128, 0, 1, '2011-08-11', 4706, 4, NULL, 0), \
-('Radio Pro-B Romania', '[Bitrate: 128] ', 'http://89.38.207.242:9999', '', '', 0, 128, 0, 1, '2011-08-11', 4707, 41, NULL, 0), \
-('ROCKY FM - Today''s Best Rock!', '[Bitrate: 128]  ', 'http://80.237.210.81:80', '', '', 1, 128, 0, 1, '2011-08-11', 4708, 8, NULL, 0), \
-('AAN COUNTRY', '[Bitrate: 128] ', 'http://76.10.222.237:9002', '', '', 6, 128, 0, 1, '2011-08-11', 4709, 7, NULL, 0), \
-('shoutcast3', '[Bitrate: 128] ', 'http://87.117.198.86:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4710, 9, NULL, 0), \
-('PONdENDS.COM', 'DjFranz HipHop_NOV_part2  [Bitrate: 128] ', 'http://178.159.0.80:7098', '', '', 0, 128, 0, 1, '2011-08-11', 4711, 34, NULL, 0), \
-('MUSIK.SCHLAGER', '[Bitrate: 128]', 'http://80.237.157.12:18000', '', '', 0, 128, 0, 1, '2011-08-11', 4714, 42, NULL, 0), \
-('UZIC.CH', '[Bitrate: 128]', 'http://128.179.101.9:9010', '', '', 0, 128, 0, 1, '2011-08-11', 4715, 24, NULL, 0), \
-('shoutcast', '[Bitrate: 128]', 'http://87.117.198.85:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4716, 9, NULL, 0), \
-('shoutcast2', '[Bitrate: 128] ', 'http://87.117.198.89:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4717, 9, NULL, 0), \
-('Radio PLAYONE Manele www.radioplayone.com', '[Bitrate: 128] ', 'http://195.64.132.45:9888', '', '', 0, 128, 0, 1, '2011-08-11', 4718, 22, NULL, 0), \
-('KCRW Simulcast', '[Bitrate: 128]', 'http://scfire-mtc-aa02.stream.aol.com:80/stream/1046', '', '', 0, 128, 0, 1, '2011-08-11', 4719, 7, NULL, 0), \
-('Secret Agent: The soundtrack for your stylis', ' mysterious', 'http://scfire-mtc-aa04.stream.aol.com:80/stream/1021', '', '', 0, 128, 0, 1, '2011-08-11', 4720, 7, NULL, 0), \
-('1.FM - The Chillout Lounge', 'Lazybatusu - 8.00 - AM  [Bitrate: 128]', 'http://72.13.83.99:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4721, 7, NULL, 0), \
-('minimalstation.de', '[Bitrate: 128]', 'http://64.150.176.192:8227', '', '', 0, 128, 0, 1, '2011-08-11', 4722, 7, NULL, 0), \
-('Itapoan FM', '[Bitrate: 128]', 'http://68.233.243.9:8001', '', '', 0, 128, 0, 1, '2011-08-11', 4723, 7, NULL, 0), \
-('247Polkaheaven ''The World''s Polka Network', 'The Worlds Polka Network  [Bitrate: 128] [Max Listeners: 250]', 'http://216.59.35.38:8046', '', '', 0, 128, 0, 1, '2011-08-11', 4724, 22, NULL, 0), \
-('Webblaster Radio 2', '[Bitrate: 128]  ', 'http://91.121.194.238:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4725, 4, NULL, 0), \
-('Radio Monte Carlo', '[Bitrate: 128]  ', 'http://212.40.13.22:11000', '', '', 1, 128, 0, 1, '2011-08-11', 4727, 24, NULL, 0), \
-('Springsteenradio.com', '[Bitrate: 128]   ', 'http://67.212.166.178:9000', '', '', 21, 128, 0, 1, '2011-08-11', 4728, 7, NULL, 0), \
-('STAR 107.9', '[Bitrate: 128]  ', 'http://67.212.174.226:10001', '', '', 13, 128, 0, 1, '2011-08-11', 4729, 7, NULL, 0), \
-('Soulful Bits', '[Bitrate: 128]  ', 'http://88.191.137.70:80', '', '', 0, 128, 0, 1, '2011-08-11', 4730, 4, NULL, 0), \
-('Golden Hits Radio', '[Bitrate: 128]  ', 'http://77.67.106.2:10157', '', '', 3, 128, 0, 1, '2011-08-11', 4731, 30, NULL, 0), \
-('Frequence India', 'India radio [Bitrate: 128]', 'http://94.23.120.121:80', '', '', 0, 128, 0, 1, '2011-08-11', 4738, 27, NULL, 0), \
-('VOLKSMUSIKNET', ' [Bitrate: 128]  ', 'http://208.53.158.48:8188', '', '', 51, 128, 0, 1, '2011-08-11', 4739, 7, NULL, 0), \
-('Radio MilleniuM Manele', '[Bitrate: 128]  ', 'http://195.60.77.239:9000', '', '', 0, 128, 0, 1, '2011-08-11', 4740, 29, NULL, 0), \
-('DANCEGROOVE.RADIO', '[Bitrate: 128]', 'http://46.4.78.207:12160', '', '', 4, 128, 0, 1, '2011-08-11', 4741, 8, NULL, 0), \
-('ByblosRadio.com', '[Bitrate: 128]  ', 'http://72.13.86.83:443', '', '', 0, 128, 0, 1, '2011-08-11', 4742, 7, NULL, 0), \
-('GotRadio - New Age', '[Bitrate: 128] ', 'http://64.62.164.196:2348', '', '', 0, 128, 0, 1, '2011-08-11', 4744, 7, NULL, 0), \
-('CLUBsoundz.FM WEBRADIO - HOUSE', ' TRANCE', 'http://87.118.112.38:8000', '', '', 41, 128, 0, 1, '2011-08-11', 4745, 8, NULL, 0), \
-('GotRadio - Classic Country', '[Bitrate: 128] ', 'http://64.202.109.70:80', '', '', 0, 128, 0, 1, '2011-08-11', 4746, 7, NULL, 0), \
-('Only1', 'IN HOUSE WE TRUST - aux platines Damien J Carter  [Bitrate: 128]  ', 'http://88.191.64.200:9000', '', '', 0, 128, 0, 1, '2011-08-11', 4748, 4, NULL, 0), \
-('simply electronica', 'fresh musique 360 with deep phunk (27-05-2011) part 2  [Bitrate: 128]  ', 'http://62.146.7.155:8240', '', '', 0, 128, 0, 1, '2011-08-11', 4749, 8, NULL, 0), \
-('MixoTeka Radio', '[Bitrate: 128] [Max Listeners: 250]', 'http://88.198.44.24:8888', '', '', 0, 128, 0, 1, '2011-08-11', 4750, 8, NULL, 0), \
-('Renessans 94.2', '[Bitrate: 128] [Max Listeners: 800]', 'http://217.20.164.163:8014', '', '', 9, 128, 1, 1, '2011-08-11', 4751, 49, '2011-10-14 16:11:13', 0), \
-('Discofoxhimmel', '[Bitrate: 128] [Max Listeners: 550]', 'http://87.230.101.29:8000', '', '', 0, 128, 2, 1, '2011-08-11', 4752, 42, '2011-10-14 16:04:50', 0), \
-('Expressiv Fm', 'www.iaumuzica.com  [Bitrate: 128]  ', 'http://89.45.194.87:8000', '', '', 4, 128, 3, 1, '2011-08-11', 4753, 41, NULL, 0), \
-('ETN.fm ch2: House Stream', '[Bitrate: 128]  ', 'http://scfire-ntc-aa06.stream.aol.com:80/stream/1079', '', '', 0, 128, 0, 1, '2011-08-11', 4754, 7, NULL, 0), \
-('Najbolji Radio', 'radio-dijaspora.com ', 'http://188.40.107.251:9000', '', '', 51, 128, 0, 1, '2011-08-11', 4756, 8, NULL, 0), \
-('p s y r a d i o * f m - chillchannel', '[Bitrate: 128] [Max Listeners: 410]', 'http://81.88.36.42:8020', '', '', 0, 128, 0, 1, '2011-08-11', 4757, 8, NULL, 0), \
-('Cvrcak', '[Bitrate: 128]  ', 'http://46.4.113.188:8800', '', '', 51, 128, 0, 1, '2011-08-11', 4758, 8, NULL, 0), \
-('Radio Wish', 'Live Deejay Razvy  [Bitrate: 128]  ', 'http://195.60.77.201:6200', '', '', 4, 128, 0, 1, '2011-08-11', 4759, 29, NULL, 0), \
-('Radio Eska Bydgoszcz - 94', '4 FM - transmisje zapewnia firma MPI.PL ', 'http://91.121.166.33:9440', '', '', 0, 128, 0, 1, '2011-08-11', 4761, 4, NULL, 0), \
-('RTL Radio  Die besten Hits aller Zeiten', '  [Bitrate: 128] [Max Listeners: 205]', 'http://81.92.237.123:8080', '', '', 45, 128, 0, 1, '2011-08-11', 4762, 5, NULL, 0), \
-('Radio Beograd 1', '[Bitrate: 128] [Max Listeners: 2000]', 'http://195.252.107.194:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4763, 3, NULL, 0), \
-('Sodazaa Radio', '[Bitrate: 128]  ', 'http://103.22.181.124:8620', '', '', 45, 128, 0, 1, '2011-08-11', 4764, 7, NULL, 0), \
-('EBM Radio', 'Invincible Limit', 'http://87.106.138.241:7000', '', '', 0, 128, 0, 1, '2011-08-11', 4765, 7, NULL, 0), \
-('Technolovers.net', '[Bitrate: 128]', 'http://109.230.252.254:2010', '', '', 0, 128, 0, 1, '2011-08-11', 4766, 39, NULL, 0), \
-('Revolution Live', 'HarderRadio Hands Up Mix August 2009  [Bitrate: 128]', 'http://92.51.132.244:9999', '', '', 0, 128, 0, 1, '2011-08-11', 4767, 8, NULL, 0), \
-('GotRadio - Guitar Genius', '[Bitrate: 128] ', 'http://64.202.109.63:80', '', '', 0, 128, 0, 1, '2011-08-11', 4768, 7, NULL, 0), \
-('Soundset Plavi', '[Bitrate: 128]  ', 'http://92.48.127.99:9800', '', '', 0, 128, 0, 1, '2011-08-11', 4770, 27, NULL, 0), \
-('98 A Radio Rock', '98 A Radio Rock  [Bitrate: 128]  ', 'http://184.172.134.4:9400', '', '', 1, 128, 0, 1, '2011-08-11', 4771, 7, NULL, 0), \
-('Cavo Paradiso Radio', 'Sorry', 'http://85.17.122.212:8488', '', '', 0, 128, 0, 1, '2011-08-11', 4773, 6, NULL, 0), \
-('Hot Mix Radio', 'http://www.hotmixradiodance.fr [Bitrate: 128]', 'http://213.218.147.24:80', '', '', 0, 128, 0, 1, '2011-08-11', 4774, 4, NULL, 0), \
-('THE BLAZE', '[Bitrate: 128]  ', 'http://204.45.8.170:8057', '', '', 0, 128, 0, 1, '2011-08-11', 4775, 7, NULL, 0), \
-('Stryper', '[Bitrate: 128] [Max Listeners: 240]', 'http://207.210.88.138:5108', '', '', 0, 128, 0, 1, '2011-08-11', 4778, 27, NULL, 0), \
-('Your-Money', '', 'http://stream-01.pleinair.net:8110', '', 'Your-Money.png', 0, 0, 0, 1, '2011-11-11', 4780, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Plein-Air-991', '', 'http://stream-01.pleinair.net:8110', 'http://www.pleinair.net/', 'Radio-Plein-Air-991.png', 0, 0, 0, 1, '2011-11-11', 4781, 0, '2017-01-01 00:00:00', 0), \
-('Michael-Wolff', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Michael-Wolff.png', 0, 0, 0, 1, '2011-11-11', 4782, 0, '2017-01-01 00:00:00', 0), \
-('Food-Talk', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Food-Talk.png', 0, 0, 0, 1, '2011-11-11', 4783, 0, '2017-01-01 00:00:00', 0), \
-('WALG-1590-AM-News-Talk', '', 'http://housemusic1.com/housemusic1.m3u', '', 'WALG-1590-AM-News-Talk.png', 0, 0, 0, 1, '2011-11-11', 4784, 0, '2017-01-01 00:00:00', 0), \
-('House-Music1', 'We edit the extra long remixes so you are never more than 4 minutes away from a fresh new tune. It&#39;s all about keeping it fresh.<BR><BR> <BR><BR>We add new releases and remixes every weekend, so y', 'http://housemusic1.com/housemusic1.m3u', 'http://www.housemusic1.com', 'House-Music1.png', 0, 0, 0, 1, '2011-11-11', 4785, 0, '2017-01-01 00:00:00', 0), \
-('Just-Thinking', '', 'http://streamer.tcworks.net:8000/koll', '', 'Just-Thinking.png', 0, 0, 0, 1, '2011-11-11', 4786, 0, '2017-01-01 00:00:00', 0), \
-('The-River-1063', '', 'http://streamer.tcworks.net:8000/koll', 'http://www.fm1063theriver.com/', 'The-River-1063.png', 0, 0, 0, 1, '2011-11-11', 4787, 0, '2017-01-01 00:00:00', 0), \
-('The-Apartments', '', 'mms://nick9.surfernetwork.com/WMDM', '', 'The-Apartments.png', 0, 0, 0, 1, '2011-11-11', 4788, 0, '2017-01-01 00:00:00', 0), \
-('WISR-680', '', 'mms://nick9.surfernetwork.com/WMDM', 'http://www.wisr680.com/', 'WISR-680.png', 0, 0, 0, 1, '2011-11-11', 4789, 0, '2017-01-01 00:00:00', 0), \
-('Megadeth', '', 'mms://nick9.surfernetwork.com/WMDM', '', 'Megadeth.png', 0, 0, 0, 1, '2011-11-11', 4790, 0, '2017-01-01 00:00:00', 0), \
-('The-Rocket-977', '', 'mms://nick9.surfernetwork.com/WMDM', 'http://www.977therocket.com/', 'The-Rocket-977.png', 0, 0, 0, 1, '2011-11-11', 4791, 0, '2017-01-01 00:00:00', 0), \
-('Lonnie-Liston-Smith', '', 'mms://stream3.securenetsystems.net/WKHI', '', 'Lonnie-Liston-Smith.png', 0, 0, 0, 1, '2011-11-11', 4792, 0, '2017-01-01 00:00:00', 0), \
-('Hot-Country-1077', '', 'mms://stream3.securenetsystems.net/WKHI', 'http://www.hotcountry1077.com/', 'Hot-Country-1077.png', 0, 0, 0, 1, '2011-11-11', 4793, 0, '2017-01-01 00:00:00', 0), \
-('LMFAO', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'LMFAO.png', 0, 0, 0, 1, '2011-11-11', 4794, 0, '2017-01-01 00:00:00', 0), \
-('Dermot-OLeary', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Dermot-OLeary.png', 0, 0, 0, 1, '2011-11-11', 4795, 0, '2017-01-01 00:00:00', 0), \
-('WQKT-1045', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.wqkt.com/', 'WQKT-1045.png', 0, 0, 0, 1, '2011-11-11', 4796, 0, '2017-01-01 00:00:00', 0), \
-('Dionne-Bromfield', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Dionne-Bromfield.png', 0, 0, 0, 1, '2011-11-11', 4797, 0, '2017-01-01 00:00:00', 0), \
-('Allen-Shepard', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Allen-Shepard.png', 0, 0, 0, 1, '2011-11-11', 4798, 0, '2017-01-01 00:00:00', 0), \
-('Waddle--Silvy', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Waddle--Silvy.png', 0, 0, 0, 1, '2011-11-11', 4799, 0, '2017-01-01 00:00:00', 0), \
-('East-17', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'East-17.png', 0, 0, 0, 1, '2011-11-11', 4800, 0, '2017-01-01 00:00:00', 0), \
-('Paul-van-Dyk', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Paul-van-Dyk.png', 0, 0, 0, 1, '2011-11-11', 4801, 0, '2017-01-01 00:00:00', 0), \
-('Sports-Talk', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Sports-Talk.png', 0, 0, 0, 1, '2011-11-11', 4802, 0, '2017-01-01 00:00:00', 0), \
-('WFLA-540', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.540wfla.com/', 'WFLA-540.png', 0, 0, 0, 1, '2011-11-11', 4803, 0, '2017-01-01 00:00:00', 0), \
-('Kool-1027', 'The station is currently owned by Kershaw Radio Corporation and features programing from CNN Radio.<BR><BR>KOOL 102.7 FM (WPUB) and StarTime 1590 AM (WCAM) broadcasts 24 hours a day from Kershaw Count', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.kool1027.com/', 'Kool-1027.png', 0, 0, 0, 1, '2011-11-11', 4804, 0, '2017-01-01 00:00:00', 0), \
-('Pixie-Lott', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Pixie-Lott.png', 0, 0, 0, 1, '2011-11-11', 4805, 0, '2017-01-01 00:00:00', 0), \
-('KMIX-1063', 'KMIX 106.3 is all about the Antelope Valley. KMIX 106.3 plays The Best Mix of the 80s, 90s, and Today', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.kmix1063.com/', 'KMIX-1063.png', 0, 0, 0, 1, '2011-11-11', 4806, 0, '2017-01-01 00:00:00', 0), \
-('Raven-Symon', '', 'http://rs1.radiostreamer.com:8070/', '', 'Raven-Symon.png', 0, 0, 0, 1, '2011-11-11', 4807, 0, '2017-01-01 00:00:00', 0), \
-('Cheverus-vs-Biddeford-Oct-8-2011', '', 'http://rs1.radiostreamer.com:8070/', '', 'Cheverus-vs-Biddeford-Oct-8-2011.png', 0, 0, 0, 1, '2011-11-11', 4808, 0, '2017-01-01 00:00:00', 0), \
-('NonStop80s-Radio', 'It does what is says on the tin, NonStop 80&#39;s music all day, everyday... this is nonstop80s.net!<BR><BR>The decade that brought us the Rubik&#39;s cube, the PC, shoulder pads, Dallas, Mobile Phone', 'http://rs1.radiostreamer.com:8070/', 'http://www.nonstop80s.net/', 'NonStop80s-Radio.png', 0, 0, 0, 1, '2011-11-11', 4809, 0, '2017-01-01 00:00:00', 0), \
-('The-Rooftop-Singers', '', 'http://in.icy2.abacast.com/cherrycreek-kpqam-32.m3u', '', 'The-Rooftop-Singers.png', 0, 0, 0, 1, '2011-11-11', 4810, 0, '2017-01-01 00:00:00', 0), \
-('KPQ-560', '', 'http://in.icy2.abacast.com/cherrycreek-kpqam-32.m3u', 'http://www.kpq.com/', 'KPQ-560.png', 0, 0, 0, 1, '2011-11-11', 4811, 0, '2017-01-01 00:00:00', 0), \
-('The-God-Show', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', '', 'The-God-Show.png', 0, 0, 0, 1, '2011-11-11', 4812, 0, '2017-01-01 00:00:00', 0), \
-('WRJW-1320', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.wrjw.com/', 'WRJW-1320.png', 0, 0, 0, 1, '2011-11-11', 4813, 0, '2017-01-01 00:00:00', 0), \
-('Jozi-FM-1058', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.jozifm.co.za/', 'Jozi-FM-1058.png', 0, 0, 0, 1, '2011-11-11', 4814, 0, '2017-01-01 00:00:00', 0), \
-('KBAD-920', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://werlv.com/pages/1695802.php', 'KBAD-920.png', 0, 0, 0, 1, '2011-11-11', 4815, 0, '2017-01-01 00:00:00', 0), \
-('Y98-St-Louis-981', 'Y98 St. Louis is a Hot AC radio station based in St. Louis, MO.  Y98 St. Louis can be heard at radio.com', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.y98.com/', 'Y98-St-Louis-981.png', 0, 0, 0, 1, '2011-11-11', 4816, 0, '2017-01-01 00:00:00', 0), \
-('Beyond-Beyond-is-Beyond', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', '', 'Beyond-Beyond-is-Beyond.png', 0, 0, 0, 1, '2011-11-11', 4817, 0, '2017-01-01 00:00:00', 0), \
-('KCEO-1000', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.kceoradio.com/', 'KCEO-1000.png', 0, 0, 0, 1, '2011-11-11', 4818, 0, '2017-01-01 00:00:00', 0), \
-('Lee-Konitz', '', 'http://icy2.abacast.com/sunrise-wrmrfmaac-32.m3u', '', 'Lee-Konitz.png', 0, 0, 0, 1, '2011-11-11', 4819, 0, '2017-01-01 00:00:00', 0), \
-('Modern-Rock-987', '', 'http://icy2.abacast.com/sunrise-wrmrfmaac-32.m3u', 'http://www.modernrock987.com/', 'Modern-Rock-987.png', 0, 0, 0, 1, '2011-11-11', 4820, 0, '2017-01-01 00:00:00', 0), \
-('WJML-1110', '', 'mms://streamer2.securenetsystems.net/WJML', 'http://www.wjml.com', 'WJML-1110.png', 0, 0, 0, 1, '2011-11-11', 4821, 0, '2017-01-01 00:00:00', 0), \
-('WLRS-1051', '', 'http://in.icy2.abacast.com/mainline-wlrsfm-32.m3u', 'http://www.wlrs.com/', 'WLRS-1051.png', 0, 0, 0, 1, '2011-11-11', 4822, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Class-FM-1033', '', 'http://www.sztarnet.hu/ClassFM/mp3_adas_1.m3u', 'http://www.classfm.hu/', 'Radio-Class-FM-1033.png', 0, 0, 0, 1, '2011-11-11', 4823, 0, '2017-01-01 00:00:00', 0), \
-('Krokus', '', 'http://oraclebroadcasting.com/64k.pls', '', 'Krokus.png', 0, 0, 0, 1, '2011-11-11', 4824, 0, '2017-01-01 00:00:00', 0), \
-('Netzradio Germania', '[Bitrate: 128]  ', 'http://85.25.148.195:1488', '', '', 0, 128, 0, 1, '2011-08-11', 4825, 41, NULL, 0), \
-('Oracle-Broadcasting', 'The Oracle Broadcasting Radio Network strives to be the, &quot;The Home Of Cutting Edge Talk Radio.&quot; Oracle Broadcasting streams the best uncensored talk radio, geared to freedom and liberty mind', 'http://oraclebroadcasting.com/64k.pls', 'http://www.oraclebroadcasting.com/', 'Oracle-Broadcasting.png', 0, 0, 0, 1, '2011-11-11', 4826, 0, '2017-01-01 00:00:00', 0), \
-('NOVA-fm-914', 'Danmarks st&#248;rste kommercielle radiostation. Danmarks eneste landsd&#230;kkende kommercielle radiostation.', 'http://stream.novafm.dk/nova128', 'http://novafm.dk/', 'NOVA-fm-914.png', 0, 0, 0, 1, '2011-11-11', 4827, 0, '2017-01-01 00:00:00', 0), \
-('KUUL-1013', '', 'http://wmc1.den.liquidcompass.net/WUBEFM', 'http://www.kuul.com/', 'KUUL-1013.png', 0, 0, 0, 1, '2011-11-11', 4828, 0, '2017-01-01 00:00:00', 0), \
-('Vinyl-107-1071', '', 'http://lon.icy.abacast.com/sbsradiosweden-sbsradiosweden6-64.m3u', 'http://www.vinyl107.se/', 'Vinyl-107-1071.png', 0, 0, 0, 1, '2011-11-11', 4830, 0, '2017-01-01 00:00:00', 0), \
-('Dark-Section-Radio', '[Bitrate: 128]  ', 'http://78.46.62.121:8000', '', '', 0, 128, 0, 1, '2011-08-11', 4831, 8, NULL, 0), \
-('The-Wave-1037', '', 'http://www.jazz.fm/streaming/JAZZFM91.pls', '', 'The-Wave-1037.png', 0, 0, 0, 1, '2011-11-11', 4832, 0, '2017-01-01 00:00:00', 0), \
-('JAZZFM91-911', 'JAZZ.FM91 is Canada&#39;s Premier Jazz Radio Station, broadcasting all the best in jazz music, interviews, documentaries, news, and events 24 hours a day, 7 days a week, across Southern Ontario and We', 'http://www.jazz.fm/streaming/JAZZFM91.pls', 'http://www.jazz.fm/', 'JAZZFM91-911.png', 0, 0, 0, 1, '2011-11-11', 4833, 0, '2017-01-01 00:00:00', 0), \
-('The-Drive-1005', '', 'http://202.129.186.43:7028/', 'http://www.mydrivefm.com/', 'The-Drive-1005.png', 0, 0, 0, 1, '2011-11-11', 4834, 0, '2017-01-01 00:00:00', 0), \
-('Super-Hits-106-1061', '', 'http://202.129.186.43:7028/', 'http://www.superhits106.com/', 'Super-Hits-106-1061.png', 0, 0, 0, 1, '2011-11-11', 4835, 0, '2017-01-01 00:00:00', 0), \
-('Cheryl-Adams', '', 'http://202.129.186.43:7028/', '', 'Cheryl-Adams.png', 0, 0, 0, 1, '2011-11-11', 4836, 0, '2017-01-01 00:00:00', 0), \
-('La-X-1039', '', 'http://50.23.239.20:8719', 'http://www.laxmasmusica.com/', 'La-X-1039.png', 0, 0, 0, 1, '2011-11-11', 4837, 0, '2017-01-01 00:00:00', 0), \
-('Cobra-Starship', '', 'http://50.23.239.20:8719', '', 'Cobra-Starship.png', 0, 0, 0, 1, '2011-11-11', 4838, 0, '2017-01-01 00:00:00', 0), \
-('CRM-Happy-Radio-1014', 'Emittente siciliana che trasmette programmi di notizie, rubriche, e musica.', 'http://www.crmhappyradio.it/playlist.pls', 'http://www.crmhappyradio.it/', 'CRM-Happy-Radio-1014.png', 0, 0, 0, 1, '2011-11-11', 4839, 0, '2017-01-01 00:00:00', 0), \
-('SEN-Sports-1116', '', 'http://sen1116.conexim.com.au/sen1116_16.asx', 'http://www.sen.com.au/', 'SEN-Sports-1116.png', 0, 0, 0, 1, '2011-11-11', 4840, 0, '2017-01-01 00:00:00', 0), \
-('MortalFm Dancefloor Radio', '  [Bitrate: 128]  ', 'http://91.121.139.150:8044', '', '', 4, 128, 0, 1, '2011-08-11', 4842, 4, NULL, 0), \
-('Miguel', '', 'http://sen1116.conexim.com.au/sen1116_16.asx', '', 'Miguel.png', 0, 0, 0, 1, '2011-11-11', 4843, 0, '2017-01-01 00:00:00', 0), \
-('GamerFM', '', 'http://www.gamer.fm/radio/listen.pls', 'http://www.gamer.fm/', 'GamerFM.png', 0, 0, 0, 1, '2011-11-11', 4844, 0, '2017-01-01 00:00:00', 0), \
-('WCBC-1270', 'WCBC 1270 AM radio was founded in April, 1976.', 'http://public.wavepanel.net/QZP70NUEWONVG4Y8/listen/m3u', 'http://www.wcbcradio.com/', 'WCBC-1270.png', 0, 0, 0, 1, '2011-11-11', 4845, 0, '2017-01-01 00:00:00', 0), \
-('Energy-FM-Romania', 'Classic Dance and the best new Music', 'http://www.energyfm.ro/energy.m3u', 'http://www.energyfm.ro/', 'Energy-FM-Romania.png', 0, 0, 0, 1, '2011-11-11', 4846, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Now-973', '', 'http://www.energyfm.ro/energy.m3u', 'http://www.973radionow.com/', 'Radio-Now-973.png', 0, 0, 0, 1, '2011-11-11', 4847, 0, '2017-01-01 00:00:00', 0), \
-('Llewod-71', '', 'http://www.energyfm.ro/energy.m3u', '', 'Llewod-71.png', 0, 0, 0, 1, '2011-11-11', 4848, 0, '2017-01-01 00:00:00', 0), \
-('KVON-1440', '', 'http://www.energyfm.ro/energy.m3u', 'http://www.kvon.com/', 'KVON-1440.png', 0, 0, 0, 1, '2011-11-11', 4849, 0, '2017-01-01 00:00:00', 0), \
-('Truth-for-Life-Weekend', '', 'http://www.energyfm.ro/energy.m3u', '', 'Truth-for-Life-Weekend.png', 0, 0, 0, 1, '2011-11-11', 4850, 0, '2017-01-01 00:00:00', 0), \
-('Old-School-945', '', 'http://www.energyfm.ro/energy.m3u', 'http://oldschool945.com/', 'Old-School-945.png', 0, 0, 0, 1, '2011-11-11', 4851, 0, '2017-01-01 00:00:00', 0), \
-('Power-107-1075', '', 'http://www.energyfm.ro/energy.m3u', 'http://www.power1075.com/', 'Power-107-1075.png', 0, 0, 0, 1, '2011-11-11', 4852, 0, '2017-01-01 00:00:00', 0), \
-('Majic-1049', '', 'http://www.energyfm.ro/energy.m3u', 'http://www.kmjm.com/', 'Majic-1049.png', 0, 0, 0, 1, '2011-11-11', 4853, 0, '2017-01-01 00:00:00', 0), \
-('The-Zone-1150', '', 'http://www.energyfm.ro/energy.m3u', 'http://www.kzne.com/', 'The-Zone-1150.png', 0, 0, 0, 1, '2011-11-11', 4854, 0, '2017-01-01 00:00:00', 0), \
-('FM-Palulun-762', '', 'http://www.simulradio.jp/asx/FmPalulun.asx', 'http://www.fmpalulun.co.jp/', 'FM-Palulun-762.png', 0, 0, 0, 1, '2011-11-11', 4855, 0, '2017-01-01 00:00:00', 0), \
-('The-Beatles-Brunch', '', 'http://www.simulradio.jp/asx/FmPalulun.asx', '', 'The-Beatles-Brunch.png', 0, 0, 0, 1, '2011-11-11', 4856, 0, '2017-01-01 00:00:00', 0), \
-('The-Buzz-945', '', 'http://www.simulradio.jp/asx/FmPalulun.asx', 'http://www.thebuzz.com/', 'The-Buzz-945.png', 0, 0, 0, 1, '2011-11-11', 4857, 0, '2017-01-01 00:00:00', 0), \
-('WEES-LP-1079', '', 'http://www.live365.com/play/wees', 'http://www.wees.org/', 'WEES-LP-1079.png', 0, 0, 0, 1, '2011-11-11', 4858, 0, '2017-01-01 00:00:00', 0), \
-('Bolt-Thrower', '', 'http://www.live365.com/play/wees', '', 'Bolt-Thrower.png', 0, 0, 0, 1, '2011-11-11', 4859, 0, '2017-01-01 00:00:00', 0), \
-('Radio-101-1010', '', 'http://audio.radio101.lv/aac-hq.m3u', 'http://www.radio101.lv', 'Radio-101-1010.png', 0, 0, 0, 1, '2011-11-11', 4860, 0, '2017-01-01 00:00:00', 0), \
-('Rocky-FM', 'Hier spielen exklusiv die gr&#246;&#223;ten Rocksongs aller Zeiten; von Alanis Morissette, Bryan Adams, Bon Jovi, Tom Petty bis zu Fleetwood Mac sowie die neuesten und besten Rocksongs von Maroon 5, D', 'http://www.rockyfm.de/listen.asx', 'http://www.rockyfm.de/', 'Rocky-FM.png', 0, 0, 0, 1, '2011-11-11', 4861, 0, '2017-01-01 00:00:00', 0), \
-('Old-School-Freight-Train', '', 'http://www.rockyfm.de/listen.asx', '', 'Old-School-Freight-Train.png', 0, 0, 0, 1, '2011-11-11', 4862, 0, '2017-01-01 00:00:00', 0), \
-('KXPN-1460', '', 'http://online.audiohauler.com/load/live/kxpn1.asx', 'http://www.espnsuperstation.com/', 'KXPN-1460.png', 0, 0, 0, 1, '2011-11-11', 4863, 0, '2017-01-01 00:00:00', 0), \
-('Freddie-Hubbard', '', 'http://online.audiohauler.com/load/live/kxpn1.asx', '', 'Freddie-Hubbard.png', 0, 0, 0, 1, '2011-11-11', 4864, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-Sports-Radio-900', '', 'http://1.ice1.sa.streamaudio.com:8000/wmop_am.aac', 'http://www.espngo1.com/', 'ESPN-Sports-Radio-900.png', 0, 0, 0, 1, '2011-11-11', 4865, 0, '2017-01-01 00:00:00', 0), \
-('WTBC-1230', '', 'http://1.ice1.sa.streamaudio.com:8000/wmop_am.aac', 'http://www.wtbc1230.com/', 'WTBC-1230.png', 0, 0, 0, 1, '2011-11-11', 4866, 0, '2017-01-01 00:00:00', 0), \
-('WWIS-FM-997', 'Tune to FM 99.7 for all of your classic country favorites. AND don&#39;t miss coverage of your favorite local sports teams plus Badger Football and Basketball, NFL Football and Brewers Baseball.', 'http://www.shinyrock.com/wwisradio.asx', 'http://www.wwisradio.com/', 'WWIS-FM-997.png', 0, 0, 0, 1, '2011-11-11', 4867, 0, '2017-01-01 00:00:00', 0), \
-('Progressive-Radio-Network', 'Progressive Radio Network is the thinking person', 'http://216.55.165.146:8000', 'http://www.progressiveradionetwork.com/', 'Progressive-Radio-Network.png', 0, 0, 0, 1, '2011-11-11', 4868, 0, '2017-01-01 00:00:00', 0), \
-('Nostalgie-Soul-Party', '', 'http://94.23.16.31:8000/SOUL.mp3', 'http://www.nostalgie.be/', 'Nostalgie-Soul-Party.png', 0, 0, 0, 1, '2011-11-11', 4869, 0, '2017-01-01 00:00:00', 0), \
-('Talk-Radio-1023', '', 'http://94.23.16.31:8000/SOUL.mp3', 'http://wgow.com/fm/', 'Talk-Radio-1023.png', 0, 0, 0, 1, '2011-11-11', 4870, 0, '2017-01-01 00:00:00', 0), \
-('KURY-910', '', 'http://94.23.16.31:8000/SOUL.mp3', 'http://www.kuryradio.com/', 'KURY-910.png', 0, 0, 0, 1, '2011-11-11', 4871, 0, '2017-01-01 00:00:00', 0), \
-('Bloodhound-Gang', '', 'http://94.23.16.31:8000/SOUL.mp3', '', 'Bloodhound-Gang.png', 0, 0, 0, 1, '2011-11-11', 4872, 0, '2017-01-01 00:00:00', 0), \
-('Radio-10-Gold-80s-Hits', '', 'http://82.201.100.23/WEB05-R10G-80sHits.m3u', 'http://www.radio10gold.nl/', 'Radio-10-Gold-80s-Hits.png', 0, 0, 0, 1, '2011-11-11', 4873, 0, '2017-01-01 00:00:00', 0), \
-('Heligoats', '', 'http://82.201.100.23/WEB05-R10G-80sHits.m3u', '', 'Heligoats.png', 0, 0, 0, 1, '2011-11-11', 4874, 0, '2017-01-01 00:00:00', 0), \
-('Rizen-Radio', 'Top 40 Style Christian Music. Rock~Pop~Priase &amp; Worship~Reggae~Country!  Get Undignified!', 'http://ice3.securenetsystems.net:80/RIZEN', 'http://www.rizenradio.com/', 'Rizen-Radio.png', 0, 0, 0, 1, '2011-11-11', 4875, 0, '2017-01-01 00:00:00', 0), \
-('WRNR-740', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.talkradiowrnr.com/', 'WRNR-740.png', 0, 0, 0, 1, '2011-11-11', 4876, 0, '2017-01-01 00:00:00', 0), \
-('Hot-957', 'HOT 95-7 is Houston&#39;s hottest new radio station for ALL the hottest hits! This is the new generation of radio that YOU control. Lady Gaga, Ke$ha Usher, Rihanna, Katy Perry and more! If it&#39;s HO', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.hothits957.com/', 'Hot-957.png', 0, 0, 0, 1, '2011-11-11', 4877, 0, '2017-01-01 00:00:00', 0), \
-('Kathy-Wagner', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'Kathy-Wagner.png', 0, 0, 0, 1, '2011-11-11', 4878, 0, '2017-01-01 00:00:00', 0), \
-('Christian-Legal-Concepts', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'Christian-Legal-Concepts.png', 0, 0, 0, 1, '2011-11-11', 4879, 0, '2017-01-01 00:00:00', 0), \
-('Emery', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'Emery.png', 0, 0, 0, 1, '2011-11-11', 4880, 0, '2017-01-01 00:00:00', 0), \
-('KNSI-1450', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.1450knsi.com/', 'KNSI-1450.png', 0, 0, 0, 1, '2011-11-11', 4881, 0, '2017-01-01 00:00:00', 0), \
-('News-Radio-550', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://wsva.valleyradio.com/', 'News-Radio-550.png', 0, 0, 0, 1, '2011-11-11', 4882, 0, '2017-01-01 00:00:00', 0), \
-('WLTN-FM-967', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'WLTN-FM-967.png', 0, 0, 0, 1, '2011-11-11', 4883, 0, '2017-01-01 00:00:00', 0), \
-('The-Sports-Fix', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'The-Sports-Fix.png', 0, 0, 0, 1, '2011-11-11', 4884, 0, '2017-01-01 00:00:00', 0), \
-('The-Coyote-1079', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.1079thecoyote.com/', 'The-Coyote-1079.png', 0, 0, 0, 1, '2011-11-11', 4886, 0, '2017-01-01 00:00:00', 0), \
-('X-103-1033', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.x103.com/', 'X-103-1033.png', 0, 0, 0, 1, '2011-11-11', 4887, 0, '2017-01-01 00:00:00', 0), \
-('Through-The-Night', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'Through-The-Night.png', 0, 0, 0, 1, '2011-11-11', 4888, 0, '2017-01-01 00:00:00', 0), \
-('KKLX-961', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'KKLX-961.png', 0, 0, 0, 1, '2011-11-11', 4889, 0, '2017-01-01 00:00:00', 0), \
-('Destinys-Child', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', '', 'Destinys-Child.png', 0, 0, 0, 1, '2011-11-11', 4890, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-FM-931', '', 'mms://mediaserver.citynet.net/WRNRRadioLive', 'http://www.ksii.com/', 'Kiss-FM-931.png', 0, 0, 0, 1, '2011-11-11', 4891, 0, '2017-01-01 00:00:00', 0), \
-('StylzFM-961', '', 'http://stylzfm.primcast.com:6756/', 'http://www.stylzfm.com/', 'StylzFM-961.png', 0, 0, 0, 1, '2011-11-11', 4892, 0, '2017-01-01 00:00:00', 0), \
-('KRXK-1230', '', 'http://stylzfm.primcast.com:6756/', '', 'KRXK-1230.png', 0, 0, 0, 1, '2011-11-11', 4893, 0, '2017-01-01 00:00:00', 0), \
-('Kass-FM-891', '', 'http://media.kassfm.co.ke:8006/live', 'http://www.kassfm.co.ke/', 'Kass-FM-891.png', 0, 0, 0, 1, '2011-11-11', 4894, 0, '2017-01-01 00:00:00', 0), \
-('Virgin-Radio-Club', '', 'http://vipicecast.yacast.net/vra_webradio03.m3u', 'http://www.virginradio.fr/', 'Virgin-Radio-Club.png', 0, 0, 0, 1, '2011-11-11', 4895, 0, '2017-01-01 00:00:00', 0), \
-('KONP-1450', '', 'mms://nick9.surfernetwork.com/KONP', 'http://www.konp.com/', 'KONP-1450.png', 0, 0, 0, 1, '2011-11-11', 4896, 0, '2017-01-01 00:00:00', 0), \
-('Full-Service-1340', '', 'mms://nick9.surfernetwork.com/KONP', 'http://www.kgfw.com', 'Full-Service-1340.png', 0, 0, 0, 1, '2011-11-11', 4897, 0, '2017-01-01 00:00:00', 0), \
-('Fear-My-Thoughts', '', 'mms://nick9.surfernetwork.com/KONP', '', 'Fear-My-Thoughts.png', 0, 0, 0, 1, '2011-11-11', 4898, 0, '2017-01-01 00:00:00', 0), \
-('WDCB-909', 'Chicago&#39;s jazz station!  WDCB 90.9fm Public Radio broadcasts 24/7: jazz, blues, acoustic/Americana music and news to Chicago, Northeastern Illinois and the world via our iTunes and Windows Media P', 'http://wdcb-ice.streamguys.org/wdcb.m3u', 'http://www.wdcb.org/', 'WDCB-909.png', 0, 0, 0, 1, '2011-11-11', 4899, 0, '2017-01-01 00:00:00', 0), \
-('System-of-a-Down', '', 'http://wdcb-ice.streamguys.org/wdcb.m3u', '', 'System-of-a-Down.png', 0, 0, 0, 1, '2011-11-11', 4900, 0, '2017-01-01 00:00:00', 0), \
-('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 4901, 0, '2011-10-14 16:00:16', 0), \
-('Radio-Stotis-1008', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.raduga.lt/', 'Radio-Stotis-1008.png', 0, 0, 0, 1, '2011-11-11', 4903, 0, '2017-01-01 00:00:00', 0), \
-('Q1047', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.q1047.com/', 'Q1047.png', 0, 0, 0, 1, '2011-11-11', 4904, 0, '2017-01-01 00:00:00', 0), \
-('Jokoan', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Jokoan.png', 0, 0, 0, 1, '2011-11-11', 4905, 0, '2017-01-01 00:00:00', 0), \
-('Hank-FM-971', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.hankfm.com/', 'Hank-FM-971.png', 0, 0, 0, 1, '2011-11-11', 4906, 0, '2017-01-01 00:00:00', 0), \
-('Real-Golf-Radio', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Real-Golf-Radio.png', 0, 0, 0, 1, '2011-11-11', 4907, 0, '2017-01-01 00:00:00', 0), \
-('Bethel-Missionary-Baptist-Church', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Bethel-Missionary-Baptist-Church.png', 0, 0, 0, 1, '2011-11-11', 4908, 0, '2017-01-01 00:00:00', 0), \
-('The-Clark-Howard-Show', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'The-Clark-Howard-Show.png', 0, 0, 0, 1, '2011-11-11', 4909, 0, '2017-01-01 00:00:00', 0), \
-('Power-1069', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.power1069fm.com/', 'Power-1069.png', 0, 0, 0, 1, '2011-11-11', 4910, 0, '2017-01-01 00:00:00', 0), \
-('Snoop-Dogg', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Snoop-Dogg.png', 0, 0, 0, 1, '2011-11-11', 4911, 0, '2017-01-01 00:00:00', 0), \
-('KTLK-1150', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.ktlkam1150.com/', 'KTLK-1150.png', 0, 0, 0, 1, '2011-11-11', 4912, 0, '2017-01-01 00:00:00', 0), \
-('The-Stranglers', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'The-Stranglers.png', 0, 0, 0, 1, '2011-11-11', 4913, 0, '2017-01-01 00:00:00', 0), \
-('Max-FM-1023', '', 'http://ice2.securenetsystems.net:80/WDQX', 'http://1023maxfm.com/', 'Max-FM-1023.png', 0, 0, 0, 1, '2011-11-11', 4914, 0, '2017-01-01 00:00:00', 0), \
-('Incognito', '', 'http://ice2.securenetsystems.net:80/WDQX', '', 'Incognito.png', 0, 0, 0, 1, '2011-11-11', 4915, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-987', '', 'http://ice5.securenetsystems.net:80/KKST', 'http://www.kiss987.fm/', 'Kiss-987.png', 0, 0, 0, 1, '2011-11-11', 4916, 0, '2017-01-01 00:00:00', 0), \
-('Living-Natural-First', '', 'http://ice5.securenetsystems.net:80/KKST', '', 'Living-Natural-First.png', 0, 0, 0, 1, '2011-11-11', 4917, 0, '2017-01-01 00:00:00', 0), \
-('Our-Lady-Peace', '', 'http://ice5.securenetsystems.net:80/KKST', '', 'Our-Lady-Peace.png', 0, 0, 0, 1, '2011-11-11', 4918, 0, '2017-01-01 00:00:00', 0), \
-('AVF-Speed-Shop', '', 'http://ice5.securenetsystems.net:80/KKST', '', 'AVF-Speed-Shop.png', 0, 0, 0, 1, '2011-11-11', 4919, 0, '2017-01-01 00:00:00', 0), \
-('RTL-2-Guadeloupe-1062', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.rtl2antilles.fr/', 'RTL-2-Guadeloupe-1062.png', 0, 0, 0, 1, '2011-11-11', 4920, 0, '2017-01-01 00:00:00', 0), \
-('Conversations-at-the-Well', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Conversations-at-the-Well.png', 0, 0, 0, 1, '2011-11-11', 4921, 0, '2017-01-01 00:00:00', 0), \
-('Minnie-Riperton', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Minnie-Riperton.png', 0, 0, 0, 1, '2011-11-11', 4922, 0, '2017-01-01 00:00:00', 0), \
-('Tony-Dibbin', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Tony-Dibbin.png', 0, 0, 0, 1, '2011-11-11', 4923, 0, '2017-01-01 00:00:00', 0), \
-('KJQS-1230', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.thefansports.com/', 'KJQS-1230.png', 0, 0, 0, 1, '2011-11-11', 4924, 0, '2017-01-01 00:00:00', 0), \
-('Ben-E-King', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Ben-E-King.png', 0, 0, 0, 1, '2011-11-11', 4927, 0, '2017-01-01 00:00:00', 0), \
-('Les-McCann', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Les-McCann.png', 0, 0, 0, 1, '2011-11-11', 4928, 0, '2017-01-01 00:00:00', 0), \
-('Decapitated', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Decapitated.png', 0, 0, 0, 1, '2011-11-11', 4929, 0, '2017-01-01 00:00:00', 0), \
-('The-Ronettes', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'The-Ronettes.png', 0, 0, 0, 1, '2011-11-11', 4930, 0, '2017-01-01 00:00:00', 0), \
-('News-Talk-550', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wdun.com/', 'News-Talk-550.png', 0, 0, 0, 1, '2011-11-11', 4932, 0, '2017-01-01 00:00:00', 0), \
-('KQNG-570', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'KQNG-570.png', 0, 0, 0, 1, '2011-11-11', 4933, 0, '2017-01-01 00:00:00', 0), \
-('Spiller', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Spiller.png', 0, 0, 0, 1, '2011-11-11', 4934, 0, '2017-01-01 00:00:00', 0), \
-('The-Weekend-Countdown', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'The-Weekend-Countdown.png', 0, 0, 0, 1, '2011-11-11', 4935, 0, '2017-01-01 00:00:00', 0), \
-('WOR-710', 'Founded in 1922, WOR 710 HD is New York&#39;s oldest, privately-owned and continuously-operated radio station.  As the top talk radio station in the country, it has continually made history with its a', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wor710.com/', 'WOR-710.png', 0, 0, 0, 1, '2011-11-11', 4936, 0, '2017-01-01 00:00:00', 0), \
-('Eddie-Lockjaw-Davis', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Eddie-Lockjaw-Davis.png', 0, 0, 0, 1, '2011-11-11', 4937, 0, '2017-01-01 00:00:00', 0), \
-('WPFP-980', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wnbiam.com/', 'WPFP-980.png', 0, 0, 0, 1, '2011-11-11', 4938, 0, '2017-01-01 00:00:00', 0), \
-('Puddle-of-Mudd', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Puddle-of-Mudd.png', 0, 0, 0, 1, '2011-11-11', 4939, 0, '2017-01-01 00:00:00', 0), \
-('Australia128', 'Australia128 plays a variety of rare album tracks,new indie bands and solo artists from around the world, and tracks that were discovered by alternative music experts on American, European or Australi', 'http://listen.radionomy.com/australia128', 'http://www.radionomy.com/en/radio/australia128', 'Australia128.png', 0, 0, 0, 1, '2011-11-11', 4940, 0, '2017-01-01 00:00:00', 0), \
-('KLLE-1079', '', 'http://listen.radionomy.com/australia128', 'http://www.univision.com/content/channel.jhtml?chid=9542&amp;schid=9553', 'KLLE-1079.png', 0, 0, 0, 1, '2011-11-11', 4941, 0, '2017-01-01 00:00:00', 0), \
-('Fun-Radio-943', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.funradio.sk/', 'Fun-Radio-943.png', 0, 0, 0, 1, '2011-11-11', 4942, 0, '2017-01-01 00:00:00', 0), \
-('WAEB-790', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.waeb.com/', 'WAEB-790.png', 0, 0, 0, 1, '2011-11-11', 4944, 0, '2017-01-01 00:00:00', 0), \
-('KTZN-950', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.550thezone.com/', 'KTZN-950.png', 0, 0, 0, 1, '2011-11-11', 4945, 0, '2017-01-01 00:00:00', 0), \
-('Kim-Waters', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Kim-Waters.png', 0, 0, 0, 1, '2011-11-11', 4946, 0, '2017-01-01 00:00:00', 0), \
-('WKFN-540', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'WKFN-540.png', 0, 0, 0, 1, '2011-11-11', 4947, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Programming', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Gospel-Programming.png', 0, 0, 0, 1, '2011-11-11', 4948, 0, '2017-01-01 00:00:00', 0), \
-('WSYY-1240', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.themountain949.com/', 'WSYY-1240.png', 0, 0, 0, 1, '2011-11-11', 4949, 0, '2017-01-01 00:00:00', 0), \
-('Cold', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Cold.png', 0, 0, 1, 1, '2011-11-11', 4950, 0, '2011-10-11 21:27:52', 0), \
-('1CLUBFM--90s-Pop-Hits', 'Hip-Hop and R&amp;B hits of the 90s.', 'http://wms-19.streamsrus.com/90s-aac', 'http://www.1club.fm/', '1CLUBFM--90s-Pop-Hits.png', 0, 0, 0, 1, '2011-11-11', 4951, 0, '2017-01-01 00:00:00', 0), \
-('The-Show-With-No-Name', '', 'http://wms-19.streamsrus.com/90s-aac', '', 'The-Show-With-No-Name.png', 0, 0, 0, 1, '2011-11-11', 4952, 0, '2017-01-01 00:00:00', 0), \
-('Morning-Sports-Center', '', 'http://wms-19.streamsrus.com/90s-aac', '', 'Morning-Sports-Center.png', 0, 0, 0, 1, '2011-11-11', 4953, 0, '2017-01-01 00:00:00', 0), \
-('1CLUBFM--90s-Dance--Beyond', '', 'http://wms-19.streamsrus.com/90sdance-aac', 'http://1club.fm/', '1CLUBFM--90s-Dance--Beyond.png', 0, 0, 0, 1, '2011-11-11', 4954, 0, '2017-01-01 00:00:00', 0), \
-('WCRK-1150', 'Since 1947 the Lakeway Area&#39;s Leading Full Service News &amp; Information Station', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', 'http://www.wcrk.com/', 'WCRK-1150.png', 0, 0, 0, 1, '2011-11-11', 4955, 0, '2017-01-01 00:00:00', 0), \
-('All-Night-With-Jason-Smith', '', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', '', 'All-Night-With-Jason-Smith.png', 0, 0, 1, 1, '2011-11-11', 4957, 0, '2011-10-14 15:59:43', 0), \
-('Eurythmics', '', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', '', 'Eurythmics.png', 0, 0, 0, 1, '2011-11-11', 4958, 0, '2017-01-01 00:00:00', 0), \
-('NRJ-90s', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', 'http://www.energyzueri.ch/', 'NRJ-90s.png', 0, 0, 0, 1, '2011-11-11', 4959, 0, '2017-01-01 00:00:00', 0);";
+('RADIODISCOPOLO.FM', ' radio ZET', 'http://94.23.36.107:443', '', '', 0, 128, 0, 1, '2011-08-11', 4652, 4, NULL, 1), \
+('LOLLIRADIO ITALIA ', '[Bitrate: 128]', 'http://94.23.67.172:8010', '', '', 0, 128, 0, 1, '2011-08-11', 4669, 26, NULL, 1), \
+('Sharmanka 104.0 Kiev', '[Bitrate: 128]', 'http://217.20.164.163:8006', '', '', 0, 128, 1, 1, '2011-08-11', 4673, 49, '2011-10-14 16:11:19', 1), \
+('JACK FM - ALL HIT RADIO', '[Bitrate: 128]', 'http://80.237.210.91:80', '', '', 0, 128, 0, 1, '2011-08-11', 4687, 8, NULL, 1), \
+('Folk Alley', 'FolkAlley.com  [Bitrate: 128]', 'http://66.225.205.8:80', '', '', 51, 128, 0, 1, '2011-08-11', 4698, 7, NULL, 1), \
+('Raggakings the 24-7', 'Bersenbrueck ReggaeJam 2011 - Ranking Joe  [Bitrate: 128] ', 'http://64.202.98.51:7970', '', '', 0, 128, 0, 1, '2011-08-11', 4702, 7, NULL, 1), \
+('Springsteenradio.com', '[Bitrate: 128]   ', 'http://67.212.166.178:9000', '', '', 21, 128, 0, 1, '2011-08-11', 4728, 7, NULL, 1), \
+('psyradio*fm', 'chillchannel [Bitrate: 128] [Max Listeners: 410]', 'http://81.88.36.42:8020', '', '', 0, 128, 0, 1, '2011-08-11', 4757, 8, NULL, 1), \
+('Radio Beograd 1', '[Bitrate: 128] [Max Listeners: 2000]', 'http://195.252.107.194:8002', '', '', 0, 128, 0, 1, '2011-08-11', 4763, 3, NULL, 1), \
+('Raven-Symon', '', 'http://rs1.radiostreamer.com:8070/', '', 'Raven-Symon.png', 0, 0, 0, 1, '2011-11-11', 4807, 0, '2017-01-01 00:00:00', 1), \
+('Cheverus-vs-Biddeford-Oct-8-2011', '', 'http://rs1.radiostreamer.com:8070/', '', 'Cheverus-vs-Biddeford-Oct-8-2011.png', 0, 0, 0, 1, '2011-11-11', 4808, 0, '2017-01-01 00:00:00', 1), \
+('Oracle-Broadcasting', 'The Oracle Broadcasting Radio Network strives to be the, &quot;The Home Of Cutting Edge Talk Radio.&quot; Oracle Broadcasting streams the best uncensored talk radio, geared to freedom and liberty mind', 'http://oraclebroadcasting.com/64k.pls', 'http://www.oraclebroadcasting.com/', 'Oracle-Broadcasting.png', 0, 0, 0, 1, '2011-11-11', 4826, 0, '2017-01-01 00:00:00', 1), \
+('NOVA-fm', 'Danmarks st&#248;rste kommercielle radiostation.', 'http://stream.novafm.dk/nova128', 'http://novafm.dk/', 'NOVA-fm-914.png', 0, 0, 0, 1, '2011-11-11', 4827, 0, '2017-01-01 00:00:00', 1), \
+('Rocky-FM', 'Hier spielen exklusiv die gr&#246;&#223;ten Rocksongs aller Zeiten; von Alanis Morissette, Bryan Adams, Bon Jovi, Tom Petty bis zu Fleetwood Mac sowie die neuesten und besten Rocksongs von Maroon 5, D', 'http://www.rockyfm.de/listen.asx', 'http://www.rockyfm.de/', 'Rocky-FM.png', 0, 0, 0, 1, '2011-11-11', 4861, 0, '2017-01-01 00:00:00', 1), \
+('Old-School-Freight-Train', '', 'http://www.rockyfm.de/listen.asx', '', 'Old-School-Freight-Train.png', 0, 0, 0, 1, '2011-11-11', 4862, 0, '2017-01-01 00:00:00', 1), \
+('WWIS-FM-997', 'Tune to FM 99.7 for all of your classic country favorites. AND don&#39;t miss coverage of your favorite local sports teams plus Badger Football and Basketball, NFL Football and Brewers Baseball.', 'http://www.shinyrock.com/wwisradio.asx', 'http://www.wwisradio.com/', 'WWIS-FM-997.png', 0, 0, 0, 1, '2011-11-11', 4867, 0, '2017-01-01 00:00:00', 1), \
+('Progressive-Radio-Network', 'Progressive Radio Network is the thinking person', 'http://216.55.165.146:8000', 'http://www.progressiveradionetwork.com/', 'Progressive-Radio-Network.png', 0, 0, 0, 1, '2011-11-11', 4868, 0, '2017-01-01 00:00:00', 1), \
+('Kass-FM-891', '', 'http://media.kassfm.co.ke:8006/live', 'http://www.kassfm.co.ke/', 'Kass-FM-891.png', 0, 0, 0, 1, '2011-11-11', 4894, 0, '2017-01-01 00:00:00', 1), \
+('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 4901, 0, '2011-10-14 16:00:16', 1), \
+('RTL-2-Guadeloupe-1062', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.rtl2antilles.fr/', 'RTL-2-Guadeloupe-1062.png', 0, 0, 0, 1, '2011-11-11', 4920, 0, '2017-01-01 00:00:00', 1), \
+('Fun-Radio-943', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.funradio.sk/', 'Fun-Radio-943.png', 0, 0, 0, 1, '2011-11-11', 4942, 0, '2017-01-01 00:00:00', 1), \
+('WAEB-790', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.waeb.com/', 'WAEB-790.png', 0, 0, 0, 1, '2011-11-11', 4944, 0, '2017-01-01 00:00:00', 1), \
+('KTZN-950', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.550thezone.com/', 'KTZN-950.png', 0, 0, 0, 1, '2011-11-11', 4945, 0, '2017-01-01 00:00:00', 1), \
+('Kim-Waters', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Kim-Waters.png', 0, 0, 0, 1, '2011-11-11', 4946, 0, '2017-01-01 00:00:00', 1);";
+
+
+
+
+// check radio her fra og frem
+
 
 
 
 
 const char *radio_station_setupsql12="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('1003-KILT', '100.3 KILT gives Houstonians Real Country Variety.  KILT plays the best of country music from great artists like George Strait, Tim McGraw, Faith Hill, Kenny Chesney, Carrie Underwood, Keith Urban, Al', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', 'http://www.kilt.com/', '1003-KILT.png', 0, 0, 0, 1, '2011-11-11', 4960, 0, '2017-01-01 00:00:00', 0), \
-('Washington-Redskins-Post-Game-Show', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'Washington-Redskins-Post-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 4961, 0, '2017-01-01 00:00:00', 0), \
-('Superchick', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'Superchick.png', 0, 0, 0, 1, '2011-11-11', 4963, 0, '2017-01-01 00:00:00', 0), \
-('The-Opening-Drive', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'The-Opening-Drive.png', 0, 0, 0, 1, '2011-11-11', 4964, 0, '2017-01-01 00:00:00', 0), \
-('KUVO-HD2-893', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', 'http://www.kuvo.org/hd2', 'KUVO-HD2-893.png', 0, 0, 0, 1, '2011-11-11', 4965, 0, '2017-01-01 00:00:00', 0), \
-('Big-Sean', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', '', 'Big-Sean.png', 0, 0, 0, 1, '2011-11-11', 4966, 0, '2017-01-01 00:00:00', 0), \
-('The-Killers', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', '', 'The-Killers.png', 0, 0, 0, 1, '2011-11-11', 4967, 0, '2017-01-01 00:00:00', 0), \
-('Act', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', '', 'Act.png', 0, 0, 0, 1, '2011-11-11', 4968, 0, '2017-01-01 00:00:00', 0), \
-('WAME-550', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', 'http://mycountrylegends.com', 'WAME-550.png', 0, 0, 0, 1, '2011-11-11', 4969, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Islam-1548', '', 'http://listenlive-c2d1.ndstream.net/', 'http://radioislam.orgza.info/a/', 'Radio-Islam-1548.png', 0, 0, 0, 1, '2011-11-11', 4970, 0, '2017-01-01 00:00:00', 0), \
-('Ring-Talk', '', 'http://listenlive-c2d1.ndstream.net/', '', 'Ring-Talk.png', 0, 0, 0, 1, '2011-11-11', 4971, 0, '2017-01-01 00:00:00', 0), \
-('HockeyCentral', '', 'http://listenlive-c2d1.ndstream.net/', '', 'HockeyCentral.png', 0, 0, 0, 1, '2011-11-11', 4972, 0, '2017-01-01 00:00:00', 0), \
-('Vintage-Classic-Rock', '', 'http://listenlive-c2d1.ndstream.net/', '', 'Vintage-Classic-Rock.png', 0, 0, 0, 1, '2011-11-11', 4973, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Schlag-Fertig', 'Gute Musik und Spannung', 'http://bdsm-radio.de/extpop/rsf.m3u', 'http://www.bdsm-radio.de/front.php', 'Radio-Schlag-Fertig.png', 0, 0, 0, 1, '2011-11-11', 4974, 0, '2017-01-01 00:00:00', 0), \
-('3WK-Classic-Undergroundradio', 'The independent choice for indie, 80&#39;s/90&#39;s and classic rock.', 'http://sc.3wk.com:8500', 'http://www.3wk.com/', '3WK-Classic-Undergroundradio.png', 0, 0, 0, 1, '2011-11-11', 4975, 0, '2017-01-01 00:00:00', 0), \
-('KWDQ-1023', '', 'http://sc.3wk.com:8500', 'http://www.purerockq102.com', 'KWDQ-1023.png', 0, 0, 0, 1, '2011-11-11', 4976, 0, '2017-01-01 00:00:00', 0), \
-('WSOX-961', '', 'mms://live.cumulusstreaming.com/WSOX-FM', 'http://www.961wsox.com/', 'WSOX-961.png', 0, 0, 0, 1, '2011-11-11', 4978, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Gem-Show', '', 'mms://live.cumulusstreaming.com/WSOX-FM', '', 'Gospel-Gem-Show.png', 0, 0, 0, 1, '2011-11-11', 4979, 0, '2017-01-01 00:00:00', 0), \
-('Absolute-Radio-extra', '', 'mms://live.cumulusstreaming.com/WSOX-FM', 'http://www.absoluteradio.co.uk/extra/', 'Absolute-Radio-extra.png', 0, 0, 0, 1, '2011-11-11', 4980, 0, '2017-01-01 00:00:00', 0), \
-('UJFM-954', '', 'http://216.246.37.52:8022/', 'http://www.ujfm.co.za/', 'UJFM-954.png', 0, 0, 0, 1, '2011-11-11', 4981, 0, '2017-01-01 00:00:00', 0), \
-('Badlands-FM-947', '', 'http://ice5.securenetsystems.net:80/KBSO', 'http://www.badlandsfm.com/', 'Badlands-FM-947.png', 0, 0, 0, 1, '2011-11-11', 4982, 0, '2017-01-01 00:00:00', 0), \
-('FUV-Music-907', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', 'http://www.wfuv.org/programs/fuvmusic.html', 'FUV-Music-907.png', 0, 0, 0, 1, '2011-11-11', 4983, 0, '2017-01-01 00:00:00', 0), \
-('Todays-word-from-the-Church-of-the-Advent', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Todays-word-from-the-Church-of-the-Advent.png', 0, 0, 0, 1, '2011-11-11', 4984, 0, '2017-01-01 00:00:00', 0), \
-('Fontella-Bass', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Fontella-Bass.png', 0, 0, 0, 1, '2011-11-11', 4985, 0, '2017-01-01 00:00:00', 0), \
-('Steel-Breeze', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Steel-Breeze.png', 0, 0, 0, 1, '2011-11-11', 4986, 0, '2017-01-01 00:00:00', 0), \
-('Jennifer-Lopez', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Jennifer-Lopez.png', 0, 0, 0, 1, '2011-11-11', 4987, 0, '2017-01-01 00:00:00', 0), \
-('RSR-Espace-2-1008', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.rsr.ch/', 'RSR-Espace-2-1008.png', 0, 0, 0, 1, '2011-11-11', 4988, 0, '2017-01-01 00:00:00', 0), \
-('1061-BLI', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://wbli.com/', '1061-BLI.png', 0, 0, 0, 1, '2011-11-11', 4989, 0, '2017-01-01 00:00:00', 0), \
-('Marnie-T', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Marnie-T.png', 0, 0, 0, 1, '2011-11-11', 4991, 0, '2017-01-01 00:00:00', 0), \
-('KRTY-953', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.krty.com/', 'KRTY-953.png', 0, 0, 0, 1, '2011-11-11', 4992, 0, '2017-01-01 00:00:00', 0), \
-('The-Legend-1027', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.kscb.net/source/1027fm/index.html', 'The-Legend-1027.png', 0, 0, 0, 1, '2011-11-11', 4993, 0, '2017-01-01 00:00:00', 0), \
-('The-Fast-Lane', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'The-Fast-Lane.png', 0, 0, 0, 1, '2011-11-11', 4994, 0, '2017-01-01 00:00:00', 0), \
-('Future-Music', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Future-Music.png', 0, 0, 0, 1, '2011-11-11', 4995, 0, '2017-01-01 00:00:00', 0), \
-('Aly--AJ', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Aly--AJ.png', 0, 0, 0, 1, '2011-11-11', 4996, 0, '2017-01-01 00:00:00', 0), \
-('Scandal', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Scandal.png', 0, 0, 0, 1, '2011-11-11', 4997, 0, '2017-01-01 00:00:00', 0), \
-('Global-Policy-Radio-Broadcasts', 'Identify and eradicate root causes of human-created suffering. Pathways to authentic global advancement. Solutions to world hunger, education, money debt, health and medical, conflict and cooperation,', 'http://204.45.13.66:8075', 'http://humanitytest.org/global-policy-radio-broadcasts/', 'Global-Policy-Radio-Broadcasts.png', 0, 0, 0, 1, '2011-11-11', 4998, 0, '2017-01-01 00:00:00', 0), \
-('Antenne-Bayern-Classic-Rock-Live', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', 'http://www.antenne.de/', 'Antenne-Bayern-Classic-Rock-Live.png', 0, 0, 0, 1, '2011-11-11', 4999, 0, '2017-01-01 00:00:00', 0), \
-('Clemson-Tigers-at-Maryland', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', '', '', 0, 0, 0, 1, '2011-11-11', 5000, 0, '2017-01-01 00:00:00', 0), \
-('Golf-World-On-Air', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', '', 'Golf-World-On-Air.png', 0, 0, 0, 1, '2011-11-11', 5001, 0, '2017-01-01 00:00:00', 0), \
-('Sunny-1065', 'Sunny 106 is the station that picks you up and makes you feel good all day long with the 9-5 no repeat work day and the 70-80&#39;s lunch and so much more. Sunny is your local station.', 'mms://media1.ezstream.com/159404', 'http://www.sunny1065.fm/', 'Sunny-1065.png', 0, 0, 0, 1, '2011-11-11', 5002, 0, '2017-01-01 00:00:00', 0), \
-('KVI-570', '', 'http://www.ophanim.net:8500', 'http://www.kvi.com/', 'KVI-570.png', 0, 0, 0, 1, '2011-11-11', 5003, 0, '2017-01-01 00:00:00', 0), \
-('Hot-105-1051', '', 'http://www.ophanim.net:8500', 'http://hot105fm.com/', 'Hot-105-1051.png', 0, 0, 0, 1, '2011-11-11', 5004, 0, '2017-01-01 00:00:00', 0), \
-('KMOJ-899', '', 'http://sc1.abacast.com:8045', 'http://www.kmojfm.com/', 'KMOJ-899.png', 0, 0, 0, 1, '2011-11-11', 5005, 0, '2017-01-01 00:00:00', 0), \
-('The-Pain-Clinic', '', 'http://sc1.abacast.com:8045', '', 'The-Pain-Clinic.png', 0, 0, 0, 1, '2011-11-11', 5006, 0, '2017-01-01 00:00:00', 0), \
-('Tampa-Bay-Lightning-Audio', '', 'http://sc1.abacast.com:8045', '', 'Tampa-Bay-Lightning-Audio.png', 0, 0, 0, 1, '2011-11-11', 5007, 0, '2017-01-01 00:00:00', 0), \
-('Cee-Lo-Green', '', 'http://sc1.abacast.com:8045', '', 'Cee-Lo-Green.png', 0, 0, 0, 1, '2011-11-11', 5008, 0, '2017-01-01 00:00:00', 0), \
-('Mission-Network-News', '', 'http://sc1.abacast.com:8045', '', 'Mission-Network-News.png', 0, 0, 0, 1, '2011-11-11', 5009, 0, '2017-01-01 00:00:00', 0), \
-('Wisin--Yandel', '', 'http://sc1.abacast.com:8045', '', 'Wisin--Yandel.png', 0, 0, 0, 1, '2011-11-11', 5010, 0, '2017-01-01 00:00:00', 0), \
-('Hangover-Cafe', '', 'http://sc1.abacast.com:8045', '', 'Hangover-Cafe.png', 0, 0, 0, 1, '2011-11-11', 5011, 0, '2017-01-01 00:00:00', 0), \
-('96-FM-Bauru-969', 'A programa&#231;&#227;o da 96FM est&#225; em sintonia com tudo o que h&#225; de melhor no mundo da m&#250;sica. Sempre atenta aos lan&#231;amentos, a 96FM tamb&#233;m tem espa&#231;o para os ritmos do', 'http://78.159.112.72:8037', 'http://www.96fmbauru.com.br', '96-FM-Bauru-969.png', 0, 0, 0, 1, '2011-11-11', 5012, 0, '2017-01-01 00:00:00', 0), \
-('Q101-1007', '', 'http://78.159.112.72:8037', 'http://www.q101online.com/', 'Q101-1007.png', 0, 0, 0, 1, '2011-11-11', 5013, 0, '2017-01-01 00:00:00', 0), \
-('Talk-of-the-Nation', '', 'http://78.159.112.72:8037', '', 'Talk-of-the-Nation.png', 0, 0, 0, 1, '2011-11-11', 5014, 0, '2017-01-01 00:00:00', 0), \
-('CBSSportscom-Fantasy-Football-Podcast', '', 'http://78.159.112.72:8037', '', '', 0, 0, 0, 1, '2011-11-11', 5015, 0, '2017-01-01 00:00:00', 0), \
-('The-FOX-1037', '', 'http://78.159.112.72:8037', 'http://www.klkkfm.com/', 'The-FOX-1037.png', 0, 0, 0, 1, '2011-11-11', 5016, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Heartline-Bali-FM-922', '', 'http://202.129.186.43:7028/', 'http://www.heartline.co.id/', 'Radio-Heartline-Bali-FM-922.png', 0, 0, 0, 1, '2011-11-11', 5017, 0, '2017-01-01 00:00:00', 0), \
-('Moby', '', 'http://202.129.186.43:7028/', '', 'Moby.png', 0, 0, 0, 1, '2011-11-11', 5018, 0, '2017-01-01 00:00:00', 0), \
-('Kass-FM-891', '', 'http://media.kassfm.co.ke:8006/live', 'http://www.kassfm.co.ke/', 'Kass-FM-891.png', 0, 0, 0, 1, '2011-11-11', 5019, 0, '2017-01-01 00:00:00', 0), \
-('Virgin-Radio-Club', '', 'http://vipicecast.yacast.net/vra_webradio03.m3u', 'http://www.virginradio.fr/', 'Virgin-Radio-Club.png', 0, 0, 0, 1, '2011-11-11', 5020, 0, '2017-01-01 00:00:00', 0), \
-('KONP-1450', '', 'mms://nick9.surfernetwork.com/KONP', 'http://www.konp.com/', 'KONP-1450.png', 0, 0, 0, 1, '2011-11-11', 5021, 0, '2017-01-01 00:00:00', 0), \
-('Full-Service-1340', '', 'mms://nick9.surfernetwork.com/KONP', 'http://www.kgfw.com', 'Full-Service-1340.png', 0, 0, 0, 1, '2011-11-11', 5022, 0, '2017-01-01 00:00:00', 0), \
-('Fear-My-Thoughts', '', 'mms://nick9.surfernetwork.com/KONP', '', 'Fear-My-Thoughts.png', 0, 0, 0, 1, '2011-11-11', 5023, 0, '2017-01-01 00:00:00', 0), \
-('WDCB-909', 'Chicago&#39;s jazz station!  WDCB 90.9fm Public Radio broadcasts 24/7: jazz, blues, acoustic/Americana music and news to Chicago, Northeastern Illinois and the world via our iTunes and Windows Media P', 'http://wdcb-ice.streamguys.org/wdcb.m3u', 'http://www.wdcb.org/', 'WDCB-909.png', 0, 0, 0, 1, '2011-11-11', 5024, 0, '2017-01-01 00:00:00', 0), \
-('System-of-a-Down', '', 'http://wdcb-ice.streamguys.org/wdcb.m3u', '', 'System-of-a-Down.png', 0, 0, 0, 1, '2011-11-11', 5025, 0, '2017-01-01 00:00:00', 0), \
-('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 5026, 0, '2011-10-14 16:00:11', 0), \
-('Radio-Stotis-1008', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.raduga.lt/', 'Radio-Stotis-1008.png', 0, 0, 0, 1, '2011-11-11', 5028, 0, '2017-01-01 00:00:00', 0), \
-('Q1047', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.q1047.com/', 'Q1047.png', 0, 0, 0, 1, '2011-11-11', 5029, 0, '2017-01-01 00:00:00', 0), \
-('Jokoan', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Jokoan.png', 0, 0, 0, 1, '2011-11-11', 5030, 0, '2017-01-01 00:00:00', 0), \
-('Hank-FM-971', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.hankfm.com/', 'Hank-FM-971.png', 0, 0, 0, 1, '2011-11-11', 5031, 0, '2017-01-01 00:00:00', 0), \
-('Real-Golf-Radio', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Real-Golf-Radio.png', 0, 0, 0, 1, '2011-11-11', 5032, 0, '2017-01-01 00:00:00', 0), \
-('Bethel-Missionary-Baptist-Church', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Bethel-Missionary-Baptist-Church.png', 0, 0, 0, 1, '2011-11-11', 5033, 0, '2017-01-01 00:00:00', 0), \
-('The-Clark-Howard-Show', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'The-Clark-Howard-Show.png', 0, 0, 0, 1, '2011-11-11', 5034, 0, '2017-01-01 00:00:00', 0), \
-('Power-1069', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.power1069fm.com/', 'Power-1069.png', 0, 0, 0, 1, '2011-11-11', 5035, 0, '2017-01-01 00:00:00', 0), \
-('Snoop-Dogg', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'Snoop-Dogg.png', 0, 0, 0, 1, '2011-11-11', 5036, 0, '2017-01-01 00:00:00', 0), \
-('KTLK-1150', '', 'http://stream.raduga.lt/raduga/high.m3u', 'http://www.ktlkam1150.com/', 'KTLK-1150.png', 0, 0, 0, 1, '2011-11-11', 5037, 0, '2017-01-01 00:00:00', 0), \
-('The-Stranglers', '', 'http://stream.raduga.lt/raduga/high.m3u', '', 'The-Stranglers.png', 0, 0, 0, 1, '2011-11-11', 5038, 0, '2017-01-01 00:00:00', 0), \
-('Max-FM-1023', '', 'http://ice2.securenetsystems.net:80/WDQX', 'http://1023maxfm.com/', 'Max-FM-1023.png', 0, 0, 0, 1, '2011-11-11', 5039, 0, '2017-01-01 00:00:00', 0), \
-('Incognito', '', 'http://ice2.securenetsystems.net:80/WDQX', '', 'Incognito.png', 0, 0, 0, 1, '2011-11-11', 5040, 0, '2017-01-01 00:00:00', 0), \
-('Kiss-987', '', 'http://ice2.securenetsystems.net:80/WDQX', 'http://www.kiss987.fm/', 'Kiss-987.png', 0, 0, 0, 1, '2011-11-11', 5041, 0, '2017-01-01 00:00:00', 0), \
-('Living-Natural-First', '', 'http://ice2.securenetsystems.net:80/WDQX', '', 'Living-Natural-First.png', 0, 0, 0, 1, '2011-11-11', 5042, 0, '2017-01-01 00:00:00', 0), \
-('Our-Lady-Peace', '', 'http://ice2.securenetsystems.net:80/WDQX', '', 'Our-Lady-Peace.png', 0, 0, 0, 1, '2011-11-11', 5043, 0, '2017-01-01 00:00:00', 0), \
-('AVF-Speed-Shop', '', 'http://ice2.securenetsystems.net:80/WDQX', '', 'AVF-Speed-Shop.png', 0, 0, 0, 1, '2011-11-11', 5044, 0, '2017-01-01 00:00:00', 0), \
-('RTL-2-Guadeloupe-1062', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.rtl2antilles.fr/', 'RTL-2-Guadeloupe-1062.png', 0, 0, 0, 1, '2011-11-11', 5045, 0, '2017-01-01 00:00:00', 0), \
-('Conversations-at-the-Well', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Conversations-at-the-Well.png', 0, 0, 0, 1, '2011-11-11', 5046, 0, '2017-01-01 00:00:00', 0), \
-('Minnie-Riperton', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Minnie-Riperton.png', 0, 0, 0, 1, '2011-11-11', 5047, 0, '2017-01-01 00:00:00', 0), \
-('Tony-Dibbin', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Tony-Dibbin.png', 0, 0, 0, 1, '2011-11-11', 5048, 0, '2017-01-01 00:00:00', 0), \
-('KJQS-1230', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.thefansports.com/', 'KJQS-1230.png', 0, 0, 0, 1, '2011-11-11', 5049, 0, '2017-01-01 00:00:00', 0), \
-('The-Coyote-1027', '', 'http://stream3.securenetsystems.net:80/WZVN', 'http://www.1027thecoyote.com/', 'The-Coyote-1027.png', 0, 0, 0, 1, '2011-11-11', 5051, 0, '2017-01-01 00:00:00', 0), \
-('Ben-E-King', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Ben-E-King.png', 0, 0, 0, 1, '2011-11-11', 5052, 0, '2017-01-01 00:00:00', 0), \
-('Les-McCann', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Les-McCann.png', 0, 0, 0, 1, '2011-11-11', 5053, 0, '2017-01-01 00:00:00', 0), \
-('Decapitated', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Decapitated.png', 0, 0, 0, 1, '2011-11-11', 5054, 0, '2017-01-01 00:00:00', 0), \
-('The-Ronettes', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'The-Ronettes.png', 0, 0, 0, 1, '2011-11-11', 5055, 0, '2017-01-01 00:00:00', 0), \
-('Hot-Hot-Heat', '', 'http://stream3.securenetsystems.net:80/WZVN', '', 'Hot-Hot-Heat.png', 0, 0, 0, 1, '2011-11-11', 5056, 0, '2017-01-01 00:00:00', 0), \
-('News-Talk-550', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wdun.com/', 'News-Talk-550.png', 0, 0, 0, 1, '2011-11-11', 5057, 0, '2017-01-01 00:00:00', 0), \
-('KQNG-570', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'KQNG-570.png', 0, 0, 0, 1, '2011-11-11', 5058, 0, '2017-01-01 00:00:00', 0), \
-('Spiller', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Spiller.png', 0, 0, 0, 1, '2011-11-11', 5059, 0, '2017-01-01 00:00:00', 0), \
-('The-Weekend-Countdown', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'The-Weekend-Countdown.png', 0, 0, 0, 1, '2011-11-11', 5060, 0, '2017-01-01 00:00:00', 0), \
-('WOR-710', 'Founded in 1922, WOR 710 HD is New York&#39;s oldest, privately-owned and continuously-operated radio station.  As the top talk radio station in the country, it has continually made history with its a', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wor710.com/', 'WOR-710.png', 0, 0, 0, 1, '2011-11-11', 5061, 0, '2017-01-01 00:00:00', 0), \
-('Eddie-Lockjaw-Davis', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Eddie-Lockjaw-Davis.png', 0, 0, 0, 1, '2011-11-11', 5062, 0, '2017-01-01 00:00:00', 0), \
-('WPFP-980', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', 'http://www.wnbiam.com/', 'WPFP-980.png', 0, 0, 0, 1, '2011-11-11', 5063, 0, '2017-01-01 00:00:00', 0), \
-('Puddle-of-Mudd', '', 'mms://2.uni2.sa.streamaudio.com/WDUN_AM', '', 'Puddle-of-Mudd.png', 0, 0, 0, 1, '2011-11-11', 5064, 0, '2017-01-01 00:00:00', 0), \
-('Australia128', 'Australia128 plays a variety of rare album tracks,new indie bands and solo artists from around the world, and tracks that were discovered by alternative music experts on American, European or Australi', 'http://listen.radionomy.com/australia128', 'http://www.radionomy.com/en/radio/australia128', 'Australia128.png', 0, 0, 0, 1, '2011-11-11', 5065, 0, '2017-01-01 00:00:00', 0), \
-('KLLE-1079', '', 'http://listen.radionomy.com/australia128', 'http://www.univision.com/content/channel.jhtml?chid=9542&amp;schid=9553', 'KLLE-1079.png', 0, 0, 0, 1, '2011-11-11', 5066, 0, '2017-01-01 00:00:00', 0), \
-('Fun-Radio-943', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.funradio.sk/', 'Fun-Radio-943.png', 0, 0, 0, 1, '2011-11-11', 5067, 0, '2017-01-01 00:00:00', 0), \
-('Audio-Book-News', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Audio-Book-News.png', 0, 0, 0, 1, '2011-11-11', 5068, 0, '2017-01-01 00:00:00', 0), \
-('WAEB-790', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.waeb.com/', 'WAEB-790.png', 0, 0, 0, 1, '2011-11-11', 5069, 0, '2017-01-01 00:00:00', 0), \
-('KTZN-950', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.550thezone.com/', 'KTZN-950.png', 0, 0, 0, 1, '2011-11-11', 5070, 0, '2017-01-01 00:00:00', 0), \
-('Kim-Waters', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Kim-Waters.png', 0, 0, 0, 1, '2011-11-11', 5071, 0, '2017-01-01 00:00:00', 0), \
-('WKFN-540', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'WKFN-540.png', 0, 0, 0, 1, '2011-11-11', 5072, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Programming', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Gospel-Programming.png', 0, 0, 0, 1, '2011-11-11', 5073, 0, '2017-01-01 00:00:00', 0), \
-('WSYY-1240', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.themountain949.com/', 'WSYY-1240.png', 0, 0, 0, 1, '2011-11-11', 5074, 0, '2017-01-01 00:00:00', 0), \
-('Cold', '', 'http://stream.funradio.sk:8000/fun128.mp3', '', 'Cold.png', 0, 0, 0, 1, '2011-11-11', 5075, 0, '2017-01-01 00:00:00', 0), \
-('1CLUBFM--90s-Pop-Hits', 'Hip-Hop and R&amp;B hits of the 90s.', 'http://wms-19.streamsrus.com/90s-aac', 'http://www.1club.fm/', '1CLUBFM--90s-Pop-Hits.png', 0, 0, 0, 1, '2011-11-11', 5076, 0, '2017-01-01 00:00:00', 0), \
-('The-Show-With-No-Name', '', 'http://wms-19.streamsrus.com/90s-aac', '', 'The-Show-With-No-Name.png', 0, 0, 0, 1, '2011-11-11', 5077, 0, '2017-01-01 00:00:00', 0), \
-('Morning-Sports-Center', '', 'http://wms-19.streamsrus.com/90s-aac', '', 'Morning-Sports-Center.png', 0, 0, 0, 1, '2011-11-11', 5078, 0, '2017-01-01 00:00:00', 0), \
-('WCRK-1150', 'Since 1947 the Lakeway Area&#39;s Leading Full Service News &amp; Information Station', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', 'http://www.wcrk.com/', 'WCRK-1150.png', 0, 0, 0, 1, '2011-11-11', 5080, 0, '2017-01-01 00:00:00', 0), \
-('Home-Remedies', '', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', '', 'Home-Remedies.png', 0, 0, 0, 1, '2011-11-11', 5081, 0, '2017-01-01 00:00:00', 0), \
-('All-Night-With-Jason-Smith', '', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', '', 'All-Night-With-Jason-Smith.png', 0, 0, 0, 1, '2011-11-11', 5082, 0, '2017-01-01 00:00:00', 0), \
-('Eurythmics', '', 'http://74.254.184.30:85/broadwave.m3u?src=1&kbps=128', '', 'Eurythmics.png', 0, 0, 0, 1, '2011-11-11', 5083, 0, '2017-01-01 00:00:00', 0), \
-('NRJ-90s', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', 'http://www.energyzueri.ch/', 'NRJ-90s.png', 0, 0, 0, 1, '2011-11-11', 5084, 0, '2017-01-01 00:00:00', 0), \
-('1003-KILT', '100.3 KILT gives Houstonians Real Country Variety.  KILT plays the best of country music from great artists like George Strait, Tim McGraw, Faith Hill, Kenny Chesney, Carrie Underwood, Keith Urban, Al', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', 'http://www.kilt.com/', '1003-KILT.png', 0, 0, 0, 1, '2011-11-11', 5085, 0, '2017-01-01 00:00:00', 0), \
-('Washington-Redskins-Post-Game-Show', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'Washington-Redskins-Post-Game-Show.png', 0, 0, 0, 1, '2011-11-11', 5086, 0, '2017-01-01 00:00:00', 0), \
-('Dinner-Jazz', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'Dinner-Jazz.png', 0, 0, 1, 1, '2011-11-11', 5087, 0, '2011-10-17 23:43:45', 0), \
-('The-Opening-Drive', '', 'http://broadcast.infomaniak.ch/energy90s-high.mp3.m3u', '', 'The-Opening-Drive.png', 0, 0, 0, 1, '2011-11-11', 5088, 0, '2017-01-01 00:00:00', 0), \
-('KUVO-HD2-893', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', 'http://www.kuvo.org/hd2', 'KUVO-HD2-893.png', 0, 0, 0, 1, '2011-11-11', 5089, 0, '2017-01-01 00:00:00', 0), \
-('The-Killers', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', '', 'The-Killers.png', 0, 0, 0, 1, '2011-11-11', 5090, 0, '2017-01-01 00:00:00', 0), \
-('Act', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', '', 'Act.png', 0, 0, 0, 1, '2011-11-11', 5091, 0, '2017-01-01 00:00:00', 0), \
-('WAME-550', '', 'http://kuvo-ice.streamguys.org/kuvohd2-aac-64.m3u', 'http://mycountrylegends.com', 'WAME-550.png', 0, 0, 0, 1, '2011-11-11', 5092, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Islam-1548', '', 'http://listenlive-c2d1.ndstream.net/', 'http://radioislam.orgza.info/a/', 'Radio-Islam-1548.png', 0, 0, 0, 1, '2011-11-11', 5093, 0, '2017-01-01 00:00:00', 0), \
-('Ring-Talk', '', 'http://listenlive-c2d1.ndstream.net/', '', 'Ring-Talk.png', 0, 0, 0, 1, '2011-11-11', 5094, 0, '2017-01-01 00:00:00', 0), \
-('HockeyCentral', '', 'http://listenlive-c2d1.ndstream.net/', '', 'HockeyCentral.png', 0, 0, 0, 1, '2011-11-11', 5095, 0, '2017-01-01 00:00:00', 0), \
-('Vintage-Classic-Rock', '', 'http://listenlive-c2d1.ndstream.net/', '', 'Vintage-Classic-Rock.png', 0, 0, 0, 1, '2011-11-11', 5096, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Schlag-Fertig', 'Gute Musik und Spannung', 'http://bdsm-radio.de/extpop/rsf.m3u', 'http://www.bdsm-radio.de/front.php', 'Radio-Schlag-Fertig.png', 0, 0, 0, 1, '2011-11-11', 5097, 0, '2017-01-01 00:00:00', 0), \
-('3WK-Classic-Undergroundradio', 'The independent choice for indie, 80&#39;s/90&#39;s and classic rock.', 'http://sc.3wk.com:8500', 'http://www.3wk.com/', '3WK-Classic-Undergroundradio.png', 0, 0, 0, 1, '2011-11-11', 5098, 0, '2017-01-01 00:00:00', 0), \
-('KWDQ-1023', '', 'http://sc.3wk.com:8500', 'http://www.purerockq102.com', 'KWDQ-1023.png', 0, 0, 0, 1, '2011-11-11', 5099, 0, '2017-01-01 00:00:00', 0), \
-('WSOX-961', '', 'mms://live.cumulusstreaming.com/WSOX-FM', 'http://www.961wsox.com/', 'WSOX-961.png', 0, 0, 0, 1, '2011-11-11', 5101, 0, '2017-01-01 00:00:00', 0), \
-('Gospel-Gem-Show', '', 'mms://live.cumulusstreaming.com/WSOX-FM', '', 'Gospel-Gem-Show.png', 0, 0, 0, 1, '2011-11-11', 5102, 0, '2017-01-01 00:00:00', 0), \
-('Absolute-Radio-extra', '', 'mms://live.cumulusstreaming.com/WSOX-FM', 'http://www.absoluteradio.co.uk/extra/', 'Absolute-Radio-extra.png', 0, 0, 0, 1, '2011-11-11', 5103, 0, '2017-01-01 00:00:00', 0), \
-('UJFM-954', '', 'http://216.246.37.52:8022/', 'http://www.ujfm.co.za/', 'UJFM-954.png', 0, 0, 0, 1, '2011-11-11', 5104, 0, '2017-01-01 00:00:00', 0), \
-('Badlands-FM-947', '', 'http://ice5.securenetsystems.net:80/KBSO', 'http://www.badlandsfm.com/', 'Badlands-FM-947.png', 0, 0, 0, 1, '2011-11-11', 5105, 0, '2017-01-01 00:00:00', 0), \
-('FUV-Music-907', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', 'http://www.wfuv.org/programs/fuvmusic.html', 'FUV-Music-907.png', 0, 0, 0, 1, '2011-11-11', 5106, 0, '2017-01-01 00:00:00', 0), \
-('Todays-word-from-the-Church-of-the-Advent', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Todays-word-from-the-Church-of-the-Advent.png', 0, 0, 0, 1, '2011-11-11', 5107, 0, '2017-01-01 00:00:00', 0), \
-('Fontella-Bass', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Fontella-Bass.png', 0, 0, 0, 1, '2011-11-11', 5108, 0, '2017-01-01 00:00:00', 0), \
-('Steel-Breeze', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Steel-Breeze.png', 0, 0, 0, 1, '2011-11-11', 5109, 0, '2017-01-01 00:00:00', 0), \
-('Jennifer-Lopez', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Jennifer-Lopez.png', 0, 0, 0, 1, '2011-11-11', 5110, 0, '2017-01-01 00:00:00', 0), \
-('RSR-Espace-2-1008', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.rsr.ch/', 'RSR-Espace-2-1008.png', 0, 0, 0, 1, '2011-11-11', 5111, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1340', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.kata1340.com/', 'ESPN-1340.png', 0, 0, 0, 1, '2011-11-11', 5113, 0, '2017-01-01 00:00:00', 0), \
-('Marnie-T', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Marnie-T.png', 0, 0, 0, 1, '2011-11-11', 5114, 0, '2017-01-01 00:00:00', 0), \
-('KRTY-953', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.krty.com/', 'KRTY-953.png', 0, 0, 0, 1, '2011-11-11', 5115, 0, '2017-01-01 00:00:00', 0), \
-('The-Legend-1027', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', 'http://www.kscb.net/source/1027fm/index.html', 'The-Legend-1027.png', 0, 0, 0, 1, '2011-11-11', 5116, 0, '2017-01-01 00:00:00', 0), \
-('The-Fast-Lane', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'The-Fast-Lane.png', 0, 0, 0, 1, '2011-11-11', 5117, 0, '2017-01-01 00:00:00', 0), \
-('Future-Music', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Future-Music.png', 0, 0, 0, 1, '2011-11-11', 5118, 0, '2017-01-01 00:00:00', 0), \
-('Aly--AJ', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Aly--AJ.png', 0, 0, 0, 1, '2011-11-11', 5119, 0, '2017-01-01 00:00:00', 0), \
-('Scandal', '', 'http://broadcast.infomaniak.ch/rsr-espace2-high.mp3', '', 'Scandal.png', 0, 0, 0, 1, '2011-11-11', 5120, 0, '2017-01-01 00:00:00', 0), \
-('Global-Policy-Radio-Broadcasts', 'Identify and eradicate root causes of human-created suffering. Pathways to authentic global advancement. Solutions to world hunger, education, money debt, health and medical, conflict and cooperation,', 'http://204.45.13.66:8075', 'http://humanitytest.org/global-policy-radio-broadcasts/', 'Global-Policy-Radio-Broadcasts.png', 0, 0, 0, 1, '2011-11-11', 5121, 0, '2017-01-01 00:00:00', 0), \
-('Antenne-Bayern-Classic-Rock-Live', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', 'http://www.antenne.de/', 'Antenne-Bayern-Classic-Rock-Live.png', 0, 0, 0, 1, '2011-11-11', 5122, 0, '2017-01-01 00:00:00', 0), \
-('Clemson-Tigers-at-Maryland-Terrapins-Oct-15-2011', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', '', '', 0, 0, 0, 1, '2011-11-11', 5123, 0, '2017-01-01 00:00:00', 0), \
-('Golf-World-On-Air', '', 'http://www.antenne.de/webradio/channels/classic-rock-live.aac.pls', '', 'Golf-World-On-Air.png', 0, 0, 0, 1, '2011-11-11', 5124, 0, '2017-01-01 00:00:00', 0), \
-('Sunny-1065', 'Sunny 106 is the station that picks you up and makes you feel good all day long with the 9-5 no repeat work day and the 70-80&#39;s lunch and so much more. Sunny is your local station.', 'mms://media1.ezstream.com/159404', 'http://www.sunny1065.fm/', 'Sunny-1065.png', 0, 0, 0, 1, '2011-11-11', 5125, 0, '2017-01-01 00:00:00', 0), \
-('KVI-570', '', 'http://www.ophanim.net:8500', 'http://www.kvi.com/', 'KVI-570.png', 0, 0, 0, 1, '2011-11-11', 5126, 0, '2017-01-01 00:00:00', 0), \
-('Hot-105-1051', '', 'http://www.ophanim.net:8500', 'http://hot105fm.com/', 'Hot-105-1051.png', 0, 0, 0, 1, '2011-11-11', 5127, 0, '2017-01-01 00:00:00', 0), \
-('KMOJ-899', '', 'http://sc1.abacast.com:8045', 'http://www.kmojfm.com/', 'KMOJ-899.png', 0, 0, 0, 1, '2011-11-11', 5128, 0, '2017-01-01 00:00:00', 0), \
-('The-Pain-Clinic', '', 'http://sc1.abacast.com:8045', '', 'The-Pain-Clinic.png', 0, 0, 0, 1, '2011-11-11', 5129, 0, '2017-01-01 00:00:00', 0), \
-('Tampa-Bay-Lightning-Audio', '', 'http://sc1.abacast.com:8045', '', 'Tampa-Bay-Lightning-Audio.png', 0, 0, 0, 1, '2011-11-11', 5130, 0, '2017-01-01 00:00:00', 0), \
-('Cee-Lo-Green', '', 'http://sc1.abacast.com:8045', '', 'Cee-Lo-Green.png', 0, 0, 0, 1, '2011-11-11', 5131, 0, '2017-01-01 00:00:00', 0), \
-('Mission-Network-News', '', 'http://sc1.abacast.com:8045', '', 'Mission-Network-News.png', 0, 0, 0, 1, '2011-11-11', 5132, 0, '2017-01-01 00:00:00', 0), \
-('Wisin--Yandel', '', 'http://sc1.abacast.com:8045', '', 'Wisin--Yandel.png', 0, 0, 0, 1, '2011-11-11', 5133, 0, '2017-01-01 00:00:00', 0), \
-('Hangover-Cafe', '', 'http://sc1.abacast.com:8045', '', 'Hangover-Cafe.png', 0, 0, 0, 1, '2011-11-11', 5134, 0, '2017-01-01 00:00:00', 0), \
-('96-FM-Bauru-969', 'A programa&#231;&#227;o da 96FM est&#225; em sintonia com tudo o que h&#225; de melhor no mundo da m&#250;sica. Sempre atenta aos lan&#231;amentos, a 96FM tamb&#233;m tem espa&#231;o para os ritmos do', 'http://78.159.112.72:8037', 'http://www.96fmbauru.com.br', '96-FM-Bauru-969.png', 0, 0, 3, 1, '2011-11-11', 5135, 0, '2011-10-14 16:10:10', 0), \
-('Q101-1007', '', 'http://78.159.112.72:8037', 'http://www.q101online.com/', 'Q101-1007.png', 0, 0, 0, 1, '2011-11-11', 5136, 0, '2017-01-01 00:00:00', 0), \
-('Talk-of-the-Nation', '', 'http://78.159.112.72:8037', '', 'Talk-of-the-Nation.png', 0, 0, 0, 1, '2011-11-11', 5137, 0, '2017-01-01 00:00:00', 0), \
-('CBSSportscom-Fantasy-Football-Podcast', '', 'http://78.159.112.72:8037', '', '', 0, 0, 0, 1, '2011-11-11', 5138, 0, '2017-01-01 00:00:00', 0), \
-('The-FOX-1037', '', 'http://78.159.112.72:8037', 'http://www.klkkfm.com/', 'The-FOX-1037.png', 0, 0, 0, 1, '2011-11-11', 5139, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Heartline-Bali-FM-922', '', 'http://202.129.186.43:7028/', 'http://www.heartline.co.id/', 'Radio-Heartline-Bali-FM-922.png', 0, 0, 0, 1, '2011-11-11', 5140, 0, '2017-01-01 00:00:00', 0), \
-('Moby', '', 'http://202.129.186.43:7028/', '', 'Moby.png', 0, 0, 0, 1, '2011-11-11', 5141, 0, '2017-01-01 00:00:00', 0), \
-('Super-Hits-106-1061', '', 'http://202.129.186.43:7028/', 'http://www.superhits106.com/', 'Super-Hits-106-1061.png', 0, 0, 0, 1, '2011-11-11', 5143, 0, '2017-01-01 00:00:00', 0), \
-('The-Drive-1005', '', 'http://202.129.186.43:7028/', 'http://www.mydrivefm.com/', 'The-Drive-1005.png', 0, 0, 0, 1, '2011-11-11', 5144, 0, '2017-01-01 00:00:00', 0), \
-('JAZZFM91-911', 'JAZZ.FM91 is Canada&#39;s Premier Jazz Radio Station, broadcasting all the best in jazz music, interviews, documentaries, news, and events 24 hours a day, 7 days a week, across Southern Ontario and We', 'http://www.jazz.fm/streaming/JAZZFM91.pls', 'http://www.jazz.fm/', 'JAZZFM91-911.png', 0, 0, 0, 1, '2011-11-11', 5145, 0, '2017-01-01 00:00:00', 0), \
-('The-Wave-1037', '', 'http://www.jazz.fm/streaming/JAZZFM91.pls', '', 'The-Wave-1037.png', 0, 0, 0, 1, '2011-11-11', 5146, 0, '2017-01-01 00:00:00', 0), \
-('Vinyl-107-1071', '', 'http://lon.icy.abacast.com/sbsradiosweden-sbsradiosweden6-64.m3u', 'http://www.vinyl107.se/', 'Vinyl-107-1071.png', 0, 0, 0, 1, '2011-11-11', 5147, 0, '2017-01-01 00:00:00', 0), \
-('B-1051-FM', '', 'http://wmc1.den.liquidcompass.net/WUBEFM', 'http://www.b105.com/', 'B-1051-FM.png', 0, 0, 0, 1, '2011-11-11', 5148, 0, '2017-01-01 00:00:00', 0), \
-('KUUL-1013', '', 'http://wmc1.den.liquidcompass.net/WUBEFM', 'http://www.kuul.com/', 'KUUL-1013.png', 0, 0, 0, 1, '2011-11-11', 5149, 0, '2017-01-01 00:00:00', 0), \
-('NOVA-fm-914', 'Danmarks st&#248;rste kommercielle radiostation. Danmarks eneste landsd&#230;kkende kommercielle radiostation.', 'http://stream.novafm.dk/nova128', 'http://novafm.dk/', 'NOVA-fm-914.png', 0, 0, 0, 1, '2011-11-11', 5150, 0, '2017-01-01 00:00:00', 0), \
-('Oracle-Broadcasting', 'The Oracle Broadcasting Radio Network strives to be the, &quot;The Home Of Cutting Edge Talk Radio.&quot; Oracle Broadcasting streams the best uncensored talk radio, geared to freedom and liberty mind', 'http://oraclebroadcasting.com/64k.pls', 'http://www.oraclebroadcasting.com/', 'Oracle-Broadcasting.png', 0, 0, 0, 1, '2011-11-11', 5151, 0, '2017-01-01 00:00:00', 0), \
-('Krokus', '', 'http://oraclebroadcasting.com/64k.pls', '', 'Krokus.png', 0, 0, 0, 1, '2011-11-11', 5152, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Class-FM-1033', '', 'http://www.sztarnet.hu/ClassFM/mp3_adas_1.m3u', 'http://www.classfm.hu/', 'Radio-Class-FM-1033.png', 0, 0, 0, 1, '2011-11-11', 5153, 0, '2017-01-01 00:00:00', 0), \
-('WLRS-1051', '', 'http://in.icy2.abacast.com/mainline-wlrsfm-32.m3u', 'http://www.wlrs.com/', 'WLRS-1051.png', 0, 0, 0, 1, '2011-11-11', 5154, 0, '2017-01-01 00:00:00', 0), \
-('WJML-1110', '', 'mms://streamer2.securenetsystems.net/WJML', 'http://www.wjml.com', 'WJML-1110.png', 0, 0, 0, 1, '2011-11-11', 5155, 0, '2017-01-01 00:00:00', 0), \
-('Modern-Rock-987', '', 'http://icy2.abacast.com/sunrise-wrmrfmaac-32.m3u', 'http://www.modernrock987.com/', 'Modern-Rock-987.png', 0, 0, 0, 1, '2011-11-11', 5156, 0, '2017-01-01 00:00:00', 0), \
-('Lee-Konitz', '', 'http://icy2.abacast.com/sunrise-wrmrfmaac-32.m3u', '', 'Lee-Konitz.png', 0, 0, 0, 1, '2011-11-11', 5157, 0, '2017-01-01 00:00:00', 0), \
-('KCEO-1000', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.kceoradio.com/', 'KCEO-1000.png', 0, 0, 0, 1, '2011-11-11', 5158, 0, '2017-01-01 00:00:00', 0), \
-('Beyond-Beyond-is-Beyond', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', '', 'Beyond-Beyond-is-Beyond.png', 0, 0, 0, 1, '2011-11-11', 5159, 0, '2017-01-01 00:00:00', 0), \
-('Y98-St-Louis-981', 'Y98 St. Louis is a Hot AC radio station based in St. Louis, MO.', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.y98.com/', 'Y98-St-Louis-981.png', 0, 0, 0, 1, '2011-11-11', 5160, 0, '2017-01-01 00:00:00', 0), \
-('KBAD-920', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://werlv.com/pages/1695802.php', 'KBAD-920.png', 0, 0, 0, 1, '2011-11-11', 5161, 0, '2017-01-01 00:00:00', 0), \
-('Jozi-FM-1058', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.jozifm.co.za/', 'Jozi-FM-1058.png', 0, 0, 0, 1, '2011-11-11', 5162, 0, '2017-01-01 00:00:00', 0), \
-('WRJW-1320', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', 'http://www.wrjw.com/', 'WRJW-1320.png', 0, 0, 0, 1, '2011-11-11', 5163, 0, '2017-01-01 00:00:00', 0), \
-('The-God-Show', '', 'http://tuner1.dc1.sonixtream.com/playlists/premium1000/premium1000KCEO.asx', '', 'The-God-Show.png', 0, 0, 0, 1, '2011-11-11', 5164, 0, '2017-01-01 00:00:00', 0), \
-('KPQ-560', '', 'http://in.icy2.abacast.com/cherrycreek-kpqam-32.m3u', 'http://www.kpq.com/', 'KPQ-560.png', 0, 0, 0, 1, '2011-11-11', 5165, 0, '2017-01-01 00:00:00', 0), \
-('The-Rooftop-Singers', '', 'http://in.icy2.abacast.com/cherrycreek-kpqam-32.m3u', '', 'The-Rooftop-Singers.png', 0, 0, 0, 1, '2011-11-11', 5166, 0, '2017-01-01 00:00:00', 0), \
-('NonStop80s-Radio', 'It does what is says on the tin, NonStop 80&#39;s music all day, everyday... this is nonstop80s.net!<BR><BR>The decade that brought us the Rubik&#39;s cube, the PC, shoulder pads, Dallas, Mobile Phone', 'http://rs1.radiostreamer.com:8070/', 'http://www.nonstop80s.net/', 'NonStop80s-Radio.png', 0, 0, 0, 1, '2011-11-11', 5167, 0, '2017-01-01 00:00:00', 0), \
-('Cheverus-vs-Biddeford-Oct-8-2011', '', 'http://rs1.radiostreamer.com:8070/', '', 'Cheverus-vs-Biddeford-Oct-8-2011.png', 0, 0, 0, 1, '2011-11-11', 5168, 0, '2017-01-01 00:00:00', 0), \
-('Raven-Symone', '', 'http://rs1.radiostreamer.com:8070/', '', 'Raven-Symone.png', 0, 0, 0, 1, '2011-11-11', 5169, 0, '2017-01-01 00:00:00', 0), \
-('KMIX-1063', 'KMIX 106.3 is all about the Antelope Valley.', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.kmix1063.com/', 'KMIX-1063.png', 0, 0, 0, 1, '2011-11-11', 5170, 0, '2017-01-01 00:00:00', 0), \
-('Pixie-Lott', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Pixie-Lott.png', 0, 0, 0, 1, '2011-11-11', 5171, 0, '2017-01-01 00:00:00', 0), \
-('Kool-1027', 'The station is currently owned by Kershaw Radio Corporation and features programing from CNN Radio.<BR><BR>KOOL 102.7 FM (WPUB) and StarTime 1590 AM (WCAM) broadcasts 24 hours a day from Kershaw Count', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.kool1027.com/', 'Kool-1027.png', 0, 0, 0, 1, '2011-11-11', 5172, 0, '2017-01-01 00:00:00', 0), \
-('WFLA-540', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.540wfla.com/', 'WFLA-540.png', 0, 0, 0, 1, '2011-11-11', 5173, 0, '2017-01-01 00:00:00', 0), \
-('Sports-Talk', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Sports-Talk.png', 0, 0, 0, 1, '2011-11-11', 5174, 0, '2017-01-01 00:00:00', 0), \
-('Paul-van-Dyk', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Paul-van-Dyk.png', 0, 0, 0, 1, '2011-11-11', 5175, 0, '2017-01-01 00:00:00', 0), \
-('East-17', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'East-17.png', 0, 0, 0, 1, '2011-11-11', 5176, 0, '2017-01-01 00:00:00', 0), \
-('Waddle--Silvy', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Waddle--Silvy.png', 0, 0, 0, 1, '2011-11-11', 5177, 0, '2017-01-01 00:00:00', 0), \
-('Allen-Shepard', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Allen-Shepard.png', 0, 0, 0, 1, '2011-11-11', 5178, 0, '2017-01-01 00:00:00', 0), \
-('Dionne-Bromfield', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Dionne-Bromfield.png', 0, 0, 0, 1, '2011-11-11', 5179, 0, '2017-01-01 00:00:00', 0), \
-('WQKT-1045', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', 'http://www.wqkt.com/', 'WQKT-1045.png', 0, 0, 0, 1, '2011-11-11', 5180, 0, '2017-01-01 00:00:00', 0), \
-('Dermot-OLeary', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'Dermot-OLeary.png', 0, 0, 0, 1, '2011-11-11', 5181, 0, '2017-01-01 00:00:00', 0), \
-('LMFAO', '', 'mms://wms.edgecastcdn.net/200185/KGMXFM', '', 'LMFAO.png', 0, 0, 0, 1, '2011-11-11', 5182, 0, '2017-01-01 00:00:00', 0), \
-('Hot-Country-1077', '', 'mms://stream3.securenetsystems.net/WKHI', 'http://www.hotcountry1077.com/', 'Hot-Country-1077.png', 0, 0, 0, 1, '2011-11-11', 5183, 0, '2017-01-01 00:00:00', 0), \
-('Lonnie-Liston-Smith', '', 'mms://stream3.securenetsystems.net/WKHI', '', 'Lonnie-Liston-Smith.png', 0, 0, 0, 1, '2011-11-11', 5184, 0, '2017-01-01 00:00:00', 0), \
-('The-Rocket-977', '', 'mms://nick9.surfernetwork.com/WMDM', 'http://www.977therocket.com/', 'The-Rocket-977.png', 0, 0, 0, 1, '2011-11-11', 5185, 0, '2017-01-01 00:00:00', 0), \
-('Megadeth', '', 'mms://nick9.surfernetwork.com/WMDM', '', 'Megadeth.png', 0, 0, 0, 1, '2011-11-11', 5186, 0, '2017-01-01 00:00:00', 0), \
-('WISR-680', '', 'mms://nick9.surfernetwork.com/WMDM', 'http://www.wisr680.com/', 'WISR-680.png', 0, 0, 0, 1, '2011-11-11', 5187, 0, '2017-01-01 00:00:00', 0), \
-('The-Apartments', '', 'mms://nick9.surfernetwork.com/WMDM', '', 'The-Apartments.png', 0, 0, 0, 1, '2011-11-11', 5188, 0, '2017-01-01 00:00:00', 0), \
-('The-River-1063', '', 'http://streamer.tcworks.net:8000/koll', 'http://www.fm1063theriver.com/', 'The-River-1063.png', 0, 0, 0, 1, '2011-11-11', 5189, 0, '2017-01-01 00:00:00', 0), \
-('Just-Thinking', '', 'http://streamer.tcworks.net:8000/koll', '', 'Just-Thinking.png', 0, 0, 0, 1, '2011-11-11', 5190, 0, '2017-01-01 00:00:00', 0), \
-('WALG-1590-AM-News-Talk', '', 'http://housemusic1.com/housemusic1.m3u', '', 'WALG-1590-AM-News-Talk.png', 0, 0, 0, 1, '2011-11-11', 5192, 0, '2017-01-01 00:00:00', 0), \
-('Food-Talk', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Food-Talk.png', 0, 0, 0, 1, '2011-11-11', 5193, 0, '2017-01-01 00:00:00', 0), \
-('Michael-Wolff', '', 'http://housemusic1.com/housemusic1.m3u', '', 'Michael-Wolff.png', 0, 0, 0, 1, '2011-11-11', 5194, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Plein-Air-991', '', 'http://stream-01.pleinair.net:8110', 'http://www.pleinair.net/', 'Radio-Plein-Air-991.png', 0, 0, 0, 1, '2011-11-11', 5195, 0, '2017-01-01 00:00:00', 0), \
-('Your-Money', '', 'http://stream-01.pleinair.net:8110', '', 'Your-Money.png', 0, 0, 0, 1, '2011-11-11', 5196, 0, '2017-01-01 00:00:00', 0), \
-('MISS-98-975', '', 'http://ice1.securenetsystems.net:80/WWMS', 'http://www.miss98.net/', 'MISS-98-975.png', 0, 0, 0, 1, '2011-11-11', 5198, 0, '2017-01-01 00:00:00', 0), \
-('Sunny-107-1069', '', 'http://www.klamathradio.com/Sunnyindex.asx', 'http://www.klamathradio.com/sunny107/index.html', 'Sunny-107-1069.png', 0, 0, 0, 1, '2011-11-11', 5199, 0, '2017-01-01 00:00:00', 0), \
-('KECH-FM-953', '', 'http://www.klamathradio.com/Sunnyindex.asx', 'http://www.kech95.com/', 'KECH-FM-953.png', 0, 0, 0, 1, '2011-11-11', 5200, 0, '2017-01-01 00:00:00', 0), \
-('The-Jay-Mariotti-Show', '', 'http://www.klamathradio.com/Sunnyindex.asx', '', 'The-Jay-Mariotti-Show.png', 0, 0, 0, 1, '2011-11-11', 5201, 0, '2017-01-01 00:00:00', 0), \
-('933-KOBFM', '', 'http://www.klamathradio.com/Sunnyindex.asx', 'http://www.kobfm.com/', '933-KOBFM.png', 0, 0, 0, 1, '2011-11-11', 5202, 0, '2017-01-01 00:00:00', 0), \
-('Score-Atlanta-Sports-Sunday', '', 'http://www.klamathradio.com/Sunnyindex.asx', '', 'Score-Atlanta-Sports-Sunday.png', 0, 0, 0, 1, '2011-11-11', 5203, 0, '2017-01-01 00:00:00', 0), \
-('Warner-Pacific-Knights-Mens-Basketball', 'Listen live to Warner Pacific College Knights Men&#39;s basketball with &#39;The Voice of Your Knights&#39;, Jeremy Scott!<BR><BR>&quot;Running with the Pac&quot; begins ten minutes prior to tip-off, ', 'http://en.1000mikes.com/audio/1000mikes.m3u?channelId=27234', 'http://www.wpcknights.com', 'Warner-Pacific-Knights-Mens-Basketball.png', 0, 0, 0, 1, '2011-11-11', 5204, 0, '2017-01-01 00:00:00', 0), \
-('Prime-Time-Racing', '', 'http://en.1000mikes.com/audio/1000mikes.m3u?channelId=27234', '', 'Prime-Time-Racing.png', 0, 0, 0, 1, '2011-11-11', 5205, 0, '2017-01-01 00:00:00', 0), \
-('News', '', 'http://en.1000mikes.com/audio/1000mikes.m3u?channelId=27234', '', 'News.png', 0, 0, 0, 1, '2011-11-11', 5206, 0, '2017-01-01 00:00:00', 0), \
-('Kate-Winslet', '', 'http://en.1000mikes.com/audio/1000mikes.m3u?channelId=27234', '', 'Kate-Winslet.png', 0, 0, 0, 1, '2011-11-11', 5207, 0, '2017-01-01 00:00:00', 0), \
-('DR Dansktop', '', 'http://live-icy.gss.dr.dk:8000/A/A25H.mp3', 'http://www.dr.dk/radio/alle_kanaler/dansktop.asp', 'DR-Dansktop.png', 0, 0, 0, 1, '2011-11-11', 5208, 0, '2017-01-01 00:00:00', 0), \
-('KMDZ-967', '', 'http://www.dr.dk/netradio/metafiler/asx/DR_Dansktop_128.asx', '', 'KMDZ-967.png', 0, 0, 0, 1, '2011-11-11', 5209, 0, '2017-01-01 00:00:00', 0), \
-('MDR-FIGARO-Figarino', 'M&#228;rchen, Geschichten und Entdeckungsreisen - das ist der MDR FIGARO Webchannel Figarino. Mit dabei sind Lesungen aus Grimms M&#228;rchen und anderen Kinderbuch-Klassikern sowie Lieder des MDR Kin', 'http://avw.mdr.de/livestreams/mdr_figaro_figarino_128.m3u', 'http://www.mdr.de/mdr-figaro/webchannels/6526249.html', 'MDR-FIGARO-Figarino.png', 0, 0, 0, 1, '2011-11-11', 5210, 0, '2017-01-01 00:00:00', 0), \
-('Christ-Lutheran', '', 'http://avw.mdr.de/livestreams/mdr_figaro_figarino_128.m3u', '', 'Christ-Lutheran.png', 0, 0, 0, 1, '2011-11-11', 5211, 0, '2017-01-01 00:00:00', 0), \
-('Vernon-Kay', '', 'http://avw.mdr.de/livestreams/mdr_figaro_figarino_128.m3u', '', 'Vernon-Kay.png', 0, 0, 0, 1, '2011-11-11', 5212, 0, '2017-01-01 00:00:00', 0), \
-('XFM-Manchester-977', 'Like every local commercial radio station in the UK Xfm in London and in Manchester has requirements in respect of its music, news and local content. These requirements are set out in the station form', 'http://media-ice.musicradio.com/XFMManchesterMP3', 'http://www.xfm.co.uk/', 'XFM-Manchester-977.png', 0, 0, 0, 1, '2011-11-11', 5213, 0, '2017-01-01 00:00:00', 0), \
-('Def-Leppard', '', 'http://media-ice.musicradio.com/XFMManchesterMP3', '', 'Def-Leppard.png', 0, 0, 0, 1, '2011-11-11', 5214, 0, '2017-01-01 00:00:00', 0), \
-('Go-Country-105-1051', '', 'http://3.ice1.sa.streamaudio.com:8000/kkgo_fm.aac', 'http://www.gocountry105.com/', 'Go-Country-105-1051.png', 0, 0, 0, 1, '2011-11-11', 5215, 0, '2017-01-01 00:00:00', 0), \
-('KGRN-1410', '', 'http://www.iowatelecom.net/~kgrn/730news.wma', '', 'KGRN-1410.png', 0, 0, 0, 1, '2011-11-11', 5216, 0, '2017-01-01 00:00:00', 0), \
-('U93-929', 'U93 has been Michiana&#39;s source for Today&#39;s Best Music for over 30 years! Find us on Facebook at facebook.com/u93radio', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.u93.com/', 'U93-929.png', 0, 0, 0, 1, '2011-11-11', 5217, 0, '2017-01-01 00:00:00', 0), \
-('Gavin-DeGraw', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'Gavin-DeGraw.png', 0, 0, 0, 1, '2011-11-11', 5218, 0, '2017-01-01 00:00:00', 0), \
-('SLAM-1005', 'We will win our listeners through carefully mixing smooth music, with interesting features, news and sports, selecting voices that deliver a quality product every day.', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.slam1005.com', 'SLAM-1005.png', 0, 0, 0, 1, '2011-11-11', 5219, 0, '2017-01-01 00:00:00', 0), \
-('The-John-Thompson-Show', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'The-John-Thompson-Show.png', 0, 0, 0, 1, '2011-11-11', 5220, 0, '2017-01-01 00:00:00', 0), \
-('Bear-Country-999', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.bear999.com/', 'Bear-Country-999.png', 0, 0, 0, 1, '2011-11-11', 5221, 0, '2017-01-01 00:00:00', 0), \
-('1CLUBFM--Old-School-Rap', 'Classic Rap of the 70s-early 2K', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.1club.fm/', '1CLUBFM--Old-School-Rap.png', 0, 0, 0, 1, '2011-11-11', 5222, 0, '2017-01-01 00:00:00', 0), \
-('KRAZE-1013', 'red deer&#39;s new music channel!', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.kraze1013.com/', 'KRAZE-1013.png', 0, 0, 0, 1, '2011-11-11', 5223, 0, '2017-01-01 00:00:00', 0), \
-('ESPN-1450', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'ESPN-1450.png', 0, 0, 0, 1, '2011-11-11', 5224, 0, '2017-01-01 00:00:00', 0), \
-('Ridan', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'Ridan.png', 0, 0, 0, 1, '2011-11-11', 5225, 0, '2017-01-01 00:00:00', 0), \
-('News-Radio-790', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.wsgw.com/', 'News-Radio-790.png', 0, 0, 0, 1, '2011-11-11', 5226, 0, '2017-01-01 00:00:00', 0), \
-('Florence-and-The-Machine', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'Florence-and-The-Machine.png', 0, 0, 0, 1, '2011-11-11', 5227, 0, '2017-01-01 00:00:00', 0), \
-('The-Thirty-Minute-Mix', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'The-Thirty-Minute-Mix.png', 0, 0, 0, 1, '2011-11-11', 5228, 0, '2017-01-01 00:00:00', 0), \
-('AM620-WJDX', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', 'http://www.wjdx.com/', 'AM620-WJDX.png', 0, 0, 0, 1, '2011-11-11', 5229, 0, '2017-01-01 00:00:00', 0), \
-('Pitbull', '', 'mms://1.uni3.sa.streamaudio.com/WNDV_FM', '', 'Pitbull.png', 0, 0, 0, 1, '2011-11-11', 5230, 0, '2017-01-01 00:00:00', 0), \
-('Star-991', '', 'http://www.christiannetcast.com/listen/dynamicasx.asp?station=wawz1', 'http://www.star991fm.com/', 'Star-991.png', 0, 0, 0, 1, '2011-11-11', 5231, 0, '2017-01-01 00:00:00', 0), \
-('Goapele', '', 'http://www.christiannetcast.com/listen/dynamicasx.asp?station=wawz1', '', 'Goapele.png', 0, 0, 0, 1, '2011-11-11', 5232, 0, '2017-01-01 00:00:00', 0);";
+('Kass-FM-891', '', 'http://media.kassfm.co.ke:8006/live', 'http://www.kassfm.co.ke/', 'Kass-FM-891.png', 0, 0, 0, 1, '2011-11-11', 5019, 0, '2017-01-01 00:00:00', 1), \
+('Ambiance-Reggae', 'Une webradio &#224; la programmation musicale 100% reggae, Dub, Pop-Reggae, Ragga et Roots Reggae, en continu et en direct de Paris.', 'http://listen.radionomy.com/ambiance-reggae', 'http://ambiance-reggae.playtheradio.com/', 'Ambiance-Reggae.png', 0, 0, 1, 1, '2011-11-11', 5026, 0, '2011-10-14 16:00:11', 1), \
+('RTL-2-Guadeloupe-1062', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', 'http://www.rtl2antilles.fr/', 'RTL-2-Guadeloupe-1062.png', 0, 0, 0, 1, '2011-11-11', 5045, 0, '2017-01-01 00:00:00', 1), \
+('Conversations-at-the-Well', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Conversations-at-the-Well.png', 0, 0, 0, 1, '2011-11-11', 5046, 0, '2017-01-01 00:00:00', 1), \
+('Minnie-Riperton', '', 'http://radio-shoutcast.cyber-streaming.com:8090/', '', 'Minnie-Riperton.png', 0, 0, 0, 1, '2011-11-11', 5047, 0, '2017-01-01 00:00:00', 1), \
+('Fun-Radio-943', '', 'http://stream.funradio.sk:8000/fun128.mp3', 'http://www.funradio.sk/', 'Fun-Radio-943.png', 0, 0, 0, 1, '2011-11-11', 5067, 0, '2017-01-01 00:00:00', 1), \
+('FUV-Music-907', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', 'http://www.wfuv.org/programs/fuvmusic.html', 'FUV-Music-907.png', 0, 0, 0, 1, '2011-11-11', 5106, 0, '2017-01-01 00:00:00', 1), \
+('Todays-word-from-the-Church-of-the-Advent', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Todays-word-from-the-Church-of-the-Advent.png', 0, 0, 0, 1, '2011-11-11', 5107, 0, '2017-01-01 00:00:00', 1), \
+('Fontella-Bass', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Fontella-Bass.png', 0, 0, 0, 1, '2011-11-11', 5108, 0, '2017-01-01 00:00:00', 1), \
+('Steel-Breeze', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Steel-Breeze.png', 0, 0, 0, 1, '2011-11-11', 5109, 0, '2017-01-01 00:00:00', 1), \
+('Jennifer-Lopez', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Jennifer-Lopez.png', 0, 0, 0, 1, '2011-11-11', 5110, 0, '2017-01-01 00:00:00', 1), \
+('NOVA-fm-914', 'Danmarks st&#248;rste kommercielle radiostation. Danmarks eneste landsd&#230;kkende kommercielle radiostation.', 'http://stream.novafm.dk/nova128', 'http://novafm.dk/', 'NOVA-fm-914.png', 0, 0, 0, 1, '2011-11-11', 5150, 0, '2017-01-01 00:00:00', 1);";
 
 
 const char *radio_station_setupsql13="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('The-Penthouse', 'From the clubs to the classic cool...<BR>The Cosmopolitan Sound of New York is broadcasting live on ThePenthouse.fm!', 'http://208.85.240.102:80/697.64.aac', 'http://loudcaster.com/channels/697-the-penthouse', 'The-Penthouse.png', 0, 0, 0, 1, '2011-11-11', 5233, 0, '2017-01-01 00:00:00', 0), \
-('De-Eneste-To', '', 'http://208.85.240.102:80/697.64.aac', '', 'De-Eneste-To.png', 0, 0, 0, 1, '2011-11-11', 5234, 0, '2017-01-01 00:00:00', 0), \
-('WJSM-FM-927', '', 'http://shared.streamwebtown.com/wjsm', 'http://www.wjsm.com/', 'WJSM-FM-927.png', 0, 0, 0, 1, '2011-11-11', 5235, 0, '2017-01-01 00:00:00', 0), \
-('Smokey-Robinson', '', 'http://shared.streamwebtown.com/wjsm', '', 'Smokey-Robinson.png', 0, 0, 0, 1, '2011-11-11', 5236, 0, '2017-01-01 00:00:00', 0), \
-('Thelonious-Monk', '', 'http://shared.streamwebtown.com/wjsm', '', 'Thelonious-Monk.png', 0, 0, 0, 1, '2011-11-11', 5237, 0, '2017-01-01 00:00:00', 0), \
-('The-Sounds-of-Sinatra', '', 'http://shared.streamwebtown.com/wjsm', '', 'The-Sounds-of-Sinatra.png', 0, 0, 0, 1, '2011-11-11', 5238, 0, '2017-01-01 00:00:00', 0), \
-('SKYFM-Country', 'Today&#39;s Hit Country with a mix of your favorites', 'http://listen.sky.fm/partner_mp3/country.pls', 'http://www.sky.fm/country', 'SKYFM-Country.png', 0, 0, 0, 1, '2011-11-11', 5239, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Oost-1045', '', 'http://listen.sky.fm/partner_mp3/country.pls', '', 'Radio-Oost-1045.png', 0, 0, 0, 1, '2011-11-11', 5240, 0, '2017-01-01 00:00:00', 0), \
-('Wren-Football', 'Stream available 10-minutes before Live Broadcast.', 'http://www.audiosportsonline.net/Wren/Wren_Live.asx', 'http://www.hurricanetdclub.com', 'Wren-Football.png', 0, 0, 0, 1, '2011-11-11', 5241, 0, '2017-01-01 00:00:00', 0), \
-('FOX-Sports-Radio', '', 'http://www.audiosportsonline.net/Wren/Wren_Live.asx', '', 'FOX-Sports-Radio.png', 0, 0, 0, 1, '2011-11-11', 5242, 0, '2017-01-01 00:00:00', 0), \
-('WEFL-760', 'ESPN Radio affiliate in West Palm Beach, Florida featuring ESPN Radio personalities and local hosts covering South Florida sports.', 'http://www.audiosportsonline.net/Wren/Wren_Live.asx', 'http://www.espn760.com/', 'WEFL-760.png', 0, 0, 0, 1, '2011-11-11', 5243, 0, '2017-01-01 00:00:00', 0), \
-('KFJC-897', 'KFJC&#39;s mission in life, as much as we can agree on such a thing, is to be a conduit for new and interesting audio art and information, especially the sorts that are unavailable elsewhere. Our musi', 'http://netcast6.kfjc.org/listen.pls', 'http://www.kfjc.org/', 'KFJC-897.png', 0, 0, 0, 1, '2011-11-11', 5244, 0, '2017-01-01 00:00:00', 0), \
-('The-Fantasy-Football-Guys-Podcast', '', 'http://netcast6.kfjc.org/listen.pls', '', 'The-Fantasy-Football-Guys-Podcast.png', 0, 0, 0, 1, '2011-11-11', 5245, 0, '2017-01-01 00:00:00', 0), \
-('Back-to-Genesis', '', 'http://netcast6.kfjc.org/listen.pls', '', 'Back-to-Genesis.png', 0, 0, 0, 1, '2011-11-11', 5246, 0, '2017-01-01 00:00:00', 0), \
-('Ty-Austin', '', 'http://netcast6.kfjc.org/listen.pls', '', 'Ty-Austin.png', 0, 0, 0, 1, '2011-11-11', 5247, 0, '2017-01-01 00:00:00', 0), \
-('WXDU-887', '', 'http://wxdu.org/listen/wxdu128mp3.pls', 'http://www.wxdu.org/', 'WXDU-887.png', 0, 0, 0, 1, '2011-11-11', 5248, 0, '2017-01-01 00:00:00', 0), \
-('Gayle-Garton', '', 'http://wxdu.org/listen/wxdu128mp3.pls', '', 'Gayle-Garton.png', 0, 0, 0, 1, '2011-11-11', 5249, 0, '2017-01-01 00:00:00', 0), \
-('Boston', '', 'http://wxdu.org/listen/wxdu128mp3.pls', '', 'Boston.png', 0, 0, 0, 1, '2011-11-11', 5250, 0, '2017-01-01 00:00:00', 0), \
-('The-Rose-1013', '', 'http://wxdu.org/listen/wxdu128mp3.pls', 'http://www.roseradio.com/', 'The-Rose-1013.png', 0, 0, 0, 1, '2011-11-11', 5251, 0, '2017-01-01 00:00:00', 0), \
-('WTNY-790', '', 'http://wxdu.org/listen/wxdu128mp3.pls', 'http://www.790wtny.com/', 'WTNY-790.png', 0, 0, 0, 1, '2011-11-11', 5252, 0, '2017-01-01 00:00:00', 0), \
-('Frank-Black', '', 'http://wxdu.org/listen/wxdu128mp3.pls', '', 'Frank-Black.png', 0, 0, 0, 1, '2011-11-11', 5253, 0, '2017-01-01 00:00:00', 0), \
-('MLB-Play-by-Play', '', 'http://wxdu.org/listen/wxdu128mp3.pls', 'http://www.xmradio.com/', 'MLB-Play-by-Play.png', 0, 0, 0, 1, '2011-11-11', 5254, 0, '2017-01-01 00:00:00', 0), \
-('247-Praise-Radio', 'Sharing Good News and Great Music 247. Share us on Facebook and be entered to win great prizes.', 'http://208.85.240.102:80/469.64.mp3', 'http://loudcaster.com/channels/469-247-praise-radio', '247-Praise-Radio.png', 0, 0, 0, 1, '2011-11-11', 5255, 0, '2017-01-01 00:00:00', 0), \
-('Radio-Ocean-Indien-1005', '', 'http://mp3.live.tv-radio.com/rcm13/all/rcm13.mp3', 'http://www.radioceanindien.km/', 'Radio-Ocean-Indien-1005.png', 0, 0, 0, 1, '2011-11-11', 5256, 0, '2017-01-01 00:00:00', 0), \
-('Hot-1079', '', 'http://stream.oasisradiogroup.com/wjfx-iphone.aac.m3u', 'http://www.hot1079online.com/', 'Hot-1079.png', 0, 0, 0, 1, '2011-11-11', 5257, 0, '2017-01-01 00:00:00', 0), \
-('Dan-OConnell', '', 'http://stream.oasisradiogroup.com/wjfx-iphone.aac.m3u', '', 'Dan-OConnell.png', 0, 0, 0, 1, '2011-11-11', 5258, 0, '2017-01-01 00:00:00', 0), \
-('B101-1015', '', 'http://stream.oasisradiogroup.com/wjfx-iphone.aac.m3u', 'http://www.b101.com/', 'B101-1015.png', 0, 0, 0, 1, '2011-11-11', 5259, 0, '2017-01-01 00:00:00', 0), \
-('KROC-1340', '', 'mms://live.cumulusstreaming.com/KROC-AM', 'http://www.krocam.com/', 'KROC-1340.png', 0, 0, 0, 1, '2011-11-11', 5260, 0, '2017-01-01 00:00:00', 0), \
-('Carolinas-Classic-1033', '', 'http://www.live365.com/play/wolt_fm', 'http://www.wolt-fm.com/wolt-fm.html', 'Carolinas-Classic-1033.png', 0, 0, 0, 1, '2011-11-11', 5261, 0, '2017-01-01 00:00:00', 0), \
-('Da-Jam-983', '', 'http://www.live365.com/play/wolt_fm', 'http://www.dajam983.com/', 'Da-Jam-983.png', 0, 0, 0, 1, '2011-11-11', 5262, 0, '2017-01-01 00:00:00', 0), \
-('Afternoon-Show', '', 'http://www.live365.com/play/wolt_fm', '', 'Afternoon-Show.png', 0, 0, 0, 1, '2011-11-11', 5263, 0, '2017-01-01 00:00:00', 0), \
-('AlldanzRadio-Top-40', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', 'http://www.alldanzradio.com/', 'AlldanzRadio-Top-40.png', 0, 0, 0, 1, '2011-11-11', 5264, 0, '2017-01-01 00:00:00', 0), \
-('Super-X-1035', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', 'http://www.superx1035.com/', 'Super-X-1035.png', 0, 0, 0, 1, '2011-11-11', 5265, 0, '2017-01-01 00:00:00', 0), \
-('KCSJ-590', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', 'http://www.590kcsj.com/', 'KCSJ-590.png', 0, 0, 0, 1, '2011-11-11', 5266, 0, '2017-01-01 00:00:00', 0), \
-('Shania-Twain', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', '', 'Shania-Twain.png', 0, 0, 0, 1, '2011-11-11', 5267, 0, '2017-01-01 00:00:00', 0), \
-('Party-Music', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', '', 'Party-Music.png', 0, 0, 0, 1, '2011-11-11', 5268, 0, '2017-01-01 00:00:00', 0), \
-('Candlebox', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', '', 'Candlebox.png', 0, 0, 0, 1, '2011-11-11', 5269, 0, '2017-01-01 00:00:00', 0), \
-('Channel-1067', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', 'http://www.mix1067fm.com/', 'Channel-1067.png', 0, 0, 0, 1, '2011-11-11', 5270, 0, '2017-01-01 00:00:00', 0), \
-('FM-Talk-971', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', 'http://www.971talk.com/', 'FM-Talk-971.png', 0, 0, 0, 1, '2011-11-11', 5271, 0, '2017-01-01 00:00:00', 0), \
-('Dimension-Latina', '', 'http://www.alldanzradio.com/playmusic_mp.asp?Channel=top40C', '', 'Dimension-Latina.png', 0, 0, 0, 1, '2011-11-11', 5272, 0, '2017-01-01 00:00:00', 0), \
-('Hometown-Radio-Smooth--Easy', '', 'http://208.110.69.125:8026', 'http://www.hometownradio.us/', 'Hometown-Radio-Smooth--Easy.png', 0, 0, 0, 1, '2011-11-11', 5273, 0, '2017-01-01 00:00:00', 0), \
-('The-Halli-and-MoJoe-Show', 'Halli Casser-Jayne is the author of &quot;A Year in my Pajamas with President Obama&quot; and forth coming book &quot;Scout Finch&#39;s Diary.&quot; Halli shares the airwaves with co-host and radio ma', 'http://208.110.69.125:8026', 'http://www.facebook.com/thehalliandmojoeshow', 'The-Halli-and-MoJoe-Show.png', 0, 0, 0, 1, '2011-11-11', 5274, 0, '2017-01-01 00:00:00', 0), \
 ('Antenne-Bayern-80er-Kulthits', '', 'http://www.antenne.de/webradio/channels/80er-kulthits.aac.pls', 'http://www.antenne.de/', 'Antenne-Bayern-80er-Kulthits.png', 0, 0, 0, 1, '2011-11-11', 5275, 0, '2017-01-01 00:00:00', 0), \
 ('Allhits-921', '', 'http://www.antenne.de/webradio/channels/80er-kulthits.aac.pls', '', 'Allhits-921.png', 0, 0, 0, 1, '2011-11-11', 5276, 0, '2017-01-01 00:00:00', 0), \
 ('James-Brown-and-the-Famous-Flames', '', 'http://www.antenne.de/webradio/channels/80er-kulthits.aac.pls', '', 'James-Brown-and-the-Famous-Flames.png', 0, 0, 0, 1, '2011-11-11', 5277, 0, '2017-01-01 00:00:00', 0), \
