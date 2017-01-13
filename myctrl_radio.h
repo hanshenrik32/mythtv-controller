@@ -43,7 +43,7 @@ const int radiooptionsmax=40;					// mxa antal typer af radio stationer
 
 class radiostation_class {
     private:
-        enum { maxantal=500 };				          		// MAX antal radio stationer
+        enum { maxantal=1000 };				          		// MAX antal radio stationer
         radio_oversigt_type *stack[maxantal];				// radio stack
         int antal;							// Antal
         radiotype_type radiosortopt[radiooptionsmax];			// radio typer
