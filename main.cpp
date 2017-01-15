@@ -3161,6 +3161,9 @@ void display(void) {
                 if (strcmp(radiooversigt.get_stream_url(rknapnr-1),"")!=0) {
                     strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
 
+
+                    printf("play path = %s \n ",aktivplay_music_path);
+
                     // fmod player
                     #if defined USE_FMOD_MIXER
                     // set big sound buffer to stop lag
