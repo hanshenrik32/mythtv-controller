@@ -346,7 +346,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
     //gotoxy(10,13);
     //printf("Opdatere radio oversigt fra database. type %d \n",radiosortorder);
     if (radiosortorder==0)			// start order default by hørst mest
-        strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by intnr");
+        strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr");
         //strcpy(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 order by popular desc,name");
     else if (radiosortorder==28)		// bit rate
         sprintf(sqlselect,"select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by bitrate desc,popular desc,name");
