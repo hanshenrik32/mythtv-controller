@@ -57,6 +57,8 @@
 #include "/usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
+FMOD::DSP* dsp = 0;                   // TEST
+
 #include "main.h"
 #include "myctrl_storagedef.h"
 
@@ -2229,7 +2231,7 @@ void display(void) {
     float *specLeft, *specRight;
 
     // uv color table
-    float uvcolortable[]={0.0,0.8,0.8, \
+    float uvcolortable1[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
                           0.3,0.7,0.7, \
@@ -2243,6 +2245,22 @@ void display(void) {
                           0.7,0.3,0.3, \
                           0.9,0.0,0.0, \
                           0.9,0.0,0.0};
+
+    // uv color table
+    float uvcolortable[]={0.0,0.8,0.8, \
+                          0.8,0.8,0.8, \
+                          0.7,0.7,0.7, \
+                          0.7,0.7,0.7, \
+                          0.6,0.6,0.6, \
+                          0.6,0.6,0.6, \
+                          0.5,0.5,0.5, \
+                          0.5,0.5,0.5, \
+                          0.4,0.4,0.4, \
+                          0.4,0.4,0.4, \
+                          0.3,0.3,0.3, \
+                          0.3,0.3,0.3, \
+                          0.1,0.0,0.0, \
+                          0.0,0.0,0.0};
 
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -4265,42 +4283,47 @@ void display(void) {
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (radio_pictureloaded)) || ((vis_music_oversigt) && (vis_uv_meter))) {
           // getSpectrum() performs the frequency analysis, see explanation below
-          sampleSize = 64;                // nr of samples default 64
+          sampleSize = 1024;                // nr of samples default 64
           specLeft = new float[sampleSize];
           specRight = new float[sampleSize];
           for(int ii=0;ii<60;ii++) {
-            specLeft[ii]=0;
-            specRight[ii]=0;
+            specLeft[ii]=0.0f;
+            specRight[ii]=0.0f;
           }
 
+          FMOD_DSP_PARAMETER_FFT *fft=0;
+          //FMOD::DSP *dsp=0;
+          int chan;
 
-
-          // Get spectrum for left and right stereo channels
-          // old ver
-    //      channel->getSpectrum(specLeft, sampleSize, 0, FMOD_DSP_FFT_WINDOW_RECT);
-    //      channel->getSpectrum(specRight, sampleSize, 1, FMOD_DSP_FFT_WINDOW_RECT);
-
-
-/*
-          char s[256];
-          unsigned int len;
-          float *data = 0;
-          float freq[32];
-
-          channel->getParameterData(FMOD_DSP_FFT_SPECTRUM,(void **)&data, &len, s, 256);
-*/
-
-
-
+          if (!(dsp)) {
+            sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
+            channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
+            dsp->setActive(true);
+          }
+          dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+          if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
 
           spec = new float[sampleSize];
+          if (fft) {
+            for (chan = 0; chan < fft->numchannels; chan++) {
+              float average = 0.0f;
+              float power = 0.0f;
+              for (int i = 0; i < fft->length; ++i) {
+                  if (fft->spectrum[chan][i]) {
+                      specLeft[i]=(float) fft->spectrum[chan][i];
+                  }
+              }
+            }
+          }
           for (i = 0; i < sampleSize; i++) {
             spec[i] = ((specLeft[i] + specRight[i])/2);
           }
+
           float lee=0.0f;
           for (i=0;i<sampleSize;i++) {
             lee+=(spec[i]*spec[i]);
           }
+
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
@@ -4358,6 +4381,7 @@ void display(void) {
             }
           }
           glPopMatrix();
+          // do clean up after uv meters
           delete [] spec;
           delete [] specLeft;
           delete [] specRight;

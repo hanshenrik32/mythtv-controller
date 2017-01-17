@@ -6,7 +6,6 @@
 #include <string.h>
 #include <mysql.h>
 #include <GL/glc.h>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -32,18 +31,18 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-extern int debugmode;                                          // set in main
-extern unsigned int musicoversigt_antal;
-extern int radio_key_selected;
-extern int music_select_iconnr;
-extern int do_music_icon_anim_icon_ofset;
-extern GLuint _textureIdback1;
-extern GLuint onlineradio;					//
-extern GLuint onlineradio_empty;				//
-extern GLuint onlineradio192;					//
-extern GLuint onlineradio320;					//
-extern GLuint onlineradiomask;					//
-extern GLuint radiooptions,radiooptionsmask;			//
+extern int debugmode;                                         // set in main
+extern unsigned int musicoversigt_antal;                      //
+extern int radio_key_selected;                                //
+extern int music_select_iconnr;                               //
+extern int do_music_icon_anim_icon_ofset;                     //
+extern GLuint _textureIdback1;                                //
+extern GLuint onlineradio;					                          //
+extern GLuint onlineradio_empty;				                      //
+extern GLuint onlineradio192;					                        //
+extern GLuint onlineradio320;					                        //
+extern GLuint onlineradiomask;					                      //
+extern GLuint radiooptions,radiooptionsmask;			            //
 extern int fonttype;
 extern fontctrl aktivfont;
 

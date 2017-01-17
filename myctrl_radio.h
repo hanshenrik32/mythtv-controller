@@ -37,9 +37,9 @@ struct radiotype_type {
 };
 
 
-int set_radio_popular(int stationid);
+int set_radio_popular(int stationid);                // 
+const int radiooptionsmax=40;				                 // mxa antal typer af radio stationer
 
-const int radiooptionsmax=40;					// mxa antal typer af radio stationer
 
 class radiostation_class {
     private:
