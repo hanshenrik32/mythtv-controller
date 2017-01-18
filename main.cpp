@@ -2231,7 +2231,7 @@ void display(void) {
     float *specLeft, *specRight;
 
     // uv color table
-    float uvcolortable1[]={0.0,0.8,0.8, \
+    float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
                           0.3,0.7,0.7, \
@@ -2246,8 +2246,8 @@ void display(void) {
                           0.9,0.0,0.0, \
                           0.9,0.0,0.0};
 
-    // uv color table
-    float uvcolortable[]={0.0,0.8,0.8, \
+    // uv color table 2
+    float uvcolortable1[]={0.8,0.8,0.8, \
                           0.8,0.8,0.8, \
                           0.7,0.7,0.7, \
                           0.7,0.7,0.7, \
@@ -2259,7 +2259,7 @@ void display(void) {
                           0.4,0.4,0.4, \
                           0.3,0.3,0.3, \
                           0.3,0.3,0.3, \
-                          0.1,0.0,0.0, \
+                          0.1,0.1,0.1, \
                           0.0,0.0,0.0};
 
 
@@ -3129,6 +3129,7 @@ void display(void) {
                 // yes stop play
                 // stop old playing
                 sound->release();                                                                       // stop last playing song
+                dsp=0;                                                                                  // reset uv
                 ERRCHECK(result,0);
                 #endif
                 #if defined USE_SDL_MIXER
@@ -3180,7 +3181,7 @@ void display(void) {
                     strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
 
 
-                    printf("play path = %s \n ",aktivplay_music_path);
+                    printf("play radio path = %s \n ",aktivplay_music_path);
 
                     // fmod player
                     #if defined USE_FMOD_MIXER
@@ -3352,7 +3353,7 @@ void display(void) {
                 if (musicoversigt[mknapnr-1].oversigttype==-1) {
 //                    mknapnr=music_key_selected-1;
                     if (debugmode & 2) fprintf(stderr,"Loading song from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);
-                        if (hent_mythtv_playlist(musicoversigt[mknapnr-1].directory_id)==0) {		// tilføj musik valgte til playliste + load af covers
+                    if (hent_mythtv_playlist(musicoversigt[mknapnr-1].directory_id)==0) {		// tilføj musik valgte til playliste + load af covers
                         printf("**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt[mknapnr-1].directory_id);
                         exit(2);
                     }
@@ -3397,6 +3398,7 @@ void display(void) {
                        }
                        do_stop_music_all=false;						// fjern stop musik bremse
                        if (result==FMOD_OK) snd=1;
+                       dsp=0;                             // reset uv to start
                     }
                     #endif
                     #if defined USE_SDL_MIXER
@@ -4280,8 +4282,9 @@ void display(void) {
                 }
             }
         }
+        //
         if ((snd) && (show_uv)) vis_uv_meter=true;
-        if (((snd) && (vis_uv_meter) && (radio_pictureloaded)) || ((vis_music_oversigt) && (vis_uv_meter))) {
+        if (((snd) && (vis_uv_meter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
           sampleSize = 1024;                // nr of samples default 64
           specLeft = new float[sampleSize];
@@ -4291,10 +4294,10 @@ void display(void) {
             specRight[ii]=0.0f;
           }
 
+          // uv works only on fmod for now
+          #if defined USE_FMOD_MIXER
           FMOD_DSP_PARAMETER_FFT *fft=0;
-          //FMOD::DSP *dsp=0;
           int chan;
-
           if (!(dsp)) {
             sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
             channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
@@ -4302,6 +4305,7 @@ void display(void) {
           }
           dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
           if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
+          #endif
 
           spec = new float[sampleSize];
           if (fft) {
@@ -4326,7 +4330,8 @@ void display(void) {
 
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
-          glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+          //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+          glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
           glColor4f(1.0f,1.0f,1.0f,1.0f);
           int uvypos=0;
           int high;
@@ -4338,37 +4343,37 @@ void display(void) {
             if (high>14) high=14;
             for(i=0;i<high;i+=1) {
               switch(i) {
-                case 0: glColor4f(uvcolortable[0],uvcolortable[1],uvcolortable[2],1.0);
+                case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
                   break;
-                case 1: glColor4f(uvcolortable[3],uvcolortable[4],uvcolortable[5],1.0);
+                case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
                   break;
-                case 2: glColor4f(uvcolortable[6],uvcolortable[7],uvcolortable[8],1.0);
+                case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
                   break;
-                case 3: glColor4f(uvcolortable[9],uvcolortable[10],uvcolortable[11],1.0);
+                case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
                   break;
-                case 4: glColor4f(uvcolortable[12],uvcolortable[13],uvcolortable[14],1.0);
+                case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
                   break;
-                case 5: glColor4f(uvcolortable[15],uvcolortable[16],uvcolortable[17],1.0);
+                case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
                   break;
-                case 6: glColor4f(uvcolortable[18],uvcolortable[19],uvcolortable[20],1.0);
+                case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
                   break;
-                case 7: glColor4f(uvcolortable[21],uvcolortable[22],uvcolortable[23],1.0);
+                case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
                   break;
-                case 8: glColor4f(uvcolortable[24],uvcolortable[25],uvcolortable[26],1.0);
+                case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
                   break;
-                case 9: glColor4f(uvcolortable[27],uvcolortable[28],uvcolortable[29],1.0);
+                case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
                   break;
-                case 10:glColor4f(uvcolortable[30],uvcolortable[31],uvcolortable[32],1.0);
+                case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
                   break;
-                case 11:glColor4f(uvcolortable[33],uvcolortable[34],uvcolortable[35],1.0);
+                case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
                   break;
-                case 12:glColor4f(uvcolortable[36],uvcolortable[37],uvcolortable[38],1.0);
+                case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
                   break;
-                case 13:glColor4f(uvcolortable[39],uvcolortable[40],uvcolortable[41],1.0);
+                case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
                   break;
-                case 14:glColor4f(uvcolortable[42],uvcolortable[43],uvcolortable[44],1.0);
+                case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
                   break;
-                default:glColor4f(uvcolortable[0],uvcolortable[1],uvcolortable[2],1.0);
+                default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
                   break;
               }
               glBegin(GL_QUADS);
@@ -4446,6 +4451,7 @@ void display(void) {
             if (sound) {
               result=sound->release();          		// stop last played sound on soundsystem fmod
               ERRCHECK(result,do_play_music_aktiv_table_nr);
+              dsp=0;
             }
             #endif
 
@@ -4885,6 +4891,7 @@ void display(void) {
                     result = sndsystem->playSound(sound,NULL,false, &channel);
                     ERRCHECK(result,do_play_music_aktiv_table_nr);
                     if (sndsystem) channel->setVolume(configsoundvolume);
+                    dsp=0;
                 } else {
 
                     // play next song error (set skip song flag) jump to next song
@@ -4947,6 +4954,7 @@ void display(void) {
                 result = sndsystem->playSound( sound,NULL,false, &channel);
                 ERRCHECK(result,do_play_music_aktiv_table_nr-1);
                 if (sndsystem) channel->setVolume(configsoundvolume);
+                dsp=0;
             } else {
                 // play next song error (set skip song flag) jump to next song
                 if (do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) {
@@ -4995,6 +5003,7 @@ void display(void) {
                 result = sndsystem->playSound(sound, NULL,false, &channel);
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
                 if (sndsystem) channel->setVolume(configsoundvolume);
+                dsp=0;
             } else {
 
                 // play next song error (set skip song flag) jump to next song
