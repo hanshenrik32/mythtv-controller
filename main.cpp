@@ -4330,8 +4330,8 @@ void display(void) {
 
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
-          //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-          glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
+          glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+          //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
           glColor4f(1.0f,1.0f,1.0f,1.0f);
           int uvypos=0;
           int high;
@@ -4382,7 +4382,7 @@ void display(void) {
               glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
               glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
               glEnd();
-              uvypos+=16;
+              uvypos+=16;          
             }
           }
           glPopMatrix();
