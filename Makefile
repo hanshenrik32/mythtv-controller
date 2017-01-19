@@ -1,9 +1,9 @@
 CC = gcc
-# CFLAGS for 32bits -m32 / 64 bits -m64
+# CFLAGS for 32bits -m32 / 64 bits -m64 default 32 bits
 CFLAGS = -Wall -pthread -m32
 #LIBDIR   = fmodapi44006linux/api/lib
 #HDRDIR   = fmodapi44006linux/api/inc
-PROG     = mythtv-controller
+PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
@@ -15,22 +15,20 @@ BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
 # check 64 bits ver
-# download from http://www.fmod.org/download/#StudioAPIDownloads
+# download fmod from http://www.fmod.org/download/#StudioAPIDownloads
 
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
-
+#ical
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/lib/x86_64/libfmod.so 
-
-#	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10605linux/api/lowlevel/lib/x86_64/libfmod.so
-
+# fmod lib path
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/lib/x86_64/libfmod.so
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
 	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/lib/x86/libfmod.so
-        CFLAGS = -pthread -m32
+  CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
 
@@ -44,9 +42,7 @@ else
 endif
 
 
-
 OPTS =  -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) /usr/lib/libGLC.so -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) -lXrandr
-
 SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp
 
 ifeq ($(shell uname),Darwin)
@@ -56,7 +52,7 @@ else
 endif
 
 all:
-	@echo "mythtv-controller ver 0.32.1 \nPossible targets:"
+	@echo "mythtv-controller ver 0.36.1 \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
 	@echo "'make compile'             - Compile mythtv-controller"
@@ -80,7 +76,7 @@ installsound:
 	@echo "Install fmod sound system ver 4.44.41"
 	mkdir -p $(DESTDIR)
 #	cp fmodstudioapi10605linux.tar.gz $(DESTDIR)
-	cp fmodstudioapi10811linux.tar.gz $(DESTDIR)	
+	cp fmodstudioapi10811linux.tar.gz $(DESTDIR)
 	cd $(DESTDIR)
 #	tar -zxf fmodstudioapi10605linux.tar.gz -C /usr/share/mythtv-controller/
 	tar -zxf fmodstudioapi10811linux.tar.gz -C /usr/share/mythtv-controller/
@@ -93,7 +89,7 @@ installsound:
 
 
 install:
-	echo "Installing mythtv-controller ver 0.32.x in /usr/share/mythtv-controller."
+	echo "Installing mythtv-controller ver 0.36.x in /usr/share/mythtv-controller."
 	mkdir -p /usr/share/mythtv-controller/images/radiostations
 	mkdir -p /usr/share/mythtv-controller/convert/hires
 	cp charset $(DESTDIR)

@@ -4286,7 +4286,7 @@ void display(void) {
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
-          sampleSize = 1024;                // nr of samples default 64
+          sampleSize = 1024;                // nr of samples default 1024 in fmod
           specLeft = new float[sampleSize];
           specRight = new float[sampleSize];
           for(int ii=0;ii<60;ii++) {
@@ -4306,7 +4306,7 @@ void display(void) {
           dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
           if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
           #endif
-
+          // get uv data from fmod dsp
           spec = new float[sampleSize];
           if (fft) {
             for (chan = 0; chan < fft->numchannels; chan++) {
@@ -4315,10 +4315,12 @@ void display(void) {
               for (int i = 0; i < fft->length; ++i) {
                   if (fft->spectrum[chan][i]) {
                       specLeft[i]=(float) fft->spectrum[chan][i];
+                      specRight[i]=(float) fft->spectrum[chan][i];
                   }
               }
             }
           }
+          // normlize
           for (i = 0; i < sampleSize; i++) {
             spec[i] = ((specLeft[i] + specRight[i])/2);
           }
@@ -4339,7 +4341,7 @@ void display(void) {
           // Draw uv lines 16
           for(qq=0;qq<16;qq++) {
             uvypos=0;
-            high=sqrt(spec[(qq*2)+1])*30.0f;
+            high=sqrt(spec[(qq*2)+1])*40.0f;
             if (high>14) high=14;
             for(i=0;i<high;i+=1) {
               switch(i) {
@@ -4377,12 +4379,15 @@ void display(void) {
                   break;
               }
               glBegin(GL_QUADS);
+              // org
               glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
               glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
               glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
               glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
               glEnd();
-              uvypos+=16;          
+              // org
+              uvypos+=16;
+
             }
           }
           glPopMatrix();
