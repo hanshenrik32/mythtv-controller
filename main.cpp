@@ -4132,6 +4132,7 @@ void display(void) {
                         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
                             ERRCHECK(result,0);
                         }
+                        
                         // get play length new version
                         result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
                         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
@@ -4382,7 +4383,7 @@ void display(void) {
               glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
               glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
               glEnd();
-              uvypos+=16;          
+              uvypos+=16;
             }
           }
           glPopMatrix();
