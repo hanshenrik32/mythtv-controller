@@ -4329,7 +4329,6 @@ void display(void) {
           for (i=0;i<sampleSize;i++) {
             lee+=(spec[i]*spec[i]);
           }
-
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
