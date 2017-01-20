@@ -862,7 +862,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 
 // check file size
-
+// return size
 int check_zerro_bytes_file(char *filename) {
   long size;
   FILE *f = fopen(filename, "rb");
