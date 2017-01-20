@@ -4214,6 +4214,7 @@ void display(void) {
                     radio_playtime_min=(radio_playtime/60);
                     radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
                     radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
+                    if (radio_playtime_min>60) radio_playtime_min=0;
                     glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
                     sprintf(temptxt,music_timename[1]);       // 1 = danish
                     temptxt[40]=0;
