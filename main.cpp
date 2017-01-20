@@ -861,7 +861,18 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 
 
+// check file size
 
+int check_zerro_bytes_file(char *filename) {
+  long size;
+  FILE *f = fopen(filename, "rb");
+  if (f) {
+   fseek(f, 0 ,SEEK_END);
+   size = ftell(f);
+   fclose(f);
+  }
+  return(size);
+}
 
 
 
@@ -1087,7 +1098,7 @@ int parse_config(char *filename) {
         }
         fclose(fil);
     } else return(0);
-    return(1);
+    if (check_zerro_bytes_file(filename)>0) return(1); else return(0);
 }
 
 // save config to file
