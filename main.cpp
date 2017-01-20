@@ -4132,7 +4132,7 @@ void display(void) {
                         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
                             ERRCHECK(result,0);
                         }
-                        
+
                         // get play length new version
                         result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
                         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
@@ -4215,12 +4215,12 @@ void display(void) {
                     radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
                     radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
                     glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-                    sprintf(temptxt,"Tid        ");
+                    sprintf(temptxt,music_timename[1]);       // 1 = danish
                     temptxt[40]=0;
                     glTranslatef(1, 1, 0);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
-                    glcRenderString(temptxt);
+                    glcRenderString(temptxt);                // write text
                     glPopMatrix();
 
                     glPushMatrix();

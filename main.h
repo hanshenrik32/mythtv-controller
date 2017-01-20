@@ -18,6 +18,10 @@
 //
 // English, danish, france, tysk, Arabic
 
+// time in language
+
+const char *music_timename[]={"Time","Tid","time","time","time"};
+
 // music stuf
 const char *music_now_playing[]={"Now Playing.","Spiller nu.","Lecture en cours.","Now Playing.","قائمة الأغاني"};
 const char *music_artist[]={"Artist","Artist","Artiste","kunstenaar","فنان"};
