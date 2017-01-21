@@ -17,6 +17,7 @@ int getuserhomedir(char *homedir) {
 }
 
 
+
 bool file_exists(const char * filename)
 {
     if (FILE * file = fopen(filename, "r")) {
@@ -25,6 +26,21 @@ bool file_exists(const char * filename)
     }
     return false;
 }
+
+// check file size
+// return size
+int check_zerro_bytes_file(char *filename) {
+  long size;
+  FILE *f = fopen(filename, "rb");
+  if (f) {
+   fseek(f, 0 ,SEEK_END);
+   size = ftell(f);
+   fclose(f);
+  }
+  return(size);
+}
+
+
 
 int clearscreen() {
     gotoxy(1,1);

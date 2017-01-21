@@ -154,6 +154,8 @@ char configvideoplayer[200];      // default video player
 char configdefaultplayer[256];				// default player
 int configdefaultplayer_screenmode;				// default player
 
+int configuvmeter;
+
 int configland=0;
 const int configlandantal=5;
 char *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *)
@@ -861,21 +863,6 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 
 
-// check file size
-// return size
-int check_zerro_bytes_file(char *filename) {
-  long size;
-  FILE *f = fopen(filename, "rb");
-  if (f) {
-   fseek(f, 0 ,SEEK_END);
-   size = ftell(f);
-   fclose(f);
-  }
-  return(size);
-}
-
-
-
 //
 // config file paser
 //
@@ -886,7 +873,8 @@ int parse_config(char *filename) {
     char buffer[513];
     FILE *fil;
     int n,nn;
-    enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath };
+    enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setuvmetertype};
     int commandlength;
     char value[200];
     bool command=false;
@@ -972,7 +960,6 @@ int parse_config(char *filename) {
                         command=true;
                         command_nr=setscreenmode;
                         commandlength=9;
-
                     } else if (strncmp(buffer+n,"configdefaultmusicpath",21)==0) {
                       command=true;
                       command_nr=setconfigdefaultmusicpath;
@@ -988,6 +975,10 @@ int parse_config(char *filename) {
                         commandlength=4;
                         debugmode=atoi(value);		// set debug mode from config file
                         showfps=true;
+                    } else  if (strncmp(buffer+n,"uvmetertype",4)==0) {
+                        command=true;
+                        command_nr=setuvmetertype;
+                        commandlength=10;
                     } else command=false;
                 }
                 if (command) {
@@ -1091,6 +1082,8 @@ int parse_config(char *filename) {
                         }
                     } else if (command_nr==setland) {
                       configland=1; // set default land code
+                    } else if (command_nr==setuvmetertype) {
+                      configuvmeter=atoi(value);
                     }
                 }
             }
@@ -1110,37 +1103,28 @@ int save_config(char * filename) {
         fputs("backend=",file);
         fputs(configbackend,file);
         fputs("\n",file);
-
         fputs("mysqluser=",file);
         fputs(configmysqluser,file);
         fputs("\n",file);
-
-
         fputs("mysqlpass=",file);
         fputs(configmysqlpass,file);
         fputs("\n",file);
-
         fputs("mysqlhost=",file);
         fputs(configmysqlhost,file);
         fputs("\n",file);
-
         fputs("mythhost=",file);
         fputs(configmythhost,file);
         fputs("\n",file);
-
         fputs("soundsystem=",file);
         sprintf(temp,"%d",soundsystem);
         fputs(temp,file);
         fputs("\n",file);
-
         fputs("soundoutport=",file);
         fputs(configsoundoutport,file);
         fputs("\n",file);
-
         fputs("screensaver=",file);
         fputs(configscreensavertimeout,file);
         fputs("\n",file);
-
         fputs("screensavername=",file);
         if (urtype==DIGITAL) fputs("digital\n",file);
         else if (urtype==ANALOG) fputs("analog\n",file);
@@ -1148,37 +1132,28 @@ int save_config(char * filename) {
         else if (urtype==SAVER3D2) fputs("3D2\n",file);
         else if (urtype==PICTURE3D) fputs("PICTURE3D\n",file);
         else fputs("None\n",file);
-
         sprintf(temp,"screensize=%d\n",screen_size);
         fputs(temp,file);
-
         sprintf(temp,"tema=%d\n",tema);
         fputs(temp,file);
-
         sprintf(temp,"font=%s\n",configfontname);
         fputs(temp,file);
-
         sprintf(temp,"mouse=%s\n",configmouse);
         fputs(temp,file);
-
         sprintf(temp,"use3d=%s\n",configuse3deffect);
         fputs(temp,file);
-
         sprintf(temp,"land=%d\n",configland);
         fputs(temp,file);
-
         if (full_screen) sprintf(temp,"fullscreen=true\n"); else sprintf(temp,"fullscreen=false\n");
         fputs(temp,file);
-
         sprintf(temp,"debug=0\n");
         fputs(temp,file);
-
         sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
-
         sprintf(temp,"configdefaultmusicpath=%s\n",configdefaultmusicpath);
         fputs(temp,file);
-
+        sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
+        fputs(temp,file);
         fclose(file);
     }
     file = fopen("mythtv-controller.keys", "w");
@@ -1224,6 +1199,7 @@ void load_config(char * filename) {
     strcpy(configfontname,"Ubuntu");
     strcpy(configvideoplayer,"default");
     strcpy(configdefaultmusicpath,"Music");                 // default start music dir
+    configuvmeter=1;                                        // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
         strcpy(configaktivescreensavername,"analog");				// default analog clock
@@ -1259,6 +1235,7 @@ void load_config(char * filename) {
            fputs("debug=0\n",file);
            fputs("videoplayer=default\n",file);
            fputs("configdefaultmusicpath=Music\n",file);
+           fputs("uvmetertype=1\n",file);
            fclose(file);
         } else {
           printf("Config file not writeble ");
@@ -2239,6 +2216,7 @@ void display(void) {
 
     int sampleSize = 64;
     float *spec;
+    float *spec2;
     float *specLeft, *specRight;
 
     // uv color table
@@ -4321,84 +4299,196 @@ void display(void) {
           #endif
 
           spec = new float[sampleSize];
+          spec2 = new float[sampleSize];
           if (fft) {
             for (chan = 0; chan < fft->numchannels; chan++) {
               float average = 0.0f;
               float power = 0.0f;
               for (int i = 0; i < fft->length; ++i) {
                   if (fft->spectrum[chan][i]) {
-                      specLeft[i]=(float) fft->spectrum[chan][i];
+                      specLeft[i]=(float) fft->spectrum[0][i];
+                      specRight[i]=(float) fft->spectrum[1][i];
                   }
               }
             }
           }
           for (i = 0; i < sampleSize; i++) {
-            spec[i] = ((specLeft[i] + specRight[i])/2);
+            spec[i] = specLeft[i]*2;
+            spec2[i] = specRight[i]*2;
           }
 
-          float lee=0.0f;
-          for (i=0;i<sampleSize;i++) {
-            lee+=(spec[i]*spec[i]);
-          }
 
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-          //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
-          glColor4f(1.0f,1.0f,1.0f,1.0f);
-          int uvypos=0;
-          int high;
-          int qq;
-          // Draw uv lines 16
-          for(qq=0;qq<16;qq++) {
-            uvypos=0;
-            high=sqrt(spec[(qq*2)+1])*30.0f;
-            if (high>14) high=14;
-            for(i=0;i<high;i+=1) {
-              switch(i) {
-                case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                  break;
-                case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
-                  break;
-                case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
-                  break;
-                case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
-                  break;
-                case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
-                  break;
-                case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
-                  break;
-                case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
-                  break;
-                case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
-                  break;
-                case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
-                  break;
-                case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
-                  break;
-                case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
-                  break;
-                case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
-                  break;
-                case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
-                  break;
-                case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
-                  break;
-                case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
-                  break;
-                default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                  break;
+          // draw uv meter
+          if (configuvmeter==1) {
+            glPushMatrix();
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+            //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
+            glColor4f(1.0f,1.0f,1.0f,1.0f);
+            int uvypos=0;
+            int high;
+            int qq;
+            // Draw uv lines 16
+            for(qq=0;qq<16;qq++) {
+              uvypos=0;
+              high=sqrt(spec[(qq*2)+1])*30.0f;
+              if (high>14) high=14;
+              for(i=0;i<high;i+=1) {
+                switch(i) {
+                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
+                    break;
+                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
+                    break;
+                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
+                    break;
+                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
+                    break;
+                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
+                    break;
+                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
+                    break;
+                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
+                    break;
+                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
+                    break;
+                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
+                    break;
+                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
+                    break;
+                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
+                    break;
+                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
+                    break;
+                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
+                    break;
+                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
+                    break;
+                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                }
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
+                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
+                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
+                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
+                glEnd();
+                uvypos+=16;
               }
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
-              glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
-              glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
-              glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
-              glEnd();
-              uvypos+=16;
             }
+            glPopMatrix();
+          } else if (configuvmeter==2) {
+            glPushMatrix();
+
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+            //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
+            glColor4f(1.0f,1.0f,1.0f,1.0f);
+            int uvypos=0;
+            int uvyypos=0;
+            int high;
+            int qq;
+            // Draw uv lines
+            for(qq=0;qq<16;qq++) {
+              uvypos=0;
+              uvyypos=0;
+              high=sqrt(spec[(qq*2)+1])*10.0f;
+              if (high>14) high=14;
+              // draw 1 bar
+              for(i=0;i<high;i+=1) {
+                switch(i) {
+                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
+                    break;
+                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
+                    break;
+                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
+                    break;
+                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
+                    break;
+                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
+                    break;
+                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
+                    break;
+                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
+                    break;
+                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
+                    break;
+                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
+                    break;
+                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
+                    break;
+                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
+                    break;
+                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
+                    break;
+                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
+                    break;
+                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
+                    break;
+                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                }
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+4 +uvypos, 0.0);
+                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+14+4+uvypos, 0.0);
+                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+14+4+uvypos , 0.0);
+                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+4+uvypos, 0.0);
+                glEnd();
+                uvypos+=16;
+              }
+              high=sqrt(spec2[(qq*2)+1])*10.0f;
+              for(i=0;i<high;i+=1) {
+                switch(i) {
+                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
+                    break;
+                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
+                    break;
+                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
+                    break;
+                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
+                    break;
+                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
+                    break;
+                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
+                    break;
+                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
+                    break;
+                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
+                    break;
+                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
+                    break;
+                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
+                    break;
+                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
+                    break;
+                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
+                    break;
+                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
+                    break;
+                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
+                    break;
+                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                }
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+4 -uvyypos, 0.0);
+                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+14+4-uvyypos, 0.0);
+                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+14+4-uvyypos , 0.0);
+                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+4-uvyypos, 0.0);
+                glEnd();
+                uvyypos+=16;
+              }
+            }
+
+            // do some uv stuf
+            glPopMatrix();
+
           }
-          glPopMatrix();
           // do clean up after uv meters
           delete [] spec;
           delete [] specLeft;

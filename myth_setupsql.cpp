@@ -588,6 +588,7 @@ const char *radio_station_setupsql8="REPLACE INTO `radio_stations` (`name`, `bes
 ('Steel-Breeze', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Steel-Breeze.png', 0, 0, 0, 1, '2011-11-11', 5109, 0, '2017-01-01 00:00:00', 1), \
 ('Jennifer-Lopez', '', 'http://www.wfuv.org/sites/all/files/streams/fuv247_64k.pls', '', 'Jennifer-Lopez.png', 0, 0, 0, 1, '2011-11-11', 5110, 0, '2017-01-01 00:00:00', 1);";
 
+
 const char *radio_station_setupsql13="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('181FM-Kickin-Country', '', 'http://listen.181fm.com/181-kickincountry_128k.mp3', 'http://www.181.fm/', '181FM-Kickin-Country.png', 0, 0, 0, 1, '2011-11-11', 5295, 0, '2017-01-01 00:00:00', 1), \
 ('Cheche-80S--90S-Rock-Hits', 'Esta es una emisora especializada en clasicos, especialmente de las decadas 80&#180;s y 90&#180;s. La programacion abarca los diversos subgeneros del rock. Escucharas las bandas, grupos y artistas con', 'http://listen.radionomy.com/cheche-international-radio', 'http://www.elcheche.net', 'Cheche-80S--90S-Rock-Hits.png', 0, 0, 0, 1, '2011-11-11', 5324, 0, '2017-01-01 00:00:00', 1), \
