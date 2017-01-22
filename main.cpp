@@ -4554,11 +4554,12 @@ void display(void) {
             if ((sound) && (snd)) {
               // stop sound playing
               result=channel->stop();
-              ERRCHECK(result,do_play_music_aktiv_table_nr);
               // release sound system again
               result=sound->release();
-              ERRCHECK(result,do_play_music_aktiv_table_nr);
+              //ERRCHECK(result,do_play_music_aktiv_table_nr);
               dsp=0;
+              snd=0;
+              sound=0;
             }
             #endif
 
