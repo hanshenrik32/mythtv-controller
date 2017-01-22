@@ -59,68 +59,68 @@ const char *create_sql_radio_types_data="REPLACE INTO `radiotypes` (`typename`, 
 
 const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landekode`, `imgpath`) VALUES \
                                                                 ('Yugoslavia', 3, 'yu.jpg'), \
-                                                                ('France',   4, 'fr.jpg'), \
+                                                                ('France',     4, 'fr.jpg'), \
                                                                 ('Luxembourg', 5, 'luxembourg.jpg'), \
-                                                                ('Holland',  6, 'nl.jpg'), \
-                                                                ('Usa',      7, 'usa.jpg'), \
-                                                                ('Tyskland', 8, 'de.jpg'), \
-                                                                ('England',  9, 'uk.jpg'), \
-                                                                ('Rusland', 10, 'ru.jpg'), \
-                                                                ('Israel',  11, 'Israel.jpg'), \
-                                                                ('Austria', 12, 'Austria.jpg'), \
-                                                                ('Lebanon',  13, 'lebanon.jpg'), \
-                                                                ('Latvia',  14, 'latvia.jpg'), \
-                                                                ('Vietnam', 16, 'Vietnam.jpg'), \
+                                                                ('Holland',    6, 'nl.jpg'), \
+                                                                ('Usa',        7, 'usa.jpg'), \
+                                                                ('Tyskland',   8, 'de.jpg'), \
+                                                                ('England',    9, 'uk.jpg'), \
+                                                                ('Rusland',   10, 'ru.jpg'), \
+                                                                ('Israel',    11, 'Israel.jpg'), \
+                                                                ('Austria',   12, 'Austria.jpg'), \
+                                                                ('Lebanon',   13, 'lebanon.jpg'), \
+                                                                ('Latvia',    14, 'latvia.jpg'), \
+                                                                ('Vietnam',   16, 'Vietnam.jpg'), \
                                                                 ('Saudi-Arabia', 17, 'Saudi-Arabia.jpg'), \
-                                                                ('as',      18, 'as.jpg'), \
-                                                                ('brazil',  19, 'brazil.jpg'), \
-                                                                ('Norge',   21, 'no.jpg'), \
-                                                                ('Polen',   22, 'pl.jpg'), \
-                                                                ('Sverige', 23, 'se.jpg'), \
+                                                                ('as',        18, 'as.jpg'), \
+                                                                ('brazil',    19, 'brazil.jpg'), \
+                                                                ('Norge',     21, 'no.jpg'), \
+                                                                ('Polen',     22, 'pl.jpg'), \
+                                                                ('Sverige',   23, 'se.jpg'), \
                                                                 ('Switzerland', 24, 'sw.jpg'), \
-                                                                ('Mexico',  25, 'mexico.jpg'), \
-                                                                ('Belgium', 26, 'be.jpg'), \
-                                                                ('Canada',  27, 'ca.jpg'), \
+                                                                ('Mexico',    25, 'mexico.jpg'), \
+                                                                ('Belgium',   26, 'be.jpg'), \
+                                                                ('Canada',    27, 'ca.jpg'), \
                                                                 ('Australia', 28, 'as.jpg'), \
-                                                                ('Rusland', 29, 'ru.jpg'), \
-                                                                ('Spain',   30, 'sp.jpg'), \
+                                                                ('Rusland',   29, 'ru.jpg'), \
+                                                                ('Spain',     30, 'sp.jpg'), \
                                                                 ('United Arab Emirates', 31, 'ae.jpg'), \
-                                                                ('Hungary', 32, 'hu.jpg'), \
-                                                                ('Thailand', 33, 'th.jpg'), \
-                                                                ('Greece',  34, 'gr.jpg'), \
+                                                                ('Hungary',   32, 'hu.jpg'), \
+                                                                ('Thailand',  33, 'th.jpg'), \
+                                                                ('Greece',    34, 'gr.jpg'), \
                                                                 ('Bosnia and Herzegovina', 35, 'bk.jpg'), \
-                                                                ('Bulgaria', 36, 'nu.jpg'), \
-                                                                ('India', 37, 'in.jpg'), \
-                                                                ('Portugal', 38, 'po.jpg'), \
-                                                                ('Iran', 39, 'ir.jpg'), \
-                                                                ('Korea', 40, 'ks.jpg'), \
-                                                                ('Romania', 41, 'romania.jpg'), \
-                                                                ('Italy',   42, 'it.jpg'), \
-                                                                ('Finland', 43, 'fi.jpg'), \
-                                                                ('Bahrain', 44, 'bahrain.jpg'), \
-                                                                ('Denmark', 45, 'dk.jpg'), \
-                                                                ('Chile', 46, 'chile.jpg'), \
-                                                                ('Chile', 47, 'chile.jpg'), \
-                                                                ('Slovakia', 48, 'Slovakia.jpg'), \
-                                                                ('Ukraine', 49, 'Ukraine.jpg'), \
-                                                                ('Hungary', 50, 'hu.jpg'), \
-                                                                ('Colombia', 51, 'co.jpg'), \
+                                                                ('Bulgaria',  36, 'nu.jpg'), \
+                                                                ('India',     37, 'in.jpg'), \
+                                                                ('Portugal',  38, 'po.jpg'), \
+                                                                ('Iran',      39, 'ir.jpg'), \
+                                                                ('Korea',     40, 'ks.jpg'), \
+                                                                ('Romania',   41, 'romania.jpg'), \
+                                                                ('Italy',     42, 'it.jpg'), \
+                                                                ('Finland',   43, 'fi.jpg'), \
+                                                                ('Bahrain',   44, 'bahrain.jpg'), \
+                                                                ('Denmark',   45, 'dk.jpg'), \
+                                                                ('Chile',     46, 'chile.jpg'), \
+                                                                ('Chile',     47, 'chile.jpg'), \
+                                                                ('Slovakia',  48, 'Slovakia.jpg'), \
+                                                                ('Ukraine',   49, 'Ukraine.jpg'), \
+                                                                ('Hungary',   50, 'hu.jpg'), \
+                                                                ('Colombia',  51, 'co.jpg'), \
                                                                 ('Dominican Republic', 52, 'do.jpg'), \
-                                                                ('Azerbaijan', 53, 'Azerbaijan.png'), \
+                                                                ('Azerbaijan',53, 'Azerbaijan.png'), \
                                                                 ('Lithuania', 54, 'Lithuania.png'), \
-                                                                ('Andorra', 55, 'Andorra.png'), \
-                                                                ('Estonia', 56, 'Estonia.png'), \
-                                                                ('Tajikistan', 57, 'Tajikistan.png'), \
-                                                                ('Turkey', 58, 'Turkey.png'), \
-                                                                ('Mongolia', 59, 'Mongolia.jpg'), \
-                                                                ('Belarus', 60, 'Belarus.jpg'), \
-                                                                ('Slovenia', 61, 'Slovenia.jpg'), \
-                                                                ('Cyprus', 62, 'Cyprus.jpg'), \
-                                                                ('China', 63, 'China.jpg'), \
-                                                                ('Cambodia', 64, 'Cambodia.jpg'), \
+                                                                ('Andorra',   55, 'Andorra.png'), \
+                                                                ('Estonia',   56, 'Estonia.png'), \
+                                                                ('Tajikistan',57, 'Tajikistan.png'), \
+                                                                ('Turkey',    58, 'Turkey.png'), \
+                                                                ('Mongolia',  59, 'Mongolia.jpg'), \
+                                                                ('Belarus',   60, 'Belarus.jpg'), \
+                                                                ('Slovenia',  61, 'Slovenia.jpg'), \
+                                                                ('Cyprus',    62, 'Cyprus.jpg'), \
+                                                                ('China',     63, 'China.jpg'), \
+                                                                ('Cambodia',  64, 'Cambodia.jpg'), \
                                                                 ('Indonesia', 65, 'Indonesia.jpg'), \
                                                                 ('Singapore', 66, 'Singapore.jpg'), \
-                                                                ('Croatia', 67, 'Croatia.jpg'), \
+                                                                ('Croatia',   67, 'Croatia.jpg'), \
                                                                 ('Czech Republic', 68, 'Czech Republic.jpg')";
 
 //

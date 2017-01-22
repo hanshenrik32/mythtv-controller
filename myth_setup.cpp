@@ -22,6 +22,7 @@
 #include "myth_setup.h"
 #include "checknet.h"
 
+extern int configuvmeter;
 extern int debugmode;
 
 struct configkeytype {
@@ -681,8 +682,6 @@ void show_setup_video() {
     glPopMatrix();
 
     glPushMatrix();
-
-
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(380.0f, 750.0f, 0.0f);
@@ -730,6 +729,29 @@ void show_setup_video() {
 
 
     glPushMatrix();
+    winsizx=100;
+    winsizy=40;
+    xpos=250;
+    ypos=500;
+    // here start input
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd(); //End quadrilateral coordinates
+    glPopMatrix();
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
     // show close on exit type
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(380.0f, 650.0f, 0.0f);
@@ -756,8 +778,61 @@ void show_setup_video() {
     }
     glPopMatrix();
 
-
     if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(configaktivescreensavername));
+
+
+
+
+
+    glPushMatrix();
+    winsizx=300;
+    winsizy=40;
+    xpos=250;
+    ypos=450;
+    // here start input
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd(); //End quadrilateral coordinates
+    glPopMatrix();
+
+
+
+
+
+    // show uv mode
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(380.0f, 600.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "UV Meter mode             ");
+    if (configuvmeter==0) strcpy(resl,"None");
+    if (configuvmeter==1) strcpy(resl,"Simple");
+    if (configuvmeter==2) strcpy(resl,"Dual");
+    if (configuvmeter>2) strcpy(resl,"None");
+    if (do_show_setup_select_linie==3) {
+        glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
+        myglprint4((char *) resl);
+    } else {
+        myglprint4((char *) resl);
+    }
+    glPopMatrix();
+
+
+//    if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(configaktivescreensavername));
 
 }
 

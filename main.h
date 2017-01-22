@@ -81,7 +81,6 @@ void *radio_check_statusloader(void *data);
 float music_icon_anim_files_ofset=0.0f;
 int music_icon_anim_files_numbers=19;
 
-
 float tv_icon_anim_files_ofset=0.0f;
 int tv_icon_anim_files_numbers=19;
 

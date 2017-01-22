@@ -4291,6 +4291,7 @@ void display(void) {
           int chan;
           if (!(dsp)) {
             sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
+            dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, 128);
             channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
             dsp->setActive(true);
           }
@@ -4390,10 +4391,10 @@ void display(void) {
             int high;
             int qq;
             // Draw uv lines
-            for(qq=0;qq<16;qq++) {
+            for(qq=0;qq<32;qq++) {
               uvypos=0;
               uvyypos=0;
-              high=sqrt(spec[(qq*2)+1])*10.0f;
+              high=sqrt(spec[(qq*1)+1])*10.0f;
               if (high>14) high=14;
               // draw 1 bar
               for(i=0;i<high;i+=1) {
@@ -4432,14 +4433,16 @@ void display(void) {
                     break;
                 }
                 glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+4 +uvypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+14+4+uvypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+14+4+uvypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+4+uvypos, 0.0);
+                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 +uvypos, 0.0);
+                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4+uvypos, 0.0);
+                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4+uvypos , 0.0);
+                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4+uvypos, 0.0);
                 glEnd();
                 uvypos+=16;
               }
-              high=sqrt(spec2[(qq*2)+1])*10.0f;
+
+              high=sqrt(spec2[(qq*1)+1])*10.0f;
+              if (high>14) high=14;
               for(i=0;i<high;i+=1) {
                 switch(i) {
                   case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
@@ -4476,10 +4479,10 @@ void display(void) {
                     break;
                 }
                 glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+4 -uvyypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  120+14+4-uvyypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+14+4-uvyypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  120+4-uvyypos, 0.0);
+                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 -uvyypos, 0.0);
+                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4-uvyypos, 0.0);
+                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4-uvyypos , 0.0);
+                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4-uvyypos, 0.0);
                 glEnd();
                 uvyypos+=16;
               }
@@ -4542,27 +4545,29 @@ void display(void) {
 //        spawn("./startmovie.pl","");
 //        posix_spawn(0,"./startmovie.pl","",0);
         } else {
+            // start internal player (vlc)
             if (debugmode && 16) fprintf(stderr,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
             // start play
             //
-
-
-
             // UNDER TEST
-            #if defined USE_FMOD_MIXER
             // if we play music/stream (radio) stop that before play movie stream (vlc)
-            if (sound) {
-              result=sound->release();          		// stop last played sound on soundsystem fmod
+
+            // stop music if play before start movie
+            #if defined USE_FMOD_MIXER
+            if ((sound) && (snd)) {
+              result=sound->release();			// stop all music if user press show playlist stop button
               ERRCHECK(result,do_play_music_aktiv_table_nr);
               dsp=0;
             }
             #endif
+
 
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
               // stop playing (active movie)
               film_oversigt.softstopmovie();
             }
+            // start movie
             if (film_oversigt.playmovie(fknapnr-1)==0) {
               vis_error=true;
               vis_error_timeout=60;
