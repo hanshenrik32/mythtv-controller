@@ -4560,6 +4560,9 @@ void display(void) {
               dsp=0;
               snd=0;
               sound=0;
+              // clean music playlist
+              aktiv_playlist.clean_playlist();                // clean play list (reset) play list
+              do_play_music_aktiv_table_nr=1;			// reset play start nr
             }
             #endif
 
