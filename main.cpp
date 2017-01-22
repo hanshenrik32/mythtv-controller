@@ -4553,18 +4553,23 @@ void display(void) {
             #if defined USE_FMOD_MIXER
             if ((sound) && (snd)) {
               // stop sound playing
-              result=channel->stop();
+              result=channel->stop();                         // stop fmod player
               // release sound system again
               result=sound->release();
-              //ERRCHECK(result,do_play_music_aktiv_table_nr);
+              // mp uv meters
               dsp=0;
-              snd=0;
-              sound=0;
-              // clean music playlist
-              aktiv_playlist.clean_playlist();                // clean play list (reset) play list
-              do_play_music_aktiv_table_nr=1;			// reset play start nr
             }
             #endif
+            #if defined USE_SDL_MIXER
+            Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
+            sdlmusicplayer=NULL;
+            #endif
+            // no play sound flag
+            snd=0;
+            sound=0;
+            // clean music playlist
+            aktiv_playlist.clean_playlist();                // clean play list (reset) play list
+            do_play_music_aktiv_table_nr=1;			// reset play start nr
 
             if (debugmode) printf("Stop playing wideo if any \n");
 /*
