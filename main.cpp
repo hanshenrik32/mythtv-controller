@@ -4547,26 +4547,29 @@ void display(void) {
         } else {
             // start internal player (vlc)
             if (debugmode && 16) fprintf(stderr,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
-            // start play
-            //
-            // UNDER TEST
             // if we play music/stream (radio) stop that before play movie stream (vlc)
-
             // stop music if play before start movie
+            if (debugmode) printf("Stop playing music/radio \n");
             #if defined USE_FMOD_MIXER
             if ((sound) && (snd)) {
-              result=sound->release();			// stop all music if user press show playlist stop button
+              // stop sound playing
+              result=channel->stop();
+              ERRCHECK(result,do_play_music_aktiv_table_nr);
+              // release sound system again
+              result=sound->release();
               ERRCHECK(result,do_play_music_aktiv_table_nr);
               dsp=0;
             }
             #endif
 
-
+            if (debugmode) printf("Stop playing wideo if any \n");
+/*
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
               // stop playing (active movie)
               film_oversigt.softstopmovie();
             }
+*/
             // start movie
             if (film_oversigt.playmovie(fknapnr-1)==0) {
               vis_error=true;
