@@ -6613,7 +6613,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_videoplayer) {
-                        if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
+                        if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
 
                     keybuffer[0]=0;
@@ -7026,7 +7026,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                             keybuffer[keybufferindex]=key;
                             keybufferindex++;
                             keybuffer[keybufferindex]='\0';	// else input key text in buffer
-
                             printf("Keybuffer=%s\n",keybuffer);
                         }
                       }
@@ -7042,6 +7041,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (key==32) {
                           if (debugmode>1) debugmode=debugmode*2; else debugmode++;
                           if (debugmode>512) debugmode=0;
+                        }
+                      }
+                      if (do_show_setup_select_linie==3) {
+                        if (key==32) {
+                          configuvmeter=+1;
+                          if (configuvmeter>2) configuvmeter=0;
                         }
                       }
                   }
@@ -7176,7 +7181,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                           break;
                   case 2: //strcpy(configvideoplayer,keybuffer);
                           break;
-            }
+                  case 3:
+                          break;
+              }
            }
        }
     } else {
