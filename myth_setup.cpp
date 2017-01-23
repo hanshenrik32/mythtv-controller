@@ -809,9 +809,6 @@ void show_setup_video() {
     glPopMatrix();
 
 
-
-
-
     // show uv mode
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
