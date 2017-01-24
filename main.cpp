@@ -2800,31 +2800,30 @@ void display(void) {
       // background
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      glTranslatef(550, orgwinsizey-50, 0.0f);
-      glEnable(GL_BLEND);
-      glDisable(GL_DEPTH_TEST);
-      //glBindTexture(GL_TEXTURE_2D,streammoviebuttonmask);
-      glColor4f(1.0f, 1.0f, 1.0f,0.5f);
-      glBindTexture(GL_TEXTURE_2D,_errorbox); // mask _textureId5_!
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f,1.0f,1.0f,0.2f);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D, _errorbox);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      //glBlendFunc(GL_ONE, GL_ONE);
-      glBlendFunc(GL_ONE, GL_ZERO);
+      glTranslatef(550, 19, 0.0f);                                          // orgwinsizey
       glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 50.0, 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 50.0, 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 10.0, 0.0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 10.0, 50.0, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 640.0, 50.0, 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 640.0, 0.0, 0.0);
       glEnd(); //End quadrilateral coordinates
       glPopMatrix();
 
-      glPopMatrix();
       if (film_oversigt.film_is_playing) {
         strcpy(temptxt1,"Error playing movie.");
       } else {
         strcpy(temptxt1,"Fault playing.");
         switch(vis_error_flag) {
+            case 18:
+              strcpy(temptxt1,"Music/Radio station not online.");
+              break;
             case 20:
               strcpy(temptxt1,"Couldn't perform seek. Limitation of the medium.");
               break;
@@ -2833,6 +2832,9 @@ void display(void) {
               break;
             case 27:
               strcpy(temptxt1,"Error 27.");
+              break;
+            case 38:
+              strcpy(temptxt1,"Music/Radio station not online.");
               break;
             case 36:
               strcpy(temptxt1,"Error 36 - An invalid object handle was used.");
@@ -2855,7 +2857,7 @@ void display(void) {
       }
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(580, orgwinsizey-30, 0.0f);
+      glTranslatef(580, 30, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
@@ -4276,7 +4278,7 @@ void display(void) {
         }
         //
         if ((snd) && (show_uv)) vis_uv_meter=true;
-        if (((snd) && (vis_uv_meter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
+        if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
           sampleSize = 1024;                // nr of samples default 64
           specLeft = new float[sampleSize];
@@ -4420,11 +4422,11 @@ void display(void) {
                     case 14:
                             glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
                             glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
-                    break;
+                            break;
                     default:
                             glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
                             glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                    break;
+                            break;
                 }
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 +uvypos, 0.0);
