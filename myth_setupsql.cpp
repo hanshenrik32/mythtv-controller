@@ -142,7 +142,7 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('181FM', '', 'http://uplink.181.fm:8068/', '', '181.fm.png', 0, 128, 1, 1, '2011-08-02', 15, 7, '2011-09-27 17:58:45', 1), \
 ('Energy 93 Eurodance', '', 'http://uplink.181.fm:8044/', '', '181.fm.png', 4, 0, 5, 1, '2011-08-02', 16, 7, '2011-10-07 16:02:00', 1), \
 ('Just Hiphop', '', 'http://stream.laut.fm:80/justhiphop', '', '', 5, 0, 2, 1, '2011-08-02', 17, 29, '2011-09-13 10:53:29', 1), \
-('Radio MRDJ', '[Bitrate: 128]  ', 'http://212.18.63.51:9000', '', '', 4, 128, 10, 1, '2011-08-11', 18, 61, NULL, 1), \
+('Radio MRDJ', '[Bitrate: 128]', 'http://212.18.63.51:9000', '', '', 4, 128, 10, 1, '2011-08-11', 18, 61, NULL, 1), \
 ('Groove Salad', 'A nicely chilled plate of ambient/downtempo beats and grooves.', 'http://ice1.somafm.com/groovesalad-128-aac', '', '', 16, 128, 13, 1, '2011-07-31', 19, 7, '2011-10-07 15:58:57', 1), \
 ('Radio EFM', 'France', 'http://radioefm.ice.infomaniak.ch:80/radioefm-high.mp3', '', '', 12, 128, 6, 1, '2011-08-01', 22, 4, NULL, 1), \
 ('The voice DK', 'The voice denmark.', 'http://195.184.101.203/voice128', '', 'The-Voice-1049.png', 40, 64, 5, 1, '2011-08-01', 23, 45, '2011-09-11 00:08:02', 1), \
@@ -919,6 +919,12 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio-Deejay', '', 'http://live.radiodeejay.hr:7002', 'http://www.radiodeejay.hr/', 'Radio-Deejay.png', 0, 0, 0, 1, '2011-11-11', 14324, 0, '2017-01-01 00:00:00', 1), \
 ('Radio-Manhattan', '', 'http://www.radionylive.com/listen/mp3', 'http://www.radiomanhattan.pl/', 'Radio-Manhattan-998.png', 0, 0, 0, 1, '2011-11-11', 14332, 0, '2017-01-01 00:00:00', 1), \
 ('Discofox-Radio', 'Hier gibt es Deutsche und Internationale Discofox-Scheiben.', 'http://stream.laut.fm/discofox', 'http://www.dj-willy.de/', 'Discofox-Radio.png', 0, 0, 0, 1, '2011-11-11', 14350, 0, '2017-01-01 00:00:00', 1), \
+('Top40 pop', 'RadioMonster.FM - Tophits.', 'http://tophits.radiomonster.fm/320.mp3', '', '', 1, 320, 0, 1, '2011-11-11', 14350, 0, '2017-01-21 00:00:00', 1), \
+('DemonFM', 'DemonFM 320k MP3', 'http://live.demonfm.co.uk:8000/demon320', '', '', 1, 320, 0, 1, '2017-01-21', 14351, 0, '2017-01-21 00:00:00', 1), \
+('Record deep radio', '320k MP3', 'http://air.radiorecord.ru:805/deep_320', '', '', 1, 320, 0, 1, '2017-01-21', 14352, 0, '2017-01-21 00:00:00', 1), \
+('LSD 25', 'LSD-25 Radio', 'http://a1.lsd-25.ru:8000/new', '', '', 1, 192, 0, 1, '2017-01-21', 14353, 0, '2017-01-21 00:00:00', 1), \
+('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 14354, 0, '2017-01-21 00:00:00', 1), \
+('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 14355, 0, '2017-01-21 00:00:00', 1), \
 ('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
 
 
