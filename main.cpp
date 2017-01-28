@@ -2741,6 +2741,7 @@ void display(void) {
           glPushMatrix();
           aktivfont.selectfont("DejaVu Sans");
           film_oversigt.show_film_oversigt(_fangley,fknapnr);
+          //glEnable(GL_BLEND);
           glPopMatrix();
         } else if (vis_stream_oversigt) {
           glPushMatrix();
@@ -4399,7 +4400,7 @@ void display(void) {
               uvypos=0;
               uvyypos=0;
               high=sqrt(spec[(qq*1)+1])*10.0f;
-              if (high>14) high=14;
+              if (high>7) high=6;
               // draw 1 bar
               for(i=0;i<high;i+=1) {
                 glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
@@ -4439,7 +4440,7 @@ void display(void) {
               }
 
               high=sqrt(spec2[(qq*1)+1])*10.0f;
-              if (high>14) high=14;
+              if (high>7) high=6;
               for(i=0;i<high;i+=1) {
                 switch(i) {
                     case 1:
