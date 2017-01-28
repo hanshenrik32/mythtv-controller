@@ -2738,7 +2738,10 @@ void display(void) {
       if (vis_music_oversigt) {
           show_music_oversigt1(musicoversigt,_textureId7,_textureId7_1,_textureIdback,_textureId28,_textureId28_1,_mangley);
         } else if (vis_film_oversigt) {
+          glPushMatrix();
+          aktivfont.selectfont("DejaVu Sans");
           film_oversigt.show_film_oversigt(_fangley,fknapnr);
+          glPopMatrix();
         } else if (vis_stream_oversigt) {
           glPushMatrix();
           streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);

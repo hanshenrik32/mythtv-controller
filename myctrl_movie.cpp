@@ -1405,11 +1405,11 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[i+sofset].gettextureid()) {
         // print cover dvd
-        glPushMatrix();
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1421,8 +1421,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
-
-
         // print movie cover over
         glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
         glDisable(GL_BLEND);
@@ -1441,7 +1439,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         // print cover dvd
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1454,7 +1453,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-      glPopMatrix();
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
