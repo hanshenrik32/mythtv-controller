@@ -923,11 +923,11 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('DemonFM', 'DemonFM 320k MP3', 'http://live.demonfm.co.uk:8000/demon320', '', '', 1, 320, 0, 1, '2017-01-21', 14351, 0, '2017-01-21 00:00:00', 1), \
 ('Record deep radio', '320k MP3', 'http://air.radiorecord.ru:805/deep_320', '', '', 1, 320, 0, 1, '2017-01-21', 14352, 0, '2017-01-21 00:00:00', 1), \
 ('LSD 25', 'LSD-25 Radio', 'http://a1.lsd-25.ru:8000/new', '', '', 1, 192, 0, 1, '2017-01-21', 14353, 0, '2017-01-21 00:00:00', 1), \
-('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 14354, 0, '2017-01-21 00:00:00', 1), \
-('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 14355, 0, '2017-01-21 00:00:00', 1), \
+('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 6, 0, '2017-01-21 00:00:00', 1), \
+('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 5, 0, '2017-01-21 00:00:00', 1), \
 ('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
 
-
+// 700 -> 1000 is free on intnr
 
 // operet databaser/tables if now exist
 int create_radio_oversigt() {

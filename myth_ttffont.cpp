@@ -61,7 +61,7 @@ int fontctrl::updatefontlist()
               //if (j==0) strcpy(typeinfo[0].fonttype,(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
               if (j==0) sprintf(typeinfo[i].fontname,"%s",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j)); //glcGetMasterListc(i, GLC_FACE_LIST, j)
 
-              printf("Font list %s \n",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));	// 	glcGetMasterListc(i, GLC_CHAR_LIST, j));
+              if (debugmode==128) printf("Font list %s \n",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));	// 	glcGetMasterListc(i, GLC_CHAR_LIST, j));
 
               master = i;
           }

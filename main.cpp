@@ -636,8 +636,6 @@ GLuint _textureId14; 	//pause knap
 GLuint _textureId15; 	//lille cover mask
 GLuint _textureId16; 	//box2.bmp
 GLuint _dvdcovermask; 	//dvdcovermask
-GLuint _dvdcovermask2;	// no dvd default cover full size mask
-GLuint _dvdcovermask3;	// no dvd default cover full size mask
 GLuint _textureId18; 	//movie options box
 GLuint _textureId18_1; 	//mask movie options box
 GLuint _textureId19; 	//movie options box
@@ -9732,8 +9730,8 @@ void loadgfx() {
     _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
-    _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
-    _defaultdvdcover2	    = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
+    _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
+    _defaultdvdcover2	    = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     if (screen_size<3)
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
@@ -9767,8 +9765,6 @@ void loadgfx() {
     _textureId15         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _textureId16         	= loadgfxfile(temapath,(char *) "images/",(char *) "box2");
     _dvdcovermask       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
-    _dvdcovermask2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask2");
-    _dvdcovermask3       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask3");
     _textureId18         	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox1");
     _textureId18_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_mask");
     _textureId19         	= loadgfxfile(temapath,(char *) "images/",(char *) "box3");
@@ -9983,8 +9979,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId15);							// bruges ikk
     glDeleteTextures( 1, &_textureId16);			// hvis ingen texture (music cover) set default (box2.bmp)
     glDeleteTextures( 1, &_dvdcovermask);			// dvd cover mask
-    glDeleteTextures( 1, &_dvdcovermask2);			// dvd cover mask
-    glDeleteTextures( 1, &_dvdcovermask3);			// dvd cover mask
     glDeleteTextures( 1, &_textureId18);			// ask display order
     glDeleteTextures( 1, &_textureId18_1);			// ask box mask
     glDeleteTextures( 1, &_textureId19);			// other box2
