@@ -2741,7 +2741,6 @@ void display(void) {
           glPushMatrix();
           aktivfont.selectfont("DejaVu Sans");
           film_oversigt.show_film_oversigt(_fangley,fknapnr);
-          //glEnable(GL_BLEND);
           glPopMatrix();
         } else if (vis_stream_oversigt) {
           glPushMatrix();
@@ -2755,6 +2754,7 @@ void display(void) {
         } else if (vis_recorded_oversigt) {
           recordoversigt.show_recorded_oversigt1(0,0);
         }
+        // show radio options menu
         if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
         }
@@ -7033,6 +7033,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                           if (debugmode>512) debugmode=0;
                         }
                       }
+                      // uv meter mode
                       if (do_show_setup_select_linie==3) {
                         if (key==32) {
                           configuvmeter=+1;
@@ -7184,6 +7185,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     break;
             case '*':
                     if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
+                    if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
                     if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
                     break;
             case 'o':
@@ -7230,7 +7232,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     }
                     if (vis_radio_oversigt) {
                         rknapnr=0;
-                        hent_radio_search=true;				// start radio station search
+                        hent_radio_search=true;			  	// start radio station search
                         radio_key_selected=1;
                         _rangley=0.0f;
                     }
@@ -7246,16 +7248,13 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                     if ((vis_music_oversigt) && (keybufferopenwin)) {
                         hent_music_search=true;                         // start music search  (set flag)
-                        mknapnr=0;					//reset mouse/key pos in vis_music_overs
+                        mknapnr=0;				                            	// reset mouse/key pos in vis_music_overs
                         music_key_selected=1;
                         music_select_iconnr=0;
                         music_icon_anim_icon_ofset=0;
                         music_icon_anim_icon_ofsety=0;
                         _mangley=0.0f;
                     }
-
-
-
 
 
                     if ((vis_music_oversigt) && (!(do_zoom_music_cover))) {
@@ -7491,7 +7490,7 @@ void update(int value) {
                     }
 
 
-                    // Home back to start of program init
+                    // Home back to starvis_radio_oversigtt of program init
                     if (strcmp(c,"Home")==0) {
                         do_play_music_aktiv=false;							// sluk music info cover
                         vis_tv_oversigt=false;								// sluk tv oversigt

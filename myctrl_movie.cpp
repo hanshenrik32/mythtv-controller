@@ -284,13 +284,18 @@ int film_oversigt_typem::playmovie(int nr) {
       // Create a media player playing environement
       vlc_mp=libvlc_media_player_new_from_media(vlc_m);
       libvlc_media_add_option(vlc_m,"no-video-title-show");
+      // set fullscreen
       libvlc_set_fullscreen(vlc_mp,true);
       // enable ketboard input to vlc player
       libvlc_video_set_key_input(vlc_mp,true);
+      libvlc_video_set_mouse_input(vlc_mp,true);
       //libvlc_media_add_option(vlc_m,":fullscreen");
       //libvlc_media_add_option(vlc_m,":sout-all");
       // <gdk/gdkx.h>
       // Bind to xwindows
+
+      //libvlc_media_player_set_xwindow(vlc_mp, 0);
+
       //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
       if (!(vlc_mp)) error=1;
       libvlc_media_release(vlc_m);
