@@ -2751,7 +2751,7 @@ void display(void) {
         } else if (vis_film_oversigt) {
           glPushMatrix();
           aktivfont.selectfont("DejaVu Sans");
-          film_oversigt.show_film_oversigt(_fangley,fknapnr);          
+          film_oversigt.show_film_oversigt(_fangley,fknapnr);
           glPopMatrix();
         } else if (vis_stream_oversigt) {
           glPushMatrix();
@@ -9052,34 +9052,15 @@ int init_sound_system(int devicenr) {
         ERRCHECK(result,0);
         result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
         ERRCHECK(result,0);
-
-/*
-        printf("%2d - %-30s", count + 1, name);
-        if (count % 2)
-        {
-            printf("\n");
-        }
-*/
     }
-//    printf("\n");
-//    printf("Output plugins\n");
-//    printf("--------------\n");
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_OUTPUT, &num);
     ERRCHECK(result,0);
     for (count = 0; count < num; count++) {
         result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_OUTPUT, count, &handle);
         ERRCHECK(result,0);
-
         result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
         ERRCHECK(result,0);
-
-/*        printf("%2d - %-30s", count + 1, name);
-        if (count % 2) {
-            printf("\n");
-        }
-*/
     }
-    //printf("\n");
     result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_OUTPUT, 2, &handle);
     ERRCHECK(result,0);
     if (handle==3) strcpy(configdeviceid,"FMOD ESD");
@@ -9122,7 +9103,6 @@ int init_sound_system(int devicenr) {
     /* If we actually care about what we got, we can ask here.
     In this program we don't, but I'm showing the function call here anyway in case we'd want to know later. */
     Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-
     sdlmusic=Mix_Init(flags);
     if(sdlmusic&flags != flags) {
         printf("Mix_Init: Failed to init required ogg,mp3,flac support!\n");
@@ -9238,11 +9218,17 @@ void *datainfoloader_music(void *data) {
   pthread_exit(NULL);
 }
 
+
+
+
+
+
+
+
+
 //
 // phread dataload Film
 //
-
-
 
 
 void *datainfoloader_movie(void *data) {
@@ -9656,7 +9642,7 @@ void *xbmcdatainfoloader_movie(void *data) {
         }
       }
     }
-    // check user homedir
+    // check/get user homedir
     getuserhomedir(userhomedir);
     strcpy(videohomedirpath,userhomedir);
     // add kodi dir ro db files
@@ -9676,7 +9662,6 @@ void *xbmcdatainfoloader_movie(void *data) {
       case 12:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos75.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
                 break;
-
     }
     printf("loader thread starting - Loading movies from xbmc/kodi.\n");
     xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
@@ -9941,33 +9926,24 @@ void loadgfx() {
     radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
     radiooptionsmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptionsmask");
-
-
     onlinestreammask=loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_mask");
     onlinestreammaskicon=loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_mask");
-
     // stream stuf
     // stream/movie button mask
     streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
     streambutton=loadgfxfile(temapath,(char *) "images/",(char *) "stream_button");
     onlinestreammask=loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_mask");
-
     // movie
     moviebutton=loadgfxfile(temapath,(char *) "images/",(char *) "movie_button");
-
     // main logo
     _mainlogo=loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
     strcpy(fileload,(char *) "/usr/share/mythtv-controller/images/landemask.jpg");
     gfxlandemask=loadTexture (fileload);
-
-
     // screen saver boxes
     screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
     screensaverbox_mask=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix_mask");
-
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
-
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
 
 // *********************************************************************
@@ -10230,24 +10206,51 @@ void InitGL()              // We call this right after our OpenGL window is crea
         strcpy(temapath,"tema1/");
         tema=1;
     }
-
     //load_lande_flags();
-
-
 // Load radio stations gfx **********************************************
 // virker vis aktiveres
 // bliver loaded første gang de bruges
 
-
-
 //    radiooversigt.load_radio_stations_gfx();
-
 // *********************************************************************
-
-
-
 //    mybox.settexture(musicoversigt);
 }
+
+
+
+
+
+// bruges til at checke_copy radio icons som virker til nyt dir
+
+
+int check_radio_stations_icons() {
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  bool dbexist=false;
+  char resl[1024];
+
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    // test fpom musik table exist
+    mysql_query(conn,"select gfx_link from radio_stations where online=1 and gfx_link!=''");
+    res = mysql_store_result(conn);
+    while ((row = mysql_fetch_row(res)) != NULL) {
+      strcpy(resl,"cp images/radiostations/");
+      strcat(resl,row[0]);
+      strcat(resl," images/radiostations_ok/");
+      system(resl);
+    }
+  }
+}
+
+
+
+
 
 
 
@@ -10385,6 +10388,10 @@ int main(int argc, char** argv) {
     //libvlc_media_player_release(vlc_mp);
 
     initlirc();
+
+    // bruges til at checke_copy radio icons som virker til nyt dir
+    //check_radio_stations_icons();
+
 
     glutInit(&argc, argv);
     init_sound_system(soundsystem);                             // Init sound
