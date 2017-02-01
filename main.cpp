@@ -2751,7 +2751,7 @@ void display(void) {
         } else if (vis_film_oversigt) {
           glPushMatrix();
           aktivfont.selectfont("DejaVu Sans");
-          film_oversigt.show_film_oversigt(_fangley,fknapnr);
+          film_oversigt.show_film_oversigt(_fangley,fknapnr);          
           glPopMatrix();
         } else if (vis_stream_oversigt) {
           glPushMatrix();
@@ -4814,6 +4814,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie title
       glPushMatrix();
       glTranslatef(670,760+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4827,6 +4828,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie length
       glPushMatrix();
       glTranslatef(670,740+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4838,6 +4840,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie year
       glPushMatrix();
       glTranslatef(670,720+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4849,6 +4852,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie rating on imdb
       glPushMatrix();
       glTranslatef(670,700+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4864,6 +4868,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie imdb nr
       glPushMatrix();
       glTranslatef(670,680+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4880,6 +4885,7 @@ void display(void) {
       glcRenderString(temptxt);
       glPopMatrix();
 
+      // show movie land
       glPushMatrix();
       glTranslatef(670,660+100,0);
       glRasterPos2f(0.0f, 0.0f);
@@ -4899,6 +4905,7 @@ void display(void) {
       }
       glPopMatrix();
 
+      // show movie descrition
       glPushMatrix();
       glTranslatef(430,560+90,0);
       glRasterPos2f(0.0f, 0.0f);

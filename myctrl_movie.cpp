@@ -1404,6 +1404,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   ypos=700;
   while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
+
     if ((i+sofset)<filmoversigt_antal) {
       if (((i % bonline)==0) && (i>0)) {
         xpos=20;
@@ -1412,13 +1413,15 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[i+sofset].gettextureid()) {
+
+
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_DST_COLOR, GL_ZERO);
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1444,12 +1447,13 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glEnd(); //End quadrilateral coordinates
 
       } else {
+
         // print cover dvd
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_DST_COLOR, GL_ZERO);
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1460,10 +1464,13 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
+
       }
+
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
+
 
       glPushMatrix();
       if (strlen(temptxt)<=14) {
@@ -1536,21 +1543,25 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
           ii++;	// skip space
         }
 
-/*
+
+
         //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(20.0, 20.0, 1.0);
-        glcRenderString(temptxt);
-*/
+//        glRasterPos2f(0.0f, 0.0f);
+//        glDisable(GL_TEXTURE_2D);
+//        glScalef(20.0, 20.0, 1.0);
+//        glcRenderString(temptxt);
+
       }
+
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+
     xpos+=205;
     i++;
-    glPopMatrix();
+    //glPopMatrix();
   }
+
 
   if (movie_oversigt_loaded_nr<this->filmoversigt_antal) {
     winsizx=200;
