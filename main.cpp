@@ -2159,8 +2159,19 @@ void show_background() {
   glTexCoord2f(1.0, 0.0); glVertex3f(1920.0, 0.0, 0.0);
   glEnd();
   glPopMatrix();
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4749,7 +4760,27 @@ void display(void) {
       glEnd();
       glPopMatrix();
 
-      // show movie icon
+
+      // show movie dvd cover
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glTranslatef(420,600,0);
+      glDisable(GL_DEPTH_TEST);
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 0, 100 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0, 0+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+220, 0+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+220, 100 , 0.0);
+      glEnd();
+      glPopMatrix();
+
+
+      // show movie icon over dvd cover
       glPushMatrix();
       textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfronttextureid();
       if (textureId==0) textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid();
@@ -4763,10 +4794,10 @@ void display(void) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0, 100 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220, 0+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220, 100 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 +5, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320-5, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( 0+220-3, 0+320-5 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( 0+220-3, 100+5 , 0.0);
       glEnd();
       glPopMatrix();
 
@@ -6221,10 +6252,10 @@ void handlespeckeypress(int key,int x,int y) {
     saver_irq=true;                                     // stop screen saver
 
 
-    mnumbersoficonline=9;		// antal i music oversigt
-    fnumbersoficonline=9;	  // antal i film oversigt
+    mnumbersoficonline=8;		// antal i music oversigt
+    fnumbersoficonline=8;	  // antal i film oversigt
     rnumbersoficonline=8;   // antal i radio oversigt
-    snumbersoficonline=9;   // antal i stream oversigt
+    snumbersoficonline=8;   // antal i stream oversigt
     MOVIE_CS=46.0f;					// movie dvd cover side
     MUSIC_CS=41.0;					// music cd cover side
     RADIO_CS=41.0;					// radio cd cover side
@@ -6537,6 +6568,9 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
 
+
+                if (vis_film_oversigt) printf("select = %d  Antal=%d\m ",film_select_iconnr,film_oversigt.film_antal());
+
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
                     if (film_key_selected>=11) {
                         _fangley+=MOVIE_CS;
@@ -6548,7 +6582,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 // radio
-                if ((vis_radio_oversigt) && (show_radio_options==false) && (radio_select_iconnr+(rnumbersoficonline)<radiooversigt_antal)) {
+                if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+rnumbersoficonline)<radiooversigt.radioantal())) {
                     if (radio_key_selected>=20) {
                         _rangley+=RADIO_CS;
                         radio_select_iconnr+=rnumbersoficonline;
@@ -6811,6 +6845,7 @@ void handlespeckeypress(int key,int x,int y) {
 
 void handleKeypress(unsigned char key, int x, int y) {
 
+    const char optionmenukey='O';
     char id[80];		// bruges af wlan setup
     char tmptxt[80];
     char temptxt[200];
@@ -6818,7 +6853,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
-    if ((key!=27) && (key!='*') && (key!='-') && (key!=13) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!='o')) || (do_show_setup))) {
+    if ((key!=27) && (key!='*') && (key!='-') && (key!=13) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
        // gem key pressed in buffer
        if (keybufferindex<80) {
           if (key==8) {						// back space
@@ -7039,6 +7074,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                           configuvmeter=+1;
                           if (configuvmeter>2) configuvmeter=0;
                         }
+/*                        if (configuvmeter==0) strcpy(keybuffer,"none");
+                        if (configuvmeter==1) strcpy(keybuffer,"Simple");
+                        if (configuvmeter==2) strcpy(keybuffer,"Dual");
+*/
+                        sprintf(keybuffer,"%d",configuvmeter);
                       }
                   }
               }
@@ -7188,7 +7228,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
                     if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
                     break;
-            case 'o':
+            case optionmenukey:
                     if (vis_film_oversigt) {
                         vis_movie_options=!vis_movie_options;
                     } else if ((vis_tv_oversigt) && (!(vis_tvrec_list))) {

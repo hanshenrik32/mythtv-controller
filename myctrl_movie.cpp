@@ -467,13 +467,14 @@ int countEntriesInDir(const char* dirname) {
 
 // hent film oversigt
 
-void film_oversigt_typem::opdatere_film_oversigt() {
+int film_oversigt_typem::opdatere_film_oversigt() {
     char convert_command[2000];
     char convert_command1[2000];
     char sqlselect[2000];
     char temptxt[1000];
 //    char tmptxt1[200];
     unsigned int i;
+    int filmantal=0;
     FILE *filhandle;
     char resl[200];
     char database[200];
@@ -499,6 +500,7 @@ void film_oversigt_typem::opdatere_film_oversigt() {
     filhandle=fopen("filmcover_gfx.log","w");
     if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+            filmantal++;
             filmoversigt[i].setfilmid(atoi(row[0]));
             filmoversigt[i].setfilmtitle(row[1]);
 
@@ -745,14 +747,15 @@ void film_oversigt_typem::opdatere_film_oversigt() {
             if (file_exists(temptxt)) {
                 filmoversigt[i].setfilmscoverfile(temptxt);
             }
-  	    i++;
+  	        i++;
         }
     }
     if (filhandle) fclose(filhandle);							// close log file again
-    if (i>0) this->filmoversigt_antal=i-1; else this->filmoversigt_antal=0;
+    if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
-    printf(" %d dvd covers loaded\n",i);
+    printf(" %d dvd covers loaded\n",filmantal);
     mysql_close(conn);
+    return(filmantal);
 }
 
 
@@ -830,7 +833,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
               sofset=(_mangley/41)*9;
               bonline=5;				// antal pr linie
               xvgaz=-1000.0f;
-              lfilmoversigt_antal=9*6;
+              lfilmoversigt_antal=8*6;
               buttonsizex=84.0f+30.0f+10.0f;				// 84.0f
               buttonsizey=74.0f+22.0f+30.0f+10.0f;			// =74.0f+22.0f;
               break;

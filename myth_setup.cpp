@@ -816,10 +816,13 @@ void show_setup_video() {
     glTranslatef(380.0f, 600.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     myglprint4((char *) "UV Meter mode             ");
+    /*
     if (configuvmeter==0) strcpy(resl,"None");
     if (configuvmeter==1) strcpy(resl,"Simple");
     if (configuvmeter==2) strcpy(resl,"Dual");
     if (configuvmeter>2) strcpy(resl,"None");
+    */
+    sprintf(resl,"%d",configuvmeter);
     if (do_show_setup_select_linie==3) {
         glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
         myglprint4((char *) resl);
