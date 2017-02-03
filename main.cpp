@@ -5,7 +5,6 @@
 #include <GL/glut.h>
 #include <IL/il.h>
 #include <math.h>
-
 #include <errno.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -20,24 +19,17 @@
 #include <unistd.h>                     // get hostname
 #include <time.h>                       // have strftime
 #include <sqlite3.h>                    // sqlite interface to xbmc(kodi)
-
 // vlc plugin
 #include <vlc/vlc.h>
-
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
-
 // Set sound system used
-
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
-
-
 #if defined USE_SDL_MIXER
 #include <SDL_mixer.h>
 #endif
-
 #if defined __APPLE__ && defined __MACH__
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
@@ -47,9 +39,6 @@
 #endif
 
 #include <pthread.h>                   // multi thread support
-
-
-
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
@@ -96,6 +85,7 @@ static const char * const opt [] = {
 */
 
 
+// struct used by keyboard config of functions keys
 struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
@@ -103,27 +93,24 @@ struct configkeytype {
 
 int numCPU;                                             // have the numbers of cpu cores
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
-
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
-
 const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
-
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
-int findtype=0;						// bruges af search kunster/sange
+int findtype=0;					                              	// bruges af search kunster/sange
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
 char configmysqlhost[256];                              //
-
-char configxbmcuser[256];                              // /mythtv/mysql access info
-char configxbmcpass[256];                              //
-char configxbmchost[256];                              //
-
-char configdefaultmusicpath[256];                      // internal db for music
+// ************************************************************************************************
+char configxbmcuser[256];                               // /mythtv/mysql access info
+char configxbmcpass[256];                               //
+char configxbmchost[256];                               //
+// ************************************************************************************************
+char configdefaultmusicpath[256];                       // internal db for music
 char configbackend[20];			                        		// backend system xbmc/mythtv
 char configmythhost[256];			                        	// host of mythtv master
 char configmysqlip[256];				                        // mysql server ip
@@ -133,40 +120,39 @@ char confighostwlanname[256];				                    // wlan netid name
 char configpicturepath[256];                            // path til pictures gallery source (den laver et dir under som hedder "mythc_gallery"
 char configmusicpath[256];                              // path til music source
 char configmusicmypath[256];                            // mythtv-controller internal path
-char configmoviepath[256];
-char configrecordpath[256];
-char configmythsoundsystem[256];			// selected soundsystem output device 0 = default
-char avalible_device[10][256];				// sound system devises list
-char configsoundoutport[256];				// sound output port (hdmi/spdif/analog)
-char configclosemythtvfrontend[256];			// close mythtvfront end on startup
-char configaktivescreensavername[256];			// screen saver name
-char configdvale[256];					// kan vi gå i dvale (mythtv kontrol) gen lock file
-char configmouse[256];					// mouse enable
-storagedef configstoragerecord[storagegroupantal];	// storage array (for recorded programs)
+char configmoviepath[256];                              //
+char configrecordpath[256];                             //
+char configmythsoundsystem[256];	                   		// selected soundsystem output device 0 = default
+char avalible_device[10][256];			                    // sound system devises list
+char configsoundoutport[256];			                    	// sound output port (hdmi/spdif/analog)
+char configclosemythtvfrontend[256];		              	// close mythtvfront end on startup
+char configaktivescreensavername[256];			            // screen saver name
+char configdvale[256];			                         		// kan vi gå i dvale (mythtv kontrol) gen lock file
+char configmouse[256];			                         		// mouse enable
+storagedef configstoragerecord[storagegroupantal];    	// storage array (for recorded programs)
 char configdeviceid[256];                               // music device name
 float configsoundvolume=1.0f;                           // default sound volume
-char configscreensavertimeout[256];			// default screensaver timeout
-char configfontname[200];				// default ttf font name to load and use
-configkeytype configkeyslayout[12];			// functions keys startfunc
-char configuse3deffect[20];				// use 3d effects
-
-char configvideoplayer[200];      // default video player
-char configdefaultplayer[256];				// default player
-int configdefaultplayer_screenmode;				// default player
-
+char configscreensavertimeout[256];			                // default screensaver timeout
+char configfontname[200];				                        // default ttf font name to load and use
+configkeytype configkeyslayout[12];	                		// functions keys startfunc
+char configuse3deffect[20];			                      	// use 3d effects
+// ************************************************************************************************
+char configvideoplayer[200];                            // default video player
+char configdefaultplayer[256];				                  // default player
+int configdefaultplayer_screenmode;				              // default player screeb mode
+// ************************************************************************************************
 int configuvmeter;
-
+// ************************************************************************************************
 int configland=0;
 const int configlandantal=5;
-char *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *)
-"Arabic"};
-
-int tema=3;       					// aktiv tema
-int screen_size=3;					// default screen size
-bool do_shift_song=false;				// jump to next song to play
+char *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
+// ************************************************************************************************
+int tema=3;       					                            // aktiv tema
+int screen_size=3;		                            			// default screen size
+bool do_shift_song=false;				                        // jump to next song to play
 bool do_stop_music=false;                               // stop all play
 bool do_stop_radio=false;                               // stop all play
-int soundsystem=0;					// used sound system 1=FMOD 2=OPENSOUND
+int soundsystem=0;				                      	// used sound system 1=FMOD 2=OPENSOUND
 int numbersofsoundsystems=0;                            // antal devices
 unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
@@ -235,10 +221,10 @@ bool stream_loadergfx_started_done=false;            	// thread stream gfx loade
 bool stream_loadergfx_started_break=false;
 
 bool vis_music_oversigt=false;                          // vis music player
-bool vis_film_oversigt=false;				// vis film oversigt
-bool vis_recorded_oversigt=false;
-bool vis_tv_oversigt=false;
-bool vis_radio_oversigt=false;
+bool vis_film_oversigt=false;				                    // vis film oversigt
+bool vis_recorded_oversigt=false;                       // vis recorded oversigt
+bool vis_tv_oversigt=false;                             // vis tv oversigt
+bool vis_radio_oversigt=false;                          // vis radio player
 
 bool vis_old_recorded=false;
 bool vis_tvrec_list=false;
@@ -278,7 +264,7 @@ bool vis_stream_oversigt=false;
 bool startstream=false;
 bool do_play_stream=false;
 
-int rknapnr=0;
+int rknapnr=0;                                           // buttons vars
 int sknapnr=0;
 int mknapnr=0;
 int tvknapnr=0;
@@ -822,10 +808,10 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
 {
     char file_path[1024];
     if (result != FMOD_OK) {
-      printf("FMOD error! (%d): %s on songnr %d \n", result, FMOD_ErrorString(result),songnr);
+      fprintf(stderr,"FMOD error! (%d): %s on songnr %d \n", result, FMOD_ErrorString(result),songnr);
       if (vis_music_oversigt) {
-          aktiv_playlist.m_play_playlist(file_path,songnr);
-          printf("File name %s\n",file_path);
+        aktiv_playlist.m_play_playlist(file_path,songnr);
+        fprintf(stderr,"File name %s\n",file_path);
       }
       vis_error_flag=result;
       vis_error=true;			// set vis error flag
@@ -833,7 +819,7 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
       vis_error_timeout=ERROR_TIMEOUT;
       do_zoom_radio=false;		// close play info
       if ((result!=23) && (result!=37) && (result!=27) && (result!=20)) {
-          printf("FMOD ERROR %d %s ",result,FMOD_ErrorString(result));
+        fprintf(stderr,"FMOD ERROR %d %s ",result,FMOD_ErrorString(result));
 //          exit(-1);
       }
     }
@@ -849,8 +835,8 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
 {
     char file_path[1024];
     if (vis_music_oversigt) {
-        aktiv_playlist.m_play_playlist(file_path,songnr);
-        printf("File name %s error : %s\n",file_path,text);
+      aktiv_playlist.m_play_playlist(file_path,songnr);
+      fprintf(stderr,"File name %s error : %s\n",file_path,text);
     }
     vis_error=1;			// vis error
     if (strcmp(text,"music parameter was NULL")==0) vis_error_flag=36;
@@ -999,10 +985,10 @@ int parse_config(char *filename) {
                 if ((command) && (valueok)) {
                     // set backupend system to XBMC or mythtv
                     if (command_nr==setbackend) {
-                        strcpy(configbackend,value);
-                        printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
-                        printf("Mode selected : %s\n",configbackend);
-                        printf("*********************************************************\n");
+                      strcpy(configbackend,value);
+                      printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
+                      printf("Mode selected : %s\n",configbackend);
+                      printf("*********************************************************\n");
                     }
                     // hostname
                     if (command_nr==sethostname) strcpy(configmythhost,value);
@@ -1237,8 +1223,9 @@ void load_config(char * filename) {
            fputs("uvmetertype=1\n",file);
            fclose(file);
         } else {
-          printf("Config file not writeble ");
-          printf("%s \n",filename);
+          fprintf(stderr,"Config file not writeble ");
+          fprintf(stderr,"%s \n",filename);
+          fprintf(stderr,"check /etc/mythtv-controller.conf is writeble by user.");
           exit(0);
         }
     }
@@ -1307,12 +1294,12 @@ void load_config(char * filename) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-                strcpy(configmoviepath,row[0]);
-            }
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            strcpy(configmoviepath,row[0]);
+          }
         } else {
-            printf("No access to mysql database... \nCan not read config infomations.\n");
-            exit(-1);
+          fprintf(stderr,"No access to mysql database... \nCan not read config infomations.\n");
+          exit(-1);
         }
 
         //
@@ -1320,15 +1307,15 @@ void load_config(char * filename) {
         // load default
         //
         if (strcmp(configmoviepath,"")==0) {
-            strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
-            mysql_query(conn,sqlselect);
-            res = mysql_store_result(conn);
-            if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                    strcpy(configmoviepath,row[0]);
-                    if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
-                }
+          strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              strcpy(configmoviepath,row[0]);
+              if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
             }
+          }
         }
         if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
 
@@ -1340,12 +1327,12 @@ void load_config(char * filename) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-                strcpy(configpicturepath,row[0]);
-            }
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            strcpy(configpicturepath,row[0]);
+          }
         } else {
-            printf("No access to mysql database... Can not read GalleryDir table.\n");
-            exit(-1);
+          printf("No access to mysql database... Can not read GalleryDir table.\n");
+          exit(-1);
         }
         if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
 
@@ -1371,22 +1358,21 @@ void load_config(char * filename) {
 
         // er der ingen storagegroup defined. Load old type from settings table
         if (strcmp(configrecordpath,"")==0) {
-            strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
-            strcat(sqlselect,configmysqlhost);
-            strcat(sqlselect,"' ");
-
-            mysql_query(conn,sqlselect);
-            res = mysql_store_result(conn);
-            if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                    strcpy(configrecordpath,row[0]);
-                    if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
-                }
-            } else {
-                printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations.\n");
-                exit(-1);
+          strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
+          strcat(sqlselect,configmysqlhost);
+          strcat(sqlselect,"' ");
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              strcpy(configrecordpath,row[0]);
+              if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
             }
-            if (conn) mysql_close(conn);
+          } else {
+            printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations.\n");
+            exit(-1);
+          }
+          if (conn) mysql_close(conn);
         }
     } else {
         strcpy(configmusicpath,"");
@@ -1395,16 +1381,16 @@ void load_config(char * filename) {
     }
     // read key file setup
     if ((file = fopen("mythtv-controller.keys", "r"))) {
-        if (!(feof(file))) {
-            fread(configkeyslayout,sizeof(configkeytype)*12,1,file);
-            fclose(file);
-        }
+      if (!(feof(file))) {
+        fread(configkeyslayout,sizeof(configkeytype)*12,1,file);
+        fclose(file);
+      }
     } else {
-        file = fopen("mythtv-controller.keys", "w");
-        if (file) {
-            fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
-            fclose(file);
-        } else printf("Disk write error, saving mythtv-controller.keys\n");
+      file = fopen("mythtv-controller.keys", "w");
+      if (file) {
+        fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
+        fclose(file);
+      } else printf("Disk write error, saving mythtv-controller.keys\n");
     }
 }
 
@@ -1435,9 +1421,9 @@ int update_afspillinger_music_song(char *filename)
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     pathpointer=strrchr(filename,'/');
     if (pathpointer) {
-        strcpy(songname,pathpointer+1);		// hentfilename efter path (sidste '/')
+      strcpy(songname,pathpointer+1);		// hentfilename efter path (sidste '/')
     } else {
-        strcpy(songname,filename);		//
+      strcpy(songname,filename);		//
     }
     sprintf(sqlselect,"update music_songs set music_songs.lastplay=NOW(), music_songs.numplays=music_songs.numplays+1 where music_songs.filename like '%s' limit 1",songname);
     mysql_query(conn,"set NAMES 'utf8'");
@@ -1474,10 +1460,10 @@ void hent_dir_id1(char *path,char *parent_id,char *dirid) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(parent_id,row[0]);
-            strcpy(path,row[1]);
-        }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(parent_id,row[0]);
+        strcpy(path,row[1]);
+      }
     }
     mysql_close(conn);
 }
@@ -1603,22 +1589,22 @@ int hent_mythtv_playlist(int playlistnr) {
 // load dir icons efter et update.
 
 void opdatere_music_oversigt_icons() {
-    unsigned int i;
-    char tmpfilename[200];
-    for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
+  unsigned int i;
+  char tmpfilename[200];
+  for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
+    musicoversigt[i].textureId=0;
+  }
+  i=0;
+  while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
+    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
+    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
+      // load covers file into opengl as textures (jpg)
+      musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
+    } else {
       musicoversigt[i].textureId=0;
     }
-    i=0;
-    while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
-        strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
-        if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-            // load covers file into opengl as textures (jpg)
-            musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
-        } else {
-            musicoversigt[i].textureId=0;
-        }
-        i++;
-    }
+    i++;
+  }
 }
 
 
@@ -1629,12 +1615,8 @@ void opdatere_music_oversigt_icons() {
 // hent antal af songs fra mythtv playlist database og fyld music play array
 
 unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
-//    char tmpfilename[200];
-//    char convert_command[256];
-//    char convert_newfilename[256];
     char sqlselect[512];
-//    char tmptxt[200];
-    long i;
+    long i=0;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res,*res1;
@@ -1648,57 +1630,50 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     char songname[80];
     char artistname[80];
     char songlength[20];
-//    GLuint textureId;
     int songintnr;				// sang nr som skal i playliste
     long songantal=0;				// antal sange i array i database
     int songnr=1;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-
     if (debugmode & 2) fprintf(stderr,"Henter info om playlistnr = %d \n",playlistnr);
-
     dirmusic.emtydirmusic();
-    i=0;
     conn=mysql_init(NULL);
     // Connect to mythtv database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     while(!(finish)) {
-        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
-        mysql_query(conn,"set NAMES 'utf8'");
-        res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-
-//                if (debugmode & 2) printf("Fundet recnr (songnr) %s \n",row[0]);
-                songintnr=atoi(row[0]);
-                songantal=atoi(row[1]);
-
-                // find cd cover samt sange info i mythtv music database
-                sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
-                mysql_query(conn,sqlselect);
-                res1 = mysql_store_result(conn);
-  //              if (debugmode & 2) printf("Hentet music nummer = %i ,add song %s to liste\n",i,songname);
-                if (res1) {
-                    while ((row = mysql_fetch_row(res1)) != NULL) {
-                        strcpy(songid,row[0]);
-                        strcpy(artistid,row[5]);
-                        strcpy(albumname,row[3]);
-                        strcpy(songname,row[4]);
-                        strcpy(artistname,row[6]);
-                        strcpy(songlength,row[7]);
-                        dirmusic.pushsong(songname,artistid);
-                        i++;
-                    }
-                }
-            } // endwhile
-        } // endif
-        songnr++;
-        if (i==songantal) finish=true;
-    } // endwhile
-
-    mysql_close(conn);
-    return(songnr);		// antal sange fundet i dir id
+      sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          //                if (debugmode & 2) printf("Fundet recnr (songnr) %s \n",row[0]);
+          songintnr=atoi(row[0]);
+          songantal=atoi(row[1]);
+          // find cd cover samt sange info i mythtv music database
+          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+          mysql_query(conn,sqlselect);
+          res1 = mysql_store_result(conn);
+          //              if (debugmode & 2) printf("Hentet music nummer = %i ,add song %s to liste\n",i,songname);
+          if (res1) {
+            while ((row = mysql_fetch_row(res1)) != NULL) {
+              strcpy(songid,row[0]);
+              strcpy(artistid,row[5]);
+              strcpy(albumname,row[3]);
+              strcpy(songname,row[4]);
+              strcpy(artistname,row[6]);
+              strcpy(songlength,row[7]);
+              dirmusic.pushsong(songname,artistid);
+              i++;
+            }
+          }
+        } // end while
+      } // endif
+      songnr++;
+      if (i==songantal) finish=true;
+  } // endwhile
+  mysql_close(conn);
+  return(songnr);		// antal sange fundet i dir id
 }
 
 
@@ -1739,12 +1714,11 @@ unsigned int hent_antal_dir_songs(int dirid) {
     res = mysql_store_result(conn);
     i=0;
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            dirmusic.pushsong(row[1],row[2]);
-            i++;
-        }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dirmusic.pushsong(row[1],row[2]);
+        i++;
+      }
     }
-
     // hent aktiv dir id info
     strcpy(sqlselect,"SELECT path FROM music_directories where directory_id=");
     sprintf(tmptxt,"%d limit 1",dirid);
@@ -1752,48 +1726,42 @@ unsigned int hent_antal_dir_songs(int dirid) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-            sprintf(tmptxt,"%s",row[0]);
-            strcat(tmpfilename,tmptxt);
-            strcat(tmpfilename,"/mythcFront.jpg");
-            if (file_exists(tmpfilename)) {
-                dirmusic.textureId=loadTexture((char *) tmpfilename);
-            } else {
-                dirmusic.textureId=0;
-            }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
+        sprintf(tmptxt,"%s",row[0]);
+        strcat(tmpfilename,tmptxt);
+        strcat(tmpfilename,"/mythcFront.jpg");
+        if (file_exists(tmpfilename)) {
+          dirmusic.textureId=loadTexture((char *) tmpfilename);
+        } else {
+          dirmusic.textureId=0;
         }
+      }
     }
-
-
     // hent dirs info til visning samt covers data i 3d format
-
     strcpy(sqlselect,"SELECT directory_id,path FROM music_directories where parent_id=");
     sprintf(tmptxt,"%d limit 100",dirid);
     strcat(sqlselect,tmptxt);
-
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     ii=0;
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            dirmusic.pushdir(row[1],row[0]);
-
-            if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
-            sprintf(tmptxt,"%s",row[1]);
-            strcat(tmpfilename,tmptxt);
-            strcat(tmpfilename,"/mythcFront.jpg");
-            if (file_exists(tmpfilename)) {
-                textureId = loadTexture((char *) tmpfilename);		// load texture to opengl
-            } else {
-//                printf("Music cover file load error \n");
-                textureId=0;
-            }
-            dirmusic.settexture(textureId,ii);				// set directory texture
-            ii++;
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dirmusic.pushdir(row[1],row[0]);
+        if (global_use_internal_music_loader_system) strcpy(tmpfilename,configdefaultmusicpath); else strcpy(tmpfilename,configmusicpath);
+        sprintf(tmptxt,"%s",row[1]);
+        strcat(tmpfilename,tmptxt);
+        strcat(tmpfilename,"/mythcFront.jpg");
+        if (file_exists(tmpfilename)) {
+          textureId = loadTexture((char *) tmpfilename);		// load texture to opengl
+        } else {
+          //                printf("Music cover file load error \n");
+          textureId=0;
         }
+        dirmusic.settexture(textureId,ii);				// set directory texture
+        ii++;
+      }
     }
-
     mysql_close(conn);
     return(i);		// antal sange fundet i dir id
 }
@@ -1803,32 +1771,31 @@ unsigned int hent_antal_dir_songs(int dirid) {
 // init lirc
 
 int initlirc() {
-    // LIRC SETUP
-    int flags;
-    sock=lirc_init((char *) "mythtv-controller",1);                  // print error to stderr
-    if (sock!=-1) {
-        if (lirc_readconfig(NULL,&lircconfig,NULL)!=0) {
-            fprintf(stderr,"No lirc mythtv-controller config file found.\n");
-            lirc_deinit();
-            sock=-1;				// lirc error code
-//            exit(0);
-        } else {
-            // fjern vente tid fra lirc getchar
-            fcntl(sock,F_SETOWN,getpid());
-            flags=fcntl(sock,F_GETFL,0);
-            if(flags!=-1) {
-                fcntl(sock,F_SETFL,flags|O_NONBLOCK);
-            }
-            printf("Lirc mythtv-controller info loaded.\n");
-        }
-        printf("Remote control init finish.\n");
-        return(sock);
+  // LIRC SETUP
+  int flags;
+  sock=lirc_init((char *) "mythtv-controller",1);                  // print error to stderr
+  if (sock!=-1) {
+    if (lirc_readconfig(NULL,&lircconfig,NULL)!=0) {
+      if (debugmode) fprintf(stderr,"No lirc mythtv-controller config file found.\n");
+      lirc_deinit();
+      sock=-1;				// lirc error code
     } else {
-        printf("Remote control not found...\n");
-        printf("No lirc. (No remote control support)\n");
-        // no lirc support error
+      // fjern vente tid fra lirc getchar
+      fcntl(sock,F_SETOWN,getpid());
+      flags=fcntl(sock,F_GETFL,0);
+      if(flags!=-1) {
+        fcntl(sock,F_SETFL,flags|O_NONBLOCK);
+      }
+      printf("Lirc mythtv-controller info loaded.\n");
     }
-    return(-1);
+    printf("Remote control init finish.\n");
+    return(sock);
+  } else {
+    printf("Remote control not found...\n");
+    printf("No lirc. (No remote control support)\n");
+    // no lirc support error
+  }
+  return(-1);
 }
 
 
@@ -1890,16 +1857,16 @@ int init_ttf_fonts() {
 // save command to be exectued to script exec
 
 int saveexitcommand(configkeytype command) {
-    FILE *file;
-    file=fopen("mythtv-controller.cmd","w");
-    if (file) {
-        fputs(command.cmdname,file);
-        fputs(";",file);
-        fprintf(file,"%d",command.scrnr);
-        fputs("\n",file);
-        fclose(file);
-        return(1);
-    } else return(0);
+  FILE *file;
+  file=fopen("mythtv-controller.cmd","w");
+  if (file) {
+    fputs(command.cmdname,file);
+    fputs(";",file);
+    fprintf(file,"%d",command.scrnr);
+    fputs("\n",file);
+    fclose(file);
+    return(1);
+  } else return(0);
 }
 
 
@@ -1907,9 +1874,7 @@ int saveexitcommand(configkeytype command) {
 // find sangs id til playlist opdatering/restore
 // returnere songid fra music_songstablen
 
-long find_music_song_placering(char *filename,char *songname)
-
-{
+long find_music_song_placering(char *filename,char *songname) {
     char sqlselect[1024];
     char *database = (char *) "mythconverg";
     long recnr=0;
@@ -1926,10 +1891,10 @@ long find_music_song_placering(char *filename,char *songname)
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            recnr=atol(row[0]);
-            fundet=true;						// sang fundet i music_songs
-        }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        recnr=atol(row[0]);
+        fundet=true;						// sang fundet i music_songs
+      }
     }
     mysql_close(conn);
     return(recnr);
@@ -3084,7 +3049,7 @@ void display(void) {
         i=0;
         if (dirmusic.numbersindirlist()==0) dirmusiclistemax=20; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
 
-
+        // show cd song list så man kan vælge
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
             ofset=18*i;
             dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
@@ -3110,13 +3075,16 @@ void display(void) {
             glTranslatef(560.0f, 850.0f -ofset, 0.0f);
             glRasterPos2f(0.0f, 0.0f);
             glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+            //aktivfont.selectfont("Courier 10 Pitch");
             glcRenderString(temptxt1);
             i++;
-            if (aktiv==true) {
+            glTranslatef(5.0f, 0.0f, 0.0f);
+             if (aktiv==true) {
               glcRenderString("[X]");
             } else {
               glcRenderString("[ ]");
             }
+            //aktivfont.selectfont(configfontname);
             glPopMatrix();
           }
         }
@@ -3186,7 +3154,7 @@ void display(void) {
                     strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
 
 
-                    printf("play radio path = %s \n ",aktivplay_music_path);
+                    if (debugmode & 2) fprintf(stderr,"play radio path = %s \n ",aktivplay_music_path);
 
                     // fmod player
                     #if defined USE_FMOD_MIXER
@@ -4550,7 +4518,7 @@ void display(void) {
             if (debugmode && 16) fprintf(stderr,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
             // if we play music/stream (radio) stop that before play movie stream (vlc)
             // stop music if play before start movie
-            if (debugmode) printf("Stop playing music/radio \n");
+            if (debugmode & 16) fprintf(stderr,"Stop playing music/radio \n");
             #if defined USE_FMOD_MIXER
             if ((sound) && (snd)) {
               // stop sound playing
@@ -4572,7 +4540,7 @@ void display(void) {
             aktiv_playlist.clean_playlist();                // clean play list (reset) play list
             do_play_music_aktiv_table_nr=1;			// reset play start nr
 
-            if (debugmode) printf("Stop playing wideo if any \n");
+            if (debugmode & 16)  fprintf(stderr,"Stop playing wideo if any \n");
 /*
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
@@ -4665,7 +4633,7 @@ void display(void) {
             //strcat(systemcommand,configrecordpath);
             strcat(systemcommand,temptxt);
 
-            printf("Start command :%s \n",systemcommand);
+             if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
 
             system(systemcommand);
             do_play_recorded_aktiv_nr=0;                        // start kun 1 player
@@ -5195,12 +5163,6 @@ void display(void) {
 
 
 
-
-
-
-
-
-
 int list_hits(GLint hits, GLuint *names,int x,int y) {
     int i=hits;			// numbers of hits
     bool fundet=false;
@@ -5211,7 +5173,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         */
 
     do {
-
         // setup menu
         if ((fundet==false) && (do_show_setup)) {
             // test for setup menu sound
@@ -5351,7 +5312,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 if (tema>TEMA_ANTAL) tema=1;
                 fundet=true;
             }
-
         }
 
         // test menu
@@ -5369,9 +5329,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // test for menu select music
             if ((GLubyte) names[i*4+3]==2) {
-
-                printf("Select vis_radio_and_music \n");
-
+                if (debugmode) printf("Select vis_radio_and_music \n");
 
                 vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
                 //vis_radio_oversigt=!vis_radio_oversigt;
@@ -5974,7 +5932,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
                     // radio stuf
                     if ((vis_radio_oversigt) && (retfunc==0)) {
-                        fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
+                        if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                         if (rknapnr>0) do_play_radio=1;						// select button do play
 
                     }
@@ -6246,6 +6204,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     }
 //    printf("button = %d \n",button);
 }
+
+
 
 
 void handlespeckeypress(int key,int x,int y) {
@@ -6860,7 +6820,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
-    if ((key!=27) && (key!='*') && (key!='-') && (key!=13) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
+    if ((key!=27) && (key!='*') && (key!=13) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
        // gem key pressed in buffer
        if (keybufferindex<80) {
           if (key==8) {						// back space
@@ -7235,6 +7195,24 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
                     if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
                     break;
+
+            case '+':                                                                  // volume up
+                    if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+                    #if defined USE_FMOD_MIXER
+                    if (sndsystem) channel->setVolume(configsoundvolume);
+                    #endif
+                    show_volume_info=true;					// show volume info window
+                    break;
+
+            case '-':                                                                 // volume down
+                    if (configsoundvolume>0) configsoundvolume-=0.1f;
+                    #if defined USE_FMOD_MIXER
+                    if (sndsystem) channel->setVolume(configsoundvolume);
+                    #endif
+                    show_volume_info=true;					// show volume info window
+                    break;
+
+
             case optionmenukey:
                     if (vis_film_oversigt) {
                         vis_movie_options=!vis_movie_options;
@@ -7460,6 +7438,8 @@ void handleKeypress(unsigned char key, int x, int y) {
 }
 
 
+
+// controll by the remove controller
 
 
 void update(int value) {
@@ -10240,9 +10220,9 @@ int check_radio_stations_icons() {
     mysql_query(conn,"select gfx_link from radio_stations where online=1 and gfx_link!=''");
     res = mysql_store_result(conn);
     while ((row = mysql_fetch_row(res)) != NULL) {
-      strcpy(resl,"cp images/radiostations/");
+      strcpy(resl,"cp radiostations/");
       strcat(resl,row[0]);
-      strcat(resl," images/radiostations_ok/");
+      strcat(resl," images/radiostations/");
       system(resl);
     }
   }
@@ -10392,7 +10372,6 @@ int main(int argc, char** argv) {
     // bruges til at checke_copy radio icons som virker til nyt dir
     //check_radio_stations_icons();
 
-
     glutInit(&argc, argv);
     init_sound_system(soundsystem);                             // Init sound
     ilInit();                                                   // Initialization of DevIL
@@ -10400,7 +10379,6 @@ int main(int argc, char** argv) {
     orgwinsizex=glutGet(GLUT_SCREEN_WIDTH);
     orgwinsizey=glutGet(GLUT_SCREEN_HEIGHT);
     printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
-
     // get first monitor screen size (pixel)
     Display *dpy = XOpenDisplay(":0");
     Window rootxwindow = RootWindow(dpy, 0);

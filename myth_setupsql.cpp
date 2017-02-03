@@ -132,21 +132,26 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 63, 1, '2011-07-29', 1, 45, '2011-09-16 21:50:41', 1), \
 ('P2 DK', 'Dansk radio', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'www.dr.dk/P2', 'DR-P2-1023.png', 1, 320, 62, 1, '2011-07-28', 2, 45, '2011-09-15 22:20:34', 1), \
 ('P3 DK', 'www.p3.dk Dansk radio.', 'http://live-icy.gss.dr.dk:8000/A/A05H.mp3', 'www.dr.dk', 'DR-P3-939.png', 1, 128, 77, 1, '2011-07-28', 3, 45, '2011-10-20 15:37:44', 1), \
-('DR P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 4, 45, '2011-09-29 13:40:49', 1), \
-('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente værter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 9, 45, '2011-10-09 16:13:11', 1), \
-('Radio Aura DK', 'DK', 'http://icecast.xstream.dk:80/aura', '', 'Radio-Aura-1054.png', 40, 128, 46, 1, '2011-08-02', 10, 45, '2011-10-11 23:05:02', 1), \
-('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8020', '', '', 41, 128, 0, 1, '2011-08-11', 11, 8, '2011-10-20 15:37:44', 1), \
-('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', 'Maxxima.png', 4, 0, 10, 1, '2011-08-02', 12, 4, '2011-10-02 02:25:35', 1), \
-('Bay Radio', '[Bitrate: 128]', 'http://icy-e-01.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 45, 320, 1, 1, '2011-07-31', 13, 45, '2011-09-17 18:06:22', 1), \
-('Heat radio UK', '[Bitrate: 128] Denne radio er mega cool og spiller meget godt og blandet musik fra england. ', 'http://ams01.egihosting.com:9108/', '', 'Heat-Radio.png', 3, 128, 242, 1, '2011-07-31', 14, 9, '2011-10-21 15:23:52', 1),  \
-('181FM', '', 'http://uplink.181.fm:8068/', '', '181.fm.png', 0, 128, 1, 1, '2011-08-02', 15, 7, '2011-09-27 17:58:45', 1), \
-('Energy 93 Eurodance', '', 'http://uplink.181.fm:8044/', '', '181.fm.png', 4, 0, 5, 1, '2011-08-02', 16, 7, '2011-10-07 16:02:00', 1), \
-('Just Hiphop', '', 'http://stream.laut.fm:80/justhiphop', '', '', 5, 0, 2, 1, '2011-08-02', 17, 29, '2011-09-13 10:53:29', 1), \
-('Radio MRDJ', '[Bitrate: 128]', 'http://212.18.63.51:9000', '', '', 4, 128, 10, 1, '2011-08-11', 18, 61, NULL, 1), \
-('Groove Salad', 'A nicely chilled plate of ambient/downtempo beats and grooves.', 'http://ice1.somafm.com/groovesalad-128-aac', '', '', 16, 128, 13, 1, '2011-07-31', 19, 7, '2011-10-07 15:58:57', 1), \
-('Radio EFM', 'France', 'http://radioefm.ice.infomaniak.ch:80/radioefm-high.mp3', '', '', 12, 128, 6, 1, '2011-08-01', 22, 4, NULL, 1), \
-('The voice DK', 'The voice denmark.', 'http://195.184.101.203/voice128', '', 'The-Voice-1049.png', 40, 64, 5, 1, '2011-08-01', 23, 45, '2011-09-11 00:08:02', 1), \
-('Private Investigations', '', 'http://listen.radionomy.com/private-investigations', '', '', 21, 0, 0, 1, '2011-08-02', 25, 7, NULL, 1), \
+('DR P4 København', '', 'http://live-icy.gss.dr.dk:8000/A/A08H.mp3', 'http://www.dr.dk/p4/kbh/', 'DR-P4-Koebenhavn-965.png', 0, 0, 0, 1, '2011-11-11', 17, 0, '2017-01-01 00:00:00', 1), \
+('DR P4 Esbjerg', '', 'http://live-icy.gss.dr.dk:8000/A/A15H.mp3', 'http://www.dr.dk/Regioner/Esbjerg/', 'DR-P4-Esbjerg-990.png', 0, 0, 0, 1, '2011-11-11', 18, 0, '2017-01-01 00:00:00', 1), \
+('DR P6 Beat', '', 'http://live-icy.gss.dr.dk:8000/A/A29H.mp3', 'http://www.dr.dk/p6beat/', 'DR-P6-Beat.png', 0, 0, 0, 1, '2011-11-11', 19, 0, '2017-01-01 00:00:00', 1), \
+('DR P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 20, 45, '2011-09-29 13:40:49', 1), \
+('Radio24syv', '', 'http://rrr.sz.xlcdn.com/?account=Radio24syv&file=ENC1_Web128&type=live&service=icecast&port=8000&output=pls', 'radio24syv', '', 0, 0, 0, 1, '2017-01-01', 21, 0, '2017-01-01 00:00:00', 1), \
+('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente værter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 22, 45, '2011-10-09 16:13:11', 1), \
+('Næstved Lokal Radio', 'http://78.47.115.218:8007/stream.m3u', 'http://næstvedlokalradio.dk/', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 23, 0, '2017-01-01 00:00:00', 1), \
+('Radio Aura DK', 'DK', 'http://icecast.xstream.dk:80/aura', '', 'Radio-Aura-1054.png', 40, 128, 46, 1, '2011-08-02', 26, 45, '2011-10-11 23:05:02', 1), \
+('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8020', '', '', 41, 128, 0, 1, '2011-08-11', 27, 8, '2011-10-20 15:37:44', 1), \
+('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', 'Maxxima.png', 4, 0, 10, 1, '2011-08-02', 28, 4, '2011-10-02 02:25:35', 1), \
+('Bay Radio', '[Bitrate: 128]', 'http://icy-e-01.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 45, 320, 1, 1, '2011-07-31', 29, 45, '2011-09-17 18:06:22', 1), \
+('Heat radio UK', '[Bitrate: 128] Denne radio er mega cool og spiller meget godt og blandet musik fra england. ', 'http://ams01.egihosting.com:9108/', '', 'Heat-Radio.png', 3, 128, 242, 1, '2011-07-31', 30, 9, '2011-10-21 15:23:52', 1),  \
+('181FM', '', 'http://uplink.181.fm:8068/', '', '181.fm.png', 0, 128, 1, 1, '2011-08-02', 31, 7, '2011-09-27 17:58:45', 1), \
+('Energy 93 Eurodance', '', 'http://uplink.181.fm:8044/', '', '181.fm.png', 4, 0, 5, 1, '2011-08-02', 32, 7, '2011-10-07 16:02:00', 1), \
+('Just Hiphop', '', 'http://stream.laut.fm:80/justhiphop', '', '', 5, 0, 2, 1, '2011-08-02', 33, 29, '2011-09-13 10:53:29', 1), \
+('Radio MRDJ', '[Bitrate: 128]', 'http://212.18.63.51:9000', '', '', 4, 128, 10, 1, '2011-08-11', 34, 61, NULL, 1), \
+('Groove Salad', 'A nicely chilled plate of ambient/downtempo beats and grooves.', 'http://ice1.somafm.com/groovesalad-128-aac', '', '', 16, 128, 13, 1, '2011-07-31', 35, 7, '2011-10-07 15:58:57', 1), \
+('Radio EFM', 'France', 'http://radioefm.ice.infomaniak.ch:80/radioefm-high.mp3', '', '', 12, 128, 6, 1, '2011-08-01', 36, 4, NULL, 1), \
+('The voice DK', 'The voice denmark.', 'http://195.184.101.203/voice128', '', 'The-Voice-1049.png', 40, 64, 5, 1, '2011-08-01', 37, 45, '2011-09-11 00:08:02', 1), \
+('Private Investigations', '', 'http://listen.radionomy.com/private-investigations', '', '', 21, 0, 0, 1, '2011-08-02', 38, 7, NULL, 1), \
 ('Capital 95.8', '', 'http://media-ice.musicradio.com:80/CapitalMP3', '', '', 40, 192, 2, 1, '2011-08-05', 39, 9, NULL, 1), \
 ('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 7, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
 ('TechnoBase.FM', '', 'http://listen.technobase.fm/tunein-dsl-pls', 'http://TechnoBase.FM', '', 50, 192, 1, 0, '2011-08-05', 43, 8, NULL, 1), \
@@ -773,7 +778,6 @@ const char *radio_station_setupsql27="REPLACE INTO `radio_stations` (`name`, `be
 ('Fun-Radio-Dance', '24-hour stream of dance music, from the latest hits to the 90-ies, designed especially for diskomaniakov.', 'http://stream.funradio.sk:8000/dance128.mp3', 'http://www.funradio.sk/', 'Fun-Radio-Dance.png', 0, 0, 0, 1, '2011-11-11', 9449, 0, '2017-01-01 00:00:00', 1), \
 ('Club--Dance-Radio', '', 'http://listen.radionomy.com/club-dance', 'http://www.clubanddance.com/', 'Club--Dance-Radio.png', 0, 0, 0, 1, '2011-11-11', 9453, 0, '2017-01-01 00:00:00', 1), \
 ('NRJ-Girl', '', 'http://broadcast.infomaniak.ch/energygirl-high.mp3.m3u', 'http://www.energyzueri.ch/', 'NRJ-Girl.png', 0, 0, 0, 1, '2011-11-11', 9466, 0, '2017-01-01 00:00:00', 1), \
-('DR P6 Beat', '', 'http://live-icy.gss.dr.dk:8000/A/A29H.mp3', 'http://www.dr.dk/p6beat/', 'DR-P6-Beat.png', 0, 0, 0, 1, '2011-11-11', 9473, 0, '2017-01-01 00:00:00', 1), \
 ('WHPK-FM-885', '', 'http://www.whpk.org:8000/mp3', 'http://whpk.uchicago.edu/', 'WHPK-FM-885.png', 0, 0, 0, 1, '2011-11-11', 9479, 0, '2017-01-01 00:00:00', 1), \
 ('ESPN-Radio-1360', '', 'http://www.whpk.org:8000/mp3', '', 'ESPN-Radio-1360.png', 0, 0, 0, 1, '2011-11-11', 9480, 0, '2017-01-01 00:00:00', 1), \
 ('The-BBC-London-Boxing-Hour', '', 'http://www.whpk.org:8000/mp3', '', 'The-BBC-London-Boxing-Hour.png', 0, 0, 0, 1, '2011-11-11', 9482, 0, '2017-01-01 00:00:00', 1), \
@@ -817,14 +821,11 @@ const char *radio_station_setupsql27="REPLACE INTO `radio_stations` (`name`, `be
 const char *radio_station_setupsql31="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('WJEJ-1240', 'Classic Radio - Hometown radio for the entire family...Fantastic light and easy music from yesterday and today.  LIVE, Local DJ&#39;s, Local News and Weather, Local Sports, Talk Shows, Big Band Jump, ', 'http://www.ophanim.net:7900', 'http://www.wjejradio.com/', 'WJEJ-1240.png', 0, 0, 0, 1, '2011-11-11', 10368, 0, '2017-01-01 00:00:00', 1), \
 ('Radio-Ballerup-902', '', 'http://96.31.83.86:8200/', 'http://www.radioballerup.com/', 'Radio-Ballerup-902.png', 0, 0, 0, 1, '2011-11-11', 10461, 0, '2017-01-01 00:00:00', 1), \
-('DR P4 Esbjerg', '', 'http://live-icy.gss.dr.dk:8000/A/A15H.mp3', 'http://www.dr.dk/Regioner/Esbjerg/', 'DR-P4-Esbjerg-990.png', 0, 0, 0, 1, '2011-11-11', 11233, 0, '2017-01-01 00:00:00', 1), \
 ('DR Nyheder', '', 'http://live-icy.gss.dr.dk:8000/A/A02H.mp3', 'http://www.dr.dk/radio/alle_kanaler/nyheder.asp', 'DR-Nyheder.png', 0, 0, 0, 1, '2011-11-11', 11396, 0, '2017-01-01 00:00:00', 1), \
 ('DR P4 Trekanten', '', 'http://live-icy.gss.dr.dk:8000/A/A13H.mp3', 'http://www.dr.dk/p4/trekanten/', 'DR-P4-Trekanten-940.png', 0, 0, 0, 1, '2011-11-11', 11450, 0, '2017-01-01 00:00:00', 1), \
 ('DR P5', '', 'http://live-icy.gss.dr.dk:8000/A/A25H.mp3.m3u', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 14362, 0, '2017-01-01 00:00:00', 1), \
-('Radio24syv', '', 'http://rrr.sz.xlcdn.com/?account=Radio24syv&file=ENC1_Web128&type=live&service=icecast&port=8000&output=pls', 'radio24syv', '', 0, 0, 0, 1, '2017-01-01', 14363, 0, '2017-01-01 00:00:00', 1), \
 ('Radio Soft', '', 'http://onair.100fmlive.dk/soft_live.mp3.m3u', 'http://www.radioplay.dk/radiosoft', '', 0, 0, 0, 1, '2017-01-01', 14364, 0, '2017-01-01 00:00:00', 1), \
 ('Tiger FM', '', 'http://85.202.67.163:8000/stream.mp3.m3u', 'http://www.tigerfm.dk/', '', 0, 0, 0, 1, '2017-01-01', 14365, 0, '2017-01-01 00:00:00', 1), \
-('Næstved Lokal Radio', 'http://78.47.115.218:8007/stream.m3u', 'http://næstvedlokalradio.dk/', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 14366, 0, '2017-01-01 00:00:00', 1), \
 ('PARTY VIBE', 'TECHNO-HOUSE-TRANCE','http://107.182.233.214:8046/stream', 'https://www.partyvibe.com', '', 0, 0, 0, 1, '2017-01-01', 14367, 0, '2017-01-01 00:00:00', 1), \
 ('Chillkyway', 'TECHNO','http://136.243.16.19:8000/stream/3/', 'http://www.chillkyway.net', '', 0, 0, 0, 1, '2017-01-01',14368 , 0, '2017-01-01 00:00:00', 1), \
 ('Audiophile Jazz', 'JAZZ','http://8.38.78.173:8210/stream', 'http://www.chillkyway.net', '', 0, 0, 0, 1, '2017-01-01',14369 , 0, '2017-01-01 00:00:00', 1), \
@@ -835,7 +836,6 @@ const char *radio_station_setupsql39="REPLACE INTO `radio_stations` (`name`, `be
 ('DR P1', '', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', 'http://www.dr.dk/p1/', 'DR-P1-908.png', 0, 0, 0, 1, '2011-11-11', 12822, 0, '2017-01-01 00:00:00', 1);";
 
 const char *radio_station_setupsql40="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
-('DR P4 København', '', 'http://live-icy.gss.dr.dk:8000/A/A08H.mp3', 'http://www.dr.dk/p4/kbh/', 'DR-P4-Koebenhavn-965.png', 0, 0, 0, 1, '2011-11-11', 13160, 0, '2017-01-01 00:00:00', 1), \
 ('Spirit-1059', 'SPIRIT 105.9, The Spirit of Austin, features Adult Contemporary Christian music; a popular music format that appeals to a wide range of listeners.', 'http://crista-kfmk.streamguys1.com/kfmkaacp.m3u', 'http://www.spirit1059.com/', 'Spirit-1059.png', 0, 0, 0, 1, '2011-11-11', 13176, 0, '2017-01-01 00:00:00', 1), \
 ('Dance90s', '', 'http://listen.radionomy.com/dance90', 'http://dance90.tk/', 'Dance90s.png', 0, 0, 0, 1, '2011-11-11', 13185, 0, '2017-01-01 00:00:00', 1), \
 ('WESC-FM-925', '', 'http://listen.radionomy.com/dance90', 'http://www.wescfm.com/', 'WESC-FM-925.png', 0, 0, 0, 1, '2011-11-11', 13186, 0, '2017-01-01 00:00:00', 1), \
