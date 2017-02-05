@@ -2715,7 +2715,7 @@ void display(void) {
           show_music_oversigt1(musicoversigt,_textureId7,_textureId7_1,_textureIdback,_textureId28,_textureId28_1,_mangley);
         } else if (vis_film_oversigt) {
           glPushMatrix();
-          aktivfont.selectfont("DejaVu Sans");
+          //aktivfont.selectfont("DejaVu Sans");
           film_oversigt.show_film_oversigt(_fangley,fknapnr);
           glPopMatrix();
         } else if (vis_stream_oversigt) {
@@ -6820,7 +6820,23 @@ void handleKeypress(unsigned char key, int x, int y) {
 
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
-    if ((key!=27) && (key!='*') && (key!=13) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
+    if (key=='+') {
+      if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+      #if defined USE_FMOD_MIXER
+      if (sndsystem) channel->setVolume(configsoundvolume);
+      #endif
+      show_volume_info=true;					// show volume info window
+    }
+
+    if (key=='-') {                               // volume down
+      if (configsoundvolume>0) configsoundvolume-=0.1f;
+      #if defined USE_FMOD_MIXER
+      if (sndsystem) channel->setVolume(configsoundvolume);
+      #endif
+      show_volume_info=true;					// show volume info window
+    }
+
+    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
        // gem key pressed in buffer
        if (keybufferindex<80) {
           if (key==8) {						// back space
@@ -7195,23 +7211,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
                     if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
                     break;
-
-            case '+':                                                                  // volume up
-                    if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
-                    #if defined USE_FMOD_MIXER
-                    if (sndsystem) channel->setVolume(configsoundvolume);
-                    #endif
-                    show_volume_info=true;					// show volume info window
-                    break;
-
-            case '-':                                                                 // volume down
-                    if (configsoundvolume>0) configsoundvolume-=0.1f;
-                    #if defined USE_FMOD_MIXER
-                    if (sndsystem) channel->setVolume(configsoundvolume);
-                    #endif
-                    show_volume_info=true;					// show volume info window
-                    break;
-
 
             case optionmenukey:
                     if (vis_film_oversigt) {
