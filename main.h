@@ -18,6 +18,10 @@
 //
 // English, danish, france, tysk, Arabic
 
+// time in language
+
+const char *music_timename[]={"Time","Tid","time","time","time"};
+
 // music stuf
 const char *music_now_playing[]={"Now Playing.","Spiller nu.","Lecture en cours.","Now Playing.","قائمة الأغاني"};
 const char *music_artist[]={"Artist","Artist","Artiste","kunstenaar","فنان"};
@@ -76,7 +80,6 @@ void *radio_check_statusloader(void *data);
 
 float music_icon_anim_files_ofset=0.0f;
 int music_icon_anim_files_numbers=19;
-
 
 float tv_icon_anim_files_ofset=0.0f;
 int tv_icon_anim_files_numbers=19;

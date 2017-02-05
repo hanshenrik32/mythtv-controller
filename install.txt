@@ -14,14 +14,18 @@ dialog libglc-dev imagemagick liblircclient-dev xmltv libglc-dev libdevil1c2 unz
 
 Program version.
 
-mythtv-controller ver 0.32.x
+mythtv-controller ver 0.36.x
 
 Howto install.
 
 mkdir mythtv-controller
 cd mythtv-controller   
+<<<<<<< HEAD
 download into dir and unpack by
 tar -zvxf fmodapi44441linux.tar.gz
+=======
+tar -zxf fmodstudioapi10811linux.tar.gz
+>>>>>>> bugfix-start
 
 Now install by doing.
 

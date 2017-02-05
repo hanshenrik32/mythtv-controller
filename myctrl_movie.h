@@ -162,7 +162,7 @@ class film_oversigt_typem {
       void show_film_oversigt(float _mangley,int filmnr);			// new ver
       // show startup new added movies
       void show_minifilm_oversigt(float _mangley,int filmnr);
-      void opdatere_film_oversigt();
+      int opdatere_film_oversigt();
       void resetallefilm();
       int load_film_dvcovers();
       int playmovie(int nr);

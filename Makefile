@@ -78,7 +78,8 @@ installsound:
 #	cp fmodstudioapi10605linux.tar.gz $(DESTDIR)
 	cp fmodstudioapi10811linux.tar.gz $(DESTDIR)
 	cd $(DESTDIR)
-#	tar -zxf fmodstudioapi10605linux.tar.gz -C /usr/share/mythtv-controller/
+	touch /etc/mythtv-controller.conf
+	chmod 777 /etc/mythtv-controller.conf
 	tar -zxf fmodstudioapi10811linux.tar.gz -C /usr/share/mythtv-controller/
 	ln -s /usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/lib/x86_64/libfmod.so.8.11 /usr/lib/libfmod.so.8.11
 	ln -s /usr/share/mythtv-controller/fmodstudioapi10811linux/api/lowlevel/lib/x86_64/libfmodL.so.8.11 /usr/lib/libfmodL.so.8.11
