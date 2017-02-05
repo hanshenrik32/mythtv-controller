@@ -1213,7 +1213,7 @@ void load_config(char * filename) {
            fputs(temptxt,file);
            fputs("screensize=1\n",file);
            fputs("tema=3\n",file);
-           fputs("font=Ubuntu\n",file);
+           fputs("font=FreeMono\n",file);
            fputs("mouse=1\n",file);
            fputs("use3d=yes\n",file);
            fputs("land=1\n",file);
