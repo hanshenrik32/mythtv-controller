@@ -51,18 +51,17 @@ int fontctrl::updatefontlist()
     printf("\nTrue type fonts is found in this path\n");
     for (i = 0; i<count; i++) printf("%s\n", glcGetListc(GLC_CATALOG_LIST, i));
     // load font list
+    i=0;
     while((i < (int) mastercount) && (i<TYPE_MAX)) {
         if (glcGetMasterc(i, GLC_FAMILY)) {
+          const GLCchar *font = glcGetMasterc(i, GLC_FAMILY );
           strcpy(typeinfo[i].fontname,(char *) glcGetMasterc(i, GLC_FAMILY));
-          if (debugmode & 64) printf("font named %20s found \n",typeinfo[i].fontname);
+          //if (debugmode & 128) printf("Font named %10s found \n",typeinfo[i].fontname);
           face_count = glcGetMasteri(i, GLC_FACE_COUNT);
           for (j = 0; j < face_count; j++) {
-              if (debugmode & 64) printf(" %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
+              if (debugmode & 128) printf(" Face types %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
               //if (j==0) strcpy(typeinfo[0].fonttype,(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
               if (j==0) sprintf(typeinfo[i].fontname,"%s",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j)); //glcGetMasterListc(i, GLC_FACE_LIST, j)
-
-              if (debugmode==128) printf("Font list %s \n",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));	// 	glcGetMasterListc(i, GLC_CHAR_LIST, j));
-
               master = i;
           }
         }

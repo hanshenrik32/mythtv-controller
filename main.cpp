@@ -1211,7 +1211,7 @@ void load_config(char * filename) {
            strcat(temptxt,configaktivescreensavername);
            strcat(temptxt,"\n");
            fputs(temptxt,file);
-           fputs("screensize=1\n",file);
+           fputs("screensize=3\n",file);
            fputs("tema=3\n",file);
            fputs("font=FreeMono\n",file);
            fputs("mouse=1\n",file);
@@ -1269,7 +1269,7 @@ void load_config(char * filename) {
     if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
               strcpy(configmusicpath,row[0]);
-              if (debugmode & 32) fprintf(stderr,"Fundet music config dirs %s \n",row[0]);
+              if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
         }
         //
         // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
@@ -1298,7 +1298,7 @@ void load_config(char * filename) {
             strcpy(configmoviepath,row[0]);
           }
         } else {
-          fprintf(stderr,"No access to mysql database... \nCan not read config infomations.\n");
+          fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
           exit(-1);
         }
 
@@ -1318,8 +1318,6 @@ void load_config(char * filename) {
           }
         }
         if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
-
-
         strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
         strcat(sqlselect,configmysqlhost);
         strcat(sqlselect,"' ");
@@ -1345,7 +1343,7 @@ void load_config(char * filename) {
         if (res) {
             i=0;
             while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
-                if (i==0) strcpy(configrecordpath,row[0]);					// store fist found default path
+                if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
                 strcpy(configstoragerecord[i].path,row[0]);
                 strcpy(configstoragerecord[i].name,row[1]);
                 if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
@@ -1353,7 +1351,7 @@ void load_config(char * filename) {
             }
             if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
         } else {
-            printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations.\n");
+            printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
         }
 
         // er der ingen storagegroup defined. Load old type from settings table
@@ -1369,7 +1367,7 @@ void load_config(char * filename) {
               if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
             }
           } else {
-            printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations.\n");
+            printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
             exit(-1);
           }
           if (conn) mysql_close(conn);
