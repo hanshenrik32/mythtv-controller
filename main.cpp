@@ -3408,54 +3408,29 @@ void display(void) {
         if (do_zoom_music_cover) {
             //  printf("numbers of songs = %d aktiv song =%d in array  play position %d sec   \n",aktiv_playlist.numbers_in_playlist(),do_play_music_aktiv_nr,(snd->getPlayPosition())/1000);
             // show background mask
-            glPushMatrix();
-//            glLoadIdentity();								 //Reset the drawing perspective
-            glEnable(GL_TEXTURE_2D);
-            glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glDisable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
             int buttonsize=800;
             int buttonsizey=500;
             yof=200;
-            if ((do_zoom_music_cover_remove_timeout<=10) && (do_zoom_music_cover_remove_timeout!=0)) {
-//                printf("time out is %d  \n",do_zoom_music_cover_remove_timeout);
-                glBindTexture(GL_TEXTURE_2D, _textureIdmusic_mask_anim[((do_zoom_music_cover_remove_timeout))]);				// FADE anim use alpha mask
-            } else {
-                glBindTexture(GL_TEXTURE_2D, _textureId8_1);			//  _textureIdmusic_mask_anim[9] _textureId8_1
-            }
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // draw mask
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4), yof , 0.0);
-            glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),yof+buttonsizey, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+buttonsize, yof+buttonsizey , 0.0);
-            glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+buttonsize,yof , 0.0);
-            glEnd();
-
-            glPopMatrix();						       // background
 
             // background
             glPushMatrix();
             glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
             glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glBlendFunc(GL_ONE, GL_ONE);
-            glEnable(GL_BLEND);
-//            glDisable(GL_DEPTH_TEST);
-//            glBlendFunc(GL_DST_COLOR,GL_SRC_COLOR);
             glEnable(GL_TEXTURE_2D);
-
+            glEnable(GL_BLEND);
+            //glDisable(GL_DEPTH_TEST);
+//            glBlendFunc(GL_DST_COLOR,GL_SRC_COLOR);
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             if (do_stop_music_all) {						// SKAL checkes om gfx er ok
                 glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
             } else {
-                glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);			//  _textureId14
+                glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);			//  _textureId1
             }
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             glColor4f(1.0f, 1.0f, 1.0f,1.00f);					// lav alpha blending. 80%
-            glLoadName(5);				                        // Overwrite the first name in the buffer
+            //glLoadName(5);				                        // Overwrite the first name in the buffer
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4), yof , 0.0);
             glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),yof+buttonsizey, 0.0);
@@ -3570,12 +3545,12 @@ void display(void) {
             glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
             glBlendFunc(GL_ONE, GL_ONE);
             textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
-            if (textureId==0) textureId=_textureId16;						// hvis ingen texture (music cover) set default (box2.bmp)
+            if (textureId==0) textureId=_textureId16;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
             glBindTexture(GL_TEXTURE_2D, textureId);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glLoadName(9);                        // Overwrite the first name in the buffer
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
+            glLoadName(9);                                                            // Set button id
+            glBegin(GL_QUADS);
             // last
             glTexCoord2f(0, 0); glVertex3f(560+ (orgwinsizex/4),40+yof , 0.0);
             glTexCoord2f(0, 1); glVertex3f(560+ (orgwinsizex/4),40+yof+200, 0.0);
@@ -3583,133 +3558,6 @@ void display(void) {
             glTexCoord2f(1, 0); glVertex3f(560+ (orgwinsizex/4)+200,40+yof , 0.0);
             glEnd(); //End quadrilateral coordinates
             glPopMatrix();
-
-
-
-/*
-            // draw shadow/mirror mask
-            glLoadIdentity();
-            glEnable(GL_TEXTURE_2D);
-            switch (screen_size) {
-                case 1: glTranslatef(-83.5, -30.0f, -200.0f);
-                        break;
-                case 2: glTranslatef(-83.0, -30.0f, -200.0f);
-                        break;
-                case 3: glTranslatef(-83.5, -29.5f, -214.0f);
-                        break;
-                case 4: glTranslatef(-83.5, -29.5f, -214.0f);
-                        break;
-            }
-            glRotatef(35.0f, 0.0f, 1.0f, 0.0f);
-//            glEnable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
-
-            glBlendFunc(GL_ONE,GL_ONE);
-
-            //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-            glBindTexture(GL_TEXTURE_2D,_texturecdmirrormask);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-            switch (screen_size) {
-                case 1: glTexCoord2f(0.0, 0.0); glVertex3f(-12+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(27+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(27+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-12+3, -5, 0.0);
-                        break;
-                case 2: glTexCoord2f(0.0, 0.0); glVertex3f(-18+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(25+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(25+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-18+3, -5, 0.0);
-                        break;
-                case 3: glTexCoord2f(0.0, 0.0); glVertex3f(-22+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(24+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(24+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-22+3, -5, 0.0);
-                        break;
-                case 4: glTexCoord2f(0.0, 0.0); glVertex3f(-22+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(24+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(24+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-22+3, -5, 0.0);
-                        break;
-            }
-            glEnd();
-
-
-
-            // draw mirror
-            glLoadIdentity();
-            glEnable(GL_TEXTURE_2D);
-            glEnable(GL_BLEND);
-
-            switch (screen_size) {
-                case 1: glTranslatef(-83.5, -30.0f, -200.0f);
-                        break;
-                case 2: glTranslatef(-83.0, -30.0f, -200.0f);
-                        break;
-                case 3: glTranslatef(-83.5, -29.5f, -214.0f);
-                        break;
-                case 4: glTranslatef(-83.5, -29.5f, -214.0f);
-                        break;
-            }
-
-            glRotatef(35.0f, 0.0f, 1.0f, 0.0f);
-            glBlendFunc(GL_DST_COLOR,GL_SRC_COLOR);
-            glColor4f(1.0f,1.0f,1.0f,0.1f);
-
-//            glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-//            glBlendFunc(GL_ONE, GL_ONE);
-            glBindTexture(GL_TEXTURE_2D,textureId);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-            switch (screen_size) {
-                case 1: glTexCoord2f(0.0, 0.0); glVertex3f(-12+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(27+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(27+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-12+3, -5, 0.0);
-                        break;
-                case 2: glTexCoord2f(0.0, 0.0); glVertex3f(-18+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(25+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(25+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-18+3, -5, 0.0);
-                        break;
-                case 3: glTexCoord2f(0.0, 0.0); glVertex3f(-22+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(24+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(24+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-22+3, -5, 0.0);
-                        break;
-                case 4: glTexCoord2f(0.0, 0.0); glVertex3f(-22+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, 0.0); glVertex3f(24+3, -40+10, 0.0);
-                        glTexCoord2f(1.0, -1.0); glVertex3f(24+3, -5, 0.0);
-                        glTexCoord2f(0.0, -1.0); glVertex3f(-22+3, -5, 0.0);
-                        break;
-            }
-            glEnd();
-
-
-            glDisable(GL_TEXTURE_2D);
-
-            glLoadIdentity();
-            glBlendFunc(GL_ONE,GL_ONE);
-
-            glColor3f(1.0f, 1.0f, 1.0f);
-            switch (screen_size) {
-                case 1: glTranslatef(-91.0f, -6.3f+10,-200);
-                        break;
-                case 2: glTranslatef(-91.0f, -6.3f+10,-200);
-                        break;
-                case 3: glTranslatef(-91.0f, -6.3f+10,-200);
-                        break;
-                case 4: glTranslatef(-91.0f, -6.3f+10,-200);
-                        break;
-            }
-            glRasterPos2f(0.0f, 0.0f);
-            glScalef(3.5, 3.5, 1.0);      		              // danish charset ttf
-            glcRenderString(music_nowplaying[configland]);			//opengl print
-*/
 
             // show artist
 //            glLoadIdentity();
@@ -3990,22 +3838,13 @@ void display(void) {
             // show playing radio station
             if ((snd) && (do_zoom_radio)) {
                 glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-                // window mask
-                glEnable(GL_TEXTURE_2D);
-                glDisable(GL_BLEND);
-                glBindTexture(GL_TEXTURE_2D,_textureId8_1);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
-                glEnd();
 
                 // window texture
                 glEnable(GL_TEXTURE_2D);
                 glEnable(GL_BLEND);
+                //glBlendFunc(GL_ONE, GL_ONE);
+                glDisable(GL_DEPTH_TEST);
+                glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
                 glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -9755,8 +9594,8 @@ void loadgfx() {
     _textureId7_1         = loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask");
     _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
     _textureId7_4       	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
-    _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info1");
-    _textureId8_1        	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info1_mask");
+    _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
+    _textureId8_1        	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info_mask");
     _textureId9          	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
     _textureId10         	= loadgfxfile(temapath,(char *) "images/",(char *) "play");

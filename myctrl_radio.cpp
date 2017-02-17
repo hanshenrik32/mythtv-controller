@@ -614,8 +614,9 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     if (radio_oversigt_loaded_nr<radiooversigt.radioantal()) {
         // show radio icon loader status
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,_textureIdloading);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
