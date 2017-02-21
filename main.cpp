@@ -600,7 +600,6 @@ GLuint _textureId2;                     	//error window
 GLuint _defaultdvdcover;                	//The id of the texture
 GLuint _defaultdvdcover2;	                //The id of the texture
 GLuint _texturemovieinfobox;	            // movie image
-GLuint _textureId5_1;	                    // movie mask
 GLuint _textureId7; 	                    //folder image
 GLuint _textureId7_1; 	                  //folder image
 GLuint _textureId7_2;	//folder image
@@ -662,8 +661,6 @@ GLuint moviebutton;
 
 GLuint gfxlandemask;
 GLuint gfxlande[80];
-
-
 GLuint texturedot;
 
 // loading window
@@ -673,7 +670,6 @@ GLuint _textureIdloading1;                      // empty window
 
 // setup menu textures
 GLuint setuptexture;
-GLuint setuptexturemask;
 GLuint setuptexturemask2;
 GLuint setupscreenbackmask;                   // setup screen/saver window mask
 GLuint setupsoundback;
@@ -2854,6 +2850,8 @@ void display(void) {
           yof=200;
           buttonsize=200;
             // background MASK
+
+/*
           glPushMatrix();
 //            glLoadIdentity(); 					//Reset the drawing perspective
           glEnable(GL_TEXTURE_2D);
@@ -2873,13 +2871,14 @@ void display(void) {
           glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
           glEnd(); //End quadrilateral coordinates
           glPopMatrix();
-
+*/
 
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
           glBlendFunc(GL_ONE, GL_ONE);
           glColor3f(1.0f, 1.0f, 1.0f);
-          glBlendFunc(GL_ONE, GL_ONE);
+          //glBlendFunc(GL_ONE, GL_ONE);
+          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
           glBindTexture(GL_TEXTURE_2D, _textureId9);						// texture9
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -4490,7 +4489,7 @@ void display(void) {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
-
+/*
       // mask
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -4508,14 +4507,16 @@ void display(void) {
       glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
       glEnd();
       glPopMatrix();
-
+*/
       // window
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400,400,0);
-      glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      //glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glEnable(GL_BLEND);
+      //glDisable(GL_DEPTH_TEST);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemovieinfobox);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4530,6 +4531,7 @@ void display(void) {
 
       // play movie icon
       glPushMatrix();
+      glDisable(GL_BLEND);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400+10,400+10,0);
       glDisable(GL_DEPTH_TEST);
@@ -7040,8 +7042,12 @@ void handleKeypress(unsigned char key, int x, int y) {
     } else {
         switch(key) {
             case 27:
-                    remove("mythtv-controller.lock");
-                    exit(0);
+                    // close setup windows again or close proram of not in menu
+                    if (do_show_setup) do_show_setup=false;
+                    else {
+                      remove("mythtv-controller.lock");
+                      exit(0);
+                    }
                     break;
             case '*':
                     if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
@@ -9587,9 +9593,6 @@ void loadgfx() {
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
-    if (screen_size<3)
-        _textureId5_1     = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox_mask");
-    else _textureId5_1    = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox_mask3-4");
     _textureId7           = loadgfxfile(temapath,(char *) "images/",(char *) "dir1");
     _textureId7_1         = loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask");
     _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
@@ -9636,8 +9639,6 @@ void loadgfx() {
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
-    setuptexturemask      = loadgfxfile(temapath,(char *) "images/",(char *) "setupmask");
-    //setuptexturemask 	= loadgfxfile(temapath,(char *) "images/",(char *) "setupmask");
     setuptexturemask2   	= loadgfxfile(temapath,(char *) "images/",(char *) "setupmask2");
     setupscreenbackmask   = loadgfxfile(temapath,(char *) "images/",(char *) "setupscreenbackmask");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
@@ -9799,7 +9800,6 @@ void freegfx() {
     glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_defaultdvdcover2);		// default dvd cover 2 hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_texturemovieinfobox);		  // movie info box
-    glDeleteTextures( 1, &_textureId5_1);			  // movie info box mask
     glDeleteTextures( 1, &_textureId7);				  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_textureId7_1);			  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_textureId7_2);			  // cd/dir icon in music oversigt mask (hvis cd cover findes)
@@ -9841,7 +9841,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback);			// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			// bruges af setup
-    glDeleteTextures( 1, &setuptexturemask);			// bruges af setup
     glDeleteTextures( 1, &setuptexturemask2);
     glDeleteTextures( 1, &setupscreenbackmask);
     glDeleteTextures( 1, &_textureIdtv);							// bruges ikke

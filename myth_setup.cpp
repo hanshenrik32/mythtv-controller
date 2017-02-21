@@ -65,7 +65,6 @@ extern char *configlandsprog[];
 extern int configxbmcver;
 extern GLuint _texturesetupclose;
 extern GLuint setuptexture;
-extern GLuint setuptexturemask;
 extern GLuint _texturesoundsetup;
 extern GLuint _texturesourcesetup;
 extern GLuint _textureimagesetup;
@@ -75,7 +74,6 @@ extern GLuint _texturekeyssetup;
 extern GLuint _texturelock;			                  // en hænge lås
 extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
-extern GLuint setuptexturemask;
 extern GLuint setupsoundback;
 extern GLuint setuptexturemask2;
 extern GLuint setupsqlback;
@@ -2959,6 +2957,7 @@ void show_setup_interface() {
     int ypos=0;
     int tabelofset=0;
 
+/*
     // mask
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -2978,14 +2977,15 @@ void show_setup_interface() {
     glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
     glEnd();
     glPopMatrix();
-
+*/
 
     // background
 //    glLoadIdentity();
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
 
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setuptexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
