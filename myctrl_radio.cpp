@@ -580,10 +580,12 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
                 glTexCoord2f(1, 0); glVertex3f(10+ xof+40,yof +10, 0.0);
                 glEnd();
             } else {
-                if (debugmode & 64) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
+                if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             }
         }
 
+
+        // print radios station name
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
         glTranslatef(xof,yof-218,0);
@@ -598,11 +600,9 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         ofs=(strlen(temptxt)/2)*9;
 
         glTranslatef(1,10,0);
-
-        if (strlen(temptxt)<=14) {
-            glcRenderString(temptxt);
-        } else {
-            temptxt[15]=0;
+        if (strlen(temptxt)<=14) glcRenderString(temptxt);
+        else {
+            temptxt[14]=0;
             glcRenderString(temptxt);
 
         }

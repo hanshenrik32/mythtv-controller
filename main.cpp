@@ -168,6 +168,7 @@ int debugmode=8+2;                                      // 64 = radio station la
                                                         // 128= stream search
                                                         // 256 = tv program stuf
                                                         // 512 = media importer
+                                                        // 1024 = flag loader
 
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
@@ -606,7 +607,6 @@ GLuint _textureId7_2;	//folder image
 GLuint _textureId7_3;	//folder mask image
 GLuint _textureId7_4;	//folder trans mask image
 GLuint _texturemusicplayer; 	//music image		// show player
-GLuint _textureId8_1; 	//music mask image
 GLuint _textureId9; 	//askbox image
 GLuint _textureId9_1; 	//askbox image
 GLuint _textureId9_2; 	//askbox image
@@ -9598,7 +9598,6 @@ void loadgfx() {
     _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
     _textureId7_4       	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
-    _textureId8_1        	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info_mask");
     _textureId9          	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
     _textureId10         	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
@@ -9805,7 +9804,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId7_2);			  // cd/dir icon in music oversigt mask (hvis cd cover findes)
     glDeleteTextures( 1, &_textureId7_4);			  // bruges til billed af cdcover i show music play
     glDeleteTextures( 1, &_texturemusicplayer); // show music info player
-    glDeleteTextures( 1, &_textureId8_1);			  // zoom music info mask
     glDeleteTextures( 1, &_textureId9);				  // ask box
     glDeleteTextures( 1, &_textureId9_2);			  // ask box
     glDeleteTextures( 1, &_textureId10);			  // play icon

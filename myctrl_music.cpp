@@ -1452,7 +1452,7 @@ void show_music_oversigt1(music_oversigt_type *musicoversigt,GLuint normal_icon,
             xof=0;
             yof=yof-(buttonsizey+44);
         }
-
+/*
         glPushMatrix();
         if (i==0) {
             if (musicoversigt[i+sofset].oversigttype!=-1) {
@@ -1498,11 +1498,12 @@ void show_music_oversigt1(music_oversigt_type *musicoversigt,GLuint normal_icon,
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
         glEnd();
         glPopMatrix();
-
+*/
 
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         if (i==0) {
             if (musicoversigt[i+sofset].oversigttype!=-1) {
                 if (i+sofset==0) {
@@ -1536,7 +1537,8 @@ void show_music_oversigt1(music_oversigt_type *musicoversigt,GLuint normal_icon,
             }
         }
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glLoadName(100+i);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
