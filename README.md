@@ -74,15 +74,16 @@ You can uninstall by.
 'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang/ libraries and headers
 
 
-# First start is slow, if your mythtv is setup right. The program have to
-# convert some gfx/cdcover/dvdcover file to internal format.
-#
-# After start. First jump to F1 menu for setup. 
-# Check the database setup for connect to mythtv backend.
-# After setup is okay.. restart the program to load the data from the mythtv
-# system the radio stations will be installed by the mythtv-controller
-# program.
-#
+ First start is slow, if your mythtv is setup right. The program have to
+ convert all the gfx/cdcover/dvdcover file to internal format.
+
+ After start. First jump to F1 menu for setup. 
+ Check the database setup for connect to mythtv or kodi backend. You can change the system type by spacekey.
+
+ After setup is okay.. restart the program to load the data from the mythtv
+
+ the radio stations db will be installed by the mythtv-controller by first run if able to create db (again check password in config file.)
+
 # Se install.txt for arch linux install.
 #
 # Programmed by Hans-Henrik Grüner-Pedersen
