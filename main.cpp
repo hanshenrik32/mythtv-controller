@@ -670,8 +670,6 @@ GLuint _textureIdloading1;                      // empty window
 
 // setup menu textures
 GLuint setuptexture;
-GLuint setuptexturemask2;
-GLuint setupscreenbackmask;                   // setup screen/saver window mask
 GLuint setupsoundback;
 GLuint setupsqlback;
 GLuint setupnetworkback;
@@ -4025,7 +4023,7 @@ void display(void) {
                     radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
                     if (radio_playtime_min>60) radio_playtime_min=0;
                     glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-                    sprintf(temptxt,music_timename[1]);       // 1 = danish
+                    sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
                     temptxt[40]=0;
                     glTranslatef(1, 1, 0);
                     glScalef(20,20, 1.0);                    // danish charset ttf
@@ -5002,6 +5000,11 @@ void display(void) {
 
 
 
+
+
+
+
+
 int list_hits(GLint hits, GLuint *names,int x,int y) {
     int i=hits;			// numbers of hits
     bool fundet=false;
@@ -5650,8 +5653,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
     }
     return(returnfunc);
 }
-
-
 
 
 
@@ -6375,7 +6376,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
 
-                if (vis_film_oversigt) printf("select = %d  Antal=%d\m ",film_select_iconnr,film_oversigt.film_antal());
+                if (vis_film_oversigt) printf("select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
 
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
                     if (film_key_selected>=11) {
@@ -6420,7 +6421,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_setup_sound) {
                        if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
                     }
-                    // setup screen window
+                    // setup screen window (screem config)
                     if (do_show_setup_screen) {
                        if (do_show_setup_select_linie<5) do_show_setup_select_linie++;
                     }
@@ -6754,9 +6755,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                                   screen_size=1;
                               }
                           }
+                      // screen saver
                       } else if (do_show_setup_select_linie==1) {
                           if (key==32) {		// space key
-                              if (strcmp(keybuffer,"analog")==0) {
+                              if (strncmp(keybuffer,"analog",7)==0) {
                                   strcpy(keybuffer,"digital");
                                   urtype=DIGITAL;
                               } else if (strcmp(keybuffer,"digital")==0) {
@@ -6776,7 +6778,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                                   urtype=ANALOG;
                               } else strcpy(keybuffer,"analog");
                           }
-                          // timeout
+                          // screen saver timeout
                       } else if (do_show_setup_select_linie==2) {
                           if (key!=13) {
                               keybuffer[keybufferindex]=key;
@@ -6795,6 +6797,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                                   use3deffect=true;
                               }
                           } else strcpy(keybuffer,configuse3deffect);
+                      // language
                       } else if (do_show_setup_select_linie==4) {
                           if (key==32) {
                               if (configland<(configlandantal-1)) configland++;
@@ -6940,6 +6943,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                     //strcpy(configuse3deffect,keybuffer);
                     break;
                    case 4:
+                     //strcpy(configuse3deffect,keybuffer);
+                    break;
+                   case 5:
                     if (key==32) full_screen=!full_screen;
               }
            } else if (do_show_setup_network) {
@@ -9566,8 +9572,10 @@ void loadgfx() {
     char tmpfilename[256];
     char fileload[256];
     char temapath[256];
+    char temapath1[256];
     printf ("Loading init graphic.\n");
     strcpy(temapath,"");
+    strcpy(temapath1,"");
     if (tema==1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
     if (tema==2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
     if (tema==3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
@@ -9582,8 +9590,8 @@ void loadgfx() {
         strcpy(temapath,"tema1/");
         tema=1;
     }
-    _textureuv1           = loadgfxfile("","images/",(char *) "uv_map1");
-    _textureuv1_top       = loadgfxfile("","images/",(char *) "uv_map2");
+    _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
+    _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
@@ -9638,8 +9646,6 @@ void loadgfx() {
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
-    setuptexturemask2   	= loadgfxfile(temapath,(char *) "images/",(char *) "setupmask2");
-    setupscreenbackmask   = loadgfxfile(temapath,(char *) "images/",(char *) "setupscreenbackmask");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
     _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "music");
     _textureIdfilm       	= loadgfxfile(temapath,(char *) "buttons/",(char *) "movie");
@@ -9839,8 +9845,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback);			// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			// bruges af setup
-    glDeleteTextures( 1, &setuptexturemask2);
-    glDeleteTextures( 1, &setupscreenbackmask);
     glDeleteTextures( 1, &_textureIdtv);							// bruges ikke
     glDeleteTextures( 1, &_textureIdmusic);			// music
     glDeleteTextures( 1, &_textureIdfilm);			// default film icon
@@ -9957,6 +9961,8 @@ void freegfx() {
 void load_lande_flags() {
     int i;
     char tmpfilename[1024];
+    char path[1024];
+    char path2[10];
     // *********************************************************************
     // 1-9
     // 10-19
@@ -9965,7 +9971,7 @@ void load_lande_flags() {
     // 40-49
     // 50-59
     // 60-69
-    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu.jpg",(char *) "fr.pmg",(char *) "luxembourg.jpg",(char *) "nl.jpg",(char *) "usa.jpg",(char *) "de.jpg",(char *) "uk.jpg", //
+    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu",(char *) "fr.pmg",(char *) "luxembourg.jpg",(char *) "nl.jpg",(char *) "usa.jpg",(char *) "de.jpg",(char *) "uk.jpg", //
                    (char *) "ru.jpg",(char *) "israel.jpg",(char *) "Austria.jpg",(char *) "lebanon.jpg",(char *) "latvia.jpg",(char *) "",(char *) "Vietnam.jpg",(char *) "Saudi-Arabia.jpg",(char *) "as.jpg",(char *) "brazil.jpg", //
                    (char *) "Egypt.jpg",(char *) "no.jpg",(char *) "pl.jpg",(char *) "se.jpg",(char *) "sw.jpg",(char *) "mexico.jpg",(char *) "be.jpg",(char *) "ca.jpg",(char *) "as.jpg",(char *) "ru.jpg", //
                    (char *) "sp.jpg",(char *) "ae.jpg",(char *) "hu.jpg",(char *) "th.jpg",(char *) "gr.jpg",(char *) "bk.jpg",(char *) "nu.jpg",(char *) "in.jpg",(char *) "po.jpg",(char *) "ir.jpg", //
@@ -9973,18 +9979,19 @@ void load_lande_flags() {
                    (char *) "hu.jpg",(char *) "co.jpg",(char *) "do.jpg",(char *) "Azerbaijan.jpg",(char *) "Lithuania.jpg",(char *) "Andorra.jpg",(char *) "Estonia.jpg",(char *) "Tajikistan.jpg",(char *) "Turkey.jpg",(char *) "Mongolia.jpg", //
                    (char *) "Belarus.jpg",(char *) "Slovenia.jpg",(char *) "Cyprus.jpg",(char *) "China.jpg",(char *) "Cambodia.jpg",(char *) "Indonesia.jpg",(char *) "Singapore.jpg",(char *) "Croatia.jpg",(char *) "Czech Republic.jpg",(char *) ""};
     i=0;
+    strcpy(path2,"");
     while(i<69) {
         printf("load flag %d %s \n",i,lande[i]);
         strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
         strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
+        strcpy(path,"/usr/share/mythtv-controller/images/");
         if (strcmp(lande[i],"")!=0) {
-          //gfxlande[i]=loadgfxfile("",tmpfilename,lande[i]);
-          gfxlande[i]=loadTexture ((char *) tmpfilename);
+          gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
+          //gfxlande[i]=loadTexture ((char *) tmpfilename);
         }
         i++;
     }
 }
-
 
 
 

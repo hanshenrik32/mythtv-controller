@@ -75,12 +75,10 @@ extern GLuint _texturelock;			                  // en hænge lås
 extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
 extern GLuint setupsoundback;
-extern GLuint setuptexturemask2;
 extern GLuint setupsqlback;
 extern GLuint setupnetworkback;
 extern GLuint setupnetworkwlanback;
 extern GLuint setupscreenback;
-extern GLuint setupscreenbackmask;                  // setup screen/saver window mask
 extern GLuint setuptemaback;                        //
 extern GLuint setupfontback;                        //
 extern GLuint setupkeysback;                        //
@@ -176,30 +174,12 @@ void show_setup_screen() {
     int winsizy=800;
     int xpos=0;
     int ypos=0;
-    // mask
-    //glLoadIdentity();                                                            //Reset the drawing perspective
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setupscreenbackmask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glEnd();
-    glPopMatrix();
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupscreenback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -571,30 +551,12 @@ void show_setup_video() {
     int winsizy=600;
     int xpos=0;
     int ypos=0;
-    // mask
-    //glLoadIdentity();                                                            //Reset the drawing perspective
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setupscreenbackmask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glEnd();
-    glPopMatrix();
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupscreenback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -851,31 +813,11 @@ void show_setup_tema() {
     int xpos=0;
     int ypos=0;
 
-
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,200 , 0.0);
-    glEnd();
-    glPopMatrix();
-
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupscreenback);                   //setuptemaback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1010,30 +952,11 @@ void show_setup_font(int startofset) {
     int ypos=0;
 
 
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,200 , 0.0);
-    glEnd();
-    glPopMatrix();
-
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupfontback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1160,31 +1083,11 @@ void show_wlan_networks(int valgtnr) {
     int xpos=0;
     int ypos=0;
 
-
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,200 , 0.0);
-    glEnd();
-    glPopMatrix();
-
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1312,30 +1215,11 @@ void show_setup_network() {
     int ypos=0;
 
 
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,200 , 0.0);
-    glEnd();
-        glPopMatrix();
-
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupnetworkback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1613,30 +1497,12 @@ void show_setup_sound() {
     int winsizy=200;
     int xpos=0;
     int ypos=0;
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),200 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,200 , 0.0);
-    glEnd();
-    glPopMatrix();
-
 
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupsoundback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1823,30 +1689,11 @@ void show_setup_sql() {
     int xpos=0;
     int ypos=0;
 
-    // mask
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),100 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,100 , 0.0);
-    glEnd();
-    glPopMatrix();
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setupsqlback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2231,35 +2078,13 @@ void show_setup_keys() {
     int winsizy=300;
     int xpos=0;
     int ypos=0;
-
     char text[200];
-    //float mythver;
-    // mask
-
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D,setuptexturemask2);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4),100 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+800,100 , 0.0);
-    glEnd();
-    glPopMatrix();
-
 
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,setupkeysback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
