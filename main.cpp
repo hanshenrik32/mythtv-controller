@@ -4095,7 +4095,7 @@ void display(void) {
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
-          sampleSize = 1024;                // nr of samples default 1024 in fmod
+          sampleSize = 1024;                // nr of samples default 64
           specLeft = new float[sampleSize];
           specRight = new float[sampleSize];
           for(int ii=0;ii<60;ii++) {
@@ -4116,7 +4116,7 @@ void display(void) {
           dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
           if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
           #endif
-          // get uv data from fmod dsp
+
           spec = new float[sampleSize];
           spec2 = new float[sampleSize];
           if (fft) {
@@ -4125,87 +4125,17 @@ void display(void) {
               float power = 0.0f;
               for (int i = 0; i < fft->length; ++i) {
                   if (fft->spectrum[chan][i]) {
-<<<<<<< HEAD
-                      specLeft[i]=(float) fft->spectrum[chan][i];
-                      specRight[i]=(float) fft->spectrum[chan][i];
-=======
                       specLeft[i]=(float) fft->spectrum[0][i];
                       specRight[i]=(float) fft->spectrum[1][i];
->>>>>>> bugfix-start
                   }
               }
             }
           }
-          // normlize
           for (i = 0; i < sampleSize; i++) {
             spec[i] = specLeft[i]*2;
             spec2[i] = specRight[i]*2;
           }
 
-<<<<<<< HEAD
-          float lee=0.0f;
-          for (i=0;i<sampleSize;i++) {
-            lee+=(spec[i]*spec[i]);
-          }
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-          //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
-          glColor4f(1.0f,1.0f,1.0f,1.0f);
-          int uvypos=0;
-          int high;
-          int qq;
-          // Draw uv lines 16
-          for(qq=0;qq<16;qq++) {
-            uvypos=0;
-            high=sqrt(spec[(qq*2)+1])*40.0f;
-            if (high>14) high=14;
-            for(i=0;i<high;i+=1) {
-              switch(i) {
-                case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                  break;
-                case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
-                  break;
-                case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
-                  break;
-                case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
-                  break;
-                case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
-                  break;
-                case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
-                  break;
-                case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
-                  break;
-                case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
-                  break;
-                case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
-                  break;
-                case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
-                  break;
-                case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
-                  break;
-                case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
-                  break;
-                case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
-                  break;
-                case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
-                  break;
-                case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
-                  break;
-                default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                  break;
-              }
-              glBegin(GL_QUADS);
-              // org
-              glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
-              glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
-              glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
-              glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
-              glEnd();
-              // org
-              uvypos+=16;
-
-=======
 
           // draw uv meter
           if (configuvmeter==1) {
@@ -4359,7 +4289,6 @@ void display(void) {
                 glEnd();
                 uvyypos+=16;
               }
->>>>>>> bugfix-start
             }
 
             // do some uv stuf

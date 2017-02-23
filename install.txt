@@ -1,18 +1,15 @@
-# packs to install to compile the code
-# The program req 350 Mbytes of diskspace.
-#
-# first version 02-09-2014
-# last update 01-01-2017
-#
+# packs to install to compile
+# The program req 300 Mbytes of diskspace.
 # open shell
 # write in shell
+# updated 02-09-2014
 
-This packets need to be installed on Ubuntu linux.
+This packets need to be installed on Ubuntu.
 
 g++ make libdevil-dev libsdl1.2-dev glutg3-dev libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source 
 dialog libglc-dev imagemagick liblircclient-dev xmltv libglc-dev libdevil1c2 unzip lirc
 
-Program version.
+Version.
 
 mythtv-controller ver 0.36.x
 
@@ -20,12 +17,7 @@ Howto install.
 
 mkdir mythtv-controller
 cd mythtv-controller   
-<<<<<<< HEAD
-download into dir and unpack by
-tar -zvxf fmodapi44441linux.tar.gz
-=======
 tar -zxf fmodstudioapi10811linux.tar.gz
->>>>>>> bugfix-start
 
 Now install by doing.
 
