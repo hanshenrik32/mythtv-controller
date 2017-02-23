@@ -1,14 +1,18 @@
-# mythtv-controller
-# packs to install to compile on Ubuntu 14.xx/16.xx
-# Updated 13/11/2016
+# mythtv-controller 
+# packs to install to compile on Ubuntu 10/12/14/16.xx
+# Updated 02/23/2017
 #
 
 Version.
 
+mythtv-controller ver 0.36.1
+
+uv music meter fixed after fmod upgrade
+All databases is now auto created by the system.
+
 mythtv-controller ver 0.36.0
 
 New xbmc/kodi loader,faster tread loader on all types
-
 
 mythtv-controller ver 0.32.6
 
@@ -51,4 +55,39 @@ sudo sh apt-get.sh
 You can install them by 'sudo sh apt-get.sh' when you have downloaded and
 untar the install file.
 
+mkdir mythtv-controller
+cd mythtv-controller
+tar -zxf mythtv-controller-0.33.6.tar.gz
+
+Rember to check the password in the config file (/etc/mythtv-controller.conf) BEFORE run
+
+Now it is time to install mythtv-controller by doing.
+
+Possible targets:
+'sudo sh apt-get.sh'       - Install software required by mythtv-controller
+'sudo make installsound'   - Install FMOD sound system
+'make compile'             - Compile mythtv-controller
+'sudo make install'        - Install mythtv-controller in /usr/share/mythtv-controller
+
+You can uninstall by.
+
+'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang/ libraries and headers
+
+
+ First start is slow, if your mythtv is setup right. The program have to
+ convert all the gfx/cdcover/dvdcover file to internal format.
+
+ After start. First jump to F1 menu for setup. 
+ Check the database setup for connect to mythtv or kodi backend. You can change the system type by spacekey.
+
+ After setup is okay.. restart the program to load the data from the mythtv
+
+ the radio stations db will be installed by the mythtv-controller by first run if able to create db (again check password in config file.)
+
+# Se install.txt for arch linux install.
+#
+# Programmed by Hans-Henrik Grüner-Pedersen
+# release under GPL
+# hanshenrik32@gmail.com
+#
 

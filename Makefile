@@ -65,7 +65,7 @@ compile: $(PROG)
 $(PROG): $(SRCS)
 	$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
-#$(CC) $(CFLAGS) -ggdb -g -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
+#$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
 uninstall:
 	rm -f $(DESTDIR)

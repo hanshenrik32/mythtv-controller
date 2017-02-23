@@ -580,10 +580,12 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
                 glTexCoord2f(1, 0); glVertex3f(10+ xof+40,yof +10, 0.0);
                 glEnd();
             } else {
-                if (debugmode & 64) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
+                if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             }
         }
 
+
+        // print radios station name
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
         glTranslatef(xof,yof-218,0);
@@ -598,11 +600,9 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         ofs=(strlen(temptxt)/2)*9;
 
         glTranslatef(1,10,0);
-
-        if (strlen(temptxt)<=14) {
-            glcRenderString(temptxt);
-        } else {
-            temptxt[15]=0;
+        if (strlen(temptxt)<=14) glcRenderString(temptxt);
+        else {
+            temptxt[14]=0;
             glcRenderString(temptxt);
 
         }
@@ -614,8 +614,9 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     if (radio_oversigt_loaded_nr<radiooversigt.radioantal()) {
         // show radio icon loader status
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,_textureIdloading);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
