@@ -59,12 +59,7 @@ mkdir mythtv-controller
 cd mythtv-controller
 tar -zxf mythtv-controller-0.33.6.tar.gz
 
-Now you have to create a database, called mythtvcontroller
-use mysql to create the database. Rember to check the password in the
-config file. 'createdb.sql' textfelt 'PASSWORD HERE' BEFORE run.
-
-mysql -u root -p < createdb.sql
-
+Rember to check the password in the config file (/etc/mythtv-controller.conf) BEFORE run
 
 Now it is time to install mythtv-controller by doing.
 
