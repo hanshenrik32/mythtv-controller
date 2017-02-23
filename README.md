@@ -1,5 +1,5 @@
 # mythtv-controller 
-# packs to install to compile on Ubuntu 10./12/14/16.xx
+# packs to install to compile on Ubuntu 10/12/14/16.xx
 # Updated 02/23/2017
 #
 
