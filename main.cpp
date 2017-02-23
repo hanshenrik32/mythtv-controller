@@ -177,6 +177,8 @@ bool stopmovie=false;
 
 int film_key_selected=1;                                // den valgte med keyboard i film oversigt
 
+int vis_volume_timeout=0;
+
 int music_key_selected=0;
 bool ask_open_dir_or_play=false;
 bool ask_open_dir_or_play_aopen=false;
@@ -2081,6 +2083,8 @@ unsigned int do_playlist_backup_playlist() {
     return(songnr);		// antal sange fundet i dir id
 }
 
+
+
 // Bruges af ur pause display
 
 void myglprint(char *string)
@@ -2091,6 +2095,7 @@ void myglprint(char *string)
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
     }
 }
+
 
 
 void show_background() {
@@ -2117,14 +2122,6 @@ void show_background() {
   glEnd();
   glPopMatrix();
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -2760,6 +2757,31 @@ void display(void) {
       }
     }
 
+    if (show_volume_info) {
+      vis_volume_timeout--;
+      if (vis_volume_timeout==0) show_volume_info=false;
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f,1.0f,1.0f,0.2f);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D, _textureuv1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTranslatef(10, 19, 0.0f);                                          // orgwinsizey
+      int aa=0;
+      for(i=0;i<(configsoundvolume*10);i++) {
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glTexCoord2f(0, 0); glVertex3f( 10.0+aa, 0.0, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 10.0+aa, 40.0, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( 40.0+aa, 40.0, 0.0);
+        glTexCoord2f(1, 0); glVertex3f( 40.0+aa, 0.0, 0.0);
+        glEnd(); //End quadrilateral coordinates
+        aa+=40;
+      }
+      glPopMatrix();
+    } else vis_volume_timeout=80;
 
     // vis_error=true;
     // vis_error_timeout=10;
