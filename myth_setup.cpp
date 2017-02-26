@@ -576,6 +576,8 @@ void show_setup_video() {
     myglprint4((char *) "Video play options.");   // keybuffer
     glPopMatrix();
 
+
+
     glPushMatrix();
     // close buttons
     glEnable(GL_TEXTURE_2D);
@@ -597,6 +599,8 @@ void show_setup_video() {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
+
+
 
     glPushMatrix();
     winsizx=300;
@@ -694,6 +698,7 @@ void show_setup_video() {
     glPopMatrix();
 
 
+    // debug mode
     glPushMatrix();
     winsizx=100;
     winsizy=40;
@@ -744,11 +749,7 @@ void show_setup_video() {
     }
     glPopMatrix();
 
-    if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(configaktivescreensavername));
-
-
-
-
+    if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(resl));
 
     glPushMatrix();
     winsizx=300;
@@ -782,12 +783,12 @@ void show_setup_video() {
     glTranslatef(380.0f, 600.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     myglprint4((char *) "UV Meter mode             ");
-    /*
+
     if (configuvmeter==0) strcpy(resl,"None");
     if (configuvmeter==1) strcpy(resl,"Simple");
     if (configuvmeter==2) strcpy(resl,"Dual");
     if (configuvmeter>2) strcpy(resl,"None");
-    */
+
     sprintf(resl,"%d",configuvmeter);
     if (do_show_setup_select_linie==3) {
         glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
@@ -797,8 +798,11 @@ void show_setup_video() {
     }
     glPopMatrix();
 
+    // show cursor
+    if (do_show_setup_select_linie==2) showcoursornow(250,500,strlen(resl));
 
 //    if (do_show_setup_select_linie==1) showcoursornow(250,550,strlen(configaktivescreensavername));
+
 
 }
 

@@ -6913,11 +6913,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                           configuvmeter=+1;
                           if (configuvmeter>2) configuvmeter=0;
                         }
-/*                        if (configuvmeter==0) strcpy(keybuffer,"none");
+                        if (configuvmeter==0) strcpy(keybuffer,"none");
                         if (configuvmeter==1) strcpy(keybuffer,"Simple");
                         if (configuvmeter==2) strcpy(keybuffer,"Dual");
-*/
-                        sprintf(keybuffer,"%d",configuvmeter);
+
+                        //sprintf(keybuffer,"%d",configuvmeter);
                       }
                   }
               }
@@ -7052,9 +7052,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                           break;
                   case 1: strcpy(configvideoplayer,keybuffer);
                           break;
-                  case 2: //strcpy(configvideoplayer,keybuffer);
+                  case 2: debugmode=atoi(keybuffer);                   // set debugmode
                           break;
-                  case 3:
+                  case 3: if ((keybuffer,"none")==0) {
+                            configuvmeter=0;
+                          } else if ((keybuffer,"single")==0) {
+                            configuvmeter=1;
+                          } else if ((keybuffer,"dual")==0) {
+                            configuvmeter=2;
+                          } else configuvmeter=1;
                           break;
               }
            }
