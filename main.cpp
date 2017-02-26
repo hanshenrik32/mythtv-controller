@@ -663,7 +663,6 @@ GLuint gfxlande[80];
 GLuint texturedot;
 
 // loading window
-GLuint _textureIdloading_mask;
 GLuint _textureIdloading;                       // loading window
 GLuint _textureIdloading1;                      // empty window
 
@@ -699,7 +698,7 @@ GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,s
 GLuint _textureIdback_main=0,_textureIdback_music=0;            // main background
 GLuint _textureIdback_setup;
 GLuint  screensaverbox;
-GLuint _tvoldrecordedmask;
+//GLuint _tvoldrecordedmask;
 GLuint _textureIdmusic_aktiv;
 GLuint _tvoldrecorded;
 GLuint screensaverbox_mask;
@@ -2695,7 +2694,7 @@ void display(void) {
 
     if (!(visur)) {
       if (vis_music_oversigt) {
-          show_music_oversigt1(musicoversigt,_textureId7,_textureId7_1,_textureIdback,_textureId28,_textureId28_1,_mangley);
+          show_music_oversigt1(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
         } else if (vis_film_oversigt) {
           glPushMatrix();
           //aktivfont.selectfont("DejaVu Sans");
@@ -7065,6 +7064,12 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 27:
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) do_show_setup=false;
+                    else if (vis_music_oversigt) vis_music_oversigt=false;
+                    else if (vis_radio_oversigt) vis_radio_oversigt=false;
+                    else if (vis_film_oversigt) vis_film_oversigt=false;
+                    else if (vis_stream_oversigt) vis_stream_oversigt=false;
+                    else if (vis_tv_oversigt) vis_tv_oversigt=false;
+                    else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                     else {
                       remove("mythtv-controller.lock");
                       exit(0);
@@ -9677,7 +9682,6 @@ void loadgfx() {
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
     _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
-    _textureIdloading_mask=  loadgfxfile(temapath,(char *) "images/",(char *) "loadingmask");
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
@@ -9725,23 +9729,23 @@ void loadgfx() {
 
 // ************************* screen shot *******************************
 
-    screenshot1=loadTexture ((char *) "images/screenshot1.jpg");
-    screenshot2=loadTexture ((char *) "images/screenshot2.jpg");
-    screenshot3=loadTexture ((char *) "images/screenshot3.jpg");
-    screenshot4=loadTexture ((char *) "images/screenshot4.jpg");
+    screenshot1=loadTexture ((char *) "images/screenshot1.png");
+    screenshot2=loadTexture ((char *) "images/screenshot2.png");
+    screenshot3=loadTexture ((char *) "images/screenshot3.png");
+    screenshot4=loadTexture ((char *) "images/screenshot4.png");
     screenshot5=loadTexture ((char *) "images/screenshot5.png");
-    screenshot6=loadTexture ((char *) "images/screenshot6.jpg");
-    screenshot7=loadTexture ((char *) "images/screenshot7.jpg");
-    screenshot8=loadTexture ((char *) "images/screenshot8.jpg");
-    screenshot9=loadTexture ((char *) "images/screenshot9.jpg");
-    screenshot10=loadTexture ((char *) "images/screenshot10.jpg");
+    screenshot6=loadTexture ((char *) "images/screenshot6.png");
+    screenshot7=loadTexture ((char *) "images/screenshot7.png");
+    screenshot8=loadTexture ((char *) "images/screenshot8.png");
+    screenshot9=loadTexture ((char *) "images/screenshot9.png");
+    screenshot10=loadTexture ((char *) "images/screenshot10.png");
 
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
-    _tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
+    //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
 
     // icons buttons
@@ -9870,7 +9874,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdradiosearch);		    // sang search
     glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
     glDeleteTextures( 1, &_textureIdloading);
-    glDeleteTextures( 1, &_textureIdloading_mask);
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
     glDeleteTextures( 1, &_textureIdclose);
     glDeleteTextures( 1, &_textureIdclose1);
@@ -9922,7 +9925,6 @@ void freegfx() {
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar2);
     glDeleteTextures( 1, &_tvoldrecorded);
-    glDeleteTextures( 1, &_tvoldrecordedmask);
     glDeleteTextures( 1, &_tv_prgtype);
     glDeleteTextures( 1, &onlineradio_empty);
     glDeleteTextures( 1, &onlineradio);		                   		// radio icon

@@ -31,7 +31,7 @@ const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
-extern GLuint _textureIdloading_mask;
+//extern GLuint _textureIdloading_mask;
 // window info
 extern int orgwinsizey;
 extern int orgwinsizex;
@@ -1276,7 +1276,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
 
-
+/*
     glTranslatef(loader_xpos,loader_ypos,-600);
     glBindTexture(GL_TEXTURE_2D,_textureIdloading_mask);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1288,11 +1288,12 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
     glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
     glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     glLoadIdentity();
     glTranslatef(loader_xpos,loader_ypos,-600);
     glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glRotatef(45.0f, 0.0f, 0.0f, 0.0f);

@@ -42,7 +42,7 @@ extern GLuint _tvrecordbutton;
 GLuint _textureId13;
 extern GLuint _tvrecordcancelbutton;
 extern GLuint _tvoldrecorded;
-extern GLuint _tvoldrecordedmask;
+//extern GLuint _tvoldrecordedmask;
 
 extern GLuint _tvoldprgrecordedbutton;
 extern GLuint _tvnewprgrecordedbutton;
@@ -1837,7 +1837,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
 
     // top
     glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1894,7 +1896,8 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
         glPushMatrix();
         glTranslatef(10,50, 0.0f);
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
         glBindTexture(GL_TEXTURE_2D,_tvbar1_1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1950,7 +1953,8 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     glPushMatrix();
     glTranslatef(10,50, 0.0f);
     glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,tvprginfobig);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1973,7 +1977,8 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
 
     glTranslatef(0,0, 0.0f);
     glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,_tvbar2);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2801,29 +2806,12 @@ void earlyrecorded::earlyrecordedload(char *mysqlhost,char *mysqluser,char *mysq
 void earlyrecorded::showearlyrecorded() {
     int i;
     glColor3f(1.0f, 1.0f, 1.0f);
-
-    // mask
-    glLoadIdentity();
-    glTranslatef(-10.0f, 0.0f, -110.0f);
-    glEnable(GL_TEXTURE);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, _tvoldrecordedmask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-50.0, -32.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 70.0, -32.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 70.0, 30.0, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-50.0, 30.0, 0.0);
-    glEnd();
-
-    // img
+    // img bg
     glLoadIdentity();
     glEnable(GL_TEXTURE);
     glTranslatef(-10.0f, 0.0f, -110.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, _tvoldrecorded);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2880,12 +2868,6 @@ void earlyrecorded::showearlyrecorded() {
     glEnd();
 
     // End button 1
-
-
-
-
-
-
 
 }
 
@@ -2981,24 +2963,11 @@ void earlyrecorded::showtvreclist() {
     glEnable(GL_TEXTURE);
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-//    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, _tvoldrecordedmask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-50.0, -32.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 70.0, -32.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 70.0, 30.0, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-50.0, 30.0, 0.0);
-    glEnd();
-
     // img
     glLoadIdentity();
     glEnable(GL_TEXTURE);
     glTranslatef(-10.0f, 0.0f, -110.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, _tvoldrecorded);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

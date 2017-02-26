@@ -39,7 +39,7 @@ extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
 
 extern GLuint _textureIdloading,_textureIdloading1;
-extern GLuint _textureIdloading_mask;
+//extern GLuint _textureIdloading_mask;
 
 
 // stream mask
@@ -1228,7 +1228,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
+/*
     glTranslatef(loader_xpos,loader_ypos,-600);
     glBindTexture(GL_TEXTURE_2D,_textureIdloading_mask);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1240,11 +1240,12 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
     glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     glLoadIdentity();
     glTranslatef(loader_xpos,loader_ypos,-600);
     glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
