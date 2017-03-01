@@ -117,6 +117,7 @@ char configmythhost[256];			                        	// host of mythtv master
 char configmysqlip[256];				                        // mysql server ip
 char confighostname[256];                               // this hostname
 char confighostip[256];				                          // this host ip adress
+float configvolume;                                     // save/load last volume value
 char confighostwlanname[256];				                    // wlan netid name
 char configpicturepath[256];                            // path til pictures gallery source (den laver et dir under som hedder "mythc_gallery"
 char configmusicpath[256];                              // path til music source
@@ -850,7 +851,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setuvmetertype};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setuvmetertype,setvolume};
     int commandlength;
     char value[200];
     bool command=false;
@@ -951,10 +952,14 @@ int parse_config(char *filename) {
                         commandlength=4;
                         debugmode=atoi(value);		// set debug mode from config file
                         showfps=true;
-                    } else  if (strncmp(buffer+n,"uvmetertype",4)==0) {
+                    } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
                         command=true;
                         command_nr=setuvmetertype;
                         commandlength=10;
+                    } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
+                        command=true;
+                        command_nr=setvolume;
+                        commandlength=12;
                     } else command=false;
                 }
                 if (command) {
@@ -1061,6 +1066,8 @@ int parse_config(char *filename) {
                       configland=1; // set default land code
                     } else if (command_nr==setuvmetertype) {
                       configuvmeter=atoi(value);
+                    } else if (command_nr==setvolume) {
+                      configvolume=atof(value);                         // set default volume under play
                     }
                 }
             }
@@ -1131,6 +1138,8 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
         fputs(temp,file);
+        sprintf(temp,"defaultvolume=%f\n",configvolume);                               // uv meter type
+        fputs(temp,file);
         fclose(file);
     }
     file = fopen("mythtv-controller.keys", "w");
@@ -1176,6 +1185,7 @@ void load_config(char * filename) {
     strcpy(configfontname,"FreeMono");
     strcpy(configvideoplayer,"default");
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
+    configvolume=1.0f;                                        // default start music volume
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
@@ -6917,7 +6927,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (configuvmeter==1) strcpy(keybuffer,"Simple");
                         if (configuvmeter==2) strcpy(keybuffer,"Dual");
 
-                        //sprintf(keybuffer,"%d",configuvmeter);
+                        sprintf(keybuffer,"%d",configuvmeter);
                       }
                   }
               }
@@ -9008,9 +9018,6 @@ void *radio_check_statusloader(void *data) {
 
 
 
-
-
-
 //
 // phread dataload Music
 //
@@ -9201,8 +9208,6 @@ void *datainfoloader(void *data) {
 CXBMCClient *xbmcclient=new CXBMCClient("");
 int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
-
-
 
 
 //

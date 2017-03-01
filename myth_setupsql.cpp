@@ -55,9 +55,6 @@ const char *create_sql_radio_types_data="REPLACE INTO `radiotypes` (`typename`, 
                                                                                     ('Favorites first',   0, 0)";
 
 
-
-
-
 const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landekode`, `imgpath`) VALUES \
                                                                 ('Yugoslavia', 3, 'yu.png'), \
                                                                 ('France',     4, 'fr.png'), \
