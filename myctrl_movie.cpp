@@ -31,6 +31,7 @@ const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
+extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
 //extern GLuint _textureIdloading_mask;
 // window info
 extern int orgwinsizey;
@@ -1563,8 +1564,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     //glPopMatrix();
   }
 
-
-  if (movie_oversigt_loaded_nr<this->filmoversigt_antal) {
+  // show dvd cover loading status
+  if ((movie_oversigt_loaded_nr<this->filmoversigt_antal) && (!(vis_uv_meter))) {
     winsizx=200;
     winsizy=150;
     xpos=orgwinsizex-200;

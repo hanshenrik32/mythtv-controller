@@ -2440,7 +2440,7 @@ void display(void) {
         glEnd();
 
 
-        // radio icon
+        // movie stuf
         //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_film_oversigt) || (vis_stream_oversigt)) {
             glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
@@ -4118,7 +4118,9 @@ void display(void) {
                 }
             }
         }
-        //
+
+        // create uv meter
+
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
@@ -4514,25 +4516,7 @@ void display(void) {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
-/*
-      // mask
-      glPushMatrix();
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glTranslatef(400,400,0);
-      glDisable(GL_DEPTH_TEST);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      glBindTexture(GL_TEXTURE_2D, _textureId5_1);        // mask
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+550, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+550 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
-      glEnd();
-      glPopMatrix();
-*/
+
       // window
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
