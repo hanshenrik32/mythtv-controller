@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +47,10 @@
 #endif
 
 FMOD::DSP* dsp = 0;                   // TEST
+
+// from compiler
+extern char __BUILD_DATE;
+extern char __BUILD_NUMBER;
 
 #include "main.h"
 #include "myctrl_storagedef.h"
@@ -1138,7 +1141,7 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
         fputs(temp,file);
-        sprintf(temp,"defaultvolume=%f\n",configvolume);                               // uv meter type
+        sprintf(temp,"defaultvolume=%2.1f\n",configvolume);                               // uv meter type
         fputs(temp,file);
         fclose(file);
     }
@@ -10097,6 +10100,8 @@ int check_radio_stations_icons() {
 
 
 int main(int argc, char** argv) {
+    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
