@@ -48,6 +48,10 @@
 
 FMOD::DSP* dsp = 0;                   // TEST
 
+// from compiler
+extern char __BUILD_DATE;
+extern char __BUILD_NUMBER;
+
 #include "main.h"
 #include "myctrl_storagedef.h"
 
@@ -176,6 +180,8 @@ int configmythtvver=0;            			                // mythtv config found vers
 bool stopmovie=false;
 
 int film_key_selected=1;                                // den valgte med keyboard i film oversigt
+
+int vis_volume_timeout=0;
 
 int music_key_selected=0;
 bool ask_open_dir_or_play=false;
@@ -315,7 +321,7 @@ GLint ctx, myFont;
 
 bool do_swing_movie_cover=false;                        // do anim
 
-bool vis_nyefilm_oversigt=true;
+bool vis_nyefilm_oversigt=true;                         // start med at vise nye film
 
 // stream
 
@@ -403,7 +409,6 @@ int tvstartxofset=0;
 // ************************************************************************************************
 
 extern mplaylist aktiv_playlist;
-
 
 struct dirmusic_list_type {
     char name[200];
@@ -625,14 +630,11 @@ GLuint _textureId18; 	//movie options box
 GLuint _textureId18_1; 	//mask movie options box
 GLuint _textureId19; 	//movie options box
 GLuint _textureId19_1; 	//mask movie options box
-GLuint _textureId20; 	//mask movie options box
-GLuint _textureId21; 	//mask movie options box
-GLuint _textureId22; 	//move options box
-GLuint _textureId22_1; 	//mask movie options box
-GLuint _textureId23; 	//movie options box
-GLuint _textureId23_1; 	//mask movie options box
+GLuint _textureId20; 	// mask movie options box
+GLuint _textureId21; 	// mask movie options box
+GLuint _textureId22; 	// move options box
+GLuint _textureId23; 	// movie options box
 GLuint _textureId24; 	// movie options box
-GLuint _textureId24_1; 	//mask movie options box
 GLuint _textureId25; 	//
 GLuint _textureId26; 	//
 GLuint _textureId27; 	//
@@ -664,7 +666,6 @@ GLuint gfxlande[80];
 GLuint texturedot;
 
 // loading window
-GLuint _textureIdloading_mask;
 GLuint _textureIdloading;                       // loading window
 GLuint _textureIdloading1;                      // empty window
 
@@ -700,7 +701,7 @@ GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,s
 GLuint _textureIdback_main=0,_textureIdback_music=0;            // main background
 GLuint _textureIdback_setup;
 GLuint  screensaverbox;
-GLuint _tvoldrecordedmask;
+//GLuint _tvoldrecordedmask;
 GLuint _textureIdmusic_aktiv;
 GLuint _tvoldrecorded;
 GLuint screensaverbox_mask;
@@ -724,7 +725,6 @@ GLuint _textureIdclosemask;
 GLuint _texturesetupmenu;
 GLuint _textureIdclose;
 GLuint _textureIdclose1;
-GLuint _textureIdmusicsearchmask;
 GLuint _texturemplay;
 GLuint _texturemstop;
 GLuint _texturemnext;
@@ -853,7 +853,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setuvmetertype};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setuvmetertype,setvolume};
     int commandlength;
     char value[200];
     bool command=false;
@@ -879,7 +879,7 @@ int parse_config(char *filename) {
                         command=true;
                         command_nr=setbackend;
                         commandlength=6;
-                    } else if (strncmp(buffer+n,"mythhost",7)==0) {
+                    } else if (strncmp(buffer+n,"mythhost",7)==0)  {
                         command=true;
                         command_nr=sethostname;
                         commandlength=7;
@@ -954,10 +954,14 @@ int parse_config(char *filename) {
                         commandlength=4;
                         debugmode=atoi(value);		// set debug mode from config file
                         showfps=true;
-                    } else  if (strncmp(buffer+n,"uvmetertype",4)==0) {
+                    } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
                         command=true;
                         command_nr=setuvmetertype;
                         commandlength=10;
+                    } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
+                        command=true;
+                        command_nr=setvolume;
+                        commandlength=12;
                     } else command=false;
                 }
                 if (command) {
@@ -1006,6 +1010,7 @@ int parse_config(char *filename) {
                         }
                     }
                     else if (command_nr==setvideoplayer) {
+                        if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
                         strcpy(configvideoplayer,value);
                     }
                     // sound port
@@ -1063,6 +1068,8 @@ int parse_config(char *filename) {
                       configland=1; // set default land code
                     } else if (command_nr==setuvmetertype) {
                       configuvmeter=atoi(value);
+                    } else if (command_nr==setvolume) {
+                      configsoundvolume=atof(value);                         // set default volume under play
                     }
                 }
             }
@@ -1133,6 +1140,8 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
         fputs(temp,file);
+        sprintf(temp,"defaultvolume=%2.2f\n",configsoundvolume);                               // uv meter type
+        fputs(temp,file);
         fclose(file);
     }
     file = fopen("mythtv-controller.keys", "w");
@@ -1169,29 +1178,30 @@ void load_config(char * filename) {
         strcpy(configstoragerecord[i].path,"");
         strcpy(configstoragerecord[i].name,"");
     }
-    strcpy(configdefaultplayer,"default");		// default sound player
-    strcpy(configclosemythtvfrontend,"no");		// close mythtv frontend
-    strcpy(configscreensavertimeout,"30");		// default screensaver timeout
-    strcpy(configsoundoutport,"SPDIF");			// default sound interface
+    strcpy(configdefaultplayer,"default");	                 	// default sound player (fmod)
+    strcpy(configclosemythtvfrontend,"no");		                // close mythtv frontend
+    strcpy(configscreensavertimeout,"30");	                 	// default screensaver timeout
+    strcpy(configsoundoutport,"SPDIF");			                  // default sound interface
     strcpy(configdvale,"yes");
     strcpy(configuse3deffect,"yes");
-    strcpy(configfontname,"Ubuntu");
+    strcpy(configfontname,"FreeMono");
     strcpy(configvideoplayer,"default");
-    strcpy(configdefaultmusicpath,"Music");                 // default start music dir
-    configuvmeter=1;                                        // default uv meter type
+    strcpy(configdefaultmusicpath,"Music");                   // default start music dir
+    configsoundvolume=1.0f;
+    configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
         strcpy(configaktivescreensavername,"analog");				// default analog clock
         urtype=2;								// default screen saver
-        strcpy(configmysqluser,"mythtv");					// default userid for mythtv
-        strcpy(configmysqlpass,"password");					// default password
-        strcpy(configmysqlhost,"localhost");					// localhost mysql server default
-        strcpy(configmythhost,"localhost");					// localhost mythtv server default
-        strcpy(configmythsoundsystem,"");					//
-        strcpy(configsoundoutport,"SPDIF");					// spdif out default
-        strcpy(configclosemythtvfrontend,"no");					//
-        strcpy(configfontname,"Ubuntu");					//
-        strcpy(configmouse,"1");						// enable mouse default
+        strcpy(configmysqluser,"mythtv");				           	// default userid for mythtv
+        strcpy(configmysqlpass,"password");				         	// default password
+        strcpy(configmysqlhost,"localhost");		      			// localhost mysql server default
+        strcpy(configmythhost,"localhost");				         	// localhost mythtv server default
+        strcpy(configmythsoundsystem,"");			          		//
+        strcpy(configsoundoutport,"SPDIF");				         	// spdif out default
+        strcpy(configclosemythtvfrontend,"no");				     	//
+        strcpy(configfontname,"FreeMono");			           		//
+        strcpy(configmouse,"1");						                // enable mouse default
         FILE * file = fopen(filename, "w");
         if (file) {
            fputs("mysqluser=mythtv\n",file);
@@ -1811,7 +1821,7 @@ int init_ttf_fonts() {
     glc_font_id = glcGenFontID();
     glcAppendCatalog("/usr/share/fonts/truetype");
     myFont = glcGenFontID();
-    glcNewFontFromFamily(myFont, configfontname);               // Droid Serif,Ubuntu
+    glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
     if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Open ttf font select error.\n");  // Regular
     glcFont(myFont);
 
@@ -1839,9 +1849,6 @@ int init_ttf_fonts() {
 //    glcEnable(GLC_HINTING_QSO);
     return(1);
 }
-
-
-
 
 
 
@@ -2081,6 +2088,8 @@ unsigned int do_playlist_backup_playlist() {
     return(songnr);		// antal sange fundet i dir id
 }
 
+
+
 // Bruges af ur pause display
 
 void myglprint(char *string)
@@ -2091,6 +2100,7 @@ void myglprint(char *string)
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
     }
 }
+
 
 
 void show_background() {
@@ -2124,14 +2134,6 @@ void show_background() {
 
 
 
-
-
-
-
-
-
-
-
 //
 // *********************** MAIN LOOP ************************************************************************************************************
 //
@@ -2150,7 +2152,7 @@ void display(void) {
     int sounderrflag;                           // husk last sound system status
     int numtags, numtagsupdated, count;         // bliver brugt til at vise stream tags
     GLuint textureId;
-    static int show_newmovietimeout=120;
+    static int show_newmovietimeout=120*10;
     bool radio_pictureloaded;
 
     unsigned int lenbytes, kbps;
@@ -2422,7 +2424,7 @@ void display(void) {
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
             glLoadName(27);                  // Overwrite the first name in the buffer
         } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdtv);				// default tv
+            glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// default tv
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -2437,7 +2439,7 @@ void display(void) {
         glEnd();
 
 
-        // radio icon
+        // movie stuf
         //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_film_oversigt) || (vis_stream_oversigt)) {
             glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
@@ -2548,8 +2550,6 @@ void display(void) {
 
 
 
-
-
     // radio stuf
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
         // img
@@ -2635,15 +2635,13 @@ void display(void) {
         show_newmovietimeout=0;
         vis_nyefilm_oversigt=false;
     }
-    /*
+
+    // shopw oversigt over nye film
     if (vis_nyefilm_oversigt) {
         if (show_newmovietimeout==0) vis_nyefilm_oversigt=false;
         if (fknapnr==0) show_newmovietimeout--;
         film_oversigt.show_minifilm_oversigt(0,0);
     }
-    */
-
-
 
 
     // search radio station buffer search
@@ -2704,7 +2702,7 @@ void display(void) {
 
     if (!(visur)) {
       if (vis_music_oversigt) {
-          show_music_oversigt1(musicoversigt,_textureId7,_textureId7_1,_textureIdback,_textureId28,_textureId28_1,_mangley);
+          show_music_oversigt1(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
         } else if (vis_film_oversigt) {
           glPushMatrix();
           //aktivfont.selectfont("DejaVu Sans");
@@ -2736,7 +2734,6 @@ void display(void) {
         glEnable(GL_BLEND);
         if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch); // mask _textureId5_!
         else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1); // mask _textureId5_!
-        //glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearchmask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -2760,6 +2757,31 @@ void display(void) {
       }
     }
 
+    if (show_volume_info) {
+      vis_volume_timeout--;
+      if (vis_volume_timeout==0) show_volume_info=false;
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f,1.0f,1.0f,0.2f);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D, _textureuv1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTranslatef(10, 19, 0.0f);                                          // orgwinsizey
+      int aa=0;
+      for(i=0;i<(configsoundvolume*10);i++) {
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glTexCoord2f(0, 0); glVertex3f( 10.0+aa, 0.0, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 10.0+aa, 40.0, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( 40.0+aa, 40.0, 0.0);
+        glTexCoord2f(1, 0); glVertex3f( 40.0+aa, 0.0, 0.0);
+        glEnd(); //End quadrilateral coordinates
+        aa+=40;
+      }
+      glPopMatrix();
+    } else vis_volume_timeout=80;
 
     // vis_error=true;
     // vis_error_timeout=10;
@@ -4091,7 +4113,9 @@ void display(void) {
                 }
             }
         }
-        //
+
+        // create uv meter
+
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
@@ -4487,25 +4511,7 @@ void display(void) {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
-/*
-      // mask
-      glPushMatrix();
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glTranslatef(400,400,0);
-      glDisable(GL_DEPTH_TEST);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      glBindTexture(GL_TEXTURE_2D, _textureId5_1);        // mask
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0, 0+550, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+800, 0+550 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+800, 0 , 0.0);
-      glEnd();
-      glPopMatrix();
-*/
+
       // window
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -6661,17 +6667,23 @@ void handleKeypress(unsigned char key, int x, int y) {
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
     if (key=='+') {
-      if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+      if (configsoundvolume<1.0f) configsoundvolume+=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
+
+      save_config((char *) "/etc/mythtv-controller.conf");
+
       #endif
       show_volume_info=true;					// show volume info window
     }
 
     if (key=='-') {                               // volume down
-      if (configsoundvolume>0) configsoundvolume-=0.1f;
+      if (configsoundvolume>0) configsoundvolume-=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
+
+      save_config((char *) "/etc/mythtv-controller.conf");
+
       #endif
       show_volume_info=true;					// show volume info window
     }
@@ -6899,10 +6911,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                           configuvmeter=+1;
                           if (configuvmeter>2) configuvmeter=0;
                         }
-/*                        if (configuvmeter==0) strcpy(keybuffer,"none");
+                        if (configuvmeter==0) strcpy(keybuffer,"none");
                         if (configuvmeter==1) strcpy(keybuffer,"Simple");
                         if (configuvmeter==2) strcpy(keybuffer,"Dual");
-*/
+
                         sprintf(keybuffer,"%d",configuvmeter);
                       }
                   }
@@ -7038,9 +7050,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                           break;
                   case 1: strcpy(configvideoplayer,keybuffer);
                           break;
-                  case 2: //strcpy(configvideoplayer,keybuffer);
+                  case 2: debugmode=atoi(keybuffer);                   // set debugmode
                           break;
-                  case 3:
+                  case 3: if ((keybuffer,"none")==0) {
+                            configuvmeter=0;
+                          } else if ((keybuffer,"single")==0) {
+                            configuvmeter=1;
+                          } else if ((keybuffer,"dual")==0) {
+                            configuvmeter=2;
+                          } else configuvmeter=1;
                           break;
               }
            }
@@ -7050,6 +7068,12 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 27:
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) do_show_setup=false;
+                    else if (vis_music_oversigt) vis_music_oversigt=false;
+                    else if (vis_radio_oversigt) vis_radio_oversigt=false;
+                    else if (vis_film_oversigt) vis_film_oversigt=false;
+                    else if (vis_stream_oversigt) vis_stream_oversigt=false;
+                    else if (vis_tv_oversigt) vis_tv_oversigt=false;
+                    else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                     else {
                       remove("mythtv-controller.lock");
                       exit(0);
@@ -7065,9 +7089,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_film_oversigt) {
                         vis_movie_options=!vis_movie_options;
                     } else if ((vis_tv_oversigt) && (!(vis_tvrec_list))) {
-                        vis_old_recorded=!vis_old_recorded;		// show old recorded programs
+                        vis_old_recorded=!vis_old_recorded;	                        	    // show old recorded programs
                     } else if (vis_radio_oversigt) {
-                        show_radio_options=!show_radio_options;				// show radio options
+                        show_radio_options=!show_radio_options;			                    	// show radio options
                         if (do_zoom_radio) do_zoom_radio=false;
                     }
                     break;
@@ -8982,9 +9006,6 @@ void *radio_check_statusloader(void *data) {
 
 
 
-
-
-
 //
 // phread dataload Music
 //
@@ -9175,8 +9196,6 @@ void *datainfoloader(void *data) {
 CXBMCClient *xbmcclient=new CXBMCClient("");
 int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
-
-
 
 
 //
@@ -9633,11 +9652,8 @@ void loadgfx() {
     _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
     _textureId21         	= loadgfxfile(temapath,(char *) "images/",(char *) "textbox");
     _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
-    _textureId22_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1_mask");
     _textureId23         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox2");
-    _textureId23_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox2_mask");
     _textureId24         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox3");
-    _textureId24_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox3_mask");
     _textureId25         	= loadgfxfile(temapath,(char *) "images/",(char *) "recorded_vis_mask");
     _textureId26         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar");
     _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
@@ -9663,10 +9679,8 @@ void loadgfx() {
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
 
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
-    _textureIdmusicsearchmask= loadgfxfile(temapath,(char *) "images/",(char *) "music_search_mask");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
     _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
-    _textureIdloading_mask=  loadgfxfile(temapath,(char *) "images/",(char *) "loadingmask");
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
@@ -9714,23 +9728,23 @@ void loadgfx() {
 
 // ************************* screen shot *******************************
 
-    screenshot1=loadTexture ((char *) "images/screenshot1.jpg");
-    screenshot2=loadTexture ((char *) "images/screenshot2.jpg");
-    screenshot3=loadTexture ((char *) "images/screenshot3.jpg");
-    screenshot4=loadTexture ((char *) "images/screenshot4.jpg");
+    screenshot1=loadTexture ((char *) "images/screenshot1.png");
+    screenshot2=loadTexture ((char *) "images/screenshot2.png");
+    screenshot3=loadTexture ((char *) "images/screenshot3.png");
+    screenshot4=loadTexture ((char *) "images/screenshot4.png");
     screenshot5=loadTexture ((char *) "images/screenshot5.png");
-    screenshot6=loadTexture ((char *) "images/screenshot6.jpg");
-    screenshot7=loadTexture ((char *) "images/screenshot7.jpg");
-    screenshot8=loadTexture ((char *) "images/screenshot8.jpg");
-    screenshot9=loadTexture ((char *) "images/screenshot9.jpg");
-    screenshot10=loadTexture ((char *) "images/screenshot10.jpg");
+    screenshot6=loadTexture ((char *) "images/screenshot6.png");
+    screenshot7=loadTexture ((char *) "images/screenshot7.png");
+    screenshot8=loadTexture ((char *) "images/screenshot8.png");
+    screenshot9=loadTexture ((char *) "images/screenshot9.png");
+    screenshot10=loadTexture ((char *) "images/screenshot10.png");
 
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
-    _tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
+    //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
 
     // icons buttons
@@ -9814,56 +9828,51 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId9_2);			  // ask box
     glDeleteTextures( 1, &_textureId10);			  // play icon
     glDeleteTextures( 1, &_textureId10_1);			// open icon
-    glDeleteTextures( 1, &_textureclose);			  // no dont play icon
-    glDeleteTextures( 1, &_textureId10_3);			// no dont play icon
-    glDeleteTextures( 1, &_textureId11);			  // tv program oversigt logo
-    glDeleteTextures( 1, &_textureIdback_main);	// main background
+    glDeleteTextures( 1, &_textureclose);			          // no dont play icon
+    glDeleteTextures( 1, &_textureId10_3);			        // no dont play icon
+    glDeleteTextures( 1, &_textureId11);			          // tv program oversigt logo
+    glDeleteTextures( 1, &_textureIdback_main);       	// main background
     glDeleteTextures( 1, &_textureIdback_music);                // music background
     glDeleteTextures( 1, &_textureIdback_setup);                // setup background
-    glDeleteTextures( 1, &_textureIdback_other);		// other background
-    glDeleteTextures( 1, &_textureId14);			//pause knap
-    glDeleteTextures( 1, &_textureId15);							// bruges ikk
-    glDeleteTextures( 1, &_textureId16);			// hvis ingen texture (music cover) set default (box2.bmp)
-    glDeleteTextures( 1, &_dvdcovermask);			// dvd cover mask
-    glDeleteTextures( 1, &_textureId18);			// ask display order
-    glDeleteTextures( 1, &_textureId18_1);			// ask box mask
-    glDeleteTextures( 1, &_textureId19);			// other box2
-    glDeleteTextures( 1, &_textureId19_1);			// 3d screen saver
-    glDeleteTextures( 1, &_textureId20);			// bruges af 3d screen saver (lille logo)
-    glDeleteTextures( 1, &_textureId21);							// bruges ikke
-    glDeleteTextures( 1, &_textureId22);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId22_1);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId23);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId23_1);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId24);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId24_1);			// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId25);			// recorded vis recorded border
-    glDeleteTextures( 1, &_textureId26);			// vol control
-    glDeleteTextures( 1, &_textureId27);			// vol control
-    glDeleteTextures( 1, &_textureId28);			// playlist default icon
-    glDeleteTextures( 1, &_textureId28_1);			// playlist default icon mask
-    glDeleteTextures( 1, &_textureIdback);			// bruges ved music
+    glDeleteTextures( 1, &_textureIdback_other);		    // other background
+    glDeleteTextures( 1, &_textureId14);	           		//pause knap
+    glDeleteTextures( 1, &_textureId15);					   		// bruges ikk
+    glDeleteTextures( 1, &_textureId16);		          	// hvis ingen texture (music cover) set default (box2.bmp)
+    glDeleteTextures( 1, &_dvdcovermask);	          		// dvd cover mask
+    glDeleteTextures( 1, &_textureId18);	             	// ask display order
+    glDeleteTextures( 1, &_textureId18_1);        			// ask box mask
+    glDeleteTextures( 1, &_textureId19);		          	// other box2
+    glDeleteTextures( 1, &_textureId19_1);	         		// 3d screen saver
+    glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
+    glDeleteTextures( 1, &_textureId21);		  					// bruges ikke
+    glDeleteTextures( 1, &_textureId22);		          	// bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId23);	           		// bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId24);			          // bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId25);			          // recorded vis recorded border
+    glDeleteTextures( 1, &_textureId26);			          // vol control
+    glDeleteTextures( 1, &_textureId27);	           		// vol control
+    glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
+    glDeleteTextures( 1, &_textureId28_1);		        	// playlist default icon mask
+    glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
-    glDeleteTextures( 1, &setuptexture);			// bruges af setup
-    glDeleteTextures( 1, &_textureIdtv);							// bruges ikke
-    glDeleteTextures( 1, &_textureIdmusic);			// music
-    glDeleteTextures( 1, &_textureIdfilm);			// default film icon
-    glDeleteTextures( 1, &_textureIdrecorded);			// default recorded icon
-    glDeleteTextures( 1, &_texturemlast);							// bruges ikke
-    glDeleteTextures( 1, &_texturemlast2);			// bruges
-    glDeleteTextures( 1, &_texturemnext);			// next song
-    glDeleteTextures( 1, &_texturemplay);			// play song
-    glDeleteTextures( 1, &_textureIdpup);			//
-    glDeleteTextures( 1, &_textureIdpdown);			//
-    glDeleteTextures( 1, &_texturemstop);			// stop
+    glDeleteTextures( 1, &setuptexture);			          // bruges af setup
+    glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
+    glDeleteTextures( 1, &_textureIdmusic);			        // music
+    glDeleteTextures( 1, &_textureIdfilm);			        // default film icon
+    glDeleteTextures( 1, &_textureIdrecorded);			    // default recorded icon
+    glDeleteTextures( 1, &_texturemlast);							  // bruges ikke
+    glDeleteTextures( 1, &_texturemlast2);			        // bruges
+    glDeleteTextures( 1, &_texturemnext);			          // next song
+    glDeleteTextures( 1, &_texturemplay);		           	// play song
+    glDeleteTextures( 1, &_textureIdpup);		           	//
+    glDeleteTextures( 1, &_textureIdpdown);		         	//
+    glDeleteTextures( 1, &_texturemstop);			          // stop
     glDeleteTextures( 1, &_textureIdrecorded_aktiv);		// film
-    glDeleteTextures( 1, &_textureIdfilm_aktiv);		// film
-    glDeleteTextures( 1, &_textureIdmusicsearch);		// search felt til music
-    glDeleteTextures( 1, &_textureIdradiosearch);		// sang search
-    glDeleteTextures( 1, &_textureIdmusicsearch1);		// artist search
-    glDeleteTextures( 1, &_textureIdmusicsearchmask);		// search mask
+    glDeleteTextures( 1, &_textureIdfilm_aktiv);	     	// film
+    glDeleteTextures( 1, &_textureIdmusicsearch);	     	// search felt til music
+    glDeleteTextures( 1, &_textureIdradiosearch);		    // sang search
+    glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
     glDeleteTextures( 1, &_textureIdloading);
-    glDeleteTextures( 1, &_textureIdloading_mask);
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
     glDeleteTextures( 1, &_textureIdclose);
     glDeleteTextures( 1, &_textureIdclose1);
@@ -9915,7 +9924,6 @@ void freegfx() {
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar2);
     glDeleteTextures( 1, &_tvoldrecorded);
-    glDeleteTextures( 1, &_tvoldrecordedmask);
     glDeleteTextures( 1, &_tv_prgtype);
     glDeleteTextures( 1, &onlineradio_empty);
     glDeleteTextures( 1, &onlineradio);		                   		// radio icon
@@ -10077,6 +10085,8 @@ int check_radio_stations_icons() {
 
 
 int main(int argc, char** argv) {
+    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {

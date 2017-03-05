@@ -14,6 +14,9 @@ ETCDIR     = /etc
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
+
+BUILD_NUMBER_FILE=build-number.txt
+
 # check 64 bits ver
 # download from http://www.fmod.org/download/#StudioAPIDownloads
 
@@ -67,7 +70,7 @@ all:
 compile: $(PROG)
 
 $(PROG): $(SRCS)
-	$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
+	$(CC) $(CFLAGS) $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
@@ -110,3 +113,6 @@ install:
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
 	  cp lirc/mythtv-controller ~/.lirc/; fi
+
+
+include buildnumber.mak

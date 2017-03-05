@@ -31,7 +31,8 @@ const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
-extern GLuint _textureIdloading_mask;
+extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
+//extern GLuint _textureIdloading_mask;
 // window info
 extern int orgwinsizey;
 extern int orgwinsizex;
@@ -766,26 +767,17 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 // i start menu
 
 void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
-
-  int lfilmoversigt_antal;
+  int lfilmoversigt_antal=6;
   int i=0;
 //  int txtbrede;
-  float ofs=0.0f;		// used to calc the text length
-  float yof=0.0f;
-  float xof=0.0f;
   bool cover3d=false;
-//  float yofset=10.0f;
-//  float xofset=22.0f;
   char *lastslash;
   float xvgaz=0.0f;
   char temptxt[200];
-  unsigned int sofset;
-  int bonline;
-  float buttonsizex=68.0f;
-  float buttonsizey=58.0f;
-  float buttonzoom=0.0f;
-//  float scale=1.0f;
+  unsigned int sofset=0;
+  int bonline=8;
   float boffset;
+  int ofs;
 
   static bool movie_oversigt_loaded=false;
   static int movie_oversigt_loaded_done=0;
@@ -793,9 +785,13 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   static int movie_oversigt_loaded_nr=0; // hent alle music convers
   int loader_xpos,loader_ypos;
 
+  int winsizx,winsizy;
+  int xpos,ypos;
+
   // load dvd covers dynamic one pr frame
-  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<10)) {
+  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
       strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
+
       if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
           this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
       }
@@ -804,554 +800,176 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
           movie_oversigt_loaded_done=1;
       } else movie_oversigt_loaded_nr++;
   }
+  glTranslatef(0.0f, 0.0f ,0.0f);
 
-
-//  printf("nr %d filename = %s \n ",movie_oversigt_loaded_nr,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
-
-
-  switch(screen_size) {
-      case 1: xof=-370.0f;
-              yof= 250.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;					// numbers of icons in x direction
-              xvgaz=-800.0f;
-              lfilmoversigt_antal=5*5;				// numbers of icons in y direction
-              buttonsizex=88.0f+7.0f;				// 68
-              buttonsizey=68.0f+40.0f+7.0f;
-              break;
-      case 2: xof=-380.0f;
-              yof= 270.0f;				// 250.0f
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-850.0f;
-              lfilmoversigt_antal=6*4;
-              buttonsizex=88.0f+7.0f;
-              buttonsizey=98.0f+7.0f;
-              break;
-      case 3: xof=-660.0f+100.0;			// start ofset
-              yof= 336.0f-100.0;			//
-              sofset=(_mangley/41)*9;
-              bonline=5;				// antal pr linie
-              xvgaz=-1000.0f;
-              lfilmoversigt_antal=8*6;
-              buttonsizex=84.0f+30.0f+10.0f;				// 84.0f
-              buttonsizey=74.0f+22.0f+30.0f+10.0f;			// =74.0f+22.0f;
-              break;
-      case 4: xof=-660.0f;
-              yof= 336.0f;
-              sofset=(_mangley/41)*8;
-              bonline=5;
-              xvgaz=-1000.0f;
-              lfilmoversigt_antal=8*5;
-              buttonsizex=96.0f+7.0f;
-              buttonsizey=86.0f+20.0+7.0f;
-              break;
-      default:
-              xof=-370.0;
-              yof= 250.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-800.0f;
-              lfilmoversigt_antal=5*4;
-              buttonsizex=88.0f+7.0f;
-              buttonsizey=68.0f+40.f+7.0f;
-              break;
-  }
-  boffset=buttonsizey*1.4;
-  //
-  // hvis der ikke brugfes nvidia core ret størelser
-  //
-  if (cur_avail_mem_kb==0) {
-      buttonsizex-=26.0f;
-      buttonsizey-=28.0f;
-  }
-
-  // viser det antal dvdcovers som kan være på skærmen på en gang
-  // ellers er der et start ofset (sofset) som beskriver start ofset fra array (bliver rettet andet sted) pilup/pildown osv osv
-//  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
-  while((i<10) && (i+sofset<filmoversigtsize)) {
-    switch(screen_size) {
-      case 1:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-370;
-        }
-        break;
-      case 2:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-380;
-        }
-        break;
-      case 3:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset)-50;
-          xof=-660+100.0f;
-        }
-        break;
-      case 4:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-660;
-        }
-        break;
-    }
+  // mask
+  winsizx=200;
+  winsizy=200;
+  xpos=220;
+  ypos=700;
+  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
+    sofset=(_mangley/40)*8;
 
     if ((i+sofset)<filmoversigt_antal) {
-        glLoadIdentity();
+      if (((i % bonline)==0) && (i>0)) {
+        xpos=220;
+        ypos=ypos-(winsizy+60);
+      }
+      if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
+      if (filmoversigt[i+sofset].gettextureid()) {
+
+        // print cover dvd
+        //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        // mask
-        glEnable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        // dvd cover har et icon
-        if (filmoversigt[i+sofset].gettextureid()) {
+        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
+        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
+        glEnd();
+        // print movie cover over
+        glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
+        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
+        glEnd(); //End quadrilateral coordinates
 
-            if (filmoversigt[i+sofset].getcover3d())
-            cover3d=true; else cover3d=false;
+      } else {
 
-            // er der 3d cover
-            if (cover3d) {
-                glLoadIdentity();
-                // empty background mask
-                glEnable(GL_BLEND);
-                //glBlendFunc(GL_ONE, GL_ONE);
-                glBlendFunc(GL_DST_COLOR, GL_ZERO);
+        // print cover dvd
+        glEnable(GL_TEXTURE_2D);
+        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
+        glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
+        glEnd();
 
-                glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      }
 
-                // zoom valgte
-                if (i+1==(int) film_key_selected) buttonzoom=8.0f;
-                else buttonzoom=0.0f;
-
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-//            	glLoadName(100+i+sofset);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-                //
-                // draw icon
-                glLoadIdentity();
-                glBlendFunc(GL_ONE, GL_ONE);
-                glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-                glLoadName(100+i+sofset);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-            } else {
-                glLoadIdentity();
-                // empty background mask
-                glEnable(GL_BLEND);
-                //glBlendFunc(GL_ONE, GL_ONE);
-                glBlendFunc(GL_DST_COLOR, GL_ZERO);
-                glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                // zoom valgte
-                if (i+1==(int) film_key_selected) buttonzoom=8.0f;
-                else buttonzoom=0.0f;
-
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-//            glLoadName(100+i+sofset);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-                glLoadIdentity();
-            // no dvd icon draw default
-//            glDisable(GL_BLEND);
-                glBlendFunc(GL_ONE, GL_ONE);
-//            glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-                glBindTexture(GL_TEXTURE_2D,_defaultdvdcover2);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                // zoom valgte
-                if (i+1==(int) film_key_selected) buttonzoom=8.0f;
-                else buttonzoom=0.0f;
-
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-                glLoadName(100+i+sofset);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-                // zoom valgte
-                if (i+1==(int) film_key_selected) buttonzoom=-12.0f+8.0f;
-                else buttonzoom=-12.0f;
-
-                // mask
-                //
-                glLoadIdentity();
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_DST_COLOR, GL_ZERO);
-                glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-                // zoom valgte
-                if (i+1==(int) film_key_selected) buttonzoom=-12.0f+8.0f;
-                else buttonzoom=-12.0f;
-
-                //
-                // draw icon
-                glLoadIdentity();
-//                glBlendFunc(GL_ONE, GL_ONE);
-                glBlendFunc(GL_ONE,  GL_SRC_ALPHA);
-                glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTranslatef(xof,yof,xvgaz);
-                glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-//            glLoadName(100+i+sofset);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-            }
-
-        } else {
-            glLoadIdentity();
-            // empty background mask
-            glEnable(GL_BLEND);
-            //glBlendFunc(GL_ONE, GL_ONE);
-            glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-            glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            // zoom valgte
-            if (i+1==(int) film_key_selected) buttonzoom=8.0f;
-            else buttonzoom=0.0f;
-
-            glTranslatef(xof,yof,xvgaz);
-            glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-//            glLoadName(100+i+sofset);
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-            glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-            glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-            glEnd(); //End quadrilateral coordinates
+      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
+      lastslash=strrchr(temptxt,'/');
+      if (lastslash) strcpy(temptxt,lastslash+1);
 
 
-
-             glLoadIdentity();
-            // no dvd icon draw default
-//            glDisable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ONE);
-//            glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-            glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            // zoom valgte
-            if (i+1==(int) film_key_selected) buttonzoom=8.0f;
-            else buttonzoom=0.0f;
-
-            glTranslatef(xof,yof,xvgaz);
-            glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-            glLoadName(100+i+sofset);
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-            glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-            glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-            glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-            glEnd(); //End quadrilateral coordinates
-        }
-
-
-        buttonzoom=0.0f;
-
-        strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
-        lastslash=strrchr(temptxt,'/');
-        if (lastslash) strcpy(temptxt,lastslash+1);
-        //    temptxt[13]=0;
-        //    txtbrede=t3dDrawWidth(musicoversigt[i+sofset].album_name);
-
-        glPushMatrix();
+      glPushMatrix();
+      if (strlen(temptxt)<=14) {
+        ofs=(strlen(temptxt)/2)*12;
+        glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glDisable(GL_TEXTURE_2D);
+        glScalef(20.0, 20.0, 1.0);
+        glcRenderString(temptxt);
+      } else {
+        glTranslatef(xpos+(60-ofs), ypos+120 ,0.0f);
+        glScalef(20.0, 20.0, 1.0);
+        glDisable(GL_TEXTURE_2D);
+        ofs=(strlen(temptxt)/2)*9;
 
         float ytextofset=0.0f;
         int ii,j,k,pos;
+        int xof,yof;
         ii=pos=0;
         char word[16000];
 
-        if (strlen(temptxt)<=14) {
-            glLoadIdentity();
-            ofs=(strlen(temptxt)/2)*9;
-            switch(screen_size) {
-                case 1: glTranslatef(xof-ofs,  yof-60-26 ,xvgaz);
-                        break;
-                case 2: glTranslatef(xof-ofs,  yof-60-12 ,xvgaz);
-                        break;
-                case 3: glTranslatef(xof-ofs,  yof-60-60 ,xvgaz);
-                        break;
-                case 4: glTranslatef(xof-ofs,  yof-60-24 ,xvgaz);
-                        break;
-                default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
-                        break;
+        while((1) && (ytextofset<=10.0)) {		// max 2 linier
+          j=0;
+          while(!isspace(temptxt[ii])) {
+            if (temptxt[ii]=='\0') break;
+            word[j]=temptxt[ii];
+            ii++;
+            j++;
+          }
 
+          word[j]='\0';	// j = word length
+          if (j>13) {		// print char by char
+            k=0;
+            while(word[k]!='\0') {
+              if (pos>=13) {
+                if ( k != 0 ) glcRenderChar('-');
+                pos=0;
+                ytextofset+=15.0f;
+                ofs=0;
+
+              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
+
+                glRasterPos2f(0.0f, 0.0f);
+                glScalef(14.0, 14.0, 1.0);
+              }
+              glcRenderChar(word[k]);
+              pos++;
+              k++;
             }
-            glRasterPos2f(0.0f, 0.0f);
-            glDisable(GL_TEXTURE_2D);
-            glScalef(14.0, 14.0, 1.0);
-            glcRenderString(temptxt);
-        } else {
+          } else {
+            if (pos+j>13) {	// word doesn't fit line
+              ytextofset+=15.0f;
+              pos=0;
+              ofs=(int) (strlen(word)/2)*9;
 
-            temptxt[26]='\0';
-            glLoadIdentity();
-            ofs=(strlen(temptxt)/2)*9;
-            switch(screen_size) {
-                case 1: glTranslatef(xof-50,  yof-60-26 ,xvgaz);
-                        break;
-                case 2: glTranslatef(xof-50,  yof-60-12 ,xvgaz);
-                    break;
-                case 3: glTranslatef(xof-50,  yof-60-60 ,xvgaz);
-                    break;
-                case 4:	glTranslatef(xof-50,  yof-60-24 ,xvgaz);
-                        break;
-                default:glTranslatef(xof-50,  yof-60 ,xvgaz);
-                        break;
+            glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
+
+              glRasterPos2f(0.0f, 0.0f);
+              glScalef(14.0, 14.0, 1.0);
             }
-            glRasterPos2f(0.0f, 0.0f);
-            glDisable(GL_TEXTURE_2D);
-            glScalef(14.0, 14.0, 1.0);
+            glcRenderString(word);
+            pos+=j;
+          }
+          if (pos<12) {
+            glcRenderChar(' ');
+            pos++;
+          }
 
-
-            while((1) && (ytextofset<=10.0)) {		// max 2 linier
-                j=0;
-                while(!isspace(temptxt[ii])) {
-                    if (temptxt[ii]=='\0') break;
-                    word[j]=temptxt[ii];
-                    ii++;
-                    j++;
-                }
-
-                word[j]='\0';	// j = word length
-
-                if (j>13) {		// print char by char
-                    k=0;
-                    while(word[k]!='\0') {
-                        if (pos>=13) {
-                            if ( k != 0 ) glcRenderChar('-');
-                            pos=0;
-                            ytextofset+=15.0f;
-                            glLoadIdentity();
-                            ofs=0;
-                            switch(screen_size) {
-                                case 1: glTranslatef(xof-50,  yof-60-26-ytextofset ,xvgaz);
-                                    break;
-                                case 2: glTranslatef(xof-50,  yof-60-12-ytextofset ,xvgaz);
-                                        break;
-                                case 3: glTranslatef(xof-50,  yof-60-60-ytextofset ,xvgaz);
-                                        break;
-                                case 4: glTranslatef(xof-50,  yof-60-24-ytextofset ,xvgaz);
-                                        break;
-                                default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                        break;
-                            }
-                            glRasterPos2f(0.0f, 0.0f);
-                            glScalef(14.0, 14.0, 1.0);
-                        }
-                        glcRenderChar(word[k]);
-                        pos++;
-                        k++;
-                    }
-                } else {
-                    if (pos+j>13) {	// word doesn't fit line
-                        ytextofset+=15.0f;
-                        pos=0;
-                        glLoadIdentity();
-                        ofs=(int) (strlen(word)/2)*9;
-                        switch(screen_size) {
-                            case 1: glTranslatef(xof-50,  yof-60-26-ytextofset ,xvgaz);
-                                    break;
-                            case 2: glTranslatef(xof-50,  yof-60-12-ytextofset ,xvgaz);
-                                    break;
-                            case 3: glTranslatef(xof-50,  yof-60-60-ytextofset ,xvgaz);
-                                    break;
-                            case 4: glTranslatef(xof-50,  yof-60-24-ytextofset ,xvgaz);
-                                    break;
-                            default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                    break;
-                        }
-                        glRasterPos2f(0.0f, 0.0f);
-                        glScalef(14.0, 14.0, 1.0);
-                    }
-                    glcRenderString(word);
-                    pos+=j;
-                }
-                if (pos<12) {
-                    glcRenderChar(' ');
-                    pos++;
-                }
-
-                if (temptxt[ii]=='\0') break;
-                ii++;	// skip space
-            }
+          if (temptxt[ii]=='\0') break;
+          ii++;	// skip space
         }
-        glPopMatrix();
+
+
+
+        //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
+//        glRasterPos2f(0.0f, 0.0f);
+//        glDisable(GL_TEXTURE_2D);
+//        glScalef(20.0, 20.0, 1.0);
+//        glcRenderString(temptxt);
+
+      }
+
+      glEnable(GL_TEXTURE_2D);
+      glPopMatrix();
     }
 
+    xpos+=205;
     i++;
-    switch(screen_size) {
-        case 1: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else  xof+=(buttonsizex*1.6);
-                break;
-        case 2: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.6);
-                break;
-        case 3: if (cur_avail_mem_kb==0) xof+=(buttonsizex*1.55)+8; else xof+=(buttonsizex*1.55);
-                break;
-        case 4: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.65);
-                break;
-        default:if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*2.0)+8;
-                break;
-    }
-  }
-
-  if (movie_oversigt_loaded_nr<10) {
-    glLoadIdentity();
-    glEnable(GL_TEXTURE_2D);
-//    glDisable(GL_BLEND);
-//    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-//    glBlendFunc(GL_ONE, GL_ONE);
-
-
-    switch (screen_size) {
-      case 1: loader_xpos=-250;
-              loader_ypos=-230;
-              break;
-      case 2: loader_xpos=-250;
-              loader_ypos=-230;
-              break;
-      case 3: loader_xpos=-380;
-              loader_ypos=-230;
-              break;
-      case 4: loader_xpos=-250;
-              loader_ypos=-230;
-              break;
-      default:loader_xpos=-250;
-              loader_ypos=-230;
-              break;
-    }
-
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-
-
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading_mask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-    glLoadIdentity();
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-
-    glLoadIdentity();
-    glTranslatef((loader_xpos-36),loader_ypos-16,-600);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-
-    sprintf(temptxt,"%4d of %4d ",movie_oversigt_loaded_nr,filmoversigt_antal-1);
-
-    glcRenderString(temptxt);
-  }
-
-  if (filmoversigt_antal<1) {
-
-    glLoadIdentity();
-    glTranslatef(-10,10,-600);
-    if (_textureIdloading1) {
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glBlendFunc(GL_ONE,GL_ZERO);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(-170, -60, 0.0);
-      glTexCoord2f(0, 1); glVertex3f(-170,  60, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 170,  60, 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 170, -60, 0.0);
-      glEnd(); //End quadrilateral coordinates
-    }
-    glLoadIdentity();
-    glTranslatef(-48,6,-300);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-    sprintf(temptxt,"No movies loaded.");
-    glcRenderString(temptxt);
-
-    if ((configmythtvver==0) && (configxbmcver==0)) {
-        glLoadIdentity();
-        glTranslatef(-52,-6,-300);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(8.0, 8.0, 1.0);
-        strcpy(temptxt,"No backend ");
-        strcat(temptxt,configmysqlhost);
-        glcRenderString(temptxt);
-    }
   }
 }
+
+
+
+
+
+
 
 
 
@@ -1562,8 +1180,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     //glPopMatrix();
   }
 
-
-  if (movie_oversigt_loaded_nr<this->filmoversigt_antal) {
+  // show dvd cover loading status
+  if ((movie_oversigt_loaded_nr<this->filmoversigt_antal) && (!(vis_uv_meter))) {
     winsizx=200;
     winsizy=150;
     xpos=orgwinsizex-200;

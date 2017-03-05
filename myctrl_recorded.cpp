@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdarg.h>
 
- 
+
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -42,11 +42,8 @@ extern bool reset_recorded_texture;
 extern storagedef configstoragerecord[];      // storage array (for recorded programs)
 
 extern GLuint _textureId22;    // movie open info box1
-extern GLuint _textureId22_1;  // mask movie options box
 extern GLuint _textureId23;    // movie open info box2
-extern GLuint _textureId23_1;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
-extern GLuint _textureId24_1;    // movie open info box3
 extern GLuint _textureId25;    // recored picture mask
 
 extern int screen_size;
@@ -111,7 +108,7 @@ recorded_top_type::recorded_top_type()
 
 void recorded_top_type::put_recorded_top(char *title)
 
-{    
+{
     strcpy(this->title,title);
 }
 
@@ -128,8 +125,8 @@ void draw_ccover() {
 
     int zofset=0;
     int xofset=0;
-            
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
 
     glTexCoord2f(0.0, 0.0); glVertex3f(-3.5+xofset, -3.5, 0.0-zofset);
     glTexCoord2f(0.0, 1.0); glVertex3f(-3.5+xofset, 3.5, 0.0-zofset);
@@ -171,7 +168,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     char sqlselect[512];
     char title[128];
     int n,nn;
-    // mysql vars  
+    // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -185,7 +182,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);    
+    res = mysql_store_result(conn);
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     n=-1;
@@ -202,7 +199,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
                 if (n==-1) n++;
                 nn++;
             }
-            
+
 // printf("title=%s n=%d nn=%d  \n",title,n,nn);
 
             strcpy(filename,row[4]);
@@ -214,7 +211,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
                 recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],filename,row[5]);
                 recordoversigt.programs[n].prg_antal++;
             }
-        }        	// end while        
+        }        	// end while
     } else {
         //gotoxy(10,18);
         printf("SQL DATBASE ERROR                                                    \n");
@@ -232,9 +229,9 @@ int recorded_overigt::opdatere_recorded_oversigt() {
 /*
 // Denne som bruges
 
-void myglprint2(char *string) 
+void myglprint2(char *string)
 {
-    int len,i;    
+    int len,i;
     len = (int) strlen(string);
     for (i = 0; i < len; i++) {
         switch (screen_size) {
@@ -243,7 +240,7 @@ void myglprint2(char *string)
             case 1: glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
                     break;
             case 2: glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
-                    break;   
+                    break;
             case 3: glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
                     break;
         }
@@ -253,9 +250,9 @@ void myglprint2(char *string)
 
 
 
-void myglprint3(char *string) 
+void myglprint3(char *string)
 {
-    int len,i;    
+    int len,i;
     len = (int) strlen(string);
     for (i = 0; i < len; i++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[i]);
@@ -266,7 +263,7 @@ void myglprint3(char *string)
 void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
     va_list args;
     char buffer[200], *p;
-        
+
     va_start(args, format);
     vsprintf(buffer, format, args);
     va_end(args);
@@ -299,7 +296,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     char title[128];
     char subtitle[128];
     char startdato[40];
-    char slutdato[40]; 
+    char slutdato[40];
     char desc[200];			// desc
 //    float xofset=5.5f;
     float yofset=0.5f;
@@ -308,7 +305,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     char temptxt[256];
     char temptxt1[256];
 //    int show_max_antal=10;
-    
+
 //    int valgtnr=9;
     if (valgtnr>10) {
         startofset=valgtnr-10;
@@ -326,11 +323,12 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
                 break;
     }
 
+/*
     // box2 mask
     glLoadIdentity();
     glTranslatef(-2.0f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_BLEND);      
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
@@ -338,36 +336,39 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(-1, 2.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(-1, -4.5f, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     // box2
     glLoadIdentity();
     glTranslatef(-2.0f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_TEXTURE_2D); 
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,_textureId23);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(-1, 2.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(-1, -4.5f, 0.0);
     glEnd(); //End quadrilateral coordinates
 
+
+/*
     // box 3 mask
     glLoadIdentity();
     glTranslatef(3.5f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_BLEND);      
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
@@ -375,25 +376,25 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(1, 2.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(1, -4.5f, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     // box3
     glLoadIdentity();
     glTranslatef(3.5f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_TEXTURE_2D); 
-    glBlendFunc(GL_ONE, GL_ONE);
-
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_textureId24);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(1, 2.0, 0.0);
@@ -402,12 +403,12 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
 
 
 
-
+/*
     // mask box1
     glLoadIdentity();
     glTranslatef(-3.0f, -2.7f,-15.0f+screen_zofset);
 
-    glEnable(GL_BLEND);      
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 //    glBlendFunc(GL_ONE, GL_ONE);
@@ -416,36 +417,39 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-5, -2.5, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-5, 1.5, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(7, 1.5, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(7, -2.5, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
 
 
     // box1
     glLoadIdentity();
     glTranslatef(-3.0f, -2.7f,-15.0f+screen_zofset);
-    glEnable(GL_TEXTURE_2D); 
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
     glBindTexture(GL_TEXTURE_2D,_textureId22);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(-5, -2.5, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-5, 1.5, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(7, 1.5, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(7, -2.5, 0.0);
     glEnd(); //End quadrilateral coordinates
-    
+
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
 
     while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
-        recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc); 
+        recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc);
 
         if (i+startofset==valgtnr+startofset) {
             glLoadIdentity();
@@ -485,14 +489,14 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
         subvalgtnr=10;
     } else substartofset=0;
 
-    while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max 
-        recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc); 
+    while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
+        recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);
 
         if (i+substartofset==subvalgtnr+substartofset) {
             glLoadIdentity();
             glColor3f(0.0f, 0.0f, 1.0f);
-            glTranslatef(-1.7f, 5.1f+yof,-14.9f+screen_zofset);        
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+            glTranslatef(-1.7f, 5.1f+yof,-14.9f+screen_zofset);
+            glBegin(GL_QUADS); //Begin quadrilateral coordinates
             glVertex3f(-0.5, -0.2, 0.0);
             glVertex3f(-0.5, 0.3, 0.0);
             glVertex3f(5.9, 0.3, 0.0);
@@ -552,7 +556,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
 
     strptime(startdato,"%Y-%m-%d %H:%M:%S",&prgstarttid);
     strptime(slutdato,"%Y-%m-%d %H:%M:%S",&prgsluttid);
-    
+
     prgstarttid.tm_isdst=1;
     prgsluttid.tm_isdst=1;
     time_t st=mktime(&prgstarttid);
@@ -588,7 +592,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
         glTranslatef(-5.9f, -3.5f,-14.8f+screen_zofset);
         glRotatef(0.0f, 0.0f,0.0f, 0.0f);
 
-        glEnable(GL_BLEND);     
+        glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
         glEnable(GL_TEXTURE_2D);
@@ -596,12 +600,12 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0.0, 0.0); glVertex3f(-1.55f, -1.2f, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(-1.55f, 1.2f, 0.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(1.55f, 1.2f, 0.0);
         glTexCoord2f(1.0, 0.0); glVertex3f(1.55f, -1.2f, 0.0);
-        glEnd(); //End quadrilateral coordinates     
+        glEnd(); //End quadrilateral coordinates
 
         if ((texture) && (reset_recorded_texture)) {
             reset_recorded_texture=false;				// load kun texture 1 gang
@@ -620,12 +624,12 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0.0, 0.0); glVertex3f(-1.55f, -1.2f, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(-1.55f, 1.2f, 0.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(1.55f, 1.2f, 0.0);
         glTexCoord2f(1.0, 0.0); glVertex3f(1.55f, -1.2f, 0.0);
-        glEnd(); //End quadrilateral coordinates     
+        glEnd(); //End quadrilateral coordinates
     }
     glDisable(GL_TEXTURE_2D);
 
@@ -634,7 +638,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     iii=0;
     while (ii<(int) strlen((char *) desc)) {
         // check max linie længe
-        
+
         if (iii<41)  {
             temptxt[iii]=desc[ii];
             temptxt[iii+1]=0;
@@ -651,7 +655,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
             glprintyofset-=0.3;
         }
 //        ii++;
-    }        
+    }
     // er der mere tekst
     if (iii>0) {
         glLoadIdentity();
@@ -683,7 +687,7 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     char title[128];
     char subtitle[128];
     char startdato[40];
-    char slutdato[40]; 
+    char slutdato[40];
     char desc[200];			// desc
 //    float xofset=5.5f;
     float yofset=0.5f;
@@ -693,7 +697,7 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     char temptxt1[256];
     int xpos,ypos;
 //    int show_max_antal=10;
-    
+
 //    int valgtnr=9;
     if (valgtnr>10) {
         startofset=valgtnr-10;
@@ -706,8 +710,8 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
 
     xpos=100;
     ypos=250;
-    
-    glEnable(GL_BLEND);      
+/*
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
@@ -715,25 +719,26 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+500, ypos+600, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+500, ypos+100, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     // box2
 //    glLoadIdentity();
 //    glTranslatef(-2.0f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_TEXTURE_2D); 
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,_textureId23);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+500, ypos+600, 0.0);
@@ -743,9 +748,8 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
 
     xpos=510;
     ypos=250;
-
-
-    glEnable(GL_BLEND);      
+/*
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
@@ -753,25 +757,26 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+800, ypos+600, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+800, ypos+100, 0.0);
     glEnd(); //End quadrilateral coordinates
-
+*/
     // box2
 //    glLoadIdentity();
 //    glTranslatef(-2.0f, 4.0f,-15.0f+screen_zofset);
 
-    glEnable(GL_TEXTURE_2D); 
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindTexture(GL_TEXTURE_2D,_textureId24);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+600, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+800, ypos+600, 0.0);
@@ -780,20 +785,20 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
 
 
 
-    //box3
+    //box3 mask
     xpos=100;
     ypos=40;
 
 
-    glEnable(GL_BLEND);      
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
-    glBindTexture(GL_TEXTURE_2D,_textureId22_1);
+  //  glBindTexture(GL_TEXTURE_2D,_textureId22_1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+300, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+1210, ypos+300, 0.0);
@@ -802,14 +807,14 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
 
     // box3
 
-    glEnable(GL_TEXTURE_2D); 
+    glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_ONE, GL_ONE);
 
     glBindTexture(GL_TEXTURE_2D,_textureId22);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates    
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+100, ypos+100, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+100, ypos+300, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+1210, ypos+300, 0.0);
@@ -820,12 +825,12 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     glTranslatef(210.0f, 820.0f,0);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.0f, 20.0f, 1.0f);
-    glcRenderString("temptxt");    
+    glcRenderString("temptxt");
     glPopMatrix();
 
     while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
         glPushMatrix();
-        recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc); 
+        recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc);
         // hvis valgte
         if (i+startofset==valgtnr+startofset) {
         }
@@ -839,37 +844,37 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
     }
 
     i=0;
-    while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max 
+    while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
         glPushMatrix();
-        recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);         
+        recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);
         strcpy(temptxt,title);
         glTranslatef(620.0f, 820.0f,0);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.0f, 20.0f, 1.0f);
         strcpy(temptxt,subtitle);					// get sub title
-        if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet                
+        if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
         glcRenderString("temptxt");
         glPopMatrix();
-        i++;        
+        i++;
     }
-    recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc);    
-    
-    glPushMatrix();        
+    recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc);
+
+    glPushMatrix();
     glTranslatef(220.0f, 310.0f,0);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.0f, 20.0f, 1.0f);
     glcRenderString("Date...:");
-    strcpy(temptxt,startdato);    
+    strcpy(temptxt,startdato);
     temptxt[10]=0;
-    glcRenderString(temptxt);    
+    glcRenderString(temptxt);
 
     glcRenderString(" KL.:");
-    strcpy(temptxt,startdato);    
-    temptxt[5]=0;    
+    strcpy(temptxt,startdato);
+    temptxt[5]=0;
     glcRenderString(temptxt);
-    
+
     glPopMatrix();
-    
+
     static time_t tm;				// this time (now)
     struct tm *nutid;
     struct tm prgstarttid;
@@ -883,26 +888,17 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
 
     strptime(startdato,"%Y-%m-%d %H:%M:%S",&prgstarttid);
     strptime(slutdato,"%Y-%m-%d %H:%M:%S",&prgsluttid);
-    
+
     prgstarttid.tm_isdst=1;
     prgsluttid.tm_isdst=1;
     time_t st=mktime(&prgstarttid);
     time_t et=mktime(&prgsluttid);
 
-    if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu        
+    if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
         glColor3f(1.0f, 0.0f, 0.0f);
         glScalef(18.0f, 18.0f, 1.0f);
         glcRenderString((char *) "Recording");
     }
 
-       
+
 }
-
-
-
-
-
-
-
-
-
