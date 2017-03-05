@@ -322,7 +322,7 @@ GLint ctx, myFont;
 
 bool do_swing_movie_cover=false;                        // do anim
 
-bool vis_nyefilm_oversigt=true;
+bool vis_nyefilm_oversigt=true;                         // start med at vise nye film
 
 // stream
 
@@ -2551,8 +2551,6 @@ void display(void) {
 
 
 
-
-
     // radio stuf
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
         // img
@@ -2638,13 +2636,14 @@ void display(void) {
         show_newmovietimeout=0;
         vis_nyefilm_oversigt=false;
     }
-    /*
+
+
     if (vis_nyefilm_oversigt) {
         if (show_newmovietimeout==0) vis_nyefilm_oversigt=false;
         if (fknapnr==0) show_newmovietimeout--;
         film_oversigt.show_minifilm_oversigt(0,0);
     }
-    */
+
 
 
 
