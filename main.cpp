@@ -2153,7 +2153,7 @@ void display(void) {
     int sounderrflag;                           // husk last sound system status
     int numtags, numtagsupdated, count;         // bliver brugt til at vise stream tags
     GLuint textureId;
-    static int show_newmovietimeout=120;
+    static int show_newmovietimeout=120*10;
     bool radio_pictureloaded;
 
     unsigned int lenbytes, kbps;
@@ -2637,15 +2637,12 @@ void display(void) {
         vis_nyefilm_oversigt=false;
     }
 
-
+    // shopw oversigt over nye film
     if (vis_nyefilm_oversigt) {
         if (show_newmovietimeout==0) vis_nyefilm_oversigt=false;
         if (fknapnr==0) show_newmovietimeout--;
         film_oversigt.show_minifilm_oversigt(0,0);
     }
-
-
-
 
 
     // search radio station buffer search

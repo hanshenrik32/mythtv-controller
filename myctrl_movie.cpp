@@ -767,7 +767,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 // i start menu
 
 void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
-  int lfilmoversigt_antal=8;
+  int lfilmoversigt_antal=6;
   int i=0;
 //  int txtbrede;
   bool cover3d=false;
@@ -789,7 +789,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int xpos,ypos;
 
   // load dvd covers dynamic one pr frame
-  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
+  if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
       strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
 
       if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
@@ -805,14 +805,14 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   // mask
   winsizx=200;
   winsizy=200;
-  xpos=20;
+  xpos=220;
   ypos=700;
   while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
 
     if ((i+sofset)<filmoversigt_antal) {
       if (((i % bonline)==0) && (i>0)) {
-        xpos=20;
+        xpos=220;
         ypos=ypos-(winsizy+60);
       }
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
