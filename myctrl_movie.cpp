@@ -962,7 +962,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 
     xpos+=205;
     i++;
-    //glPopMatrix();
   }
 }
 

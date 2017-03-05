@@ -120,7 +120,6 @@ char configmythhost[256];			                        	// host of mythtv master
 char configmysqlip[256];				                        // mysql server ip
 char confighostname[256];                               // this hostname
 char confighostip[256];				                          // this host ip adress
-float configvolume;                                     // save/load last volume value
 char confighostwlanname[256];				                    // wlan netid name
 char configpicturepath[256];                            // path til pictures gallery source (den laver et dir under som hedder "mythc_gallery"
 char configmusicpath[256];                              // path til music source
@@ -1070,7 +1069,7 @@ int parse_config(char *filename) {
                     } else if (command_nr==setuvmetertype) {
                       configuvmeter=atoi(value);
                     } else if (command_nr==setvolume) {
-                      configvolume=atof(value);                         // set default volume under play
+                      configsoundvolume=atof(value);                         // set default volume under play
                     }
                 }
             }
@@ -1141,7 +1140,7 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
         fputs(temp,file);
-        sprintf(temp,"defaultvolume=%2.1f\n",configvolume);                               // uv meter type
+        sprintf(temp,"defaultvolume=%2.1f\n",configsoundvolume);                               // uv meter type
         fputs(temp,file);
         fclose(file);
     }
@@ -1188,7 +1187,7 @@ void load_config(char * filename) {
     strcpy(configfontname,"FreeMono");
     strcpy(configvideoplayer,"default");
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
-    configvolume=1.0f;                                        // default start music volume
+    configsoundvolume=1.0f;    
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
