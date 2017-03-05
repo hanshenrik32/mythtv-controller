@@ -1140,7 +1140,7 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
         fputs(temp,file);
-        sprintf(temp,"defaultvolume=%2.1f\n",configsoundvolume);                               // uv meter type
+        sprintf(temp,"defaultvolume=%2.2f\n",configsoundvolume);                               // uv meter type
         fputs(temp,file);
         fclose(file);
     }
@@ -1187,7 +1187,7 @@ void load_config(char * filename) {
     strcpy(configfontname,"FreeMono");
     strcpy(configvideoplayer,"default");
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
-    configsoundvolume=1.0f;    
+    configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
@@ -6667,17 +6667,23 @@ void handleKeypress(unsigned char key, int x, int y) {
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
     if (key=='+') {
-      if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+      if (configsoundvolume<1.0f) configsoundvolume+=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
+
+      save_config((char *) "/etc/mythtv-controller.conf");
+
       #endif
       show_volume_info=true;					// show volume info window
     }
 
     if (key=='-') {                               // volume down
-      if (configsoundvolume>0) configsoundvolume-=0.1f;
+      if (configsoundvolume>0) configsoundvolume-=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
+
+      save_config((char *) "/etc/mythtv-controller.conf");
+
       #endif
       show_volume_info=true;					// show volume info window
     }
