@@ -151,6 +151,8 @@ class vlc_controller {
     ~vlc_controller();
     int playmovie(char *path);
     void stopmovie();
+    float get_position();
+    void pause();
 };
 
 
