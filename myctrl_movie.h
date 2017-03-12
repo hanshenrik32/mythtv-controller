@@ -1,21 +1,11 @@
 #ifndef MYCTRL_MOVIE
 #define MYCTRL_MOVIE
-
 #include <stdio.h>
 #include <string.h>
 #include <GL/gl.h>
-#include <vlc/vlc.h>
+#include "myth_vlcplayer.h"
 
-
-// vlc stuf
-
-static const char * const opt [] = {
-      "--fullscreen",
-      "--play-and-stop",
-      "--verbose=1",
-      "--ignore-config",
-      "--no-xlib",
-};
+// #include <vlc/vlc.h>
 
 
 // structur som bruges når der skal vises list over film i 3d view
@@ -132,8 +122,6 @@ class film_oversigt_type {
 
     void setfilmsubtitle(char *value) { strcpy(film_subtitle,value); }
 //    char *getfilmsubtitle() { return(film_subtitle); }
-
-
     void resetfilm();
 };
 
@@ -141,19 +129,19 @@ class film_oversigt_type {
 
 // main film class
 
-class film_oversigt_typem {
+class film_oversigt_typem : vlc_controller {
   private:
-      unsigned int filmoversigtsize;			// antal elementer i array MAX def
+      unsigned int filmoversigtsize;			       // antal elementer i array MAX def
       bool film_oversigt_loaded;
-      bool film_is_pause;                     // pause ?
-      unsigned int filmoversigt_antal;				// loaded antal
+      bool film_is_pause;                        // pause ?
+      unsigned int filmoversigt_antal;			  	 // loaded antal
       // load vlc stuf
-      libvlc_instance_t *vlc_inst;
-      libvlc_media_player_t *vlc_mp;
+//      libvlc_instance_t *vlc_inst;              //
+//      libvlc_media_player_t *vlc_mp;            //
       float getmovieposition();
     public:
-      bool film_is_playing;                   // playing ?
-      film_oversigt_type *filmoversigt;
+      bool film_is_playing;                       // playing ?
+      film_oversigt_type *filmoversigt;           // all movie array to show in movie overview
       void sortfilm(int type);
       unsigned int film_antal(void) { return(filmoversigt_antal); }
       void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }

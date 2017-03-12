@@ -8,11 +8,16 @@
 #include <mysql.h>                      // mysql stuf
 #include <dirent.h>                     // dir functions
 
+#include <linux/limits.h>
+
 #include "utility.h"
 #include "myctrl_movie.h"
 #include "readjpg.h"
 
+#include "myth_vlcplayer.h"
+
 #include "myctrl_music.h"
+extern char configbackend[];
 extern const char *dbname;
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
@@ -32,7 +37,7 @@ extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
-//extern GLuint _textureIdloading_mask;
+
 // window info
 extern int orgwinsizey;
 extern int orgwinsizex;
@@ -205,9 +210,10 @@ void film_oversigt_type::resetfilm() {
      strcpy(category_name,"");
      textureId=0;                    // texture id for 3D cover hvis der findes en cover til filmen
      frontcover=0;                   // normal cover
-     sidecover=0;			// side cover
-     backcover=0;			// back cover
+     sidecover=0;		                 // side cover
+     backcover=0;             			 // back cover
 }
+
 
 // constructor
 
@@ -217,7 +223,6 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
     film_oversigt_loaded=false;
     film_is_playing=false;
     film_is_pause=false;
-    vlc_inst = libvlc_new(5,opt);
 }
 
 // destructor
@@ -225,7 +230,6 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
 film_oversigt_typem::~film_oversigt_typem() {
     if (filmoversigt) delete [] filmoversigt;
     filmoversigtsize=0;
-    if (vlc_inst) libvlc_release(vlc_inst);
 }
 
 // reset all movies in array
@@ -238,94 +242,45 @@ void film_oversigt_typem::resetallefilm() {
 }
 
 
+
 // default player
 // stop playing movie
 
 void film_oversigt_typem::stopmovie() {
-  if (vlc_mp) {
-    libvlc_media_player_stop(vlc_mp);
-    libvlc_media_player_release(vlc_mp);
-  } else {
-    printf("Error stop movie player\n");
-    exit(1);
-  }
+  vlc_controller::stopmedia();
 }
 
 
 // stop player
 
 void film_oversigt_typem::softstopmovie() {
-  if (vlc_mp) {
-    libvlc_media_player_stop(vlc_mp);
-//    libvlc_media_player_release(vlc_mp);
-  } else {
-    printf("Error stop movie player\n");
-    exit(1);
-  }
+  vlc_controller::stopmedia();
 }
 
 
 // to play streams from web
 //vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
 
-
 // start playing movie by vlclib
 
 int film_oversigt_typem::playmovie(int nr) {
-    int error=0;
-    libvlc_media_t *vlc_m;
-    char systemcommand[2000];                             // path
+    char path[PATH_MAX];                                     // max path
     if (this->film_is_playing) stopmovie();               // stop last played movie
-    strcpy(systemcommand,"");
-    strcat(systemcommand,this->filmoversigt[nr].getfilmfilename());
-    vlc_m=libvlc_media_new_path(vlc_inst, systemcommand);
-    if (vlc_m) {
-      // set playing flag in class
-      this->film_is_playing=true;
-      // Create a media player playing environement
-      vlc_mp=libvlc_media_player_new_from_media(vlc_m);
-      libvlc_media_add_option(vlc_m,"no-video-title-show");
-      // set fullscreen
-      libvlc_set_fullscreen(vlc_mp,true);
-      // enable ketboard input to vlc player
-      libvlc_video_set_key_input(vlc_mp,true);
-      libvlc_video_set_mouse_input(vlc_mp,true);
-      //libvlc_media_add_option(vlc_m,":fullscreen");
-      //libvlc_media_add_option(vlc_m,":sout-all");
-      // <gdk/gdkx.h>
-      // Bind to xwindows
-
-      //libvlc_media_player_set_xwindow(vlc_mp, 0);
-
-      //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
-      if (!(vlc_mp)) error=1;
-      libvlc_media_release(vlc_m);
-      #if 0
-           /* This is a non working code that show how to hooks into a window,
-            * if we have a window around */
-            libvlc_media_player_set_xwindow (mp, xid);
-           /* or on windows */
-            libvlc_media_player_set_hwnd (mp, hwnd);
-           /* or on mac os */
-            libvlc_media_player_set_nsobject (mp, view);
-      #endif
-      // start play
-      libvlc_media_player_play(vlc_mp);
-    }
-    return(error);
+    strcpy(path,"");
+    strcat(path,this->filmoversigt[nr].getfilmfilename());
+    vlc_controller::playmedia(path);
 }
 
 // pause movie
 
 void film_oversigt_typem::pausemovie() {
-  if (vlc_mp) libvlc_media_player_pause(vlc_mp);
+  vlc_controller::pause();
 }
-
 
 // get position
 
 float film_oversigt_typem::getmovieposition() {
-  float factor=libvlc_media_player_get_position(vlc_mp);
+  vlc_controller::get_position();
 }
 
 // sort movies after type
@@ -817,14 +772,10 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       }
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[i+sofset].gettextureid()) {
-
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -941,25 +892,13 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
             glcRenderChar(' ');
             pos++;
           }
-
           if (temptxt[ii]=='\0') break;
           ii++;	// skip space
         }
-
-
-
-        //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
-//        glRasterPos2f(0.0f, 0.0f);
-//        glDisable(GL_TEXTURE_2D);
-//        glScalef(20.0, 20.0, 1.0);
-//        glcRenderString(temptxt);
-
       }
-
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
-
     xpos+=205;
     i++;
   }
@@ -1040,7 +979,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);                           //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -1210,7 +1149,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glPopMatrix();
   }
   if (i==0) {
-    strcpy(temptxt,"No backend ");
+    sprintf(temptxt,"No info from %s backend. ",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
     xpos=700;
