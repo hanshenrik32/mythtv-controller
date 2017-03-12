@@ -1,21 +1,11 @@
 #ifndef MYCTRL_MOVIE
 #define MYCTRL_MOVIE
-
 #include <stdio.h>
 #include <string.h>
 #include <GL/gl.h>
-#include <vlc/vlc.h>
+#include "myth_vlcplayer.h"
 
-
-// vlc stuf
-
-static const char * const opt [] = {
-      "--fullscreen",
-      "--play-and-stop",
-      "--verbose=1",
-      "--ignore-config",
-      "--no-xlib",
-};
+// #include <vlc/vlc.h>
 
 
 // structur som bruges når der skal vises list over film i 3d view
@@ -137,26 +127,6 @@ class film_oversigt_type {
 
 
 
-
-
-// vlc player class
-
-class vlc_controller {
-  private:
-    libvlc_instance_t *vlc_inst;              //
-    libvlc_media_player_t *vlc_mp;            //
-    bool is_playing;
-  public:
-    vlc_controller();
-    ~vlc_controller();
-    int playmovie(char *path);
-    void stopmovie();
-    float get_position();
-    void pause();
-};
-
-
-
 // main film class
 
 class film_oversigt_typem : vlc_controller {
@@ -166,8 +136,8 @@ class film_oversigt_typem : vlc_controller {
       bool film_is_pause;                        // pause ?
       unsigned int filmoversigt_antal;			  	 // loaded antal
       // load vlc stuf
-      libvlc_instance_t *vlc_inst;              //
-      libvlc_media_player_t *vlc_mp;            //
+//      libvlc_instance_t *vlc_inst;              //
+//      libvlc_media_player_t *vlc_mp;            //
       float getmovieposition();
     public:
       bool film_is_playing;                       // playing ?
