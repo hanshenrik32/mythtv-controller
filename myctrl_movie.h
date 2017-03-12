@@ -19,16 +19,16 @@ const int castlinieantal=20;
 
 class film_oversigt_type {
   private:
-    unsigned int nr;			// record nr
+    unsigned int nr;	               		// record nr
     GLuint textureId;                   // texture id for 3D cover hvis der findes en cover til filmen
     GLuint frontcover;                  // normal cover
-    GLuint backcover;			// back cover
-    GLuint sidecover;			// side cover
+    GLuint backcover;		               	// back cover
+    GLuint sidecover;			              // side cover
     unsigned int film_id;               // filmid i mysql
     unsigned int length;                // film length
     unsigned int year;                  // aar som den udkom
     unsigned int userrating;            // bruger rating
-    char *rating;			// imdb rating size = 100
+    char *rating;			                  // imdb rating size = 100
     char *film_imdbnr;                  // movie imdb nr if any size = 20
     char *film_title;                   // film title size = 128
     char *film_coverfile;               // path to created (by convert) 3d gfx file 256
@@ -36,9 +36,9 @@ class film_oversigt_type {
     char *film_backcoverfile;           // path to back cover file hentet fra mythtv 256
     char *film_sidecoverfile;           // path to side cover file hentet fra mythtv 256
     char *film_filename;                // path to file 256
-    char *film_adddate;			// date added to db
-    bool cover3d;			// show 3d cover in movie display
-//    char *genre;                        // size = 200
+    char *film_adddate;			            // date added to db
+    bool cover3d;		                   	// show 3d cover in movie display
+//    char *genre;                      // size = 200
 
 
   public:
@@ -49,7 +49,6 @@ class film_oversigt_type {
     film_oversigt_type();		// constructor
     ~film_oversigt_type();		// destructor
 // functions
-
     // swap movies
     void swap_film(film_oversigt_type *film1,film_oversigt_type *film2);
 

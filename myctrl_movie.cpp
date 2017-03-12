@@ -264,7 +264,7 @@ void film_oversigt_typem::softstopmovie() {
 // start playing movie by vlclib
 
 int film_oversigt_typem::playmovie(int nr) {
-    char path[PATH_MAX];                                     // max path
+    char path[PATH_MAX];                                  // max path length from os
     if (this->film_is_playing) stopmovie();               // stop last played movie
     strcpy(path,"");
     strcat(path,this->filmoversigt[nr].getfilmfilename());

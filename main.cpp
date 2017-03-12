@@ -5922,7 +5922,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
         // scroll film up/down
         if (vis_film_oversigt) {
-            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+5<film_oversigt.film_antal()-1)) {
+            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+16<film_oversigt.film_antal()-1)) {
                 do_movie_icon_anim_icon_ofset=1;
                 switch(screen_size) {
                     case 1: _fangley+=(41.0f);					// 51 scroll 1 line
