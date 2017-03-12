@@ -5,19 +5,17 @@
 
 // vlc player class
 
-// vlc stuf
-
-
 class vlc_controller {
   private:
     libvlc_instance_t *vlc_inst;              //
     libvlc_media_player_t *vlc_mp;            //
-    bool is_playing;
+    bool is_playing;                          // do we play media
   public:
+    bool vlc_in_playing();
     vlc_controller();
     ~vlc_controller();
-    int playmovie(char *path);
-    void stopmovie();
+    int playmedia(char *path);
+    void stopmedia();
     float get_position();
     void pause();
 };

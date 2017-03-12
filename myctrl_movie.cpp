@@ -8,6 +8,8 @@
 #include <mysql.h>                      // mysql stuf
 #include <dirent.h>                     // dir functions
 
+#include <linux/limits.h>
+
 #include "utility.h"
 #include "myctrl_movie.h"
 #include "readjpg.h"
@@ -15,6 +17,7 @@
 #include "myth_vlcplayer.h"
 
 #include "myctrl_music.h"
+extern char configbackend[];
 extern const char *dbname;
 extern char configmysqluser[256];                              // /mythtv/mysql access info
 extern char configmysqlpass[256];                              //
@@ -34,7 +37,7 @@ extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
-//extern GLuint _textureIdloading_mask;
+
 // window info
 extern int orgwinsizey;
 extern int orgwinsizex;
@@ -207,8 +210,8 @@ void film_oversigt_type::resetfilm() {
      strcpy(category_name,"");
      textureId=0;                    // texture id for 3D cover hvis der findes en cover til filmen
      frontcover=0;                   // normal cover
-     sidecover=0;			// side cover
-     backcover=0;			// back cover
+     sidecover=0;		                 // side cover
+     backcover=0;             			 // back cover
 }
 
 
@@ -239,19 +242,19 @@ void film_oversigt_typem::resetallefilm() {
 }
 
 
+
 // default player
 // stop playing movie
 
 void film_oversigt_typem::stopmovie() {
-  vlc_controller::stopmovie();
+  vlc_controller::stopmedia();
 }
-
 
 
 // stop player
 
 void film_oversigt_typem::softstopmovie() {
-  vlc_controller::stopmovie();
+  vlc_controller::stopmedia();
 }
 
 
@@ -261,11 +264,11 @@ void film_oversigt_typem::softstopmovie() {
 // start playing movie by vlclib
 
 int film_oversigt_typem::playmovie(int nr) {
-    char systemcommand[2000];                             // path
+    char path[PATH_MAX];                                     // max path
     if (this->film_is_playing) stopmovie();               // stop last played movie
-    strcpy(systemcommand,"");
-    strcat(systemcommand,this->filmoversigt[nr].getfilmfilename());
-    vlc_controller::playmovie(systemcommand);
+    strcpy(path,"");
+    strcat(path,this->filmoversigt[nr].getfilmfilename());
+    vlc_controller::playmedia(path);
 }
 
 // pause movie
@@ -769,14 +772,10 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       }
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[i+sofset].gettextureid()) {
-
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -893,25 +892,13 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
             glcRenderChar(' ');
             pos++;
           }
-
           if (temptxt[ii]=='\0') break;
           ii++;	// skip space
         }
-
-
-
-        //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
-//        glRasterPos2f(0.0f, 0.0f);
-//        glDisable(GL_TEXTURE_2D);
-//        glScalef(20.0, 20.0, 1.0);
-//        glcRenderString(temptxt);
-
       }
-
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
-
     xpos+=205;
     i++;
   }
@@ -992,7 +979,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);                           //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -1162,7 +1149,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glPopMatrix();
   }
   if (i==0) {
-    strcpy(temptxt,"No backend ");
+    sprintf(temptxt,"No info from %s backend. ",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
     xpos=700;

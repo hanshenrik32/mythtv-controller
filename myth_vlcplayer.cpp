@@ -27,10 +27,13 @@ vlc_controller::~vlc_controller() {
   if (vlc_inst) libvlc_release(vlc_inst);
 }
 
+bool vlc_controller::vlc_in_playing() {
+  return is_playing;
+};
 
 // do play function by use (libvlc)
 
-int vlc_controller::playmovie(char *path) {
+int vlc_controller::playmedia(char *path) {
   int error=0;
   libvlc_media_t *vlc_m;
   vlc_m=libvlc_media_new_path(vlc_inst,path);
@@ -49,9 +52,7 @@ int vlc_controller::playmovie(char *path) {
     //libvlc_media_add_option(vlc_m,":sout-all");
     // <gdk/gdkx.h>
     // Bind to xwindows
-
     //libvlc_media_player_set_xwindow(vlc_mp, 0);
-
     //libvlc_media_player_set_xwindow(mp, GDK_WINDOW_XID(gtk_widget_get_window(b_window)));
     if (!(vlc_mp)) error=1;
     libvlc_media_release(vlc_m);
@@ -71,7 +72,9 @@ int vlc_controller::playmovie(char *path) {
 }
 
 
-void vlc_controller::stopmovie() {
+// stop play media
+
+void vlc_controller::stopmedia() {
   if (vlc_mp) {
     libvlc_media_player_stop(vlc_mp);
     libvlc_media_player_release(vlc_mp);
@@ -82,13 +85,14 @@ void vlc_controller::stopmovie() {
 }
 
 
-// return pos
+// return play pos
 
 float vlc_controller::get_position() {
   return(libvlc_media_player_get_position(vlc_mp));
 }
 
-// set play on pause
+
+// set play or pause
 
 void vlc_controller::pause() {
   if (vlc_mp) libvlc_media_player_pause(vlc_mp);

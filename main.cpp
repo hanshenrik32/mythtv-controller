@@ -74,21 +74,6 @@ extern char __BUILD_NUMBER;
 // #include "myth_picture.h"
 
 
-/*
-// load vlc stuf
-libvlc_instance_t *vlc_inst;
-libvlc_media_player_t *vlc_mp;
-libvlc_media_t *vlc_m;
-static const char * const opt [] = {
-      "--fullscreen",
-      "--play-and-stop",
-      "--verbose=1",
-      "--ignore-config",
-      "--no-xlib",
-};
-*/
-
-
 // struct used by keyboard config of functions keys
 struct configkeytype {
     char cmdname[200];
@@ -1170,10 +1155,10 @@ void load_config(char * filename) {
     struct hostent *remoteHost;
     struct in_addr **addr_list;
 
-    gethostname(hostname,128);						// get running hosts name
+    gethostname(hostname,128);				                		// get this hosts name
     strcpy(confighostname,hostname);
-    char *database = (char *) "mythconverg";				// mythtv database name
-    strcpy(configrecordpath,"");					// default value (bliver fundet i mysql mythtv databasen)
+    char *database = (char *) "mythconverg";			            // mythtv database name
+    strcpy(configrecordpath,"");			                     		// default value (bliver fundet i mysql mythtv databasen)
     for(i = 0; i < storagegroupantal; i++) {
         strcpy(configstoragerecord[i].path,"");
         strcpy(configstoragerecord[i].name,"");
@@ -4360,7 +4345,7 @@ void display(void) {
         //load_lande_flags();
     }
 
-    // start movie player
+    // do start movie player
     if ((startmovie) && (do_zoom_film_cover)) {
         if (strcmp("default",configdefaultplayer)!=0)  {
             if (debugmode && 16) fprintf(stderr,"Start movie nr %d Player is vlc path :%s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
@@ -4398,7 +4383,8 @@ void display(void) {
             aktiv_playlist.clean_playlist();                // clean play list (reset) play list
             do_play_music_aktiv_table_nr=1;			// reset play start nr
 
-            if (debugmode & 16)  fprintf(stderr,"Stop playing wideo if any \n");
+            if (debugmode & 16)  fprintf(stderr,"Stop playing media/wideo if any \n");
+
 /*
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
