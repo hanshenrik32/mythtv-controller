@@ -911,16 +911,13 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 
 
 
-
-
-
 //
 // normal oversigt
 // ny udgave
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int lfilmoversigt_antal=4*8;
-  int i=0;
+  int film_nr=0;
 //  int txtbrede;
   bool cover3d=false;
   char *lastslash;
@@ -959,17 +956,17 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   winsizy=200;
   xpos=20;
   ypos=700;
-  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
+  while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
 
-    if ((i+sofset)<filmoversigt_antal) {
-      if (((i % bonline)==0) && (i>0)) {
+    if ((film_nr+sofset)<filmoversigt_antal) {
+      if (((film_nr % bonline)==0) && (film_nr>0)) {
         xpos=20;
         ypos=ypos-(winsizy+60);
       }
 
-      if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
-      if (filmoversigt[i+sofset].gettextureid()) {
+      if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
+      if (filmoversigt[film_nr+sofset].gettextureid()) {
 
 
         // print cover dvd
@@ -982,7 +979,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);                           //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(100+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
@@ -990,12 +987,12 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
         // print movie cover over
-        glBindTexture(GL_TEXTURE_2D,filmoversigt[i+sofset].gettextureid());
+        glBindTexture(GL_TEXTURE_2D,filmoversigt[film_nr+sofset].gettextureid());
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(100+film_nr+sofset);
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos+24,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
@@ -1014,7 +1011,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
+        glLoadName(100+film_nr+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
@@ -1024,7 +1021,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
       }
 
-      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
+      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
 
@@ -1115,7 +1112,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     }
 
     xpos+=205;
-    i++;
+    film_nr++;
     //glPopMatrix();
   }
 
@@ -1148,7 +1145,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glEnable(GL_TEXTURE_2D);
     glPopMatrix();
   }
-  if (i==0) {
+  if (film_nr==0) {
     sprintf(temptxt,"No info from %s backend. ",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
