@@ -203,7 +203,7 @@ int wifinetdef::findaktiv_wifi(char *aktivhardwareadress) {
                         finish=true;
                   }
             }
-      } else if (debugmode & 1) fprintf(stderr,"Warning no wifi inerface found,\n");
+      } else if (debugmode & 1) fprintf(stderr,"Warning no wifi interface found,\n");
       if (fp) {
             pclose(fp);
             if (finish) {
