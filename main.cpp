@@ -147,13 +147,13 @@ unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
-                                                        // 1  = free
+                                                        // 1  = wifi net
                                                         // 2  = music
                                                         // 4  = stream
                                                         // 8  = keyboard/mouse move
                                                         // 16 = movie
                                                         // 32 = searcg
-int debugmode=8+2;                                      // 64 = radio station land icon loader
+int debugmode=8+2+1;                                    // 64 = radio station land icon loader
                                                         // 128= stream search
                                                         // 256 = tv program stuf
                                                         // 512 = media importer
