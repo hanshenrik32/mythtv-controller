@@ -959,7 +959,7 @@ int create_radio_oversigt() {
             exit(-1);
         }
         if ((dbname,mysql_errno(conn)!=2006) && (dbname,mysql_errno(conn)!=2003) && (dbname,mysql_errno(conn)!=1049)) {
-            printf("Mysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
+            printf("Mysql error %s %s\n",dbname,mysql_error(conn));
             exit(-1);
         }
     }
@@ -1153,7 +1153,7 @@ int create_radio_oversigt() {
         printf("Create tables error-. Mysql error %d \n",mysql_errno(conn));
         if (mysql_errno(conn)==1044) printf("MySQL Error: No access to %s database.\n",dbname);
         if (mysql_errno(conn)==1049) printf("MySQL Error: Unknown database %s\n",dbname);
-        printf("Mysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
+        printf("Mysql error %s %s\n",dbname,mysql_error(conn));
         exit(1);
     }
     return(0);

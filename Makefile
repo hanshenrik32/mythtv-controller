@@ -74,6 +74,10 @@ $(PROG): $(SRCS)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
+
+Debug: $(PROG)
+
+
 uninstall:
 	rm -f $(DESTDIR)
 	rm -f $(BINPROG)

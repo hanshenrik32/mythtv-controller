@@ -153,7 +153,7 @@ int orgwinsizex,orgwinsizey;
                                                         // 8  = keyboard/mouse move
                                                         // 16 = movie
                                                         // 32 = searcg
-int debugmode=8+2+1;                                    // 64 = radio station land icon loader
+int debugmode=8+2;                                    // 64 = radio station land icon loader
                                                         // 128= stream search
                                                         // 256 = tv program stuf
                                                         // 512 = media importer
@@ -808,7 +808,6 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
 
 
 
-
 void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 {
@@ -824,6 +823,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
     vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
     vis_error_timeout=ERROR_TIMEOUT;
 }
+
 
 
 
@@ -10064,14 +10064,9 @@ int check_radio_stations_icons() {
 
 
 
-
-
-
-
-
 int main(int argc, char** argv) {
-    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+    //printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    //printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {

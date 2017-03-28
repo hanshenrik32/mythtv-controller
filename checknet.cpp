@@ -89,6 +89,8 @@ void wifinetdef::update_wifi_netlist() {
 }
 
 
+// find wifi network interface name
+
 void wifinetdef::find_interfacenames() {
     struct ifaddrs *ifaddr, *ifa;
     int family, s, n;
@@ -115,8 +117,8 @@ void wifinetdef::find_interfacenames() {
         }
         if ((interfacefound==false) && (strncmp(ifa->ifa_name,"wl",2)==0)) {
             interfacefound=true;
-            strcpy(interfacename,ifa->ifa_name);
-            strcpy(interfaceaddress,host);
+            strcpy(interfacename,ifa->ifa_name);                                // save in config
+            strcpy(interfaceaddress,host);                                      // save ipadress in config
         }
         if (debugmode & 1) printf("address: <%s>\n", host);
       }
@@ -129,7 +131,7 @@ void wifinetdef::find_interfacenames() {
 // load wifi net list from OS
 
 int wifinetdef::create_wifilist() {
-      FILE *fp;
+      FILE *fp=NULL;
       char *sted;				// bruges til string search
       //int status;
       int maxlength=20000;
