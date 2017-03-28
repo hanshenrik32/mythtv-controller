@@ -21,7 +21,10 @@ class wifinetdef {
   private:
       int wifinetantal;
       wifinetid wifilist[20];
+      char interfacename[200];
+      char interfaceaddress[200];
       int create_wifilist();
+      void find_interfacenames();
   public:
       wifinetdef();
       void update_wifi_netlist();
@@ -34,4 +37,3 @@ class wifinetdef {
       void put_wifipass(int n,char *p);
       int findaktiv_wifi(char *aktivhardwareadress);		// hent aktic mac adress
 };
-

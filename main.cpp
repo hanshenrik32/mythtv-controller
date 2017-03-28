@@ -147,13 +147,13 @@ unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
-                                                        // 1  = free
+                                                        // 1  = wifi net
                                                         // 2  = music
                                                         // 4  = stream
                                                         // 8  = keyboard/mouse move
                                                         // 16 = movie
                                                         // 32 = searcg
-int debugmode=8+2;                                      // 64 = radio station land icon loader
+int debugmode=8+2;                                    // 64 = radio station land icon loader
                                                         // 128= stream search
                                                         // 256 = tv program stuf
                                                         // 512 = media importer
@@ -808,7 +808,6 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
 
 
 
-
 void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 {
@@ -824,6 +823,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
     vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
     vis_error_timeout=ERROR_TIMEOUT;
 }
+
 
 
 
@@ -2742,9 +2742,10 @@ void display(void) {
       }
     }
 
+    // show volume value
     if (show_volume_info) {
       vis_volume_timeout--;
-      if (vis_volume_timeout==0) show_volume_info=false;
+      if (vis_volume_timeout<=0) show_volume_info=false;
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -2766,7 +2767,7 @@ void display(void) {
         aa+=40;
       }
       glPopMatrix();
-    } else vis_volume_timeout=80;
+    }
 
     // vis_error=true;
     // vis_error_timeout=10;
@@ -4100,7 +4101,6 @@ void display(void) {
         }
 
         // create uv meter
-
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
           // getSpectrum() performs the frequency analysis, see explanation below
@@ -4986,12 +4986,7 @@ void display(void) {
  */
     glFlush();
     glutSwapBuffers();
-
 }
-
-
-
-
 
 
 
@@ -6661,6 +6656,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
       #endif
       show_volume_info=true;					// show volume info window
+      vis_volume_timeout=80;
     }
 
     if (key=='-') {                               // volume down
@@ -6672,6 +6668,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
       #endif
       show_volume_info=true;					// show volume info window
+      vis_volume_timeout=80;
     }
 
     if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
@@ -8614,6 +8611,7 @@ void update(int value) {
                         if (sndsystem) channel->setVolume(configsoundvolume);
                         #endif
                         show_volume_info=true;					// show volume info window
+                        vis_volume_timeout=80;
                     }
 
                     if (strcmp("Key-vol-down",c)==0) {
@@ -8622,6 +8620,7 @@ void update(int value) {
                         if (sndsystem) channel->setVolume(configsoundvolume);
                         #endif
                         show_volume_info=true;					// show volume info window
+                        vis_volume_timeout=80;
                     }
 
                     if (strcmp("Return",c)==0) {
@@ -10065,14 +10064,9 @@ int check_radio_stations_icons() {
 
 
 
-
-
-
-
-
 int main(int argc, char** argv) {
-    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+    //printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    //printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {

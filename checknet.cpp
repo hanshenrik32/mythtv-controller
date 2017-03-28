@@ -6,7 +6,13 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
+#include <netdb.h>
+#include <ifaddrs.h>
 #include "checknet.h"
+
+extern int debugmode;
 
 
 extern char confighostwlanname[256];
@@ -70,6 +76,7 @@ void wifinetid::get_pass(char *p) {
 
 wifinetdef::wifinetdef() {
       wifinetantal=0;
+      strcpy(interfacename,"");
       create_wifilist();			// create list of wifinets in range
       printf("Wifinet found %d \n",wifinetantal);
 }
@@ -82,23 +89,69 @@ void wifinetdef::update_wifi_netlist() {
 }
 
 
+// find wifi network interface name
+
+void wifinetdef::find_interfacenames() {
+    struct ifaddrs *ifaddr, *ifa;
+    int family, s, n;
+    char host[NI_MAXHOST];
+    bool interfacefound=false;
+    if (getifaddrs(&ifaddr) == -1) {
+      perror("getifaddrs");
+      exit(EXIT_FAILURE);
+    }
+    // loop all interfaces found by getifaddrs call
+    for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
+      if (ifa->ifa_addr == NULL)
+        continue;
+      family = ifa->ifa_addr->sa_family;
+      if ((debugmode & 1) && ((family==AF_INET) || (family==AF_INET6))) printf("interface %-12s ",ifa->ifa_name);
+
+      // For an AF_INET* interface address, display the address
+
+      if (family == AF_INET || family == AF_INET6) {
+        s = getnameinfo(ifa->ifa_addr,(family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),host, NI_MAXHOST,NULL, 0, NI_NUMERICHOST);
+        if (s != 0) {
+          printf("getnameinfo() failed: %s\n", gai_strerror(s));
+          exit(EXIT_FAILURE);
+        }
+        if ((interfacefound==false) && (strncmp(ifa->ifa_name,"wl",2)==0)) {
+            interfacefound=true;
+            strcpy(interfacename,ifa->ifa_name);                                // save in config
+            strcpy(interfaceaddress,host);                                      // save ipadress in config
+        }
+        if (debugmode & 1) printf("address: <%s>\n", host);
+      }
+    }
+    if (ifaddr) freeifaddrs(ifaddr);
+}
+
 
 
 // load wifi net list from OS
 
 int wifinetdef::create_wifilist() {
-      FILE *fp;
+      FILE *fp=NULL;
       char *sted;				// bruges til string search
       //int status;
       int maxlength=20000;
       char result[20000];
       char tmptxt[80];
-      char hadd[18];    // hardware adress
-      char essid[80];   // network id
+      char hadd[18];                  // hardware adress
+      char essid[80];                 // network id
+      char foundinterfacename[200];
       int signal=0;
       int encrypt=0;
       int finish=0;
-      fp=popen("/sbin/iwlist wlan0 scan","r");
+      if (debugmode & 1) fprintf(stderr,"Scanning for wifi networks.\n");
+      find_interfacenames();                      // get interface names and select wifi networks
+      strcpy(foundinterfacename,"/sbin/iwlist ");
+      strcat(foundinterfacename,this->interfacename);       // add found interface name found by find_interfacenames
+      strcat(foundinterfacename," scan");
+      fp=popen(foundinterfacename,"r");
+      sleep(3);                                           // wait for scan
+      if (fp) pclose(fp);
+      fp=popen(foundinterfacename,"r");
       if (fp) {
             while(fgets(result,maxlength-1,fp)!=NULL) {
                   if ((sted=strstr(result,"Address:"))) {
@@ -128,7 +181,7 @@ int wifinetdef::create_wifilist() {
                         finish=0;
                   }
             }
-      }
+      } else if (debugmode & 1) fprintf(stderr,"ERROR loading wifi network list by missing command /sbin/iwlist\n");
       if (fp) pclose(fp);
       return(wifinetantal);
 }
@@ -152,7 +205,7 @@ int wifinetdef::findaktiv_wifi(char *aktivhardwareadress) {
                         finish=true;
                   }
             }
-      }
+      } else if (debugmode & 1) fprintf(stderr,"Warning no wifi interface found,\n");
       if (fp) {
             pclose(fp);
             if (finish) {
