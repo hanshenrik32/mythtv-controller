@@ -1291,15 +1291,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
                 xsiz=xsiz+(xtid*7);
               }
 
-/*
               if (chanid==2) {
                 printf("\nChannelid %d xtid=%d ",tvkanaler[kanalnr+pstartofset].chanid,xtid);
                 printf(" Program %20s \n",tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].program_navn);
                 printf("Start time %s ", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix));
-                printf("End time %s \n", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].endtime_unix));
+                printf("End   time %s \n", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].endtime_unix));
               }
-*/
-
               //tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix
 
               if (startofset>0) {
@@ -1321,11 +1318,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
               //glTranslatef(210+startofset,ypos+12, 0.0f);
               glTranslatef(xpos+startofset+2,ypos+12, 0.0f);
               if (xtidlength>10) {
-                if (debugmode & 2) sprintf(tmptxt,"startofset %d start %s %-14s %d",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn,xtid);
+                if (debugmode) sprintf(tmptxt,"startofset %d start %s %-14s %d",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn,xtid);
                 else sprintf(tmptxt,"%-14s",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
                 //tmptxt[15]='\0';
               } else {
-                if (debugmode & 2) sprintf(tmptxt,"startofset %d start %s %-3s",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
+                if (debugmode) sprintf(tmptxt,"startofset %d start %s %-3s",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
                 else sprintf(tmptxt,"%-3s..",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
                 tmptxt[3]='\0';
               }
