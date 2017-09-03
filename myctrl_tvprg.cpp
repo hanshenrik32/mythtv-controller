@@ -859,6 +859,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     strcpy(this->mysqlluser,mysqluser);
     strcpy(this->mysqllpass,mysqlpass);
 
+    loading_tv_guide=true;
+
     if (nystarttid==0) {
         // get time now in a string format (yyyy-mm-dd hh:mm:ss)
         rawtime=time( NULL );				     			 // hent nu tid
@@ -963,6 +965,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         }
         mysql_close(conn);
     }
+    loading_tv_guide=false;
 }
 
 
