@@ -167,6 +167,9 @@ int debugmode=2+1;                                        // 64 = radio station 
 char music_db_update_loader[256];                       //
 
 
+bool loading_tv_guide=false;                            // loading_tv_guide true if loading
+
+
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
 
