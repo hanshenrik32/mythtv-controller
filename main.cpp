@@ -700,7 +700,7 @@ GLuint _textureIdmusic_aktiv;
 GLuint _tvoldrecorded;
 GLuint screensaverbox_mask;
 GLuint _tvmaskprgrecordedbutton;
-GLuint _tvbar1,_tvbar2;
+GLuint _tvbar1,_tvbar2,_tvbar3;
 GLuint _tv_prgtype;
 GLuint _mainlogo;
 GLuint _tvnewprgrecordedbutton;
@@ -2471,9 +2471,6 @@ void display() {
         rawtime1=0;                             // reset timer så den henter ti
         remove_log_file=false;                  // clear remove lock file flag
     }
-
-    if (loading_tv_guide) printf("loading_tv_guide TRUE \n");
-    else printf("loading_tv_guide FALSE  \n");
 
     // vis menu **********************************************************************
     if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer==0)) {
@@ -9887,6 +9884,7 @@ void loadgfx() {
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
+    _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
     //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
@@ -10067,6 +10065,7 @@ void freegfx() {
 
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar2);
+    glDeleteTextures( 1, &_tvbar3);
     glDeleteTextures( 1, &_tvoldrecorded);
     glDeleteTextures( 1, &_tv_prgtype);
     glDeleteTextures( 1, &onlineradio_empty);

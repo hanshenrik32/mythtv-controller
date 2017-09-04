@@ -35,6 +35,7 @@ extern int configland;
 extern GLuint _tvbar1;
 extern GLuint _tvbar1_1;
 extern GLuint _tvbar2;
+extern GLuint _tvbar3;
 extern GLuint _textureIdclose;
 extern GLuint tvprginfobig;
 extern GLuint _tvprgrecorded;
@@ -1154,6 +1155,36 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
     glcRenderString(tmptxt);
     glPopMatrix();
 
+
+    if (loading_tv_guide) {
+      // show loading tv guide
+      xsiz=450;
+      ysiz=100;
+      xpos=(orgwinsizex/2)-xsiz/2;
+      ypos=(orgwinsizey/2)-ysiz/2;
+      glPushMatrix();
+      glTranslatef(10,50, 0.0f);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBindTexture(GL_TEXTURE_2D,_tvbar1);
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glEnd(); //End quadrilateral coordinates
+      // print
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(xpos+120,ypos, 0.0f);
+      glScalef(20.0, 20.0,1);
+      glDisable(GL_TEXTURE_2D);
+      glcRenderString("Loading tv guide....");
+      glPopMatrix();
+    }
+
+
     // make time string
     glPushMatrix();
     strcpy(tmptxt,"");
@@ -1200,7 +1231,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       nutidtime+=60*60*24;
       iii=0;
       int chanid=0;
-
       if (loading_tv_guide==FALSE) {
         // 14 channel over view
         while (iii<14) {
@@ -1370,32 +1400,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
           kanalnr++;
           iii++;
         }
-      } else {
-        // show loading tv guide
-        xsiz=450;
-        ysiz=100;
-        xpos=(orgwinsizex/2)-xsiz/2;
-        ypos=(orgwinsizey/2)-ysiz/2;
-        glPushMatrix();
-        glTranslatef(10,50, 0.0f);
-        glColor3f(0.5f, 0.5f, 0.5f);
-        glBegin(GL_LINE_LOOP);
-        //glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-        glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-        glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-        glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-        glEnd(); //End quadrilateral coordinates
-        // print
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(xpos+120,ypos, 0.0f);
-        glScalef(20.0, 20.0,1);
-        glDisable(GL_TEXTURE_2D);
-        glcRenderString("Loading tv guide....");
-        glPopMatrix();
       }
 
-      if (loading_tv_guide) {
+      if (!(loading_tv_guide)) {
         // show the clock line
         xpos=200+timeinfo->tm_min*7;
         ypos=orgwinsizey-930;
