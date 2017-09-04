@@ -291,6 +291,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
+
+  loading_tv_guide=true;
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
@@ -318,9 +320,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
     while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
   }
   mysql_free_result(res);
-
-  loading_tv_guide=true;
-
   if (!(fundet)) {
     strcpy(sql,"create table IF NOT EXISTS channel(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,channum varchar(10),freqid varchar(10) ,sourceid int(10) unsigned,callsign varchar(20),name  varchar(64), icon varchar(255), finetune int(11) , videofilters varchar(255), xmltvid varchar(64), recpriority int(10), contrast int(11) DEFAULT 32768, brightness int(11) DEFAULT 32768, colour int(11) DEFAULT 32768, hue int(11) DEFAULT 32768, tvformat varchar(10), visible tinyint(1) DEFAULT 1, outputfilters  varchar(255) ,useonairguide tinyint(1)  DEFAULT 0, mplexid  smallint(6), serviceid  mediumint(8) unsigned, atsc_major_chan int(10) unsigned DEFAULT 0, atsc_minor_chan int(10) unsigned DEFAULT 0, last_record datetime, default_authority varchar(32), commmethod int(11) DEFAULT +1, iptvid smallint(6) unsigned,orderid int(12) unsigned DEFAULT 0)");
     mysql_query(conn,sql);
