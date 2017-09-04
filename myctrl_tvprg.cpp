@@ -1068,6 +1068,15 @@ void WordWrap( char *str, int N ) {
 
 void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
 
+  int totaltid=0;
+  int omgang=0;
+  int startyofset=0;
+  int textofset=0;
+  int startofset=0;
+  // husk tv kanalid
+  // program loop
+
+
     struct tm *timeinfo;
     struct tm nowtime_h;
     struct tm endnowtime_h;
@@ -1192,8 +1201,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       iii=0;
       int chanid=0;
 
-      if (loading_tv_guide==false) {
-
+      if (loading_tv_guide==FALSE) {
         // 14 channel over view
         while (iii<14) {
           xpos=10;
@@ -1217,13 +1225,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
             glEnd(); //End quadrilateral coordinates
           }
           glPopMatrix();
-          int totaltid=0;
-          int omgang=0;
-          int startyofset=0;
-          int textofset=0;
-          int startofset=0;
-          // husk tv kanalid
-          // program loop
 
           //
           // endnowtime_h = endtime to show i while
@@ -1301,13 +1302,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
                 startofset+=xsiz;
                 xsiz=xsiz+(xtid*7);
               }
-
+/*
               if (chanid==2) {
                 printf("\nChannelid %d xtid=%d ",tvkanaler[kanalnr+pstartofset].chanid,xtid);
                 printf(" Program %20s \n",tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].program_navn);
                 printf("Start time %s ", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix));
                 printf("End   time %s \n", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].endtime_unix));
               }
+
+*/
               //tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix
               if (startofset>0) {
                 // make line box around program in xsiz

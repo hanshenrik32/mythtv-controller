@@ -2472,6 +2472,9 @@ void display() {
         remove_log_file=false;                  // clear remove lock file flag
     }
 
+    if (loading_tv_guide) printf("loading_tv_guide TRUE \n");
+    else printf("loading_tv_guide FALSE  \n");
+
     // vis menu **********************************************************************
     if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer==0)) {
         // tv icon
