@@ -7,11 +7,6 @@
 const int maxprogram_antal=100;
 const int MAXKANAL_ANTAL=40;
 
-
-
-
-
-
 // tv oversigt til 3d
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv databasen
 
@@ -66,6 +61,7 @@ class tv_oversigt {
         char mysqllhost[200];
         char mysqlluser[200];
         char mysqllpass[200];
+        char loadinginfotxt[200];
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					// return type (1/2/3) found of tv program to record
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);

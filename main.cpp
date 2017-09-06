@@ -9885,6 +9885,7 @@ void loadgfx() {
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
+    
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
     //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
