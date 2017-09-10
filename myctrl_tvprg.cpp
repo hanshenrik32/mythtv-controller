@@ -291,7 +291,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   MYSQL_RES *res;
   MYSQL_ROW row;
 
-  loading_tv_guide=true;
+  loading_tv_guide=true;        // set loadtv guide flag to show in show_tv_guide then xml files is passed
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
@@ -304,7 +304,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   sprintf(sql,"CREATE DATABASE IF NOT EXISTS %s",database);
   mysql_query(conn,sql);
   res = mysql_store_result(conn);
-  mysql_free_result(res);
+  if (res) mysql_free_result(res);
 
   sprintf(sql,"use %s",database);
   mysql_query(conn,sql);
@@ -338,17 +338,19 @@ int tv_oversigt::parsexmltv(const char *filename) {
     mysql_free_result(res);
 
     // crete index
-//    strcpy(sql,"create index chanid on program (chanid)");
-//    mysql_query(conn,sql);
-//    res = mysql_store_result(conn);
+    // strcpy(sql,"create index chanid on program (chanid)");
+    // mysql_query(conn,sql);
+    // res = mysql_store_result(conn);
   }
   if (conn) {
     //  add user homedir and open file
     getuserhomedir(userhomedir);
     strcpy(path,userhomedir);
     strcat(path,"/");
-    strcat(path,filename);
-    document = xmlReadFile(path, NULL, 0);
+    strcat(path,filename);                            // add filename to xmlfile name
+    document = xmlReadFile(path, NULL, 0);            // open xml file
+    // if exist do all the parse and update db
+    // it use REPLACE in mysql to create/update records if changed in xmlfile
     if (document) {
       root = xmlDocGetRootElement(document);
       first_child = root->children;

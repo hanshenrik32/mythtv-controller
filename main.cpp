@@ -309,7 +309,7 @@ int do_zoom_film_aktiv_nr=0;
 
 bool vis_radio_or_music_oversigt=false;
 bool vis_stream_or_movie_oversigt=false;
-bool global_use_internal_music_loader_system=false;
+bool global_use_internal_music_loader_system=false;     // use internal db for musicdb or mysql/kodi/
 
 bool ask_tv_record=false;
 bool do_play_radio=false;
@@ -317,7 +317,6 @@ bool do_play_radio=false;
 GLint ctx, myFont;
 
 bool do_swing_movie_cover=false;                        // do anim
-
 bool vis_nyefilm_oversigt=true;                         // start med at vise nye film
 
 // stream
@@ -964,10 +963,10 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=settvgraber;
                       commandlength=7;
-                    } else if (strncmp(buffer+n,"settvgraberpath",15)==0) {
+                    } else if (strncmp(buffer+n,"settvgraberpath",14)==0) {
                       command=true;
                       command_nr=settvgraberpath;
-                      commandlength=15;
+                      commandlength=14;
                     } else command=false;
 
                 }
@@ -996,9 +995,13 @@ int parse_config(char *filename) {
                       printf("*********************************************************\n");
                     }
                     // set tv graber
-                    else if (command_nr==settvgraber) strcpy(configbackend_tvgraber,value);
-                    // set tv graber path
-                    else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
+                    else if (command_nr==settvgraber) {
+                      strcpy(configbackend_tvgraber,value);
+                      printf("**************** Set config xmltv graber ****************\n");
+                      printf("Tv graber ....: %s\n",configbackend_tvgraber);
+                      printf("*********************************************************\n");
+                      // else set tv graber path
+                    } else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
                     // set hostname
                     else if (command_nr==sethostname) strcpy(configmythhost,value);
                     // mysql host
@@ -2302,7 +2305,7 @@ void display() {
 
     // make xmltv update
     today=time(NULL);
-    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {
+    if ((lasttoday+(60*1*1)<today) && (do_update_xmltv==false)) {         //60*60*24
       lasttoday=today;
       do_update_xmltv=true;
     }
@@ -2765,34 +2768,34 @@ void display() {
         }
     }
 
+    // music view
     if (!(visur)) {
       if (vis_music_oversigt) {
-          //load_music_covergfx(musicoversigt);
-          show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
-        } else if (vis_film_oversigt) {
-          glPushMatrix();
-          //aktivfont.selectfont("DejaVu Sans");
-          film_oversigt.show_film_oversigt(_fangley,fknapnr);
-          glPopMatrix();
-        } else if (vis_stream_oversigt) {
-          glPushMatrix();
-          streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
-          glPopMatrix();
-        } else if (vis_radio_oversigt) {
+        //load_music_covergfx(musicoversigt);
+        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
+      } else if (vis_film_oversigt) {
+        glPushMatrix();
+        //aktivfont.selectfont("DejaVu Sans");
+        film_oversigt.show_film_oversigt(_fangley,fknapnr);
+        glPopMatrix();
+      } else if (vis_stream_oversigt) {
+        glPushMatrix();
+        streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
+        glPopMatrix();
+      } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
-        } else if (vis_tv_oversigt) {
+      } else if (vis_tv_oversigt) {
+        //        aktiv_tv_oversigt.show_tv_oversigt1(0);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0);
+        //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
 
-          //        aktiv_tv_oversigt.show_tv_oversigt1(0);
-          aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0);
-          //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
-
-        } else if (vis_recorded_oversigt) {
-          recordoversigt.show_recorded_oversigt1(0,0);
-        }
+      } else if (vis_recorded_oversigt) {
+        recordoversigt.show_recorded_oversigt1(0,0);
+      }
         // show radio options menu
-        if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
-          radiooversigt.show_radio_options();
-        }
+      if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
+        radiooversigt.show_radio_options();
+      }
     }
 
     // show search box and text for radio and music
@@ -9885,7 +9888,7 @@ void loadgfx() {
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
-    
+
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
     //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
     _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
