@@ -7249,6 +7249,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                         vis_movie_options=false;                        // luk option window igen
                     }
                     break;
+            case 'u':
+                    if ((vis_tv_oversigt) && (loading_tv_guide==false)) {
+                      // u key
+                      // Update tv guide
+                      printf("Update tv guide\n");
+                      loading_tv_guide=true;
+                      if (strcmp(configbackend,"mythtv")==0) {
+                        update_xmltv_phread_loader();                   // start thred update flag in main loop
+                      }
+                    }
+                    break;
             case 'g':
                     if (vis_movie_options) {
                         vis_movie_sort_option=1;
@@ -9263,6 +9274,15 @@ void *datainfoloader_stream(void *data) {
 }
 
 
+// intern function for _xmltv
+
+void *get_tvguide_fromweb() {
+  printf("Start tv graber background process\n");
+  int result=system("/usr/bin/tv_grab_dk_dr > /home/hans/tvguide.xml");
+//  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+  printf("Done tv graber background process\n");
+}
+
 
 
 //
@@ -9280,6 +9300,7 @@ void *datainfoloader_xmltv(void *data) {
     aktiv_tv_oversigt.parsexmltv("tvguide.xml");
     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
+  get_tvguide_fromweb();
   printf("loader thread done xmltvguide.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
@@ -9300,7 +9321,6 @@ void *update_xmltv_phread_loader() {
     }
   }
 }
-
 
 
 //

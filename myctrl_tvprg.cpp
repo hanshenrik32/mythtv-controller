@@ -1211,7 +1211,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
     glPopMatrix();
 
 
-    if ((this->kanal_antal>0) && (!(loading_tv_guide))) {
+    if (this->kanal_antal>0) {
       endnowtime_h.tm_min=0;
       endnowtime_h.tm_sec=0;
       endnowtime_h.tm_hour=timeinfo->tm_hour+4;
@@ -1240,7 +1240,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       iii=0;
       int chanid=0;
       // 14 channel over view
-      while (iii<14) {
+      while (iii<10) {
         xpos=10;
         ypos=orgwinsizey-300-(iii*50);
         xsiz=180;
@@ -1266,7 +1266,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
         // endnowtime_h = endtime to show i while
         //
         chanid=tvkanaler[kanalnr+cstartofset].chanid;
+
+        //printf("chanid = %d \n",chanid);
+
         while((tvkanaler[kanalnr+cstartofset].chanid==chanid) && (omgang<tvkanaler[kanalnr+cstartofset].program_antal()) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<nutidtime+(60*60*24))) {
+
+          //printf("*");
+          
             //printf("program start kl %s max time %s \n",ctime((time_t *) &tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix),ctime((time_t *)&endnowtime_h));
             //
           xpos=189+2;
