@@ -2305,44 +2305,19 @@ void display() {
 
     // make xmltv update
     today=time(NULL);
-    if ((lasttoday+(60*1*1)<today) && (do_update_xmltv==false)) {         //60*60*24
+    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {         //60*60*24
+      printf("start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
     }
 
-
     glPushMatrix();
-
-
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
-
-
     //visur=1;
     if (visur) {
-/*
-        //
-        // load all streams types gfx in thread
-        //
-        if ((stream_loadergfx_started==false) && (stream_loadergfx_started_done==false)) {
-            pthread_t stream_loaderthread;           // the stream gfx web loader
-            stream_loadergfx_started=true;
-            int src=pthread_create(&stream_loaderthread,NULL,load_all_stream_gfx,NULL);
-            if (src) {
-                printf("ERROR; return code from pthread_create() is %d\n", src);
-                exit(-1);
-            }
-            //    load_all_stream_gfx();
-        }
-
-
-*/
       glPushMatrix();
-
-
       //urtype=SAVER3D;
-
-
       switch (urtype) {
         case DIGITAL:
             glPushMatrix();
@@ -9292,6 +9267,7 @@ void *get_tvguide_fromweb() {
 void *datainfoloader_xmltv(void *data) {
   //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading xmltv guide from file (tvguide.xml).\nUpdate tvguide.\n");
+  // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
     aktiv_tv_oversigt.parsexmltv("tvguide.xml");
@@ -9300,6 +9276,7 @@ void *datainfoloader_xmltv(void *data) {
     aktiv_tv_oversigt.parsexmltv("tvguide.xml");
     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
+  // load xmltvguide from web
   get_tvguide_fromweb();
   printf("loader thread done xmltvguide.\n");
   //pthread_mutex_unlock(&count_mutex);
