@@ -9252,10 +9252,13 @@ void *datainfoloader_stream(void *data) {
 // intern function for _xmltv
 
 void *get_tvguide_fromweb() {
+  char exestring[2048];
+  strcpy(exestring,configbackend_tvgraber);
+  strcat(exestring," > ~/tvguide.xml");
   printf("Start tv graber background process\n");
-  int result=system("/usr/bin/tv_grab_dk_dr > /home/hans/tvguide.xml");
+  int result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
-  printf("Done tv graber background process\n");
+  printf("Done tv graber background process\nresult %d\n");
 }
 
 
