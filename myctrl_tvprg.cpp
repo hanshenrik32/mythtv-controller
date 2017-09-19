@@ -911,7 +911,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         // do select from db
         strcpy(sqlselect,"SELECT channel.name,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
-        strcat(sqlselect,"' and endtime>='");
+        strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
 
@@ -1272,7 +1272,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
         while((tvkanaler[kanalnr+cstartofset].chanid==chanid) && (omgang<tvkanaler[kanalnr+cstartofset].program_antal()) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<nutidtime+(60*60*24))) {
 
           //printf("*");
-          
+
             //printf("program start kl %s max time %s \n",ctime((time_t *) &tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix),ctime((time_t *)&endnowtime_h));
             //
           xpos=189+2;
