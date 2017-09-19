@@ -65,6 +65,7 @@ class tv_oversigt {
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					// return type (1/2/3) found of tv program to record
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);
+        time_t lastupdated;
     public:
         tv_oversigt();
         ~tv_oversigt();
