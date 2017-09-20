@@ -60,8 +60,9 @@ extern int orgwinsizex,orgwinsizey;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
-extern char configmusicpath[256];
-extern char configmusicmypath[];
+extern char configmusicpath[256];                              //
+extern char configmusicmypath[];                               //
+extern long configtvguidelastupdate;                           //
 
 extern bool loading_tv_guide;
 
@@ -325,6 +326,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   }
   mysql_free_result(res);
   if (!(fundet)) {
+    // if tvguide db not exist create it.
     strcpy(sql,"create table IF NOT EXISTS channel(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,channum varchar(10),freqid varchar(10) ,sourceid int(10) unsigned,callsign varchar(20),name  varchar(64), icon varchar(255), finetune int(11) , videofilters varchar(255), xmltvid varchar(64), recpriority int(10), contrast int(11) DEFAULT 32768, brightness int(11) DEFAULT 32768, colour int(11) DEFAULT 32768, hue int(11) DEFAULT 32768, tvformat varchar(10), visible tinyint(1) DEFAULT 1, outputfilters  varchar(255) ,useonairguide tinyint(1)  DEFAULT 0, mplexid  smallint(6), serviceid  mediumint(8) unsigned, atsc_major_chan int(10) unsigned DEFAULT 0, atsc_minor_chan int(10) unsigned DEFAULT 0, last_record datetime, default_authority varchar(32), commmethod int(11) DEFAULT +1, iptvid smallint(6) unsigned,orderid int(12) unsigned DEFAULT 0)");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
@@ -355,12 +357,14 @@ int tv_oversigt::parsexmltv(const char *filename) {
     strcat(path,filename);                            // add filename to xmlfile name
 
     // get file date
-    stat(path, &t_stat);                            // get file info like create date
-    lastmod=gmtime(&(t_stat.st_mtime));
+    stat(path, &t_stat);                              // get file info like create date
+    lastmod=localtime(&(t_stat.st_mtime));               // convert to unix time
 
-    // if file change
-    if (lastupdated!=mktime(lastmod)) {
-      this->lastupdated=mktime(lastmod);
+    // if file change update tv guide again
+    if (configtvguidelastupdate!=mktime(lastmod)) {
+      // save last updated
+      setlastupdate(mktime(lastmod));
+      configtvguidelastupdate=mktime(lastmod);
       document = xmlReadFile(path, NULL, 0);            // open xml file
       // if exist do all the parse and update db
       // it use REPLACE in mysql to create/update records if changed in xmlfile
@@ -498,6 +502,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
       } else {
         printf("tvguide.xml not found \n");
       }
+
     }
   }
   loading_tv_guide=false;

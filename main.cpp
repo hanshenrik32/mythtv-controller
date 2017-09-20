@@ -101,6 +101,7 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
+long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -846,7 +847,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,settvgraberpath};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,settvgraberpath,tvgraberupdate};
     int commandlength;
     char value[200];
     bool command=false;
@@ -967,8 +968,11 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=settvgraberpath;
                       commandlength=14;
+                    } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
+                      command=true;
+                      command_nr=tvgraberupdate;
+                      commandlength=13;
                     } else command=false;
-
                 }
                 if (command) {
                     while((n<strlen(buffer)) && (!(valueok))) {
@@ -1002,6 +1006,8 @@ int parse_config(char *filename) {
                       printf("*********************************************************\n");
                       // else set tv graber path
                     } else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
+                    //
+                    else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
                     // set hostname
                     else if (command_nr==sethostname) strcpy(configmythhost,value);
                     // mysql host
@@ -1172,7 +1178,12 @@ int save_config(char * filename) {
         if (strcmp(configbackend_tvgraber,"Other")!=0) {
           sprintf(temp,"tvgraberpath=%s\n",configbackend_tvgraber_path);              // tv graber to use
           fputs(temp,file);
+        } else {
+          sprintf(temp,"tvgraberpath=\n");              // tv graber to use
+          fputs(temp,file);
         }
+        sprintf(temp,"tvgraberupdate=%d\n",configtvguidelastupdate);
+        fputs(temp,file);
         fclose(file);
     }
     file = fopen("mythtv-controller.keys", "w");
@@ -1222,6 +1233,7 @@ void load_config(char * filename) {
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraber_path,"");                   // default tv guide tv_grab_uk_tvguide other command
+    configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
@@ -1261,8 +1273,9 @@ void load_config(char * filename) {
            fputs("configdefaultmusicpath=Music\n",file);
            fputs("configdefaultmovie=Movies\n",file);
            fputs("uvmetertype=1\n",file);
-           fputs("tvgraber=tv_grab_dk_dr\n",file);
+           fputs("tvgraber=tv_grab_uk_tvguide\n",file);
            fputs("tvgraberpath=\n",file);
+           fputs("tvgraberupdate=0\n",file);
            fclose(file);
         } else {
           fprintf(stderr,"Config file not writeble ");
@@ -9262,7 +9275,6 @@ void *get_tvguide_fromweb() {
 }
 
 
-
 //
 // phread dataload xmltv
 //
@@ -9281,6 +9293,8 @@ void *datainfoloader_xmltv(void *data) {
   }
   // load xmltvguide from web
   get_tvguide_fromweb();
+  // save config again
+  save_config((char *) "/etc/mythtv-controller.conf");
   printf("loader thread done xmltvguide.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);

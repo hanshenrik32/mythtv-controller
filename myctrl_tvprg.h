@@ -65,7 +65,7 @@ class tv_oversigt {
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					// return type (1/2/3) found of tv program to record
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);
-        time_t lastupdated;
+        time_t lastupdated;                                                       // last updated unix date
     public:
         tv_oversigt();
         ~tv_oversigt();
@@ -83,6 +83,8 @@ class tv_oversigt {
         int findguidetvtidspunkt(int kanalnr,time_t tidspunkt);							// finder record nr som svare til starttid i timer
         time_t hentprgstartklint(int kanalnr,int prgnr);
         int parsexmltv(const char *filename);
+        time_t getlastupdate() { return lastupdated; }
+        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }
 };
 
 
