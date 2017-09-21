@@ -360,8 +360,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
     stat(path, &t_stat);                              // get file info like create date
     lastmod=localtime(&(t_stat.st_mtime));               // convert to unix time
 
-    // if file change update tv guide again
-    if (configtvguidelastupdate!=mktime(lastmod)) {
+    // if file change from last run. update tv guide again
+    if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
       // save last updated
       setlastupdate(mktime(lastmod));
       configtvguidelastupdate=mktime(lastmod);
@@ -1498,6 +1498,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
+
 
     ptype=0;
     // under menu in colors

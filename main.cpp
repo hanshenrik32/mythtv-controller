@@ -9268,7 +9268,7 @@ void *get_tvguide_fromweb() {
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml");
-  printf("Start tv graber background process\n");
+  printf("Start tv graber program background process\n");
   int result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
   printf("Done tv graber background process\nresult %d\n");
@@ -9280,16 +9280,17 @@ void *get_tvguide_fromweb() {
 //
 
 void *datainfoloader_xmltv(void *data) {
+  int error;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting - Loading xmltv guide from file (tvguide.xml).\nUpdate tvguide.\n");
+  printf("loader thread starting....\n");
   // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-    aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   } else {
-    aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
   // load xmltvguide from web
   get_tvguide_fromweb();
