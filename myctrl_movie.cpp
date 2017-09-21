@@ -49,24 +49,24 @@ extern int orgwinsizex;
 film_oversigt_type::film_oversigt_type() {
     film_id=0;				// filmid i mysql
     film_title=new char[128];
-    film_subtitle=new char[1024];	// film info (sub title)
-    film_filename=new char[256];	// path to file to play
-    film_coverfile=new char[256];	// path to created (by convert) 3d gfx file
+    film_subtitle=new char[1024];	      // film info (sub title)
+    film_filename=new char[256];	      // path to file to play
+    film_coverfile=new char[256];	      // path to created (by convert) 3d gfx file
     film_frontcoverfile=new char[256];	// path to created (by convert) 3d
-    film_backcoverfile=new char[256];	// path to back cover file hentet fra 3d
-    film_sidecoverfile=new char[256];	// path to side cover file hentet fra 3d
-    film_adddate=new char[25];		// format (åååå-mm-dd hh:mm:ss)
-    rating=new char[100];		// imdb rating
-    textureId=0;			// texture id for 3D cover hvis der findes en cover til filmen
-    frontcover=0;			// normal cover
+    film_backcoverfile=new char[256];	  // path to back cover file hentet fra 3d
+    film_sidecoverfile=new char[256];	  // path to side cover file hentet fra 3d
+    film_adddate=new char[25];		      // format (åååå-mm-dd hh:mm:ss)
+    rating=new char[100];		            // imdb rating
+    textureId=0;		                  	// texture id for 3D cover hvis der findes en cover til filmen
+    frontcover=0;			                  // normal cover
     sidecover=0;
     backcover=0;
-    length=0;				// film length
-    year=0;				// aar som den udkom
-    userrating=0;			// bruger rating
-    film_imdbnr=new char[20];
-    category_name=new char[128];	// from mythtv film type (tal = database)
-    genre=new char[200];		//
+    length=0;	                    			// film length
+    year=0;				                      // aar som den udkom
+    userrating=0;			                  // bruger rating
+    film_imdbnr=new char[20];           //
+    category_name=new char[128];	      // from mythtv film type (tal = database)
+    genre=new char[200];		            //
     for(int n=0;n<20;n++) strcpy(cast[n],"");
     cover3d=false;
 }
@@ -467,15 +467,15 @@ int film_oversigt_typem::opdatere_film_oversigt() {
                 filmoversigt[i].setfilmsubtitle(row[8]);
             } else filmoversigt[i].setfilmsubtitle((char *) "");
 
-            filmoversigt[i].setfilmfilename(row[2]);				// fil navn på film
-            filmoversigt[i].setfilmcoverfile(row[3]);				// fil navn på cover fil
-            filmoversigt[i].setfilmlength(atoi(row[4]));			// film længde i unsigned int
+            filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
+            filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
+            filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
             filmoversigt[i].setfilmaar(atoi(row[5]));
-            filmoversigt[i].setimdbfilmrating(row[6]);				// rating hmm imdb ?
-            filmoversigt[i].setfilmrating(atoi(row[7]));			// user rating
+            filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
+            filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
             filmoversigt[i].setfilmimdbnummer(row[9]);
-            if (row[10]) {							// category (type text)
-                strncpy(filmoversigt[i].category_name,row[10],127);
+            if (row[10]) {							                              // category (type text)
+                strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
             } else strcpy(filmoversigt[i].category_name,"");
 
             if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");

@@ -101,6 +101,7 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
+long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -309,7 +310,7 @@ int do_zoom_film_aktiv_nr=0;
 
 bool vis_radio_or_music_oversigt=false;
 bool vis_stream_or_movie_oversigt=false;
-bool global_use_internal_music_loader_system=false;
+bool global_use_internal_music_loader_system=false;     // use internal db for musicdb or mysql/kodi/
 
 bool ask_tv_record=false;
 bool do_play_radio=false;
@@ -317,7 +318,6 @@ bool do_play_radio=false;
 GLint ctx, myFont;
 
 bool do_swing_movie_cover=false;                        // do anim
-
 bool vis_nyefilm_oversigt=true;                         // start med at vise nye film
 
 // stream
@@ -847,7 +847,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,settvgraberpath};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,settvgraberpath,tvgraberupdate};
     int commandlength;
     char value[200];
     bool command=false;
@@ -964,12 +964,15 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=settvgraber;
                       commandlength=7;
-                    } else if (strncmp(buffer+n,"settvgraberpath",15)==0) {
+                    } else if (strncmp(buffer+n,"settvgraberpath",14)==0) {
                       command=true;
                       command_nr=settvgraberpath;
-                      commandlength=15;
+                      commandlength=14;
+                    } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
+                      command=true;
+                      command_nr=tvgraberupdate;
+                      commandlength=13;
                     } else command=false;
-
                 }
                 if (command) {
                     while((n<strlen(buffer)) && (!(valueok))) {
@@ -996,9 +999,15 @@ int parse_config(char *filename) {
                       printf("*********************************************************\n");
                     }
                     // set tv graber
-                    else if (command_nr==settvgraber) strcpy(configbackend_tvgraber,value);
-                    // set tv graber path
-                    else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
+                    else if (command_nr==settvgraber) {
+                      strcpy(configbackend_tvgraber,value);
+                      printf("**************** Set config xmltv graber ****************\n");
+                      printf("Tv graber ....: %s\n",configbackend_tvgraber);
+                      printf("*********************************************************\n");
+                      // else set tv graber path
+                    } else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
+                    //
+                    else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
                     // set hostname
                     else if (command_nr==sethostname) strcpy(configmythhost,value);
                     // mysql host
@@ -1169,7 +1178,12 @@ int save_config(char * filename) {
         if (strcmp(configbackend_tvgraber,"Other")!=0) {
           sprintf(temp,"tvgraberpath=%s\n",configbackend_tvgraber_path);              // tv graber to use
           fputs(temp,file);
+        } else {
+          sprintf(temp,"tvgraberpath=\n");              // tv graber to use
+          fputs(temp,file);
         }
+        sprintf(temp,"tvgraberupdate=%d\n",configtvguidelastupdate);
+        fputs(temp,file);
         fclose(file);
     }
     file = fopen("mythtv-controller.keys", "w");
@@ -1219,6 +1233,7 @@ void load_config(char * filename) {
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraber_path,"");                   // default tv guide tv_grab_uk_tvguide other command
+    configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
@@ -1258,8 +1273,9 @@ void load_config(char * filename) {
            fputs("configdefaultmusicpath=Music\n",file);
            fputs("configdefaultmovie=Movies\n",file);
            fputs("uvmetertype=1\n",file);
-           fputs("tvgraber=tv_grab_dk_dr\n",file);
+           fputs("tvgraber=tv_grab_uk_tvguide\n",file);
            fputs("tvgraberpath=\n",file);
+           fputs("tvgraberupdate=0\n",file);
            fclose(file);
         } else {
           fprintf(stderr,"Config file not writeble ");
@@ -2302,44 +2318,19 @@ void display() {
 
     // make xmltv update
     today=time(NULL);
-    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {
+    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {         //60*60*24
+      printf("start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
     }
 
-
     glPushMatrix();
-
-
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
-
-
     //visur=1;
     if (visur) {
-/*
-        //
-        // load all streams types gfx in thread
-        //
-        if ((stream_loadergfx_started==false) && (stream_loadergfx_started_done==false)) {
-            pthread_t stream_loaderthread;           // the stream gfx web loader
-            stream_loadergfx_started=true;
-            int src=pthread_create(&stream_loaderthread,NULL,load_all_stream_gfx,NULL);
-            if (src) {
-                printf("ERROR; return code from pthread_create() is %d\n", src);
-                exit(-1);
-            }
-            //    load_all_stream_gfx();
-        }
-
-
-*/
       glPushMatrix();
-
-
       //urtype=SAVER3D;
-
-
       switch (urtype) {
         case DIGITAL:
             glPushMatrix();
@@ -2765,34 +2756,34 @@ void display() {
         }
     }
 
+    // music view
     if (!(visur)) {
       if (vis_music_oversigt) {
-          //load_music_covergfx(musicoversigt);
-          show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
-        } else if (vis_film_oversigt) {
-          glPushMatrix();
-          //aktivfont.selectfont("DejaVu Sans");
-          film_oversigt.show_film_oversigt(_fangley,fknapnr);
-          glPopMatrix();
-        } else if (vis_stream_oversigt) {
-          glPushMatrix();
-          streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
-          glPopMatrix();
-        } else if (vis_radio_oversigt) {
+        //load_music_covergfx(musicoversigt);
+        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
+      } else if (vis_film_oversigt) {
+        glPushMatrix();
+        //aktivfont.selectfont("DejaVu Sans");
+        film_oversigt.show_film_oversigt(_fangley,fknapnr);
+        glPopMatrix();
+      } else if (vis_stream_oversigt) {
+        glPushMatrix();
+        streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
+        glPopMatrix();
+      } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
-        } else if (vis_tv_oversigt) {
+      } else if (vis_tv_oversigt) {
+        //        aktiv_tv_oversigt.show_tv_oversigt1(0);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0);
+        //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
 
-          //        aktiv_tv_oversigt.show_tv_oversigt1(0);
-          aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0);
-          //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
-
-        } else if (vis_recorded_oversigt) {
-          recordoversigt.show_recorded_oversigt1(0,0);
-        }
+      } else if (vis_recorded_oversigt) {
+        recordoversigt.show_recorded_oversigt1(0,0);
+      }
         // show radio options menu
-        if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
-          radiooversigt.show_radio_options();
-        }
+      if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
+        radiooversigt.show_radio_options();
+      }
     }
 
     // show search box and text for radio and music
@@ -7246,6 +7237,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                         vis_movie_options=false;                        // luk option window igen
                     }
                     break;
+            case 'u':
+                    if ((vis_tv_oversigt) && (loading_tv_guide==false)) {
+                      // u key
+                      // Update tv guide
+                      printf("Update tv guide\n");
+                      loading_tv_guide=true;
+                      if (strcmp(configbackend,"mythtv")==0) {
+                        update_xmltv_phread_loader();                   // start thred update flag in main loop
+                      }
+                    }
+                    break;
             case 'g':
                     if (vis_movie_options) {
                         vis_movie_sort_option=1;
@@ -9260,6 +9262,17 @@ void *datainfoloader_stream(void *data) {
 }
 
 
+// intern function for _xmltv
+
+void *get_tvguide_fromweb() {
+  char exestring[2048];
+  strcpy(exestring,configbackend_tvgraber);
+  strcat(exestring," > ~/tvguide.xml");
+  printf("Start tv graber background process\n");
+  int result=system(exestring);
+//  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+  printf("Done tv graber background process\nresult %d\n");
+}
 
 
 //
@@ -9269,6 +9282,7 @@ void *datainfoloader_stream(void *data) {
 void *datainfoloader_xmltv(void *data) {
   //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading xmltv guide from file (tvguide.xml).\nUpdate tvguide.\n");
+  // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
     aktiv_tv_oversigt.parsexmltv("tvguide.xml");
@@ -9277,6 +9291,10 @@ void *datainfoloader_xmltv(void *data) {
     aktiv_tv_oversigt.parsexmltv("tvguide.xml");
     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
+  // load xmltvguide from web
+  get_tvguide_fromweb();
+  // save config again
+  save_config((char *) "/etc/mythtv-controller.conf");
   printf("loader thread done xmltvguide.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
@@ -9297,7 +9315,6 @@ void *update_xmltv_phread_loader() {
     }
   }
 }
-
 
 
 //
