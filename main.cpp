@@ -2774,7 +2774,7 @@ void display() {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
         //        aktiv_tv_oversigt.show_tv_oversigt1(0);
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0);
+        aktiv_tv_oversigt.show_fasttv_oversigt1(tvvalgtrecordnr,0);
         //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
 
       } else if (vis_recorded_oversigt) {
