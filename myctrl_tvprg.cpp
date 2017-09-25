@@ -360,8 +360,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
     stat(path, &t_stat);                              // get file info like create date
     lastmod=localtime(&(t_stat.st_mtime));               // convert to unix time
 
-    // if file change update tv guide again
-    if (configtvguidelastupdate!=mktime(lastmod)) {
+    // if file change from last run. update tv guide again
+    if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
       // save last updated
       setlastupdate(mktime(lastmod));
       configtvguidelastupdate=mktime(lastmod);
@@ -1081,6 +1081,54 @@ void WordWrap( char *str, int N ) {
 
 
 
+// vis_tv_oversigt
+// new
+// den som bruges
+
+
+void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
+  struct tm *timeinfo;
+  struct tm nowtime_h;
+  struct tm endnowtime_h;
+  time_t nutidtime;
+  int n;
+  int kanalantal=12;
+  int chanid;
+  int kanalnr=0;
+  int cstartofset=0;
+  float xpos,ypos;
+  char tmptxt[1024];
+  glPushMatrix();
+  glLoadIdentity();
+  aktivfont.selectfont((char *) "Norasi");
+  if (loading_tv_guide) {
+  }
+  xpos=orgwinsizex/2;
+  ypos=orgwinsizey/2;
+  while (n<10) {
+    chanid=tvkanaler[kanalnr+cstartofset].chanid;
+    strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].chanel_name);
+    //strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[0].program_navn); // min start
+
+    printf("Chanid=%s \n",tmptxt);
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor4f(1.0f,1.0f,1.0f,1.0f);
+    glTranslatef(xpos,ypos, 0.0f);
+    glScalef(20.0, 20.0,1);
+    glDisable(GL_TEXTURE_2D);
+    glcRenderString("TEST");
+    //glcRenderString(tmptxt);
+    kanalnr++;
+    n++;
+  }
+  glPopMatrix();
+}
+
+
+
+
+
 
 
 
@@ -1498,6 +1546,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
+
 
     ptype=0;
     // under menu in colors
