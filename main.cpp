@@ -9287,10 +9287,12 @@ void *datainfoloader_xmltv(void *data) {
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    //if (error==0)
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   } else {
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    //if (error==0)
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
   // load xmltvguide from web
   get_tvguide_fromweb();

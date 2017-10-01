@@ -70,7 +70,7 @@ extern bool loading_tv_guide;
 //extern earlyrecorded newtcrecordlist;
 
 
-const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                 /* Action, Series     */
+const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
                               0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         */
                               1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    */
                                0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        */
@@ -82,21 +82,21 @@ const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                 /* Act
                               0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      */
                               0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      */
                               0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    */
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                 /*none,  ukendt (last)  */
+                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  */
 
 
 
 
 const char *prgtypee[2*10]={"Action"," Series",
-                          "News","Kids",
-                          " Music","Animation",
-                          " Horror"," Drama",
-                          " sci fi","Comedies",
-                          "Romance","Thriller",
-                          "Fiction","Musical",
-                          "War"," Doc.",
-                          "Adventure","Comedie",
-                          "None","Unknown"};
+                            "News","Kids",
+                            " Music","Animation",
+                            " Horror"," Drama",
+                            " sci fi","Comedies",
+                            "Romance","Thriller",
+                            "Fiction","Musical",
+                            "War"," Doc.",
+                            "Adventure","Comedie",
+                            "None","Unknown"};
 
 
 
@@ -131,6 +131,7 @@ unsigned int ELFHash(const char *s) {
 // that pointer with the returned value, since the original pointer must be
 // deallocated using the same allocator with which it was allocated.  The return
 // value must NOT be deallocated using free() etc.
+
 char *trimwhitespace(char *str)
 {
   char *end;
@@ -349,6 +350,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
     // mysql_query(conn,sql);
     // res = mysql_store_result(conn);
   }
+
   if (conn) {
     //  add user homedir and open file
     getuserhomedir(userhomedir);
@@ -1096,33 +1098,136 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   int chanid;
   int kanalnr=0;
   int cstartofset=0;
-  float xpos,ypos;
+  int xpos,ypos;
+  int xsiz,ysiz;
+  int prglength=0;
+
+
+
   char tmptxt[1024];
-  glPushMatrix();
-  glLoadIdentity();
-  aktivfont.selectfont((char *) "Norasi");
+
   if (loading_tv_guide) {
-  }
-  xpos=orgwinsizex/2;
-  ypos=orgwinsizey/2;
-  while (n<10) {
-    chanid=tvkanaler[kanalnr+cstartofset].chanid;
-    strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].chanel_name);
-    //strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[0].program_navn); // min start
-
-    printf("Chanid=%s \n",tmptxt);
-
+    // show loading tv guide
+    xsiz=450;
+    ysiz=100;
+    xpos=(orgwinsizex/2)-xsiz/2;
+    ypos=(orgwinsizey/2)-ysiz/2;
+    glPushMatrix();
+    glTranslatef(10,50, 0.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glTranslatef(xpos,ypos, 0.0f);
+    glBindTexture(GL_TEXTURE_2D,_tvbar3);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glEnd(); //End quadrilateral coordinates
+    // print
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(xpos+120,ypos, 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
-    glcRenderString("TEST");
-    //glcRenderString(tmptxt);
-    kanalnr++;
-    n++;
+    glcRenderString("Loading tv guide....");
+    glTranslatef(-9.0f,-1.5f, 0.0f);
+    if (strcmp("",this->loadinginfotxt)!=0) {
+      strcpy(tmptxt,"Updating ch ");
+      strcat(tmptxt,this->loadinginfotxt);
+      glcRenderString(tmptxt);
+    }
+    glPopMatrix();
   }
+
+  //strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[0].program_navn); // min start
+  xpos=10;
+  ypos=orgwinsizey-200;
+  xsiz=(orgwinsizex-50);
+  ysiz=150;
+
+  glPushMatrix();
+  glTranslatef(10,50, 0.0f);
+  // top
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(27);     // 40
+  glColor3f(1.0f, 1.0f, 1.0f);
+  aktivfont.selectfont((char *) "Norasi");
+  chanid=tvkanaler[1].chanid;
+  strcpy(tmptxt,tvkanaler[1].chanel_name);
+//  glScalef(70.0, 70.0, 1.0);
+//  glcRenderString("TEST");
+  glBegin(GL_QUADS); //Begin quadrilateral coordinates
+  glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+  glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
+  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
+  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+  glEnd(); //End quadrilateral coordinates
+  glScalef(40.0, 40.0, 1.0);
+  glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
+
+  kanalnr=1;
+  xpos=50;
+  while ((xpos<orgwinsizex) && (kanalnr<7)) {
+    glPushMatrix();
+    glTranslatef(xpos,860, 0.0f);
+    glScalef(24.0, 24.0, 1.0);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    chanid=tvkanaler[0].chanid;
+    strcpy(tmptxt,tvkanaler[kanalnr].chanel_name);
+    glcRenderString(tmptxt);
+    glPopMatrix();
+
+    int yypos=0;
+    int prg_nr=0;
+
+    int xsiz=210;
+    int ysiz=110;
+
+    while(yypos<50) {
+      ypos=orgwinsizey-245-(prglength*4);
+      prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+      ysiz=prglength*4;
+      glPushMatrix();
+      //glTranslatef(xpos,820-yypos, 0.0f);
+      glTranslatef(10,10, 0.0f);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+      glEnd(); //End quadrilateral coordinates
+      glPopMatrix();
+
+      glPushMatrix();
+      glTranslatef(xpos,820-yypos, 0.0f);
+      glScalef(16.0, 16.0, 1.0);
+      strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+      strcat(tmptxt," - ");
+      strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
+      glcRenderString(tmptxt);
+      glPopMatrix();
+      glPushMatrix();
+      glTranslatef(xpos,820-(yypos+18), 0.0f);
+      glScalef(20.0, 20.0, 1.0);
+      strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+      glcRenderString(tmptxt);
+      glPopMatrix();
+
+      yypos+=(20*2);
+      prg_nr++;
+    }
+
+    xpos+=300;
+    kanalnr++;
+  }
+
 }
 
 
