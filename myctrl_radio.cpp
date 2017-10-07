@@ -432,17 +432,21 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     char *lastslash;
     bool radio_pictureloaded=true;
     const char *radiostation_iconsgfx="/usr/share/mythtv-controller/images/radiostations/";
-
     sofset=(_mangley/40)*8;
-
     //static bool radio_oversigt_loaded=false;
     static int radio_oversigt_loaded_nr=0;
     GLuint texture;
+    if (screen_size==2) {
+      bonline=6;
+    }
+    if (screen_size==4) {
+      bonline=7;
+      buttonsize=160;
+      buttonsizey=140;
+    }
     // er gfx loaded
     // if no load 1 at eatch run
-
-    if (screen_size==2) bonline=6;
-
+    // loader
     if ((radio_oversigt_loaded==false) && (radio_oversigt_loaded_nr<radiooversigt.radioantal())) {
         radio_pictureloaded=false;
         strcpy(tmpfilename,radiostation_iconsgfx);      		                                    // hent path

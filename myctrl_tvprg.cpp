@@ -488,7 +488,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
               channelid=get_cannel_id(channelname);
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 // create/update record in program guide table
-                sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%d,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","","");
+                sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","","");
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
@@ -1092,6 +1092,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   struct tm *timeinfo;
   struct tm nowtime_h;
   struct tm endnowtime_h;
+  time_t nutid;
   time_t nutidtime;
   int n;
   int kanalantal=12;
@@ -1103,6 +1104,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   int prglength=0;
   int barsize=0;
 
+  int starttimeinmin;
 
   char tmptxt[1024];
   char tmptxt1[1024];
@@ -1140,12 +1142,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     glPopMatrix();
   }
 
-
-  if (selectchanel>7) cstartofset=selectchanel-7;
+  if (selectchanel>6) cstartofset=selectchanel-6;
   else cstartofset=0;
 
-
-  //strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[0].program_navn); // min start
   xpos=10;
   ypos=orgwinsizey-200;
   xsiz=(orgwinsizex-50);
@@ -1174,10 +1173,13 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
   glEnd(); //End quadrilateral coordinates
   glScalef(40.0, 40.0, 1.0);
-  glcRenderString(tvkanaler[1].chanel_name);
+  //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
 
   kanalnr=0+cstartofset;
+
+  // hent tidspunk nu
+  nutid=mktime(&nowtime_h);
 
   xpos=50;
   int vis_kanal_antal;
@@ -1186,7 +1188,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     glPushMatrix();
     glTranslatef(xpos,860, 0.0f);
     glScalef(24.0, 24.0, 1.0);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.8f, 0.8f, 0.8f);
     chanid=tvkanaler[0].chanid;
     strcpy(tmptxt,tvkanaler[kanalnr].chanel_name);
     glcRenderString(tmptxt);
@@ -1201,8 +1203,17 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     barsize=0;
 
     srand(1);
-    while((yypos<40*10) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+    while((yypos<40*3) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+      // start pos orgwinsizey-245
       ypos=orgwinsizey-245-barsize;
+
+      if ((prg_nr==0) && (vis_kanal_antal==0)) {
+        strncpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);
+        *(tmptxt+3)='\0';
+        starttimeinmin=atoi(tmptxt);
+        ypos=ypos-starttimeinmin*5;
+      }
+
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
       ysiz=prglength*5;
 
@@ -1285,12 +1296,13 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       glcRenderString(tmptxt);
       glPopMatrix();
 
+      //starttimeinmin=difftime(tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix)/60;
 
       glPushMatrix();
       strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
       strcat(tmptxt," - ");
       strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
-      sprintf(tmptxt1," l=%d",tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type);
+      sprintf(tmptxt1," l=%d",starttimeinmin);
       strcat(tmptxt,tmptxt1);
       glTranslatef(xpos+20,ypos-8, 0.0f);
       glScalef(16.0, 16.0, 1.0);
@@ -1300,12 +1312,10 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       yypos+=(20*2);
       prg_nr++;
     }
-
     xpos+=260;
     kanalnr++;
     vis_kanal_antal++;
   }
-
 }
 
 
@@ -1401,7 +1411,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
               break;
       case 3: sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
-      case 4: sprintf(tmptxt,"دليل التلفزيون %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+      case 4: sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
       default:sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
