@@ -5888,7 +5888,7 @@ int gl_select(int x,int y) {
     gluPickMatrix(x, y, 1.0, 1.0, view);	// restrict the draw to an area around the cursor
     //gluPerspective(45.0, (double)screenx / (double) screeny, 0.0001, 10000.0);
 
-    glOrtho(0.0, orgwinsizex, 0.0, orgwinsizey, -0.0,10.0);
+    glOrtho(0.0f, (float) orgwinsizex, 0.0f,(float) orgwinsizey, -0.0f,10.0f);
 
     glMatrixMode(GL_MODELVIEW);		// Draw the objects onto the screen
     glutSwapBuffers();			// draw only the names in the stack, and fill the array

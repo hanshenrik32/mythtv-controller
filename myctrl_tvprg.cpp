@@ -1182,9 +1182,18 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   nutid=mktime(&nowtime_h);
 
   xpos=50;
-  int vis_kanal_antal;
-  vis_kanal_antal=0;
-  while ((xpos<orgwinsizex) && (vis_kanal_antal<7)) {
+  int do_kanal_nr=0;
+  int vis_kanal_antal=8;                        // antal kanler som vises
+
+  int startyofset;
+
+  //
+  // loop for channel
+  //
+  while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
+
+    startyofset=0;
+
     glPushMatrix();
     glTranslatef(xpos,860, 0.0f);
     glScalef(24.0, 24.0, 1.0);
@@ -1202,21 +1211,33 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
 
     barsize=0;
 
+    //
+    // loop for program
+    //
     srand(1);
     while((yypos<40*3) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       ypos=orgwinsizey-245-barsize;
 
-      if ((prg_nr==0) && (vis_kanal_antal==0)) {
+      if (prg_nr==0) {
+        strncpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);    // hent min
+        *(tmptxt+3)='\0';
+        starttimeinmin=atoi(tmptxt);
+        strncpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+10,2);    // hent timer
+        starttimeinmin+=atoi(tmptxt)*60;
+        startyofset=starttimeinmin*5;
+        //ypos=ypos-startyofset;
+      } else {
         strncpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);
         *(tmptxt+3)='\0';
         starttimeinmin=atoi(tmptxt);
-        ypos=ypos-starttimeinmin*5;
+        strncpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+10,2);    // hent timer
+        starttimeinmin+=atoi(tmptxt)*60;
       }
 
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+      // hent i minuter og lav det om til pixel (min * 5)
       ysiz=prglength*5;
-
 
       glPushMatrix();
       //glTranslatef(xpos,820-yypos, 0.0f);
@@ -1274,8 +1295,8 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
           break;
       }
 
-      float colo=(float) rand() / 1000000000;
-      glColor3f(0.0f,colo, colo);
+      //float colo=(float) rand() / 1000000000;
+      //glColor3f(0.0f,colo, colo);
 
       glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
@@ -1284,8 +1305,6 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
       glEnd(); //End quadrilateral coordinates
       glPopMatrix();
-
-      barsize=barsize+(prglength*5);
 
 
       glPushMatrix();
@@ -1309,12 +1328,13 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       glcRenderString(tmptxt);
       glPopMatrix();
 
+      barsize=barsize+(prglength*5);
       yypos+=(20*2);
       prg_nr++;
     }
-    xpos+=260;
+    xpos+=220;
     kanalnr++;
-    vis_kanal_antal++;
+    do_kanal_nr++;
   }
 }
 
