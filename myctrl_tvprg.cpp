@@ -70,7 +70,7 @@ extern bool loading_tv_guide;
 //extern earlyrecorded newtcrecordlist;
 
 
-const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
+const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
                               0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         */
                               1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    */
                                0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        */
@@ -285,6 +285,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char prgtitle[1024];
   char channelname[1024];
   char channelidname[1024];
+  char category[1924];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -438,7 +439,16 @@ int tv_oversigt::parsexmltv(const char *filename) {
 
                 tmpdat=xmlGetProp(node,( xmlChar *) "category");
                 if (tmpdat) {
-                  if (tmpdat) printf("category: %s\n", tmpdat);
+                  if (debugmode & 256) {
+                    if (tmpdat) printf("category: %s\n", tmpdat);
+                  }
+                  if (strcmp("Serier",(char *) tmpdat)==0) strcpy(category,"Serier");
+                  else if (strcmp("Natur",(char *) tmpdat)==0) strcpy(category,"Natur");
+                  else if (strcmp("Dokumentar",(char *) tmpdat)==0) strcpy(category,"Dokumentar");
+                  else if (strcmp("Underholdning",(char *) tmpdat)==0) strcpy(category,"Underholdning");
+                  else if (strcmp("Sport",(char *) tmpdat)==0) strcpy(category,"sport");
+                  else if (strcmp("Film",(char *) tmpdat)==0) strcpy(category,"Film");
+                  else strcpy(category,"None");
                 }
 
                 tmpdat=xmlGetProp(node1,( xmlChar *) "stop");
@@ -487,8 +497,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
               // get changel id to db
               channelid=get_cannel_id(channelname);
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
+                if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
-                sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","","");
+                sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
@@ -968,6 +979,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                   else if (strcmp("debatprogram.",row[8])==0) prgtype=7;          //
                   else if (strcmp("music",row[8])==0) prgtype=8;                  //
                   else if (strcmp("dyr",row[8])==0) prgtype=9;                    //
+                  else if (strcmp("none",row[8])==0) prgtype=0;                   //
                   else prgtype=0;                                                 // default panic
                 } else prgtype=0;                                                 // default panic
                 if (prgtype==0) {
@@ -1246,22 +1258,22 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
 
       switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
         case 0:
-          glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		// film
+          glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
           break;
         case 1:
-          glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	// serier
+          glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
           break;
         case 2:
-          glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	// div
+          glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
           break;
         case 3:
-          glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	// action
+          glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
           break;
         case 4:
           glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
           break;
         case 5:
-          glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		// komedier
+          glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
           break;
         case 6:
           glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
@@ -1273,25 +1285,25 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
           glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
           break;
         case 9:
-          glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		// sifi
+          glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
           break;
         case 10:
-          glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		// ukdentd
+          glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
           break;
         case 11:
-          glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		// rejser
+          glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
           break;
         case 12:
-          glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		//
+          glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
           break;
         case 13:
-          glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		// ukendt
+          glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
           break;
         case 14:
-          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		// rejser
+          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
           break;
         default:
-          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		// rejser
+          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
           break;
       }
 
@@ -1299,6 +1311,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       //glColor3f(0.0f,colo, colo);
 
       glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
+      //glBegin(GL_QUADS);
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
       glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
       glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
@@ -1311,6 +1324,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       //glTranslatef(xpos,820-(yypos+18), 0.0f);
       glTranslatef(xpos+20,ypos-28, 0.0f);
       glScalef(20.0, 20.0, 1.0);
+      glColor3f(1.0f,1.0f, 1.0f);		// rejser
       strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
       glcRenderString(tmptxt);
       glPopMatrix();
@@ -1325,6 +1339,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       strcat(tmptxt,tmptxt1);
       glTranslatef(xpos+20,ypos-8, 0.0f);
       glScalef(16.0, 16.0, 1.0);
+      glColor3f(1.0f,1.0f, 1.0f);		// rejser
       glcRenderString(tmptxt);
       glPopMatrix();
 
