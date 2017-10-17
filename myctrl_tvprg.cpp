@@ -1120,6 +1120,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   int yypos=0;
   int prg_nr=0;
   int startyofset;
+  const int CHANELS_PR_LINE=8;
 
   char tmptxt[1024];
   char tmptim[1024];
@@ -1159,10 +1160,10 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     glPopMatrix();
   }
 
-  if (selectchanel>6) cstartofset=selectchanel-6;
+  if (selectchanel>(CHANELS_PR_LINE-1)) cstartofset=selectchanel-(CHANELS_PR_LINE-1);
   else cstartofset=0;
 
-  xpos=10;
+  xpos=20;
   ypos=orgwinsizey-200;
   xsiz=(orgwinsizex-50);
   ysiz=150;
@@ -1193,22 +1194,35 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
 
-
+  //
+  // show time bar in left side
+  //
   n=0;
   time_t rawtime;
-  time( &rawtime );
   struct tm *timelist;
+  struct tm mytimelist;
+  time(&rawtime);
   timelist=localtime(&rawtime);
+  mytimelist.tm_hour=timelist->tm_hour;
+  mytimelist.tm_min=0;
+  mytimelist.tm_mon=timelist->tm_mon;
+  mytimelist.tm_sec=timelist->tm_sec;
+  mytimelist.tm_year=timelist->tm_year;
+  mytimelist.tm_mday=timelist->tm_mday;
+  mytimelist.tm_yday=timelist->tm_yday;
+  mytimelist.tm_isdst=timelist->tm_isdst;
   while (n<10) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-200)-(n*50), 0.0f);
+    glTranslatef(xpos+10,(orgwinsizey-230)-(n*200), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
-    sprintf(tmptxt,"%02d:%02d",timelist->tm_hour,timelist->tm_min);
+    sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
     glcRenderString(tmptxt);
     glPopMatrix();
     n++;
+    mytimelist.tm_hour++;
+    mktime(&mytimelist);
   }
 
 
@@ -1217,11 +1231,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   // hent tidspunk nu
   nutid=mktime(&nowtime_h);
 
-  xpos=50;
+  xpos=50+40;
   int do_kanal_nr=0;
   int vis_kanal_antal=8;                        // antal kanler som vises
-
-
 
   //
   // loop for channel
@@ -1229,7 +1241,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
-    glTranslatef(xpos,860, 0.0f);
+    glTranslatef(xpos+10,860, 0.0f);
     glScalef(24.0, 24.0, 1.0);
     if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.8f, 0.8f, 0.8f);
     chanid=tvkanaler[0].chanid;
@@ -1237,7 +1249,6 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     *(tmptim+15)='\0';
     glcRenderString(tmptxt);
     glPopMatrix();
-
 
     int xsiz=210;
     int ysiz=110;

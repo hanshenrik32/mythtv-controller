@@ -6548,27 +6548,24 @@ void handlespeckeypress(int key,int x,int y) {
 
                 if (vis_tv_oversigt) {
 /*
-                    if (vis_tv_oversigt) {
-                        if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
-                        else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
-                    }
+                  if (vis_tv_oversigt) {
+                    if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
+                    else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+                  }
 */
+                  if (tvvisvalgtnrtype==1) {
                     if (tvvisvalgtnrtype==1) {
-
-                      if (tvvisvalgtnrtype==1) {
-                          if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
-                              if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
-                              tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
-                              //tvsubvalgtrecordnr=0;
-                          }
-                      } else if (tvvisvalgtnrtype==2) {
-                          if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
-                              tvsubvalgtrecordnr++;
-                          }
+                      if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
+                        if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+                        tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+                        //tvsubvalgtrecordnr=0;
                       }
-
-
-                }
+                    } else if (tvvisvalgtnrtype==2) {
+                      if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                        tvsubvalgtrecordnr++;
+                      }
+                    }
+                  }
 
 
 /*
