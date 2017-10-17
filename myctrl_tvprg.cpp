@@ -1193,22 +1193,24 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
 
-  glPushMatrix();
+
   n=0;
   time_t rawtime;
   time( &rawtime );
   struct tm *timelist;
   timelist=localtime(&rawtime);
   while (n<10) {
+    glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-200)-(n*10), 0.0f);
+    glTranslatef(xpos+10,(orgwinsizey-200)-(n*50), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",timelist->tm_hour,timelist->tm_min);
     glcRenderString(tmptxt);
+    glPopMatrix();
     n++;
   }
-  glPopMatrix();
+
 
   kanalnr=0+cstartofset;
 
