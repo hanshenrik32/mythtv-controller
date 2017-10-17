@@ -1159,7 +1159,7 @@ int save_config(char * filename) {
         fputs(temp,file);
         if (full_screen) sprintf(temp,"fullscreen=true\n"); else sprintf(temp,"fullscreen=false\n");
         fputs(temp,file);
-        sprintf(temp,"debug=0\n");
+        sprintf(temp,"debug=%d\n",debugmode);
         fputs(temp,file);
         sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
@@ -6254,7 +6254,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 }
 
 
-
+// handle keys
 
 void handlespeckeypress(int key,int x,int y) {
     float MOVIE_CS;
@@ -6425,6 +6425,32 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
 
+                if (vis_tv_oversigt) {
+                    if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
+                      tvvalgtrecordnr--;
+                      tvsubvalgtrecordnr=0;
+                    }
+                    /*
+                                        if (vis_tv_oversigt) {
+                                            if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
+                                            else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+                                        }
+                    */
+
+/*
+                    if (tvstartxofset<2300) {
+                        tvstartxofset+=tvprgsstep;
+                        glDeleteLists(tvoversigt, 1);				// delete old list
+                        tvoversigt=glGenLists(1);				// make new
+                        glNewList(tvoversigt,GL_COMPILE);
+                        aktiv_tv_oversigt.build_tv_oversigt(tvstartxofset,0);
+                        glEndList();
+
+                    }
+*/
+                }
+
+
                 if (vis_recorded_oversigt) {
                     if (visvalgtnrtype==1) visvalgtnrtype=2;
                     else if (visvalgtnrtype==2) visvalgtnrtype=1;
@@ -6436,8 +6462,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (vis_tv_oversigt) {
+/*
                     if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
                     else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+*/
                 }
 
 
@@ -6519,10 +6547,29 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (vis_tv_oversigt) {
+/*
                     if (vis_tv_oversigt) {
                         if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
                         else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
                     }
+*/
+                    if (tvvisvalgtnrtype==1) {
+
+                      if (tvvisvalgtnrtype==1) {
+                          if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
+                              if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+                              tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+                              //tvsubvalgtrecordnr=0;
+                          }
+                      } else if (tvvisvalgtnrtype==2) {
+                          if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                              tvsubvalgtrecordnr++;
+                          }
+                      }
+
+
+                }
+
 
 /*
                     if (tvstartxofset<2300) {
@@ -6674,6 +6721,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
+/*
                     if (tvvisvalgtnrtype==1) {
                         if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
                             if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
@@ -6685,8 +6733,7 @@ void handlespeckeypress(int key,int x,int y) {
                             tvsubvalgtrecordnr++;
                         }
                     }
-                    //if ((int) kanal_oversigt_startofset+14<aktiv_tv_oversigt.tv_kanal_antal()) kanal_oversigt_startofset++;
-                    /////////////  _anglex-=1.5f;
+*/
                 }
 
                 break;
@@ -6745,6 +6792,7 @@ void handlespeckeypress(int key,int x,int y) {
 
                 // tv stuf
                 if (vis_tv_oversigt) {
+/*
                     if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
                         if (tvvalgtrecordnr>0) tvvalgtrecordnr--;
                         tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
@@ -6754,6 +6802,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
 // old ver                    if (kanal_oversigt_startofset>0) kanal_oversigt_startofset--;
                     // _anglex+=1.5f;
+*/
                 }
 
                 if (vis_recorded_oversigt) {
