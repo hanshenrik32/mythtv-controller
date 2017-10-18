@@ -2225,6 +2225,7 @@ void display() {
 //    int fps;
     static GLint T0     = 0;
     static GLint Frames = 0;
+    static bool firsttime_xmltvupdate=true;
 
     int no_open_dir=0;
     char temptxt1[200];
@@ -2319,10 +2320,11 @@ void display() {
 
     // make xmltv update
     today=time(NULL);
-    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {         //60*60*24
-      printf("start timer xmltvguide update process.\n");
+    if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
+      if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
+      firsttime_xmltvupdate=false;                          // only used first time
     }
 
     glPushMatrix();
@@ -9420,10 +9422,10 @@ void *get_tvguide_fromweb() {
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml");
-  printf("Start tv graber program background process\n");
+  printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
   int result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
-  printf("Done tv graber background process\n");
+  printf("Done tv graber background process exit kode %d\n",result);
 }
 
 
@@ -9434,7 +9436,7 @@ void *get_tvguide_fromweb() {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting....\n");
+  printf("loader thread xmltv starting....\n");
   // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
@@ -9450,7 +9452,7 @@ void *datainfoloader_xmltv(void *data) {
   get_tvguide_fromweb();
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  printf("loader thread done xmltvguide.\n");
+  printf("loader thread xmltvguide done.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }

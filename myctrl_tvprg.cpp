@@ -1127,6 +1127,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   char tmpmin[1024];
   char tmptxt1[1024];
 
+  starttid=time( NULL );
+  timeinfo=localtime(&starttid);
+
   if (loading_tv_guide) {
     // show loading tv guide
     xsiz=450;
@@ -1192,6 +1195,31 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   glEnd(); //End quadrilateral coordinates
   glScalef(40.0, 40.0, 1.0);
   //glcRenderString(tvkanaler[1].chanel_name);
+  glPopMatrix();
+
+  // overskrift (tvguide .......)
+  glPushMatrix();
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(xpos+620,orgwinsizey-80, 0.0f);
+  glScalef(40.0, 40.0,1);
+  glDisable(GL_TEXTURE_2D);
+
+  switch (configland) {
+    case 0: sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 1: sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 2: sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 3: sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 4: sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    default:sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+  };
+
+  glcRenderString(tmptxt);
   glPopMatrix();
 
   //
@@ -1393,9 +1421,6 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     do_kanal_nr++;
   }
 }
-
-
-
 
 
 
