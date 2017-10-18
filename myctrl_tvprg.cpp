@@ -1106,6 +1106,12 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   struct tm endnowtime_h;
   time_t nutid;
   time_t nutidtime;
+
+  time_t rawtime;
+  struct tm *timelist;
+  struct tm mytimelist;
+
+
   int n;
   int kanalantal=12;
   int chanid;
@@ -1226,10 +1232,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   // show time bar in left side
   //
   n=0;
-  time_t rawtime;
-  struct tm *timelist;
-  struct tm mytimelist;
+  // hent ur
   time(&rawtime);
+  // convert clovk to localtime
   timelist=localtime(&rawtime);
   mytimelist.tm_hour=timelist->tm_hour;
   mytimelist.tm_min=0;
@@ -1281,6 +1286,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     int xsiz=210;
     int ysiz=110;
 
+    prg_nr=0;
     barsize=0;
     yypos=0;
 
