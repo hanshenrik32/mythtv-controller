@@ -1159,7 +1159,7 @@ int save_config(char * filename) {
         fputs(temp,file);
         if (full_screen) sprintf(temp,"fullscreen=true\n"); else sprintf(temp,"fullscreen=false\n");
         fputs(temp,file);
-        sprintf(temp,"debug=0\n");
+        sprintf(temp,"debug=%d\n",debugmode);
         fputs(temp,file);
         sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
@@ -1182,7 +1182,7 @@ int save_config(char * filename) {
           sprintf(temp,"tvgraberpath=\n");              // tv graber to use
           fputs(temp,file);
         }
-        sprintf(temp,"tvgraberupdate=%d\n",configtvguidelastupdate);
+        sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
         fputs(temp,file);
         fclose(file);
     }
@@ -2161,21 +2161,22 @@ void show_background() {
   // glBlendFunc(GL_ONE, GL_ONE);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+  if (screen_size!=4) {
+    if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);					// background picture
+    else if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _textureIdback_setup);
+    else if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);
+    else glBindTexture(GL_TEXTURE_2D, _textureIdback_other);
 
-  if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);					// background picture
-  else if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _textureIdback_setup);
-  else if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);
-  else glBindTexture(GL_TEXTURE_2D, _textureIdback_other);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(0.0, 0.0, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(0.0, 1280.0, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f(1920.0, 1280, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f(1920.0, 0.0, 0.0);
-  glEnd();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(0.0, 0.0, 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(0.0, 1280.0, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(1920.0, 1280, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(1920.0, 0.0, 0.0);
+    glEnd();
+  }
   glPopMatrix();
 }
 
@@ -2224,6 +2225,7 @@ void display() {
 //    int fps;
     static GLint T0     = 0;
     static GLint Frames = 0;
+    static bool firsttime_xmltvupdate=true;
 
     int no_open_dir=0;
     char temptxt1[200];
@@ -2298,11 +2300,11 @@ void display() {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
 
-    rawtime=time(NULL);                         // hent now time
+    rawtime=time(NULL);                                 // hent now time
     int savertimeout=atoi(configscreensavertimeout);
     if ((rawtime1==0) || (saver_irq)) {                 // ur timer
         rawtime1=rawtime+(60*savertimeout);             // x minuter hentet i config
-        visur=false;                            //        if (debug) printf("Start screen saver timer.\n");
+        visur=false;                                    // if (debug) printf("Start screen saver timer.\n");
         saver_irq=false;
     }
 
@@ -2318,10 +2320,11 @@ void display() {
 
     // make xmltv update
     today=time(NULL);
-    if ((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) {         //60*60*24
-      printf("start timer xmltvguide update process.\n");
+    if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
+      if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
+      firsttime_xmltvupdate=false;                          // only used first time
     }
 
     glPushMatrix();
@@ -2463,6 +2466,13 @@ void display() {
         remove_log_file=false;                  // clear remove lock file flag
     }
 
+    int iconsizex=200;
+    int iconspacey=210;
+    if ((screen_size==3) || (screen_size==4)) {
+      iconsizex=192;                            // 200
+      iconspacey=192;
+    }
+
     // vis menu **********************************************************************
     if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer==0)) {
         // tv icon
@@ -2488,12 +2498,11 @@ void display() {
 
         }
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-210 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-210+200 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+200,orgwinsizey-210+200 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+200,   orgwinsizey-210 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
         glEnd();
-
 
         // movie stuf
         //glBlendFunc(GL_ONE, GL_ONE);
@@ -2518,12 +2527,11 @@ void display() {
             glLoadName(2); 			// Overwrite the first name in the buffer
         }
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-420 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-420+200 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+200,orgwinsizey-420+200 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+200,   orgwinsizey-420 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
-
 
         //film  icon
         //glBlendFunc(GL_ONE, GL_ONE);
@@ -2546,10 +2554,10 @@ void display() {
             glLoadName(3); 			// Overwrite the first name in the buffer
         }
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-630 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-630+200 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+200,orgwinsizey-630+200 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+200,   orgwinsizey-630 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*3) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*3)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*3)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
 
         // recorded icon
@@ -2575,10 +2583,10 @@ void display() {
             glLoadName(4); 			// Overwrite the first name in the buffer
         }                                                                                    // _textureId13			// default button mask
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-840 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-840+200 , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+200,orgwinsizey-840+200 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+200,   orgwinsizey-840 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*4) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
 
 
@@ -2595,9 +2603,9 @@ void display() {
               glLoadName(5);
               glBegin(GL_QUADS);
               glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-              glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+200 , 0.0);
-              glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+200,orgwinsizey-1050+200 , 0.0);
-              glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+200,   orgwinsizey-1050 , 0.0);
+              glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+              glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+              glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
               glEnd();
           }
         }
@@ -4056,7 +4064,18 @@ void display() {
                     // show song name
                     sprintf(temptxt,"Song Name ");
                     temptxt[22]=0;
-                    glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+200, 0);
+                              break;
+                      default:glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                    }
+
 //                    glRasterPos2f(1, 1);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -4068,7 +4087,17 @@ void display() {
                     // show song name
                     sprintf(temptxt,": %-30s",aktivsongname);
                     temptxt[22]=0;
-                    glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+200, 0);
+                              break;
+                      default:glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                    }
 //                    glRasterPos2f(1, 1);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -4078,7 +4107,17 @@ void display() {
 
                     glPushMatrix();
                     // show station name
-                    glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+160, 0);
+                              break;
+                      default:glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
+                    }
                     sprintf(temptxt,"Station ");
                     temptxt[39]=0;
                     glScalef(20,20, 1.0);
@@ -4089,7 +4128,17 @@ void display() {
 
                     glPushMatrix();
                     // show station name
-                    glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+160, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
+                    }
                     sprintf(temptxt,": %s",radiooversigt.get_station_name(aktiv_radio_station));
                     temptxt[39]=0;
                     glScalef(20,20, 1.0);
@@ -4105,7 +4154,17 @@ void display() {
                     radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
                     radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
                     if (radio_playtime_min>60) radio_playtime_min=0;
-                    glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+140, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
+                    }
                     sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
                     temptxt[40]=0;
                     glTranslatef(1, 1, 0);
@@ -4115,7 +4174,17 @@ void display() {
                     glPopMatrix();
 
                     glPushMatrix();
-                    glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+140, 0);
+                              break;
+                      default:  glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
+                    }
                     glTranslatef(1, 1, 0);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -4130,7 +4199,17 @@ void display() {
                     frequency=192;
                     sprintf(temptxt,"Bitrate ");
                     temptxt[40]=0;
-                    glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
+                    }
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glcRenderString(temptxt);
@@ -4142,14 +4221,34 @@ void display() {
                     frequency=192;
                     sprintf(temptxt,": %3.0f Kbits",frequency);
                     temptxt[40]=0;
-                    glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
+                    }
                     glColor4f(1.0f,1.0f,1.0f,1.0f);
                     glScalef(20,20, 1.0);                    // danish charset ttf
                     glcRenderString(temptxt);
                     glPopMatrix();
 
                     glPushMatrix();
-                    glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+100, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
+                    }
                     // song status / loading
                     sprintf(temptxt,"Status ");
                     temptxt[40]=0;
@@ -4160,7 +4259,17 @@ void display() {
                     glPopMatrix();
 
                     glPushMatrix();
-                    glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
+                    switch (screen_size) {
+                      case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
+                              break;
+                      case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+100, 0);
+                              break;
+                      default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
+                    }
                     // song status / loading
                     sprintf(temptxt,": %-20s",aktivsongstatus);
                     temptxt[40]=0;
@@ -4222,7 +4331,7 @@ void display() {
 
 
           // draw uv meter
-          if (configuvmeter==1) {
+          if ((configuvmeter==1) && (screen_size!=4)) {
             glPushMatrix();
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
@@ -4281,7 +4390,7 @@ void display() {
               }
             }
             glPopMatrix();
-          } else if (configuvmeter==2) {
+          } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
 
             //glEnable(GL_TEXTURE_2D);
@@ -5196,7 +5305,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 do_show_setup=false;
                 do_show_tvgraber=false;
                 fundet=true;
-
                 do_save_config=true;             // save setup
 
             }
@@ -5782,7 +5890,7 @@ int gl_select(int x,int y) {
     gluPickMatrix(x, y, 1.0, 1.0, view);	// restrict the draw to an area around the cursor
     //gluPerspective(45.0, (double)screenx / (double) screeny, 0.0001, 10000.0);
 
-    glOrtho(0.0, orgwinsizex, 0.0, orgwinsizey, -0.0,10.0);
+    glOrtho(0.0f, (float) orgwinsizex, 0.0f,(float) orgwinsizey, -0.0f,10.0f);
 
     glMatrixMode(GL_MODELVIEW);		// Draw the objects onto the screen
     glutSwapBuffers();			// draw only the names in the stack, and fill the array
@@ -6148,7 +6256,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 }
 
 
-
+// handle keys
 
 void handlespeckeypress(int key,int x,int y) {
     float MOVIE_CS;
@@ -6319,6 +6427,32 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
 
+                if (vis_tv_oversigt) {
+                    if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
+                      tvvalgtrecordnr--;
+                      tvsubvalgtrecordnr=0;
+                    }
+                    /*
+                                        if (vis_tv_oversigt) {
+                                            if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
+                                            else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+                                        }
+                    */
+
+/*
+                    if (tvstartxofset<2300) {
+                        tvstartxofset+=tvprgsstep;
+                        glDeleteLists(tvoversigt, 1);				// delete old list
+                        tvoversigt=glGenLists(1);				// make new
+                        glNewList(tvoversigt,GL_COMPILE);
+                        aktiv_tv_oversigt.build_tv_oversigt(tvstartxofset,0);
+                        glEndList();
+
+                    }
+*/
+                }
+
+
                 if (vis_recorded_oversigt) {
                     if (visvalgtnrtype==1) visvalgtnrtype=2;
                     else if (visvalgtnrtype==2) visvalgtnrtype=1;
@@ -6330,8 +6464,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (vis_tv_oversigt) {
+/*
                     if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
                     else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+*/
                 }
 
 
@@ -6413,10 +6549,26 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (vis_tv_oversigt) {
-                    if (vis_tv_oversigt) {
-                        if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
-                        else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+/*
+                  if (vis_tv_oversigt) {
+                    if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
+                    else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
+                  }
+*/
+                  if (tvvisvalgtnrtype==1) {
+                    if (tvvisvalgtnrtype==1) {
+                      if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
+                        if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+                        tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+                        //tvsubvalgtrecordnr=0;
+                      }
+                    } else if (tvvisvalgtnrtype==2) {
+                      if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                        tvsubvalgtrecordnr++;
+                      }
                     }
+                  }
+
 
 /*
                     if (tvstartxofset<2300) {
@@ -6568,6 +6720,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
+/*
                     if (tvvisvalgtnrtype==1) {
                         if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
                             if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
@@ -6579,8 +6732,7 @@ void handlespeckeypress(int key,int x,int y) {
                             tvsubvalgtrecordnr++;
                         }
                     }
-                    //if ((int) kanal_oversigt_startofset+14<aktiv_tv_oversigt.tv_kanal_antal()) kanal_oversigt_startofset++;
-                    /////////////  _anglex-=1.5f;
+*/
                 }
 
                 break;
@@ -6639,6 +6791,7 @@ void handlespeckeypress(int key,int x,int y) {
 
                 // tv stuf
                 if (vis_tv_oversigt) {
+/*
                     if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
                         if (tvvalgtrecordnr>0) tvvalgtrecordnr--;
                         tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
@@ -6648,6 +6801,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
 // old ver                    if (kanal_oversigt_startofset>0) kanal_oversigt_startofset--;
                     // _anglex+=1.5f;
+*/
                 }
 
                 if (vis_recorded_oversigt) {
@@ -9268,10 +9422,10 @@ void *get_tvguide_fromweb() {
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml");
-  printf("Start tv graber program background process\n");
+  printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
   int result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
-  printf("Done tv graber background process\nresult %d\n");
+  printf("Done tv graber background process exit kode %d\n",result);
 }
 
 
@@ -9282,21 +9436,23 @@ void *get_tvguide_fromweb() {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting....\n");
+  printf("loader thread xmltv starting....\n");
   // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    //if (error==0)
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   } else {
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    //if (error==0)
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
   // load xmltvguide from web
   get_tvguide_fromweb();
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  printf("loader thread done xmltvguide.\n");
+  printf("loader thread xmltvguide done.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }
@@ -10243,7 +10399,7 @@ int check_radio_stations_icons() {
 
 int main(int argc, char** argv) {
     //printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
@@ -10388,10 +10544,14 @@ int main(int argc, char** argv) {
     orgwinsizex=glutGet(GLUT_SCREEN_WIDTH);
     orgwinsizey=glutGet(GLUT_SCREEN_HEIGHT);
 
+    if (orgwinsizex==1366) screen_size=4;
+    if (orgwinsizex==1920) screen_size=3;
+
     if (orgwinsizex>1920) orgwinsizex=1920;
     if (orgwinsizey>1080) orgwinsizey=1080;
 
     printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
+    printf("Screen mode %d\n",screen_size);
 
     Display *dpy=NULL;
     Window rootxwindow;
