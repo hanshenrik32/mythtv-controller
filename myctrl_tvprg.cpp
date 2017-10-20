@@ -1133,6 +1133,7 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   char tmpmin[1024];
   char tmptxt1[1024];
 
+  time_t prgstarttid,prgendtid;
   starttid=time( NULL );
   timeinfo=localtime(&starttid);
 
@@ -1236,7 +1237,8 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
   time(&rawtime);
   // convert clovk to localtime
   timelist=localtime(&rawtime);
-  mytimelist.tm_hour=timelist->tm_hour;
+
+  mytimelist.tm_hour=13;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1257,6 +1259,9 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
     mytimelist.tm_hour++;
     mktime(&mytimelist);
   }
+
+  mytimelist.tm_hour=timelist->tm_hour;
+  mytimelist.tm_hour=13;                                 // timelist->tm_hour;
 
 
   kanalnr=0+cstartofset;
@@ -1298,129 +1303,135 @@ void tv_oversigt::show_fasttv_oversigt1(int selectchanel,int selectprg) {
       // start pos orgwinsizey-245
       ypos=orgwinsizey-245-barsize;
       // hent prg length in min
+      prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;
+      prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+      //
+      if (prgstarttid>=mktime(&mytimelist)) {
+        if (prg_nr==0) {
+//          strncpy(tmptim,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11,2);    // hent min
+//          *(tmptim+3)='\0';
+          strncpy(tmpmin,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);    // hent timer
+          *(tmpmin+3)='\0';
+          starttimeinmin=atoi(tmpmin);
+          startyofset=starttimeinmin*5;
+          ypos=ypos-startyofset;
+        } else {
+//          strncpy(tmptim,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11,2);
+//          *(tmptim+3)='\0';
+          strncpy(tmpmin,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);
+          *(tmpmin+3)='\0';
+          starttimeinmin=atoi(tmpmin);
+          startyofset=starttimeinmin*5;
+          ypos=ypos-startyofset;
+        }
 
-      if (prg_nr==0) {
-        strncpy(tmptim,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11,2);    // hent min
-        *(tmptim+3)='\0';
-        strncpy(tmpmin,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);    // hent timer
-        *(tmpmin+3)='\0';
-        starttimeinmin=atoi(tmpmin)+(atoi(tmptim)*60);
-        startyofset=starttimeinmin*5;
-        //ypos=ypos-startyofset;
-      } else {
-        strncpy(tmptim,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11,2);
-        *(tmptim+3)='\0';
-        strncpy(tmpmin,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);
-        *(tmpmin+3)='\0';
-        starttimeinmin=atoi(tmpmin)+(atoi(tmptim)*60);
-      }
+        // hent i minuter og lav det om til pixel (min * 5)
+        ysiz=prglength*5;
 
-      // hent i minuter og lav det om til pixel (min * 5)
-      ysiz=prglength*5;
-
-      glPushMatrix();
-      //glTranslatef(xpos,820-yypos, 0.0f);
-      glTranslatef(10,10, 0.0f);
-//      glColor3f(1.0f, 1.0f, 1.0f);
-
-      switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
-        case 0:
-          glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
-          break;
-        case 1:
-          glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
-          break;
-        case 2:
-          glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
-          break;
-        case 3:
-          glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
-          break;
-        case 4:
-          glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
-          break;
-        case 5:
-          glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
-          break;
-        case 6:
-          glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
-          break;
-        case 7:
-          glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
-          break;
-        case 8:
-          glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
-          break;
-        case 9:
-          glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
-          break;
-        case 10:
-          glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-          break;
-        case 11:
-          glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-          break;
-        case 12:
-          glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-          break;
-        case 13:
-          glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-          break;
-        case 14:
-          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-          break;
-        default:
-          glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-          break;
-      }
-
-      //float colo=(float) rand() / 1000000000;
-      //glColor3f(0.0f,colo, colo);
-
-      glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
-      //glBegin(GL_QUADS);
-      glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-      glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
-
-      if (prglength>10) {
         glPushMatrix();
-        //glTranslatef(xpos,820-(yypos+18), 0.0f);
-        glTranslatef(xpos+20,ypos-28, 0.0f);
-        glScalef(18.0, 18.0, 1.0);
-        glColor3f(1.0f,1.0f, 1.0f);		// rejser
-        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
-        *(tmptxt+21)='\0';
-        glcRenderString(tmptxt);
+        //glTranslatef(xpos,820-yypos, 0.0f);
+        glTranslatef(10,10, 0.0f);
+    //      glColor3f(1.0f, 1.0f, 1.0f);
+
+        switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+          case 0:
+            glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+            break;
+          case 1:
+            glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+            break;
+          case 2:
+            glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+            break;
+          case 3:
+            glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+            break;
+          case 4:
+            glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+            break;
+          case 5:
+            glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+            break;
+          case 6:
+            glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+            break;
+          case 7:
+            glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+            break;
+          case 8:
+            glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+            break;
+          case 9:
+            glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+            break;
+          case 10:
+            glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+            break;
+          case 11:
+            glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+            break;
+          case 12:
+            glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+            break;
+          case 13:
+            glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+            break;
+          case 14:
+            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+            break;
+          default:
+            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+            break;
+        }
+
+        //float colo=(float) rand() / 1000000000;
+        //glColor3f(0.0f,colo, colo);
+
+        glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
+        //glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+        glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+        glEnd(); //End quadrilateral coordinates
         glPopMatrix();
-        glPushMatrix();
-        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
-        strcat(tmptxt," - ");
-        strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
-        sprintf(tmptxt1," l=%d",starttimeinmin);
-        strcat(tmptxt,tmptxt1);
-        glTranslatef(xpos+20,ypos-8, 0.0f);
-        glScalef(16.0, 16.0, 1.0);
-        glColor3f(1.0f,1.0f, 1.0f);		// rejser
-        glcRenderString(tmptxt);
-        glPopMatrix();
-      } else {
-        glPushMatrix();
-        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
-        *(tmptxt+21)='\0';
-        glTranslatef(xpos+20,ypos-8, 0.0f);
-        glScalef(16.0, 16.0, 1.0);
-        glColor3f(1.0f,1.0f, 1.0f);		// rejser
-        glcRenderString(tmptxt);
-        glPopMatrix();
+
+        if (prglength>10) {
+          glPushMatrix();
+          //glTranslatef(xpos,820-(yypos+18), 0.0f);
+          glTranslatef(xpos+20,ypos-28, 0.0f);
+          glScalef(18.0, 18.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+          *(tmptxt+21)='\0';
+          glcRenderString(tmptxt);
+          glPopMatrix();
+          glPushMatrix();
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+          strcat(tmptxt," - ");
+          strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
+          sprintf(tmptxt1," l=%d",starttimeinmin);
+          strcat(tmptxt,tmptxt1);
+          glTranslatef(xpos+20,ypos-8, 0.0f);
+          glScalef(16.0, 16.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glcRenderString(tmptxt);
+          glPopMatrix();
+        } else {
+          glPushMatrix();
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+          *(tmptxt+21)='\0';
+          glTranslatef(xpos+20,ypos-8, 0.0f);
+          glScalef(16.0, 16.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glcRenderString(tmptxt);
+          glPopMatrix();
+        }
+        barsize=barsize+(prglength*5);
+        yypos+=(20*2);
       }
-      barsize=barsize+(prglength*5);
-      yypos+=(20*2);
-      prg_nr++;
+      prg_nr++;                                   // next program
     }
     xpos+=220;
     kanalnr++;
