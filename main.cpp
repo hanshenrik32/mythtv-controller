@@ -960,20 +960,21 @@ int parse_config(char *filename) {
                         command=true;
                         command_nr=setvolume;
                         commandlength=12;
-                    } else if (strncmp(buffer+n,"tvgraber",7)==0) {
-                      command=true;
-                      command_nr=settvgraber;
-                      commandlength=7;
-                    } else if (strncmp(buffer+n,"settvgraberpath",14)==0) {
+                    } else if (strncmp(buffer+n,"tvgraberpath",11)==0) {
                       command=true;
                       command_nr=settvgraberpath;
-                      commandlength=14;
+                      commandlength=11;
                     } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
                       command=true;
                       command_nr=tvgraberupdate;
                       commandlength=13;
+                    } else if (strncmp(buffer+n,"tvgraber",7)==0) {
+                      command=true;
+                      command_nr=settvgraber;
+                      commandlength=7;
                     } else command=false;
                 }
+                strcpy(value,"");
                 if (command) {
                     while((n<strlen(buffer)) && (!(valueok))) {
                         if ((buffer[n]!=10) && (buffer[n]!='=')) {
