@@ -2949,10 +2949,10 @@ void show_setup_tv_graber() {
     }
     glPopMatrix();
 
-
     if ((do_show_setup_select_linie==0) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(keybuffer));
     if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) showcoursornow(311,450,strlen(keybuffer));
     else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
+    else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
 }
 
 

@@ -6701,6 +6701,14 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
+                    if (do_show_tvgraber) {
+                      if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
+                    }
+                    // setup videoplayer window
+                    if (do_show_tvgraber) {
+                        if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
+                    }
+
 
                     keybuffer[0]=0;
                     keybufferindex=0;
@@ -6844,6 +6852,10 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                     }
+                    if (do_show_tvgraber) {
+                      if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                    }
+
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
@@ -7183,6 +7195,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                       else if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraber,"tv_grab_ar");
                     }
                     if (do_show_setup_select_linie==1) {
+                      if ((key!=13) && (key!=32)) {
+                        keybuffer[keybufferindex]=key;
+                        keybufferindex++;
+                        keybuffer[keybufferindex]='\0';
+                      }
+                    }
+                    if (do_show_setup_select_linie==2) {
                       if ((key!=13) && (key!=32)) {
                         keybuffer[keybufferindex]=key;
                         keybufferindex++;
