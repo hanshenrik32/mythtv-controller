@@ -596,6 +596,9 @@ int aktiv_radio_station=0;                //
 int radio_key_selected=0;                 //
 int radiooversigt_antal=0;                // antal aktive sange
 GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
+
+GLuint _textureutvbgmask;
+
 GLuint _texturecdmirrormask;		      		// cd mirror mask
 GLuint _textureId1;                     	//The id of the texture
 GLuint _textureId2;                     	//error window
@@ -2782,7 +2785,7 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,10);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,22);
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -9444,7 +9447,7 @@ void *datainfoloader_stream(void *data) {
 void *get_tvguide_fromweb() {
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
-  strcat(exestring," > ~/tvguide.xml");
+  strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
   printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
   int result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
@@ -9948,6 +9951,8 @@ void loadgfx() {
         strcpy(temapath,"tema1/");
         tema=1;
     }
+
+    _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
@@ -10153,6 +10158,7 @@ void loadgfx() {
 
 void freegfx() {
     int i;
+    glDeleteTextures( 1, &_textureutvbgmask);
     glDeleteTextures( 1, &_texturecdmirrormask);		// backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId1);				  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
