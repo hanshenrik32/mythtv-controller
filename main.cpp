@@ -2781,10 +2781,8 @@ void display() {
         glPopMatrix();
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
-      } else if (vis_tv_oversigt) {
-        //        aktiv_tv_oversigt.show_tv_oversigt1(0);
-        aktiv_tv_oversigt.show_fasttv_oversigt1(tvvalgtrecordnr,0);
-        //aktiv_tv_oversigt.show_fasttv_oversigt(0,0);
+      } else if (vis_tv_oversigt) {        
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,10);
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -7178,7 +7176,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         sprintf(keybuffer,"%d",configuvmeter);
                       }
                   } else if (do_show_tvgraber) {
-                    if (key==32) {
+                    if ((key==32) && (do_show_setup_select_linie==0)) {
                       if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) strcpy(configbackend_tvgraber,"tv_grab_dk_dr");
                       else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) strcpy(configbackend_tvgraber,"tv_grab_dtv_la");
                       else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) strcpy(configbackend_tvgraber,"tv_grab_fi");
@@ -7194,12 +7192,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                       else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) strcpy(configbackend_tvgraber,"Other");
                       else if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraber,"tv_grab_ar");
                     }
-                    if (do_show_setup_select_linie==1) {
+                    if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) {
                       if ((key!=13) && (key!=32)) {
                         keybuffer[keybufferindex]=key;
                         keybufferindex++;
                         keybuffer[keybufferindex]='\0';
                       }
+                    } else {
+
                     }
                     if (do_show_setup_select_linie==2) {
                       if ((key!=13) && (key!=32)) {
@@ -7355,7 +7355,10 @@ void handleKeypress(unsigned char key, int x, int y) {
            } else if (do_show_tvgraber) {
              switch(do_show_setup_select_linie) {
                 case 0: break;
-                case 1: strcpy(configbackend_tvgraber_path,keybuffer);
+                case 1: if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraber_path,keybuffer);
+                        else {
+                          printf("Select tv channels\n");
+                        }
                         break;
              }
            }
