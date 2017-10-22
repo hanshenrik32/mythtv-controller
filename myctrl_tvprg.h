@@ -7,11 +7,6 @@
 const int maxprogram_antal=100;
 const int MAXKANAL_ANTAL=40;
 
-
-
-
-
-
 // tv oversigt til 3d
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv databasen
 
@@ -66,9 +61,11 @@ class tv_oversigt {
         char mysqllhost[200];
         char mysqlluser[200];
         char mysqllpass[200];
+        char loadinginfotxt[200];
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					// return type (1/2/3) found of tv program to record
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);
+        time_t lastupdated;                                                       // last updated unix date
     public:
         tv_oversigt();
         ~tv_oversigt();
@@ -76,7 +73,7 @@ class tv_oversigt {
         int tv_kanal_antal() { return (kanal_antal); }
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);
         void show_fasttv_oversigt_old(int selectchanel,int selectprg);
-        void show_fasttv_oversigt(int selectchanel,int selectprg);
+        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl);
         void show_canal_names();
         void showandsetprginfo(int kanalnr,int tvprgnr);					  	// show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }
@@ -86,6 +83,8 @@ class tv_oversigt {
         int findguidetvtidspunkt(int kanalnr,time_t tidspunkt);							// finder record nr som svare til starttid i timer
         time_t hentprgstartklint(int kanalnr,int prgnr);
         int parsexmltv(const char *filename);
+        time_t getlastupdate() { return lastupdated; }
+        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }
 };
 
 

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+
 
 #include <GL/glut.h>    // Header File For The GLUT Library
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
@@ -33,7 +35,6 @@ extern int fonttype;
 extern int configland;
 
 extern GLuint _tvbar1;
-extern GLuint _tvbar1_1;
 extern GLuint _tvbar2;
 extern GLuint _tvbar3;
 extern GLuint _textureIdclose;
@@ -56,11 +57,13 @@ extern GLuint _tv_prgtype;
 extern fontctrl aktivfont;
 extern int orgwinsizex,orgwinsizey;
 
+extern GLuint _textureutvbgmask;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
-extern char configmusicpath[256];
-extern char configmusicmypath[];
+extern char configmusicpath[256];                              //
+extern char configmusicmypath[];                               //
+extern long configtvguidelastupdate;                           //
 
 extern bool loading_tv_guide;
 
@@ -68,7 +71,7 @@ extern bool loading_tv_guide;
 //extern earlyrecorded newtcrecordlist;
 
 
-const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                 /* Action, Series     */
+const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
                               0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         */
                               1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    */
                                0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        */
@@ -80,21 +83,21 @@ const float prgtypeRGB[]={0.4f,0.4f,0.4f ,0.5f,0.9f,0.0f,                 /* Act
                               0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      */
                               0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      */
                               0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    */
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                 /*none,  ukendt (last)  */
+                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  */
 
 
 
 
 const char *prgtypee[2*10]={"Action"," Series",
-                          "News","Kids",
-                          " Music","Animation",
-                          " Horror"," Drama",
-                          " sci fi","Comedies",
-                          "Romance","Thriller",
-                          "Fiction","Musical",
-                          "War"," Doc.",
-                          "Adventure","Comedie",
-                          "None","Unknown"};
+                            "News","Kids",
+                            " Music","Animation",
+                            " Horror"," Drama",
+                            " sci fi","Comedies",
+                            "Romance","Thriller",
+                            "Fiction","Musical",
+                            "War"," Doc.",
+                            "Adventure","Comedie",
+                            "None","Unknown"};
 
 
 
@@ -129,6 +132,7 @@ unsigned int ELFHash(const char *s) {
 // that pointer with the returned value, since the original pointer must be
 // deallocated using the same allocator with which it was allocated.  The return
 // value must NOT be deallocated using free() etc.
+
 char *trimwhitespace(char *str)
 {
   char *end;
@@ -282,6 +286,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char prgtitle[1024];
   char channelname[1024];
   char channelidname[1024];
+  char category[1924];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -292,7 +297,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
   MYSQL_RES *res;
   MYSQL_ROW row;
 
-  loading_tv_guide=true;
+  struct stat t_stat;           // file info struct
+  struct tm* lastmod;           //
+
+  loading_tv_guide=true;        // set loadtv guide flag to show in show_tv_guide then xml files is passed
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
@@ -305,7 +313,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   sprintf(sql,"CREATE DATABASE IF NOT EXISTS %s",database);
   mysql_query(conn,sql);
   res = mysql_store_result(conn);
-  mysql_free_result(res);
+  if (res) mysql_free_result(res);
 
   sprintf(sql,"use %s",database);
   mysql_query(conn,sql);
@@ -321,6 +329,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   }
   mysql_free_result(res);
   if (!(fundet)) {
+    // if tvguide db not exist create it.
     strcpy(sql,"create table IF NOT EXISTS channel(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,channum varchar(10),freqid varchar(10) ,sourceid int(10) unsigned,callsign varchar(20),name  varchar(64), icon varchar(255), finetune int(11) , videofilters varchar(255), xmltvid varchar(64), recpriority int(10), contrast int(11) DEFAULT 32768, brightness int(11) DEFAULT 32768, colour int(11) DEFAULT 32768, hue int(11) DEFAULT 32768, tvformat varchar(10), visible tinyint(1) DEFAULT 1, outputfilters  varchar(255) ,useonairguide tinyint(1)  DEFAULT 0, mplexid  smallint(6), serviceid  mediumint(8) unsigned, atsc_major_chan int(10) unsigned DEFAULT 0, atsc_minor_chan int(10) unsigned DEFAULT 0, last_record datetime, default_authority varchar(32), commmethod int(11) DEFAULT +1, iptvid smallint(6) unsigned,orderid int(12) unsigned DEFAULT 0)");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
@@ -339,148 +348,173 @@ int tv_oversigt::parsexmltv(const char *filename) {
     mysql_free_result(res);
 
     // crete index
-//    strcpy(sql,"create index chanid on program (chanid)");
-//    mysql_query(conn,sql);
-//    res = mysql_store_result(conn);
+    // strcpy(sql,"create index chanid on program (chanid)");
+    // mysql_query(conn,sql);
+    // res = mysql_store_result(conn);
   }
+
   if (conn) {
     //  add user homedir and open file
     getuserhomedir(userhomedir);
     strcpy(path,userhomedir);
     strcat(path,"/");
-    strcat(path,filename);
-    document = xmlReadFile(path, NULL, 0);
-    if (document) {
-      root = xmlDocGetRootElement(document);
-      first_child = root->children;
-      for (node = first_child; node; node = node->next) {
-        if (node->type==XML_ELEMENT_NODE) {
-          //fprintf(stdout, "\t Child is <%s> (%i) \n", node->name,node->type);
-          if (strcmp((char *) node->name,"channel")==0) {
-            content = xmlNodeGetContent(node);
-            if (content) {
-              strcpy(result,(char *) content);
-              s=trimwhitespace(result);
-              if (debugmode & 1) printf("TV chanel found : %s \n",s);
-            }
-            subnode=node->xmlChildrenNode;
-            while(subnode) {
-              xmltvid=xmlGetProp(node,( xmlChar *) "id");
-              strcpy(channelidname,(char *) xmltvid);
-              subnode=subnode->next;
-            }
-            cidfundet=do_cannel_exist(channelidname);
-            if (cidfundet==0) {
-              sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid) values(0,'%s','%s','%s')",channelidname,s,xmltvid);
-              mysql_query(conn,sql);
-              res = mysql_store_result(conn);
-            }
-          }
+    strcat(path,filename);                            // add filename to xmlfile name
 
-          // create tv programs in guide from xmltag programme
-          if (strcmp((char *) node->name,"programme")==0) {
-            content = xmlNodeGetContent(node);
-            if (content) {
-              strcpy(result,(char *) content);
-              s=trimwhitespace(result);
-              getfirstlinefromstring(prgtitle,s);
-              //printf("\t Program : %s \n",s);
-            }
-            subnode=node->xmlChildrenNode;
-            while(subnode) {
-              getstart=false;
-              getend=false;
-              gettchannel=false;
-              node1=node;
+    // get file date
+    stat(path, &t_stat);                              // get file info like create date
+    lastmod=localtime(&(t_stat.st_mtime));               // convert to unix time
 
-              tmpdat=xmlGetProp(node1,( xmlChar *) "start");
-              //if (tmpdat) printf("tmpdat : %s \n", tmpdat);
-              if (tmpdat) {
-                getstart=true;
-                strcpy(starttime,"");
-                strncpy(starttime,( char *) tmpdat,4);
-                starttime[4]='\0';
-                strcat(starttime,"-");
-                strncat(starttime,( char *) tmpdat+4,2);
-                strcat(starttime,"-");
-                strncat(starttime,( char *) tmpdat+6,2);
-                strcat(starttime," ");
-                strncat(starttime,( char *) tmpdat+8,2);
-                strcat(starttime,":");
-                strncat(starttime,( char *) tmpdat+10,2);
-                strcat(starttime,":");
-                strncat(starttime,( char *) tmpdat+12,2);
-                //starttime[16]=0;
-                if (debugmode & 1) printf("From: %20s", starttime);
+    // if file change from last run. update tv guide again
+    if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
+      // save last updated
+      setlastupdate(mktime(lastmod));
+      configtvguidelastupdate=mktime(lastmod);
+      document = xmlReadFile(path, NULL, 0);            // open xml file
+      // if exist do all the parse and update db
+      // it use REPLACE in mysql to create/update records if changed in xmlfile
+      if (document) {
+        root = xmlDocGetRootElement(document);
+        first_child = root->children;
+        for (node = first_child; node; node = node->next) {
+          if (node->type==XML_ELEMENT_NODE) {
+            //fprintf(stdout, "\t Child is <%s> (%i) \n", node->name,node->type);
+            if (strcmp((char *) node->name,"channel")==0) {
+              content = xmlNodeGetContent(node);
+              if (content) {
+                strcpy(result,(char *) content);
+                s=trimwhitespace(result);
+                if (debugmode & 256) printf("TV chanel found : %s \n",s);
               }
-              //xmlFree(tmpdat);
-
-
-              tmpdat=xmlGetProp(node,( xmlChar *) "category");
-              if (tmpdat) {
-                if (tmpdat) printf("category: %s\n", tmpdat);
+              subnode=node->xmlChildrenNode;
+              while(subnode) {
+                xmltvid=xmlGetProp(node,( xmlChar *) "id");
+                strcpy(channelidname,(char *) xmltvid);
+                subnode=subnode->next;
               }
-
-              tmpdat=xmlGetProp(node1,( xmlChar *) "stop");
-              if (tmpdat) {
-                getend=true;
-                strcpy(endtime,"");
-                strncpy(endtime,( char *) tmpdat,4);
-                endtime[4]='\0';
-                strcat(endtime,"-");
-                strncat(endtime,( char *) tmpdat+4,2);
-                strcat(endtime,"-");
-                strncat(endtime,( char *) tmpdat+6,2);
-                strcat(endtime," ");
-                strncat(endtime,( char *) tmpdat+8,2);
-                strcat(endtime,":");
-                strncat(endtime,( char *) tmpdat+10,2);
-                strcat(endtime,":");
-                strncat(endtime,( char *) tmpdat+12,2);
-                //endtime[16]=0;
-                if (debugmode & 1) printf(" ->%20s", endtime);
+              cidfundet=do_cannel_exist(channelidname);
+              if (cidfundet==0) {
+                sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid) values(0,'%s','%s','%s')",channelidname,s,xmltvid);
+                mysql_query(conn,sql);
+                res = mysql_store_result(conn);
               }
-              //xmlFree(tmpdat);
-
-              xmltvid=xmlGetProp(node1,( xmlChar *) "channel");
-              if ((xmltvid) && (gettchannel==false)) {
-                gettchannel=true;
-                strcpy(channelname,(char *) xmltvid);
-                if (debugmode & 1) printf(" %s",channelname);
-              }
-
-              //xmlFree(tmpdat);
-              if (debugmode & 1) printf("\n");
-              subnode=subnode->next;
             }
-            //title=xmlGetProp(node1,( xmlChar *) "title");
-            //if (title) printf("title : %s\n", title);
 
-            //desc=xmlGetProp(node1,( xmlChar *) "desc");
-            //if (desc) printf("desc: %s\n", desc);
+            // create tv programs in guide from xmltag programme
+            if (strcmp((char *) node->name,"programme")==0) {
+              content = xmlNodeGetContent(node);
+              if (content) {
+                strcpy(result,(char *) content);
+                s=trimwhitespace(result);
+                getfirstlinefromstring(prgtitle,s);
+                //printf("\t Program : %s \n",s);
+              }
+              subnode=node->xmlChildrenNode;
+              while(subnode) {
+                getstart=false;
+                getend=false;
+                gettchannel=false;
+                node1=node;
 
-//            tmpdat=xmlGetProp(subnode,( xmlChar *) "category");
-//            if (tmpdat) printf("category: %s\n", tmpdat);
+                tmpdat=xmlGetProp(node1,( xmlChar *) "start");
+                //if (tmpdat) printf("tmpdat : %s \n", tmpdat);
+                if (tmpdat) {
+                  getstart=true;
+                  strcpy(starttime,"");
+                  strncpy(starttime,( char *) tmpdat,4);
+                  starttime[4]='\0';
+                  strcat(starttime,"-");
+                  strncat(starttime,( char *) tmpdat+4,2);
+                  strcat(starttime,"-");
+                  strncat(starttime,( char *) tmpdat+6,2);
+                  strcat(starttime," ");
+                  strncat(starttime,( char *) tmpdat+8,2);
+                  strcat(starttime,":");
+                  strncat(starttime,( char *) tmpdat+10,2);
+                  strcat(starttime,":");
+                  strncat(starttime,( char *) tmpdat+12,2);
+                  //starttime[16]=0;
+                  if (debugmode & 256) printf("From: %20s", starttime);
+                }
+                //xmlFree(tmpdat);
+                tmpdat=xmlGetProp(node,( xmlChar *) "category");
+                if (tmpdat) {
+                  if (debugmode & 256) {
+                    if (tmpdat) printf("category: %s\n", tmpdat);
+                  }
+                  if (strcmp("Serier",(char *) tmpdat)==0) strcpy(category,"Serier");
+                  else if (strcmp("Natur",(char *) tmpdat)==0) strcpy(category,"Natur");
+                  else if (strcmp("Dokumentar",(char *) tmpdat)==0) strcpy(category,"Dokumentar");
+                  else if (strcmp("Underholdning",(char *) tmpdat)==0) strcpy(category,"Underholdning");
+                  else if (strcmp("Sport",(char *) tmpdat)==0) strcpy(category,"sport");
+                  else if (strcmp("Film",(char *) tmpdat)==0) strcpy(category,"Film");
+                  else strcpy(category,"None");
+                }
 
-            // get changel id to db
-            channelid=get_cannel_id(channelname);
-            if (!(do_program_exist(channelid,prgtitle,starttime))) {
-              // create/update record in program guide table
-              sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%d,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","","");
-              mysql_query(conn,sql);
-              res = mysql_store_result(conn);
-              mysql_free_result(res);
-              if (debugmode & 256) fprintf(stdout,"Tvguide Program created %s->%s %s \n",starttime,endtime,prgtitle);
-            } else {
-              if (debugmode & 256) fprintf(stdout,"Tvguide Program exist,no update %s->%s %s \n",starttime,endtime,prgtitle);
+                tmpdat=xmlGetProp(node1,( xmlChar *) "stop");
+                if (tmpdat) {
+                  getend=true;
+                  strcpy(endtime,"");
+                  strncpy(endtime,( char *) tmpdat,4);
+                  endtime[4]='\0';
+                  strcat(endtime,"-");
+                  strncat(endtime,( char *) tmpdat+4,2);
+                  strcat(endtime,"-");
+                  strncat(endtime,( char *) tmpdat+6,2);
+                  strcat(endtime," ");
+                  strncat(endtime,( char *) tmpdat+8,2);
+                  strcat(endtime,":");
+                  strncat(endtime,( char *) tmpdat+10,2);
+                  strcat(endtime,":");
+                  strncat(endtime,( char *) tmpdat+12,2);
+                  //endtime[16]=0;
+                  if (debugmode & 256) printf(" ->%20s", endtime);
+                }
+                //xmlFree(tmpdat);
+
+                xmltvid=xmlGetProp(node1,( xmlChar *) "channel");
+                if ((xmltvid) && (gettchannel==false)) {
+                  gettchannel=true;
+                  strcpy(channelname,(char *) xmltvid);
+                  if (debugmode & 256) printf(" %s",channelname);
+                }
+                // save channelname to show in update
+                strcpy(this->loadinginfotxt,channelname);
+
+                //xmlFree(tmpdat);
+                if (debugmode & 256) printf("\n");
+                subnode=subnode->next;
+              }
+              //title=xmlGetProp(node1,( xmlChar *) "title");
+              //if (title) printf("title : %s\n", title);
+
+              //desc=xmlGetProp(node1,( xmlChar *) "desc");
+              //if (desc) printf("desc: %s\n", desc);
+
+              //            tmpdat=xmlGetProp(subnode,( xmlChar *) "category");
+              //            if (tmpdat) printf("category: %s\n", tmpdat);
+
+              // get changel id to db
+              channelid=get_cannel_id(channelname);
+              if (!(do_program_exist(channelid,prgtitle,starttime))) {
+                if (strcmp("",(char *) category)==0) strcpy(category,"None");
+                // create/update record in program guide table
+                sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
+                mysql_query(conn,sql);
+                res = mysql_store_result(conn);
+                mysql_free_result(res);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program created %s->%s %s \n",starttime,endtime,prgtitle);
+              } else {
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist,no update %s->%s %s \n",starttime,endtime,prgtitle);
+              }
             }
           }
         }
+        fprintf(stdout, "...\n");
+        xmlFreeDoc(document);
+      } else {
+        printf("tvguide.xml not found \n");
       }
-      fprintf(stdout, "...\n");
-      xmlFreeDoc(document);
-    } else {
-      printf("tvguide.xml not found \n");
+
     }
   }
   loading_tv_guide=false;
@@ -603,6 +637,8 @@ tv_oversigt::tv_oversigt() {
     strcpy(mysqllhost,"");
     strcpy(mysqlluser,"");
     strcpy(mysqllpass,"");
+    strcpy(loadinginfotxt,"");
+    lastupdated=0;
 }
 
 
@@ -907,7 +943,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         // do select from db
         strcpy(sqlselect,"SELECT channel.name,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
-        strcat(sqlselect,"' and endtime>='");
+        strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
 
@@ -942,6 +978,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                   else if (strcmp("debatprogram.",row[8])==0) prgtype=7;          //
                   else if (strcmp("music",row[8])==0) prgtype=8;                  //
                   else if (strcmp("dyr",row[8])==0) prgtype=9;                    //
+                  else if (strcmp("none",row[8])==0) prgtype=0;                   //
                   else prgtype=0;                                                 // default panic
                 } else prgtype=0;                                                 // default panic
                 if (prgtype==0) {
@@ -1057,16 +1094,411 @@ void WordWrap( char *str, int N ) {
 
 
 
-
-
-
-
-//
-// Vis tv oversigt
+// vis_tv_oversigt
+// new
 // den som bruges
+
+
+void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl) {
+  struct tm *timeinfo;
+  struct tm nowtime_h;
+  time_t nutid;
+  time_t nutidtime;
+  time_t rawtime;
+  time_t prgtidunix;                          // used to calc new length if now rom for it
+  struct tm *timelist;
+  struct tm mytimelist;
+  struct tm *prgtime;
+
+  int n;
+  int kanalantal=12;
+  int chanid;
+  int kanalnr=0;
+  int cstartofset=0;
+  int xpos,ypos;
+  int xsiz,ysiz;
+  int prglength=0;
+  int barsize=0;
+
+  int starttimeinmin,starttimeintim;
+  int yypos=0;
+  int prg_nr=0;
+  int startyofset;
+  const int CHANELS_PR_LINE=8;
+
+  char tmptxt[1024];
+  char tmptim[1024];
+  char tmpmin[1024];
+  char tmptxt1[1024];
+
+  time_t prgstarttid,prgendtid;
+  starttid=time( NULL );
+  timeinfo=localtime(&starttid);
+
+  if (loading_tv_guide) {
+    // show loading tv guide
+    xsiz=450;
+    ysiz=100;
+    xpos=(orgwinsizex/2)-xsiz/2;
+    ypos=(orgwinsizey/2)-ysiz/2;
+    glPushMatrix();
+    glTranslatef(10,50, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBindTexture(GL_TEXTURE_2D,_tvbar3);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glEnd(); //End quadrilateral coordinates
+    // print
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(xpos+120,ypos, 0.0f);
+    glScalef(20.0, 20.0,1);
+    glDisable(GL_TEXTURE_2D);
+    glcRenderString("Loading tv guide....");
+    glTranslatef(-9.0f,-1.5f, 0.0f);
+    if (strcmp("",this->loadinginfotxt)!=0) {
+      strcpy(tmptxt,"Updating ch ");
+      strcat(tmptxt,this->loadinginfotxt);
+      glcRenderString(tmptxt);
+    }
+    glPopMatrix();
+  }
+
+  if (selectchanel>(CHANELS_PR_LINE-1)) cstartofset=selectchanel-(CHANELS_PR_LINE-1);
+  else cstartofset=0;
+
+  xpos=20;
+  ypos=orgwinsizey-200;
+  xsiz=(orgwinsizex-50);
+  ysiz=150;
+
+  glPushMatrix();
+  glTranslatef(10,50, 0.0f);
+  // top
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glLoadName(27);     // 40
+  glColor3f(1.0f, 1.0f, 1.0f);
+  aktivfont.selectfont((char *) "Norasi");
+  chanid=tvkanaler[1].chanid;
+  strcpy(tmptxt,tvkanaler[1].chanel_name);
+//  glScalef(70.0, 70.0, 1.0);
+//  glcRenderString("TEST");
+  glBegin(GL_QUADS); //Begin quadrilateral coordinates
+  glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+  glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
+  glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
+  glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+  glEnd(); //End quadrilateral coordinates
+  glScalef(40.0, 40.0, 1.0);
+  //glcRenderString(tvkanaler[1].chanel_name);
+  glPopMatrix();
+
+  // overskrift (tvguide .......)
+  glPushMatrix();
+  glColor3f(1.0f, 1.0f, 1.0f);
+  switch (screen_size) {
+    case 4: glTranslatef(xpos+320,orgwinsizey-80, 0.0f);
+            break;
+    default:glTranslatef(xpos+620,orgwinsizey-80, 0.0f);
+            break;
+  }
+  glScalef(40.0, 40.0,1);
+  glDisable(GL_TEXTURE_2D);
+
+  switch (configland) {
+    case 0: sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 1: sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 2: sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 3: sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    case 4: sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+    default:sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+            break;
+  };
+
+  glcRenderString(tmptxt);
+  glPopMatrix();
+
+  //
+  // show time bar in left side
+  //
+  n=0;
+  // hent ur
+  time(&rawtime);
+  // convert clovk to localtime
+  timelist=localtime(&rawtime);
+  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
+  mytimelist.tm_min=0;
+  mytimelist.tm_mon=timelist->tm_mon;
+  mytimelist.tm_sec=timelist->tm_sec;
+  mytimelist.tm_year=timelist->tm_year;
+  mytimelist.tm_mday=timelist->tm_mday;
+  mytimelist.tm_yday=timelist->tm_yday;
+  mytimelist.tm_isdst=timelist->tm_isdst;
+  while (n<10) {
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(xpos+10,(orgwinsizey-230)-(n*260), 0.0f);
+    glScalef(20.0, 20.0,1);
+    glDisable(GL_TEXTURE_2D);
+    sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
+    glcRenderString(tmptxt);
+    glPopMatrix();
+    n++;
+    mytimelist.tm_hour++;
+    mktime(&mytimelist);
+  }
+
+  mytimelist.tm_hour=timelist->tm_hour;
+  if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
+
+
+  kanalnr=0+cstartofset;
+
+  // hent tidspunk nu
+  nutid=mktime(&nowtime_h);
+
+  xpos=50+40;
+  int do_kanal_nr=0;
+  int vis_kanal_antal=8;                        // antal kanler som vises
+
+  //
+  // loop for channel
+  //
+  while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
+    startyofset=0;
+    glPushMatrix();
+    glTranslatef(xpos+10,860, 0.0f);
+    glScalef(24.0, 24.0, 1.0);
+    if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.8f, 0.8f, 0.8f);
+    chanid=tvkanaler[0].chanid;
+    strcpy(tmptxt,tvkanaler[kanalnr].chanel_name);
+    *(tmptim+15)='\0';
+    glcRenderString(tmptxt);
+    glPopMatrix();
+
+    int xsiz=210;
+    int ysiz=110;
+
+    prg_nr=0;
+    barsize=0;
+    yypos=0;
+
+    //
+    // loop for program
+    //
+    while((yypos<40*5) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+      // start pos orgwinsizey-245
+      //ypos=orgwinsizey-245-barsize;
+      ypos=orgwinsizey-245;
+      // hent prg length in min
+      prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;
+      prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;
+      prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+
+      // show program start before over view time start
+      if ((prgstarttid<mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
+        // hent i minuter og lav det om til pixel (min * 5)
+        // calc new length for ysiz
+        prglength=20;
+        time_t prgtidunix=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;
+        prgtime=localtime(&prgtidunix);
+        prglength=difftime(mktime(prgtime),mktime(&mytimelist))/60;
+        //prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+        ysiz=prglength*5;
+        glPushMatrix();
+        //glTranslatef(xpos,820-yypos, 0.0f);
+        glTranslatef(10,10, 0.0f);
+        glColor3f(1.0f,1.0f, 1.0f);		                                   // active program color
+
+        //_textureutvbgmask
+        if (_textureutvbgmask) {
+          glEnable(GL_TEXTURE_2D);
+          glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
+          glBegin(GL_QUADS);                  // box
+        } else glBegin(GL_LINE_LOOP);                // line
+        glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+        glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
+
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+        *(tmptxt+21)='\0';
+        glTranslatef(xpos+20,ypos-8, 0.0f);
+        glScalef(16.0, 16.0, 1.0);
+        glColor3f(1.0f,1.0f, 1.0f);                                           // text color
+        glcRenderString(tmptxt);                                              // print program name
+        glPopMatrix();
+
+        if (prglength>13) {
+          glPushMatrix();
+          glDisable(GL_TEXTURE_2D);
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+          strcat(tmptxt," - ");
+          strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
+          glTranslatef(xpos+20,ypos-22, 0.0f);
+          glScalef(16.0, 16.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glcRenderString(tmptxt);
+          glPopMatrix();
+        }
+      }
+
+
+      // show program start after over view time start
+      if (prgstarttid>=mktime(&mytimelist)) {
+        strncpy(tmpmin,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+14,2);
+        strncpy(tmptim,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11,2);
+        *(tmpmin+3)='\0';
+        starttimeinmin=atoi(tmpmin);
+        starttimeintim=atoi(tmptim)-mytimelist.tm_hour;
+        startyofset=((starttimeintim*60)+starttimeinmin);
+        ypos=ypos-(startyofset)*5;
+        // hent i minuter og lav det om til pixel (min * 5)
+        ysiz=(prglength-1)*5;
+        glPushMatrix();
+        //glTranslatef(xpos,820-yypos, 0.0f);
+        glTranslatef(10,10, 0.0f);
+    //      glColor3f(1.0f, 1.0f, 1.0f);
+
+        switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+          case 0:
+            glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+            break;
+          case 1:
+            glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+            break;
+          case 2:
+            glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+            break;
+          case 3:
+            glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+            break;
+          case 4:
+            glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+            break;
+          case 5:
+            glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+            break;
+          case 6:
+            glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+            break;
+          case 7:
+            glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+            break;
+          case 8:
+            glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+            break;
+          case 9:
+            glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+            break;
+          case 10:
+            glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+            break;
+          case 11:
+            glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+            break;
+          case 12:
+            glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+            break;
+          case 13:
+            glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+            break;
+          case 14:
+            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+            break;
+          default:
+            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+            break;
+        }
+        //float colo=(float) rand() / 1000000000;
+        //glColor3f(0.0f,colo, colo);
+        if (_textureutvbgmask) {
+          glEnable(GL_TEXTURE_2D);
+          glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
+          glBegin(GL_QUADS);                  // box
+        } else glBegin(GL_LINE_LOOP);                // line
+        //glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+        glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
+        glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
+
+        if (prglength>10) {
+          glPushMatrix();
+          glDisable(GL_TEXTURE_2D);
+          //glTranslatef(xpos,820-(yypos+18), 0.0f);
+          glTranslatef(xpos+20,ypos-28, 0.0f);
+          glScalef(18.0, 18.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+          *(tmptxt+21)='\0';
+          glcRenderString(tmptxt);
+          glPopMatrix();
+          glPushMatrix();
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+          strcat(tmptxt," - ");
+          strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
+          sprintf(tmptxt1," l=%d",selectprg);
+          strcat(tmptxt,tmptxt1);
+          glDisable(GL_TEXTURE_2D);
+          glTranslatef(xpos+20,ypos-8, 0.0f);
+          glScalef(16.0, 16.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glcRenderString(tmptxt);
+          glPopMatrix();
+        } else {
+          glPushMatrix();
+          strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+          *(tmptxt+21)='\0';
+          glDisable(GL_TEXTURE_2D);
+          glTranslatef(xpos+20,ypos-8, 0.0f);
+          glScalef(16.0, 16.0, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glcRenderString(tmptxt);
+          glPopMatrix();
+        }
+        barsize=barsize+(prglength*5);
+        yypos+=(20*2);
+      }
+      prg_nr++;                                   // next program
+    }
+    xpos+=220;
+    kanalnr++;
+    do_kanal_nr++;
+  }
+}
+
+
+
+
+
+
+//
+// Vis tv oversigt old ver
+//
 //
 
-void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
+void tv_oversigt::show_fasttv_oversigt_old(int selectchanel,int selectprg) {
 
   int totaltid=0;
   int omgang=0;
@@ -1146,7 +1578,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
               break;
       case 3: sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
-      case 4: sprintf(tmptxt,"دليل التلفزيون %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+      case 4: sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
       default:sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
               break;
@@ -1164,10 +1596,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       glPushMatrix();
       glTranslatef(10,50, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
-      glBindTexture(GL_TEXTURE_2D,_tvbar1);
+      glBindTexture(GL_TEXTURE_2D,_tvbar3);
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-
       glBegin(GL_QUADS);
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
       glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
@@ -1180,6 +1611,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       glScalef(20.0, 20.0,1);
       glDisable(GL_TEXTURE_2D);
       glcRenderString("Loading tv guide....");
+      glTranslatef(-9.0f,-1.5f, 0.0f);
+      if (strcmp("",this->loadinginfotxt)!=0) {
+        strcpy(tmptxt,"Updating ch ");
+        strcat(tmptxt,this->loadinginfotxt);
+        glcRenderString(tmptxt);
+      }
       glPopMatrix();
     }
 
@@ -1230,51 +1667,68 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
       nutidtime+=60*60*24;
       iii=0;
       int chanid=0;
-      if (loading_tv_guide==FALSE) {
-        // 14 channel over view
-        while (iii<14) {
-          xpos=10;
-          ypos=orgwinsizey-300-(iii*50);
-          xsiz=180;
-          ysiz=50;
-          glPushMatrix();
-          glTranslatef(10,50, 0.0f);
-          if (strlen(tvkanaler[kanalnr+cstartofset].chanel_name)>0) {
-            if (selectchanel==iii+cstartofset) glColor3f(0.6f, 0.6f, 0.6f); else glColor3f(1.0f, 1.0f, 1.0f);
-            glEnable(GL_TEXTURE_2D);
-            glBlendFunc(GL_ONE, GL_ONE);
-            glBindTexture(GL_TEXTURE_2D,_tvbar1);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-            glEnd(); //End quadrilateral coordinates
-          }
-          glPopMatrix();
+      // 14 channel over view
+      while (iii<10) {
+        xpos=10;
+        ypos=orgwinsizey-300-(iii*50);
+        xsiz=180;
+        ysiz=50;
+        glPushMatrix();
+        glTranslatef(10,50, 0.0f);
+        if (strlen(tvkanaler[kanalnr+cstartofset].chanel_name)>0) {
+          if (selectchanel==iii+cstartofset) glColor3f(0.6f, 0.6f, 0.6f); else glColor3f(1.0f, 1.0f, 1.0f);
+          glEnable(GL_TEXTURE_2D);
+          glBlendFunc(GL_ONE, GL_ONE);
+          glBindTexture(GL_TEXTURE_2D,_tvbar1);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glBegin(GL_QUADS); //Begin quadrilateral coordinates
+          glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+          glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
+          glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
+          glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+          glEnd(); //End quadrilateral coordinates
+        }
+        glPopMatrix();
+          //
+        // endnowtime_h = endtime to show i while
+        //
+        chanid=tvkanaler[kanalnr+cstartofset].chanid;
 
-          //
-          // endnowtime_h = endtime to show i while
-          //
-          chanid=tvkanaler[kanalnr+cstartofset].chanid;
-          while((tvkanaler[kanalnr+cstartofset].chanid==chanid) && (omgang<tvkanaler[kanalnr+cstartofset].program_antal()) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<nutidtime+(60*60*24))) {
+        //printf("chanid = %d \n",chanid);
+
+        while((tvkanaler[kanalnr+cstartofset].chanid==chanid) && (omgang<tvkanaler[kanalnr+cstartofset].program_antal()) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<nutidtime+(60*60*24))) {
+
+          //printf("*");
 
             //printf("program start kl %s max time %s \n",ctime((time_t *) &tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix),ctime((time_t *)&endnowtime_h));
-
             //
-            xpos=189+2;
-            ypos=orgwinsizey-300-(iii*50);
-            xsiz=1000;
-            ysiz=50;
-
+          xpos=189+2;
+          ypos=orgwinsizey-300-(iii*50);
+          xsiz=1000;
+          ysiz=50;
             // hent program læmgde
-            xsiz=(int) tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_length_minuter*7;
+          xsiz=(int) tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_length_minuter*7;
+          strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime+14); // min start
+          tmptxt[2]='\0';
+          nowtime_h.tm_hour=timeinfo->tm_hour;
+          nowtime_h.tm_min=0;
+          nowtime_h.tm_sec=0;
+          nowtime_h.tm_mon=timeinfo->tm_mon;
+          nowtime_h.tm_mday=timeinfo->tm_mday;
+          nowtime_h.tm_year=timeinfo->tm_year;
+          nowtime_h.tm_wday=timeinfo->tm_wday;
+          nowtime_h.tm_yday=timeinfo->tm_yday;
+          nowtime_h.tm_isdst=timeinfo->tm_isdst;
+          char ttmp[80];
+          time_t start=tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix;
+          time_t nutid=mktime(&nowtime_h);
+          strcpy(ttmp,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
 
-            strcpy(tmptxt,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime+14); // min start
-            tmptxt[2]='\0';
-
+          if (((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<=nutidtime) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix>nutidtime)) ||
+            ((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<=nutidtime) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix>mktime(&nowtime_h))) ||
+            //(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix>starttid)) {
+            (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix>0)) {
             nowtime_h.tm_hour=timeinfo->tm_hour;
             nowtime_h.tm_min=0;
             nowtime_h.tm_sec=0;
@@ -1284,53 +1738,34 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
             nowtime_h.tm_wday=timeinfo->tm_wday;
             nowtime_h.tm_yday=timeinfo->tm_yday;
             nowtime_h.tm_isdst=timeinfo->tm_isdst;
+            // nowtime_h is the clock now bud only the hour like 13:00:00
+            // starttid=now() (time)
+            if (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<starttid) {
+              // beregn antal minuter fra program start til starttid på overview eks (14:00) start tid som vises i window
+              xtid=difftime(mktime(&nowtime_h),tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
 
-            char ttmp[80];
-            time_t start=tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix;
-            time_t nutid=mktime(&nowtime_h);
-            strcpy(ttmp,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
+              //printf("xtid ofset =%d\n",xtid);
 
-            if (((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<=nutidtime) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix>nutidtime)) ||
-              ((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<=nutidtime) && (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix>mktime(&nowtime_h))) ||
-              //(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix>starttid)) {
-              (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix>0)) {
-              nowtime_h.tm_hour=timeinfo->tm_hour;
-              nowtime_h.tm_min=0;
-              nowtime_h.tm_sec=0;
-              nowtime_h.tm_mon=timeinfo->tm_mon;
-              nowtime_h.tm_mday=timeinfo->tm_mday;
-              nowtime_h.tm_year=timeinfo->tm_year;
-              nowtime_h.tm_wday=timeinfo->tm_wday;
-              nowtime_h.tm_yday=timeinfo->tm_yday;
-              nowtime_h.tm_isdst=timeinfo->tm_isdst;
-              // nowtime_h is the clock now bud only the hour like 13:00:00
-              // starttid=now() (time)
-              if (tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix<starttid) {
-                // beregn antal minuter fra program start til starttid på overview eks (14:00) start tid som vises i window
-                xtid=difftime(mktime(&nowtime_h),tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
-
-                //printf("xtid ofset =%d\n",xtid);
-
-                if (xtid<=0) {
-                  // find lænde siden last hele clock (timer)
-                  xtid=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,mktime(&nowtime_h))/60;
-                  xsiz=xsiz+(xtid);
-                  startofset=((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix-mktime(&nowtime_h))/60)*7;
-                } else {
-                  startofset=0;
-                }
-                // diff in min
-                xtidlength=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
-                //xsiz=xsiz-(xtid*7);
+              if (xtid<=0) {
+                // find lænde siden last hele clock (timer)
+                xtid=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,mktime(&nowtime_h))/60;
+                xsiz=xsiz+(xtid);
+                startofset=((tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix-mktime(&nowtime_h))/60)*7;
               } else {
-                // length in min
-                //xtid=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
-                xtid=(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix-tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
-                // diff in min
-                xtidlength=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
-                startofset+=xsiz;
-                xsiz=xsiz+(xtid*7);
+                startofset=0;
               }
+              // diff in min
+              xtidlength=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
+              //xsiz=xsiz-(xtid*7);
+            } else {
+              // length in min
+              //xtid=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
+              xtid=(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix-tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
+              // diff in min
+              xtidlength=difftime(tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].endtime_unix,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime_unix)/60;
+              startofset+=xsiz;
+              xsiz=xsiz+(xtid*7);
+            }
 /*
               if (chanid==2) {
                 printf("\nChannelid %d xtid=%d ",tvkanaler[kanalnr+pstartofset].chanid,xtid);
@@ -1341,65 +1776,64 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
 
 */
               //tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix
-              if (startofset>0) {
-                // make line box around program in xsiz
-                glPushMatrix();
-                glTranslatef(10,50, 0.0f);
-                glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
-                glTexCoord2f(0.0, 0.0); glVertex3f(xpos+startofset, ypos, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(xpos+startofset, ypos+ysiz, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz+startofset, ypos+ysiz, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz+startofset, ypos, 0.0);
-                glEnd(); //End quadrilateral coordinates
-                glPopMatrix();
-                // show progrma name
-                glPushMatrix();
-                glDisable(GL_TEXTURE_2D);
-                glTranslatef(10,50, 0.0f);
-                //glTranslatef(210+startofset,ypos+12, 0.0f);
-                glTranslatef(xpos+startofset+2,ypos+12, 0.0f);
-                if (xtidlength>10) {
-                  if (debugmode) sprintf(tmptxt,"startofset %d start %s %-14s %d",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn,xtid);
-                  else sprintf(tmptxt,"%-14s",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
-                  //tmptxt[15]='\0';
-                } else {
-                  if (debugmode) sprintf(tmptxt,"startofset %d start %s %-3s",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
-                  else sprintf(tmptxt,"%-3s..",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
-                  tmptxt[3]='\0';
-                }
-                glScalef(17.0, 17.0,1);
-                glcRenderString(tmptxt);
-                glScalef(20.0, 20.0,1);
-                glPopMatrix();
+            if (startofset>0) {
+              // make line box around program in xsiz
+              glPushMatrix();
+              glTranslatef(10,50, 0.0f);
+              glBegin(GL_LINE_LOOP); //Begin quadrilateral coordinates
+              glTexCoord2f(0.0, 0.0); glVertex3f(xpos+startofset, ypos, 0.0);
+              glTexCoord2f(0.0, 1.0); glVertex3f(xpos+startofset, ypos+ysiz, 0.0);
+              glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz+startofset, ypos+ysiz, 0.0);
+              glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz+startofset, ypos, 0.0);
+              glEnd(); //End quadrilateral coordinates
+              glPopMatrix();
+              // show progrma name
+              glPushMatrix();
+              glDisable(GL_TEXTURE_2D);
+              glTranslatef(10,50, 0.0f);
+              //glTranslatef(210+startofset,ypos+12, 0.0f);
+              glTranslatef(xpos+startofset+2,ypos+12, 0.0f);
+              if (xtidlength>10) {
+                if (debugmode & 256) sprintf(tmptxt,"startofset %d start %s %-14s %d",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn,xtid);
+                else sprintf(tmptxt,"%-14s",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
+                //tmptxt[15]='\0';
+              } else {
+                if (debugmode & 256) sprintf(tmptxt,"startofset %d start %s %-3s",startofset ,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].starttime,tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
+                else sprintf(tmptxt,"%-3s..",tvkanaler[kanalnr+cstartofset].tv_prog_guide[omgang].program_navn);
+                tmptxt[3]='\0';
               }
-            } else {
-              /*
-              printf("\n\tChannelid %d xtid=%d ",tvkanaler[kanalnr+pstartofset].chanid,xtid);
-              printf("\tProgram %20s \n",tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].program_navn);
-              printf("\tStart time %s ", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix));
-              printf("\tEnd   time %s \n", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].endtime_unix));
-              */
+              glScalef(17.0, 17.0,1);
+              glcRenderString(tmptxt);
+              glScalef(20.0, 20.0,1);
+              glPopMatrix();
             }
-            startyofset+=xsiz;
-            totaltid++;
-            omgang++;
-            //tidsloop++;                   // plus one hour
+          } else {
+            /*
+            printf("\n\tChannelid %d xtid=%d ",tvkanaler[kanalnr+pstartofset].chanid,xtid);
+            printf("\tProgram %20s \n",tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].program_navn);
+            printf("\tStart time %s ", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].starttime_unix));
+            printf("\tEnd   time %s \n", ctime ((const time_t*) &tvkanaler[kanalnr+pstartofset].tv_prog_guide[omgang].endtime_unix));
+            */
           }
-
-          // show kanal navn text
-          glPushMatrix();
-          glColor3f(1.0f, 1.0f, 1.0f);
-          glTranslatef(26,orgwinsizey-230-(iii*50), 0.0f);
-          glScalef(20.0, 20.0,1);
-          glDisable(GL_TEXTURE_2D);
-          sprintf(tmptxt,"%-14s",tvkanaler[kanalnr+cstartofset].chanel_name);
-          tmptxt[15]='\0';
-          glcRenderString(tmptxt);
-          glPopMatrix();
-          kanalnr++;
-          iii++;
+          startyofset+=xsiz;
+          totaltid++;
+          omgang++;
+          //tidsloop++;                   // plus one hour
         }
+          // show kanal navn text
+        glPushMatrix();
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(26,orgwinsizey-230-(iii*50), 0.0f);
+        glScalef(20.0, 20.0,1);
+        glDisable(GL_TEXTURE_2D);
+        sprintf(tmptxt,"%-14s",tvkanaler[kanalnr+cstartofset].chanel_name);
+        tmptxt[15]='\0';
+        glcRenderString(tmptxt);
+        glPopMatrix();
+        kanalnr++;
+        iii++;
       }
+
 
       if (!(loading_tv_guide)) {
         // show the clock line
@@ -1472,6 +1906,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
+
 
     ptype=0;
     // under menu in colors
@@ -1652,378 +2087,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg) {
 
 
 
-
-
-
-// viser teksten i fast tvguide
-
-void tv_oversigt::show_fasttv_oversigt_old(int selectchanel,int selectprg)
-{
-    char tmptxt[250];
-    char tmptxt1[200];
-    char tmptxt2[200];
-    int kanalnr=0;
-//    int tidspunkt=0;
-    int kanalantal;
-    int prglength;
-    int pstartofset;
-    int upstartofset;
-    struct tm * timeinfo;
-    int i,j,k,pos;
-    int iii;
-    const int MAXLINES=40;
-//    const int MAXLINESLENGTH=80;
-    i = pos = 0;
-    int N=36;
-    char word[1600];
-    char str[16000];
-    char desclines[40][80];
-    for(int ii=0;ii<40;ii++) desclines[ii][0]='\0';
-    if (selectchanel>11) pstartofset=selectchanel-11;
-    else pstartofset=0;
-
-    if (selectprg>11) upstartofset=selectprg-11;
-    else upstartofset=0;
-
-//printf("startofset %d \n",starttidofset);
-    glColor3f(1.0f, 1.0f, 1.0f);      				// color
-    switch(screen_size) {
-        case 1: kanalantal=12;
-                break;
-        case 2: kanalantal=12;
-                break;
-        case 3: kanalantal=12;
-                break;
-        case 4: kanalantal=12;
-                break;
-        default:kanalantal=12;
-    }
-
-    //aktivfont.selectfont("Umpush");
-    aktivfont.selectfont((char *) "Norasi");
-
-
-    // show time/date in the guide
-    glLoadIdentity();
-
-    glTranslatef(300.0f,orgwinsizey-100.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(70.0, 70.0, 1.0);
-    glColor3f(1.0f, 1.0f, 1.0f);
-
-
-    //glTranslatef(-34.0f, (23.6)+2.6, -80.0f);
-    //glScalef(3.6, 3.6, 3.6);
-    starttid=time( NULL );
-    timeinfo=localtime(&starttid);
-    sprintf(tmptxt,"TV Guiden %s den %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
-    glcRenderString(tmptxt);
-
-
-    glColor3f(1.0f,1.0f,1.0f);
-    glDisable(GL_TEXTURE_2D);
-    while (kanalnr<12) {				// kanalantal
-        glLoadIdentity();
-        switch (screen_size) {
-            case 1: glTranslatef(-62.8+3, (23.6)-(kanalnr*(4.6)), -110.0f);	// 47.8 = center/55.8 left align
-                    break;
-            case 2: glTranslatef(-62.8+3, (23.6)-(kanalnr*(4.6)), -110.0f);
-                    break;
-            case 3: glTranslatef(-88.8+3, (23.6)-(kanalnr*(4.6)), -110.0f);
-                    break;
-            case 4: glTranslatef(-85.8+3, (23.6)-(kanalnr*(4.6)), -110.0f);
-                    break;
-        }
-        if (kanalnr==selectchanel-pstartofset)
-            glColor3f(1.0f,1.0f,1.0f);
-        else
-            glColor3f(0.5f,0.5f,0.5f);
-        glScalef(1.6, 1.6,1.6);
-        sprintf(tmptxt,"%16s",tvkanaler[kanalnr+pstartofset].chanel_name);
-        glcRenderString(tmptxt);
-        kanalnr++;
-    }
-
-    glLoadIdentity();
-    switch (screen_size) {
-        case 1: glTranslatef(-48.8+3, (27.6), -110.0f);	// 47.8 = center/55.8 left align
-                break;
-        case 2: glTranslatef(-58.8+3, (27.6), -110.0f);
-                break;
-        case 3: glTranslatef(-72.8+3, (27.6), -110.0f);
-                break;
-        case 4: glTranslatef(-70.8+3, (27.6), -110.0f);
-                break;
-    }
-
-    i=0;
-    while(i<12) {
-        prglength=tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].program_length_minuter;
-        glLoadIdentity();
-        switch (screen_size) {
-            case 1: glTranslatef(-46.8+2, (23.6)-(i*(4.6)), -110.0f);	// 47.8 = center/55.8 left align
-                      break;
-            case 2: glTranslatef(-46.8+2, (23.6)-(i*(4.6)), -110.0f);
-                    break;
-            case 3: glTranslatef(-72.8+4, (23.6)-(i*(4.6)), -110.0f);
-                    break;
-            case 4: glTranslatef(-68.8+2, (23.6)-(i*(4.6)), -110.0f);
-                    break;
-        }
-        if (i==selectprg-upstartofset) glColor3f(1,1,1);
-        else glColor3f(0.5f,0.5f,0.5f);
-        glScalef(1.8, 1.8,1.8);
-        if (strlen(tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].program_navn)>0) {
-            sprintf(tmptxt1,"%s",tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].starttime+11);
-            tmptxt1[5]='\0';
-            sprintf(tmptxt2,"%s",tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].endtime+11);
-            tmptxt2[5]='\0';
-            sprintf(tmptxt,"%s-%s %s ",tmptxt1,tmptxt2,tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].program_navn);
-            if (strlen(tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].sub_title)>0) {
-//                strcat(tmptxt,"- ");
-                strcat(tmptxt,tvkanaler[selectchanel+pstartofset].tv_prog_guide[i+upstartofset].sub_title);
-            }
-            glcRenderString(tmptxt);
-        } else {
-            glcRenderString("Ingen program information.");
-        }
-        i++;
-    }
-
-
-
-    strcpy(str,tvkanaler[selectchanel].tv_prog_guide[selectprg].description);
-    iii=0;			// aktiv linie i array
-    i=0;
-    while( 1 ) {
-        j = 0;
-        while( !isspace( str[i]) ) // Find next word
-        {
-            if( str[i] == '\0' )
-                break;
-            word[j] = str[i];
-            i++;
-            j++;
-        }
-
-        word[j] = '\0'; // The value of j is the word length
-
-        if( j > N ) // Word length is greater than column length
-        { // print char-by-char
-            k = 0;
-            while( word[k] != '\0' ) {
-                if( pos >= N-1 ) {
-                    if( k != 0 ) {
-                        desclines[iii][strlen(desclines[iii])]='-';
-                        desclines[iii][strlen(desclines[iii])+1]='\0';
-                        //putchar('-'); // print '-' if last-but-one column
-                    }
-                    pos = 0;
-                    //putchar('\n');
-                    if (iii<MAXLINES) iii++;
-                }
-                desclines[iii][strlen(desclines[iii])]=word[k];
-                //putchar( word[k] );
-                pos++;
-                k++;
-            }
-        } else {
-            if( pos + j > N ) // Word doesn't fit in line
-            {
-                //putchar('\n');
-                pos = 0;
-                if (iii<MAXLINES) iii++;
-            }
-            strcat(desclines[iii],word);				// add word
-            //printf("%s", word );
-            pos += j;
-        }
-        if( pos < N-1 ) // print space if not last column
-        {
-            strcat(desclines[iii]," ");
-            //putchar(' ');
-            pos++;
-        }
-        if( str[i] == '\0' ) break;
-        i++; // Skip space
-    }
-
-    // show tv prgoram subtitle
-    glLoadIdentity();
-    glColor3f(1,1,1);
-//    glScalef(3.8, 3.8, 3.8);
-    glRotatef(45.0f,0.0f, 0.0f, 0.0f);
-    switch(screen_size) {
-        case 1:	glTranslatef(39.0f-30.0f, 0.0f+12.5f, -60.0f);
-                break;
-        case 2:	glTranslatef(39.0f-30.0f, 0.0f+12.5f, -60.0f);
-                break;
-        case 3:	glTranslatef(48.0f-30.0f, 0.0f+12.5f, -60.0f);
-                break;
-        case 4:	glTranslatef(50.0f-30.0f, 0.0f+12.5f, -60.0f);
-                break;
-    }
-    glcRenderString(tvkanaler[selectchanel].tv_prog_guide[selectprg].sub_title);
-
-    //
-    // draw tv program big info
-    //
-    i=0;
-    while(i<22) {
-        if (strcmp(desclines[i],"")!=0) {
-            glLoadIdentity();
-            glcScale(3.0f,3.0f);
-            glColor3f(1.0f, 1.0f, 1.0f);
-            switch(screen_size) {
-                case 1:	glTranslatef(39.0f-30.0f, 0.0f+10.5f-(i*1.2f), -60.0f);
-                        break;
-                case 2:	glTranslatef(39.0f-30.0f, 0.0f+10.5f-(i*1.2f), -60.0f);
-                        break;
-                case 3:	glTranslatef(48.0f-30.0f, 0.0f+10.5f-(i*1.2f), -60.0f);
-                        break;
-                case 4:	glTranslatef(50.0f-30.0f, 0.0f+10.5f-(i*1.2f), -60.0f);
-                        break;
-            }
-            glcRenderString(desclines[i]);
-        }
-        i++;
-    }
-    // show clock
-    glLoadIdentity();
-    sprintf(tmptxt,"%02d:%02d",timeinfo->tm_hour,timeinfo->tm_min);
-    glcScale(3.0f,3.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    switch(screen_size) {
-        case 1: glTranslatef(8.0f, -8.0f, -22.0f);
-                break;
-        case 2: glTranslatef(8.0f, -8.0f, -22.0f);
-                break;
-        case 3: glTranslatef(8.0f, -8.0f, -22.0f);
-                break;
-        case 4: glTranslatef(8.0f, -8.0f, -22.0f);
-                break;
-    }
-//    glcRenderStyle(GLC_BITMAP);
-    glcRenderString(tmptxt);    				// render clock
-//    glcRenderStyle(GLC_TRIANGLE );
-
-
-    glEnable(GL_TEXTURE_2D);
-    // old recordeings button mask
-    glLoadIdentity();
-    switch (screen_size) {
-        case 1: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 2: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 3: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 4: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-    }
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, _tvmaskprgrecordedbutton);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-10, -5, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(10, -5, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(10, 5, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-10, 5, 0.0);
-    glEnd();
-
-    // old recordings button gfx
-    glLoadIdentity();
-    switch (screen_size) {
-        case 1: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 2: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 3: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-        case 4: glTranslatef(0.0f, -39.0f, -110.0f);
-                break;
-    }
-    glColor3f(1.0f, 1.0f, 1.0f);
-                //            glColor4f(1.0f,1.0f,1.0f,1.0f);
-                //            glBlendFunc(GL_ONE, GL_ONE);
-    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindTexture(GL_TEXTURE_2D, _tvoldprgrecordedbutton);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(44);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-10, -5, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(10, -5, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(10, 5, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-10, 5, 0.0);
-    glEnd();
-
-    // End button 1 (old recordings)
-
-    // new recordeings button mask
-    glLoadIdentity();
-    switch (screen_size) {
-        case 1: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 2: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 3: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 4: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-    }
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, _tvmaskprgrecordedbutton);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-10, -5, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(10, -5, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(10, 5, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-10, 5, 0.0);
-    glEnd();
-
-    // new recordings button gfx
-    glLoadIdentity();
-    switch (screen_size) {
-        case 1: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 2: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 3: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-        case 4: glTranslatef(25.0f, -39.0f, -110.0f);
-                break;
-    }
-    glColor3f(1.0f, 1.0f, 1.0f);
-                //            glColor4f(1.0f,1.0f,1.0f,1.0f);
-                //            glBlendFunc(GL_ONE, GL_ONE);
-    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindTexture(GL_TEXTURE_2D, _tvnewprgrecordedbutton);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(45);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-10, -5, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(10, -5, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(10, 5, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-10, 5, 0.0);
-    glEnd();
-
-    // End button 2 (new recordings)
-
-}
 
 
 //

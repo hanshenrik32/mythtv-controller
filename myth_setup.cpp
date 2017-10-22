@@ -2914,7 +2914,21 @@ void show_setup_tv_graber() {
         myglprint4((char *) configbackend_tvgraber);
     }
     glPopMatrix();
-
+    if (strcmp(configbackend_tvgraber,"Other")!=0) {
+        // line 1 input
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glTranslatef(680 , 600 , 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glColor3f(1.0f,1.0f,1.0f);
+        if (do_show_setup_select_linie==0) {
+            strcpy(keybuffer,"[ ]");
+            myglprint4((char *) keybuffer);   // keybuffer
+        } else {
+            myglprint4((char *) "[X]");
+        }
+        glPopMatrix();
+    }
     glPushMatrix();
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
@@ -2924,9 +2938,21 @@ void show_setup_tv_graber() {
       myglprint4((char *) configbackend_tvgraber_path);
     }
     glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(680 , 600 , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f,1.0f,1.0f);
+    if (do_show_setup_select_linie==2) {
+      //strcp   y(keybuffer,configbackend_tvgraber_path);
+      myglprint4((char *) "  ");
+    }
+    glPopMatrix();
+
     if ((do_show_setup_select_linie==0) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(keybuffer));
     if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) showcoursornow(311,450,strlen(keybuffer));
     else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
+    else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
 }
 
 
