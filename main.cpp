@@ -2781,7 +2781,7 @@ void display() {
         glPopMatrix();
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
-      } else if (vis_tv_oversigt) {        
+      } else if (vis_tv_oversigt) {
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,10);
 
       } else if (vis_recorded_oversigt) {
