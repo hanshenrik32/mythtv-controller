@@ -2785,7 +2785,7 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,22);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0);
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -9952,7 +9952,7 @@ void loadgfx() {
         tema=1;
     }
 
-    _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
+    _textureutvbgmask     = loadgfxfile(temapath1,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");

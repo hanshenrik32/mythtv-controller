@@ -1240,7 +1240,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   time(&rawtime);
   // convert clovk to localtime
   timelist=localtime(&rawtime);
-  if (viskl>0) mytimelist.tm_hour=viskl; else mytimelist.tm_hour=13;
+  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
