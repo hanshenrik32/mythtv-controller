@@ -1111,7 +1111,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   struct tm *prgtime;
 
   int n;
-  int kanalantal=12;
   int chanid;
   int kanalnr=0;
   int cstartofset=0;
@@ -1119,12 +1118,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   int xsiz,ysiz;
   int prglength=0;
   int barsize=0;
+  float textsize1=18.0f;
+  float textsize2=16.0f;
 
   int starttimeinmin,starttimeintim;
   int yypos=0;
   int prg_nr=0;
   int startyofset;
-  const int CHANELS_PR_LINE=8;
+  const int CHANELS_PR_LINE=7;
 
   char tmptxt[1024];
   char tmptim[1024];
@@ -1235,7 +1236,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   //
   // show time bar in left side
   //
-  n=0;
   // hent ur
   time(&rawtime);
   // convert clovk to localtime
@@ -1248,10 +1248,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   mytimelist.tm_mday=timelist->tm_mday;
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
+  n=0;
   while (n<10) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-230)-(n*260), 0.0f);
+    glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
@@ -1273,7 +1274,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
 
   xpos=50+40;
   int do_kanal_nr=0;
-  int vis_kanal_antal=8;                        // antal kanler som vises
+  int vis_kanal_antal=7;                        // antal kanler som vises
 
   //
   // loop for channel
@@ -1281,9 +1282,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
-    glTranslatef(xpos+10,860, 0.0f);
+    glTranslatef(xpos+11,860, 0.0f);
     glScalef(24.0, 24.0, 1.0);
-    if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.8f, 0.8f, 0.8f);
+    if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.6f, 0.6f, 0.6f);
     chanid=tvkanaler[0].chanid;
     strcpy(tmptxt,tvkanaler[kanalnr].chanel_name);
     *(tmptim+15)='\0';
@@ -1297,10 +1298,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
     barsize=0;
     yypos=0;
 
+    time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
     //
-    while((yypos<40*5) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+    while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
       ypos=orgwinsizey-245;
@@ -1337,15 +1339,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
 
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
-        *(tmptxt+21)='\0';
-        glTranslatef(xpos+20,ypos-8, 0.0f);
-        glScalef(16.0, 16.0, 1.0);
-        glColor3f(1.0f,1.0f, 1.0f);                                           // text color
-        glcRenderString(tmptxt);                                              // print program name
-        glPopMatrix();
 
         if (prglength>13) {
           glPushMatrix();
@@ -1353,12 +1346,24 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
           strcat(tmptxt," - ");
           strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
-          glTranslatef(xpos+20,ypos-22, 0.0f);
-          glScalef(16.0, 16.0, 1.0);
+          glTranslatef(xpos+20,ypos-7, 0.0f);
+          glScalef(textsize2, textsize2, 1.0);
           glColor3f(1.0f,1.0f, 1.0f);		// rejser
           glcRenderString(tmptxt);
           glPopMatrix();
         }
+
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
+        *(tmptxt+21)='\0';
+        if (prglength>13) glTranslatef(xpos+20,ypos-22, 0.0f); else glTranslatef(xpos+20,ypos-7, 0.0f);
+        glScalef(textsize1, textsize1, 1.0f);
+        glColor3f(1.0f,1.0f, 1.0f);                                           // text color
+        glcRenderString(tmptxt);                                              // print program name
+        glPopMatrix();
+
+
       }
 
 
@@ -1448,7 +1453,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           glDisable(GL_TEXTURE_2D);
           //glTranslatef(xpos,820-(yypos+18), 0.0f);
           glTranslatef(xpos+20,ypos-28, 0.0f);
-          glScalef(18.0, 18.0, 1.0);
+          glScalef(textsize1, textsize1, 1.0);
           glColor3f(1.0f,1.0f, 1.0f);		// rejser
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
           *(tmptxt+21)='\0';
@@ -1462,8 +1467,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           strcat(tmptxt,tmptxt1);
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
-          glScalef(16.0, 16.0, 1.0);
-          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glScalef(textsize2, textsize2, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		//
           glcRenderString(tmptxt);
           glPopMatrix();
         } else {
@@ -1472,13 +1477,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           *(tmptxt+21)='\0';
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
-          glScalef(16.0, 16.0, 1.0);
-          glColor3f(1.0f,1.0f, 1.0f);		// rejser
+          glScalef(textsize2, textsize2, 1.0);
+          glColor3f(1.0f,1.0f, 1.0f);		//
           glcRenderString(tmptxt);
           glPopMatrix();
         }
         barsize=barsize+(prglength*5);
-        yypos+=(20*2);
+        yypos+=1;
       }
       prg_nr++;                                   // next program
     }
