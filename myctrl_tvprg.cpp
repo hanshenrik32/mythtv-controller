@@ -1298,6 +1298,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
     barsize=0;
     yypos=0;
 
+    // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
@@ -1344,8 +1345,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           glPushMatrix();
           glDisable(GL_TEXTURE_2D);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+          *(tmptxt+5)='\0';
           strcat(tmptxt," - ");
           strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
+          *(tmptxt+13)='\0';
           glTranslatef(xpos+20,ypos-7, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
           glColor3f(1.0f,1.0f, 1.0f);		// rejser
@@ -1362,8 +1365,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
         glColor3f(1.0f,1.0f, 1.0f);                                           // text color
         glcRenderString(tmptxt);                                              // print program name
         glPopMatrix();
-
-
       }
 
 
@@ -1461,10 +1462,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
           glPopMatrix();
           glPushMatrix();
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
+          *(tmptxt+5)='\0';
           strcat(tmptxt," - ");
           strcat(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime+11);
-          sprintf(tmptxt1," l=%d",selectprg);
-          strcat(tmptxt,tmptxt1);
+          *(tmptxt+13)='\0';
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);

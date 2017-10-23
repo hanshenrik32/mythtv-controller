@@ -4,8 +4,9 @@
 #include <time.h>
 #include <string.h>
 
-const int maxprogram_antal=100;
-const int MAXKANAL_ANTAL=40;
+const int maxprogram_antal=200;
+// antal programer pr kanal
+const int MAXKANAL_ANTAL=100;
 
 // tv oversigt til 3d
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv databasen
