@@ -9462,7 +9462,7 @@ void *get_tvguide_fromweb() {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread xmltv starting....\n");
+  printf("Thread xmltv file parser starting....\n");
   // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
@@ -9478,7 +9478,7 @@ void *datainfoloader_xmltv(void *data) {
   get_tvguide_fromweb();
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  printf("loader thread xmltvguide done.\n");
+  printf("parser xmltv guide done.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }

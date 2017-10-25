@@ -901,7 +901,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         // get time now in a string format (yyyy-mm-dd hh:mm:ss)
         rawtime=time( NULL );				     			 // hent nu tid
         rawtime2=time( NULL );					   	   // hent nu tid
-        rawtime2+=60*60*24;                   //  + 1 døgn
+        rawtime2+=60*60*48;                   //  + 2 døgn
     } else {
         // hent ny starttid
         rawtime=this->starttid;                // this
@@ -1240,6 +1240,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   time(&rawtime);
   // convert clovk to localtime
   timelist=localtime(&rawtime);
+  // vis nu eller kl viskl ?
   if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1249,7 +1250,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   n=0;
-  while (n<10) {
+  while (n<4) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
@@ -1263,9 +1264,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
     mktime(&mytimelist);
   }
 
+
   mytimelist.tm_hour=timelist->tm_hour;
   if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
-
 
   kanalnr=0+cstartofset;
 
@@ -1492,6 +1493,43 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
     kanalnr++;
     do_kanal_nr++;
   }
+
+  // show clock line over tvguide
+  //
+  if (!(loading_tv_guide)) {
+    time(&rawtime);
+    timelist=localtime(&rawtime);
+    xpos=20;
+    ypos=orgwinsizey-298;
+    xsiz=(orgwinsizex-320);
+    ysiz=2;
+    float timelineofset=(timelist->tm_min*4.5);
+    ypos-=timelineofset;
+
+    glPushMatrix();
+    glTranslatef(10,50, 0.0f);
+    // top
+    glEnable(GL_TEXTURE_2D);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);
+  //  glScalef(70.0, 70.0, 1.0);
+  //  glcRenderString("TEST");
+    //glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_LINE_LOOP);                // line
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+    glEnd(); //End quadrilateral coordinates
+    glScalef(40.0, 40.0, 1.0);
+    //glcRenderString(tvkanaler[1].chanel_name);
+    glPopMatrix();
+  }
+
 }
 
 
