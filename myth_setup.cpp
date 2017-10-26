@@ -13,6 +13,8 @@
 
 #include <GL/glc.h>                     // glc true type font system
 
+#include <libxml/parser.h>
+
 // mysql support
 
 #include <mysql.h>
@@ -2781,6 +2783,46 @@ void show_setup_keys() {
 
 
 
+
+
+
+
+
+void load_channel_list_from_graber() {
+  char channel_list[200][80];                             // channel_list array used in setup graber
+  xmlChar *tmpdat;
+  xmlDoc *document;
+  xmlNode *root, *first_child, *node, *node1 ,*subnode;
+  xmlChar *xmltvid;
+  xmlChar *content;
+  int sysresult;
+  int channelnr=0;
+  char result[1024];
+  char exestring[2048];
+  strcpy(exestring,configbackend_tvgraber);
+  strcat(exestring," --list-channels > ~/tvguide_channels.xml");
+  sysresult=system(exestring);
+  document = xmlReadFile("~/tvguide_channels.xml", NULL, 0);            // open xml file
+  if (document) {
+    root = xmlDocGetRootElement(document);
+    first_child = root->children;
+    for (node = first_child; node; node = node->next) {
+      if (node->type==XML_ELEMENT_NODE) {
+        if (strcmp((char *) node->name,"channel")==0) {
+          content = xmlNodeGetContent(node);
+          if (content) {
+            strcpy(result,(char *) content);
+            strcpy(channel_list[channelnr],result);
+            channelnr++;
+          }
+        }
+      }
+    }
+    xmlFreeDoc(document);
+  }
+}
+
+
 //
 // ********************* show setuo tv graber ************************************************************************
 //
@@ -2791,6 +2833,8 @@ void show_setup_tv_graber() {
     int xpos=0;
     int ypos=0;
     char text[200];
+
+    load_channel_list_from_graber();
 
     // background
     glPushMatrix();

@@ -1287,8 +1287,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
     glScalef(24.0, 24.0, 1.0);
     if (selectchanel==kanalnr) glColor3f(1.0f,1.0f, 1.0f); else glColor3f(0.6f, 0.6f, 0.6f);
     chanid=tvkanaler[0].chanid;
-    strcpy(tmptxt,tvkanaler[kanalnr].chanel_name);
-    *(tmptim+15)='\0';
+    strcpy(tmptxt," ");
+    strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
+    *(tmptim+14)='\0';
     glcRenderString(tmptxt);
     glPopMatrix();
 
@@ -1499,9 +1500,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   if (!(loading_tv_guide)) {
     time(&rawtime);
     timelist=localtime(&rawtime);
-    xpos=20;
+    xpos=35;
     ypos=orgwinsizey-298;
-    xsiz=(orgwinsizex-320);
+    xsiz=(orgwinsizex-300);
     ysiz=2;
     float timelineofset=(timelist->tm_min*4.5);
     ypos-=timelineofset;
@@ -1604,7 +1605,6 @@ void tv_oversigt::show_fasttv_oversigt_old(int selectchanel,int selectprg) {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
-
     glPushMatrix();
     aktivfont.selectfont((char *) "Norasi");
     glTranslatef(300.0f,orgwinsizey-100.0f, 0.0f);
@@ -1657,7 +1657,7 @@ void tv_oversigt::show_fasttv_oversigt_old(int selectchanel,int selectprg) {
       glcRenderString("Loading tv guide....");
       glTranslatef(-9.0f,-1.5f, 0.0f);
       if (strcmp("",this->loadinginfotxt)!=0) {
-        strcpy(tmptxt,"Updating ch ");
+        strcpy(tmptxt,"Updating ");
         strcat(tmptxt,this->loadinginfotxt);
         glcRenderString(tmptxt);
       }

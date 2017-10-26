@@ -9447,9 +9447,12 @@ void *datainfoloader_stream(void *data) {
 void *get_tvguide_fromweb() {
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
+  strcat(exestring," --list-channels > ~/tvguide_channels.txt");
+  int result=system(exestring);
+  strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
   printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
-  int result=system(exestring);
+  result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
   printf("Done tv graber background process exit kode %d\n",result);
 }
