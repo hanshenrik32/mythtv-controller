@@ -2798,6 +2798,7 @@ void load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
+  if (debugmode) printf("Get channel list file from web.\n");
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
   sysresult=system(exestring);
@@ -2813,6 +2814,7 @@ void load_channel_list_from_graber() {
       }
     }
     fclose(fil);
+    if (debugmode) printf("Done channel list file from web.\n");
   }
 }
 
@@ -2829,9 +2831,11 @@ void show_setup_tv_graber() {
     int xpos=0;
     int ypos=0;
     char text[200];
-
-    load_channel_list_from_graber();
-
+    static bool hent_tv_channels=false;
+    if (hent_tv_channels==false) {
+      hent_tv_channels=true;
+      load_channel_list_from_graber();
+    }
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
