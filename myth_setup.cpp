@@ -2780,16 +2780,15 @@ void show_setup_keys() {
 }
 
 
-
-
-
-
-
-
-
+//
+//
+//
 
 void load_channel_list_from_graber() {
-  char channel_list[200][80];                             // channel_list array used in setup graber
+  FILE *fil;
+  char buffer[1024];
+  unsigned int cnr=0;
+  channel_list_struct channel_list[200];                             // channel_list array used in setup graber
   xmlChar *tmpdat;
   xmlDoc *document;
   xmlNode *root, *first_child, *node, *node1 ,*subnode;
@@ -2800,27 +2799,24 @@ void load_channel_list_from_graber() {
   char result[1024];
   char exestring[2048];
   strcpy(exestring,configbackend_tvgraber);
-  strcat(exestring," --list-channels > ~/tvguide_channels.xml");
+  strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
   sysresult=system(exestring);
-  document = xmlReadFile("~/tvguide_channels.xml", NULL, 0);            // open xml file
-  if (document) {
-    root = xmlDocGetRootElement(document);
-    first_child = root->children;
-    for (node = first_child; node; node = node->next) {
-      if (node->type==XML_ELEMENT_NODE) {
-        if (strcmp((char *) node->name,"channel")==0) {
-          content = xmlNodeGetContent(node);
-          if (content) {
-            strcpy(result,(char *) content);
-            strcpy(channel_list[channelnr],result);
-            channelnr++;
-          }
-        }
+
+  fil=fopen("~/tvguide_channels.txt","r");
+  if (fil) {
+    while(!(feof(fil))) {
+      fgets(buffer,512,fil);
+      if (cnr<200) {
+        strcpy(channel_list[cnr].id,"");
+        strcpy(channel_list[cnr].name,buffer);
+        cnr++;
       }
     }
-    xmlFreeDoc(document);
+    fclose(fil);
   }
 }
+
+
 
 
 //

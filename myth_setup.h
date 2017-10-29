@@ -5,6 +5,12 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+
+struct channel_list_struct {
+  char id[80];                             // channel_list array used in setup graber
+  char name[80];                             // channel_list array used in setup graber
+};
+
 void show_setup_interface();
 void show_setup_screen();
 void show_setup_video();

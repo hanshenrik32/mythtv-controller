@@ -9446,9 +9446,7 @@ void *datainfoloader_stream(void *data) {
 
 void *get_tvguide_fromweb() {
   char exestring[2048];
-  strcpy(exestring,configbackend_tvgraber);
-  strcat(exestring," --list-channels > ~/tvguide_channels.txt");
-  int result=system(exestring);
+  int result;
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
   printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
