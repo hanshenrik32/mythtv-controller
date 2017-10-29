@@ -2762,7 +2762,7 @@ void show_setup_keys() {
 
     if (do_show_setup_select_linie==16) showcoursornow(311,100,strlen(keybuffer));
 
-    // line 8
+    // line 9
     glPushMatrix();
     glTranslatef(1180 , 250 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
@@ -2820,7 +2820,31 @@ void load_channel_list_from_graber() {
   }
 }
 
+void save_channel_list() {
+  FILE *fil;
+  unsigned int cnr=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  if (fil) {
+    while(cnr<200) {
+      fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+      cnr++;
+    }
+    fclose(fil);
+  }
+}
 
+void load_channel_list() {
+  FILE *fil;
+  unsigned int cnr=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  if (fil) {
+    while(cnr<200) {
+      fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+      cnr++;
+    }
+    fclose(fil);
+  }
+}
 
 
 //
@@ -2997,10 +3021,9 @@ void show_setup_tv_graber() {
     glPopMatrix();
 
 
-
-
-
-
+    //
+    // show channel naes to select active channel and order
+    //
     glPushMatrix();
     winsizx=450;
     winsizy=280;
@@ -3025,7 +3048,7 @@ void show_setup_tv_graber() {
       glPushMatrix();
       glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      if (do_show_setup_select_linie>=3) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.6f,0.6f,0.6f);
+      if ((do_show_setup_select_linie-3)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
       if (channel_list[n-1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
       myglprint4((char *) channel_list[n-1].name);
       glPopMatrix();
