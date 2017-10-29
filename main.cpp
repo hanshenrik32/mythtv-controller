@@ -6707,7 +6707,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_tvgraber) {
-                        if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
+                        if (do_show_setup_select_linie<12) do_show_setup_select_linie++;
                     }
 
 

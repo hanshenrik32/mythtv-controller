@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+const int MAXPRGLIST_ANTAL=200;
 
 struct channel_list_struct {
   char id[80];                             // channel_list array used in setup graber
