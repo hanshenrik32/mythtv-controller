@@ -3026,8 +3026,8 @@ void show_setup_tv_graber() {
       glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       if (do_show_setup_select_linie>=3) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.6f,0.6f,0.6f);
-      if (channel_list[n+1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
-      myglprint4((char *) channel_list[n].name);
+      if (channel_list[n-1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
+      myglprint4((char *) channel_list[n-1].name);
       glPopMatrix();
     }
 
