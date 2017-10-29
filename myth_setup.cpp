@@ -105,7 +105,7 @@ static bool fontselected=false;
 
 const GLfloat selectcolor[3]={1.0f,1.0f,0.0f};		// text select color
 
-channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+extern channel_list_struct channel_list[];                             // channel_list array used in setup graber
 
 // Denne som bruges
 
@@ -2811,6 +2811,7 @@ void load_channel_list_from_graber() {
       if (cnr<MAXPRGLIST_ANTAL) {
         strcpy(channel_list[cnr].id,"");
         strcpy(channel_list[cnr].name,buffer);
+        channel_list[cnr].selected=true;
         cnr++;
       }
     }
@@ -3020,11 +3021,12 @@ void show_setup_tv_graber() {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
-    for (int n=0;n<11;n++) {
+    for (int n=0;n<14;n++) {
       glPushMatrix();
-      glTranslatef(680 , 560-(n*26) , 0.0f);
+      glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      if (do_show_setup_select_linie>2) glColor3f(1.0f,1.0f,1.0f); else glColor3f(1.0f,1.0f,1.0f);
+      if (do_show_setup_select_linie>=3) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.6f,0.6f,0.6f);
+      if (channel_list[n+1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
       myglprint4((char *) channel_list[n].name);
       glPopMatrix();
     }
@@ -3034,7 +3036,7 @@ void show_setup_tv_graber() {
     else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
     else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
     else if ((do_show_setup_select_linie>=2) && (strcmp(configbackend_tvgraber,"Other")!=0)) {
-      showcoursornow(311,388-((do_show_setup_select_linie-3)*26),0);
+      showcoursornow(311,388-((do_show_setup_select_linie-3)*20),0);
     }
 }
 

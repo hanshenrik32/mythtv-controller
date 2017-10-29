@@ -92,6 +92,9 @@ unsigned int keybufferindex=0;                          // keyboard buffer index
 int findtype=0;					                              	// bruges af search kunster/sange
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
+
+channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -6707,7 +6710,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_tvgraber) {
-                        if (do_show_setup_select_linie<12) do_show_setup_select_linie++;
+                        if (do_show_setup_select_linie<15) do_show_setup_select_linie++;
                     }
 
 
@@ -7210,6 +7213,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                         keybufferindex++;
                         keybuffer[keybufferindex]='\0';
                       }
+                    }
+                    if (do_show_setup_select_linie>=3) {
+                      channel_list[do_show_setup_select_linie-3].selected=!channel_list[do_show_setup_select_linie-3].selected;
                     }
                   }
               }
