@@ -13,6 +13,8 @@
 
 #include <GL/glc.h>                     // glc true type font system
 
+#include <libxml/parser.h>
+
 // mysql support
 
 #include <mysql.h>
@@ -102,6 +104,8 @@ static bool fontselected=false;
 
 
 const GLfloat selectcolor[3]={1.0f,1.0f,0.0f};		// text select color
+
+extern channel_list_struct channel_list[];                             // channel_list array used in setup graber
 
 // Denne som bruges
 
@@ -2758,7 +2762,7 @@ void show_setup_keys() {
 
     if (do_show_setup_select_linie==16) showcoursornow(311,100,strlen(keybuffer));
 
-    // line 8
+    // line 9
     glPushMatrix();
     glTranslatef(1180 , 250 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
@@ -2778,7 +2782,69 @@ void show_setup_keys() {
 }
 
 
+//
+//
+//
 
+void load_channel_list_from_graber() {
+  FILE *fil;
+  char buffer[1024];
+  unsigned int cnr=0;
+  xmlChar *tmpdat;
+  xmlDoc *document;
+  xmlNode *root, *first_child, *node, *node1 ,*subnode;
+  xmlChar *xmltvid;
+  xmlChar *content;
+  int sysresult;
+  int channelnr=0;
+  char result[1024];
+  char exestring[2048];
+  if (debugmode) printf("Get channel list file from web.\n");
+  strcpy(exestring,configbackend_tvgraber);
+  strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
+  sysresult=system(exestring);
+
+  fil=fopen("/home/hans/tvguide_channels.txt","r");
+  if (fil) {
+    while(!(feof(fil))) {
+      fgets(buffer,512,fil);
+      if (cnr<MAXPRGLIST_ANTAL) {
+        strcpy(channel_list[cnr].id,"");
+        strcpy(channel_list[cnr].name,buffer);
+        channel_list[cnr].selected=true;
+        cnr++;
+      }
+    }
+    fclose(fil);
+    if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
+  }
+}
+
+void save_channel_list() {
+  FILE *fil;
+  unsigned int cnr=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  if (fil) {
+    while(cnr<200) {
+      fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+      cnr++;
+    }
+    fclose(fil);
+  }
+}
+
+void load_channel_list() {
+  FILE *fil;
+  unsigned int cnr=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  if (fil) {
+    while(cnr<200) {
+      fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+      cnr++;
+    }
+    fclose(fil);
+  }
+}
 
 
 //
@@ -2791,7 +2857,12 @@ void show_setup_tv_graber() {
     int xpos=0;
     int ypos=0;
     char text[200];
-
+    static bool hent_tv_channels=false;
+    // update channel list before show it
+    if (hent_tv_channels==false) {
+      hent_tv_channels=true;
+      load_channel_list_from_graber();
+    }
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
@@ -2949,10 +3020,47 @@ void show_setup_tv_graber() {
     }
     glPopMatrix();
 
+
+    //
+    // show channel naes to select active channel and order
+    //
+    glPushMatrix();
+    winsizx=450;
+    winsizy=280;
+    xpos=300;
+    ypos=150;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,0);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd(); //End quadrilateral coordinates
+    glPopMatrix();
+
+    for (int n=0;n<14;n++) {
+      glPushMatrix();
+      glTranslatef(672 , 560-(n*20) , 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      if ((do_show_setup_select_linie-3)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
+      if (channel_list[n-1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
+      myglprint4((char *) channel_list[n-1].name);
+      glPopMatrix();
+    }
+
     if ((do_show_setup_select_linie==0) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(keybuffer));
     if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) showcoursornow(311,450,strlen(keybuffer));
     else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
     else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
+    else if ((do_show_setup_select_linie>=2) && (strcmp(configbackend_tvgraber,"Other")!=0)) {
+      showcoursornow(311,388-((do_show_setup_select_linie-3)*20),0);
+    }
 }
 
 

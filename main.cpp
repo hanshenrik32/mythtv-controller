@@ -92,6 +92,9 @@ unsigned int keybufferindex=0;                          // keyboard buffer index
 int findtype=0;					                              	// bruges af search kunster/sange
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
+
+channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -6707,7 +6710,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_tvgraber) {
-                        if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
+                        if (do_show_setup_select_linie<15) do_show_setup_select_linie++;
                     }
 
 
@@ -7210,6 +7213,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                         keybufferindex++;
                         keybuffer[keybufferindex]='\0';
                       }
+                    }
+                    if (do_show_setup_select_linie>=3) {
+                      channel_list[do_show_setup_select_linie-3].selected=!channel_list[do_show_setup_select_linie-3].selected;
                     }
                   }
               }
@@ -9446,10 +9452,11 @@ void *datainfoloader_stream(void *data) {
 
 void *get_tvguide_fromweb() {
   char exestring[2048];
+  int result;
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
   printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
-  int result=system(exestring);
+  result=system(exestring);
 //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
   printf("Done tv graber background process exit kode %d\n",result);
 }
@@ -9462,7 +9469,7 @@ void *get_tvguide_fromweb() {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread xmltv starting....\n");
+  printf("Thread xmltv file parser starting....\n");
   // parse last tvguide loaded
   if (strcmp(configbackend,"mythtv")==0) {
     // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
@@ -9478,7 +9485,7 @@ void *datainfoloader_xmltv(void *data) {
   get_tvguide_fromweb();
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  printf("loader thread xmltvguide done.\n");
+  printf("parser xmltv guide done.\n");
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }

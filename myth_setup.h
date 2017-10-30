@@ -5,6 +5,16 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+const int MAXPRGLIST_ANTAL=200;
+
+struct channel_list_struct {
+  bool selected;
+  char id[80];                             // channel_list array used in setup graber
+  char name[80];                             // channel_list array used in setup graber
+};
+
+void save_channel_list();
+void load_channel_list();
 
 void show_setup_interface();
 void show_setup_screen();
@@ -16,6 +26,7 @@ void show_setup_network();
 void show_setup_font(int startofset);
 void show_setup_keys();
 void show_setup_tv_graber();
+void load_channel_list_from_graber();
 void show_wlan_networks(int valgtnr);
 
 #endif
