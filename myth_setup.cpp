@@ -2851,7 +2851,7 @@ void load_channel_list() {
 // ********************* show setuo tv graber ************************************************************************
 //
 
-void show_setup_tv_graber() {
+void show_setup_tv_graber(int startofset) {
     int winsizx=100;
     int winsizy=300;
     int xpos=0;
@@ -3049,8 +3049,8 @@ void show_setup_tv_graber() {
       glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       if ((do_show_setup_select_linie-3)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
-      if (channel_list[n-1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
-      myglprint4((char *) channel_list[n-1].name);
+      if (channel_list[(n-1)+startofset].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
+      myglprint4((char *) channel_list[(n-1)+startofset].name);
       glPopMatrix();
     }
 
