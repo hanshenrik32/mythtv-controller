@@ -173,6 +173,7 @@ char music_db_update_loader[256];                       //
 
 bool loading_tv_guide=false;                            // loading_tv_guide true if loading
 
+int tvchannel_startofset=0;
 
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
@@ -2199,7 +2200,6 @@ void show_background() {
 
 
 void display() {
-
     // used by xmltv updater func
     static time_t today=0;
     static time_t lasttoday=0;
@@ -4517,7 +4517,10 @@ void display() {
             }
             if (do_show_setup_font) show_setup_font(setupfontselectofset);
             if (do_show_setup_keys) show_setup_keys();
-            if (do_show_tvgraber) show_setup_tv_graber();
+            if (do_show_tvgraber) {
+              //if (do_show_setup_select_linie>10) tvchannel_startofset++;
+              show_setup_tv_graber(tvchannel_startofset);
+            }
         }
         glPopMatrix();
     }
@@ -6710,7 +6713,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_tvgraber) {
-                        if (do_show_setup_select_linie<15) do_show_setup_select_linie++;
+                      if (do_show_setup_select_linie==15) tvchannel_startofset++; else do_show_setup_select_linie++;
                     }
 
 
@@ -6857,7 +6860,12 @@ void handlespeckeypress(int key,int x,int y) {
                         if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                     }
                     if (do_show_tvgraber) {
-                      if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                      if (do_show_setup_select_linie>0) {
+                        if ((do_show_setup_select_linie>0) && (tvchannel_startofset>0)) {
+                          if (do_show_setup_select_linie>3) do_show_setup_select_linie--; else
+                          if (tvchannel_startofset>0) tvchannel_startofset--; else do_show_setup_select_linie--;
+                        } else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                      }
                     }
 
                     keybuffer[0]=0;

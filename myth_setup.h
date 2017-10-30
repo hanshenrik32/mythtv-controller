@@ -25,7 +25,7 @@ void show_setup_tema();
 void show_setup_network();
 void show_setup_font(int startofset);
 void show_setup_keys();
-void show_setup_tv_graber();
+void show_setup_tv_graber(int startofset);
 void load_channel_list_from_graber();
 void show_wlan_networks(int valgtnr);
 
