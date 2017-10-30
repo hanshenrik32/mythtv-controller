@@ -2783,7 +2783,7 @@ void show_setup_keys() {
 
 
 //
-//
+// parse channel info from xmltvguide reader channel overview xmlfile
 //
 
 void load_channel_list_from_graber() {
@@ -2820,6 +2820,10 @@ void load_channel_list_from_graber() {
   }
 }
 
+//
+// save tvguide channel info
+//
+
 void save_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
@@ -2832,6 +2836,11 @@ void save_channel_list() {
     fclose(fil);
   }
 }
+
+
+//
+// load tvguide channel info
+//
 
 void load_channel_list() {
   FILE *fil;
