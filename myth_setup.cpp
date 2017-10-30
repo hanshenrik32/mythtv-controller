@@ -31,7 +31,7 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
-
+extern int PRGLIST_ANTAL;
 extern bool global_use_internal_music_loader_system;
 extern bool full_screen;
 extern char configmythsoundsystem[256];
@@ -2803,7 +2803,6 @@ void load_channel_list_from_graber() {
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
   sysresult=system(exestring);
-
   fil=fopen("/home/hans/tvguide_channels.txt","r");
   if (fil) {
     while(!(feof(fil))) {
@@ -2813,6 +2812,7 @@ void load_channel_list_from_graber() {
         strcpy(channel_list[cnr].name,buffer);
         channel_list[cnr].selected=true;
         cnr++;
+        PRGLIST_ANTAL++;
       }
     }
     fclose(fil);

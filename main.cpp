@@ -280,6 +280,7 @@ int stream_key_selected=0;
 int stream_select_iconnr=0;
 int do_zoom_tvprg_aktiv_nr=0;
 
+int PRGLIST_ANTAL=0;                                      // used in tvguide xml program selector
 
 int music_select_iconnr;
 
@@ -6713,7 +6714,8 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     // setup videoplayer window
                     if (do_show_tvgraber) {
-                      if (do_show_setup_select_linie==15) tvchannel_startofset++; else do_show_setup_select_linie++;
+                      if ((do_show_setup_select_linie==15) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
+                       else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                     }
 
 
@@ -7377,6 +7379,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                           printf("Select tv channels\n");
                         }
                         break;
+                case 2: break;
+                default: break;
              }
            }
        }
@@ -7384,12 +7388,23 @@ void handleKeypress(unsigned char key, int x, int y) {
         switch(key) {
             case 27:
                     // close setup windows again or close proram of not in menu
-                    if (do_show_setup) do_show_setup=false;
+                    if (do_show_setup) {
+                      if (do_show_tvgraber) do_show_tvgraber=false; else
+                      if (do_show_videoplayer) do_show_videoplayer=false; else
+                      if (do_show_setup_sql) do_show_setup_sql=false; else
+                      if (do_show_setup_font) do_show_setup_font=false; else
+                      if (do_show_setup_keys) do_show_setup_keys=false; else
+                      if (do_show_setup_tema) do_show_setup_tema=false; else
+                      if (do_show_setup_sound) do_show_setup_sound=false; else
+                      if (do_show_setup_screen) do_show_setup_screen=false; else
+                      do_show_setup=false;
+                    }
                     else if (vis_music_oversigt) vis_music_oversigt=false;
                     else if (vis_radio_oversigt) vis_radio_oversigt=false;
                     else if (vis_film_oversigt) vis_film_oversigt=false;
                     else if (vis_stream_oversigt) vis_stream_oversigt=false;
                     else if (vis_tv_oversigt) vis_tv_oversigt=false;
+                    else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                     else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                     else {
                       remove("mythtv-controller.lock");
