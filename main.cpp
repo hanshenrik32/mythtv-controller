@@ -7389,8 +7389,10 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 27:
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
-                      if (do_show_tvgraber) do_show_tvgraber=false; else
-                      if (do_show_videoplayer) do_show_videoplayer=false; else
+                      if (do_show_tvgraber) {
+                        save_channel_list();
+                        do_show_tvgraber=false;
+                      } else if (do_show_videoplayer) do_show_videoplayer=false; else
                       if (do_show_setup_sql) do_show_setup_sql=false; else
                       if (do_show_setup_font) do_show_setup_font=false; else
                       if (do_show_setup_keys) do_show_setup_keys=false; else
