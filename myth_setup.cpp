@@ -57,8 +57,9 @@ extern char configclosemythtvfrontend[256];			// close mythtvfront end on startu
 extern char configaktivescreensavername[256];		// screen saver name
 extern char configsoundoutport[256];				    // sound output port (hdmi/spdif/analog)
 extern char configfontname[200];				        // default ttf font name to load and use
-extern char configbackend_tvgraber[256];                       // internal tv graber to use
-extern char configbackend_tvgraber_path[256];                  // internal tv graber to use
+extern long configtvguidelastupdate;            // last xmltv update
+extern char configbackend_tvgraber[256];        // internal tv graber to use
+extern char configbackend_tvgraber_path[256];   // internal tv graber to use
 extern configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
@@ -2861,6 +2862,8 @@ void load_channel_list() {
 //
 
 void show_setup_tv_graber(int startofset) {
+    const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
+    struct tm *xmlupdatelasttime;
     int winsizx=100;
     int winsizy=300;
     int xpos=0;
@@ -2871,6 +2874,7 @@ void show_setup_tv_graber(int startofset) {
     if (hent_tv_channels==false) {
       hent_tv_channels=true;
       load_channel_list_from_graber();
+      load_channel_list();
     }
     // background
     glPushMatrix();
@@ -2937,6 +2941,16 @@ void show_setup_tv_graber(int startofset) {
       glPopMatrix();
     }
 
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(540, 600, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Last update");
+    glPopMatrix();
+
+
+
     // start af input felter
 
     glPushMatrix();
@@ -3002,13 +3016,18 @@ void show_setup_tv_graber(int startofset) {
         glRasterPos2f(0.0f, 0.0f);
         glColor3f(1.0f,1.0f,1.0f);
         if (do_show_setup_select_linie==0) {
-            strcpy(keybuffer,"[ ]");
-            myglprint4((char *) keybuffer);   // keybuffer
+          xmlupdatelasttime=localtime(&configtvguidelastupdate);
+          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+          myglprint4((char *) keybuffer);   // keybuffer
         } else {
-            myglprint4((char *) "[X]");
+          xmlupdatelasttime=localtime(&configtvguidelastupdate);
+          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+          myglprint4((char *) keybuffer);   // keybuffer
         }
         glPopMatrix();
     }
+
+
     glPushMatrix();
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
