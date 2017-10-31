@@ -5340,7 +5340,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 do_show_setup_font=false;
                 do_show_setup_keys=false;
                 do_show_videoplayer=false;
-                do_show_tvgraber=true;
+                do_show_tvgraber=true;                
                 fundet=true;
             }
 
@@ -7390,6 +7390,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
+                        //
+                        // save chennel list info to internal datafile
+                        //
                         save_channel_list();
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
