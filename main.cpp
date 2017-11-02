@@ -5340,7 +5340,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 do_show_setup_font=false;
                 do_show_setup_keys=false;
                 do_show_videoplayer=false;
-                do_show_tvgraber=true;                
+                do_show_tvgraber=true;
                 fundet=true;
             }
 
@@ -9473,6 +9473,12 @@ void *datainfoloader_stream(void *data) {
   }
   printf("loader thread done loaded stream stations \n");
   pthread_exit(NULL);
+}
+
+
+bool check_tvguide_process_running() {
+
+
 }
 
 

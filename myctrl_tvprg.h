@@ -63,29 +63,29 @@ class tv_oversigt {
         char mysqlluser[200];
         char mysqllpass[200];
         char loadinginfotxt[200];
-        int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					// return type (1/2/3) found of tv program to record
-        int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);
-        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);
-        time_t lastupdated;                                                       // last updated unix date
+        int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
+        int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);                              //
+        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
+        time_t lastupdated;                                                                                   // last updated unix date
     public:
-        tv_oversigt();
-        ~tv_oversigt();
+        tv_oversigt();                                                                                        // constructor
+        ~tv_oversigt();                                                                                       // destructor
         int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
-        int tv_kanal_antal() { return (kanal_antal); }
-        void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);
-        void show_fasttv_oversigt_old(int selectchanel,int selectprg);
-        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl);
-        void show_canal_names();
-        void showandsetprginfo(int kanalnr,int tvprgnr);					  	// show the prg info in
-        int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }
-        bool changetime(time_t difftime) { starttid+=difftime; sluttid+=difftime; return(true); }
-        int cleanchannels();
-        int tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr);
-        int findguidetvtidspunkt(int kanalnr,time_t tidspunkt);							// finder record nr som svare til starttid i timer
-        time_t hentprgstartklint(int kanalnr,int prgnr);
-        int parsexmltv(const char *filename);
-        time_t getlastupdate() { return lastupdated; }
-        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }
+        int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
+        void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
+        void show_fasttv_oversigt_old(int selectchanel,int selectprg);                                        //
+        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl);                                  //
+        void show_canal_names();                                                                              //
+        void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
+        int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //
+        bool changetime(time_t difftime) { starttid+=difftime; sluttid+=difftime; return(true); }             //
+        int cleanchannels();                                                                                  // clear all tv channels
+        int tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                   //
+        int findguidetvtidspunkt(int kanalnr,time_t tidspunkt);	                                  						// finder record nr som svare til starttid i timer
+        time_t hentprgstartklint(int kanalnr,int prgnr);                                                      //
+        int parsexmltv(const char *filename);                                                                 // parse and update db from tvguide.xml file from users homedir
+        time_t getlastupdate() { return lastupdated; }                                                        //
+        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }                                     //
 };
 
 
