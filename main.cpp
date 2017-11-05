@@ -9493,9 +9493,9 @@ bool check_tvguide_process_running() {
 
 // intern function for _xmltv
 
-void *get_tvguide_fromweb() {
+int get_tvguide_fromweb() {
   char exestring[2048];
-  int result;
+  int result=-1;
   if (check_tvguide_process_running()==false) {
     strcpy(exestring,configbackend_tvgraber);
     strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
@@ -9504,6 +9504,7 @@ void *get_tvguide_fromweb() {
     //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
     printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");
+  return(result);
 }
 
 
@@ -9526,8 +9527,13 @@ void *datainfoloader_xmltv(void *data) {
     //if (error==0)
     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
   }
+  //
   // load xmltvguide from web
-  get_tvguide_fromweb();
+  if (get_tvguide_fromweb()!=-1) {
+    error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+    //if (error==0)
+    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+  }
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
   printf("parser xmltv guide done.\n");
