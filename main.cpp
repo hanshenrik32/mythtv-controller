@@ -9480,14 +9480,16 @@ void *datainfoloader_stream(void *data) {
 // ceck if process is running
 //
 
-bool check_tvguide_process_running() {
+bool check_tvguide_process_running(char *processname) {
   int processid=0;
   bool status=false;
+  char processcheckstr[1024];
+  sprintf(processcheckstr,"pidof -x %s > /dev/null",processname);
   if(0 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
     status=true;
      //A process having name PROCESS is running.
   }
-  else if(1 == system("pidof -x PROCESS > /dev/null")) {
+  else if(1 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
     status=false;
     //A process having name PROCESS is NOT running.
   }
@@ -9500,7 +9502,7 @@ bool check_tvguide_process_running() {
 int get_tvguide_fromweb() {
   char exestring[2048];
   int result=-1;
-  if (check_tvguide_process_running()==false) {
+  if (check_tvguide_process_running("tv_grab_dk_dr")==false) {
     strcpy(exestring,configbackend_tvgraber);
     strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
     printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
