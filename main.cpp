@@ -9476,6 +9476,10 @@ void *datainfoloader_stream(void *data) {
 }
 
 
+//
+// ceck if process is running
+//
+
 bool check_tvguide_process_running() {
   int processid=0;
   bool status=false;
