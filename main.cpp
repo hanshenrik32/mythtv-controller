@@ -9477,8 +9477,17 @@ void *datainfoloader_stream(void *data) {
 
 
 bool check_tvguide_process_running() {
-
-
+  int processid=0;
+  bool status=false;
+  if(0 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
+    status=true;
+     //A process having name PROCESS is running.
+  }
+  else if(1 == system("pidof -x PROCESS > /dev/null")) {
+    status=false;
+    //A process having name PROCESS is NOT running.
+  }
+  return(status);
 }
 
 
@@ -9487,12 +9496,14 @@ bool check_tvguide_process_running() {
 void *get_tvguide_fromweb() {
   char exestring[2048];
   int result;
-  strcpy(exestring,configbackend_tvgraber);
-  strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
-  printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
-  result=system(exestring);
-//  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
-  printf("Done tv graber background process exit kode %d\n",result);
+  if (check_tvguide_process_running()==false) {
+    strcpy(exestring,configbackend_tvgraber);
+    strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
+    printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
+    result=system(exestring);
+    //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+    printf("Done tv graber background process exit kode %d\n",result);
+  } else printf("Graber is already ruuning.\n");
 }
 
 
