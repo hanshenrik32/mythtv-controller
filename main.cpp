@@ -9320,13 +9320,9 @@ int init_sound_system(int devicenr) {
 
 
 
-
-
 //
 // phread dataload  check radio stations if it is online
 //
-
-
 
 void *radio_check_statusloader(void *data) {
   bool notdone=false;
@@ -9363,14 +9359,7 @@ void *radio_check_statusloader(void *data) {
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
   if (debugmode % 2) printf("loader thread starting - Loading music info from mythtv.\n");
-  //pthread_mutex_unlock(&count_mutex);
-
-  //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
   if (strcmp(configbackend,"mythtv")==0) {
-      // Opdatere tv oversigt fra mythtv db
-      //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
       // opdatere music oversigt
       // hent alt music info fra database
       // check if internal music db exist if yes do set global use it
@@ -9412,14 +9401,8 @@ void *datainfoloader_movie(void *data) {
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
     printf("loader thread starting - Loading movie info from mythtv.\n");
-      // Opdatere tv oversigt fra mythtv db
-  //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
-      // opdatere music oversigt
-      //opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
-
       film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
-                                                                // load record file list
+                                                            // load record file list
 /*
       recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
       // load old recorded list not some recorded any more
@@ -9447,17 +9430,8 @@ void *datainfoloader_movie(void *data) {
 //
 
 void *datainfoloader_stream(void *data) {
-  //pthread_mutex_lock(&count_mutex);
   printf("loader thread starting - Loading stream info from mythtv.\n");
-  //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
-      // Opdatere tv oversigt fra mythtv db
-  //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
-      // opdatere music oversigt
-      //opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
-
-      //film_oversigt.opdatere_film_oversigt();      					        // gen covers 3d hvis de ikke findes.
                                                                     // load record file list
 /*
       recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
@@ -9473,44 +9447,6 @@ void *datainfoloader_stream(void *data) {
   }
   printf("loader thread done loaded stream stations \n");
   pthread_exit(NULL);
-}
-
-
-//
-// ceck if process is running
-//
-
-bool check_tvguide_process_running(char *processname) {
-  int processid=0;
-  bool status=false;
-  char processcheckstr[1024];
-  sprintf(processcheckstr,"pidof -x %s > /dev/null",processname);
-  if(0 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
-    status=true;
-     //A process having name PROCESS is running.
-  }
-  else if(1 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
-    status=false;
-    //A process having name PROCESS is NOT running.
-  }
-  return(status);
-}
-
-
-// intern function for _xmltv
-
-int get_tvguide_fromweb() {
-  char exestring[2048];
-  int result=-1;
-  if (check_tvguide_process_running("tv_grab_dk_dr")==false) {
-    strcpy(exestring,configbackend_tvgraber);
-    strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
-    printf("Start tv graber program background process by %s\n",configbackend_tvgraber);
-    result=system(exestring);
-    //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
-    printf("Done tv graber background process exit kode %d\n",result);
-  } else printf("Graber is already ruuning.\n");
-  return(result);
 }
 
 

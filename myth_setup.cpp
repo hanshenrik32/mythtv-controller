@@ -2817,6 +2817,8 @@ void load_channel_list_from_graber() {
       }
     }
     fclose(fil);
+    // remove temp file again
+    sysresult=system("rm ~/tvguide_channels.txt");
     if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
   }
 }
@@ -2874,7 +2876,7 @@ void show_setup_tv_graber(int startofset) {
     if (hent_tv_channels==false) {
       hent_tv_channels=true;
       load_channel_list_from_graber();
-      load_channel_list();
+      //load_channel_list();
     }
     // background
     glPushMatrix();
@@ -3050,7 +3052,7 @@ void show_setup_tv_graber(int startofset) {
 
 
     //
-    // show channel naes to select active channel and order
+    // show channel names to select active channel and order
     //
     glPushMatrix();
     winsizx=450;
