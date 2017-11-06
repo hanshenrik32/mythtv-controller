@@ -39,9 +39,9 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
 
 class tv_oversigt_pr_kanal {
     private:
-        unsigned int programantal;
+        unsigned int programantal;                                  // # of program guide records
     public:
-        char chanel_name[20];								// kanal navn
+        char chanel_name[20];						                         		// kanal navn
         unsigned int chanid;
         tv_oversigt_prgtype tv_prog_guide[maxprogram_antal];				// program oversigt over kanal navn (pointer array)
         tv_oversigt_pr_kanal();
@@ -55,7 +55,7 @@ class tv_oversigt_pr_kanal {
 
 class tv_oversigt {
     private:
-        tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];
+        tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int kanal_antal;
         time_t starttid;
         time_t sluttid;
@@ -108,13 +108,14 @@ public:
     void showtvreclist();
 };
 
-int parsexmltv();
-
-
 const char ugedage[7][12]={"Søndag","Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"};
 const char ugedageus[7][12]={"Sunday","Monday","tuesday","Wednesday","Thursday","Friday","Saturday"};
 
 const char upcommingrec[]="Upcoming Recordings.";
 const char oldrecordning[]="Old recordeds.";
+
+//bool check_tvguide_process_running(char *processname);
+int parsexmltv();
+int get_tvguide_fromweb();
 
 #endif
