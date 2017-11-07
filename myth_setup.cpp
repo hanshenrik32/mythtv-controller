@@ -2827,17 +2827,18 @@ void load_channel_list_from_graber() {
 // save tvguide channel info
 //
 
-void save_channel_list() {
+bool save_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
   fil=fopen("/home/hans/tvguide_channels.dat","w");
   if (fil) {
-    while(cnr<200) {
+    while(cnr<PRGLIST_ANTAL) {
       fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
     }
     fclose(fil);
   }
+  if (cnr>0) return(true); else return(false);
 }
 
 
@@ -2845,17 +2846,20 @@ void save_channel_list() {
 // load tvguide channel info
 //
 
-void load_channel_list() {
+int load_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  PRGLIST_ANTAL=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","r");
   if (fil) {
-    while(cnr<200) {
+    while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
+      PRGLIST_ANTAL++;
     }
     fclose(fil);
   }
+  return(cnr);
 }
 
 
@@ -2865,8 +2869,8 @@ void load_channel_list() {
 
 void show_setup_tv_graber(int startofset) {
     const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
-    struct tm *xmlupdatelasttime;
     int winsizx=100;
+    struct tm *xmlupdatelasttime;
     int winsizy=300;
     int xpos=0;
     int ypos=0;
@@ -2875,8 +2879,12 @@ void show_setup_tv_graber(int startofset) {
     // update channel list before show it
     if (hent_tv_channels==false) {
       hent_tv_channels=true;
-      load_channel_list_from_graber();
-      //load_channel_list();
+      if (!(load_channel_list())) {
+        // load channel names from tvguide grapper and save it to internal db
+        // it is a first time program thing
+        load_channel_list_from_graber();
+        save_channel_list();
+      }
     }
     // background
     glPushMatrix();

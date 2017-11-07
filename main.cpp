@@ -6717,8 +6717,6 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((do_show_setup_select_linie==15) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
                        else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                     }
-
-
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
@@ -6865,9 +6863,11 @@ void handlespeckeypress(int key,int x,int y) {
                       if (do_show_setup_select_linie>0) {
                         if ((do_show_setup_select_linie>0) && (tvchannel_startofset>0)) {
                           if (do_show_setup_select_linie>3) do_show_setup_select_linie--; else
-                          if (tvchannel_startofset>0) tvchannel_startofset--; else do_show_setup_select_linie--;
+                          if (tvchannel_startofset>0) tvchannel_startofset--; else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                         } else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                       }
+                      if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
+                      if (tvchannel_startofset<0) tvchannel_startofset=0;
                     }
 
                     keybuffer[0]=0;
@@ -6881,12 +6881,24 @@ void handlespeckeypress(int key,int x,int y) {
                     aktiv_tv_oversigt.changetime(60*60*24);
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
+                if (do_show_tvgraber) {
+                  if (tvchannel_startofset>0) tvchannel_startofset-=12;
+                  else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie-=12;
+                  if (do_show_setup_select_linie<3) do_show_setup_select_linie=3;
+                  if (tvchannel_startofset<0) tvchannel_startofset=0;
+                }
+
                 break;
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(-(60*60*24));
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
+                if (do_show_tvgraber) {
+                  if (tvchannel_startofset>0) tvchannel_startofset+=12;
+                  else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie+=12;
+                }
+
                 break;
         case GLUT_KEY_HOME:
                 if (vis_tv_oversigt) {
@@ -6903,6 +6915,11 @@ void handlespeckeypress(int key,int x,int y) {
                     radio_key_selected=1;
                     radio_select_iconnr=1;
                 }
+                if (do_show_tvgraber) {
+                  tvchannel_startofset=0;
+                  do_show_setup_select_linie=0;
+                }
+
                 break;
         case GLUT_KEY_END:
                 if (vis_tv_oversigt) {
@@ -6911,11 +6928,13 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
 
-
     }
 
     if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
+
+//    if (do_show_tvgraber) printf("line %2d of %2d\n",do_show_setup_select_linie+tvchannel_startofset,PRGLIST_ANTAL);
+
 
 }
 
