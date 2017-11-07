@@ -63,6 +63,7 @@ extern char configmysqlpass[256];                              //
 extern char configmysqlhost[256];                              //
 extern char configmusicpath[256];                              //
 extern char configmusicmypath[];                               //
+extern char configbackend_tvgraber[256];                       // internal tv graber to use
 extern long configtvguidelastupdate;                           //
 
 extern bool loading_tv_guide;
@@ -110,6 +111,52 @@ void myglprinttv(char *string) {
        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
     }
 }
+
+
+//
+// ceck if process is running
+//
+
+bool check_tvguide_process_running(char *processname) {
+  int processid=0;
+  bool status=false;
+  char processcheckstr[1024];
+  sprintf(processcheckstr,"pidof -x %s > /dev/null",processname);
+  if(0 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
+    status=true;
+     //A process having name PROCESS is running.
+  }
+  else if(1 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
+    status=false;
+    //A process having name PROCESS is NOT running.
+  }
+  return(status);
+}
+
+
+// intern function for _xmltv
+
+int get_tvguide_fromweb() {
+  char exestring[2048];
+  int result=-1;
+  if (check_tvguide_process_running("tv_grab_dk_dr")==false) {
+    strcpy(exestring,configbackend_tvgraber);
+    strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
+    printf("Start tv graber background process %s\n",configbackend_tvgraber);
+    result=system(exestring);
+    //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+    printf("Done tv graber background process exit kode %d\n",result);
+  } else printf("Graber is already ruuning.\n");
+  return(result);
+}
+
+
+
+
+
+
+
+
 
 
 

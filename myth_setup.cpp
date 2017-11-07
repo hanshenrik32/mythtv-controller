@@ -31,7 +31,7 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
-
+extern int PRGLIST_ANTAL;
 extern bool global_use_internal_music_loader_system;
 extern bool full_screen;
 extern char configmythsoundsystem[256];
@@ -57,8 +57,9 @@ extern char configclosemythtvfrontend[256];			// close mythtvfront end on startu
 extern char configaktivescreensavername[256];		// screen saver name
 extern char configsoundoutport[256];				    // sound output port (hdmi/spdif/analog)
 extern char configfontname[200];				        // default ttf font name to load and use
-extern char configbackend_tvgraber[256];                       // internal tv graber to use
-extern char configbackend_tvgraber_path[256];                  // internal tv graber to use
+extern long configtvguidelastupdate;            // last xmltv update
+extern char configbackend_tvgraber[256];        // internal tv graber to use
+extern char configbackend_tvgraber_path[256];   // internal tv graber to use
 extern configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
@@ -2783,7 +2784,7 @@ void show_setup_keys() {
 
 
 //
-//
+// parse channel info from xmltvguide reader channel overview xmlfile
 //
 
 void load_channel_list_from_graber() {
@@ -2803,7 +2804,6 @@ void load_channel_list_from_graber() {
   strcpy(exestring,configbackend_tvgraber);
   strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
   sysresult=system(exestring);
-
   fil=fopen("/home/hans/tvguide_channels.txt","r");
   if (fil) {
     while(!(feof(fil))) {
@@ -2813,37 +2813,53 @@ void load_channel_list_from_graber() {
         strcpy(channel_list[cnr].name,buffer);
         channel_list[cnr].selected=true;
         cnr++;
+        PRGLIST_ANTAL++;
       }
     }
     fclose(fil);
+    // remove temp file again
+    sysresult=system("rm ~/tvguide_channels.txt");
     if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
   }
 }
 
-void save_channel_list() {
+//
+// save tvguide channel info
+//
+
+bool save_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
   fil=fopen("/home/hans/tvguide_channels.dat","w");
   if (fil) {
-    while(cnr<200) {
+    while(cnr<PRGLIST_ANTAL) {
       fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
     }
     fclose(fil);
   }
+  if (cnr>0) return(true); else return(false);
 }
 
-void load_channel_list() {
+
+//
+// load tvguide channel info
+//
+
+int load_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  PRGLIST_ANTAL=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","r");
   if (fil) {
-    while(cnr<200) {
+    while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
+      PRGLIST_ANTAL++;
     }
     fclose(fil);
   }
+  return(cnr);
 }
 
 
@@ -2851,8 +2867,10 @@ void load_channel_list() {
 // ********************* show setuo tv graber ************************************************************************
 //
 
-void show_setup_tv_graber() {
+void show_setup_tv_graber(int startofset) {
+    const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
     int winsizx=100;
+    struct tm *xmlupdatelasttime;
     int winsizy=300;
     int xpos=0;
     int ypos=0;
@@ -2861,7 +2879,12 @@ void show_setup_tv_graber() {
     // update channel list before show it
     if (hent_tv_channels==false) {
       hent_tv_channels=true;
-      load_channel_list_from_graber();
+      if (!(load_channel_list())) {
+        // load channel names from tvguide grapper and save it to internal db
+        // it is a first time program thing
+        load_channel_list_from_graber();
+        save_channel_list();
+      }
     }
     // background
     glPushMatrix();
@@ -2928,6 +2951,16 @@ void show_setup_tv_graber() {
       glPopMatrix();
     }
 
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(540, 600, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Last update");
+    glPopMatrix();
+
+
+
     // start af input felter
 
     glPushMatrix();
@@ -2993,13 +3026,18 @@ void show_setup_tv_graber() {
         glRasterPos2f(0.0f, 0.0f);
         glColor3f(1.0f,1.0f,1.0f);
         if (do_show_setup_select_linie==0) {
-            strcpy(keybuffer,"[ ]");
-            myglprint4((char *) keybuffer);   // keybuffer
+          xmlupdatelasttime=localtime(&configtvguidelastupdate);
+          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+          myglprint4((char *) keybuffer);   // keybuffer
         } else {
-            myglprint4((char *) "[X]");
+          xmlupdatelasttime=localtime(&configtvguidelastupdate);
+          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+          myglprint4((char *) keybuffer);   // keybuffer
         }
         glPopMatrix();
     }
+
+
     glPushMatrix();
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
@@ -3022,7 +3060,7 @@ void show_setup_tv_graber() {
 
 
     //
-    // show channel naes to select active channel and order
+    // show channel names to select active channel and order
     //
     glPushMatrix();
     winsizx=450;
@@ -3049,8 +3087,8 @@ void show_setup_tv_graber() {
       glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       if ((do_show_setup_select_linie-3)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
-      if (channel_list[n-1].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
-      myglprint4((char *) channel_list[n-1].name);
+      if (channel_list[(n-1)+startofset].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
+      myglprint4((char *) channel_list[(n-1)+startofset].name);
       glPopMatrix();
     }
 
