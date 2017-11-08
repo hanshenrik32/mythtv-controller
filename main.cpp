@@ -5346,7 +5346,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
 
 
-            // test for close windows again icon for alll other windows
+            // test for close windows again icon for all other windows
             if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
                 do_show_setup_sound=false;
                 do_show_setup_screen=false;
@@ -6933,9 +6933,7 @@ void handlespeckeypress(int key,int x,int y) {
     if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
 
-//    if (do_show_tvgraber) printf("line %2d of %2d\n",do_show_setup_select_linie+tvchannel_startofset,PRGLIST_ANTAL);
-
-
+    if (do_show_tvgraber) printf("line %2d of %2d\n",do_show_setup_select_linie+tvchannel_startofset,PRGLIST_ANTAL);
 }
 
 
@@ -7233,8 +7231,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                         keybufferindex++;
                         keybuffer[keybufferindex]='\0';
                       }
-                    } else {
-
                     }
                     if (do_show_setup_select_linie==2) {
                       if ((key!=13) && (key!=32)) {
@@ -7244,7 +7240,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                     }
                     if (do_show_setup_select_linie>=3) {
-                      channel_list[do_show_setup_select_linie-3].selected=!channel_list[do_show_setup_select_linie-3].selected;
+                      // set tvguide channel activate or inactive
+                      channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected;
                     }
                   }
               }
