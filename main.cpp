@@ -6984,8 +6984,6 @@ void handlespeckeypress(int key,int x,int y) {
 // keyboard handler *******************************************************************************************************
 
 void handleKeypress(unsigned char key, int x, int y) {
-
-    const char *tv_grabers[]={"tv_grab_ar","tv_grab_dk_dr","tv_grab_dtv_la","tv_grab_fi","tv_grab_fi_sv","tv_grab_fr","tv_grab_il","tv_grab_is","tv_grab_it","tv_grab_nl","tv_grab_tr","tv_grab_uk_tvguide","tv_grab_eu_dotmedia"};
     const char optionmenukey='O';
     char id[80];		// bruges af wlan setup
     char tmptxt[80];
