@@ -1012,6 +1012,33 @@ int parse_config(char *filename) {
                     // set tv graber
                     else if (command_nr==settvgraber) {
                       strcpy(configbackend_tvgraber,value);
+                      if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")) aktiv_tv_graber.graberaktivnr=0;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_nl")) aktiv_tv_graber.graberaktivnr=1;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")) aktiv_tv_graber.graberaktivnr=2;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_il")) aktiv_tv_graber.graberaktivnr=3;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")) aktiv_tv_graber.graberaktivnr=4;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")) aktiv_tv_graber.graberaktivnr=5;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi")) aktiv_tv_graber.graberaktivnr=6;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")) aktiv_tv_graber.graberaktivnr=7;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")) aktiv_tv_graber.graberaktivnr=8;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")) aktiv_tv_graber.graberaktivnr=9;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr")) aktiv_tv_graber.graberaktivnr=10;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")) aktiv_tv_graber.graberaktivnr=11;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_huro")) aktiv_tv_graber.graberaktivnr=12;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")) aktiv_tv_graber.graberaktivnr=13;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_it")) aktiv_tv_graber.graberaktivnr=14;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_is")) aktiv_tv_graber.graberaktivnr=15;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")) aktiv_tv_graber.graberaktivnr=16;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")) aktiv_tv_graber.graberaktivnr=17;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_tr")) aktiv_tv_graber.graberaktivnr=18;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")) aktiv_tv_graber.graberaktivnr=19;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")) aktiv_tv_graber.graberaktivnr=20;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")) aktiv_tv_graber.graberaktivnr=21;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_ar")) aktiv_tv_graber.graberaktivnr=22;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")) aktiv_tv_graber.graberaktivnr=23;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")) aktiv_tv_graber.graberaktivnr=24;
+                      else aktiv_tv_graber.graberaktivnr=-1;
+
                       printf("**************** Set config xmltv graber ****************\n");
                       printf("Tv graber ....: %s\n",configbackend_tvgraber);
                       printf("*********************************************************\n");
