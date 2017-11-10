@@ -2887,7 +2887,7 @@ void show_setup_tv_graber(int startofset) {
     static bool hent_tv_channels=false;
     // update channel list before show it
     if (hent_tv_channels==false) {
-      hent_tv_channels=true;
+
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
@@ -3003,17 +3003,6 @@ void show_setup_tv_graber(int startofset) {
     sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
     myglprint4((char *) keybuffer);   // keybuffer
     glPopMatrix();
-/*
-    glPushMatrix();
-    glTranslatef(680 , 600 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==2) {
-      //strcp   y(keybuffer,configbackend_tvgraber_path);
-      myglprint4((char *) "  ");
-    }
-    glPopMatrix();
-*/
     //
     // show channel names to select active channel and order
     //
