@@ -1195,10 +1195,8 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
-        //
         sprintf(temp,"configdefaultmusicpath=%s\n",configdefaultmusicpath);
         fputs(temp,file);
-        //
         sprintf(temp,"configdefaultmoviepath=%s\n",configdefaultmoviepath);
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
@@ -1206,8 +1204,6 @@ int save_config(char * filename) {
         sprintf(temp,"defaultvolume=%2.2f\n",configsoundvolume);                      // sound volume
         fputs(temp,file);
         sprintf(temp,"tvgraber=%s\n",configbackend_tvgraber);                         // tv graber to use
-        fputs(temp,file);
-        sprintf(temp,"tvgraberpath=%s\n",configbackend_tvgraber);              // tv graber to use
         fputs(temp,file);
         sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
         fputs(temp,file);
