@@ -1255,26 +1255,26 @@ void load_config(char * filename) {
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
-    strcpy(configbackend_tvgraberland,"");                   // default tv guide tv_grab_uk_tvguide other command
+    strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
-        strcpy(configaktivescreensavername,"analog");				// default analog clock
-        urtype=2;								// default screen saver
-        strcpy(configmysqluser,"mythtv");				           	// default userid for mythtv
-        strcpy(configmysqlpass,"password");				         	// default password
-        strcpy(configmysqlhost,"localhost");		      			// localhost mysql server default
-        strcpy(configmythhost,"localhost");				         	// localhost mythtv server default
-        strcpy(configmythsoundsystem,"");			          		//
-        strcpy(configsoundoutport,"SPDIF");				         	// spdif out default
-        strcpy(configclosemythtvfrontend,"no");				     	//
+        strcpy(configaktivescreensavername,"analog");				  // default analog clock
+        urtype=2;								                              // default screen saver
+        strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
+        strcpy(configmysqlpass,"password");				         	  // default password
+        strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
+        strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
+        strcpy(configmythsoundsystem,"");			          		  //
+        strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
+        strcpy(configclosemythtvfrontend,"no");				     	  //
         strcpy(configfontname,"FreeMono");			           		//
-        strcpy(configmouse,"1");						                // enable mouse default
-        FILE * file = fopen(filename, "w");
+        strcpy(configmouse,"1");						                  // enable mouse default
+        FILE * file = fopen(filename, "w");                   // open file for write
         if (file) {
-           fputs("mysqluser=mythtv\n",file);
+           fputs("mysqluser=mythtv\n",file);                  // write config info to config file
            fputs("mysqlpass=password\n",file);
            fputs("mysqlhost=localhost\n",file);
            fputs("mythhost=localhost\n",file);
@@ -1297,7 +1297,6 @@ void load_config(char * filename) {
            fputs("configdefaultmovie=Movies\n",file);
            fputs("uvmetertype=1\n",file);
            fputs("tvgraber=tv_grab_uk_tvguide\n",file);
-           fputs("tvgraberpath=\n",file);
            fputs("tvgraberupdate=0\n",file);
            fclose(file);
         } else {
@@ -6723,12 +6722,9 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
-                    if (do_show_tvgraber) {
-                      if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
-                    }
                     //
                     if (do_show_tvgraber) {
-                      if ((do_show_setup_select_linie==15) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
+                      if ((do_show_setup_select_linie==13) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
                        else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                     }
                     keybuffer[0]=0;
@@ -6875,18 +6871,13 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     if (do_show_tvgraber) {
                       if (do_show_setup_select_linie>0) {
-
-
-//                        if ((do_show_setup_select_linie>0) && (tvchannel_startofset>0)) {
-//                          if (do_show_setup_select_linie>1) do_show_setup_select_linie--; else
-//                          if (tvchannel_startofset>0) tvchannel_startofset--; else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
-//                        } else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
-
-                        if ((tvchannel_startofset>0) && (do_show_setup_select_linie>15)) {
+                        // controller scoll fuction in select program channel list
+                        if ((tvchannel_startofset>0) && (do_show_setup_select_linie>13)) {
                           tvchannel_startofset--;
                         } else {
-                          if (tvchannel_startofset>0) tvchannel_startofset--;
-                          else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                          if ((tvchannel_startofset>0) && (do_show_setup_select_linie>1)) do_show_setup_select_linie--;
+                          else if ((tvchannel_startofset>0) && (do_show_setup_select_linie==1)) tvchannel_startofset--;
+                          else if ((tvchannel_startofset==0) && (do_show_setup_select_linie>0)) do_show_setup_select_linie--;
                         }
 
                       }
@@ -6957,7 +6948,7 @@ void handlespeckeypress(int key,int x,int y) {
     if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
 
-    if (do_show_tvgraber) printf("line %2d of %2d\n",do_show_setup_select_linie+tvchannel_startofset,PRGLIST_ANTAL);
+    if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
 }
 
 
@@ -7237,7 +7228,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     }
                     if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
-                      channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected;
+                        channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
                     }
                   }
               }
