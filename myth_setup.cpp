@@ -31,6 +31,7 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
+extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
 extern int PRGLIST_ANTAL;
 extern bool global_use_internal_music_loader_system;
@@ -2802,6 +2803,9 @@ void load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
+
+  printf("* Do update tvguide *\n");
+
   if (debugmode) printf("Get channel list file from web.\n");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
@@ -2852,6 +2856,7 @@ bool save_channel_list() {
 
 //
 // load tvguide channel info
+// return antal loaded
 //
 
 int load_channel_list() {
@@ -2884,15 +2889,15 @@ void show_setup_tv_graber(int startofset) {
     int xpos=0;
     int ypos=0;
     char text[200];
-    static bool hent_tv_channels=false;
     // update channel list before show it
     if (hent_tv_channels==false) {
-
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
+        hent_tv_channels=true;
         load_channel_list_from_graber();
         save_channel_list();
+        //firsttime_xmltvupdate=true;
       }
     }
     // background

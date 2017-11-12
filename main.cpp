@@ -104,10 +104,12 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
+bool hent_tv_channels=false;
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
+char configbackend_tvgraber_old[256];                   // rember last select tvgraber (used in selector in keyboard controler)
 char configbackend_tvgraberland[2048];                  // internal tv graber to use
 char configbackend[20];			                        		// backend system xbmc/mythtv
 char configmythhost[256];			                        	// host of mythtv master
@@ -6722,7 +6724,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
-                    //
+                    // tv graber setup
                     if (do_show_tvgraber) {
                       if ((do_show_setup_select_linie==13) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
                        else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
@@ -6742,7 +6744,7 @@ void handlespeckeypress(int key,int x,int y) {
                             subvalgtrecordnr++;
                         }
                     }
-                    reset_recorded_texture=true;
+                    reset_recorded_texture=true;                                //
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
@@ -7224,8 +7226,21 @@ void handleKeypress(unsigned char key, int x, int y) {
                   } else if (do_show_tvgraber) {
                     if ((key==32) && (do_show_setup_select_linie==0)) {
                       if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
+                      // husk last selected
+                      strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
                       strcpy(configbackend_tvgraber,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+                      // set load flag to show_setup_tv_graber() func not good way to do it global var
+                      // and delete old db file to get the graber to update it
                     }
+/*
+                    if (do_show_setup_select_linie==0) {
+                      if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
+                        unlink("~/tvguide_channels.dat");
+                        hent_tv_channels=false;
+                        strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
+                      }
+                    }
+*/
                     if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
                         channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
@@ -7393,10 +7408,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
-                        //
+                        // clear old tvguide in db
+                        aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
-                        //
                         save_channel_list();
+                        aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+                        //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        // close tv graber windows again
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
                       if (do_show_setup_sql) do_show_setup_sql=false; else
@@ -7635,6 +7653,24 @@ void handleKeypress(unsigned char key, int x, int y) {
                         stream_key_selected=1;
                         stream_select_iconnr=0;
                         _sangley=0.0f;
+                    }
+
+                    // enter pressed in setup window xmltv
+                    // select new tv guide provider
+                    if ((do_show_tvgraber) && (do_show_setup_select_linie==0)) {
+                      if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
+                        // clean all tv guide data and reload
+                        printf("* Update tvguide *\n");
+
+                        unlink("/home/hans/tvguide_channels.dat");
+                        hent_tv_channels=false;
+                        // set update process
+                        //do_update_xmltv=true;
+
+
+                        strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
+
+                      }
                     }
 
 
@@ -10485,6 +10521,8 @@ int main(int argc, char** argv) {
 
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
+
+    strcpy(configbackend_tvgraber_old,"");
 
     if (strncmp(configbackend,"xbmc",4)==0) {
 
