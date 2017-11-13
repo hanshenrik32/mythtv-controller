@@ -2804,34 +2804,55 @@ void txmltvgraber_createconfig() {
       case 2: sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_es_laguiatv
-      case 3: sprintf(exebuffer,"'all\n' |");
+      case 3: sprintf(exebuffer,"'\n\nall\nno\nall\n' |");
               break;
               // create new config for tv_grab_il
       case 4: sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_na_tvmedia
+              // not work now
       case 5: sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_dtv_la
+              // not work
       case 6: sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_fi
       case 7: sprintf(exebuffer,"'all\n' |");
               break;
+              /*
+              0: Austria
+              1: Croatia
+              2: Denmark
+              3: Estonia
+              4: Finland
+              5: Germany
+              6: Hungary
+              7: Latvia
+              8: Lithuania
+              9: Netherlands
+              10: Norway
+              11: Poland
+              12: Sweden
+              13: Switzerland
+              14: All Radio stations
+              15: All TV Channels
+              */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"'all\n' |");
+      case 8: sprintf(exebuffer,"'2\n\all\n' |");
               break;
               // create new config for tv_grab_se_swedb
-      case 9: sprintf(exebuffer,"'all\n' |");
+      case 9: sprintf(exebuffer,"'\n\nall\n' |");
               break;
               // create new config for tv_grab_fr
+              // take some time to finish
       case 10: sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_uk_bleb
       case 11:sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_huro
-      case 12:sprintf(exebuffer,"'all\n' |");
+      case 12:sprintf(exebuffer,"'1\nall\n' |");
               break;
               // create new config for tv_grab_ch_search
       case 13:sprintf(exebuffer,"'all\n' |");
@@ -2846,30 +2867,34 @@ void txmltvgraber_createconfig() {
       case 16:sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_na_dtv
+              // do not work for now
+              // need more work on time zones
       case 17:sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_tr
-      case 18:sprintf(exebuffer,"'all\n' |");
+      case 18:sprintf(exebuffer,"'\nall\n' |");
               break;
               // create new config for tv_grab_eu_egon
-      case 19:sprintf(exebuffer,"'all\n' |");
+      case 19:sprintf(exebuffer,"'\n\nall\n' |");
               break;
               // create new config for tv_grab_dk_dr
-      case 20:sprintf(exebuffer,"'all\n' |");
+      case 20:sprintf(exebuffer,"'1\n0\n\nyes\nall\n' |");
               break;
               // create new config for tv_grab_se_tvzon
-      case 21:sprintf(exebuffer,"'all\n' |");
+      case 21:sprintf(exebuffer,"'\n\nall\n' |");
               break;
               // create new config for tv_grab_ar
+              //
       case 22:sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_fr_kazer
+              // do not work
       case 23:sprintf(exebuffer,"'all\n' |");
               break;
               // create new config for tv_grab_uk_tvguide
-      case 24:sprintf(exebuffer,"'all\n' |");
+      case 24:sprintf(exebuffer,"'\nall\n' |");
               break;
-      default: sprintf(exebuffer,"");
+      default: sprintf(exebuffer,"'\nall\n' |");
 
     }
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
