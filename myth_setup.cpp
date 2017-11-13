@@ -2792,7 +2792,7 @@ void txmltvgraber_createconfig() {
   char exebuffer[1024];
   int sysresult;
   // delete old config from dir
-  if (aktiv_tv_graber.graberaktivnr>0) {
+  if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
     sprintf(exebuffer,"rm ~/.xmltv/%s.conf",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     sysresult=system(exebuffer);
     // create new config
