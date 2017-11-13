@@ -2784,6 +2784,100 @@ void show_setup_keys() {
     }
 }
 
+//
+// call tv_graber config
+//
+
+void txmltvgraber_createconfig() {
+  char exebuffer[1024];
+  int sysresult;
+  // delete old config from dir
+  if (aktiv_tv_graber.graberaktivnr>0) {
+    sprintf(exebuffer,"rm ~/.xmltv/%s.conf",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+    sysresult=system(exebuffer);
+    // create new config
+    switch (aktiv_tv_graber.graberaktivnr) {
+              // create new config for tv_grab_na_dd
+      case 1: sprintf(exebuffer,"'\n\nall\n' |");
+              break;
+              // create new config for tv_grab_nl
+      case 2: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_es_laguiatv
+      case 3: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_il
+      case 4: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_na_tvmedia
+      case 5: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_dtv_la
+      case 6: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fi
+      case 7: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_eu_dotmedia
+      case 8: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_se_swedb
+      case 9: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fr
+      case 10: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_uk_bleb
+      case 11:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_huro
+      case 12:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_ch_search
+      case 13:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_it
+      case 14:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_is
+      case 15:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fi_sv
+      case 16:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_na_dtv
+      case 17:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_tr
+      case 18:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_eu_egon
+      case 19:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_dk_dr
+      case 20:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_se_tvzon
+      case 21:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_ar
+      case 22:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fr_kazer
+      case 23:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_uk_tvguide
+      case 24:sprintf(exebuffer,"'all\n' |");
+              break;
+      default: sprintf(exebuffer,"");
+
+    }
+    strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+    strcat(exebuffer, " --configure");
+    sysresult=system(exebuffer);
+  }
+}
+
 
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
@@ -2834,6 +2928,7 @@ void load_channel_list_from_graber() {
     }
   }
 }
+
 
 //
 // save tvguide channel info
@@ -2895,7 +2990,11 @@ void show_setup_tv_graber(int startofset) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
         hent_tv_channels=true;
+        // crete mew config file
+        txmltvgraber_createconfig();
+        // load mew chanel config data from file
         load_channel_list_from_graber();
+        // save config
         save_channel_list();
         //firsttime_xmltvupdate=true;
       }
