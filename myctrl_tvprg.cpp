@@ -570,6 +570,34 @@ int tv_oversigt::parsexmltv(const char *filename) {
 }
 
 
+//
+// clear tv guide
+//
+
+void tv_oversigt::cleartvguide() {
+  char sql[4096];
+  int error=0;
+  bool fundet=false;
+  char *database = (char *) "mythconverg";
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
+  if (!(conn)) error=1;
+  if (conn) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    sprintf(sql,"DROP DATABASE %s",database);
+    mysql_query(conn,sql);
+    res = mysql_store_result(conn);
+    if (res) mysql_free_result(res);
+    mysql_close(conn);
+  }
+}
 
 
 //
