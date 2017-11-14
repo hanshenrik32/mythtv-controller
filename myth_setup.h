@@ -21,6 +21,18 @@ struct channel_list_struct {
 };
 
 
+class channel_configfile {
+  private:
+    int maxconfigfilesize=200;
+    int configfilesize=0;
+    char configtext[200][80];
+  public:
+    void readgraber_configfile();
+    void writegraber_configfile();
+    void graber_configbuild();
+};
+
+
 
 bool save_channel_list();
 int load_channel_list();
