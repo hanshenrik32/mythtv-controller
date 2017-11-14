@@ -2790,6 +2790,7 @@ void show_setup_keys() {
 void load_channel_list_from_graber() {
   FILE *fil;
   char buffer[1024];
+  char buffer1[1024];
   unsigned int cnr=0;
   xmlChar *tmpdat;
   xmlDoc *document;
@@ -2802,16 +2803,19 @@ void load_channel_list_from_graber() {
   char exestring[2048];
   if (debugmode) printf("Get channel list file from web.\n");
   strcpy(exestring,configbackend_tvgraber);
-  strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
+  //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
+  strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
   sysresult=system(exestring);
   fil=fopen("/home/hans/tvguide_channels.txt","r");
   if (fil) {
     while(!(feof(fil))) {
       fgets(buffer,512,fil);
+      fgets(buffer1,512,fil);
       if (cnr<MAXPRGLIST_ANTAL) {
-        strcpy(channel_list[cnr].id,"");
-        strcpy(channel_list[cnr].name,buffer);
-        channel_list[cnr].selected=true;
+        strcpy(channel_list[cnr].id,buffer);
+        strcpy(channel_list[cnr].name,buffer1);
+        // set default new channel is not active
+        channel_list[cnr].selected=false;
         cnr++;
         PRGLIST_ANTAL++;
       }
@@ -2827,17 +2831,18 @@ void load_channel_list_from_graber() {
 // save tvguide channel info
 //
 
-void save_channel_list() {
+bool save_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
   fil=fopen("/home/hans/tvguide_channels.dat","w");
   if (fil) {
-    while(cnr<200) {
+    while(cnr<PRGLIST_ANTAL) {
       fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
     }
     fclose(fil);
   }
+  if (cnr>0) return(true); else return(false);
 }
 
 
@@ -2845,17 +2850,20 @@ void save_channel_list() {
 // load tvguide channel info
 //
 
-void load_channel_list() {
+int load_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  PRGLIST_ANTAL=0;
+  fil=fopen("/home/hans/tvguide_channels.dat","r");
   if (fil) {
-    while(cnr<200) {
+    while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
+      PRGLIST_ANTAL++;
     }
     fclose(fil);
   }
+  return(cnr);
 }
 
 
@@ -2865,8 +2873,8 @@ void load_channel_list() {
 
 void show_setup_tv_graber(int startofset) {
     const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
-    struct tm *xmlupdatelasttime;
     int winsizx=100;
+    struct tm *xmlupdatelasttime;
     int winsizy=300;
     int xpos=0;
     int ypos=0;
@@ -2875,8 +2883,12 @@ void show_setup_tv_graber(int startofset) {
     // update channel list before show it
     if (hent_tv_channels==false) {
       hent_tv_channels=true;
-      load_channel_list_from_graber();
-      //load_channel_list();
+      if (!(load_channel_list())) {
+        // load channel names from tvguide grapper and save it to internal db
+        // it is a first time program thing
+        load_channel_list_from_graber();
+        save_channel_list();
+      }
     }
     // background
     glPushMatrix();
@@ -2941,16 +2953,15 @@ void show_setup_tv_graber(int startofset) {
       glRasterPos2f(0.0f, 0.0f);
       myglprint4((char *) "tvg command");
       glPopMatrix();
+    } else {
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(540, 600, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      myglprint4((char *) "Last update");
+      glPopMatrix();
     }
-
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(540, 600, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Last update");
-    glPopMatrix();
-
 
 
     // start af input felter
@@ -2994,7 +3005,7 @@ void show_setup_tv_graber(int startofset) {
       glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
       glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
       glEnd(); //End quadrilateral coordinates
-      do_show_setup_select_linie=1;
+      //do_show_setup_select_linie=1;
     }
 
     // line 0 input
@@ -3027,18 +3038,17 @@ void show_setup_tv_graber(int startofset) {
           myglprint4((char *) keybuffer);   // keybuffer
         }
         glPopMatrix();
+    } else {
+      glPushMatrix();
+      glTranslatef(680 , 600 , 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor3f(1.0f,1.0f,1.0f);
+      if (do_show_setup_select_linie==1) {
+        strcpy(keybuffer,configbackend_tvgraber_path);
+        myglprint4((char *) configbackend_tvgraber_path);
+      }
+      glPopMatrix();
     }
-
-
-    glPushMatrix();
-    glTranslatef(680 , 600 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==1) {
-      strcpy(keybuffer,configbackend_tvgraber_path);
-      myglprint4((char *) configbackend_tvgraber_path);
-    }
-    glPopMatrix();
 
     glPushMatrix();
     glTranslatef(680 , 600 , 0.0f);
@@ -3084,10 +3094,12 @@ void show_setup_tv_graber(int startofset) {
       glPopMatrix();
     }
 
-    if ((do_show_setup_select_linie==0) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(keybuffer));
+    if (do_show_setup_select_linie==0) {
+      if (strcmp(configbackend_tvgraber,"Other")!=0) showcoursornow(311,500,strlen(keybuffer)); else showcoursornow(311,500,strlen(keybuffer));
+    }
     if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) showcoursornow(311,450,strlen(keybuffer));
-    else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
-    else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
+    else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
+    else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
     else if ((do_show_setup_select_linie>=2) && (strcmp(configbackend_tvgraber,"Other")!=0)) {
       showcoursornow(311,388-((do_show_setup_select_linie-3)*20),0);
     }

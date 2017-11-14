@@ -13,8 +13,8 @@ struct channel_list_struct {
   char name[80];                             // channel_list array used in setup graber
 };
 
-void save_channel_list();
-void load_channel_list();
+bool save_channel_list();
+int load_channel_list();
 
 void show_setup_interface();
 void show_setup_screen();
