@@ -2784,6 +2784,10 @@ void show_setup_keys() {
     }
 }
 
+
+
+
+
 //
 // call tv_graber config
 //
@@ -2903,6 +2907,88 @@ void txmltvgraber_createconfig() {
 }
 
 
+
+
+//
+// read xmltv config file and save it
+//
+
+void channel_configfile::readgraber_configfile() {
+  char buffer[1024];
+  char filename[1024];
+  FILE *fil;
+  int line=0;
+  strcpy(filename,"~/.xmltv/");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(filename,".conf");
+  fil=fopen(filename,"r");
+  if (fil) {
+    while(!(feof(fil))) {
+      if (line<maxconfigfilesize) {
+        fgets(buffer,512,fil);
+        strcpy(configtext[line],buffer);
+        line++;
+      }
+    }
+    if (line>0) configfilesize=line-1;
+    fclose(fil);
+  }
+}
+
+
+
+
+
+//
+// write xmltv config file and save it
+//
+
+void channel_configfile::writegraber_configfile() {
+  char buffer[1024];
+  char filename[1024];
+  FILE *fil;
+  int line=0;
+  strcpy(filename,"~/.xmltv/");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(filename,".conf");
+  fil=fopen(filename,"w");
+  if (fil) {
+    while(line<configfilesize) {
+      fputs(configtext[line],fil);
+      line++;
+    }
+    fclose(fil);
+  }
+}
+
+
+//
+// write xmltv config file and save it
+//
+
+void channel_configfile::graber_configbuild() {
+  char buffer[1024];
+  char filename[1024];
+  FILE *fil;
+  int line=0;
+  /*
+  strcpy(filename,"~/.xmltv/");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(filename,".conf");
+  fil=fopen(filename,"w");
+  if (fil) {
+    while(line<configfilesize) {
+      fputs(configtext[line],fil);
+      line++;
+    }
+    fclose(fil);
+  }
+  */
+}
+
+
+
+
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
 //
@@ -2921,9 +3007,6 @@ void load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
-
-  printf("* Do update tvguide *\n");
-
   if (debugmode) printf("Get channel list file from web.\n");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
@@ -2948,10 +3031,14 @@ void load_channel_list_from_graber() {
       fclose(fil);
       // remove temp file again
       sysresult=system("rm ~/tvguide_channels.txt");
-      if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
+      if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
   }
 }
+
+
+
+
 
 
 //
@@ -2996,7 +3083,7 @@ int load_channel_list() {
 
 
 //
-// ********************* show setuo tv graber ************************************************************************
+// ********************* show setup tv graber ************************************************************************
 //
 
 
