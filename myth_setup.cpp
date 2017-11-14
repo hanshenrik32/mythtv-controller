@@ -2895,7 +2895,6 @@ void txmltvgraber_createconfig() {
       case 24:sprintf(exebuffer,"'\nall\n' |");
               break;
       default: sprintf(exebuffer,"'\nall\n' |");
-
     }
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
