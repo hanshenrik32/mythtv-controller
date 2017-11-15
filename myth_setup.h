@@ -23,9 +23,9 @@ struct channel_list_struct {
 
 class channel_configfile {
   private:
-    int maxconfigfilesize=200;
+    int maxconfigfilesize=400;
     int configfilesize=0;
-    char configtext[200][80];
+    char configtext[400][80];
   public:
     void readgraber_configfile();
     void writegraber_configfile();

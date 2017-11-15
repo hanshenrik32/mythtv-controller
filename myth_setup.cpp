@@ -2969,21 +2969,50 @@ void channel_configfile::writegraber_configfile() {
 void channel_configfile::graber_configbuild() {
   char buffer[1024];
   char filename[1024];
+  char sql[4096];
   FILE *fil;
+  char *database = (char *) "mythconverg";
+  int error=0;
   int line=0;
-  /*
+  int cnr=0;                                                                    // channum to create in config file
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
   strcpy(filename,"~/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
-  fil=fopen(filename,"w");
-  if (fil) {
-    while(line<configfilesize) {
-      fputs(configtext[line],fil);
-      line++;
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
+  if (!(conn)) error=1;
+  if (conn) {
+    fil=fopen(filename,"w");
+    if (fil) {
+      // write file header
+      fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
+      /*
+      while (strncmp(txt,"channel=",8)!=0) {
+        fputs(configtext[line],fil);
+        line++;
+      }
+      */
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      while(cnr<channel_list[cnr].selected) {
+        sprintf(sql,"select channum from channel where channum like '%s' and visible=true",channel_list[cnr].id);
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+        if (res) {
+          fputs(configtext[line],fil);
+          mysql_free_result(res);
+        }
+        cnr++;
+      }
+      fclose(fil);
     }
-    fclose(fil);
+    mysql_close(conn);
   }
-  */
 }
 
 
