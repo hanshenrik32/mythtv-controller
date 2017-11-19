@@ -23,6 +23,7 @@
 #include "myth_ttffont.h"
 #include "myth_setup.h"
 #include "checknet.h"
+#include "utility.h"
 
 extern int configuvmeter;
 extern int debugmode;
@@ -2792,7 +2793,7 @@ void show_setup_keys() {
 // call tv_graber config
 //
 
-void txmltvgraber_createconfig() {
+int txmltvgraber_createconfig() {
   char exebuffer[1024];
   int sysresult;
   // delete old config from dir
@@ -2904,6 +2905,7 @@ void txmltvgraber_createconfig() {
     strcat(exebuffer, " --configure");
     sysresult=system(exebuffer);
   }
+  return(1);
 }
 
 
@@ -2913,7 +2915,7 @@ void txmltvgraber_createconfig() {
 // read xmltv config file and save it
 //
 
-void channel_configfile::readgraber_configfile() {
+int channel_configfile::readgraber_configfile() {
   char buffer[1024];
   char filename[1024];
   FILE *fil;
@@ -2933,6 +2935,7 @@ void channel_configfile::readgraber_configfile() {
     if (line>0) configfilesize=line-1;
     fclose(fil);
   }
+  return(1);
 }
 
 
@@ -2943,7 +2946,7 @@ void channel_configfile::readgraber_configfile() {
 // write xmltv config file and save it
 //
 
-void channel_configfile::writegraber_configfile() {
+int channel_configfile::writegraber_configfile() {
   char buffer[1024];
   char filename[1024];
   FILE *fil;
@@ -2959,6 +2962,7 @@ void channel_configfile::writegraber_configfile() {
     }
     fclose(fil);
   }
+  return(1);
 }
 
 
@@ -2966,9 +2970,10 @@ void channel_configfile::writegraber_configfile() {
 // write xmltv config file and save it
 //
 
-void channel_configfile::graber_configbuild() {
+int channel_configfile::graber_configbuild() {
   char buffer[1024];
   char filename[1024];
+  char userhomedir[1024];
   char sql[4096];
   FILE *fil;
   char *database = (char *) "mythconverg";
@@ -2979,40 +2984,25 @@ void channel_configfile::graber_configbuild() {
   MYSQL_RES *res;
   MYSQL_ROW row;
   // mysql stuf
-  strcpy(filename,"~/.xmltv/");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
-  conn=mysql_init(NULL);
-  // Connect to database
-  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
-  if (!(conn)) error=1;
-  if (conn) {
-    fil=fopen(filename,"w");
-    if (fil) {
-      // write file header
-      fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
-      /*
-      while (strncmp(txt,"channel=",8)!=0) {
-        fputs(configtext[line],fil);
-        line++;
+  fil=fopen(filename,"w");
+  if (fil) {
+    // write file header
+    fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
+    while(cnr<200) {
+      if (channel_list[cnr].selected) {
+        sprintf(buffer,"channel=%s",channel_list[cnr].id);
+        fputs(buffer,fil);
       }
-      */
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      while(cnr<channel_list[cnr].selected) {
-        sprintf(sql,"select channum from channel where channum like '%s' and visible=true",channel_list[cnr].id);
-        mysql_query(conn,sql);
-        res = mysql_store_result(conn);
-        if (res) {
-          fputs(configtext[line],fil);
-          mysql_free_result(res);
-        }
-        cnr++;
-      }
-      fclose(fil);
+      cnr++;
     }
-    mysql_close(conn);
+    fclose(fil);
   }
+  return(1);
 }
 
 
@@ -3022,7 +3012,7 @@ void channel_configfile::graber_configbuild() {
 // parse channel info from xmltvguide reader channel overview xmlfile
 //
 
-void load_channel_list_from_graber() {
+int load_channel_list_from_graber() {
   FILE *fil;
   char buffer[1024];
   char buffer1[1024];
@@ -3063,6 +3053,7 @@ void load_channel_list_from_graber() {
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
   }
+  return(1);
 }
 
 
