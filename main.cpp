@@ -7416,8 +7416,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                         save_channel_list();
                         // buid new config file for xmltv from saved db
                         xmltv_configcontrol.graber_configbuild();
+                        // kill running graber
+                        killrunninggraber();
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                         //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                         // close tv graber windows again
                         do_show_tvgraber=false;
