@@ -2968,6 +2968,19 @@ int channel_configfile::writegraber_configfile() {
 }
 
 
+
+// kill running graber
+//
+
+int killrunninggraber() {
+  int sysresult;
+  char processname[1024];
+  sprintf(processname,"killall -9 %s",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  sysresult=system(processname);
+}
+
+
+
 //
 // write xmltv config file and save it
 //

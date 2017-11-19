@@ -41,6 +41,8 @@ int load_channel_list_from_graber();
 bool save_channel_list();
 //
 int load_channel_list();
+//
+int killrunninggraber();
 
 
 void show_setup_interface();
