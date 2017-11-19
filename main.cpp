@@ -7410,17 +7410,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
+                        // kill running graber
+                        killrunninggraber();
                         // clear old tvguide in db
                         aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
                         save_channel_list();
                         // buid new config file for xmltv from saved db
                         xmltv_configcontrol.graber_configbuild();
-                        // kill running graber
-                        killrunninggraber();
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-
+                        // hent tv guide from db
                         aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                         //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                         // close tv graber windows again
