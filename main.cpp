@@ -93,7 +93,9 @@ int findtype=0;					                              	// bruges af search kunster/s
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
 
-channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+channel_list_struct channel_list[400];                  // channel_list array used in setup graber
+
+channel_configfile  xmltv_configcontrol;                //
 
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -7412,6 +7414,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                         aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
                         save_channel_list();
+                        // buid new config file for xmltv from saved db
+                        xmltv_configcontrol.graber_configbuild();
+                        // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
                         //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                         // close tv graber windows again

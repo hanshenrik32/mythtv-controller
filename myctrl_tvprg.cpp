@@ -571,7 +571,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
 
 
 //
-// clear tv guide
+// clear tv guide (drop db)
 //
 
 void tv_oversigt::cleartvguide() {

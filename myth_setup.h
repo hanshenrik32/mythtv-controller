@@ -27,15 +27,21 @@ class channel_configfile {
     int configfilesize=0;
     char configtext[400][80];
   public:
-    void readgraber_configfile();
-    void writegraber_configfile();
-    void graber_configbuild();
+    int readgraber_configfile();
+    int writegraber_configfile();
+    int graber_configbuild();                                                  // build xmltv config file
 };
 
 
-
+// create xml channel config file
+int txmltvgraber_createconfig();
+//
+int load_channel_list_from_graber();
+//
 bool save_channel_list();
+//
 int load_channel_list();
+
 
 void show_setup_interface();
 void show_setup_screen();
@@ -47,7 +53,6 @@ void show_setup_network();
 void show_setup_font(int startofset);
 void show_setup_keys();
 void show_setup_tv_graber(int startofset);
-void load_channel_list_from_graber();
 void show_wlan_networks(int valgtnr);
 
 #endif
