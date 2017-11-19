@@ -2918,6 +2918,7 @@ int txmltvgraber_createconfig() {
 int channel_configfile::readgraber_configfile() {
   char buffer[1024];
   char filename[1024];
+  bool errors=false;
   FILE *fil;
   int line=0;
   strcpy(filename,"~/.xmltv/");
@@ -2934,8 +2935,8 @@ int channel_configfile::readgraber_configfile() {
     }
     if (line>0) configfilesize=line-1;
     fclose(fil);
-  }
-  return(1);
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
 
 
@@ -2949,6 +2950,7 @@ int channel_configfile::readgraber_configfile() {
 int channel_configfile::writegraber_configfile() {
   char buffer[1024];
   char filename[1024];
+  bool errors=false;
   FILE *fil;
   int line=0;
   strcpy(filename,"~/.xmltv/");
@@ -2961,8 +2963,8 @@ int channel_configfile::writegraber_configfile() {
       line++;
     }
     fclose(fil);
-  }
-  return(1);
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
 
 
@@ -2980,6 +2982,7 @@ int channel_configfile::graber_configbuild() {
   int error=0;
   int line=0;
   int cnr=0;                                                                    // channum to create in config file
+  bool errors=false;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -3001,8 +3004,8 @@ int channel_configfile::graber_configbuild() {
       cnr++;
     }
     fclose(fil);
-  }
-  return(1);
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
 
 
@@ -3026,6 +3029,7 @@ int load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
+  bool errors=false;
   if (debugmode) printf("Get channel list file from web.\n");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
@@ -3052,8 +3056,8 @@ int load_channel_list_from_graber() {
       sysresult=system("rm ~/tvguide_channels.txt");
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
-  }
-  return(1);
+  } else errors=true;
+  if (errors==false) return(1); return(0);
 }
 
 
@@ -3068,6 +3072,7 @@ int load_channel_list_from_graber() {
 bool save_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
+  bool errors=false;
   fil=fopen("/home/hans/tvguide_channels.dat","w");
   if (fil) {
     while(cnr<PRGLIST_ANTAL) {
@@ -3075,7 +3080,7 @@ bool save_channel_list() {
       cnr++;
     }
     fclose(fil);
-  }
+  } else errors=true;
   if (cnr>0) return(true); else return(false);
 }
 
@@ -3088,6 +3093,7 @@ bool save_channel_list() {
 int load_channel_list() {
   FILE *fil;
   unsigned int cnr=0;
+  bool errors=false;
   PRGLIST_ANTAL=0;
   fil=fopen("/home/hans/tvguide_channels.dat","r");
   if (fil) {
@@ -3097,8 +3103,8 @@ int load_channel_list() {
       PRGLIST_ANTAL++;
     }
     fclose(fil);
-  }
-  return(cnr);
+  } else errors=true;
+  if (errors==false) return(cnr); return(0);
 }
 
 
