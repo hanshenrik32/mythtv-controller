@@ -3010,7 +3010,7 @@ int channel_configfile::graber_configbuild() {
   if (fil) {
     // write file header
     switch (aktiv_tv_graber.graberaktivnr) {
-      case 0: fputs("",fil);
+      case 0: fputs("Yv graber disabled.",fil);
               break;
       case 1: fputs("",fil);
               break;
@@ -3026,43 +3026,45 @@ int channel_configfile::graber_configbuild() {
               break;
       case 7: fputs("",fil);
               break;
-      case 8: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
+      case 8: fputs("",fil);
               break;
-      case 9: fputs("country=Denmark\ncachedir=/home/hans/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
+      case 9: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
               break;
-      case 10:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);     // tv_grab_se_swedb
+      case 10: fputs("country=Denmark\ncachedir=/home/hans/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
               break;
-      case 11:fputs("maxchannels=5\n",fil);                                  // tv_grab_pt_meo
+      case 11:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);     // tv_grab_se_swedb
               break;
-      case 12:fputs("Do not work graber error",fil);          // tv_grab_fr
+      case 12:fputs("maxchannels=5\n",fil);                                  // tv_grab_pt_meo
               break;
-      case 13:fputs("",fil);
+      case 13:fputs("Do not work graber error",fil);          // tv_grab_fr
               break;
-      case 14:fputs("country hu      # Hungary\n",fil);    // tv_grab_huro
+      case 14:fputs("",fil);
               break;
-      case 15:fputs("",fil);
+      case 15:fputs("country hu      # Hungary\n",fil);    // tv_grab_huro
               break;
-      case 16:fputs("",fil);    // tv_grab_it
+      case 16:fputs("",fil);
               break;
-      case 17:fputs("",fil);    // tv_grab_is
+      case 17:fputs("",fil);    // tv_grab_it
               break;
-      case 18:fputs("# -*- coding: utf-8 -*-\n",fil);
+      case 18:fputs("",fil);    // tv_grab_is
               break;
-      case 19:fputs("No tv graber config exist for this land. Use --configure\n",fil);
+      case 19:fputs("# -*- coding: utf-8 -*-\n",fil);
               break;
-      case 20:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+      case 20:fputs("No tv graber config exist for this land. Use --configure\n",fil);
               break;
-      case 21:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+      case 21:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
               break;
-      case 22:fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
+      case 22:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
               break;
-      case 23:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+      case 23:fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
               break;
-      case 24:fputs("location 683 CAPITAL FEDERAL\n",fil);
+      case 24:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
               break;
-      case 25:fputs("",fil);
+      case 25:fputs("location 683 CAPITAL FEDERAL\n",fil);
               break;
-      case 26:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+      case 26:fputs("",fil);
+              break;
+      case 27:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
               break;
       default:fputs("No tv graber exist for this land\n",fil);
     }
