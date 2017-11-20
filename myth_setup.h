@@ -7,6 +7,8 @@
 
 const int MAXPRGLIST_ANTAL=200;
 
+const int MAXCHANNEL_ANTAL=400;
+
 struct tv_graber_config {
   int graberantal=24;
   int graberaktivnr=0;                                                          // avtive tvguide nr in list
