@@ -97,6 +97,8 @@ channel_list_struct channel_list[400];                  // channel_list array us
 
 channel_configfile  xmltv_configcontrol;                //
 
+bool firsttime_xmltvupdate=true;
+
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -2250,7 +2252,7 @@ void display() {
 //    int fps;
     static GLint T0     = 0;
     static GLint Frames = 0;
-    static bool firsttime_xmltvupdate=true;
+    //static bool firsttime_xmltvupdate=true;     // global for now
 
     int no_open_dir=0;
     char temptxt1[200];
@@ -6888,7 +6890,6 @@ void handlespeckeypress(int key,int x,int y) {
                       if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                       if (tvchannel_startofset<0) tvchannel_startofset=0;
                     }
-
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
@@ -7243,6 +7244,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                     }
 */
+                    printf("do_show_setup_select_linie %d tvchannel_startofset %d \n",do_show_setup_select_linie,tvchannel_startofset);
                     if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
                         channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
@@ -7418,11 +7420,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                         save_channel_list();
                         // buid new config file for xmltv from saved db
                         xmltv_configcontrol.graber_configbuild();
+
+                        // hent ny tv guide
+                        //if (get_tvguide_fromweb()!=-1)
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-                        // hent tv guide from db
-                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
-                        //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        // hent/update tv guide from db
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                        // set update flag in display() func
+                        firsttime_xmltvupdate=true;
                         // close tv graber windows again
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
