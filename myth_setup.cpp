@@ -2790,8 +2790,9 @@ void show_setup_keys() {
 
 
 //
-// call tv_graber config
-//
+// call tv_graber config and do auto config if posible
+// will try to make list of all channels from tv_graber
+// by pipe the command in shell
 
 int txmltvgraber_createconfig() {
   char exebuffer[1024];
@@ -3131,7 +3132,12 @@ int load_channel_list_from_graber() {
   char result[1024];
   char exestring[2048];
   bool errors=false;
+  char userhomedir[1024];
+  char filename[1024];
   if (debugmode) printf("Get channel list file from web.\n");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.txt");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
     strcpy(exestring,configbackend_tvgraber);
@@ -3172,9 +3178,14 @@ int load_channel_list_from_graber() {
 
 bool save_channel_list() {
   FILE *fil;
+  char userhomedir[1024];
+  char filename[1024];
   unsigned int cnr=0;
   bool errors=false;
-  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.dat");
+  fil=fopen(filename,"w");
   if (fil) {
     while(cnr<PRGLIST_ANTAL) {
       fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
@@ -3193,10 +3204,15 @@ bool save_channel_list() {
 
 int load_channel_list() {
   FILE *fil;
+  char userhomedir[1024];
+  char filename[1024];
   unsigned int cnr=0;
   bool errors=false;
   PRGLIST_ANTAL=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","r");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.dat");
+  fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
