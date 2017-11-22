@@ -2224,6 +2224,7 @@ void display() {
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
+    static bool do_update_xmltv_show=false;
 
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2351,6 +2352,7 @@ void display() {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
+      do_update_xmltv_show=true;
       firsttime_xmltvupdate=false;                          // only used first time
     }
 
@@ -2808,7 +2810,7 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0,do_update_xmltv_show);
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -5200,6 +5202,7 @@ void display() {
       update_xmltv_phread_loader();
       //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       do_update_xmltv=false;
+      do_update_xmltv_show=false;
     }
 
 /*  don't wait!
