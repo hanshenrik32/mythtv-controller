@@ -3013,22 +3013,22 @@ int channel_configfile::graber_configbuild() {
       case 0: fputs("Tv-graber disabled.",fil);
               break;
       // tv_grab_na_dd
-      case 1: fputs("",fil);
+      case 1: fputs("Not posible to config graber use tv_grab_na_dd --configure to setup the xmltv graber.",fil);
               break;
       // tv_grab_nl
-      case 2: fputs("",fil);
+      case 2: fputs("# Channel ID                              Channel name\n",fil);
               break;
       // tv_grab_es_laguiatv
-      case 3: fputs("",fil);
+      case 3: fputs("configversion 3\nusecache yes\ncachedir /home/hans/.xmltv/cache\ngetdescriptions yes\n",fil);
               break;
       // tv_grab_il
-      case 4: fputs("",fil);
+      case 4: fputs("Do not work graber error.",fil);
               break;
       // tv_grab_na_tvmedia
-      case 5: fputs("",fil);
+      case 5: fputs("Not posible to config graber use tv_grab_na_tvmedia --configure to setup the xmltv graber.",fil);
               break;
       // tv_grab_dtv_la
-      case 6: fputs("",fil);
+      case 6: fputs("Do not work graber error. Homepage fault",fil);
               break;
       // tv_grab_fi
       case 7: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
@@ -3092,6 +3092,10 @@ int channel_configfile::graber_configbuild() {
     while(cnr<MAXCHANNEL_ANTAL) {
       if (channel_list[cnr].selected) {
         switch (aktiv_tv_graber.graberaktivnr) {
+          case 2: sprintf(buffer,"channel %s",channel_list[cnr].id);
+                  break;
+          case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
+                  break;
           case 23:sprintf(buffer,"channel=%s",channel_list[cnr].id);
                   break;
           default:sprintf(buffer,"channel=%s",channel_list[cnr].id);
