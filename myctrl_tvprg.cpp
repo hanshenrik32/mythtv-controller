@@ -968,23 +968,24 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
     loading_tv_guide=true;
 
+    // is startid as args ?
     if (nystarttid==0) {
-        // get time now in a string format (yyyy-mm-dd hh:mm:ss)
-        rawtime=time( NULL );				     			 // hent nu tid
-        rawtime2=time( NULL );					   	   // hent nu tid
-        rawtime2+=60*60*48;                   //  + 2 døgn
+                                            // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
+        rawtime=time(NULL);				     			// hent nu tid
+        rawtime2=time(NULL);					   	  // hent nu tid
+        rawtime2+=60*60*48;                 //  + 2 døgn
     } else {
         // hent ny starttid
         rawtime=this->starttid;                // this
         rawtime2=this->sluttid;                // this
     }
 
-    timeinfo = localtime ( &rawtime );			            		// lav om til local time
-    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		// lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    timeinfo2= localtime ( &rawtime2 );	            				//
-    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		// lav nu tids sting
-    this->starttid=rawtime;						// gem tider i class
-    this->sluttid=rawtime2;						//
+    timeinfo = localtime (&rawtime);			                        		// lav om til local time
+    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		      // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
+    timeinfo2= localtime ( &rawtime2 );	            		          		//
+    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		      // lav nu tids sting
+    this->starttid=rawtime;						                                // gem tider i class
+    this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
     printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
     // clear last tv guide array
@@ -1320,6 +1321,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   // convert clovk to localtime
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
+
   if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1347,6 +1349,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     mktime(&mytimelist);
   }
 
+  if (mytimelist.tm_mday>1) mytimelist.tm_mday--;
 
   mytimelist.tm_hour=timelist->tm_hour;
   if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
@@ -1358,7 +1361,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   xpos=50+40;
   int do_kanal_nr=0;
-  int vis_kanal_antal=7;                        // antal kanler som vises
+  int vis_kanal_antal=8;                        // antal kanler som vises
 
   //
   // loop for channel
