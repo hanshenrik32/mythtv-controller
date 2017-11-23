@@ -1361,7 +1361,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   xpos=50+40;
   int do_kanal_nr=0;
-  int vis_kanal_antal=8;                        // antal kanler som vises
+  int vis_kanal_antal=7;                        // antal kanler som vises
 
   //
   // loop for channel

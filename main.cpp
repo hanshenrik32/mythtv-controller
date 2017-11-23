@@ -6589,7 +6589,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (tvvisvalgtnrtype==1) {
                     if (tvvisvalgtnrtype==1) {
                       if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
-                        if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+                        if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
                         tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
                         //tvsubvalgtrecordnr=0;
                       }
@@ -6957,6 +6957,9 @@ void handlespeckeypress(int key,int x,int y) {
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
 
     if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
+
+    if (vis_tv_oversigt) printf("tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal());
+
 }
 
 
