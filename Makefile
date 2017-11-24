@@ -89,6 +89,7 @@ installsound:
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxf fmodstudioapi10906linux.tar.gz -C /usr/share/mythtv-controller/
+	cp xmltv_config/*  ~/.xmltv/
 	cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
 	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9.6
 	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9.6
@@ -108,6 +109,8 @@ install:
 	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
 	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
 	cp $(PROG) checkwakeup.sh startmovie.sh /usr/bin/
+	@mkdir ~/.xmltv/
+	cp xmltv_config/*  ~/.xmltv/
 	@chmod 755 /usr/bin/startmovie.sh
 	cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10

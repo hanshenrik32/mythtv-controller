@@ -31,6 +31,8 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
+extern bool hent_tv_channels;
+extern tv_graber_config  aktiv_tv_graber;
 extern int PRGLIST_ANTAL;
 extern bool global_use_internal_music_loader_system;
 extern bool full_screen;
@@ -59,7 +61,7 @@ extern char configsoundoutport[256];				    // sound output port (hdmi/spdif/ana
 extern char configfontname[200];				        // default ttf font name to load and use
 extern long configtvguidelastupdate;            // last xmltv update
 extern char configbackend_tvgraber[256];        // internal tv graber to use
-extern char configbackend_tvgraber_path[256];   // internal tv graber to use
+extern char configbackend_tvgraberland[256];    // internal tv graber to use country
 extern configkeytype configkeyslayout[12];			// functions keys startfunc
 extern char configuse3deffect[20];
 // extern char configvideoplayer[200];             // default video player
@@ -2782,6 +2784,125 @@ void show_setup_keys() {
     }
 }
 
+//
+// call tv_graber config
+//
+
+void txmltvgraber_createconfig() {
+  char exebuffer[1024];
+  int sysresult;
+  // delete old config from dir
+  if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
+    sprintf(exebuffer,"rm ~/.xmltv/%s.conf",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+    sysresult=system(exebuffer);
+    // create new config
+    switch (aktiv_tv_graber.graberaktivnr) {
+              // create new config for tv_grab_na_dd
+      case 1: sprintf(exebuffer,"'\n\nall\n' |");
+              break;
+              // create new config for tv_grab_nl
+      case 2: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_es_laguiatv
+      case 3: sprintf(exebuffer,"'\n\nall\nno\nall\n' |");
+              break;
+              // create new config for tv_grab_il
+      case 4: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_na_tvmedia
+              // not work now
+      case 5: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_dtv_la
+              // not work
+      case 6: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fi
+      case 7: sprintf(exebuffer,"'all\n' |");
+              break;
+              /*
+              0: Austria
+              1: Croatia
+              2: Denmark
+              3: Estonia
+              4: Finland
+              5: Germany
+              6: Hungary
+              7: Latvia
+              8: Lithuania
+              9: Netherlands
+              10: Norway
+              11: Poland
+              12: Sweden
+              13: Switzerland
+              14: All Radio stations
+              15: All TV Channels
+              */
+              // create new config for tv_grab_eu_dotmedia
+      case 8: sprintf(exebuffer,"'2\n\all\n' |");
+              break;
+              // create new config for tv_grab_se_swedb
+      case 9: sprintf(exebuffer,"'\n\nall\n' |");
+              break;
+              // create new config for tv_grab_fr
+              // take some time to finish
+      case 10: sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_uk_bleb
+      case 11:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_huro
+      case 12:sprintf(exebuffer,"'1\nall\n' |");
+              break;
+              // create new config for tv_grab_ch_search
+      case 13:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_it
+      case 14:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_is
+      case 15:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fi_sv
+      case 16:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_na_dtv
+              // do not work for now
+              // need more work on time zones
+      case 17:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_tr
+      case 18:sprintf(exebuffer,"'\nall\n' |");
+              break;
+              // create new config for tv_grab_eu_egon
+      case 19:sprintf(exebuffer,"'\n\nall\n' |");
+              break;
+              // create new config for tv_grab_dk_dr
+      case 20:sprintf(exebuffer,"'1\n0\n\nyes\nall\n' |");
+              break;
+              // create new config for tv_grab_se_tvzon
+      case 21:sprintf(exebuffer,"'\n\nall\n' |");
+              break;
+              // create new config for tv_grab_ar
+              //
+      case 22:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_fr_kazer
+              // do not work
+      case 23:sprintf(exebuffer,"'all\n' |");
+              break;
+              // create new config for tv_grab_uk_tvguide
+      case 24:sprintf(exebuffer,"'\nall\n' |");
+              break;
+      default: sprintf(exebuffer,"'\nall\n' |");
+
+    }
+    strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+    strcat(exebuffer, " --configure");
+    sysresult=system(exebuffer);
+  }
+}
+
 
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
@@ -2801,31 +2922,38 @@ void load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
+
+  printf("* Do update tvguide *\n");
+
   if (debugmode) printf("Get channel list file from web.\n");
-  strcpy(exestring,configbackend_tvgraber);
-  //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
-  strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
-  sysresult=system(exestring);
-  fil=fopen("/home/hans/tvguide_channels.txt","r");
-  if (fil) {
-    while(!(feof(fil))) {
-      fgets(buffer,512,fil);
-      fgets(buffer1,512,fil);
-      if (cnr<MAXPRGLIST_ANTAL) {
-        strcpy(channel_list[cnr].id,buffer);
-        strcpy(channel_list[cnr].name,buffer1);
-        // set default new channel is not active
-        channel_list[cnr].selected=false;
-        cnr++;
-        PRGLIST_ANTAL++;
+  // Er der en aktiv tv graber
+  if (aktiv_tv_graber.graberaktivnr>0) {
+    strcpy(exestring,configbackend_tvgraber);
+    //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
+    strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+    sysresult=system(exestring);
+    fil=fopen("/home/hans/tvguide_channels.txt","r");
+    if (fil) {
+      while(!(feof(fil))) {
+        fgets(buffer,512,fil);
+        fgets(buffer1,512,fil);
+        if (cnr<MAXPRGLIST_ANTAL) {
+          strcpy(channel_list[cnr].id,buffer);
+          strcpy(channel_list[cnr].name,buffer1);
+          // set default new channel is not active
+          channel_list[cnr].selected=false;
+          cnr++;
+          PRGLIST_ANTAL++;
+        }
       }
+      fclose(fil);
+      // remove temp file again
+      sysresult=system("rm ~/tvguide_channels.txt");
+      if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
     }
-    fclose(fil);
-    // remove temp file again
-    sysresult=system("rm ~/tvguide_channels.txt");
-    if (debugmode) printf("Done channel list file from web. found %2d \n",cnr);
   }
 }
+
 
 //
 // save tvguide channel info
@@ -2848,6 +2976,7 @@ bool save_channel_list() {
 
 //
 // load tvguide channel info
+// return antal loaded
 //
 
 int load_channel_list() {
@@ -2871,6 +3000,7 @@ int load_channel_list() {
 // ********************* show setuo tv graber ************************************************************************
 //
 
+
 void show_setup_tv_graber(int startofset) {
     const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
     int winsizx=100;
@@ -2879,15 +3009,19 @@ void show_setup_tv_graber(int startofset) {
     int xpos=0;
     int ypos=0;
     char text[200];
-    static bool hent_tv_channels=false;
     // update channel list before show it
     if (hent_tv_channels==false) {
-      hent_tv_channels=true;
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
+        hent_tv_channels=true;
+        // crete mew config file
+        txmltvgraber_createconfig();
+        // load mew chanel config data from file
         load_channel_list_from_graber();
+        // save config
         save_channel_list();
+        //firsttime_xmltvupdate=true;
       }
     }
     // background
@@ -2904,7 +3038,6 @@ void show_setup_tv_graber(int startofset) {
     glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,100 , 0.0);
     glEnd();
     glPopMatrix();
-
 
     glPushMatrix();
     // close buttons
@@ -2945,24 +3078,13 @@ void show_setup_tv_graber(int startofset) {
     myglprint4((char *) "Use TV graber ");
     glPopMatrix();
 
-    if (strcmp(configbackend_tvgraber,"Other")==0) {
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520, 600, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      myglprint4((char *) "tvg command");
-      glPopMatrix();
-    } else {
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(540, 600, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      myglprint4((char *) "Last update");
-      glPopMatrix();
-    }
-
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(540, 600, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Last update    ");
+    glPopMatrix();
 
     // start af input felter
 
@@ -2986,28 +3108,6 @@ void show_setup_tv_graber(int startofset) {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd(); //End quadrilateral coordinates
 
-    if (strcmp(configbackend_tvgraber,"Other")==0) {
-      // line 2
-      winsizx=500;
-      winsizy=30;
-      xpos=300;
-      ypos=450;
-      glEnable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glDisable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glEnd(); //End quadrilateral coordinates
-      //do_show_setup_select_linie=1;
-    }
-
     // line 0 input
     glDisable(GL_TEXTURE_2D);
     glPushMatrix();
@@ -3015,52 +3115,23 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==0) {
-        strcpy(keybuffer,configbackend_tvgraber);
+        strcpy(keybuffer,aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
         myglprint4((char *) keybuffer);   // keybuffer
     } else {
-        myglprint4((char *) configbackend_tvgraber);
+        myglprint4((char *) aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
     }
     glPopMatrix();
-    if (strcmp(configbackend_tvgraber,"Other")!=0) {
-        // line 1 input
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef(680 , 600 , 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glColor3f(1.0f,1.0f,1.0f);
-        if (do_show_setup_select_linie==0) {
-          xmlupdatelasttime=localtime(&configtvguidelastupdate);
-          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-          myglprint4((char *) keybuffer);   // keybuffer
-        } else {
-          xmlupdatelasttime=localtime(&configtvguidelastupdate);
-          sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-          myglprint4((char *) keybuffer);   // keybuffer
-        }
-        glPopMatrix();
-    } else {
-      glPushMatrix();
-      glTranslatef(680 , 600 , 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glColor3f(1.0f,1.0f,1.0f);
-      if (do_show_setup_select_linie==1) {
-        strcpy(keybuffer,configbackend_tvgraber_path);
-        myglprint4((char *) configbackend_tvgraber_path);
-      }
-      glPopMatrix();
-    }
 
+    // line 1 show last update date
     glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==2) {
-      //strcp   y(keybuffer,configbackend_tvgraber_path);
-      myglprint4((char *) "  ");
-    }
+    xmlupdatelasttime=localtime(&configtvguidelastupdate);
+    sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+    myglprint4((char *) keybuffer);   // keybuffer
     glPopMatrix();
-
-
     //
     // show channel names to select active channel and order
     //
@@ -3088,21 +3159,20 @@ void show_setup_tv_graber(int startofset) {
       glPushMatrix();
       glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      if ((do_show_setup_select_linie-3)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
+      if ((do_show_setup_select_linie-1)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
       if (channel_list[(n-1)+startofset].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
       myglprint4((char *) channel_list[(n-1)+startofset].name);
       glPopMatrix();
     }
 
     if (do_show_setup_select_linie==0) {
-      if (strcmp(configbackend_tvgraber,"Other")!=0) showcoursornow(311,500,strlen(keybuffer)); else showcoursornow(311,500,strlen(keybuffer));
+      showcoursornow(311,500,strlen(keybuffer));
     }
-    if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) showcoursornow(311,450,strlen(keybuffer));
-    else if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,450,strlen(configbackend_tvgraber));
-    else if ((do_show_setup_select_linie==2) && (strcmp(configbackend_tvgraber,"Other")!=0)) showcoursornow(311,500,strlen(configbackend_tvgraber));
-    else if ((do_show_setup_select_linie>=2) && (strcmp(configbackend_tvgraber,"Other")!=0)) {
-      showcoursornow(311,388-((do_show_setup_select_linie-3)*20),0);
-    }
+
+    if (do_show_setup_select_linie>0) {
+      //showcoursornow(311,500,strlen(keybuffer));
+      showcoursornow(311,368-((do_show_setup_select_linie-2)*20),0);
+     }
 }
 
 

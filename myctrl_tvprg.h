@@ -86,6 +86,7 @@ class tv_oversigt {
         int parsexmltv(const char *filename);                                                                 // parse and update db from tvguide.xml file from users homedir
         time_t getlastupdate() { return lastupdated; }                                                        //
         time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }                                     //
+        void cleartvguide();                                                                                  // drop db in backend
 };
 
 
