@@ -93,7 +93,11 @@ int findtype=0;					                              	// bruges af search kunster/s
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
 
-channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+channel_list_struct channel_list[400];                  // channel_list array used in setup graber
+
+channel_configfile  xmltv_configcontrol;                //
+
+bool firsttime_xmltvupdate=true;
 
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -2220,6 +2224,7 @@ void display() {
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
+    static bool do_update_xmltv_show=false;
 
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2248,7 +2253,7 @@ void display() {
 //    int fps;
     static GLint T0     = 0;
     static GLint Frames = 0;
-    static bool firsttime_xmltvupdate=true;
+    //static bool firsttime_xmltvupdate=true;     // global for now
 
     int no_open_dir=0;
     char temptxt1[200];
@@ -2347,6 +2352,7 @@ void display() {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
+      do_update_xmltv_show=true;
       firsttime_xmltvupdate=false;                          // only used first time
     }
 
@@ -2804,7 +2810,7 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0);
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0,do_update_xmltv_show);
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -5196,6 +5202,7 @@ void display() {
       update_xmltv_phread_loader();
       //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       do_update_xmltv=false;
+      do_update_xmltv_show=false;
     }
 
 /*  don't wait!
@@ -6582,7 +6589,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (tvvisvalgtnrtype==1) {
                     if (tvvisvalgtnrtype==1) {
                       if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
-                        if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+                        if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
                         tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
                         //tvsubvalgtrecordnr=0;
                       }
@@ -6886,7 +6893,6 @@ void handlespeckeypress(int key,int x,int y) {
                       if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                       if (tvchannel_startofset<0) tvchannel_startofset=0;
                     }
-
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
@@ -6951,6 +6957,9 @@ void handlespeckeypress(int key,int x,int y) {
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
 
     if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
+
+    if (vis_tv_oversigt) printf("tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal());
+
 }
 
 
@@ -7241,6 +7250,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                     }
 */
+                    printf("do_show_setup_select_linie %d tvchannel_startofset %d \n",do_show_setup_select_linie,tvchannel_startofset);
                     if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
                         channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
@@ -7408,12 +7418,23 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
+                        // kill running graber
+                        killrunninggraber();
                         // clear old tvguide in db
                         aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
                         save_channel_list();
+                        // buid new config file for xmltv from saved db
+                        xmltv_configcontrol.graber_configbuild();
+
+                        // hent ny tv guide
+                        //if (get_tvguide_fromweb()!=-1)
+                        // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-                        //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        // hent/update tv guide from db
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                        // set update flag in display() func
+                        firsttime_xmltvupdate=true;
                         // close tv graber windows again
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
