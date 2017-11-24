@@ -74,7 +74,7 @@ class tv_oversigt {
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
         void show_fasttv_oversigt_old(int selectchanel,int selectprg);                                        //
-        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl);                                  //
+        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show);        //
         void show_canal_names();                                                                              //
         void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //

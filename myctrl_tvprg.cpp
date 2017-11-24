@@ -25,8 +25,11 @@
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
+#include "myth_setup.h"
 
 #define MAXSIZE 16000+1;
+
+extern tv_graber_config aktiv_tv_graber;                                        // xmltv graber config
 
 extern int screen_size;
 extern int debugmode;
@@ -122,11 +125,11 @@ bool check_tvguide_process_running(char *processname) {
   bool status=false;
   char processcheckstr[1024];
   sprintf(processcheckstr,"pidof -x %s > /dev/null",processname);
-  if(0 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
+  if (0==system("pidof -x tv_grab_dk_dr > /dev/null")) {
     status=true;
      //A process having name PROCESS is running.
   }
-  else if(1 == system("pidof -x tv_grab_dk_dr > /dev/null")) {
+  else if (1==system("pidof -x tv_grab_dk_dr > /dev/null")) {
     status=false;
     //A process having name PROCESS is NOT running.
   }
@@ -139,7 +142,8 @@ bool check_tvguide_process_running(char *processname) {
 int get_tvguide_fromweb() {
   char exestring[2048];
   int result=-1;
-  if (check_tvguide_process_running("tv_grab_dk_dr")==false) {
+  // check if active xml_tv graber is running
+  if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
     strcpy(exestring,configbackend_tvgraber);
     strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
     printf("Start tv graber background process %s\n",configbackend_tvgraber);
@@ -149,14 +153,6 @@ int get_tvguide_fromweb() {
   } else printf("Graber is already ruuning.\n");
   return(result);
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -571,7 +567,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
 
 
 //
-// clear tv guide
+// clear tv guide (drop db)
 //
 
 void tv_oversigt::cleartvguide() {
@@ -972,23 +968,24 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
     loading_tv_guide=true;
 
+    // is startid as args ?
     if (nystarttid==0) {
-        // get time now in a string format (yyyy-mm-dd hh:mm:ss)
-        rawtime=time( NULL );				     			 // hent nu tid
-        rawtime2=time( NULL );					   	   // hent nu tid
-        rawtime2+=60*60*48;                   //  + 2 døgn
+                                            // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
+        rawtime=time(NULL);				     			// hent nu tid
+        rawtime2=time(NULL);					   	  // hent nu tid
+        rawtime2+=60*60*48;                 //  + 2 døgn
     } else {
         // hent ny starttid
         rawtime=this->starttid;                // this
         rawtime2=this->sluttid;                // this
     }
 
-    timeinfo = localtime ( &rawtime );			            		// lav om til local time
-    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		// lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    timeinfo2= localtime ( &rawtime2 );	            				//
-    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		// lav nu tids sting
-    this->starttid=rawtime;						// gem tider i class
-    this->sluttid=rawtime2;						//
+    timeinfo = localtime (&rawtime);			                        		// lav om til local time
+    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		      // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
+    timeinfo2= localtime ( &rawtime2 );	            		          		//
+    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		      // lav nu tids sting
+    this->starttid=rawtime;						                                // gem tider i class
+    this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
     printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
     // clear last tv guide array
@@ -1174,7 +1171,7 @@ void WordWrap( char *str, int N ) {
 // den som bruges
 
 
-void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl) {
+void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show) {
   struct tm *timeinfo;
   struct tm nowtime_h;
   time_t nutid;
@@ -1290,18 +1287,26 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   glScalef(40.0, 40.0,1);
   glDisable(GL_TEXTURE_2D);
 
+//do_update_xmltv_show
+
   switch (configland) {
-    case 0: sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    case 1: sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 1: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    case 2: sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 2: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"TV Guide %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    case 3: sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 3: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"TV Guide %02s %d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    case 4: sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 4: if (!(do_update_xmltv_show)) sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    default:sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    default:if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
+              sprintf(tmptxt,"TV Guide %s %02d-%02d-%d  Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
   };
 
@@ -1316,6 +1321,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   // convert clovk to localtime
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
+
   if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1325,20 +1331,25 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl)
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   n=0;
-  while (n<4) {
+  while (n<8) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+    glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
     glcRenderString(tmptxt);
     glPopMatrix();
     n++;
-    mytimelist.tm_hour++;
+    //mytimelist.tm_hour++;
+    if ((n==1) || (n==3) || (n==5)) mytimelist.tm_min=30; else {
+      mytimelist.tm_hour++;
+      mytimelist.tm_min=0;
+    }
     mktime(&mytimelist);
   }
 
+  if (mytimelist.tm_mday>1) mytimelist.tm_mday--;
 
   mytimelist.tm_hour=timelist->tm_hour;
   if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
