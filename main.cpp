@@ -104,11 +104,13 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
+bool hent_tv_channels=false;
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
-char configbackend_tvgraber_path[2048];                  // internal tv graber to use
+char configbackend_tvgraber_old[256];                   // rember last select tvgraber (used in selector in keyboard controler)
+char configbackend_tvgraberland[2048];                  // internal tv graber to use
 char configbackend[20];			                        		// backend system xbmc/mythtv
 char configmythhost[256];			                        	// host of mythtv master
 char configmysqlip[256];				                        // mysql server ip
@@ -402,6 +404,8 @@ int sdlmusic;
 // ************************************************************************************************
 
 tv_oversigt     aktiv_tv_oversigt;
+
+tv_graber_config  aktiv_tv_graber;
 
 GLuint tvoversigt;
 GLuint canalnames;
@@ -855,7 +859,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,settvgraberpath,tvgraberupdate};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate};
     int commandlength;
     char value[200];
     bool command=false;
@@ -968,15 +972,12 @@ int parse_config(char *filename) {
                         command=true;
                         command_nr=setvolume;
                         commandlength=12;
-                    } else if (strncmp(buffer+n,"tvgraberpath",11)==0) {
-                      command=true;
-                      command_nr=settvgraberpath;
-                      commandlength=11;
                     } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
                       command=true;
                       command_nr=tvgraberupdate;
                       commandlength=13;
-                    } else if (strncmp(buffer+n,"tvgraber",7)==0) {
+                      // vi do not have tvgraberpath in config file
+                    } else if ((strncmp(buffer+n,"tvgraber",7)==0) && (strncmp(buffer+n,"tvgraberpath",11)!=0)) {
                       command=true;
                       command_nr=settvgraber;
                       commandlength=7;
@@ -1010,13 +1011,37 @@ int parse_config(char *filename) {
                     // set tv graber
                     else if (command_nr==settvgraber) {
                       strcpy(configbackend_tvgraber,value);
+                      if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")==0) aktiv_tv_graber.graberaktivnr=1;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) aktiv_tv_graber.graberaktivnr=2;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")==0) aktiv_tv_graber.graberaktivnr=3;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) aktiv_tv_graber.graberaktivnr=4;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")==0) aktiv_tv_graber.graberaktivnr=5;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) aktiv_tv_graber.graberaktivnr=6;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) aktiv_tv_graber.graberaktivnr=7;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) aktiv_tv_graber.graberaktivnr=8;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")==0) aktiv_tv_graber.graberaktivnr=9;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")==0) aktiv_tv_graber.graberaktivnr=10;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) aktiv_tv_graber.graberaktivnr=11;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")==0) aktiv_tv_graber.graberaktivnr=12;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_huro")==0) aktiv_tv_graber.graberaktivnr=13;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")==0) aktiv_tv_graber.graberaktivnr=14;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) aktiv_tv_graber.graberaktivnr=15;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) aktiv_tv_graber.graberaktivnr=16;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) aktiv_tv_graber.graberaktivnr=17;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")==0) aktiv_tv_graber.graberaktivnr=18;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) aktiv_tv_graber.graberaktivnr=19;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")==0) aktiv_tv_graber.graberaktivnr=20;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) aktiv_tv_graber.graberaktivnr=21;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")==0) aktiv_tv_graber.graberaktivnr=22;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) aktiv_tv_graber.graberaktivnr=23;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")==0) aktiv_tv_graber.graberaktivnr=24;
+                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
+                      else aktiv_tv_graber.graberaktivnr=0;
+
                       printf("**************** Set config xmltv graber ****************\n");
                       printf("Tv graber ....: %s\n",configbackend_tvgraber);
                       printf("*********************************************************\n");
-                      // else set tv graber path
-                    } else if (command_nr==settvgraberpath) strcpy(configbackend_tvgraber_path,value);
-                    //
-                    else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
+                    } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
                     // set hostname
                     else if (command_nr==sethostname) strcpy(configmythhost,value);
                     // mysql host
@@ -1172,10 +1197,8 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"videoplayer=default\n");
         fputs(temp,file);
-        //
         sprintf(temp,"configdefaultmusicpath=%s\n",configdefaultmusicpath);
         fputs(temp,file);
-        //
         sprintf(temp,"configdefaultmoviepath=%s\n",configdefaultmoviepath);
         fputs(temp,file);
         sprintf(temp,"uvmetertype=%d\n",configuvmeter);                               // uv meter type
@@ -1184,13 +1207,6 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"tvgraber=%s\n",configbackend_tvgraber);                         // tv graber to use
         fputs(temp,file);
-        if (strcmp(configbackend_tvgraber,"Other")!=0) {
-          sprintf(temp,"tvgraberpath=%s\n",configbackend_tvgraber_path);              // tv graber to use
-          fputs(temp,file);
-        } else {
-          sprintf(temp,"tvgraberpath=\n");              // tv graber to use
-          fputs(temp,file);
-        }
         sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
         fputs(temp,file);
         fclose(file);
@@ -1241,26 +1257,26 @@ void load_config(char * filename) {
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
-    strcpy(configbackend_tvgraber_path,"");                   // default tv guide tv_grab_uk_tvguide other command
+    strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
-        strcpy(configaktivescreensavername,"analog");				// default analog clock
-        urtype=2;								// default screen saver
-        strcpy(configmysqluser,"mythtv");				           	// default userid for mythtv
-        strcpy(configmysqlpass,"password");				         	// default password
-        strcpy(configmysqlhost,"localhost");		      			// localhost mysql server default
-        strcpy(configmythhost,"localhost");				         	// localhost mythtv server default
-        strcpy(configmythsoundsystem,"");			          		//
-        strcpy(configsoundoutport,"SPDIF");				         	// spdif out default
-        strcpy(configclosemythtvfrontend,"no");				     	//
+        strcpy(configaktivescreensavername,"analog");				  // default analog clock
+        urtype=2;								                              // default screen saver
+        strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
+        strcpy(configmysqlpass,"password");				         	  // default password
+        strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
+        strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
+        strcpy(configmythsoundsystem,"");			          		  //
+        strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
+        strcpy(configclosemythtvfrontend,"no");				     	  //
         strcpy(configfontname,"FreeMono");			           		//
-        strcpy(configmouse,"1");						                // enable mouse default
-        FILE * file = fopen(filename, "w");
+        strcpy(configmouse,"1");						                  // enable mouse default
+        FILE * file = fopen(filename, "w");                   // open file for write
         if (file) {
-           fputs("mysqluser=mythtv\n",file);
+           fputs("mysqluser=mythtv\n",file);                  // write config info to config file
            fputs("mysqlpass=password\n",file);
            fputs("mysqlhost=localhost\n",file);
            fputs("mythhost=localhost\n",file);
@@ -1283,7 +1299,6 @@ void load_config(char * filename) {
            fputs("configdefaultmovie=Movies\n",file);
            fputs("uvmetertype=1\n",file);
            fputs("tvgraber=tv_grab_uk_tvguide\n",file);
-           fputs("tvgraberpath=\n",file);
            fputs("tvgraberupdate=0\n",file);
            fclose(file);
         } else {
@@ -6709,12 +6724,9 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
+                    // tv graber setup
                     if (do_show_tvgraber) {
-                      if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
-                    }
-                    // setup videoplayer window
-                    if (do_show_tvgraber) {
-                      if ((do_show_setup_select_linie==15) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
+                      if ((do_show_setup_select_linie==13) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++;
                        else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                     }
                     keybuffer[0]=0;
@@ -6732,7 +6744,7 @@ void handlespeckeypress(int key,int x,int y) {
                             subvalgtrecordnr++;
                         }
                     }
-                    reset_recorded_texture=true;
+                    reset_recorded_texture=true;                                //
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
@@ -6861,10 +6873,15 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     if (do_show_tvgraber) {
                       if (do_show_setup_select_linie>0) {
-                        if ((do_show_setup_select_linie>0) && (tvchannel_startofset>0)) {
-                          if (do_show_setup_select_linie>3) do_show_setup_select_linie--; else
-                          if (tvchannel_startofset>0) tvchannel_startofset--; else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
-                        } else if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                        // controller scoll fuction in select program channel list
+                        if ((tvchannel_startofset>0) && (do_show_setup_select_linie>13)) {
+                          tvchannel_startofset--;
+                        } else {
+                          if ((tvchannel_startofset>0) && (do_show_setup_select_linie>1)) do_show_setup_select_linie--;
+                          else if ((tvchannel_startofset>0) && (do_show_setup_select_linie==1)) tvchannel_startofset--;
+                          else if ((tvchannel_startofset==0) && (do_show_setup_select_linie>0)) do_show_setup_select_linie--;
+                        }
+
                       }
                       if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                       if (tvchannel_startofset<0) tvchannel_startofset=0;
@@ -6933,7 +6950,7 @@ void handlespeckeypress(int key,int x,int y) {
     if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
     if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
 
-    if (do_show_tvgraber) printf("line %2d of %2d\n",do_show_setup_select_linie+tvchannel_startofset,PRGLIST_ANTAL);
+    if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
 }
 
 
@@ -6945,8 +6962,6 @@ void handlespeckeypress(int key,int x,int y) {
 // keyboard handler *******************************************************************************************************
 
 void handleKeypress(unsigned char key, int x, int y) {
-
-    const char *tv_grabers[]={"tv_grab_ar","tv_grab_dk_dr","tv_grab_dtv_la","tv_grab_fi","tv_grab_fi_sv","tv_grab_fr","tv_grab_il","tv_grab_is","tv_grab_it","tv_grab_nl","tv_grab_tr","tv_grab_uk_tvguide","tv_grab_eu_dotmedia"};
     const char optionmenukey='O';
     char id[80];		// bruges af wlan setup
     char tmptxt[80];
@@ -7210,38 +7225,25 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                   } else if (do_show_tvgraber) {
                     if ((key==32) && (do_show_setup_select_linie==0)) {
-                      if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) strcpy(configbackend_tvgraber,"tv_grab_dk_dr");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) strcpy(configbackend_tvgraber,"tv_grab_dtv_la");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) strcpy(configbackend_tvgraber,"tv_grab_fi");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) strcpy(configbackend_tvgraber,"tv_grab_fi_sv");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) strcpy(configbackend_tvgraber,"tv_grab_fr");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) strcpy(configbackend_tvgraber,"tv_grab_il");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) strcpy(configbackend_tvgraber,"tv_grab_is");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) strcpy(configbackend_tvgraber,"tv_grab_it");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) strcpy(configbackend_tvgraber,"tv_grab_nl");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) strcpy(configbackend_tvgraber,"tv_grab_tr");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) strcpy(configbackend_tvgraber,"Other");
-                      else if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraber,"tv_grab_ar");
+                      if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
+                      // husk last selected
+                      strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
+                      strcpy(configbackend_tvgraber,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+                      // set load flag to show_setup_tv_graber() func not good way to do it global var
+                      // and delete old db file to get the graber to update it
                     }
-                    if ((do_show_setup_select_linie==1) && (strcmp(configbackend_tvgraber,"Other")==0)) {
-                      if ((key!=13) && (key!=32)) {
-                        keybuffer[keybufferindex]=key;
-                        keybufferindex++;
-                        keybuffer[keybufferindex]='\0';
+/*
+                    if (do_show_setup_select_linie==0) {
+                      if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
+                        unlink("~/tvguide_channels.dat");
+                        hent_tv_channels=false;
+                        strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
                       }
                     }
-                    if (do_show_setup_select_linie==2) {
-                      if ((key!=13) && (key!=32)) {
-                        keybuffer[keybufferindex]=key;
-                        keybufferindex++;
-                        keybuffer[keybufferindex]='\0';
-                      }
-                    }
-                    if (do_show_setup_select_linie>=3) {
+*/
+                    if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
-                      channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-3)+tvchannel_startofset].selected;
+                        channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
                     }
                   }
               }
@@ -7390,7 +7392,7 @@ void handleKeypress(unsigned char key, int x, int y) {
            } else if (do_show_tvgraber) {
              switch(do_show_setup_select_linie) {
                 case 0: break;
-                case 1: if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraber_path,keybuffer);
+                case 1: if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraberland,keybuffer);
                         else {
                           printf("Select tv channels\n");
                         }
@@ -7406,10 +7408,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
-                        //
+                        // clear old tvguide in db
+                        aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
-                        //
                         save_channel_list();
+                        aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+                        //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        // close tv graber windows again
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
                       if (do_show_setup_sql) do_show_setup_sql=false; else
@@ -7648,6 +7653,24 @@ void handleKeypress(unsigned char key, int x, int y) {
                         stream_key_selected=1;
                         stream_select_iconnr=0;
                         _sangley=0.0f;
+                    }
+
+                    // enter pressed in setup window xmltv
+                    // select new tv guide provider
+                    if ((do_show_tvgraber) && (do_show_setup_select_linie==0)) {
+                      if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
+                        // clean all tv guide data and reload
+                        printf("* Update tvguide *\n");
+
+                        unlink("/home/hans/tvguide_channels.dat");
+                        hent_tv_channels=false;
+                        // set update process
+                        //do_update_xmltv=true;
+
+
+                        strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
+
+                      }
                     }
 
 
@@ -10498,6 +10521,8 @@ int main(int argc, char** argv) {
 
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
+
+    strcpy(configbackend_tvgraber_old,"");
 
     if (strncmp(configbackend,"xbmc",4)==0) {
 
