@@ -1164,6 +1164,36 @@ void WordWrap( char *str, int N ) {
 }
 
 
+
+
+
+
+int tv_oversigt::find_start_kl_returnpointinarray(int selectchanel,int findtime) {
+  int prg_nr=0;
+  time_t rawtime;
+  struct tm *timelist;
+  struct tm mytimelist;
+  time(&rawtime);
+  timelist=localtime(&rawtime);
+  mytimelist.tm_hour=findtime;
+  mytimelist.tm_min=0;
+  mytimelist.tm_mon=timelist->tm_mon;
+  mytimelist.tm_sec=timelist->tm_sec;
+  mytimelist.tm_year=timelist->tm_year;
+  mytimelist.tm_mday=timelist->tm_mday;
+  mytimelist.tm_yday=timelist->tm_yday;
+  mytimelist.tm_isdst=timelist->tm_isdst;
+  mktime(&mytimelist);
+  time_t tt=mktime(&mytimelist);
+  while((tvkanaler[selectchanel].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<tvkanaler[selectchanel].program_antal())) {
+    prg_nr++;
+  }
+  return(prg_nr);
+}
+
+
+// find start time to change the start pos in array depaint on that the time is now
+
 int tv_oversigt::find_start_pointinarray(int selectchanel) {
   struct tm mytimelist;
   struct tm *timelist;
