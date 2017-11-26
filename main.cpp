@@ -2221,6 +2221,7 @@ void show_background() {
 
 void display() {
     // used by xmltv updater func
+    static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
@@ -2727,6 +2728,12 @@ void display() {
     if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
         show_newmovietimeout=0;
         vis_nyefilm_oversigt=false;
+        if ((vis_tv_oversigt) && (getstarttidintvguidefromarray==true)) {
+          printf("fundet start record in tv guide nr %d \n",aktiv_tv_oversigt.find_start_pointinarray(0));
+          tvsubvalgtrecordnr=aktiv_tv_oversigt.find_start_pointinarray(0)-1;
+          tvvalgtrecordnr=0;
+          getstarttidintvguidefromarray=false;
+        }
     }
 
     // shopw oversigt over nye film
