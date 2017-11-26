@@ -2811,9 +2811,12 @@ void display() {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,0,do_update_xmltv_show);
-
         if ((do_zoom_tvprg_aktiv_nr)>0) {
-          aktiv_tv_oversigt.showandsetprginfo(0,0);
+          glPushMatrix();
+          // show info om program selected
+          aktivfont.selectfont("DejaVu Sans");
+          aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
+          glPopMatrix();
         }
 
 

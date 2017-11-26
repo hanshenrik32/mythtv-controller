@@ -8,6 +8,8 @@ const int maxprogram_antal=200;
 // antal programer pr kanal
 const int MAXKANAL_ANTAL=100;
 
+
+
 // tv oversigt til 3d
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv databasen
 
@@ -73,7 +75,6 @@ class tv_oversigt {
         int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
-        void show_fasttv_oversigt_old(int selectchanel,int selectprg);                                        //
         void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show);        //
         void show_canal_names();                                                                              //
         void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
