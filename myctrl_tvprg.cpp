@@ -1052,7 +1052,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                   else if (strcmp("none",row[9])==0) prgtype=0;                   //
                   else prgtype=0;                                                 // default panic
                 } else prgtype=0;                                                 // default panic
-                if (strcmp(row[9],"None")!=0) {
+                if (strcmp(row[8],"None")!=0) {
                     if (strcmp("series",row[9])==0) prgtype=1;
                     else if (strcmp("movie",row[9])==0) prgtype=5;
                     else prgtype=0;
