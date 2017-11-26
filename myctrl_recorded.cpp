@@ -165,7 +165,7 @@ int find_storagegroupfile(char *filename) {
 
 
 int recorded_overigt::opdatere_recorded_oversigt() {
-    char sqlselect[512];
+    char sqlselect[1024];
     char title[128];
     int n,nn;
     // mysql vars
@@ -176,13 +176,15 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     char filename[512];
     int storagegroupused=0;
     //gotoxy(10,17);
-    printf("Update recorded programs from mythtv database.\n");
-    strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
+    strcpy(sqlselect,"create table recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int.stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
+    mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
+    printf("Update recorded programs from mythtv database.\n");
+    strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     n=-1;
