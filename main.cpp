@@ -2215,12 +2215,12 @@ void show_background() {
 
 
 //
-// *********************** MAIN LOOP ************************************************************************************************************
+// *********************** MAIN LOOP *********************************************************************************
 //
-
 
 void display() {
     // used by xmltv updater func
+    static int vistvguidekl=0;
     static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
@@ -2275,6 +2275,7 @@ void display() {
     float *spec;
     float *spec2;
     float *specLeft, *specRight;
+    bool startup=true;
 
     // uv color table
     float uvcolortable[]={0.0,0.8,0.8, \
@@ -2347,6 +2348,9 @@ void display() {
         visur=true;
     }
 
+    // first time startup (get hour)
+    if (startup) vistvguidekl=timeinfo->tm_hour;
+
     // make xmltv update
     today=time(NULL);
     if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
@@ -2356,6 +2360,8 @@ void display() {
       do_update_xmltv_show=true;
       firsttime_xmltvupdate=false;                          // only used first time
     }
+
+
 
     glPushMatrix();
     // background picture
@@ -2817,7 +2823,9 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,0,do_update_xmltv_show);
+        // show tv guide
+//        printf("Fundet nr in array %d \n",aktiv_tv_oversigt.find_start_kl_returnpointinarray(tvvalgtrecordnr,vistvguidekl));
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,vistvguidekl,do_update_xmltv_show);
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
           // show info om program selected

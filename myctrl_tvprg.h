@@ -89,6 +89,7 @@ class tv_oversigt {
         time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }                                     //
         void cleartvguide();                                                                                  // drop db in backend
         int find_start_pointinarray(int selectchanel);
+        int find_start_kl_returnpointinarray(int selectchanel,int findtime);        
 };
 
 
