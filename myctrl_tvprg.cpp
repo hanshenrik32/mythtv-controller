@@ -1218,6 +1218,11 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
   return(prg_nr);
 }
 
+
+
+
+
+
 // vis_tv_oversigt
 // new
 // den som bruges
@@ -1476,6 +1481,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
           glBegin(GL_QUADS);                                                   // box
         } else glBegin(GL_LINE_LOOP);                                          // line
+        glLoadName(100+prg_nr);
         glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
@@ -1580,8 +1586,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
+          glLoadName(100+prg_nr);
           glBegin(GL_QUADS);                                                   // box
-        } else glBegin(GL_LINE_LOOP);                                          // line
+        } else {
+          glLoadName(100+prg_nr);
+          glBegin(GL_LINE_LOOP);                                          // line
+        }
         //glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
@@ -1769,7 +1779,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvrecordbutton);
       glEnable(GL_TEXTURE_2D);
-      glLoadName(41);
+      glLoadName(41);                                                           // func Set program to record.
       glBegin(GL_QUADS);
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
       glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
@@ -1790,7 +1800,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glLoadName(40);
+    glLoadName(40);                                                           // func Set program to record.
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
