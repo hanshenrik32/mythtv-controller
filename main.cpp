@@ -5864,7 +5864,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
 
 
-            // skal vi spørge om vi skal optage programmet
+            // er vi igang med at spørge om vi skal optage programmet
             if (ask_tv_record) {
                 if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
                     if (debugmode & 256) fprintf(stderr,"Close window again.\n");
@@ -5885,7 +5885,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                     // opdatere tv guide med nyt info
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
-
             }
         }
         if (!(ask_tv_record)) {
