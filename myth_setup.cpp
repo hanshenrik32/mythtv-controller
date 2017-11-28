@@ -23,6 +23,7 @@
 #include "myth_ttffont.h"
 #include "myth_setup.h"
 #include "checknet.h"
+#include "utility.h"
 
 extern int configuvmeter;
 extern int debugmode;
@@ -2789,10 +2790,11 @@ void show_setup_keys() {
 
 
 //
-// call tv_graber config
-//
+// call tv_graber config and do auto config if posible
+// will try to make list of all channels from tv_graber
+// by pipe the command in shell
 
-void txmltvgraber_createconfig() {
+int txmltvgraber_createconfig() {
   char exebuffer[1024];
   int sysresult;
   // delete old config from dir
@@ -2904,6 +2906,7 @@ void txmltvgraber_createconfig() {
     strcat(exebuffer, " --configure");
     sysresult=system(exebuffer);
   }
+  return(1);
 }
 
 
@@ -2913,9 +2916,10 @@ void txmltvgraber_createconfig() {
 // read xmltv config file and save it
 //
 
-void channel_configfile::readgraber_configfile() {
+int channel_configfile::readgraber_configfile() {
   char buffer[1024];
   char filename[1024];
+  bool errors=false;
   FILE *fil;
   int line=0;
   strcpy(filename,"~/.xmltv/");
@@ -2932,7 +2936,8 @@ void channel_configfile::readgraber_configfile() {
     }
     if (line>0) configfilesize=line-1;
     fclose(fil);
-  }
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
 
 
@@ -2943,9 +2948,10 @@ void channel_configfile::readgraber_configfile() {
 // write xmltv config file and save it
 //
 
-void channel_configfile::writegraber_configfile() {
+int channel_configfile::writegraber_configfile() {
   char buffer[1024];
   char filename[1024];
+  bool errors=false;
   FILE *fil;
   int line=0;
   strcpy(filename,"~/.xmltv/");
@@ -2958,32 +2964,150 @@ void channel_configfile::writegraber_configfile() {
       line++;
     }
     fclose(fil);
-  }
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
+
+
+
+// kill running graber
+//
+
+int killrunninggraber() {
+  int sysresult;
+  char processname[1024];
+  sprintf(processname,"killall -9 %s",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  sysresult=system(processname);
+  if (sysresult) return(sysresult);
+}
+
 
 
 //
 // write xmltv config file and save it
 //
 
-void channel_configfile::graber_configbuild() {
+int channel_configfile::graber_configbuild() {
   char buffer[1024];
   char filename[1024];
+  char userhomedir[1024];
+  char sql[4096];
   FILE *fil;
+  char *database = (char *) "mythconverg";
+  int error=0;
   int line=0;
-  /*
-  strcpy(filename,"~/.xmltv/");
+  int cnr=0;                                                                    // channum to create in config file
+  bool errors=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  // mysql stuf
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
   fil=fopen(filename,"w");
   if (fil) {
-    while(line<configfilesize) {
-      fputs(configtext[line],fil);
-      line++;
+    // write file header for tvgraber config file
+    switch (aktiv_tv_graber.graberaktivnr) {
+      case 0: fputs("Tv-graber disabled.",fil);
+              break;
+      // tv_grab_na_dd
+      case 1: fputs("Not posible to config graber use tv_grab_na_dd --configure to setup the xmltv graber.",fil);
+              break;
+      // tv_grab_nl
+      case 2: fputs("# Channel ID                              Channel name\n",fil);
+              break;
+      // tv_grab_es_laguiatv
+      case 3: fputs("configversion 3\nusecache yes\ncachedir /home/hans/.xmltv/cache\ngetdescriptions yes\n",fil);
+              break;
+      // tv_grab_il
+      case 4: fputs("Do not work graber error.",fil);
+              break;
+      // tv_grab_na_tvmedia
+      case 5: fputs("Not posible to config graber use tv_grab_na_tvmedia --configure to setup the xmltv graber.",fil);
+              break;
+      // tv_grab_dtv_la
+      case 6: fputs("Do not work graber error. Homepage fault",fil);
+              break;
+      // tv_grab_fi
+      case 7: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
+              break;
+      // tv_grab_eu_dotmedia
+      case 8: fputs("country=Denmark\ncachedir=/home/hans/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
+              break;
+      // tv_grab_se_swedb
+      case 9:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);     // tv_grab_se_swedb
+              break;
+      // tv_grab_pt_meo
+      case 10:fputs("maxchannels=5\n",fil);                                  // tv_grab_pt_meo
+              break;
+      // tv_grab_fr
+      case 11:fputs("Do not work graber error",fil);          // tv_grab_fr
+              break;
+      // tv_grab_uk_bleb
+      case 12:fputs("",fil);
+              break;
+      // tv_grab_huro
+      case 13:fputs("country hu      # Hungary\n",fil);    // tv_grab_huro
+              break;
+      // tv_grab_ch_search
+      case 14:fputs("",fil);
+              break;
+      // tv_grab_it
+      case 15:fputs("",fil);    // tv_grab_it
+              break;
+      // tv_grab_is
+      case 16:fputs("",fil);    // tv_grab_is
+              break;
+      // tv_grab_fi_sv
+      case 17:fputs("# -*- coding: utf-8 -*-\n",fil);
+              break;
+      // tv_grab_na_dtv
+      case 18:fputs("No tv graber config exist for this land. Use --configure\n",fil);
+              break;
+      // tv_grab_tr
+      case 19:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+              break;
+      // tv_grab_eu_egon
+      case 20:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+              break;
+      // tv_grab_dk_dr
+      case 21:fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
+              break;
+      // tv_grab_se_tvzon
+      case 22:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+              break;
+      // tv_grab_ar
+      case 23:fputs("location 683 CAPITAL FEDERAL\n",fil);
+              break;
+      // tv_grab_fr_kazer
+      case 24:fputs("",fil);
+              break;
+      // tv_grab_uk_tvguide
+      case 25:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+              break;
+      default:fputs("No tv graber exist for this land\n",fil);
+    }
+    while(cnr<MAXCHANNEL_ANTAL) {
+      if (channel_list[cnr].selected) {
+        switch (aktiv_tv_graber.graberaktivnr) {
+          case 2: sprintf(buffer,"channel %s",channel_list[cnr].id);
+                  break;
+          case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
+                  break;
+          case 23:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          default:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+        }
+        fputs(buffer,fil);
+      }
+      cnr++;
     }
     fclose(fil);
-  }
-  */
+  } else errors=true;
+  if (errors==false) return(1); else return(0);
 }
 
 
@@ -2993,7 +3117,7 @@ void channel_configfile::graber_configbuild() {
 // parse channel info from xmltvguide reader channel overview xmlfile
 //
 
-void load_channel_list_from_graber() {
+int load_channel_list_from_graber() {
   FILE *fil;
   char buffer[1024];
   char buffer1[1024];
@@ -3007,7 +3131,13 @@ void load_channel_list_from_graber() {
   int channelnr=0;
   char result[1024];
   char exestring[2048];
+  bool errors=false;
+  char userhomedir[1024];
+  char filename[1024];
   if (debugmode) printf("Get channel list file from web.\n");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.txt");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
     strcpy(exestring,configbackend_tvgraber);
@@ -3033,7 +3163,8 @@ void load_channel_list_from_graber() {
       sysresult=system("rm ~/tvguide_channels.txt");
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
-  }
+  } else errors=true;
+  if (errors==false) return(1); return(0);
 }
 
 
@@ -3047,15 +3178,21 @@ void load_channel_list_from_graber() {
 
 bool save_channel_list() {
   FILE *fil;
+  char userhomedir[1024];
+  char filename[1024];
   unsigned int cnr=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","w");
+  bool errors=false;
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.dat");
+  fil=fopen(filename,"w");
   if (fil) {
     while(cnr<PRGLIST_ANTAL) {
       fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
     }
     fclose(fil);
-  }
+  } else errors=true;
   if (cnr>0) return(true); else return(false);
 }
 
@@ -3067,9 +3204,15 @@ bool save_channel_list() {
 
 int load_channel_list() {
   FILE *fil;
+  char userhomedir[1024];
+  char filename[1024];
   unsigned int cnr=0;
+  bool errors=false;
   PRGLIST_ANTAL=0;
-  fil=fopen("/home/hans/tvguide_channels.dat","r");
+  getuserhomedir(userhomedir);
+  strcpy(filename,userhomedir);
+  strcat(filename,"/tvguide_channels.dat");
+  fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
@@ -3077,8 +3220,8 @@ int load_channel_list() {
       PRGLIST_ANTAL++;
     }
     fclose(fil);
-  }
-  return(cnr);
+  } else errors=true;
+  if (errors==false) return(cnr); return(0);
 }
 
 

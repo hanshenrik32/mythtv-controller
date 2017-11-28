@@ -93,7 +93,11 @@ int findtype=0;					                              	// bruges af search kunster/s
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
 
-channel_list_struct channel_list[200];                             // channel_list array used in setup graber
+channel_list_struct channel_list[400];                  // channel_list array used in setup graber
+
+channel_configfile  xmltv_configcontrol;                //
+
+bool firsttime_xmltvupdate=true;
 
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -2207,19 +2211,18 @@ void show_background() {
 
 
 
-
-
-
 //
-// *********************** MAIN LOOP ************************************************************************************************************
+// *********************** MAIN LOOP *********************************************************************************
 //
-
 
 void display() {
     // used by xmltv updater func
+    static int vistvguidekl=0;
+    static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
+    static bool do_update_xmltv_show=false;
 
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2248,7 +2251,7 @@ void display() {
 //    int fps;
     static GLint T0     = 0;
     static GLint Frames = 0;
-    static bool firsttime_xmltvupdate=true;
+    //static bool firsttime_xmltvupdate=true;     // global for now
 
     int no_open_dir=0;
     char temptxt1[200];
@@ -2269,6 +2272,7 @@ void display() {
     float *spec;
     float *spec2;
     float *specLeft, *specRight;
+    bool startup=true;
 
     // uv color table
     float uvcolortable[]={0.0,0.8,0.8, \
@@ -2341,14 +2345,20 @@ void display() {
         visur=true;
     }
 
+    // first time startup (get hour)
+    if (startup) vistvguidekl=timeinfo->tm_hour;
+
     // make xmltv update
     today=time(NULL);
     if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;
       do_update_xmltv=true;
+      do_update_xmltv_show=true;
       firsttime_xmltvupdate=false;                          // only used first time
     }
+
+
 
     glPushMatrix();
     // background picture
@@ -2721,6 +2731,12 @@ void display() {
     if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
         show_newmovietimeout=0;
         vis_nyefilm_oversigt=false;
+        if ((vis_tv_oversigt) && (getstarttidintvguidefromarray==true)) {
+          printf("fundet start record in tv guide nr %d \n",aktiv_tv_oversigt.find_start_pointinarray(0));
+          tvsubvalgtrecordnr=aktiv_tv_oversigt.find_start_pointinarray(0)-1;
+          tvvalgtrecordnr=0;
+          getstarttidintvguidefromarray=false;
+        }
     }
 
     // shopw oversigt over nye film
@@ -2804,7 +2820,17 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,0,0);
+        // show tv guide
+//        printf("Fundet nr in array %d \n",aktiv_tv_oversigt.find_start_kl_returnpointinarray(tvvalgtrecordnr,vistvguidekl));
+        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,vistvguidekl,do_update_xmltv_show);
+        if ((do_zoom_tvprg_aktiv_nr)>0) {
+          glPushMatrix();
+          // show info om program selected
+          aktivfont.selectfont("DejaVu Sans");
+          aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
+          glPopMatrix();
+        }
+
 
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
@@ -5196,6 +5222,7 @@ void display() {
       update_xmltv_phread_loader();
       //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       do_update_xmltv=false;
+      //do_update_xmltv_show=false;
     }
 
 /*  don't wait!
@@ -5785,8 +5812,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         if ((!(fundet)) && (vis_tv_oversigt)) {
             if ((GLubyte) names[i*4+3]==27) {
-                if (debugmode & 256) fprintf(stderr,"Close tv oversigt\n");
-                vis_tv_oversigt=false;
+                if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
+                //vis_tv_oversigt=false;
                 fundet=true;
             }
             if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
@@ -5820,14 +5847,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
             // show old recordings
             if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
-                printf("Show old recordings \n");
+                fprintf(stderr,"Show old recordings \n");
                 vis_old_recorded=!vis_old_recorded;							// SKAL fixes
                 fundet=true;
             }
 
             // show new recordings
             if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
-                printf("Show new recordings \n");
+                fprintf(stderr,"Show new recordings \n");
                 vis_tvrec_list=!vis_tvrec_list;
                 fundet=true;
             }
@@ -5850,10 +5877,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                     // set start record tv prgoram
                     //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
 //// slal aktiveres
-////                    aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
-                    ask_tv_record=false;
+                    aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
                     // opdatere tv guide med nyt info
-////                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
             }
         }
@@ -5960,6 +5986,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (debugmode & 2) {
                         if ((show_music_oversigt) && (vis_stream_oversigt==false)) fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
                         else if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
+                        else if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
                     }
                     // any music buttons active
                     if (mknapnr>0) {
@@ -6019,9 +6046,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     }
                     // ved vis tv oversigt
                     if ((vis_tv_oversigt) && (retfunc==0)) {
+                      /*
                         ask_tv_record=true;
                         do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
                         tvsubvalgtrecordnr=tvknapnr;
+                      */
+
+                        ask_tv_record=true;
+                        tvknapnr=tvsubvalgtrecordnr;
+                        do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+
                     }
 
                     // fra start film nyt fast show
@@ -6454,28 +6488,9 @@ void handlespeckeypress(int key,int x,int y) {
                 if (vis_tv_oversigt) {
                     if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
                       tvvalgtrecordnr--;
-                      tvsubvalgtrecordnr=0;
                     }
-                    /*
-                                        if (vis_tv_oversigt) {
-                                            if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
-                                            else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
-                                        }
-                    */
-
-/*
-                    if (tvstartxofset<2300) {
-                        tvstartxofset+=tvprgsstep;
-                        glDeleteLists(tvoversigt, 1);				// delete old list
-                        tvoversigt=glGenLists(1);				// make new
-                        glNewList(tvoversigt,GL_COMPILE);
-                        aktiv_tv_oversigt.build_tv_oversigt(tvstartxofset,0);
-                        glEndList();
-
-                    }
-*/
+                    tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
                 }
-
 
                 if (vis_recorded_oversigt) {
                     if (visvalgtnrtype==1) visvalgtnrtype=2;
@@ -6486,14 +6501,6 @@ void handlespeckeypress(int key,int x,int y) {
                     setupsinofset++;
                     if (setupsinofset>99) setupsinofset=0;
                 }
-
-                if (vis_tv_oversigt) {
-/*
-                    if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
-                    else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
-*/
-                }
-
 
                 if (vis_radio_oversigt) {
                     if (radio_key_selected>1) {
@@ -6580,17 +6587,19 @@ void handlespeckeypress(int key,int x,int y) {
                   }
 */
                   if (tvvisvalgtnrtype==1) {
-                    if (tvvisvalgtnrtype==1) {
-                      if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
-                        if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
-                        tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+                    if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
+
+                      tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+
+                        //tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
                         //tvsubvalgtrecordnr=0;
-                      }
+/*
                     } else if (tvvisvalgtnrtype==2) {
                       if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
                         tvsubvalgtrecordnr++;
                       }
                     }
+*/
                   }
 
 
@@ -6748,19 +6757,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
-/*
-                    if (tvvisvalgtnrtype==1) {
-                        if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
-                            if (tvvalgtrecordnr+14<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
-                            tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
-                            //tvsubvalgtrecordnr=0;
-                        }
-                    } else if (tvvisvalgtnrtype==2) {
-                        if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
-                            tvsubvalgtrecordnr++;
-                        }
-                    }
-*/
+                    if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) tvsubvalgtrecordnr++;
                 }
 
                 break;
@@ -6819,17 +6816,7 @@ void handlespeckeypress(int key,int x,int y) {
 
                 // tv stuf
                 if (vis_tv_oversigt) {
-/*
-                    if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
-                        if (tvvalgtrecordnr>0) tvvalgtrecordnr--;
-                        tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
-                        //tvsubvalgtrecordnr=0;
-                    } else if ((tvvisvalgtnrtype==2) && (tvsubvalgtrecordnr>0)) {
-                        if (tvsubvalgtrecordnr>0) tvsubvalgtrecordnr--;	// bruges til visning af optaget programmer
-                    }
-// old ver                    if (kanal_oversigt_startofset>0) kanal_oversigt_startofset--;
-                    // _anglex+=1.5f;
-*/
+                  if (tvsubvalgtrecordnr>0) tvsubvalgtrecordnr--;
                 }
 
                 if (vis_recorded_oversigt) {
@@ -6886,7 +6873,6 @@ void handlespeckeypress(int key,int x,int y) {
                       if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                       if (tvchannel_startofset<0) tvchannel_startofset=0;
                     }
-
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
@@ -6895,7 +6881,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_PAGE_UP:
                 if (vis_tv_oversigt) {
-                    aktiv_tv_oversigt.changetime(60*60*24);
+                    aktiv_tv_oversigt.changetime(60);
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
@@ -6908,7 +6894,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_tv_oversigt) {
-                    aktiv_tv_oversigt.changetime(-(60*60*24));
+                    aktiv_tv_oversigt.changetime(-(60));
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
@@ -6919,7 +6905,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_HOME:
                 if (vis_tv_oversigt) {
-                    aktiv_tv_oversigt.changetime(-(60*60*24*7));
+                    aktiv_tv_oversigt.changetime(-(60*60*24));
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
 
@@ -6940,17 +6926,18 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_END:
                 if (vis_tv_oversigt) {
-                    aktiv_tv_oversigt.changetime((60*60*24*7));
+                    aktiv_tv_oversigt.changetime((60*60*24));
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 break;
 
     }
-
-    if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
-    if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
-
-    if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
+    if (debugmode) {
+      if (vis_music_oversigt) printf("Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
+      if (vis_film_oversigt) printf("ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
+      if (do_show_tvgraber) printf("line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
+      if (vis_tv_oversigt) printf("tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal());
+    }
 }
 
 
@@ -7224,6 +7211,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         sprintf(keybuffer,"%d",configuvmeter);
                       }
                   } else if (do_show_tvgraber) {
+                    // in setup menu
                     if ((key==32) && (do_show_setup_select_linie==0)) {
                       if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
                       // husk last selected
@@ -7241,6 +7229,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                     }
 */
+                    printf("do_show_setup_select_linie %d tvchannel_startofset %d \n",do_show_setup_select_linie,tvchannel_startofset);
                     if (do_show_setup_select_linie>=1) {
                       // set tvguide channel activate or inactive
                         channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
@@ -7408,12 +7397,23 @@ void handleKeypress(unsigned char key, int x, int y) {
                     // close setup windows again or close proram of not in menu
                     if (do_show_setup) {
                       if (do_show_tvgraber) {
+                        // kill running graber
+                        killrunninggraber();
                         // clear old tvguide in db
                         aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
                         save_channel_list();
+                        // buid new config file for xmltv from saved db
+                        xmltv_configcontrol.graber_configbuild();
+
+                        // hent ny tv guide
+                        //if (get_tvguide_fromweb()!=-1)
+                        // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-                        //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        // hent/update tv guide from db
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                        // set update flag in display() func
+                        firsttime_xmltvupdate=true;
                         // close tv graber windows again
                         do_show_tvgraber=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
@@ -7495,6 +7495,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
                         else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
                         else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
+                        else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
                     }
                     if (vis_radio_oversigt) {
                         rknapnr=0;
@@ -7592,6 +7593,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_tv_oversigt) {
                         // hvis der trykkes enter på default ask_tv_record (yes)
                         // blivere den sat til record mode (create mysql data in record table)
+                        printf("Ask om vi skal optage program \m");
                         if ((ask_tv_record) && (do_zoom_tvprg_aktiv_nr>0)) {
                             // do it
                             // set start record tv prgoram
@@ -7607,7 +7609,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                             do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
                         }
                     }
-
 
                     // stream oversigt
                     if ((vis_stream_oversigt) && (sknapnr-1>=0)){
@@ -7661,22 +7662,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                       if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
                         // clean all tv guide data and reload
                         printf("* Update tvguide *\n");
-
                         unlink("/home/hans/tvguide_channels.dat");
                         hent_tv_channels=false;
                         // set update process
                         //do_update_xmltv=true;
-
-
                         strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
-
                       }
                     }
-
-
-
+                    if (do_show_setup) {
                     // ved (return) set wlan network and close show wlan select window
-                    if ((do_show_setup) && (show_wlan_select)) {
+                      if (show_wlan_select) {
                         show_wlan_select=false;
                         // set default wlan network to selected
                         wifinets.get_networkid(setupwlanselectofset,id);
@@ -7684,12 +7679,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                         sprintf(tmptxt,"sudo /sbin/iwconfig wlan0 essid %s",id);
                         fprintf(stderr,"Charge network by %s \n",tmptxt);
                         system(tmptxt);
-                    }
-                    if ((do_show_setup) && (do_show_setup_network)) {
+                      }
+                      if (do_show_setup_network) {
                         if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                         fprintf(stderr,"next line %d \n",do_show_setup_select_linie);
+                      }
                     }
-
                     break;
         }
     }
