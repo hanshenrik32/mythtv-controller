@@ -1339,14 +1339,32 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   glScalef(40.0, 40.0,1);
   glDisable(GL_TEXTURE_2D);
 
+  //
+  // show time bar in left side
+  //
+  // hent ur
+  time(&rawtime);
+  // convert clovk to localtime
+  timelist=localtime(&rawtime);
+  // vis nu eller kl viskl ?
+
+  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
+  mytimelist.tm_min=0;
+  mytimelist.tm_mon=timelist->tm_mon;
+  mytimelist.tm_sec=timelist->tm_sec;
+  mytimelist.tm_year=timelist->tm_year;
+  mytimelist.tm_mday=timelist->tm_mday;
+  mytimelist.tm_yday=timelist->tm_yday;
+  mytimelist.tm_isdst=timelist->tm_isdst;
+
 //do_update_xmltv_show
 
   switch (configland) {
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
               sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
-    case 1: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+    case 1: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min); else
+              sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min);
             break;
     case 2: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
               sprintf(tmptxt,"TV Guide %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
@@ -1365,23 +1383,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   glcRenderString(tmptxt);
   glPopMatrix();
 
-  //
-  // show time bar in left side
-  //
-  // hent ur
-  time(&rawtime);
-  // convert clovk to localtime
-  timelist=localtime(&rawtime);
-  // vis nu eller kl viskl ?
-
-  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
-  mytimelist.tm_min=0;
-  mytimelist.tm_mon=timelist->tm_mon;
-  mytimelist.tm_sec=timelist->tm_sec;
-  mytimelist.tm_year=timelist->tm_year;
-  mytimelist.tm_mday=timelist->tm_mday;
-  mytimelist.tm_yday=timelist->tm_yday;
-  mytimelist.tm_isdst=timelist->tm_isdst;
   n=0;
   while (n<8) {
     glPushMatrix();
