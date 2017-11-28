@@ -5410,7 +5410,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
         }
 
-        // test menu
+        // main menu
         if ((fundet==false) && (do_show_setup==false)) {
             // test for menu select tv
             if ((GLubyte) names[i*4+3]==1) {
@@ -5810,7 +5810,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
 
 
-        if ((!(fundet)) && (vis_tv_oversigt)) {
+        if ((vis_tv_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==27) {
                 if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
                 //vis_tv_oversigt=false;
@@ -5832,17 +5832,21 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
             //
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
-                if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=200)) {
+                // er der trykket på et tv program
+                if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
                     tvknapnr=(GLuint) names[i*4+3]-100;					// hent music knap nr
-                    fprintf(stderr,"tv prg selected=%d  \n",tvknapnr);
                     fundet=true;
                 }
+
+/*
                 if ((!(fundet)) && ((GLuint) names[i*4+3]>=200)) {
                     //tvknapnr=(GLubyte) names[i*4+3]-200;					// hent tv kanal knap nr
                     fprintf(stderr,"tv kanal selected=%d  \n",(GLubyte) names[i*4+3]-200);
                     tvknapnr=0;								// SKAL fixes
                     fundet=true;
                 }
+*/
+
             }
 
             // show old recordings
@@ -5881,6 +5885,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                     // opdatere tv guide med nyt info
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
+
             }
         }
         if (!(ask_tv_record)) {
@@ -6053,8 +6058,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       */
 
                         ask_tv_record=true;
-                        tvknapnr=tvsubvalgtrecordnr;
                         do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                        tvvalgtrecordnr=(tvknapnr / 100);
+                        tvsubvalgtrecordnr=tvknapnr-(tvvalgtrecordnr*100);
+                        fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
+                        fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
 
                     }
 

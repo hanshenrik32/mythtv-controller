@@ -1240,6 +1240,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   struct tm *prgtime;
   float selectcolor=1.0f;
 
+  unsigned int kanalomgang=100;
   int n;
   int chanid;
   int kanalnr=0;
@@ -1479,9 +1480,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
-          glBegin(GL_QUADS);                                                   // box
-        } else glBegin(GL_LINE_LOOP);                                          // line
-        glLoadName(100+prg_nr);
+          glLoadName(kanalomgang+prg_nr);
+          glBegin(GL_QUADS);                                                    // box
+        } else {
+          glLoadName(kanalomgang+prg_nr);
+          glBegin(GL_LINE_LOOP);                                                // line
+        }
         glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
@@ -1586,10 +1590,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
-          glLoadName(100+prg_nr);
+          glLoadName(kanalomgang+prg_nr);
           glBegin(GL_QUADS);                                                   // box
         } else {
-          glLoadName(100+prg_nr);
+          glLoadName(kanalomgang+prg_nr);
           glBegin(GL_LINE_LOOP);                                          // line
         }
         //glBegin(GL_QUADS);
@@ -1637,8 +1641,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         barsize=barsize+(prglength*5);
         yypos+=1;
       }
-      prg_nr++;                                   // next program
+      prg_nr++;                                                                 // next program
     }
+    kanalomgang+=100;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
@@ -1680,8 +1685,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     glPopMatrix();
   }
 }
-
-
 
 
 
