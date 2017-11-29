@@ -1327,7 +1327,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
 
-  // overskrift (tvguide .......)
+  // big top overskrift (tvguide .......)
   glPushMatrix();
   glColor3f(1.0f, 1.0f, 1.0f);
   switch (screen_size) {
@@ -1347,6 +1347,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   // convert clovk to localtime
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
+
+  printf("viskl=%d \n ",viskl);
 
   if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
@@ -1481,10 +1483,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
-          glLoadName(kanalomgang+prg_nr);
+          glLoadName(kanalomgang+prg_nr);                                       // set array pos 100 for each array
           glBegin(GL_QUADS);                                                    // box
         } else {
-          glLoadName(kanalomgang+prg_nr);
+          glLoadName(kanalomgang+prg_nr);                                       // set array pos 100 for each array
           glBegin(GL_LINE_LOOP);                                                // line
         }
         glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
@@ -1764,7 +1766,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     sprintf(tmptxt1,"Beskrivelse : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
     glcRenderString(tmptxt1);
 
-    glPopMatrix();
+    //glPopMatrix();
 
     if (strptime(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
         printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
@@ -1797,7 +1799,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     ysiz=120;
     xpos=((orgwinsizex/2)-xsiz/2)-20;
     ypos=((orgwinsizey/2)-ysiz/2)-260;
-    glPushMatrix();
+    //glPushMatrix();
     glTranslatef(10,50, 0.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
@@ -1813,6 +1815,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     glEnd(); //End quadrilateral coordinates
 
     //glPopMatrix();
+
 }
 
 //

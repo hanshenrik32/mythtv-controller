@@ -609,37 +609,34 @@ int aktiv_radio_station=0;                //
 int radio_key_selected=0;                 //
 int radiooversigt_antal=0;                // antal aktive sange
 GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
-
-GLuint _textureutvbgmask;
-
-GLuint _texturecdmirrormask;		      		// cd mirror mask
-GLuint _textureId1;                     	//The id of the texture
-GLuint _textureId2;                     	//error window
-GLuint _defaultdvdcover;                	//The id of the texture
-GLuint _defaultdvdcover2;	                //The id of the texture
-GLuint _texturemovieinfobox;	            // movie image
-GLuint _textureId7; 	                    //folder image
-GLuint _textureId7_1; 	                  //folder image
-GLuint _textureId7_2;	                    //folder image
-GLuint _textureId7_3;	                    //folder mask image
-GLuint _textureId7_4;	                    //folder trans mask image
-GLuint _texturemusicplayer; 	            //music image		// show player
-GLuint _textureId9; 	                    //askbox image
-GLuint _textureId9_1; 	                  //askbox image
-GLuint _textureId9_2; 	                  //askbox image
+GLuint _textureutvbgmask;                 // background in tv guide programs
+GLuint _textureId1;                     	// The id of the texture
+GLuint _textureId2;                     	// error window
+GLuint _defaultdvdcover;                	// The id of the texture
+GLuint _defaultdvdcover2;	                // The id of the texture
+GLuint _texturemovieinfobox;	            //  movie image
+GLuint _textureId7; 	                    // folder image
+GLuint _textureId7_1; 	                  // folder image
+GLuint _textureId7_2;	                    // folder image
+GLuint _textureId7_3;	                    // folder mask image
+GLuint _textureId7_4;	                    // folder trans mask image
+GLuint _texturemusicplayer; 	            // music image		// show player
+GLuint _textureId9; 	                    // askbox image
+GLuint _textureId9_1; 	                  // askbox image
+GLuint _textureId9_2; 	                  // askbox image
 GLuint _textureId10; 	                    // play icon
-GLuint _textureopen; 	                  // open icon
+GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
-GLuint _textureswap; 	                  // swap icon
-GLuint _textureId11; 	                    //tv program oversigt logo
-GLuint _textureId12; 	                    //background 1
-GLuint _textureId12_1; 	                  //background 2
-GLuint _textureId14; 	                    //pause knap
-GLuint _textureId15; 	                    //lille cover mask
-GLuint _textureId16; 	                    //box2.bmp
-GLuint _dvdcovermask; 	                  //dvdcovermask
-GLuint _textureId18; 	                    //movie options box
-GLuint _textureId18_1; 	                  //mask movie options box
+GLuint _textureswap; 	                    // swap icon
+GLuint _textureId11; 	                    // tv program oversigt logo
+GLuint _textureId12; 	                    // background 1
+GLuint _textureId12_1; 	                  // background 2
+GLuint _textureId14; 	                    // pause knap
+GLuint _textureId15; 	                    // lille cover mask
+GLuint _textureId16; 	                    // box2.bmp
+GLuint _dvdcovermask; 	                  // dvdcovermask
+GLuint _textureId18; 	                    // movie options box
+GLuint _textureId18_1; 	                  // mask movie options box
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
@@ -649,9 +646,9 @@ GLuint _textureId25; 	                    //
 GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
-GLuint _textureId28_1; 	                  //mask
+GLuint _textureId28_1; 	                  // mask
 GLuint _textureIdback; 	                  //
-GLuint _textureId29_1; 	                  //mask
+GLuint _textureId29_1; 	                  // mask
 GLuint _textureuv1;                       // uv img
 GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
@@ -2209,7 +2206,7 @@ void show_background() {
 }
 
 
-
+    static int vistvguidekl=0;
 
 //
 // *********************** MAIN LOOP *********************************************************************************
@@ -2217,7 +2214,7 @@ void show_background() {
 
 void display() {
     // used by xmltv updater func
-    static int vistvguidekl=0;
+    //static int vistvguidekl=0;
     static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
@@ -2346,7 +2343,7 @@ void display() {
     }
 
     // first time startup (get hour)
-    if (startup) vistvguidekl=timeinfo->tm_hour;
+    //if (startup) vistvguidekl=timeinfo->tm_hour;
 
     // make xmltv update
     today=time(NULL);
@@ -6889,10 +6886,11 @@ void handlespeckeypress(int key,int x,int y) {
         case GLUT_KEY_PAGE_UP:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(60);
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    if (vistvguidekl<24) vistvguidekl++;
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
-                  if (tvchannel_startofset>0) tvchannel_startofset-=12;
+                  if (tvchannel_startofset>1) tvchannel_startofset-=12;
                   else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie-=12;
                   if (do_show_setup_select_linie<3) do_show_setup_select_linie=3;
                   if (tvchannel_startofset<0) tvchannel_startofset=0;
@@ -6902,7 +6900,8 @@ void handlespeckeypress(int key,int x,int y) {
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(-(60));
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    if (vistvguidekl>0) vistvguidekl--;
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
                   if (tvchannel_startofset>0) tvchannel_startofset+=12;
@@ -9996,7 +9995,6 @@ void loadgfx() {
     _textureutvbgmask     = loadgfxfile(temapath1,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
-    _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
@@ -10200,7 +10198,6 @@ void loadgfx() {
 void freegfx() {
     int i;
     glDeleteTextures( 1, &_textureutvbgmask);
-    glDeleteTextures( 1, &_texturecdmirrormask);		// backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId1);				  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade
