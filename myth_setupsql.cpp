@@ -925,6 +925,9 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('LSD 25', 'LSD-25 Radio', 'http://a1.lsd-25.ru:8000/new', '', '', 1, 192, 0, 1, '2017-01-21', 14353, 0, '2017-01-21 00:00:00', 1), \
 ('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 6, 0, '2017-01-21 00:00:00', 1), \
 ('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 5, 0, '2017-01-21 00:00:00', 1), \
+('ChristmasHits', 'ChristmasHits.FM', 'http://46.105.118.14:24000/', '', '', 1, 128, 0, 1, '2017-12-01', 5, 0, '2017-12-01 00:00:00', 1), \
+('Santa Radio', 'Santa Radio', 'http://149.255.59.164:8041/listen.pls?sid=1', '', '', 1, 128, 0, 1, '2017-12-01', 5, 0, '2017-12-01 00:00:00', 1), \
+('Christmas Music Station', 'Christmas Music Station', 'http://212.83.138.48:8047/listen.pls', '', '', 1, 128, 0, 1, '2017-12-01', 5, 0, '2017-12-01 00:00:00', 1), \
 ('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
 
 // 700 -> 1000 is free on intnr
