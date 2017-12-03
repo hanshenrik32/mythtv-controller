@@ -609,37 +609,34 @@ int aktiv_radio_station=0;                //
 int radio_key_selected=0;                 //
 int radiooversigt_antal=0;                // antal aktive sange
 GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
-
-GLuint _textureutvbgmask;
-
-GLuint _texturecdmirrormask;		      		// cd mirror mask
-GLuint _textureId1;                     	//The id of the texture
-GLuint _textureId2;                     	//error window
-GLuint _defaultdvdcover;                	//The id of the texture
-GLuint _defaultdvdcover2;	                //The id of the texture
-GLuint _texturemovieinfobox;	            // movie image
-GLuint _textureId7; 	                    //folder image
-GLuint _textureId7_1; 	                  //folder image
-GLuint _textureId7_2;	                    //folder image
-GLuint _textureId7_3;	                    //folder mask image
-GLuint _textureId7_4;	                    //folder trans mask image
-GLuint _texturemusicplayer; 	            //music image		// show player
-GLuint _textureId9; 	                    //askbox image
-GLuint _textureId9_1; 	                  //askbox image
-GLuint _textureId9_2; 	                  //askbox image
+GLuint _textureutvbgmask;                 // background in tv guide programs
+GLuint _textureId1;                     	// The id of the texture
+GLuint _textureId2;                     	// error window
+GLuint _defaultdvdcover;                	// The id of the texture
+GLuint _defaultdvdcover2;	                // The id of the texture
+GLuint _texturemovieinfobox;	            //  movie image
+GLuint _textureId7; 	                    // folder image
+GLuint _textureId7_1; 	                  // folder image
+GLuint _textureId7_2;	                    // folder image
+GLuint _textureId7_3;	                    // folder mask image
+GLuint _textureId7_4;	                    // folder trans mask image
+GLuint _texturemusicplayer; 	            // music image		// show player
+GLuint _textureId9; 	                    // askbox image
+GLuint _textureId9_1; 	                  // askbox image
+GLuint _textureId9_2; 	                  // askbox image
 GLuint _textureId10; 	                    // play icon
-GLuint _textureopen; 	                  // open icon
+GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
-GLuint _textureswap; 	                  // swap icon
-GLuint _textureId11; 	                    //tv program oversigt logo
-GLuint _textureId12; 	                    //background 1
-GLuint _textureId12_1; 	                  //background 2
-GLuint _textureId14; 	                    //pause knap
-GLuint _textureId15; 	                    //lille cover mask
-GLuint _textureId16; 	                    //box2.bmp
-GLuint _dvdcovermask; 	                  //dvdcovermask
-GLuint _textureId18; 	                    //movie options box
-GLuint _textureId18_1; 	                  //mask movie options box
+GLuint _textureswap; 	                    // swap icon
+GLuint _textureId11; 	                    // tv program oversigt logo
+GLuint _textureId12; 	                    // background 1
+GLuint _textureId12_1; 	                  // background 2
+GLuint _textureId14; 	                    // pause knap
+GLuint _textureId15; 	                    // lille cover mask
+GLuint _textureId16; 	                    // box2.bmp
+GLuint _dvdcovermask; 	                  // dvdcovermask
+GLuint _textureId18; 	                    // movie options box
+GLuint _textureId18_1; 	                  // mask movie options box
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
@@ -649,9 +646,9 @@ GLuint _textureId25; 	                    //
 GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
-GLuint _textureId28_1; 	                  //mask
+GLuint _textureId28_1; 	                  // mask
 GLuint _textureIdback; 	                  //
-GLuint _textureId29_1; 	                  //mask
+GLuint _textureId29_1; 	                  // mask
 GLuint _textureuv1;                       // uv img
 GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
@@ -2209,7 +2206,7 @@ void show_background() {
 }
 
 
-
+    static int vistvguidekl=0;
 
 //
 // *********************** MAIN LOOP *********************************************************************************
@@ -2217,7 +2214,7 @@ void show_background() {
 
 void display() {
     // used by xmltv updater func
-    static int vistvguidekl=0;
+    //static int vistvguidekl=0;
     static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
@@ -2346,7 +2343,7 @@ void display() {
     }
 
     // first time startup (get hour)
-    if (startup) vistvguidekl=timeinfo->tm_hour;
+    //if (startup) vistvguidekl=timeinfo->tm_hour;
 
     // make xmltv update
     today=time(NULL);
@@ -5410,7 +5407,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
         }
 
-        // test menu
+        // main menu
         if ((fundet==false) && (do_show_setup==false)) {
             // test for menu select tv
             if ((GLubyte) names[i*4+3]==1) {
@@ -5810,7 +5807,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
 
 
-        if ((!(fundet)) && (vis_tv_oversigt)) {
+        if ((vis_tv_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==27) {
                 if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
                 //vis_tv_oversigt=false;
@@ -5832,17 +5829,21 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
             //
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
-                if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=200)) {
+                // er der trykket på et tv program
+                if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
                     tvknapnr=(GLuint) names[i*4+3]-100;					// hent music knap nr
-                    fprintf(stderr,"tv prg selected=%d  \n",tvknapnr);
                     fundet=true;
                 }
+
+/*
                 if ((!(fundet)) && ((GLuint) names[i*4+3]>=200)) {
                     //tvknapnr=(GLubyte) names[i*4+3]-200;					// hent tv kanal knap nr
                     fprintf(stderr,"tv kanal selected=%d  \n",(GLubyte) names[i*4+3]-200);
                     tvknapnr=0;								// SKAL fixes
                     fundet=true;
                 }
+*/
+
             }
 
             // show old recordings
@@ -5860,7 +5861,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
 
 
-            // skal vi spørge om vi skal optage programmet
+            // er vi igang med at spørge om vi skal optage programmet
             if (ask_tv_record) {
                 if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
                     if (debugmode & 256) fprintf(stderr,"Close window again.\n");
@@ -6053,8 +6054,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       */
 
                         ask_tv_record=true;
-                        tvknapnr=tvsubvalgtrecordnr;
                         do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                        tvvalgtrecordnr=(tvknapnr / 100);
+                        tvsubvalgtrecordnr=tvknapnr-(tvvalgtrecordnr*100);
+                        fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
+                        fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
 
                     }
 
@@ -6311,6 +6315,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
     }
 //    printf("button = %d \n",button);
+}
+
+unsigned int hourtounixtime(int hour) {
+  time_t nutid;
+  struct tm *tid;
+  time(&nutid);                                                            // get time
+  tid=localtime(&nutid);                                                   // fillout struct
+  tid->tm_min=0;
+  tid->tm_hour=hour;
+  return(mktime(tid));
 }
 
 
@@ -6628,8 +6642,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     radio_key_selected++;
                 }
-
-
                 if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal())) {
                     if ((stream_key_selected % (snumbersoficonline*3)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
                         _sangley+=RADIO_CS;
@@ -6640,9 +6652,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     stream_key_selected++;
                 }
-
                 break;
-
         case 103:  // key down
                 // bruges af ask_open_dir_or_play
                 if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
@@ -6661,10 +6671,7 @@ void handlespeckeypress(int key,int x,int y) {
                         music_select_iconnr+=mnumbersoficonline;
                     }
                 }
-
-
                 if (vis_film_oversigt) printf("select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
-
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
                     if (film_key_selected>=11) {
                         _fangley+=MOVIE_CS;
@@ -6674,7 +6681,6 @@ void handlespeckeypress(int key,int x,int y) {
                         film_select_iconnr+=fnumbersoficonline;
                     }
                 }
-
                 // radio
                 if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+rnumbersoficonline)<radiooversigt.radioantal())) {
                     if (radio_key_selected>=20) {
@@ -6686,7 +6692,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
-
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
@@ -6697,7 +6702,6 @@ void handlespeckeypress(int key,int x,int y) {
                         stream_select_iconnr+=snumbersoficonline;
                     }
                 }
-
                 // if indside a setup menu
                 if (do_show_setup) {
                     // mythtv sql setup window
@@ -6741,7 +6745,6 @@ void handlespeckeypress(int key,int x,int y) {
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
-
                 if (vis_recorded_oversigt) {
                     if (visvalgtnrtype==1) {
                         if ((int) valgtrecordnr<(int) recordoversigt.top_antal()) {
@@ -6758,8 +6761,11 @@ void handlespeckeypress(int key,int x,int y) {
                 // tv overview
                 if (vis_tv_oversigt) {
                     if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) tvsubvalgtrecordnr++;
-                }
+                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(vistvguidekl+3)) {
+                      if (vistvguidekl<24) vistvguidekl++;
+                    }
 
+                }
                 break;
         case 101: // up key
                 // bruges af ask_open_dir_or_play
@@ -6767,7 +6773,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
                         if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
                 }
-
                 if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr>(mnumbersoficonline-1)) ) {
                     if ((_mangley>0) && ((unsigned int) music_key_selected<=mnumbersoficonline) && (music_select_iconnr>(mnumbersoficonline-1))) {
                          _mangley-=MUSIC_CS;
@@ -6777,7 +6782,6 @@ void handlespeckeypress(int key,int x,int y) {
 
                     if (music_key_selected>(int ) mnumbersoficonline) music_key_selected-=mnumbersoficonline;
                 }
-
                 // movie stuf
                 if (vis_film_oversigt) {
                     if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
@@ -6789,7 +6793,6 @@ void handlespeckeypress(int key,int x,int y) {
                         if (film_key_selected>fnumbersoficonline) film_key_selected-=fnumbersoficonline;
                     }
                 }
-
                 // radio
                 if ((vis_radio_oversigt) && (show_radio_options==false)) {
                     if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
@@ -6801,7 +6804,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
-
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
                     if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
@@ -6813,12 +6815,16 @@ void handlespeckeypress(int key,int x,int y) {
                         if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                     }
                 }
-
                 // tv stuf
                 if (vis_tv_oversigt) {
-                  if (tvsubvalgtrecordnr>0) tvsubvalgtrecordnr--;
-                }
+                  if (tvsubvalgtrecordnr>0) {
+                    tvsubvalgtrecordnr--;
+                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
+                      if (vistvguidekl>0) vistvguidekl--;
+                    }
 
+                  }
+                }
                 if (vis_recorded_oversigt) {
                     if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                         valgtrecordnr--;
@@ -6828,8 +6834,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
                 }
-
-
                 if (do_show_setup) {
                     // sql setup
                     if (do_show_setup_sql) {
@@ -6876,16 +6880,15 @@ void handlespeckeypress(int key,int x,int y) {
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
-
-
                 break;
         case GLUT_KEY_PAGE_UP:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(60);
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    if (vistvguidekl<24) vistvguidekl++;
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
-                  if (tvchannel_startofset>0) tvchannel_startofset-=12;
+                  if (tvchannel_startofset>1) tvchannel_startofset-=12;
                   else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie-=12;
                   if (do_show_setup_select_linie<3) do_show_setup_select_linie=3;
                   if (tvchannel_startofset<0) tvchannel_startofset=0;
@@ -6895,7 +6898,8 @@ void handlespeckeypress(int key,int x,int y) {
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(-(60));
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    if (vistvguidekl>0) vistvguidekl--;
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 }
                 if (do_show_tvgraber) {
                   if (tvchannel_startofset>0) tvchannel_startofset+=12;
@@ -9989,7 +9993,6 @@ void loadgfx() {
     _textureutvbgmask     = loadgfxfile(temapath1,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
-    _texturecdmirrormask  = loadgfxfile(temapath,(char *) "images/",(char *) "cdmirrormask");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
@@ -10193,7 +10196,6 @@ void loadgfx() {
 void freegfx() {
     int i;
     glDeleteTextures( 1, &_textureutvbgmask);
-    glDeleteTextures( 1, &_texturecdmirrormask);		// backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId1);				  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade

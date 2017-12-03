@@ -923,9 +923,19 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('DemonFM', 'DemonFM 320k MP3', 'http://live.demonfm.co.uk:8000/demon320', '', '', 1, 320, 0, 1, '2017-01-21', 14351, 0, '2017-01-21 00:00:00', 1), \
 ('Record deep radio', '320k MP3', 'http://air.radiorecord.ru:805/deep_320', '', '', 1, 320, 0, 1, '2017-01-21', 14352, 0, '2017-01-21 00:00:00', 1), \
 ('LSD 25', 'LSD-25 Radio', 'http://a1.lsd-25.ru:8000/new', '', '', 1, 192, 0, 1, '2017-01-21', 14353, 0, '2017-01-21 00:00:00', 1), \
-('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 6, 0, '2017-01-21 00:00:00', 1), \
-('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 5, 0, '2017-01-21 00:00:00', 1), \
-('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 14360, 45, '2012-09-15 22:20:34', 1)";
+('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', '', 1, 128, 0, 1, '2017-01-21', 14354, 0, '2017-01-21 00:00:00', 1), \
+('Go FM', 'Go FM Århus', 'http://gofm.radiostreaming.dk:8050/gofm', '', '', 1, 128, 0, 1, '2017-01-21', 14355, 0, '2017-01-21 00:00:00', 1), \
+('ChristmasHits', 'ChristmasHits.FM', 'http://46.105.118.14:24000/', '', '', 1, 128, 0, 1, '2017-12-01', 14356, 0, '2017-12-01 00:00:00', 1), \
+('Santa Radio', 'Santa Radio', 'http://149.255.59.164:8041/listen.pls?sid=1', '', '', 1, 128, 0, 1, '2017-12-01', 14357, 0, '2017-12-01 00:00:00', 1), \
+('Christmas Music Station', 'Christmas Music Station', 'http://51.255.235.165:5192', '', '', 1, 128, 0, 1, '2017-12-01', 14358, 0, '2017-12-01 00:00:00', 1), \
+('Jule radio', 'jule radio', 'http://itunedradio.fr:8765/jul', '', '', 1, 128, 0, 1, '2017-12-01', 14359, 0, '2017-12-01 00:00:00', 1), \
+('Jule radio 2', 'jule radio 2', 'http://stream.anr.dk/nordjyske', '', '', 1, 128, 0, 1, '2017-12-01', 14360, 0, '2017-12-01 00:00:00', 1), \
+('Radio Alfa jule radio', 'Radio Alfa juleradio', 'http://netradio.radioalfa.dk/alfajul', '', '', 1, 128, 0, 1, '2017-12-01', 14361, 0, '2017-12-01 00:00:00', 1), \
+('Globus jule radio', 'Globus juleradio', 'http://globusguld.dk/juleradio/', '', '', 1, 128, 0, 1, '2017-12-01', 14362, 0, '2017-12-01 00:00:00', 1), \
+('Jule radio', 'Jule radio', 'http://jule-radio.dk/', '', '', 1, 128, 0, 1, '2017-12-01', 14363, 0, '2017-12-01 00:00:00', 1), \
+('radio-xmas', 'jul', 'http://www.radio-xmas.at:443/xmas', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2017-12-01 00:00:00', 1), \
+('jule radio', 'jul', 'http://tx-bauerdk.sharp-stream.com/http_live.php?i=395_dk_aacp&amsparams=playerid:SBS_RP_WEB;skey:1512330381;&awparams=loggedin:false', '', '', 1, 128, 0, 1, '2017-12-01', 14365, 0, '2017-12-01 00:00:00', 1), \
+('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 15000, 45, '2012-09-15 22:20:34', 1)";
 
 // 700 -> 1000 is free on intnr
 
