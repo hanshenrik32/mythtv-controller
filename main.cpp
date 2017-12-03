@@ -6819,7 +6819,6 @@ void handlespeckeypress(int key,int x,int y) {
                 if (vis_tv_oversigt) {
                   if (tvsubvalgtrecordnr>0) {
                     tvsubvalgtrecordnr--;
-
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
                       if (vistvguidekl>0) vistvguidekl--;
                     }

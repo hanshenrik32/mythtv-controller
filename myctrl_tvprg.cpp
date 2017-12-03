@@ -1219,7 +1219,6 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
   return(prg_nr);
 }
 
-
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
 }
@@ -1660,35 +1659,37 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   if (!(loading_tv_guide)) {
     time(&rawtime);
     timelist=localtime(&rawtime);
-    xpos=35;
-    ypos=orgwinsizey-298;
-    xsiz=(orgwinsizex-300);
-    ysiz=2;
-    float timelineofset=(timelist->tm_min*4.5);
-    ypos-=timelineofset;
+    if (timelist->tm_hour==mytimelist.tm_hour) {
+      xpos=35;
+      ypos=orgwinsizey-298;
+      xsiz=(orgwinsizex-300);
+      ysiz=2;
+      float timelineofset=(timelist->tm_min*4.5);
+      ypos-=timelineofset;
 
-    glPushMatrix();
-    glTranslatef(10,50, 0.0f);
-    // top
-    glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glColor3f(1.0f, 1.0f, 1.0f);
-  //  glScalef(70.0, 70.0, 1.0);
-  //  glcRenderString("TEST");
-    //glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glBegin(GL_LINE_LOOP);                // line
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-    glEnd(); //End quadrilateral coordinates
-    glScalef(40.0, 40.0, 1.0);
-    //glcRenderString(tvkanaler[1].chanel_name);
-    glPopMatrix();
+      glPushMatrix();
+      glTranslatef(10,50, 0.0f);
+      // top
+      glEnable(GL_TEXTURE_2D);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      //  glScalef(70.0, 70.0, 1.0);
+      //  glcRenderString("TEST");
+      //glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glBegin(GL_LINE_LOOP);                // line
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
+      glEnd(); //End quadrilateral coordinates
+      glScalef(40.0, 40.0, 1.0);
+      //glcRenderString(tvkanaler[1].chanel_name);
+      glPopMatrix();
+    }
   }
 }
 
