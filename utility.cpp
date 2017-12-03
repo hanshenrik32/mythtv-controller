@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
-#include "utility.h"
 #include <sys/types.h>
 // used to get home dir
 // #include <unistd.h>
 #include <pwd.h>
 #include <unistd.h>
+#include "utility.h"
 
 
 // get user homedir
