@@ -1165,16 +1165,17 @@ void WordWrap( char *str, int N ) {
 
 
 
-
-
-
+//
+// return prg number from findtime (hours only) on channel selectchanel where progran start time >= findtime
+//
+/*
 int tv_oversigt::find_start_kl_returnpointinarray(int selectchanel,int findtime) {
   int prg_nr=0;
   time_t rawtime;
   struct tm *timelist;
   struct tm mytimelist;
-  time(&rawtime);
-  timelist=localtime(&rawtime);
+  time(&rawtime);                                                               // get time
+  timelist=localtime(&rawtime);                                                 // convert to localtime
   mytimelist.tm_hour=findtime;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1190,7 +1191,7 @@ int tv_oversigt::find_start_kl_returnpointinarray(int selectchanel,int findtime)
   }
   return(prg_nr);
 }
-
+*/
 
 // find start time to change the start pos in array depaint on that the time is now
 
@@ -1219,7 +1220,9 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 }
 
 
-
+unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
+  if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
+}
 
 
 

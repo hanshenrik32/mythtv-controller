@@ -6317,6 +6317,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 //    printf("button = %d \n",button);
 }
 
+unsigned int hourtounixtime(int hour) {
+  time_t nutid;
+  struct tm *tid;
+  time(&nutid);                                                            // get time
+  tid=localtime(&nutid);                                                   // fillout struct
+  tid->tm_min=0;
+  tid->tm_hour=hour;
+  return(mktime(tid));
+}
+
 
 // handle keys
 
@@ -6632,8 +6642,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     radio_key_selected++;
                 }
-
-
                 if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal())) {
                     if ((stream_key_selected % (snumbersoficonline*3)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
                         _sangley+=RADIO_CS;
@@ -6644,9 +6652,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     stream_key_selected++;
                 }
-
                 break;
-
         case 103:  // key down
                 // bruges af ask_open_dir_or_play
                 if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
@@ -6665,10 +6671,7 @@ void handlespeckeypress(int key,int x,int y) {
                         music_select_iconnr+=mnumbersoficonline;
                     }
                 }
-
-
                 if (vis_film_oversigt) printf("select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
-
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
                     if (film_key_selected>=11) {
                         _fangley+=MOVIE_CS;
@@ -6678,7 +6681,6 @@ void handlespeckeypress(int key,int x,int y) {
                         film_select_iconnr+=fnumbersoficonline;
                     }
                 }
-
                 // radio
                 if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+rnumbersoficonline)<radiooversigt.radioantal())) {
                     if (radio_key_selected>=20) {
@@ -6690,7 +6692,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
-
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
@@ -6701,7 +6702,6 @@ void handlespeckeypress(int key,int x,int y) {
                         stream_select_iconnr+=snumbersoficonline;
                     }
                 }
-
                 // if indside a setup menu
                 if (do_show_setup) {
                     // mythtv sql setup window
@@ -6745,7 +6745,6 @@ void handlespeckeypress(int key,int x,int y) {
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
-
                 if (vis_recorded_oversigt) {
                     if (visvalgtnrtype==1) {
                         if ((int) valgtrecordnr<(int) recordoversigt.top_antal()) {
@@ -6762,8 +6761,11 @@ void handlespeckeypress(int key,int x,int y) {
                 // tv overview
                 if (vis_tv_oversigt) {
                     if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) tvsubvalgtrecordnr++;
-                }
+                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(vistvguidekl+3)) {
+                      if (vistvguidekl<24) vistvguidekl++;
+                    }
 
+                }
                 break;
         case 101: // up key
                 // bruges af ask_open_dir_or_play
@@ -6771,7 +6773,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
                         if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
                 }
-
                 if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr>(mnumbersoficonline-1)) ) {
                     if ((_mangley>0) && ((unsigned int) music_key_selected<=mnumbersoficonline) && (music_select_iconnr>(mnumbersoficonline-1))) {
                          _mangley-=MUSIC_CS;
@@ -6781,7 +6782,6 @@ void handlespeckeypress(int key,int x,int y) {
 
                     if (music_key_selected>(int ) mnumbersoficonline) music_key_selected-=mnumbersoficonline;
                 }
-
                 // movie stuf
                 if (vis_film_oversigt) {
                     if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
@@ -6793,7 +6793,6 @@ void handlespeckeypress(int key,int x,int y) {
                         if (film_key_selected>fnumbersoficonline) film_key_selected-=fnumbersoficonline;
                     }
                 }
-
                 // radio
                 if ((vis_radio_oversigt) && (show_radio_options==false)) {
                     if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
@@ -6805,7 +6804,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
-
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
                     if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
@@ -6817,12 +6815,17 @@ void handlespeckeypress(int key,int x,int y) {
                         if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                     }
                 }
-
                 // tv stuf
                 if (vis_tv_oversigt) {
-                  if (tvsubvalgtrecordnr>0) tvsubvalgtrecordnr--;
-                }
+                  if (tvsubvalgtrecordnr>0) {
+                    tvsubvalgtrecordnr--;
 
+                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
+                      if (vistvguidekl>0) vistvguidekl--;
+                    }
+
+                  }
+                }
                 if (vis_recorded_oversigt) {
                     if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                         valgtrecordnr--;
@@ -6832,8 +6835,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
                 }
-
-
                 if (do_show_setup) {
                     // sql setup
                     if (do_show_setup_sql) {
@@ -6880,8 +6881,6 @@ void handlespeckeypress(int key,int x,int y) {
                     keybuffer[0]=0;
                     keybufferindex=0;
                 }
-
-
                 break;
         case GLUT_KEY_PAGE_UP:
                 if (vis_tv_oversigt) {
