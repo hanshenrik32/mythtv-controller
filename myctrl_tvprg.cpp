@@ -1703,7 +1703,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
 void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     char tmptxt[200];
-    char tmptxt1[16000];
+    char tmptxt1[17000];
     time_t aktueltid;
     time_t prgtid;
     time(&aktueltid);					// hent hvad klokken er
