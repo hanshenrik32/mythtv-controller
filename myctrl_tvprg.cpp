@@ -1463,9 +1463,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       //ypos=orgwinsizey-245-barsize;
       ypos=orgwinsizey-245;
       // hent prg length in min
-      prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;
-      prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;
-      prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;
+      prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
+      prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
+      prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
       // show program start before over view time start
       if ((prgstarttid<mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
@@ -1645,6 +1645,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         }
         barsize=barsize+(prglength*5);
         yypos+=1;
+      } else {
+        printf("NO program data kanalnr %2d prg_nr %2d \n",kanalnr,prg_nr);
       }
       prg_nr++;                                                                 // next program
     }
@@ -1703,7 +1705,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
 void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     char tmptxt[200];
-    char tmptxt1[16000];
+    char tmptxt1[17000];
     time_t aktueltid;
     time_t prgtid;
     time(&aktueltid);					// hent hvad klokken er
@@ -1782,8 +1784,8 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
       ysiz=120;
       xpos=((orgwinsizex/2)-xsiz/2)-160;
       ypos=((orgwinsizey/2)-ysiz/2)-260;
-      glPushMatrix();
-      glTranslatef(10,50, 0.0f);
+      //glPushMatrix();
+      //glTranslatef(10,50, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -1796,7 +1798,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
       glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
       glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
       glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
+      //glPopMatrix();
     }
     // close button
     xsiz=120;
@@ -1804,7 +1806,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     xpos=((orgwinsizex/2)-xsiz/2)-20;
     ypos=((orgwinsizey/2)-ysiz/2)-260;
     //glPushMatrix();
-    glTranslatef(10,50, 0.0f);
+    //glTranslatef(10,50, 0.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
     glEnable(GL_TEXTURE_2D);
@@ -1817,10 +1819,12 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
     glEnd(); //End quadrilateral coordinates
-
     //glPopMatrix();
 
 }
+
+
+
 
 //
 //*******************************************************************************************************************************//
