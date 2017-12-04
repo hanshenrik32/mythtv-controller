@@ -24,6 +24,9 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
+extern char   __BUILD_DATE;
+extern char   __BUILD_NUMBER;
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -6822,7 +6825,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
                       if (vistvguidekl>0) vistvguidekl--;
                     }
-
                   }
                 }
                 if (vis_recorded_oversigt) {
@@ -10463,8 +10465,10 @@ int check_radio_stations_icons() {
 
 
 int main(int argc, char** argv) {
-    //printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
+
+    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
