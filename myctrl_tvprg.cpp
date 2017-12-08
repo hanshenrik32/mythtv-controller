@@ -1335,7 +1335,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   switch (screen_size) {
     case 4: glTranslatef(xpos+320,orgwinsizey-80, 0.0f);
             break;
-    default:glTranslatef(xpos+620,orgwinsizey-80, 0.0f);
+    default:glTranslatef(xpos+560,orgwinsizey-80, 0.0f);
             break;
   }
   glScalef(40.0, 40.0,1);
@@ -1360,30 +1360,33 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   mytimelist.tm_mday=timelist->tm_mday;
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
-
-//do_update_xmltv_show
-
+  //show do_update_xmltv_show
   switch (configland) {
+            // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              if (mytimelist.tm_sec & 2) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              else sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
+            // dansk
     case 1: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min); else
-              sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min);
+              if (mytimelist.tm_sec & 2) sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min);
+              else sprintf(tmptxt,"TV Guiden %s den %02d-%02d-%d %02d:%02d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900,timelist->tm_hour,timelist->tm_min);
             break;
     case 2: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"TV Guide %s %02d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
     case 3: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %02s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"TV Guide %02s %d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              if (mytimelist.tm_sec & 2) sprintf(tmptxt,"TV Guide %02s %d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              else sprintf(tmptxt,"TV Guide %02s %d-%02d-%d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
     case 4: if (!(do_update_xmltv_show)) sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              if (mytimelist.tm_sec & 2) sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              else sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
     default:if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
-              sprintf(tmptxt,"TV Guide %s %02d-%02d-%d  Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              if (mytimelist.tm_sec & 2) sprintf(tmptxt,"TV Guide %s %02d-%02d-%d  Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              else sprintf(tmptxt,"TV Guide %s %02d-%02d-%d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
   };
-
   glcRenderString(tmptxt);
   glPopMatrix();
 
@@ -1430,6 +1433,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   int do_kanal_nr=0;
   int vis_kanal_antal=7;                        // antal kanler som vises
 
+  if (kanal_antal<vis_kanal_antal) vis_kanal_antal=kanal_antal;
+
   //
   // loop for channel
   //
@@ -1453,6 +1458,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     barsize=0;
     yypos=0;
 
+    printf("Omgang %d \n",do_kanal_nr);
+
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
@@ -1467,7 +1474,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
       // show program start before over view time start
-      if ((prgstarttid<mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
+      if ((prgstarttid<=mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
         // calc new length for ysiz
         prglength=20;                                                         // min prg length
@@ -1646,7 +1653,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         barsize=barsize+(prglength*5);
         yypos+=1;
       } else {
-        printf("NO program data kanalnr %2d prg_nr %2d \n",kanalnr,prg_nr);
+        //printf("NO program data kanalnr %2d prg_nr %2d tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn %s \n",kanalnr,prg_nr,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
       }
       prg_nr++;                                                                 // next program
     }
@@ -1740,21 +1747,76 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     glScalef(20.0, 20.0,1);
     glBlendFunc(GL_ONE, GL_ONE);
     glDisable(GL_TEXTURE_2D);
-    sprintf(tmptxt,"Kanal    : %-10s",tvkanaler[kanalnr].chanel_name);
+    switch (configland) {
+      case 0: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
+              break;
+      case 1: sprintf(tmptxt,"Kanal    : %-10s",tvkanaler[kanalnr].chanel_name);
+              break;
+      case 2: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
+              break;
+      case 3: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
+              break;
+      case 4: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
+              break;
+      default:
+              sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
+    }
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
-    sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+    switch (configland) {
+      case 0: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+              break;
+      case 1: sprintf(tmptxt,"Prg navn : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+              break;
+      case 2: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+              break;
+      case 3: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+              break;
+      case 4: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+              break;
+      default:
+            sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
+    }
     glcRenderString(tmptxt);
 
     //glLoadIdentity();
     //glTranslatef(400,470, 0.0f);
     glTranslatef(-15.0f, -2.0f, 0.0f);
-    sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+    switch (configland) {
+      case 0: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+              break;
+      case 1: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+              break;
+      case 2: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+              break;
+      case 3: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+              break;
+      case 4: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+              break;
+      default:sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+
+    }
     glcRenderString(tmptxt);
 
+//    int configland=0;
+//   *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
+
     glTranslatef(-15.0f, -2.0f, 0.0f);
-    sprintf(tmptxt,"Længde   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+    switch (configland) {
+      case 0: sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+              break;
+      case 1: sprintf(tmptxt,"Længde   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+              break;
+      case 2: sprintf(tmptxt,"durée du : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+              break;
+      case 3: sprintf(tmptxt,"Programmlänge : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+              break;
+      case 4: sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+              break;
+      default:
+              sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
+    }
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
@@ -1765,11 +1827,36 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
     if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn,tvkanaler[kanalnr].chanid);
-    sprintf(tmptxt,"recorded %d times before.",antalrec);
+    switch (configland) {
+      case 0: sprintf(tmptxt,"recorded %d times before.",antalrec);
+              break;
+      case 1: sprintf(tmptxt,"optaget %d gange før.",antalrec);
+              break;
+      case 2: sprintf(tmptxt,"recorded %d times before.",antalrec);
+              break;
+      case 3: sprintf(tmptxt,"recorded %d times before.",antalrec);
+              break;
+      case 4: sprintf(tmptxt,"recorded %d times before.",antalrec);
+              break;
+      default: sprintf(tmptxt,"recorded %d times before.",antalrec);
+
+    }
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
-    sprintf(tmptxt1,"Beskrivelse : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+    switch (configland) {
+      case 0: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+              break;
+      case 1: sprintf(tmptxt1,"Beskrivelse : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+              break;
+      case 2: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+              break;
+      case 3: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+              break;
+      case 4: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+              break;
+      default: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+    }
     glcRenderString(tmptxt1);
 
     //glPopMatrix();

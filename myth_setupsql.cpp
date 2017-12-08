@@ -913,7 +913,7 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio-Tunisie24 Dance', 'Among the stations Radio Tunisie24, users can discover Urban Radio Tunisie devoted to the Underground Music Rap Hip-Hop Rb.', 'http://tunisie24.net/radio-tunisie24-dance.m3u', 'http://www.tunisie24.net/', 'Radio-Tunisie24---Dance.png', 0, 0, 0, 1, '2011-11-11', 14259, 0, '2017-01-01 00:00:00', 0), \
 ('Energy-98', '', 'http://listen.181fm.com/181-energy98_128k.mp3', 'http://www.energy981.com/', 'Energy-98.png', 0, 0, 0, 1, '2011-11-11', 14263, 0, '2017-01-01 00:00:00', 1);";
 
-
+ 
 const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('Voivod', '', 'http://stream.laut.fm/eisradio', '', 'Voivod.png', 0, 0, 0, 1, '2011-11-11', 14271, 0, '2017-01-01 00:00:00', 1), \
 ('Radio-Deejay', '', 'http://live.radiodeejay.hr:7002', 'http://www.radiodeejay.hr/', 'Radio-Deejay.png', 0, 0, 0, 1, '2011-11-11', 14324, 0, '2017-01-01 00:00:00', 1), \
