@@ -24,6 +24,9 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
+extern char   __BUILD_DATE;
+extern char   __BUILD_NUMBER;
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -6761,6 +6764,7 @@ void handlespeckeypress(int key,int x,int y) {
                 // tv overview
                 if (vis_tv_oversigt) {
                     if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) tvsubvalgtrecordnr++;
+                    // check hvor vi er
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(vistvguidekl+3)) {
                       if (vistvguidekl<24) vistvguidekl++;
                     }
@@ -6822,7 +6826,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
                       if (vistvguidekl>0) vistvguidekl--;
                     }
-
                   }
                 }
                 if (vis_recorded_oversigt) {
@@ -6886,6 +6889,9 @@ void handlespeckeypress(int key,int x,int y) {
                     aktiv_tv_oversigt.changetime(60);
                     if (vistvguidekl<24) vistvguidekl++;
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    ask_tv_record=false;
+                    tvknapnr=0;
+                    do_zoom_tvprg_aktiv_nr=0;					                          // slet valget
                 }
                 if (do_show_tvgraber) {
                   if (tvchannel_startofset>1) tvchannel_startofset-=12;
@@ -6893,26 +6899,31 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_select_linie<3) do_show_setup_select_linie=3;
                   if (tvchannel_startofset<0) tvchannel_startofset=0;
                 }
-
                 break;
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(-(60));
                     if (vistvguidekl>0) vistvguidekl--;
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    ask_tv_record=false;
+                    tvknapnr=0;
+                    do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
                 }
                 if (do_show_tvgraber) {
                   if (tvchannel_startofset>0) tvchannel_startofset+=12;
                   else if ((do_show_setup_select_linie)>0) do_show_setup_select_linie+=12;
                 }
-
                 break;
         case GLUT_KEY_HOME:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(-(60*60*24));
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    if (ask_tv_record) {
+                      ask_tv_record=false;
+                      tvknapnr=0;
+                      do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
+                    }
                 }
-
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                     if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                          _rangley-=0;
@@ -7597,7 +7608,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_tv_oversigt) {
                         // hvis der trykkes enter på default ask_tv_record (yes)
                         // blivere den sat til record mode (create mysql data in record table)
-                        printf("Ask om vi skal optage program \m");
+                        printf("Ask om vi skal optage program \n");
                         if ((ask_tv_record) && (do_zoom_tvprg_aktiv_nr>0)) {
                             // do it
                             // set start record tv prgoram
@@ -10463,8 +10474,10 @@ int check_radio_stations_icons() {
 
 
 int main(int argc, char** argv) {
-    //printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
+
+    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
