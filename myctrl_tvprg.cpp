@@ -1788,7 +1788,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
               break;
       case 1: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
-      case 2: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+      case 2: sprintf(tmptxt,"début    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
       case 3: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
@@ -1799,7 +1799,6 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     }
     glcRenderString(tmptxt);
 
-//    int configland=0;
 //   *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
 
     glTranslatef(-15.0f, -2.0f, 0.0f);
