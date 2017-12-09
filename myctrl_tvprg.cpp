@@ -973,7 +973,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                                             // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
         rawtime=time(NULL);				     			// hent nu tid
         rawtime2=time(NULL);					   	  // hent nu tid
-        rawtime2+=60*60*48;                 //  + 2 døgn
+        rawtime2+=60*60*24;                 //  + 2 døgn
     } else {
         // hent ny starttid
         rawtime=this->starttid;                // this
@@ -1029,8 +1029,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal) && (kanalnr<MAXKANAL_ANTAL)) {
                 if (prgnr==0) {
                     tvkanaler[kanalnr].putkanalname(row[0]);
-                    tvkanaler[kanalnr].chanid=atoi(row[11]);
-                    strcpy(tmptxt,row[0]);
+                    tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
+                    strcpy(tmptxt,row[0]);                                        // rember channel name
                 }
                 if (strcmp(row[8],"None")!=0) {
                   if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
@@ -1058,7 +1058,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     else prgtype=0;
                 }
 
-                recorded=tvprgrecorded(row[1],row[3],row[11]);			// get recorded status from backend
+                recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
                 tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
@@ -1236,13 +1236,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   time_t nutid;
   time_t nutidtime;
   time_t rawtime;
-  time_t prgtidunix;                          // used to calc new length if now rom for it
+  time_t prgtidunix;                                                            // used to calc new length if now rom for it
   struct tm *timelist;
   struct tm mytimelist;
   struct tm *prgtime;
   float selectcolor=1.0f;
 
-  unsigned int kanalomgang=100;
+  unsigned int kanalomgang=100;                                                 //
+  unsigned int kanalomgangofset=100;
+
   int n;
   int chanid;
   int kanalnr=0;
@@ -1349,9 +1351,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   // convert clovk to localtime
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
-
-  printf("viskl=%d \n ",viskl);
-
+  //if (debugmode) printf("viskl=%d \n ",viskl);
   if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1361,6 +1361,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   //show do_update_xmltv_show
+
+  // check if we get tvguide and show it
+  if (check_tvguide_process_running("tv_grab_dk_dr")==false) do_update_xmltv_show=false;
   switch (configland) {
             // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
@@ -1458,16 +1461,20 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     barsize=0;
     yypos=0;
 
-    printf("Omgang %d \n",do_kanal_nr);
+    //if (debugmode) printf("Omgang %d \n",do_kanal_nr);
+
+    //printf("kanal nr %10d navn %40s \n",kanalnr,tvkanaler[kanalnr].chanel_name);
+
 
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
     //
-    while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+    while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
+
       ypos=orgwinsizey-245;
       // hent prg length in min
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
@@ -1657,7 +1664,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       }
       prg_nr++;                                                                 // next program
     }
-    kanalomgang+=100;                                                         // next channel
+    kanalomgang+=kanalomgangofset;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
