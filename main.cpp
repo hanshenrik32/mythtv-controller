@@ -5834,19 +5834,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
                 // er der trykket på et tv program
                 if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-                    tvknapnr=(GLuint) names[i*4+3]-100;					// hent music knap nr
+                    tvknapnr=(GLuint) names[i*4+3]-100;					                // hent tv knap nr
                     fundet=true;
                 }
-
-/*
-                if ((!(fundet)) && ((GLuint) names[i*4+3]>=200)) {
-                    //tvknapnr=(GLubyte) names[i*4+3]-200;					// hent tv kanal knap nr
-                    fprintf(stderr,"tv kanal selected=%d  \n",(GLubyte) names[i*4+3]-200);
-                    tvknapnr=0;								// SKAL fixes
-                    fundet=true;
-                }
-*/
-
             }
 
             // show old recordings
@@ -6819,11 +6809,18 @@ void handlespeckeypress(int key,int x,int y) {
                         if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                     }
                 }
-                // tv stuf
+                // tv stuf up key
                 if (vis_tv_oversigt) {
                   if (tvsubvalgtrecordnr>0) {
                     tvsubvalgtrecordnr--;
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
+                      if (vistvguidekl==0) {
+                          time_t rawtime;
+                          struct tm *timelist;
+                          time(&rawtime);
+                          timelist=localtime(&rawtime);
+                          vistvguidekl=timelist->tm_hour;
+                      }
                       if (vistvguidekl>0) vistvguidekl--;
                     }
                   }
@@ -6887,7 +6884,17 @@ void handlespeckeypress(int key,int x,int y) {
         case GLUT_KEY_PAGE_UP:
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(60);
-                    if (vistvguidekl<24) vistvguidekl++;
+                    if (vistvguidekl<24) {
+                      // hent ur
+                      if (vistvguidekl==0) {
+                          time_t rawtime;
+                          struct tm *timelist;
+                          time(&rawtime);
+                          timelist=localtime(&rawtime);
+                          vistvguidekl=timelist->tm_hour;
+                      }
+                      vistvguidekl++;
+                    }
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                     ask_tv_record=false;
                     tvknapnr=0;
@@ -6901,8 +6908,15 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_PAGE_DOWN:
-                if (vis_tv_oversigt) {
+                if ((vis_tv_oversigt) && ((vistvguidekl>1) || (vistvguidekl==0))) {
                     aktiv_tv_oversigt.changetime(-(60));
+                    if (vistvguidekl==0) {
+                        time_t rawtime;
+                        struct tm *timelist;
+                        time(&rawtime);
+                        timelist=localtime(&rawtime);
+                        vistvguidekl=timelist->tm_hour;
+                    }
                     if (vistvguidekl>0) vistvguidekl--;
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                     ask_tv_record=false;
@@ -6922,6 +6936,12 @@ void handlespeckeypress(int key,int x,int y) {
                       ask_tv_record=false;
                       tvknapnr=0;
                       do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
+                      // get time now
+                      time_t rawtime;
+                      struct tm *timelist;
+                      time(&rawtime);
+                      timelist=localtime(&rawtime);
+                      vistvguidekl=timelist->tm_hour;
                     }
                 }
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {

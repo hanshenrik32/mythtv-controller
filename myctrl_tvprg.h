@@ -4,8 +4,9 @@
 #include <time.h>
 #include <string.h>
 
-const int maxprogram_antal=200;
 // antal programer pr kanal
+const int maxprogram_antal=200;
+// antal kanaler max
 const int MAXKANAL_ANTAL=100;
 
 
