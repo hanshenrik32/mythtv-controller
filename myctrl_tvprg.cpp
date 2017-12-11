@@ -1027,7 +1027,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         kanalnr=0;
         prgnr=0;
         if (res) {
-            while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal) && (kanalnr<MAXKANAL_ANTAL)) {
+            while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal-1) && (kanalnr<MAXKANAL_ANTAL-1)) {
                 if (prgnr==0) {
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
@@ -1063,7 +1063,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
-                if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal)) {
+                if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;

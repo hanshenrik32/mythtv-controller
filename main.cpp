@@ -6804,7 +6804,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // tv stuf up key
                 if (vis_tv_oversigt) {
-                  if (tvsubvalgtrecordnr>0) {
+                  if (tvsubvalgtrecordnr>1) {
                     tvsubvalgtrecordnr--;
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(vistvguidekl)) {
                       if (vistvguidekl==0) {
