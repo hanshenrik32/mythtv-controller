@@ -6587,16 +6587,9 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 if (vis_tv_oversigt) {
-/*
-                  if (vis_tv_oversigt) {
-                    if (tvvisvalgtnrtype==1) tvvisvalgtnrtype=2;
-                    else if (tvvisvalgtnrtype==2) tvvisvalgtnrtype=1;
-                  }
-*/
                   if (tvvisvalgtnrtype==1) {
-                    if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) tvvalgtrecordnr++;
-
-                      tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
+                    if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()-1) tvvalgtrecordnr++;
+                    tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
 
                         //tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
                         //tvsubvalgtrecordnr=0;
