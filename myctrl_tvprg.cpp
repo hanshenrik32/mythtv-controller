@@ -947,6 +947,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     int totalantalprogrammer=0;
     int prgtype;
     bool recorded;
+    unsigned int huskprgantal=0;
     char sqlselect[512];
     char dagsdato[128];
     char enddate[128];
@@ -1063,11 +1064,15 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal)) {
+                    // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
+                    huskprgantal=prgnr-1;
                     prgnr=0;
                     kanalnr++;								// next tv channel
                 }
             }
+            // set last channel ¤ of programs in array
+            tvkanaler[kanalnr].set_program_antal(huskprgantal);
             this->kanal_antal=kanalnr+1;
             printf("Found nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
@@ -1471,6 +1476,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     //
     // loop for program
     //
+
+    if (kanalnr==9) {
+      int tmpk=12;
+      printf("prg name %s starttime %d sludtid %d tt %d prg_nr %d antal %d \n ",tvkanaler[kanalnr].tv_prog_guide[tmpk].program_navn,tvkanaler[kanalnr].tv_prog_guide[tmpk].starttime_unix,tvkanaler[kanalnr].tv_prog_guide[tmpk].endtime_unix,tt,prg_nr,tvkanaler[kanalnr].program_antal());
+    }
+
+
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
