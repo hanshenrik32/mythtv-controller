@@ -1476,13 +1476,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     //
     // loop for program
     //
-
-    if (kanalnr==9) {
-      int tmpk=12;
-      printf("prg name %s starttime %d sludtid %d tt %d prg_nr %d antal %d \n ",tvkanaler[kanalnr].tv_prog_guide[tmpk].program_navn,tvkanaler[kanalnr].tv_prog_guide[tmpk].starttime_unix,tvkanaler[kanalnr].tv_prog_guide[tmpk].endtime_unix,tt,prg_nr,tvkanaler[kanalnr].program_antal());
-    }
-
-
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
