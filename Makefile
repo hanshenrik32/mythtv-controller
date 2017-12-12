@@ -92,11 +92,13 @@ installsound:
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxf fmodstudioapi10906linux.tar.gz -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
-	cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
-	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9.6
-	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9.6
-	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so /usr/lib/libfmod.so.9.6
-	#ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9.6
+	#cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9.6
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9.6	
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9
+	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
