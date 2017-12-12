@@ -1028,7 +1028,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         prgnr=0;
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal-1) && (kanalnr<MAXKANAL_ANTAL-1)) {
-                if (prgnr==0) {
+                if ((prgnr==0) && (strcmp(tmptxt,row[0])!=0)) {
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
                     strcpy(tmptxt,row[0]);                                        // rember channel name
@@ -1058,9 +1058,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     else if (strcmp("movie",row[9])==0) prgtype=5;
                     else prgtype=0;
                 }
-
                 recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
-                tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
+                if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
@@ -1071,8 +1070,9 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     kanalnr++;								// next tv channel
                 }
             }
-            // set last channel ¤ of programs in array
+            // set last channel # of programs in array
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
+            // total nr of channels
             this->kanal_antal=kanalnr+1;
             printf("Found nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
@@ -1226,6 +1226,10 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
+}
+
+unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
+  if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
 }
 
 
@@ -1664,8 +1668,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         }
         barsize=barsize+(prglength*5);
         yypos+=1;
-      } else {
-        //printf("NO program data kanalnr %2d prg_nr %2d tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn %s \n",kanalnr,prg_nr,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
       }
       prg_nr++;                                                                 // next program
     }
