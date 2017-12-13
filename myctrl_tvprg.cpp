@@ -1018,7 +1018,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
-        strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
+        strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
 
         if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
 
@@ -1233,6 +1233,11 @@ unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectp
 }
 
 
+// return pointer to prgname in tvguide
+
+char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
+  return(tvkanaler[selectchanel].tv_prog_guide[selectprg].program_navn);
+}
 
 // vis_tv_oversigt
 // new
@@ -1283,7 +1288,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     xpos=(orgwinsizex/2)-xsiz/2;
     ypos=(orgwinsizey/2)-ysiz/2;
     glPushMatrix();
-    glTranslatef(10,50, 0.0f);
+    glTranslatef(10,50, 1.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D,_tvbar3);
     glEnable(GL_TEXTURE_2D);

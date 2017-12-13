@@ -20,18 +20,20 @@ struct channel_list_struct {
   bool selected;
   char id[80];                                                                  // channel_list array used in setup graber
   char name[80];                                                                // channel_list array used in setup graber
+  int ordernr;                                                                  // sort order nr
+  bool changeordernr;                                                           // do change ordre nr (used in setup)
 };
 
 
 class channel_configfile {
   private:
-    int maxconfigfilesize=400;
-    int configfilesize=0;
-    char configtext[400][80];
+    int maxconfigfilesize=400;                                                  // config for xmltv
+    int configfilesize=0;                                                       // real size
+    char configtext[400][80];                                                   // config settings
   public:
-    int readgraber_configfile();
-    int writegraber_configfile();
-    int graber_configbuild();                                                  // build xmltv config file
+    int readgraber_configfile();                                                // read graber file
+    int writegraber_configfile();                                               // read graber file
+    int graber_configbuild();                                                   // build xmltv config file
 };
 
 

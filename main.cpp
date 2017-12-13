@@ -96,7 +96,7 @@ int findtype=0;					                              	// bruges af search kunster/s
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
 bool do_save_config=false;
 
-channel_list_struct channel_list[400];                  // channel_list array used in setup graber
+channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
 
 channel_configfile  xmltv_configcontrol;                //
 
@@ -6746,12 +6746,13 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // tv overview
                 if (vis_tv_oversigt) {
-                    if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) tvsubvalgtrecordnr++;
+                    if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                      if (strcmp(aktiv_tv_oversigt.getprogram_prgname(tvvalgtrecordnr,tvsubvalgtrecordnr+1),"")!=0) tvsubvalgtrecordnr++;
+                    }
                     // check hvor vi er
                     if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(vistvguidekl+3)) {
                       if (vistvguidekl<24) vistvguidekl++;
                     }
-
                 }
                 break;
         case 101: // up key

@@ -90,6 +90,9 @@ class tv_oversigt {
         int find_start_pointinarray(int selectchanel);
         unsigned long getprogram_endunixtume(int selectchanel,int selectprg);
         unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
+
+        char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
+
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 
