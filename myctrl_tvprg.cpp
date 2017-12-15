@@ -303,6 +303,60 @@ void getfirstlinefromstring(char *resl,char *line) {
 }
 
 
+
+void expand_escapes(char* dest, const char* src) {
+  char c;
+  while (c = *(src++)) {
+    switch(c) {
+      case '\a':
+        *(dest++) = '\\';
+        *(dest++) = 'a';
+        break;
+      case '\b':
+        *(dest++) = '\\';
+        *(dest++) = 'b';
+        break;
+      case '\t':
+        *(dest++) = '\\';
+        *(dest++) = 't';
+        break;
+      case '\n':
+        *(dest++) = '\\';
+        *(dest++) = 'n';
+        break;
+      case '\v':
+        *(dest++) = '\\';
+        *(dest++) = 'v';
+        break;
+      case '\f':
+        *(dest++) = '\\';
+        *(dest++) = 'f';
+        break;
+      case '\r':
+        *(dest++) = '\\';
+        *(dest++) = 'r';
+        break;
+      case '\\':
+        *(dest++) = '\\';
+        *(dest++) = '\\';
+        break;
+      case '\"':
+        *(dest++) = '\\';
+        *(dest++) = '\"';
+        break;
+        case '\'':
+          *(dest++) = '\\';
+          *(dest++) = '\"';
+          break;
+      default:
+        *(dest++) = c;
+     }
+  }
+
+  *dest = '\0'; /* Ensure nul terminator */
+}
+
+
 //
 // read tv guide from file. And update tvguide db (create if not exist)
 //
@@ -313,6 +367,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char userhomedir[200];
   char path[1024];
   char result[1024];
+
+  char temptxt[1024];
+
   char sql[4096];
   char *s;
   int error=0;
@@ -329,6 +386,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char channelname[1024];
   char channelidname[1024];
   char category[1924];
+  char description[4096];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -351,6 +409,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
   mysql_query(conn,"set NAMES 'utf8'");
   res = mysql_store_result(conn);
   mysql_free_result(res);
+
+  strcpy(description,"");
 
   sprintf(sql,"CREATE DATABASE IF NOT EXISTS %s",database);
   mysql_query(conn,sql);
@@ -475,13 +535,20 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   strcat(starttime,":");
                   strncat(starttime,( char *) tmpdat+12,2);
                   //starttime[16]=0;
-                  if (debugmode & 256) printf("From: %20s", starttime);
+//                  if (debugmode & 256) printf("From: %20s", starttime);
                 }
+
+                tmpdat=xmlGetProp(node,( xmlChar *) "desc land");
+                if (tmpdat) {
+                  strncpy(description,(char *) tmpdat,4095);                             // get desc
+                }
+
+
                 //xmlFree(tmpdat);
                 tmpdat=xmlGetProp(node,( xmlChar *) "category");
                 if (tmpdat) {
                   if (debugmode & 256) {
-                    if (tmpdat) printf("category: %s\n", tmpdat);
+//                    if (tmpdat) printf("category: %s\n", tmpdat);
                   }
                   if (strcmp("Serier",(char *) tmpdat)==0) strcpy(category,"Serier");
                   else if (strcmp("Natur",(char *) tmpdat)==0) strcpy(category,"Natur");
@@ -509,7 +576,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   strcat(endtime,":");
                   strncat(endtime,( char *) tmpdat+12,2);
                   //endtime[16]=0;
-                  if (debugmode & 256) printf(" ->%20s", endtime);
+//                if (debugmode & 256) printf(" ->%20s", endtime);
                 }
                 //xmlFree(tmpdat);
 
@@ -517,13 +584,13 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 if ((xmltvid) && (gettchannel==false)) {
                   gettchannel=true;
                   strcpy(channelname,(char *) xmltvid);
-                  if (debugmode & 256) printf(" %s",channelname);
+  //                if (debugmode & 256) printf(" %s",channelname);
                 }
                 // save channelname to show in update
                 strcpy(this->loadinginfotxt,channelname);
 
                 //xmlFree(tmpdat);
-                if (debugmode & 256) printf("\n");
+//                if (debugmode & 256) printf("\n");
                 subnode=subnode->next;
               }
               //title=xmlGetProp(node1,( xmlChar *) "title");
@@ -540,16 +607,26 @@ int tv_oversigt::parsexmltv(const char *filename) {
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
+
+                // convert spec chars to esc string in string
+                expand_escapes(temptxt,prgtitle);
+                strcpy(prgtitle,temptxt);
+
+                // convert spec chars to esc string in string
+                expand_escapes(temptxt,description);
+                strcpy(description,temptxt);
+
                 sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program created %s->%s %s \n",starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program created.... Channel %20s %s->%s %s \n sql= %s \n",channelname,starttime,endtime,prgtitle,sql);
               } else {
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist,no update %s->%s %s \n",starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist in db Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
           }
+
         }
         fprintf(stdout, "...\n");
         xmlFreeDoc(document);
