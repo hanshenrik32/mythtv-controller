@@ -16,22 +16,28 @@ struct tv_graber_config {
   const char *grabercmd[35]={"","tv_grab_na_dd","tv_grab_nl","tv_grab_es_laguiatv","tv_grab_il","tv_grab_na_tvmedia","tv_grab_dtv_la","tv_grab_fi","tv_grab_eu_dotmedia","tv_grab_se_swedb","tv_grab_pt_meo","tv_grab_fr","tv_grab_uk_bleb","tv_grab_huro","tv_grab_ch_search","tv_grab_it","tv_grab_is","tv_grab_fi_sv","tv_grab_na_dtv","tv_grab_tr","tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide"};
 };
 
+
+
 struct channel_list_struct {
   bool selected;
   char id[80];                                                                  // channel_list array used in setup graber
   char name[80];                                                                // channel_list array used in setup graber
+  int ordernr;                                                                  // sort order nr
+  bool changeordernr;                                                           // do change ordre nr (used in setup)
 };
+
+
 
 
 class channel_configfile {
   private:
-    int maxconfigfilesize=400;
-    int configfilesize=0;
-    char configtext[400][80];
+    int maxconfigfilesize=400;                                                  // config for xmltv
+    int configfilesize=0;                                                       // real size
+    char configtext[400][80];                                                   // config settings
   public:
-    int readgraber_configfile();
-    int writegraber_configfile();
-    int graber_configbuild();                                                  // build xmltv config file
+    int readgraber_configfile();                                                // read graber file
+    int writegraber_configfile();                                               // read graber file
+    int graber_configbuild();                                                   // build xmltv config file
 };
 
 
@@ -43,6 +49,8 @@ int load_channel_list_from_graber();
 bool save_channel_list();
 //
 int load_channel_list();
+//
+int order_channel_list_in_tvguide_db();
 //
 int killrunninggraber();
 

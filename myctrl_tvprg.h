@@ -4,14 +4,13 @@
 #include <time.h>
 #include <string.h>
 
-const int maxprogram_antal=200;
 // antal programer pr kanal
+const int maxprogram_antal=200;
+// antal kanaler max
 const int MAXKANAL_ANTAL=100;
 
-
-
-// tv oversigt til 3d
-// denne table inden holder aktiv tv program for i dag. hentet fra mythtv databasen
+// tv oversigt
+// denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
 
 class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
     public:
@@ -90,6 +89,10 @@ class tv_oversigt {
         void cleartvguide();                                                                                  // drop db in backend
         int find_start_pointinarray(int selectchanel);
         unsigned long getprogram_endunixtume(int selectchanel,int selectprg);
+        unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
+
+        char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
+
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 

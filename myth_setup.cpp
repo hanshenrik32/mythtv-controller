@@ -32,6 +32,7 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
+
 extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
 extern int PRGLIST_ANTAL;
@@ -2913,7 +2914,7 @@ int txmltvgraber_createconfig() {
 
 
 //
-// read xmltv config file and save it
+// read xmltv config file
 //
 
 int channel_configfile::readgraber_configfile() {
@@ -3144,7 +3145,7 @@ int load_channel_list_from_graber() {
     //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
     strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
     sysresult=system(exestring);
-    fil=fopen("/home/hans/tvguide_channels.txt","r");
+    fil=fopen(filename,"r");
     if (fil) {
       while(!(feof(fil))) {
         fgets(buffer,512,fil);
@@ -3153,7 +3154,8 @@ int load_channel_list_from_graber() {
           strcpy(channel_list[cnr].id,buffer);
           strcpy(channel_list[cnr].name,buffer1);
           // set default new channel is not active
-          channel_list[cnr].selected=false;
+          channel_list[cnr].selected=false;                                     // default
+          channel_list[cnr].ordernr=0;                                          // default
           cnr++;
           PRGLIST_ANTAL++;
         }
@@ -3166,11 +3168,6 @@ int load_channel_list_from_graber() {
   } else errors=true;
   if (errors==false) return(1); return(0);
 }
-
-
-
-
-
 
 //
 // save tvguide channel info
@@ -3211,6 +3208,13 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
+  for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
+    channel_list[n].selected=false;                                             // is program channel active
+    channel_list[n].ordernr=0;                                                  // show ordernr
+    channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
+    strcpy(channel_list[n].name,"");                                            // channel name
+    strcpy(channel_list[n].id,"");                                              // internal dbid
+  }
   strcat(filename,"/tvguide_channels.dat");
   fil=fopen(filename,"r");
   if (fil) {
@@ -3225,13 +3229,56 @@ int load_channel_list() {
 }
 
 
+
+//
+// order tv channels in tvguide db
+// by order in channel_list array
+//
+
+int order_channel_list_in_tvguide_db() {
+  // mysql vars
+  bool done=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char sqlselect[1024];
+  // mysql stuf
+  char *database = (char *) "mythconverg";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
+      if (channel_list[n].ordernr>0) {
+        // update order to show in tvguide
+        sprintf(sqlselect,"update channel set channel.orderid=%d where channel.name like '%s' limit 1",n,channel_list[n].name);
+
+        printf("sql channel update %s \n",sqlselect);
+
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        done=true;
+      }
+    }
+    mysql_close(conn);
+  }
+  if (done) return(1); else return(0);
+}
+
+
+
 //
 // ********************* show setup tv graber ************************************************************************
 //
 
 
 void show_setup_tv_graber(int startofset) {
-    const char *weekdays[10]={"Monday","tuesday","Wednesday","thorsdag","Fredag","lørdag","søndag"};
+    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
+    const char *weekdaysuk[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+    const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
+    const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
+    const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
@@ -3358,7 +3405,24 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     xmlupdatelasttime=localtime(&configtvguidelastupdate);
-    sprintf(keybuffer,"%s %d %d %d %d:%d",weekdays[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+    //
+    // Sprog struktur.
+    //
+    // English, danish, france, tysk, Arabic
+    switch (configland) {
+      case 0: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+              break;
+      case 1: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+              break;
+      case 2: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+              break;
+      case 3: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+              break;
+      case 4: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+              break;
+      default:
+              sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+    }
     myglprint4((char *) keybuffer);   // keybuffer
     glPopMatrix();
     //
@@ -3386,7 +3450,7 @@ void show_setup_tv_graber(int startofset) {
 
     for (int n=0;n<14;n++) {
       glPushMatrix();
-      glTranslatef(672 , 560-(n*20) , 0.0f);
+      if (channel_list[(n-1)+startofset].changeordernr) glTranslatef(692 , 560-(n*20) , 0.0f); else glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       if ((do_show_setup_select_linie-1)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
       if (channel_list[(n-1)+startofset].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");

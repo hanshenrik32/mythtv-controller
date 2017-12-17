@@ -303,6 +303,60 @@ void getfirstlinefromstring(char *resl,char *line) {
 }
 
 
+
+void expand_escapes(char* dest, const char* src) {
+  char c;
+  while (c = *(src++)) {
+    switch(c) {
+      case '\a':
+        *(dest++) = '\\';
+        *(dest++) = 'a';
+        break;
+      case '\b':
+        *(dest++) = '\\';
+        *(dest++) = 'b';
+        break;
+      case '\t':
+        *(dest++) = '\\';
+        *(dest++) = 't';
+        break;
+      case '\n':
+        *(dest++) = '\\';
+        *(dest++) = 'n';
+        break;
+      case '\v':
+        *(dest++) = '\\';
+        *(dest++) = 'v';
+        break;
+      case '\f':
+        *(dest++) = '\\';
+        *(dest++) = 'f';
+        break;
+      case '\r':
+        *(dest++) = '\\';
+        *(dest++) = 'r';
+        break;
+      case '\\':
+        *(dest++) = '\\';
+        *(dest++) = '\\';
+        break;
+      case '\"':
+        *(dest++) = '\\';
+        *(dest++) = '\"';
+        break;
+        case '\'':
+          *(dest++) = '\\';
+          *(dest++) = '\"';
+          break;
+      default:
+        *(dest++) = c;
+     }
+  }
+
+  *dest = '\0'; /* Ensure nul terminator */
+}
+
+
 //
 // read tv guide from file. And update tvguide db (create if not exist)
 //
@@ -313,6 +367,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char userhomedir[200];
   char path[1024];
   char result[1024];
+
+  char temptxt[1024];
+
   char sql[4096];
   char *s;
   int error=0;
@@ -329,6 +386,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char channelname[1024];
   char channelidname[1024];
   char category[1924];
+  char description[4096];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -351,6 +409,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
   mysql_query(conn,"set NAMES 'utf8'");
   res = mysql_store_result(conn);
   mysql_free_result(res);
+
+  strcpy(description,"");
 
   sprintf(sql,"CREATE DATABASE IF NOT EXISTS %s",database);
   mysql_query(conn,sql);
@@ -475,13 +535,20 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   strcat(starttime,":");
                   strncat(starttime,( char *) tmpdat+12,2);
                   //starttime[16]=0;
-                  if (debugmode & 256) printf("From: %20s", starttime);
+//                  if (debugmode & 256) printf("From: %20s", starttime);
                 }
+
+                tmpdat=xmlGetProp(node,( xmlChar *) "desc land");
+                if (tmpdat) {
+                  strncpy(description,(char *) tmpdat,4095);                             // get desc
+                }
+
+
                 //xmlFree(tmpdat);
                 tmpdat=xmlGetProp(node,( xmlChar *) "category");
                 if (tmpdat) {
                   if (debugmode & 256) {
-                    if (tmpdat) printf("category: %s\n", tmpdat);
+//                    if (tmpdat) printf("category: %s\n", tmpdat);
                   }
                   if (strcmp("Serier",(char *) tmpdat)==0) strcpy(category,"Serier");
                   else if (strcmp("Natur",(char *) tmpdat)==0) strcpy(category,"Natur");
@@ -509,7 +576,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   strcat(endtime,":");
                   strncat(endtime,( char *) tmpdat+12,2);
                   //endtime[16]=0;
-                  if (debugmode & 256) printf(" ->%20s", endtime);
+//                if (debugmode & 256) printf(" ->%20s", endtime);
                 }
                 //xmlFree(tmpdat);
 
@@ -517,13 +584,13 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 if ((xmltvid) && (gettchannel==false)) {
                   gettchannel=true;
                   strcpy(channelname,(char *) xmltvid);
-                  if (debugmode & 256) printf(" %s",channelname);
+  //                if (debugmode & 256) printf(" %s",channelname);
                 }
                 // save channelname to show in update
                 strcpy(this->loadinginfotxt,channelname);
 
                 //xmlFree(tmpdat);
-                if (debugmode & 256) printf("\n");
+//                if (debugmode & 256) printf("\n");
                 subnode=subnode->next;
               }
               //title=xmlGetProp(node1,( xmlChar *) "title");
@@ -537,19 +604,32 @@ int tv_oversigt::parsexmltv(const char *filename) {
 
               // get changel id to db
               channelid=get_cannel_id(channelname);
+              // convert spec chars to esc string in string
+              expand_escapes(temptxt,prgtitle);
+              strcpy(prgtitle,temptxt);
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
+
+                // convert spec chars to esc string in string
+                expand_escapes(temptxt,prgtitle);
+                strcpy(prgtitle,temptxt);
+
+                // convert spec chars to esc string in string
+                expand_escapes(temptxt,description);
+                strcpy(description,temptxt);
+
                 sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program created %s->%s %s \n",starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program created.... Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               } else {
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist,no update %s->%s %s \n",starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist in db Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
           }
+
         }
         fprintf(stdout, "...\n");
         xmlFreeDoc(document);
@@ -947,6 +1027,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     int totalantalprogrammer=0;
     int prgtype;
     bool recorded;
+    unsigned int huskprgantal=0;
     char sqlselect[512];
     char dagsdato[128];
     char enddate[128];
@@ -973,7 +1054,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                                             // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
         rawtime=time(NULL);				     			// hent nu tid
         rawtime2=time(NULL);					   	  // hent nu tid
-        rawtime2+=60*60*48;                 //  + 2 døgn
+        rawtime2+=60*60*24;                 //  + 2 døgn
     } else {
         // hent ny starttid
         rawtime=this->starttid;                // this
@@ -1017,7 +1098,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
-        strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
+        strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
 
         if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
 
@@ -1026,11 +1107,11 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         kanalnr=0;
         prgnr=0;
         if (res) {
-            while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal) && (kanalnr<MAXKANAL_ANTAL)) {
-                if (prgnr==0) {
+            while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal-1) && (kanalnr<MAXKANAL_ANTAL-1)) {
+                if ((prgnr==0) && (strcmp(tmptxt,row[0])!=0)) {
                     tvkanaler[kanalnr].putkanalname(row[0]);
-                    tvkanaler[kanalnr].chanid=atoi(row[11]);
-                    strcpy(tmptxt,row[0]);
+                    tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
+                    strcpy(tmptxt,row[0]);                                        // rember channel name
                 }
                 if (strcmp(row[8],"None")!=0) {
                   if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
@@ -1057,17 +1138,21 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     else if (strcmp("movie",row[9])==0) prgtype=5;
                     else prgtype=0;
                 }
-
-                recorded=tvprgrecorded(row[1],row[3],row[11]);			// get recorded status from backend
-                tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
+                recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
+                if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
-                if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal)) {
+                if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
+                    // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
+                    huskprgantal=prgnr-1;
                     prgnr=0;
                     kanalnr++;								// next tv channel
                 }
             }
+            // set last channel # of programs in array
+            tvkanaler[kanalnr].set_program_antal(huskprgantal);
+            // total nr of channels
             this->kanal_antal=kanalnr+1;
             printf("Found nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
@@ -1223,7 +1308,16 @@ unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
 }
 
+unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
+  if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
+}
 
+
+// return pointer to prgname in tvguide
+
+char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
+  return(tvkanaler[selectchanel].tv_prog_guide[selectprg].program_navn);
+}
 
 // vis_tv_oversigt
 // new
@@ -1236,13 +1330,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   time_t nutid;
   time_t nutidtime;
   time_t rawtime;
-  time_t prgtidunix;                          // used to calc new length if now rom for it
+  time_t prgtidunix;                                                            // used to calc new length if now rom for it
   struct tm *timelist;
   struct tm mytimelist;
   struct tm *prgtime;
   float selectcolor=1.0f;
 
-  unsigned int kanalomgang=100;
+  unsigned int kanalomgang=100;                                                 //
+  unsigned int kanalomgangofset=100;
+
   int n;
   int chanid;
   int kanalnr=0;
@@ -1272,7 +1368,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     xpos=(orgwinsizex/2)-xsiz/2;
     ypos=(orgwinsizey/2)-ysiz/2;
     glPushMatrix();
-    glTranslatef(10,50, 0.0f);
+    glTranslatef(10,50, 1.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D,_tvbar3);
     glEnable(GL_TEXTURE_2D);
@@ -1349,10 +1445,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   // convert clovk to localtime
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
+  //if (debugmode) printf("viskl=%d \n ",viskl);
 
-  printf("viskl=%d \n ",viskl);
+  //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
+  if (viskl>24) viskl=0;
+  mytimelist.tm_hour=viskl;
 
-  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1361,6 +1459,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   //show do_update_xmltv_show
+
+  // check if we get tvguide and show it
+  if (check_tvguide_process_running("tv_grab_dk_dr")==false) do_update_xmltv_show=false;
   switch (configland) {
             // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
@@ -1408,8 +1509,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     }
     mktime(&mytimelist);
   }
+
   // reset to today after show time line
-  if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
+  //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
+  mytimelist.tm_hour=viskl;
+
+
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1422,7 +1527,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   //if (mytimelist.tm_mday>1) mytimelist.tm_mday--;
 
   mytimelist.tm_hour=timelist->tm_hour;
-  if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
+  //if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
+  mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
 
   kanalnr=0+cstartofset;
 
@@ -1458,16 +1564,20 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     barsize=0;
     yypos=0;
 
-    printf("Omgang %d \n",do_kanal_nr);
+    //if (debugmode) printf("Omgang %d \n",do_kanal_nr);
+
+    //printf("kanal nr %10d navn %40s \n",kanalnr,tvkanaler[kanalnr].chanel_name);
+
 
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
     //
-    while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<tvkanaler[kanalnr].program_antal())) {
+    while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
+
       ypos=orgwinsizey-245;
       // hent prg length in min
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
@@ -1652,12 +1762,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         }
         barsize=barsize+(prglength*5);
         yypos+=1;
-      } else {
-        //printf("NO program data kanalnr %2d prg_nr %2d tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn %s \n",kanalnr,prg_nr,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
       }
       prg_nr++;                                                                 // next program
     }
-    kanalomgang+=100;                                                         // next channel
+    kanalomgang+=kanalomgangofset;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
@@ -1788,7 +1896,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
               break;
       case 1: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
-      case 2: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
+      case 2: sprintf(tmptxt,"début    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
       case 3: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
               break;
@@ -1799,7 +1907,6 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     }
     glcRenderString(tmptxt);
 
-//    int configland=0;
 //   *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
 
     glTranslatef(-15.0f, -2.0f, 0.0f);
