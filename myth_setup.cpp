@@ -3410,7 +3410,7 @@ void show_setup_tv_graber(int startofset) {
 
     for (int n=0;n<14;n++) {
       glPushMatrix();
-      if (channel_list[(n-1)+startofset].changeordernr) glTranslatef(682 , 560-(n*20) , 0.0f); else glTranslatef(672 , 560-(n*20) , 0.0f);
+      if (channel_list[(n-1)+startofset].changeordernr) glTranslatef(692 , 560-(n*20) , 0.0f); else glTranslatef(672 , 560-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       if ((do_show_setup_select_linie-1)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
       if (channel_list[(n-1)+startofset].selected) myglprint4((char *) "[x] "); else myglprint4((char *) "[ ] ");
