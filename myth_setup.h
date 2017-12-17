@@ -50,6 +50,8 @@ bool save_channel_list();
 //
 int load_channel_list();
 //
+int order_channel_list_in_tvguide_db();
+//
 int killrunninggraber();
 
 

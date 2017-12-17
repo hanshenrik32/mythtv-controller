@@ -32,6 +32,7 @@ struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
 };
+
 extern bool hent_tv_channels;
 extern tv_graber_config  aktiv_tv_graber;
 extern int PRGLIST_ANTAL;
@@ -3226,6 +3227,45 @@ int load_channel_list() {
   } else errors=true;
   if (errors==false) return(cnr); return(0);
 }
+
+
+
+//
+// order tv channels in tvguide db
+// by order in channel_list array
+//
+
+int order_channel_list_in_tvguide_db() {
+  // mysql vars
+  bool done=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char sqlselect[1024];
+  // mysql stuf
+  char *database = (char *) "mythconverg";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
+      if (channel_list[n].ordernr>0) {
+        // update order to show in tvguide
+        sprintf(sqlselect,"update channel set channel.orderid=%d where channel.name like '%s' limit 1",n,channel_list[n].name);
+
+        printf("sql channel update %s \n",sqlselect);
+
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        done=true;
+      }
+    }
+    mysql_close(conn);
+  }
+  if (done) return(1); else return(0);
+}
+
 
 
 //
