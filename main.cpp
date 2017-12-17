@@ -6628,9 +6628,10 @@ void handlespeckeypress(int key,int x,int y) {
                   // first reset all other
                   for(int i=0;i<MAXCHANNEL_ANTAL-1;i++) channel_list[i].changeordernr=false;
                   channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].changeordernr=true;
+                  // set channel order nr
+                  channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].ordernr=do_show_setup_select_linie+tvchannel_startofset;
+                  //
                 }
-
-
 
                 break;
         case 103:  // key down
@@ -6885,6 +6886,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                         if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                     }
+                    // config af xmltv graber
                     if (do_show_tvgraber) {
                       if (do_show_setup_select_linie>0) {
                         // controller scoll fuction in select program channel list
@@ -7486,17 +7488,19 @@ void handleKeypress(unsigned char key, int x, int y) {
                         save_channel_list();
                         // buid new config file for xmltv from saved db
                         xmltv_configcontrol.graber_configbuild();
-
                         // hent ny tv guide
                         //if (get_tvguide_fromweb()!=-1)
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+                        // order db channels
+                        order_channel_list_in_tvguide_db();
                         // hent/update tv guide from db
                         aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                         // set update flag in display() func
                         firsttime_xmltvupdate=true;
                         // close tv graber windows again
                         do_show_tvgraber=false;
+
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
                       if (do_show_setup_sql) do_show_setup_sql=false; else
                       if (do_show_setup_font) do_show_setup_font=false; else
