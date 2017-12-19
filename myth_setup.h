@@ -17,6 +17,8 @@ struct tv_graber_config {
 };
 
 
+const char tvguide_dat_filename[]="/tvguide_channels.dat";
+
 
 struct channel_list_struct {
   bool selected;

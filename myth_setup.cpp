@@ -3181,7 +3181,7 @@ bool save_channel_list() {
   bool errors=false;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
-  strcat(filename,"/tvguide_channels.dat");
+  strcat(filename,tvguide_dat_filename);
   fil=fopen(filename,"w");
   if (fil) {
     while(cnr<PRGLIST_ANTAL) {
@@ -3208,6 +3208,7 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
+  strcat(filename,tvguide_dat_filename);
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
     channel_list[n].selected=false;                                             // is program channel active
     channel_list[n].ordernr=0;                                                  // show ordernr
@@ -3215,7 +3216,6 @@ int load_channel_list() {
     strcpy(channel_list[n].name,"");                                            // channel name
     strcpy(channel_list[n].id,"");                                              // internal dbid
   }
-  strcat(filename,"/tvguide_channels.dat");
   fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
