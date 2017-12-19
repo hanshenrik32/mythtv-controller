@@ -411,7 +411,6 @@ int sdlmusic;
 // ************************************************************************************************
 
 tv_oversigt     aktiv_tv_oversigt;
-
 tv_graber_config  aktiv_tv_graber;
 
 GLuint tvoversigt;
