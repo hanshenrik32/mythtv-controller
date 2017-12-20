@@ -2345,6 +2345,7 @@ void display() {
     }
 
     // first time startup (get hour)
+    // used in tvguide
     if (startup) {
       vistvguidekl=timeinfo->tm_hour;
       startup=false;
@@ -2354,13 +2355,11 @@ void display() {
     today=time(NULL);
     if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
-      lasttoday=today;
-      do_update_xmltv=true;
-      do_update_xmltv_show=true;
+      lasttoday=today;                                      // rember last update
+      do_update_xmltv=true;                                 // do update tvguide
+      do_update_xmltv_show=true;                            // show we are updating
       firsttime_xmltvupdate=false;                          // only used first time
     }
-
-
 
     glPushMatrix();
     // background picture
