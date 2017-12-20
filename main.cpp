@@ -2208,7 +2208,7 @@ void show_background() {
 }
 
 
-    static int vistvguidekl=0;
+static int vistvguidekl=0;
 
 //
 // *********************** MAIN LOOP *********************************************************************************
@@ -2345,7 +2345,10 @@ void display() {
     }
 
     // first time startup (get hour)
-    //if (startup) vistvguidekl=timeinfo->tm_hour;
+    if (startup) {
+      vistvguidekl=timeinfo->tm_hour;
+      startup=false;
+    }
 
     // make xmltv update
     today=time(NULL);
