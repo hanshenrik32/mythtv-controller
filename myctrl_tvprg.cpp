@@ -38,7 +38,6 @@ extern int fonttype;
 extern int configland;
 
 extern GLuint _tvbar1;
-extern GLuint _tvbar2;
 extern GLuint _tvbar3;
 extern GLuint _textureIdclose;
 extern GLuint _textureclose;                                                  // in use
@@ -1364,7 +1363,7 @@ void tv_oversigt::show_canal_names() {
 //    float zofset=-110.0f;
     // make boxes bihint canal name
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, _tvbar2);
+    glBindTexture(GL_TEXTURE_2D, _tvbar3);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     kanalantal=16;

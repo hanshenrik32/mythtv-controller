@@ -715,7 +715,7 @@ GLuint _textureIdmusic_aktiv;
 GLuint _tvoldrecorded;
 GLuint screensaverbox_mask;
 GLuint _tvmaskprgrecordedbutton;
-GLuint _tvbar1,_tvbar2,_tvbar3;
+GLuint _tvbar1,_tvbar3;
 GLuint _tv_prgtype;
 GLuint _mainlogo;
 GLuint _tvnewprgrecordedbutton;
@@ -10228,7 +10228,6 @@ void loadgfx() {
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
-    _tvbar2=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar2");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
 
     _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
@@ -10410,7 +10409,6 @@ void freegfx() {
     glDeleteTextures( 1, &screenshot10);                        // screen shots
 
     glDeleteTextures( 1, &_tvbar1);
-    glDeleteTextures( 1, &_tvbar2);
     glDeleteTextures( 1, &_tvbar3);
     glDeleteTextures( 1, &_tvoldrecorded);
     glDeleteTextures( 1, &_tv_prgtype);
