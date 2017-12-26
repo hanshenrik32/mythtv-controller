@@ -368,7 +368,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char userhomedir[200];
   char path[1024];
   char result[1024];
-
+  unsigned int prg_antal=0;
   char temptxt[1024];
 
   char sql[4096];
@@ -461,11 +461,11 @@ int tv_oversigt::parsexmltv(const char *filename) {
     getuserhomedir(userhomedir);
     strcpy(path,userhomedir);
     strcat(path,"/");
-    strcat(path,filename);                            // add filename to xmlfile name
+    strcat(path,filename);                                                      // add filename to xmlfile name
 
     // get file date
-    stat(path, &t_stat);                              // get file info like create date
-    lastmod=localtime(&(t_stat.st_mtime));               // convert to unix time
+    stat(path, &t_stat);                                                        // get file info like create date
+    lastmod=localtime(&(t_stat.st_mtime));                                      // convert to unix time
 
     // if file change from last run. update tv guide again
     if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
@@ -510,7 +510,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 s=trimwhitespace(result);
                 getfirstlinefromstring(prgtitle,s);
                 //printf("\t Program : %s \n",s);
+                //xmlFree(content);
               }
+
+              // get node childen
               subnode=node->xmlChildrenNode;
               while(subnode) {
                 getstart=false;
@@ -537,9 +540,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   strncat(starttime,( char *) tmpdat+12,2);
                   //starttime[16]=0;
 //                  if (debugmode & 256) printf("From: %20s", starttime);
+                  xmlFree(tmpdat);
                 }
 
-                tmpdat=xmlGetProp(node,( xmlChar *) "desc land");
+                tmpdat=xmlGetProp(node,( xmlChar *) "desc");
                 if (tmpdat) {
                   strncpy(description,(char *) tmpdat,4095);                             // get desc
                 }
@@ -549,7 +553,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 tmpdat=xmlGetProp(node,( xmlChar *) "category");
                 if (tmpdat) {
                   if (debugmode & 256) {
-//                    if (tmpdat) printf("category: %s\n", tmpdat);
+                    if (tmpdat) printf("category: %s\n", tmpdat);
                   }
                   if (strcmp("Serier",(char *) tmpdat)==0) strcpy(category,"Serier");
                   else if (strcmp("Natur",(char *) tmpdat)==0) strcpy(category,"Natur");
@@ -594,6 +598,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
 //                if (debugmode & 256) printf("\n");
                 subnode=subnode->next;
               }
+
+
               //title=xmlGetProp(node1,( xmlChar *) "title");
               //if (title) printf("title : %s\n", title);
 
@@ -624,14 +630,17 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program created.... Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
+                prg_antal++;
+                if (debugmode & 256) fprintf(stdout,"prg_antal %4d Tvguide Program created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
                 if (debugmode & 256) fprintf(stdout,"Tvguide Program exist in db Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
-          }
 
-        }
+            // save rec
+
+          }
+        } // for loop end
         fprintf(stdout, "...\n");
         xmlFreeDoc(document);
       } else {

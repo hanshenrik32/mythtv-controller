@@ -21,7 +21,8 @@ int xbmcsqlite::getxmlfilepath() {
   xmlNode *root, *first_child, *node;
   getuserhomedir(userhomedir);
   strcpy(path,userhomedir);
-  strcat(path,"/.kodi/userdata/sources.xml");
+  //strcat(path,"/.kodi/userdata/sources.xml");
+  strcat(path,"/tvguide.xml");
   document = xmlReadFile(path, NULL, 0);
   if (document) {
     root = xmlDocGetRootElement(document);
