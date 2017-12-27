@@ -3032,6 +3032,8 @@ int channel_configfile::graber_configbuild() {
       case 4: fputs("Do not work graber error.",fil);
               break;
       // tv_grab_na_tvmedia
+      // API Key found on your account dashboard page (https://www.xmltvlistings.com/account/)
+      // API Key:
       case 5: fputs("Not posible to config graber use tv_grab_na_tvmedia --configure to setup the xmltv graber.",fil);
               break;
       // tv_grab_dtv_la
@@ -3096,12 +3098,21 @@ int channel_configfile::graber_configbuild() {
               break;
       default:fputs("No tv graber exist for this land\n",fil);
     }
+    //
+    // write channel config in config file
+    //
     while(cnr<MAXCHANNEL_ANTAL) {
       if (channel_list[cnr].selected) {
         switch (aktiv_tv_graber.graberaktivnr) {
+          case 1: sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
           case 2: sprintf(buffer,"channel %s",channel_list[cnr].id);
                   break;
           case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
+                  break;
+          case 6: sprintf(buffer,"channel=%s",channel_list[cnr].id);                                        // tv_graber now working
+                  break;
+          case 7: sprintf(buffer,"channel %s %s",channel_list[cnr].id,channel_list[cnr].name);
                   break;
           case 8: sprintf(buffer,"channel=%s",channel_list[cnr].id);
                   break;
