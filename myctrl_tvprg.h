@@ -7,7 +7,8 @@
 // antal programer pr kanal
 const int maxprogram_antal=200;
 // antal kanaler max
-const int MAXKANAL_ANTAL=100;
+const int MAXKANAL_ANTAL=200;
+const int description_length=4096;
 
 // tv oversigt
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
@@ -15,15 +16,15 @@ const int MAXKANAL_ANTAL=100;
 class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
     public:
         char program_navn[80];
-        char sub_title[128];					    // char type from mythtv ver 0.22/24
-        char starttime[20];				       	// format yyyy-mm-dd tt:mm:ss
-        char endtime[20];				         	// format yyyy-mm-dd tt:mm:ss
-        char description[16000];
-        int starttimeinmin;					      // start tid i minuter
-        int program_length_minuter;				// længde i minuter
-        unsigned long starttime_unix;			// unix time start time
-        unsigned long endtime_unix;				// unix time end time
-        int prg_type;					          	// prg type
+        char sub_title[128];		                                      // char type from mythtv ver 0.22/24
+        char starttime[20];				                                   	// format yyyy-mm-dd tt:mm:ss
+        char endtime[20];				                                     	// format yyyy-mm-dd tt:mm:ss
+        char description[description_length];                         // prg description
+        int starttimeinmin;					                                  // start tid i minuter
+        int program_length_minuter;		                             		// længde i minuter
+        unsigned long starttime_unix;		                             	// unix time start time
+        unsigned long endtime_unix;				                            // unix time end time
+        int prg_type;					                                       	// prg type
         bool aktiv;
         bool brugt;           						// findes der et prg
         bool updated;                     // er den updated

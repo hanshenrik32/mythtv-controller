@@ -2788,8 +2788,6 @@ void show_setup_keys() {
 
 
 
-
-
 //
 // call tv_graber config and do auto config if posible
 // will try to make list of all channels from tv_graber
@@ -2846,7 +2844,7 @@ int txmltvgraber_createconfig() {
               15: All TV Channels
               */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"'2\n\all\n' |");
+      case 8: sprintf(exebuffer,"'2\n\n\all\n' |");
               break;
               // create new config for tv_grab_se_swedb
       case 9: sprintf(exebuffer,"'\n\nall\n' |");
@@ -2901,11 +2899,18 @@ int txmltvgraber_createconfig() {
               // create new config for tv_grab_uk_tvguide
       case 24:sprintf(exebuffer,"'\nall\n' |");
               break;
+      case 25:// tv_grab_zz_sdjson
+              sprintf(exebuffer,"");
+              break;
       default: sprintf(exebuffer,"'\nall\n' |");
     }
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
-    sysresult=system(exebuffer);
+    if (aktiv_tv_graber.graberaktivnr==8) {
+      sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf /home/hans/.xmltv/");
+    } else {
+      sysresult=system(exebuffer);
+    }
   }
   return(1);
 }
@@ -2986,7 +2991,7 @@ int killrunninggraber() {
 
 //
 // write xmltv config file and save it
-//
+// build xmltv config file
 
 int channel_configfile::graber_configbuild() {
   char buffer[1024];
@@ -3027,6 +3032,8 @@ int channel_configfile::graber_configbuild() {
       case 4: fputs("Do not work graber error.",fil);
               break;
       // tv_grab_na_tvmedia
+      // API Key found on your account dashboard page (https://www.xmltvlistings.com/account/)
+      // API Key:
       case 5: fputs("Not posible to config graber use tv_grab_na_tvmedia --configure to setup the xmltv graber.",fil);
               break;
       // tv_grab_dtv_la
@@ -3091,16 +3098,56 @@ int channel_configfile::graber_configbuild() {
               break;
       default:fputs("No tv graber exist for this land\n",fil);
     }
+    //
+    // write channel config in config file
+    //
     while(cnr<MAXCHANNEL_ANTAL) {
       if (channel_list[cnr].selected) {
         switch (aktiv_tv_graber.graberaktivnr) {
+          case 1: sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
           case 2: sprintf(buffer,"channel %s",channel_list[cnr].id);
                   break;
           case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
                   break;
-          case 23:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+          case 6: sprintf(buffer,"channel=%s",channel_list[cnr].id);                                        // tv_graber now working
+                  break;
+          case 7: sprintf(buffer,"channel %s %s",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 8: sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 13:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 15:sprintf(buffer,"channel %s # %s",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 16:sprintf(buffer,"channel %s # %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 17:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // sweeden
+                  break;
+          case 18:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // tv_grab_na_dtv
+                  break;
+          case 19:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 20:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 21:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
+                  break;
+          case 22:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
+                  break;
+          case 23:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 25:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
                   break;
           default:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+        }
+        fputs(buffer,fil);
+      } else {
+        switch (aktiv_tv_graber.graberaktivnr) {
+          case 8: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
+                  break;
+          case 25: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
+                  break;
+
         }
         fputs(buffer,fil);
       }
@@ -3143,7 +3190,103 @@ int load_channel_list_from_graber() {
   if (aktiv_tv_graber.graberaktivnr>0) {
     strcpy(exestring,configbackend_tvgraber);
     //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
-    strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+    switch (aktiv_tv_graber.graberaktivnr) {
+              // none
+      case 0: break;
+              // 1 tv_grab_na_dd (North America (Data Direct)) (need login)
+      case 1: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 2 tv_grab_nl (Holland)
+      case 2: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 3 tv_grab_es_laguiatv (Spain (laguiatv.com))
+      case 3: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"es\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 4 tv_grab_il  (Israel (tv-guide.walla.co.il)) (graber NOT WORKING NOW)
+      case 4: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 5 tv_grab_na_tvmedia (North America (XMLTVListings.com by TVMedia))
+              // API Key found on your account dashboard page (https://www.xmltvlistings.com/account/)
+      case 5: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 6 tv_grab_dtv_la (Latin America Direct TV listings)
+              // Could not fetch http://directstage.directvla.com/, error: 403 Forbidden at /usr/bin/tv_grab_dtv_la line 322.
+      case 6: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 7 tv_grab_fi Finland (foxtv.fi, iltapulu.fi, telkku.com, telvis.fi, yle.fi)
+      case 7: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"fi\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 8 tv_grab_eu_dotmedia danish now can be other (Europe tv schedules for free)
+              //
+      case 8: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 9 tv_grab_se_swedb (Sweden (swedb/tvsajten))
+      case 9: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"sv\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 10 tv_grab_pt_meo (Portugal)
+              // MEED CHECK
+      case 10:strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 11 tv_grab_fr (France)
+              // NOT WORKING
+      case 11:strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 12 tv_grab_uk_bleb (United Kingdom (bleb.org))
+      case 12:strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name>).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 13 tv_grab_huro (Hungary/Romania)
+              // --loc cz for Czech
+		          // --loc hu for Hungary
+		          // --loc ro for Romania
+		          // --loc sk for Slovakia
+      case 13: strcat(exestring," --list-channels --loc ro | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 14 tv_grab_ch_search (Switzerland (tv.search.ch))
+      case 14: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"de\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 15 it tv_grab_it (Italy)
+      case 15: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name>).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 16 tv_grab_is (Iceland)
+      case 16: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name>|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 17 finland tv_grab_fi_sv (Finland (Swedish))
+      case 17: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"sv\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 18 tv_grab_na_dtv  (North America using www.directv.com)
+      case 18: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name>).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 19 tv_grab_tr (Turkiye - Digiturk (www.digiturk.com.tr))
+      case 19: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"tr\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 20 tv_grab_eu_egon (German speaking area (Egon zappt))
+      case 20: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"de\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 21 danish tv_grab_dk_dr (TV Oversigten fra Danmarks Radios (2012) (www.dr.dk/tjenester/programoversigt))
+      case 21: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"da\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 22 tv_grab_se_tvzon  (Sweden (TVZon))
+      case 22: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 23 tv_grab_ar
+              // tv_grab_ar XMLTV module version 0.5.69
+              // This is tv_grab_ar version 1.22, 2016/03/16 04:12:51
+      case 23: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"es\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 24 tv_grab_fr_kazer
+              // Your userhash at kazer.org. It is shown on http://www.kazer.org/my-channels.html together with your selection of channels.
+              // need account
+      case 24: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+              // 25 uk tv_grab_uk_tvguide
+      case 25: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+      default:
+              // default for more (new contry)
+              strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
+              break;
+    }
+
     sysresult=system(exestring);
     fil=fopen(filename,"r");
     if (fil) {
@@ -3181,7 +3324,7 @@ bool save_channel_list() {
   bool errors=false;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
-  strcat(filename,"/tvguide_channels.dat");
+  strcat(filename,tvguide_dat_filename);
   fil=fopen(filename,"w");
   if (fil) {
     while(cnr<PRGLIST_ANTAL) {
@@ -3208,6 +3351,7 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
+  strcat(filename,tvguide_dat_filename);
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
     channel_list[n].selected=false;                                             // is program channel active
     channel_list[n].ordernr=0;                                                  // show ordernr
@@ -3215,7 +3359,6 @@ int load_channel_list() {
     strcpy(channel_list[n].name,"");                                            // channel name
     strcpy(channel_list[n].id,"");                                              // internal dbid
   }
-  strcat(filename,"/tvguide_channels.dat");
   fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
@@ -3253,9 +3396,7 @@ int order_channel_list_in_tvguide_db() {
       if (channel_list[n].ordernr>0) {
         // update order to show in tvguide
         sprintf(sqlselect,"update channel set channel.orderid=%d where channel.name like '%s' limit 1",n,channel_list[n].name);
-
-        printf("sql channel update %s \n",sqlselect);
-
+        if (debugmode) printf("sql channel update %s \n",sqlselect);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         done=true;
