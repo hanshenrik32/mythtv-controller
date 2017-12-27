@@ -2788,8 +2788,6 @@ void show_setup_keys() {
 
 
 
-
-
 //
 // call tv_graber config and do auto config if posible
 // will try to make list of all channels from tv_graber
@@ -2846,7 +2844,7 @@ int txmltvgraber_createconfig() {
               15: All TV Channels
               */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"'2\n\all\n' |");
+      case 8: sprintf(exebuffer,"'2\n\n\all\n' |");
               break;
               // create new config for tv_grab_se_swedb
       case 9: sprintf(exebuffer,"'\n\nall\n' |");
@@ -2901,11 +2899,18 @@ int txmltvgraber_createconfig() {
               // create new config for tv_grab_uk_tvguide
       case 24:sprintf(exebuffer,"'\nall\n' |");
               break;
+      case 25:// tv_grab_zz_sdjson
+              sprintf(exebuffer,"");
+              break;
       default: sprintf(exebuffer,"'\nall\n' |");
     }
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
-    sysresult=system(exebuffer);
+    if (aktiv_tv_graber.graberaktivnr==8) {
+      sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf /home/hans/.xmltv/");
+    } else {
+      sysresult=system(exebuffer);
+    }
   }
   return(1);
 }
@@ -2986,7 +2991,7 @@ int killrunninggraber() {
 
 //
 // write xmltv config file and save it
-//
+// build xmltv config file
 
 int channel_configfile::graber_configbuild() {
   char buffer[1024];
@@ -3098,9 +3103,40 @@ int channel_configfile::graber_configbuild() {
                   break;
           case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
                   break;
-          case 23:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+          case 8: sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 13:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 15:sprintf(buffer,"channel %s # %s",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 16:sprintf(buffer,"channel %s # %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 17:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // sweeden
+                  break;
+          case 18:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // tv_grab_na_dtv
+                  break;
+          case 19:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 20:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+                  break;
+          case 21:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
+                  break;
+          case 22:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
+                  break;
+          case 23:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
+                  break;
+          case 25:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
                   break;
           default:sprintf(buffer,"channel=%s",channel_list[cnr].id);
+        }
+        fputs(buffer,fil);
+      } else {
+        switch (aktiv_tv_graber.graberaktivnr) {
+          case 8: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
+                  break;
+          case 25: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
+                  break;
+
         }
         fputs(buffer,fil);
       }
@@ -3170,6 +3206,7 @@ int load_channel_list_from_graber() {
       case 7: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"fi\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
               break;
               // 8 tv_grab_eu_dotmedia danish now can be other (Europe tv schedules for free)
+              //
       case 8: strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
               break;
               // 9 tv_grab_se_swedb (Sweden (swedb/tvsajten))

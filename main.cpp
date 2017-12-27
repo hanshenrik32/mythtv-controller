@@ -7320,7 +7320,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   } else if (do_show_tvgraber) {
                     // in setup menu
                     if ((key==32) && (do_show_setup_select_linie==0)) {
-                      if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
+                      if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal+1) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
                       // husk last selected
                       strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
                       strcpy(configbackend_tvgraber,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
