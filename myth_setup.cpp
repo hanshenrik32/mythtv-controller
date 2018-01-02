@@ -10,14 +10,14 @@
 
 #include <X11/Intrinsic.h>    /* Display, Window */
 #include <GL/glx.h>           /* GLXContext */
-
-#include <GL/glc.h>                     // glc true type font system
+// glc true type font system
+#include <GL/glc.h>
 
 #include <libxml/parser.h>
 
 // mysql support
-
 #include <mysql.h>
+// program include
 #include "text3d.h"
 #include "readjpg.h"
 #include "myth_ttffont.h"
