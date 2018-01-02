@@ -49,19 +49,16 @@ extern char   __BUILD_NUMBER;
 #include "/usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
-FMOD::DSP* dsp = 0;                   // TEST
+FMOD::DSP* dsp = 0;                   // fmod Sound device
 
 // from compiler (debuger)
 extern char __BUILD_DATE;
 extern char __BUILD_NUMBER;
-
 //
 
 #include "main.h"
 #include "myctrl_storagedef.h"
-
 #include "myth_saver.h"
-
 #include "myth_setup.h"
 #include "myth_setupsql.h"
 #include "myctrl_xbmc.h"
@@ -72,7 +69,6 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
-
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -88,18 +84,19 @@ struct configkeytype {
 int numCPU;                                             // have the numbers of cpu cores
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
+// koki db names (by version)
 const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
 int findtype=0;					                              	// bruges af search kunster/sange
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
-bool do_save_config=false;
+bool do_save_config=false;                              // flag to save config
 
 channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
 channel_configfile  xmltv_configcontrol;                //
 
-bool firsttime_xmltvupdate=true;
+bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
 
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -177,33 +174,22 @@ int debugmode=2+1;                                        // 64 = radio station 
                                                         // 1024 = flag loader
 
 char music_db_update_loader[256];                       //
-
-
 bool loading_tv_guide=false;                            // loading_tv_guide true if loading
-
 int tvchannel_startofset=0;
-
 bool showfps=true;
 int configmythtvver=0;            			                // mythtv config found version
-
 bool stopmovie=false;
-
 int film_key_selected=1;                                // den valgte med keyboard i film oversigt
-
 int vis_volume_timeout=0;
-
 int music_key_selected=0;
 bool ask_open_dir_or_play=false;
 bool ask_open_dir_or_play_aopen=false;
 bool do_swing_music_cover=true;                         // default swing music cover
 int music_selected_iconnr=0;                            // default valgt icon i music oversigt
 float _angle=0.00;                                      // bruges af 3d screen saver
-
 bool full_screen=true;
-
 int do_play_music_aktiv_table_nr=0;                     // aktiv sang nr
 int do_play_music_aktiv_nr_select_array=0;
-
 bool show_uv=true;                                      // default show uv under menu
 bool vis_uv_meter=true;                                 // uv meter er igang med at blive vist
 bool hent_music_search=false;                           // skal vi søge efter music
@@ -438,8 +424,6 @@ const int dirliste_size=512;
 
 void loadgfx();
 void freegfx();
-
-
 
 // class to playlist gfx *****************************************************************************
 
@@ -1146,6 +1130,7 @@ int parse_config(char *filename) {
 // save config to file
 
 int save_config(char * filename) {
+    bool error=false;
     char temp[80];
     FILE *file;
     if ((file = fopen(filename, "w"))) {
@@ -1212,13 +1197,13 @@ int save_config(char * filename) {
         sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
         fputs(temp,file);
         fclose(file);
-    }
+    } else error=true;
     file = fopen("mythtv-controller.keys", "w");
     if (file) {
       fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
       fclose(file);
-    }
-    return(1);
+    } else error=true;
+    return(!(error));
 }
 
 
@@ -2826,7 +2811,7 @@ void display() {
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
           // show info om program selected
-          aktivfont.selectfont("DejaVu Sans");
+          aktivfont.selectfont("FreeMono");
           aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
           glPopMatrix();
         }
