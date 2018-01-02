@@ -10578,6 +10578,7 @@ int main(int argc, char** argv) {
           printf("\n\n");
           printf("-f For full screen mode\n");
           printf("-b For border less screen mode\n");
+          printf("-p For program guide screen mode\n");
           printf("-h This help screen\n");
           exit(0);
       }
@@ -10788,7 +10789,7 @@ int main(int argc, char** argv) {
     // init fonts
     init_ttf_fonts();
 
-
+    if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
 
     // test
     //aktiv_tv_oversigt.parsexmltv("tvguide.xml");

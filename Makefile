@@ -92,6 +92,7 @@ installsound:
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxf fmodstudioapi10906linux.tar.gz -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
+	chmod 666 ~/.xmltv/*
 	#cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
 	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9.6
 	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9
