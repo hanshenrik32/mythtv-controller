@@ -1517,6 +1517,9 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
   return(tvkanaler[selectchanel].tv_prog_guide[selectprg].program_navn);
 }
 
+
+
+
 // vis_tv_oversigt
 // new
 // den som bruges
@@ -1536,6 +1539,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   unsigned int kanalomgang=100;                                                 //
   unsigned int kanalomgangofset=100;
+  int vis_kanal_antal;
 
   int n;
   int chanid;
@@ -1551,7 +1555,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   int yypos=0;
   int prg_nr=0;
   int startyofset;
-  const int CHANELS_PR_LINE=7;
+  int CHANELS_PR_LINE=7;
   char tmptxt[1024];
   char tmptim[1024];
   char tmpmin[1024];
@@ -1559,6 +1563,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   time_t prgstarttid,prgendtid;
   starttid=time( NULL );
   timeinfo=localtime(&starttid);
+  switch(screen_size) {
+    case 4: CHANELS_PR_LINE=5;
+            break;
+    default:CHANELS_PR_LINE=7;
+            break;
+  }
   if (loading_tv_guide) {
     // show loading tv guide
     xsiz=450;
@@ -1689,11 +1699,19 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   glcRenderString(tmptxt);
   glPopMatrix();
 
+  // show time line
   n=0;
   while (n<8) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+    switch (screen_size) {
+      case 4: glTranslatef(xpos+10,orgwinsizey-230-(n*150), 0.0f);
+              break;
+      default:
+              glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+              break;
+    }
+    //glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
@@ -1735,7 +1753,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   xpos=50+40;
   int do_kanal_nr=0;
-  int vis_kanal_antal=7;                        // antal kanler som vises
+  switch (screen_size) {
+    case 4: vis_kanal_antal=5;                        // antal kanler som vises
+            break;
+    default:vis_kanal_antal=7;                        // antal kanler som vises
+            break;
+  }
 
   if (kanal_antal<vis_kanal_antal) vis_kanal_antal=kanal_antal;
 
@@ -1745,7 +1768,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
-    glTranslatef(xpos+11,860, 0.0f);
+    switch (screen_size) {
+      case 4: glTranslatef(xpos+11,orgwinsizey-210, 0.0f);
+              break;
+      default:glTranslatef(xpos+11,860, 0.0f);
+              break;
+    }
     glScalef(24.0, 24.0, 1.0);
     if (selectchanel==kanalnr) glColor3f(selectcolor,selectcolor,selectcolor); else glColor3f(0.6f, 0.6f, 0.6f);
     chanid=tvkanaler[0].chanid;
@@ -1977,7 +2005,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     if (timelist->tm_hour==mytimelist.tm_hour) {
       xpos=35;
       ypos=orgwinsizey-298;
-      xsiz=(orgwinsizex-300);
+      xsiz=(orgwinsizex-280);
       ysiz=2;
       float timelineofset=(timelist->tm_min*4.5);
       ypos-=timelineofset;
@@ -1985,13 +2013,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       glPushMatrix();
       glTranslatef(10,50, 0.0f);
       // top
-      glEnable(GL_TEXTURE_2D);
+      //glEnable(GL_TEXTURE_2D);
       //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor3f(0.8f, 0.8f, 0.8f);
       //  glScalef(70.0, 70.0, 1.0);
       //  glcRenderString("TEST");
       //glBegin(GL_QUADS); //Begin quadrilateral coordinates

@@ -59,6 +59,7 @@ class tv_oversigt {
     private:
         tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int kanal_antal;
+        //int vis_kanal_antal;
         time_t starttid;
         time_t sluttid;
         char mysqllhost[200];
