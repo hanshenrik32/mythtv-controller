@@ -6618,8 +6618,6 @@ void handlespeckeypress(int key,int x,int y) {
                     //
                   }
                 }
-
-
                 break;
         case 103:  // key down
                 // bruges af ask_open_dir_or_play
@@ -6738,7 +6736,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_tvgraber) {
                       if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
                         if (channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].changeordernr) {
-                          //swap channels
+                          //swap channels (key down)
                           channel_list_struct tempch;
                           tempch.selected=channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
                           strcpy(tempch.id,channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].id);
