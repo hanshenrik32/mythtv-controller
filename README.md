@@ -5,6 +5,12 @@
 
 Version.
 
+mythtv-controller ver 0.36.3
+
+xmltv now works. you can do setup in the setup on f1.
+And press enter key then you have select contry and then you get the channel list where you can
+select and order the channels.
+
 mythtv-controller ver 0.36.1
 
 uv music meter fixed after fmod upgrade
