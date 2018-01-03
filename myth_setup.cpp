@@ -3,21 +3,21 @@
 #include <ctime>
 #include <string.h>
 #include <stdarg.h>
-
+// opengl stuf
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
 #include <X11/Intrinsic.h>    /* Display, Window */
 #include <GL/glx.h>           /* GLXContext */
-
-#include <GL/glc.h>                     // glc true type font system
+// glc true type font system
+#include <GL/glc.h>
 
 #include <libxml/parser.h>
 
 // mysql support
-
 #include <mysql.h>
+// program include
 #include "text3d.h"
 #include "readjpg.h"
 #include "myth_ttffont.h"
@@ -2906,10 +2906,13 @@ int txmltvgraber_createconfig() {
     }
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
-    if (aktiv_tv_graber.graberaktivnr==8) {
-      sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf /home/hans/.xmltv/");
-    } else {
-      sysresult=system(exebuffer);
+    switch(aktiv_tv_graber.graberaktivnr) {
+      case 8: sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf /home/hans/.xmltv/");
+              break;
+      default:
+              sysresult=system(exebuffer);
+              break;
+
     }
   }
   return(1);
@@ -3415,7 +3418,7 @@ int order_channel_list_in_tvguide_db() {
 
 
 void show_setup_tv_graber(int startofset) {
-    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
+    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","l\ørdag","s\øndag"};
     const char *weekdaysuk[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};

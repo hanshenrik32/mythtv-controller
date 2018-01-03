@@ -437,15 +437,38 @@ int tv_oversigt::parsexmltv(const char *filename) {
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
+    //
     strcpy(sql,"create table IF NOT EXISTS program(chanid int(10) unsigned NOT NULL,starttime datetime, endtime datetime ,title varchar(128),subtitle varchar(128), description text, category varchar(64), category_type varchar(64), airdate year(4),stars float,previouslyshown tinyint(4), title_pronounce varchar(128), stereo tinyint(1), subtitled tinyint(1),hdtv tinyint(1), closecaptioned tinyint(1), partnumber int(11), parttotal int(11), seriesid  varchar(12), originalairdate date, showtype varchar(30), colorcode varchar(20), syndicatedepisodenumber varchar(20), programid varchar(64), manualid int(10) unsigned, generic tinyint(1), listingsource int(11), first tinyint(1), last tinyint(1) ,audioprop varchar(8),subtitletypes varchar(8),videoprop varchar(8))");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
+    //
     strcpy(sql,"create table IF NOT EXISTS programgenres(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,starttime datetime,relevance char(1),genre varchar(30))");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
+    //
     strcpy(sql,"create table IF NOT EXISTS programrating(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,starttime datetime,system varchar(8), rating varchar(16))");
+    mysql_query(conn,sql);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    //
+    strcpy(sql,"create table IF NOT EXISTS record(recordid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,type int(10),chanid  int(10) unsigned,starttime time,startdate date,endtime time,enddate date,title varchar(128),subtitle varchar(128),description varchar(16000),season smallint,episode smallint,category varchar(64),profile varchar(128),recpriority int,autoexpire int,maxepisodes int,maxnewest int,startoffset int,endoffset int,recgroup varchar(32),dupmethod int,dupin int,station  varchar(20),seriesid varchar(64),programid varchar(64),inetref varchar(40),search int,autotranscode int, autocommflag  int,autouserjob1 int, autouserjob2 int,autouserjob3 int, autouserjob4 int,autometadata int,findday int,findtime time,findid int,inactive int,parentid int,transcoder int,playgroup varchar(32),prefinput int,next_record datetime,last_record datetime,last_delete datetime,storagegroup varchar(32),avg_delay int,filter int)");
+    mysql_query(conn,sql);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    // The recorded table, lists programs which have already been recorded (or recorded and then transcoded) and are still available for viewing, translating the Internal Filenames into something safe for human consumption.
+    strcpy(sql,"create table IF NOT EXISTS recorded(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description varchar(16000),season smallint,episode smallint,category varchar(64),hostname varchar(255),bookmark int default 0,editing int(10) unsigned default 0,cutlist tinyint(1) default 0,autoexpire int(11) default 0,commflagged int(10) unsigned default 0,recgroup varchar(32) default 'Default',recordid int(11),seriesid varchar(64),programid varchar(64),inetref varchar(40),lastmodified timestamp,filesize bigint(20) default 0,stars float default 0.0,previouslyshown tinyint(1) default 0,originalairdate date,preserve tinyint(1) default 0,findid int(11) default 0,deletepending tinyint(1),transcoder int default 0,timestretch float default 1,recpriority int default 0,basename varchar(255),progstart datetime,progend datetime,playgroup varchar(32),profile varchar(32),duplicate tinyint(1) default 0,transcoded tinyint(1) default 0,watched tinyint(4) default 0,storagegroup varchar(32) default 'Default',bookmarkupdate datetime)");
+    mysql_query(conn,sql);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    //
+    strcpy(sql,"create table IF NOT EXISTS Recgrouppassword(recgroup varchar(32),password varchar(10))");
+    mysql_query(conn,sql);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    //
+    strcpy(sql,"create table IF NOT EXISTS Recordingprofiles(id int(10) unsigned,name varchar(128),videocodec varchar(128),audiocodec varchar(128),profilegroup int(10) unsigned)");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
@@ -988,7 +1011,13 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (doneok==false)) {
                 //tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn
-                sprintf(sqlselect,"INSERT INTO record values (0,1,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",'Default',0,0,1,0,0,0,'Default',6,15,\"%s\",%u,'',0,0,0,0,0,0,0,0,TIME('%s'),%lu,0,0,0,'Default',0,'0000-00-00 00:00:00','','0000-00-00 00:00:00','Default',100)", row[6], row[1], row[2], row[3],row[4], tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description, row[7],row[0], ELFHash(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn) , row[1], ((tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime_unix)/60/60/24)+719528);
+
+                sprintf(sqlselect,"INSERT INTO record values (0,1,%u,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
+
+                printf("sql record is %s\n",sqlselect);
+
+
+                //sprintf(sqlselect,"INSERT INTO record values (0,1,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",'Default',0,0,1,0,0,0,'Default',6,15,\"%s\",%u,'',0,0,0,0,0,0,0,0,TIME('%s'),%lu,0,0,0,'Default',0,'0000-00-00 00:00:00','','0000-00-00 00:00:00','Default',100)", row[6], row[1], row[2], row[3],row[4], tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description, row[7],row[0], ELFHash(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn) , row[1], ((tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime_unix)/60/60/24)+719528);
                 mysql_query(conn1,sqlselect);
                 res1 = mysql_store_result(conn1);
                 doneok=true;
@@ -1517,6 +1546,9 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
   return(tvkanaler[selectchanel].tv_prog_guide[selectprg].program_navn);
 }
 
+
+
+
 // vis_tv_oversigt
 // new
 // den som bruges
@@ -1536,6 +1568,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   unsigned int kanalomgang=100;                                                 //
   unsigned int kanalomgangofset=100;
+  int vis_kanal_antal;
 
   int n;
   int chanid;
@@ -1551,7 +1584,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   int yypos=0;
   int prg_nr=0;
   int startyofset;
-  const int CHANELS_PR_LINE=7;
+  int CHANELS_PR_LINE=7;
   char tmptxt[1024];
   char tmptim[1024];
   char tmpmin[1024];
@@ -1559,6 +1592,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   time_t prgstarttid,prgendtid;
   starttid=time( NULL );
   timeinfo=localtime(&starttid);
+  switch(screen_size) {
+    case 4: CHANELS_PR_LINE=5;
+            break;
+    default:CHANELS_PR_LINE=7;
+            break;
+  }
   if (loading_tv_guide) {
     // show loading tv guide
     xsiz=450;
@@ -1689,11 +1728,19 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   glcRenderString(tmptxt);
   glPopMatrix();
 
+  // show time line
   n=0;
   while (n<8) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+    switch (screen_size) {
+      case 4: glTranslatef(xpos+10,orgwinsizey-230-(n*150), 0.0f);
+              break;
+      default:
+              glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+              break;
+    }
+    //glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
@@ -1735,7 +1782,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   xpos=50+40;
   int do_kanal_nr=0;
-  int vis_kanal_antal=7;                        // antal kanler som vises
+  switch (screen_size) {
+    case 4: vis_kanal_antal=5;                        // antal kanler som vises
+            break;
+    default:vis_kanal_antal=7;                        // antal kanler som vises
+            break;
+  }
 
   if (kanal_antal<vis_kanal_antal) vis_kanal_antal=kanal_antal;
 
@@ -1745,7 +1797,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
-    glTranslatef(xpos+11,860, 0.0f);
+    switch (screen_size) {
+      case 4: glTranslatef(xpos+11,orgwinsizey-210, 0.0f);
+              break;
+      default:glTranslatef(xpos+11,860, 0.0f);
+              break;
+    }
     glScalef(24.0, 24.0, 1.0);
     if (selectchanel==kanalnr) glColor3f(selectcolor,selectcolor,selectcolor); else glColor3f(0.6f, 0.6f, 0.6f);
     chanid=tvkanaler[0].chanid;
@@ -1977,7 +2034,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
     if (timelist->tm_hour==mytimelist.tm_hour) {
       xpos=35;
       ypos=orgwinsizey-298;
-      xsiz=(orgwinsizex-300);
+      xsiz=(orgwinsizex-280);
       ysiz=2;
       float timelineofset=(timelist->tm_min*4.5);
       ypos-=timelineofset;
@@ -1985,13 +2042,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       glPushMatrix();
       glTranslatef(10,50, 0.0f);
       // top
-      glEnable(GL_TEXTURE_2D);
+      //glEnable(GL_TEXTURE_2D);
       //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
+      glColor3f(0.8f, 0.8f, 0.8f);
       //  glScalef(70.0, 70.0, 1.0);
       //  glcRenderString("TEST");
       //glBegin(GL_QUADS); //Begin quadrilateral coordinates
@@ -2014,7 +2071,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
 //
 // viser et prgrams record info.
-// ok
+// har store problemer med formatering (SKAL FIXES)
 
 void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     char tmptxt[200];
@@ -2028,7 +2085,7 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     int xpos,ypos;
     int xsiz,ysiz;
     timeinfo=localtime(&aktueltid);				// convert to localtime
-
+    // window size
     xsiz=850;
     ysiz=400;
     xpos=(orgwinsizex/2)-xsiz/2;
@@ -2146,73 +2203,79 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
       default: sprintf(tmptxt,"recorded %d times before.",antalrec);
 
     }
+    if (tvkanaler[kanalnr].tv_prog_guide[tvprgnr].recorded) strcat(tmptxt," Set to record");
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
     switch (configland) {
-      case 0: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+      case 0: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
               break;
       case 1: sprintf(tmptxt1,"Beskrivelse : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
               break;
-      case 2: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+      case 2: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
               break;
-      case 3: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+      case 3: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
               break;
-      case 4: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+      case 4: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
               break;
-      default: sprintf(tmptxt1,"description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
+      default: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
     }
     glcRenderString(tmptxt1);
-
-    //glPopMatrix();
-
     if (strptime(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
         printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
     }
-
     prgtid=mktime(&prgtidinfo);
     if ((difftime(aktueltid,prgtid)<=0) && (tvprgrecorded(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime,tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn,tmptxt)==0)) {
-      xsiz=120;
-      ysiz=120;
-      xpos=((orgwinsizex/2)-xsiz/2)-160;
-      ypos=((orgwinsizey/2)-ysiz/2)-260;
-      //glPushMatrix();
-      //glTranslatef(10,50, 0.0f);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glEnable(GL_BLEND);
+      xsiz=5;
+      ysiz=5;
+      xpos=((orgwinsizex/2)-xsiz/2)-200;
+      ypos=((orgwinsizey/2)-ysiz/2)-200;
+
+      glTranslatef(-10.0f, -2.0f, 0.0f);
+      xpos=10.0f;
+      ypos=-50.0f;
+      glTranslatef(10.0f, 50.0f, 0.0f);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvrecordbutton);
       glEnable(GL_TEXTURE_2D);
       glLoadName(41);                                                           // func Set program to record.
       glBegin(GL_QUADS);
-      glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
       glEnd(); //End quadrilateral coordinates
-      //glPopMatrix();
+      // close button
+      xpos=15.0f;
+      glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
+      glLoadName(40);                                        // func close window
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glEnd(); //End quadrilateral coordinates
+    } else {
+      // close button
+      xsiz=5;
+      ysiz=5;
+      xpos=((orgwinsizex/2)-xsiz/2)-200;
+      ypos=((orgwinsizey/2)-ysiz/2)-200;
+      glTranslatef(-10.0f, -2.0f, 0.0f);
+      xpos=15.0f;
+      ypos=-50.0f;
+      glTranslatef(10.0f, 50.0f, 0.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
+      glLoadName(40);                                        // func close window
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+      glEnd(); //End quadrilateral coordinates
     }
-    // close button
-    xsiz=120;
-    ysiz=120;
-    xpos=((orgwinsizex/2)-xsiz/2)-20;
-    ypos=((orgwinsizey/2)-ysiz/2)-260;
-    //glPushMatrix();
-    //glTranslatef(10,50, 0.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glLoadName(40);                                                           // func Set program to record.
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glEnd(); //End quadrilateral coordinates
-    //glPopMatrix();
-
 }
 
 
