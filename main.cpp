@@ -2192,15 +2192,12 @@ void show_background() {
 }
 
 
-//static int vistvguidekl=0;
-
 //
 // *********************** MAIN LOOP *********************************************************************************
 //
 
 void display() {
     // used by xmltv updater func
-    //static int vistvguidekl=0;
     static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
@@ -2330,10 +2327,12 @@ void display() {
 
     // first time startup (get hour)
     // used in tvguide
+    /*
     if (startup) {
       aktiv_tv_oversigt.vistvguidekl=timeinfo->tm_hour;
       startup=false;
     }
+    */
 
     // make xmltv update
     today=time(NULL);
@@ -6971,20 +6970,15 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_HOME:
-                // if indside tv overoview
+                // if indside tv overview reset show time to now (localtime)
                 if (vis_tv_oversigt) {
-                    aktiv_tv_oversigt.changetime(-(60*60*24));
+                    // reset tvgide time to now
+                    aktiv_tv_oversigt.reset_tvguide_time();
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                     if (ask_tv_record) {
                       ask_tv_record=false;
                       tvknapnr=0;
                       do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
-                      // get time now
-                      time_t rawtime;
-                      struct tm *timelist;
-                      time(&rawtime);
-                      timelist=localtime(&rawtime);
-                      aktiv_tv_oversigt.vistvguidekl=timelist->tm_hour;
                     }
                 }
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
@@ -7026,7 +7020,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
       if (vis_film_oversigt) fprintf(stderr,"ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
-      if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal());
+      if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
     }
 }
 

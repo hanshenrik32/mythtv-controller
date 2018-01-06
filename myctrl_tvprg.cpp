@@ -814,13 +814,19 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
 // constructor
 
 tv_oversigt::tv_oversigt() {
+    time_t rawtime;
+    struct tm *timelist;
     kanal_antal=0;
     strcpy(mysqllhost,"");
     strcpy(mysqlluser,"");
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
-    vistvguidekl=0;
+    time(&rawtime);
+    // convert clovk to localtime
+    timelist=localtime(&rawtime);
+    vistvguidekl=timelist->tm_hour;
+    if (vistvguidekl>24) vistvguidekl=0;
 }
 
 
@@ -830,7 +836,14 @@ tv_oversigt::~tv_oversigt() {
 }
 
 
-
+void tv_oversigt::reset_tvguide_time() {
+  time_t rawtime;
+  struct tm *timelist;
+  time(&rawtime);
+  timelist=localtime(&rawtime);
+  vistvguidekl=timelist->tm_hour;
+  if (vistvguidekl>24) vistvguidekl=0;
+}
 
 //
 // Clean tvprogram oversigt
@@ -1682,11 +1695,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
   //if (debugmode) printf("viskl=%d \n ",viskl);
-
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   if (vistvguidekl>24) vistvguidekl=0;
   mytimelist.tm_hour=vistvguidekl;
-
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1697,7 +1708,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   //show do_update_xmltv_show
 
   // check if we get tvguide and show it
-  if (check_tvguide_process_running("tv_grab_dk_dr")==false) do_update_xmltv_show=false;
+  if ((check_tvguide_process_running("tv_grab_dtv_la")==false) && (check_tvguide_process_running("tv_grab_zz_sdjson")==false) && (check_tvguide_process_running("tv_grab_fi_sv")==false) && (check_tvguide_process_running("tv_grab_huro")==false) && (check_tvguide_process_running("tv_grab_nl")==false) && (check_tvguide_process_running("tv_grab_tr")==false) && (check_tvguide_process_running("tv_grab_it")==false) && (check_tvguide_process_running("tv_grab_is")==false) && (check_tvguide_process_running("tv_grab_il")==false) && (check_tvguide_process_running("tv_grab_fi")==false) && (check_tvguide_process_running("tv_grab_ar")==false) && (check_tvguide_process_running("tv_grab_dk_dr")==false) && (check_tvguide_process_running("tv_grab_eu_dotmedia")==false)) do_update_xmltv_show=false;
   switch (configland) {
             // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
@@ -1757,8 +1768,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   // reset to today after show time line
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_hour=vistvguidekl;
-
-
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1768,11 +1777,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   mytimelist.tm_isdst=timelist->tm_isdst;
   mktime(&mytimelist);
 
-  //if (mytimelist.tm_mday>1) mytimelist.tm_mday--;
-
   mytimelist.tm_hour=timelist->tm_hour;
-  //if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
-  mytimelist.tm_hour=vistvguidekl;                                 // timelist->tm_hour;
+  //if (viskl>0) mytimelist.tm_hour=viskl;                                      // timelist->tm_hour;
+  mytimelist.tm_hour=vistvguidekl;                                              // timelist->tm_hour;
 
   kanalnr=0+cstartofset;
 
