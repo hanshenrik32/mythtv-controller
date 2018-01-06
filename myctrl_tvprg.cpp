@@ -371,7 +371,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   unsigned int prg_antal=0;
   char temptxt[1024];
 
-  char sql[4096];
+  char sql[8192];
   char *s;
   int error=0;
   bool cidfundet=false;
@@ -654,14 +654,12 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
                 prg_antal++;
-                if (debugmode & 256) fprintf(stdout,"prg_antal %4d Tvguide Program created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist in db Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
+                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
-
             // save rec
-
           }
         } // for loop end
         fprintf(stdout, "...\n");
@@ -822,6 +820,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
+    vistvguidekl=0;
 }
 
 
@@ -1554,7 +1553,7 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 // den som bruges
 
 
-void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show) {
+void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show) {
   struct tm *timeinfo;
   struct tm nowtime_h;
   time_t nutid;
@@ -1685,8 +1684,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   //if (debugmode) printf("viskl=%d \n ",viskl);
 
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
-  if (viskl>24) viskl=0;
-  mytimelist.tm_hour=viskl;
+  if (vistvguidekl>24) vistvguidekl=0;
+  mytimelist.tm_hour=vistvguidekl;
 
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
@@ -1757,7 +1756,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   // reset to today after show time line
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
-  mytimelist.tm_hour=viskl;
+  mytimelist.tm_hour=vistvguidekl;
 
 
   mytimelist.tm_min=0;
@@ -1773,7 +1772,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   mytimelist.tm_hour=timelist->tm_hour;
   //if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
-  mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
+  mytimelist.tm_hour=vistvguidekl;                                 // timelist->tm_hour;
 
   kanalnr=0+cstartofset;
 
