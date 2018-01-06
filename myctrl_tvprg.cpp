@@ -145,7 +145,7 @@ int get_tvguide_fromweb() {
   // check if active xml_tv graber is running
   if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
     strcpy(exestring,configbackend_tvgraber);
-    strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
+    strcat(exestring," --days 1 --output ~/tvguide.xml 2> ~/tvguide.log");
     printf("Start tv graber background process %s\n",configbackend_tvgraber);
     result=system(exestring);
     //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
@@ -636,18 +636,18 @@ int tv_oversigt::parsexmltv(const char *filename) {
               channelid=get_cannel_id(channelname);
               // convert spec chars to esc string in string
               expand_escapes(temptxt,prgtitle);
-              strcpy(prgtitle,temptxt);
+              strncpy(prgtitle,temptxt,1024-1);
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
 
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,prgtitle);
-                strcpy(prgtitle,temptxt);
+                strncpy(prgtitle,temptxt,1024-1);
 
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,description);
-                strcpy(description,temptxt);
+                strncpy(description,temptxt,4096-1);
 
                 sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
