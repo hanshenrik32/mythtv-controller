@@ -7744,7 +7744,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
                         // clean all tv guide data and reload
                         printf("* Update tvguide *\n");
-                        unlink("/home/hans/tvguide_channels.dat");
+                        unlink("~/tvguide_channels.dat");
                         hent_tv_channels=false;
                         // set update process
                         //do_update_xmltv=true;
