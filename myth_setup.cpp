@@ -1099,23 +1099,18 @@ void show_wlan_networks(int valgtnr) {
     int i;
     int si;
     char tmptxt[80];
-
     int winsizx=100;
     int winsizy=200;
     int xpos=0;
     int ypos=0;
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
     glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),200 , 0.0);
     glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
@@ -1123,8 +1118,6 @@ void show_wlan_networks(int valgtnr) {
     glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,200 , 0.0);
     glEnd();
     glPopMatrix();
-
-
     winsizx=200;
     winsizy=30;
     xpos=300;
@@ -2794,11 +2787,16 @@ void show_setup_keys() {
 // by pipe the command in shell
 
 int txmltvgraber_createconfig() {
+  char path[1024];
   char exebuffer[1024];
   int sysresult;
+  strcpy(exebuffer,"rm ");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(exebuffer,path);
   // delete old config from dir
   if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
-    sprintf(exebuffer,"rm ~/.xmltv/%s.conf",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     sysresult=system(exebuffer);
     // create new config
     switch (aktiv_tv_graber.graberaktivnr) {
@@ -2914,8 +2912,8 @@ int txmltvgraber_createconfig() {
               break;
 
     }
-  }
-  return(1);
+    return(1);
+  } else return(0);
 }
 
 
@@ -2926,14 +2924,17 @@ int txmltvgraber_createconfig() {
 //
 
 int channel_configfile::readgraber_configfile() {
+  char path[1024];
   char buffer[1024];
   char filename[1024];
   bool errors=false;
   FILE *fil;
   int line=0;
-  strcpy(filename,"~/.xmltv/");
-  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(filename,".conf");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(path,".conf");
+  strcpy(filename,path);
   fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
@@ -2958,14 +2959,17 @@ int channel_configfile::readgraber_configfile() {
 //
 
 int channel_configfile::writegraber_configfile() {
+  char path[1024];
   char buffer[1024];
   char filename[1024];
   bool errors=false;
   FILE *fil;
   int line=0;
-  strcpy(filename,"~/.xmltv/");
-  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(filename,".conf");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(path,".conf");
+  strcpy(filename,path);
   fil=fopen(filename,"w");
   if (fil) {
     while(line<configfilesize) {
@@ -3436,7 +3440,7 @@ void show_setup_tv_graber(int startofset) {
         // it is a first time program thing
         hent_tv_channels=true;
         // crete mew config file
-        txmltvgraber_createconfig();
+        if (txmltvgraber_createconfig()==0) printf("error xmltv graber confg \n");
         // load mew chanel config data from file
         load_channel_list_from_graber();
         // save config
