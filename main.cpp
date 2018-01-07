@@ -24,6 +24,9 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 
+#include <ctime>
+#include <iostream>
+
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
@@ -397,6 +400,7 @@ int sdlmusic;
 
 tv_oversigt     aktiv_tv_oversigt;
 tv_graber_config  aktiv_tv_graber;
+earlyrecorded aktiv_crecordlist;
 
 GLuint tvoversigt;
 GLuint canalnames;
@@ -2787,8 +2791,8 @@ void display() {
         }
     }
 
-    // music view
     if (!(visur)) {
+      // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
@@ -2804,9 +2808,13 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
+
         // show tv guide
-//        printf("Fundet nr in array %d \n",aktiv_tv_oversigt.find_start_kl_returnpointinarray(tvvalgtrecordnr,vistvguidekl));
+        std::clock_t    start;
+        start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
+        std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
           // show info om program selected
@@ -2823,6 +2831,13 @@ void display() {
       if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
         radiooversigt.show_radio_options();
       }
+    }
+
+
+    if (vis_tvrec_list) {
+      glPushMatrix();
+      aktiv_crecordlist.showtvreclist();
+      glPopMatrix();
     }
 
     // show search box and text for radio and music
@@ -7039,6 +7054,8 @@ void handleKeypress(unsigned char key, int x, int y) {
     char temptxt[200];
     saver_irq=true;                                     // stop screen saver
 
+    char path[1024];
+
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
     if (key=='+') {
@@ -7489,7 +7506,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         //if (get_tvguide_fromweb()!=-1)
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-                        // order db channels
+                        // order channels in db
                         order_channel_list_in_tvguide_db();
                         // hent/update tv guide from db
                         aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
@@ -7743,8 +7760,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if ((do_show_tvgraber) && (do_show_setup_select_linie==0)) {
                       if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
                         // clean all tv guide data and reload
-                        printf("* Update tvguide *\n");
-                        unlink("~/tvguide_channels.dat");
+                        // remove config dat file
+                        printf("* Delete old tvguide *\n");
+                        printf("* Update new tvguide *\n");
+                        getuserhomedir(path);
+                        strcat(path,"/tvguide_channels.dat");
+                        unlink(path);
                         hent_tv_channels=false;
                         // set update process
                         //do_update_xmltv=true;

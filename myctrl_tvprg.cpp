@@ -29,6 +29,8 @@
 
 #define MAXSIZE 16000+1;
 
+extern GLuint setupnetworkwlanback;
+
 extern tv_graber_config aktiv_tv_graber;                                        // xmltv graber config
 
 extern int screen_size;
@@ -48,6 +50,7 @@ extern GLuint _tvprgrecorded1;
 extern GLuint _tvprgrecorded_mask;
 extern GLuint _tvrecordbutton;
 GLuint _textureId13;
+extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
 extern GLuint _tvoldrecorded;
 //extern GLuint _tvoldrecordedmask;
@@ -1708,7 +1711,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   //show do_update_xmltv_show
 
   // check if we get tvguide and show it
-  if ((check_tvguide_process_running("tv_grab_dtv_la")==false) && (check_tvguide_process_running("tv_grab_zz_sdjson")==false) && (check_tvguide_process_running("tv_grab_fi_sv")==false) && (check_tvguide_process_running("tv_grab_huro")==false) && (check_tvguide_process_running("tv_grab_nl")==false) && (check_tvguide_process_running("tv_grab_tr")==false) && (check_tvguide_process_running("tv_grab_it")==false) && (check_tvguide_process_running("tv_grab_is")==false) && (check_tvguide_process_running("tv_grab_il")==false) && (check_tvguide_process_running("tv_grab_fi")==false) && (check_tvguide_process_running("tv_grab_ar")==false) && (check_tvguide_process_running("tv_grab_dk_dr")==false) && (check_tvguide_process_running("tv_grab_eu_dotmedia")==false)) do_update_xmltv_show=false;
+  //if ((check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false)) do_update_xmltv_show=false;
   switch (configland) {
             // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
@@ -1800,6 +1803,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   //
   // loop for channel
   //
+
+
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -1835,6 +1840,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     //
     // loop for program
     //
+
+
+
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
@@ -2026,11 +2034,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       }
       prg_nr++;                                                                 // next program
     }
+
     kanalomgang+=kanalomgangofset;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
   }
+
+
 
   // show clock line over tvguide
   //
@@ -2287,6 +2298,9 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
 
 
 
+
+
+
 //
 //*******************************************************************************************************************************//
 //
@@ -2298,8 +2312,9 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
 
 earlyrecorded::earlyrecorded() {
     for(int i=0;i<199;i++) {
-        strcpy(this->programinfo[i].name,"");
-        strcpy(this->programinfo[i].dato,"");
+        strcpy(this->programinfo[i].name,"ABC");
+        strcpy(this->programinfo[i].dato,"2017-01-01");
+        strcpy(this->programinfo[i].endtime,"");
     }
 }
 
@@ -2492,9 +2507,32 @@ void earlyrecorded::getrecordprogram(char *mysqlhost,char *mysqluser,char *mysql
 //
 
 void earlyrecorded::showtvreclist() {
-//    char tmptxt[200];
-    int i;
-//    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+  // background
+  //glLoadIdentity();
+  int i=0;
+  glEnable(GL_TEXTURE);
+  glEnable(GL_BLEND);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);                    //_texturemovieinfobox
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),100 , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
+  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+800,800 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,100 , 0.0);
+  glEnd();
+  glcRenderString(upcommingrec);
+  glRasterPos2f(2.0f, 2.0f);
+  glcRenderString("fdfdsfd");
+  while((i<this->antal) && (i<50)) {
+    glcRenderString(this->programinfo[i].name);
+  }
+
+
+/*
 
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // mask
@@ -2567,6 +2605,6 @@ void earlyrecorded::showtvreclist() {
     glTexCoord2f(1.0, 1.0); glVertex3f(7.5f, 5, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-7.5f, 5, 0.0);
     glEnd();
-
+*/
     // End button 1
 }
