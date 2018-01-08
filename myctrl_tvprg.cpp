@@ -1103,7 +1103,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
     loading_tv_guide=true;
 
-    // is startid as args ?
+    // is startid as args ? 0
     if (nystarttid==0) {
                                             // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
         rawtime=time(NULL);				     			// hent nu tid
@@ -1111,18 +1111,20 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         rawtime2+=60*60*24;                 //  + 2 døgn
     } else {
         // hent ny starttid
-        rawtime=this->starttid;                // this
-        rawtime2=this->sluttid;                // this
+        rawtime=this->starttid;             // this
+        rawtime2=this->starttid+(60*60*24);       // this
+        //rawtime2=this->sluttid;             // this
     }
 
-    timeinfo = localtime (&rawtime);			                        		// lav om til local time
-    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		      // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    timeinfo2= localtime ( &rawtime2 );	            		          		//
-    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		      // lav nu tids sting
+    timeinfo = gmtime(&rawtime);			                        		// lav om til local time
+    timeinfo2= gmtime(&rawtime2);	            		          		  // lav om til local time
+    //if (timeinfo->tm_isdst>0) timeinfo->tm_hour=timeinfo->tm_hour-1;
+    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
+    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
-    printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
+    printf("Tvguide from %-20s to %-20s raw start time %d \n",dagsdato,enddate,rawtime);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
