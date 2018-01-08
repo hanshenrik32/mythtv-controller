@@ -2813,7 +2813,7 @@ void display() {
         std::clock_t    start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
 
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
