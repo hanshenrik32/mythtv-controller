@@ -5,10 +5,10 @@
 #include <string.h>
 
 // antal programer pr kanal
-const int maxprogram_antal=200;
+const int maxprogram_antal=400;
 // antal kanaler max
 const int MAXKANAL_ANTAL=200;
-const int description_length=4096;
+const int description_length=2048;
 
 // tv oversigt
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
