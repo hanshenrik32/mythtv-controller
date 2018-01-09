@@ -1089,6 +1089,9 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     time_t rawtime2;
     struct tm *timeinfo;
     struct tm *timeinfo2;
+    struct tm timeinfo3;
+    //struct tm timeinfo;
+    //struct tm timeinfo2;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -1105,26 +1108,36 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
     // is startid as args ? 0
     if (nystarttid==0) {
-                                            // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
-        rawtime=time(NULL);				     			// hent nu tid
-        rawtime2=time(NULL);					   	  // hent nu tid
-        rawtime2+=60*60*24;                 //  + 2 døgn
+        rawtime=rawtime2=time(NULL);				     			// hent nu tid
     } else {
         // hent ny starttid
-        rawtime=this->starttid;             // this
-        rawtime2=this->starttid+(60*60*24);       // this
-        //rawtime2=this->sluttid;             // this
+        rawtime=this->starttid;             // start tid type (time_t unix time)
+        rawtime2=this->starttid+(60*60*24); // end   tid type (time_t unix time)
     }
 
-    timeinfo = gmtime(&rawtime);			                        		// lav om til local time
-    timeinfo2= gmtime(&rawtime2);	            		          		  // lav om til local time
-    //if (timeinfo->tm_isdst>0) timeinfo->tm_hour=timeinfo->tm_hour-1;
-    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
+    timeinfo=localtime(&rawtime);			                        		// lav om til local time
+    timeinfo2=localtime(&rawtime2);	            		          		  // lav om til local time
+    // copy struct
+    timeinfo3.tm_mday=timeinfo->tm_mday;
+    timeinfo3.tm_mon=timeinfo->tm_mon;
+    timeinfo3.tm_year=timeinfo->tm_year;
+    timeinfo3.tm_min=timeinfo->tm_min;
+    timeinfo3.tm_sec=timeinfo->tm_sec;
+    timeinfo3.tm_hour=timeinfo->tm_hour;
+    timeinfo3.tm_wday=timeinfo->tm_wday;
+    timeinfo3.tm_isdst=timeinfo->tm_isdst;
+    timeinfo3.tm_mday+=1;
+    mktime(&timeinfo3);
+
+    printf("raw start time %d  \nraw end time %d ",timeinfo->tm_mday,timeinfo2->tm_mday);
+    sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
+    sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
+    //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
+    //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
-    printf("Tvguide from %-20s to %-20s raw start time %d \n",dagsdato,enddate,rawtime);
+    printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -1806,7 +1819,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   // loop for channel
   //
 
-
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -1836,14 +1848,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
 
     //printf("kanal nr %10d navn %40s \n",kanalnr,tvkanaler[kanalnr].chanel_name);
 
-
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
     //
-
-
 
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
       // start pos orgwinsizey-245
