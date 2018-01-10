@@ -5906,12 +5906,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
 
 
-
-
-
-
-
-
 // get selected icon
 
 int gl_select(int x,int y) {
@@ -7579,6 +7573,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                       loading_tv_guide=true;
                       if (strcmp(configbackend,"mythtv")==0) {
                         update_xmltv_phread_loader();                   // start thred update flag in main loop
+                      } else if (strcmp(configbackend,"xbmc")==0) {
+                        update_xmltv_phread_loader();
                       }
                     }
                     break;

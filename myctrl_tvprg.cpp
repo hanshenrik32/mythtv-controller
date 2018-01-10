@@ -1183,9 +1183,46 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     strcpy(tmptxt,row[0]);                                        // rember channel name
                 }
                 // select by tv_grab_xx nr in array
-                switch (aktiv_tv_graber.graberaktivnr) {
-                    // graber_dk
-                  case 0:
+                if (row[8]) {
+                  switch (aktiv_tv_graber.graberaktivnr) {
+                      // graber_dk
+                    case 0:
+                        if (strcmp(row[8],"None")!=0) {
+                          if (strcmp("series",row[9])==0) prgtype=1;
+                          else if (strcmp("movie",row[9])==0) prgtype=5;
+                          else if (strcmp("sport",row[9])==0) prgtype=2;
+                          else if (strcmp("cartoon",row[9])==0) prgtype=3;
+                          else if (strcmp("animation films",row[9])==0) prgtype=3;
+                          else if (strcmp("Animation films",row[9])==0) prgtype=3;
+                          else if (strcmp("news",row[9])==0) prgtype=4;
+                          else if (strcmp("nature",row[9])==0) prgtype=9;
+                          else prgtype=0;
+                        }
+                        break;
+                    case 1:
+                      // graber_dk
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
+                        else if (strcmp("dansk underholdning.",row[9])==0) prgtype=1;   //
+                        else if (strcmp("sport",row[9])==0) prgtype=2;                  //
+                        else if (strncmp("børn",row[9],4)==0) prgtype=3;                //
+                        else if (strncmp("dukkefilm",row[9],9)==0) prgtype=3;           //
+                        else if (strstr(row[9],"tegnefilm")!=0) prgtype=3;              //
+                        else if (strstr(row[9],"animationsfilm")!=0) prgtype=3;         //
+                        else if (strcmp("news",row[9])==0) prgtype=4;                   //
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                  //
+                        else if (strstr(row[9],"dokumentarserie")!=0) prgtype=6;        //
+                        else if (strcmp("engelsk madprogram",row[9])==0) prgtype=11;    //
+                        else if (strcmp("dansk reportageserie.",row[9])==0) prgtype=7;  //
+                        else if (strcmp("amerikansk krimi.",row[9])==0) prgtype=5;      //
+                        else if (strcmp("debatprogram.",row[9])==0) prgtype=7;          //
+                        else if (strcmp("music",row[9])==0) prgtype=8;                  //
+                        else if (strcmp("dyr",row[9])==0) prgtype=9;                    //
+                        else if (strcmp("none",row[9])==0) prgtype=0;                   //
+                        else prgtype=0;                                                 // default panic
+                      } else prgtype=0;                                                 // default panic
+                      break;
+                    case 2:
                       if (strcmp(row[8],"None")!=0) {
                         if (strcmp("series",row[9])==0) prgtype=1;
                         else if (strcmp("movie",row[9])==0) prgtype=5;
@@ -1198,203 +1235,168 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                         else prgtype=0;
                       }
                       break;
-                  case 1:
-                    // graber_dk
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
-                      else if (strcmp("dansk underholdning.",row[9])==0) prgtype=1;   //
-                      else if (strcmp("sport",row[9])==0) prgtype=2;                  //
-                      else if (strncmp("børn",row[9],4)==0) prgtype=3;                //
-                      else if (strncmp("dukkefilm",row[9],9)==0) prgtype=3;           //
-                      else if (strstr(row[9],"tegnefilm")!=0) prgtype=3;              //
-                      else if (strstr(row[9],"animationsfilm")!=0) prgtype=3;         //
-                      else if (strcmp("news",row[9])==0) prgtype=4;                   //
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                  //
-                      else if (strstr(row[9],"dokumentarserie")!=0) prgtype=6;        //
-                      else if (strcmp("engelsk madprogram",row[9])==0) prgtype=11;    //
-                      else if (strcmp("dansk reportageserie.",row[9])==0) prgtype=7;  //
-                      else if (strcmp("amerikansk krimi.",row[9])==0) prgtype=5;      //
-                      else if (strcmp("debatprogram.",row[9])==0) prgtype=7;          //
-                      else if (strcmp("music",row[9])==0) prgtype=8;                  //
-                      else if (strcmp("dyr",row[9])==0) prgtype=9;                    //
-                      else if (strcmp("none",row[9])==0) prgtype=0;                   //
-                      else prgtype=0;                                                 // default panic
-                    } else prgtype=0;                                                 // default panic
-                    break;
-                  case 2:
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("sport",row[9])==0) prgtype=2;
-                      else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                      else if (strcmp("animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("news",row[9])==0) prgtype=4;
-                      else if (strcmp("nature",row[9])==0) prgtype=9;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 3:
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("sport",row[9])==0) prgtype=2;
-                      else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                      else if (strcmp("animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("news",row[9])==0) prgtype=4;
-                      else if (strcmp("nature",row[9])==0) prgtype=9;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 4:
-                    // graber_ar
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                      else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                      else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                      else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                      else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                      else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                      else if (strcmp("Cine",row[9])==0) prgtype=0;
-                      else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                      else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                      else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                  case 5:
-                      // graber_fi
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                      else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                      else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                      else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                      else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                      else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                      else if (strcmp("Cine",row[9])==0) prgtype=0;
-                      else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                      else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                      else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                      else if (strcmp("elokuvat",row[9])==0) prgtype=0;
-                      else if (strcmp("urheilu",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 6:
-                      // graber_tr
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          //
-                      else if (strcmp("film",row[9])==0) prgtype=5;                       //
-                      else if (strcmp("Life Style",row[9])==0) prgtype=7;                 //
-                      else if (strcmp("Aile",row[9])==0) prgtype=7;                       // Family
-                      else if (strcmp("Aksiyon",row[9])==0) prgtype=0;                    // Action film
-                      else if (strcmp("Animasyon",row[9])==0) prgtype=2;                  // Animation
-                      else if (strcmp("Belgesel",row[9])==0) prgtype=4;
-                      else if (strcmp("Bilim Kurgu",row[9])==0) prgtype=8;                // Science fiction
-                      else if (strcmp("Biyografi",row[9])==0) prgtype=0;
-                      else if (strcmp("Komedi",row[9])==0) prgtype=4;
-                      else if (strcmp("Animasyon",row[9])==0) prgtype=3;                  // kids
-                      else if (strcmp("Magazin",row[9])==0) prgtype=0;
-                      else if (strcmp("Eğlence",row[9])==0) prgtype=0;                    // Entertainment
-                      else if (strcmp("Haberler",row[9])==0) prgtype=4;                   // news
-                      else if (strcmp("Dram",row[9])==0) prgtype=1;                       // series
-                      else if (strcmp("Korku",row[9])==0) prgtype=0;
-                      else if (strcmp("Diğer",row[9])==0) prgtype=0;
-                      else if (strcmp("Gerilim",row[9])==0) prgtype=0;
-                      else if (strcmp("Yarışma",row[9])==0) prgtype=0;
-                      else if (strcmp("Polisiye",row[9])==0) prgtype=0;
-                      else if (strcmp("Çocuk",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 7:
-                    // graber_se_tvzon
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                      else if (strcmp("Adult",row[9])==0) prgtype=7;                 //
-                      else if (strcmp("Drama",row[9])==0) prgtype=7;                       // Family
-                      else if (strcmp("Crime",row[9])==0) prgtype=0;                    // Action film
-                      else if (strcmp("Mystery",row[9])==0) prgtype=2;                  // Animation
-                      else if (strcmp("sports",row[9])==0) prgtype=4;
-                      else if (strcmp("Sports",row[9])==0) prgtype=8;                // Science fiction
-                      else if (strcmp("Skiing",row[9])==0) prgtype=0;
-                      else if (strcmp("Soccer",row[9])==0) prgtype=4;
-                      else if (strcmp("Fencing",row[9])==0) prgtype=3;                  // kids
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                      else if (strcmp("Comedy",row[9])==0) prgtype=0;                    // Entertainment
-                      else if (strcmp("Adventure",row[9])==0) prgtype=4;                   // news
-                      else if (strcmp("Family",row[9])==0) prgtype=1;                       // series
-                      else if (strcmp("Fantasy",row[9])==0) prgtype=0;
-                      else if (strcmp("Series",row[9])==0) prgtype=0;
-                      else if (strcmp("Reality",row[9])==0) prgtype=0;
-                      else if (strcmp("Miniseries",row[9])==0) prgtype=0;
-                      else if (strcmp("TV Movie",row[9])==0) prgtype=0;
-                      else if (strcmp("Teleshopping",row[9])==0) prgtype=0;
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                      else if (strcmp("Sitcom",row[9])==0) prgtype=0;
-                      else if (strcmp("Documentary",row[9])==0) prgtype=0;
-                      else if (strcmp("Magazine",row[9])==0) prgtype=0;
-                      else if (strcmp("news",row[9])==0) prgtype=0;
-                      else if (strcmp("Romance",row[9])==0) prgtype=0;
-                      else if (strcmp("Sci-Fi",row[9])==0) prgtype=0;
-                      else if (strcmp("Action",row[9])==0) prgtype=0;
-                      else if (strcmp("Animation",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 8:
-                    // tv_grab_eu_dotmedia dk ver
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;            //
-                      else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Drama",row[9])==0) prgtype=5;            //
-                      else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
-                      else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
-                      else if (strcmp("sports",row[9])==0) prgtype=4;           //
-                      else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
-                      else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
-                      else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
-                      else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
-                      else if (strcmp("Family",row[9])==0) prgtype=1;           // series
-                      else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
-                      else if (strcmp("Series",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Reality",row[9])==0) prgtype=0;          //
-                      else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
-                      else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
-                      else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
-                      else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
-                      else if (strcmp("news",row[9])==0) prgtype=4;             // news
-                      else if (strcmp("Romance",row[9])==0) prgtype=1;          //
-                      else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Animation",row[9])==0) prgtype=0;        //
-                      else prgtype=0;
-                    }
-                    break;
-                  case 10:
-                    // tv_grab_pt_meo
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                      else prgtype=0;
-                    }
-                    break;
-                  default:
-                    prgtype=0;
-                }
+                    case 3:
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("sport",row[9])==0) prgtype=2;
+                        else if (strcmp("cartoon",row[9])==0) prgtype=3;
+                        else if (strcmp("animation films",row[9])==0) prgtype=3;
+                        else if (strcmp("Animation films",row[9])==0) prgtype=3;
+                        else if (strcmp("news",row[9])==0) prgtype=4;
+                        else if (strcmp("nature",row[9])==0) prgtype=9;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 4:
+                      // graber_ar
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
+                        else if (strcmp("Cine",row[9])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
+                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                    case 5:
+                        // graber_fi
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
+                        else if (strcmp("Cine",row[9])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
+                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
+                        else if (strcmp("elokuvat",row[9])==0) prgtype=0;
+                        else if (strcmp("urheilu",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 6:
+                        // graber_tr
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          //
+                        else if (strcmp("film",row[9])==0) prgtype=5;                       //
+                        else if (strcmp("Life Style",row[9])==0) prgtype=7;                 //
+                        else if (strcmp("Aile",row[9])==0) prgtype=7;                       // Family
+                        else if (strcmp("Aksiyon",row[9])==0) prgtype=0;                    // Action film
+                        else if (strcmp("Animasyon",row[9])==0) prgtype=2;                  // Animation
+                        else if (strcmp("Belgesel",row[9])==0) prgtype=4;
+                        else if (strcmp("Bilim Kurgu",row[9])==0) prgtype=8;                // Science fiction
+                        else if (strcmp("Biyografi",row[9])==0) prgtype=0;
+                        else if (strcmp("Komedi",row[9])==0) prgtype=4;
+                        else if (strcmp("Animasyon",row[9])==0) prgtype=3;                  // kids
+                        else if (strcmp("Magazin",row[9])==0) prgtype=0;
+                        else if (strcmp("Eğlence",row[9])==0) prgtype=0;                    // Entertainment
+                        else if (strcmp("Haberler",row[9])==0) prgtype=4;                   // news
+                        else if (strcmp("Dram",row[9])==0) prgtype=1;                       // series
+                        else if (strcmp("Korku",row[9])==0) prgtype=0;
+                        else if (strcmp("Diğer",row[9])==0) prgtype=0;
+                        else if (strcmp("Gerilim",row[9])==0) prgtype=0;
+                        else if (strcmp("Yarışma",row[9])==0) prgtype=0;
+                        else if (strcmp("Polisiye",row[9])==0) prgtype=0;
+                        else if (strcmp("Çocuk",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 7:
+                      // graber_se_tvzon
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
+                        else if (strcmp("Adult",row[9])==0) prgtype=7;                 //
+                        else if (strcmp("Drama",row[9])==0) prgtype=7;                       // Family
+                        else if (strcmp("Crime",row[9])==0) prgtype=0;                    // Action film
+                        else if (strcmp("Mystery",row[9])==0) prgtype=2;                  // Animation
+                        else if (strcmp("sports",row[9])==0) prgtype=4;
+                        else if (strcmp("Sports",row[9])==0) prgtype=8;                // Science fiction
+                        else if (strcmp("Skiing",row[9])==0) prgtype=0;
+                        else if (strcmp("Soccer",row[9])==0) prgtype=4;
+                        else if (strcmp("Fencing",row[9])==0) prgtype=3;                  // kids
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
+                        else if (strcmp("Comedy",row[9])==0) prgtype=0;                    // Entertainment
+                        else if (strcmp("Adventure",row[9])==0) prgtype=4;                   // news
+                        else if (strcmp("Family",row[9])==0) prgtype=1;                       // series
+                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;
+                        else if (strcmp("Series",row[9])==0) prgtype=0;
+                        else if (strcmp("Reality",row[9])==0) prgtype=0;
+                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;
+                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;
+                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
+                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;
+                        else if (strcmp("Documentary",row[9])==0) prgtype=0;
+                        else if (strcmp("Magazine",row[9])==0) prgtype=0;
+                        else if (strcmp("news",row[9])==0) prgtype=0;
+                        else if (strcmp("Romance",row[9])==0) prgtype=0;
+                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=0;
+                        else if (strcmp("Action",row[9])==0) prgtype=0;
+                        else if (strcmp("Animation",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 8:
+                      // tv_grab_eu_dotmedia dk ver
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;            //
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Drama",row[9])==0) prgtype=5;            //
+                        else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
+                        else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
+                        else if (strcmp("sports",row[9])==0) prgtype=4;           //
+                        else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
+                        else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
+                        else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
+                        else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
+                        else if (strcmp("Family",row[9])==0) prgtype=1;           // series
+                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
+                        else if (strcmp("Series",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Reality",row[9])==0) prgtype=0;          //
+                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
+                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
+                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
+                        else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
+                        else if (strcmp("news",row[9])==0) prgtype=4;             // news
+                        else if (strcmp("Romance",row[9])==0) prgtype=1;          //
+                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Animation",row[9])==0) prgtype=0;        //
+                        else prgtype=0;
+                      }
+                      break;
+                    case 10:
+                      // tv_grab_pt_meo
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
+                        else prgtype=0;
+                      }
+                      break;
+                    default:
+                      prgtype=0;
+                  }
+                } else prgtype=0;
                 recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
                 if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
@@ -1621,6 +1623,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   char tmptxt1[1024];
   time_t prgstarttid,prgendtid;
   starttid=time( NULL );
+  nutid=starttid;
   timeinfo=localtime(&starttid);
   switch(screen_size) {
     case 4: CHANELS_PR_LINE=5;
@@ -1863,7 +1866,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
       prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
-      // show program start before over view time start
+      // show program start before over view time start and end tine after view time start
       if ((prgstarttid<=mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
         // calc new length for ysiz
@@ -1876,7 +1879,61 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+//        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
+          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+        } else {
+          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+            case 0:
+              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+              break;
+            case 1:
+              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+              break;
+            case 2:
+              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+              break;
+            case 3:
+              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+              break;
+            case 4:
+              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+              break;
+            case 5:
+              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+              break;
+            case 6:
+              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+              break;
+            case 7:
+              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+              break;
+            case 8:
+              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+              break;
+            case 9:
+              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+              break;
+            case 10:
+              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+              break;
+            case 11:
+              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+              break;
+            case 12:
+              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+              break;
+            case 13:
+              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+              break;
+            case 14:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+              break;
+            default:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              break;
+          }
+        }
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         //_textureutvbgmask
         if (_textureutvbgmask) {
@@ -1936,57 +1993,61 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-        switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
-          case 0:
-            glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
-            break;
-          case 1:
-            glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
-            break;
-          case 2:
-            glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
-            break;
-          case 3:
-            glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
-            break;
-          case 4:
-            glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
-            break;
-          case 5:
-            glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
-            break;
-          case 6:
-            glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
-            break;
-          case 7:
-            glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
-            break;
-          case 8:
-            glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
-            break;
-          case 9:
-            glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
-            break;
-          case 10:
-            glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-            break;
-          case 11:
-            glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-            break;
-          case 12:
-            glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-            break;
-          case 13:
-            glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-            break;
-          case 14:
-            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-            break;
-          default:
-            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
-            break;
+
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
+          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+        } else {
+          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+            case 0:
+              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+              break;
+            case 1:
+              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+              break;
+            case 2:
+              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+              break;
+            case 3:
+              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+              break;
+            case 4:
+              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+              break;
+            case 5:
+              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+              break;
+            case 6:
+              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+              break;
+            case 7:
+              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+              break;
+            case 8:
+              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+              break;
+            case 9:
+              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+              break;
+            case 10:
+              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+              break;
+            case 11:
+              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+              break;
+            case 12:
+              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+              break;
+            case 13:
+              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+              break;
+            case 14:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+              break;
+            default:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              break;
+          }
         }
-        //
         // if select program
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         if (_textureutvbgmask) {
