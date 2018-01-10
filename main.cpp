@@ -10085,7 +10085,7 @@ void loadgfx() {
         tema=1;
     }
 
-    _textureutvbgmask     = loadgfxfile(temapath1,(char *) "images/",(char *) "tv_carbon");
+    _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _textureId1           = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
