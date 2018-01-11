@@ -59,7 +59,7 @@ int fontctrl::updatefontlist()
           //if (debugmode & 128) printf("Font named %10s found \n",typeinfo[i].fontname);
           face_count = glcGetMasteri(i, GLC_FACE_COUNT);
           for (j = 0; j < face_count; j++) {
-              if (debugmode & 128) printf(" Face types %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
+              //if (debugmode & 128) printf(" Face types %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
               //if (j==0) strcpy(typeinfo[0].fonttype,(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
               if (j==0) sprintf(typeinfo[i].fontname,"%s",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j)); //glcGetMasterListc(i, GLC_FACE_LIST, j)
               master = i;
