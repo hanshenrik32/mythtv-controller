@@ -1587,6 +1587,11 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 
 
 void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show) {
+
+  float now_text_color[3]={1.0f,1.0f,0.5f};
+  float now_text_clock_color[3]={1.0f,1.0f,0.0f};
+  float catalog_text_color[3]={1.0f,1.0f,1.0f};
+  float catalog_text_clock_color[3]={0.5f,1.0f,0.0f};
   struct tm *timeinfo;
   struct tm nowtime_h;
   time_t nutid;
@@ -1954,6 +1959,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
 
         // show program stat + end tid hvis plads
         if (prglength>13) {
+          // show start time
           glPushMatrix();
           glDisable(GL_TEXTURE_2D);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
@@ -1964,7 +1970,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glTranslatef(xpos+20,ypos-7, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
           glColor3f(0.5f,0.5f, 0.5f);		// rejser
-          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(1.0f,1.0f, 1.0f);	    // active program color
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);	    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
           glPopMatrix();
@@ -1977,7 +1983,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         if (prglength>13) glTranslatef(xpos+20,ypos-22, 0.0f); else glTranslatef(xpos+20,ypos-7, 0.0f);
         glScalef(textsize1, textsize1, 1.0f);
         glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
-        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(1.0f,1.0f, 1.0f);	    // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);    // active program color
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         glcRenderString(tmptxt);                                              // print program name
         glPopMatrix();
@@ -2078,7 +2084,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
           *(tmptxt+21)='\0';
-          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(1.0f,1.0f, 1.0f);	    // active program color
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);	    // active program color
           glcRenderString(tmptxt);
           glPopMatrix();
           glPushMatrix();
@@ -2090,7 +2096,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
-          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(1.0f,1.0f, 1.0f);	    // active program color
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
           glPopMatrix();
@@ -2101,7 +2107,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
-          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(1.0f,1.0f, 1.0f);	    // active program color
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);   // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
           glPopMatrix();
