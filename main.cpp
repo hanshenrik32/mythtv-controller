@@ -6518,8 +6518,8 @@ void handlespeckeypress(int key,int x,int y) {
                 if (vis_tv_oversigt) {
                     if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
                       tvvalgtrecordnr--;
+                      tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
                     }
-                    tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
                 }
 
 /*
@@ -6816,28 +6816,6 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
 
-                // tv stuf up key
-                // if indside tv overoview
-                if (vis_tv_oversigt) {
-                  if (tvsubvalgtrecordnr>0) {
-                    tvsubvalgtrecordnr--;
-                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(aktiv_tv_oversigt.vistvguidekl)) {
-                      /*
-                      if (vistvguidekl==0) {
-                          time_t rawtime;
-                          struct tm *timelist;
-                          time(&rawtime);
-                          timelist=localtime(&rawtime);
-                          vistvguidekl=timelist->tm_hour;
-                      }
-                      */
-                      // min kl 09.00
-                      if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--;
-                    }
-                  }
-                }
-
-
                 if (vis_recorded_oversigt) {
                     if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                         valgtrecordnr--;
@@ -6847,6 +6825,19 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
                 }
+
+
+                // tv stuf up key
+                // if indside tv overoview
+                if (vis_tv_oversigt) {
+                  if (tvsubvalgtrecordnr>0) {
+                    tvsubvalgtrecordnr--;
+                    if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(aktiv_tv_oversigt.vistvguidekl)) {
+                      if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--;
+                    }
+                  }
+                }
+
 
                 // if indside a setup menu
                 if (do_show_setup) {
