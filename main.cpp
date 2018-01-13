@@ -6455,7 +6455,7 @@ void handlespeckeypress(int key,int x,int y) {
                     exit(100);
                 }
                 break;
-        case 100:  // key left
+        case 100:  // left key
                 if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
                     if (music_key_selected>1) {
                         music_key_selected--;
@@ -6605,9 +6605,6 @@ void handlespeckeypress(int key,int x,int y) {
                   if (tvvisvalgtnrtype==1) {
                     if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()-1) tvvalgtrecordnr++;
                     tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
-
-                        //tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr-1,tvsubvalgtrecordnr));
-                        //tvsubvalgtrecordnr=0;
                   }
                 }
 

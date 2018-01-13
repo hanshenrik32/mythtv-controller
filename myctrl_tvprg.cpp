@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-
 #include <GL/glut.h>    // Header File For The GLUT Library
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
 #include <GL/glu.h>     // Header File For The GLu32 Library
@@ -1050,14 +1049,23 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 //
 // Find tv guide kanal med samme eller senere tidspunkt som tidspunkt og retunre hviken element i array som har den start tid
 // hvis ingen findes gå til start dvs array element 0
-// bruges ved pil up/down i tv kanal listen i vis_tv_oversigt
+// bruges ved pil up/down/left/right i tv kanal listen i vis_tv_oversigt
 //
 
 int tv_oversigt::findguidetvtidspunkt(int kanalnr,time_t tidspunkt) {
     int prgnr=0;
     bool fundet=false;
+    tidspunkt+=60*60;
     while((prgnr<tvkanaler[kanalnr].program_antal()) && (!(fundet))) {
-        if ((time_t) tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) prgnr++; else fundet=true;
+        if ((time_t) tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) {
+          if ((tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) && (tvkanaler[kanalnr].tv_prog_guide[prgnr].endtime_unix<tidspunkt)) prgnr++;
+          else fundet=true;
+        } else fundet=true;
+    }
+    if (fundet) {
+      while (((tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) && (tvkanaler[kanalnr].tv_prog_guide[prgnr].endtime_unix<tidspunkt)) && (prgnr<tvkanaler[kanalnr].program_antal())) {
+        prgnr++;
+      }
     }
     if (fundet) return(prgnr); else return(0);
 }
@@ -1181,6 +1189,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
                     strcpy(tmptxt,row[0]);                                        // rember channel name
+                    printf("Channel name : %s ",tvkanaler[kanalnr].getkanalname());
                 }
                 // select by tv_grab_xx nr in array
                 if (row[8]) {
@@ -1402,6 +1411,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
+                    printf(" Total programs loaded in channel %d \n",prgnr);
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;
