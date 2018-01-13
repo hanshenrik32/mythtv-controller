@@ -139,7 +139,10 @@ bool check_tvguide_process_running(char *processname) {
 }
 
 
+//
 // intern function for _xmltv
+// used to cmd/download the tvguide.xml file to xmlparser
+// use 2 days for tv_grab_eu_dotmedia it is fast as hell
 
 int get_tvguide_fromweb() {
   char exestring[2048];
@@ -147,10 +150,10 @@ int get_tvguide_fromweb() {
   // check if active xml_tv graber is running
   if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
     strcpy(exestring,configbackend_tvgraber);
-    strcat(exestring," --days 1 --output ~/tvguide.xml 2> ~/tvguide.log");
+    if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
+    else strcat(exestring," --days 1 --output ~/tvguide.xml 2> ~/tvguide.log");
     printf("Start tv graber background process %s\n",configbackend_tvgraber);
-    result=system(exestring);
-    //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+    result=system(exestring);   // do it
     printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");
   return(result);
@@ -362,7 +365,7 @@ void expand_escapes(char* dest, const char* src) {
 
 //
 // read tv guide from file. And update tvguide db (create if not exist)
-//
+// return >0 on error
 
 int tv_oversigt::parsexmltv(const char *filename) {
   xmlChar *content;
@@ -674,7 +677,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   }
   loading_tv_guide=false;
   mysql_close(conn);
-  return(!(error));
+  return(error);
 }
 
 

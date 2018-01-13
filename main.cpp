@@ -1905,7 +1905,6 @@ int init_ttf_fonts() {
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
 
-
     glcDisable(GLC_GL_OBJECTS);
 //    glcRenderStyle(GLC_LINE);                 // lines
 //    glcRenderStyle(GLC_TEXTURE);
@@ -6693,7 +6692,7 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   // check hvor vi er
                   if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(aktiv_tv_oversigt.vistvguidekl+3)) {
-                    if (aktiv_tv_oversigt.vistvguidekl<24) aktiv_tv_oversigt.vistvguidekl++;
+                    if (aktiv_tv_oversigt.vistvguidekl<24*2) aktiv_tv_oversigt.vistvguidekl++;
                   }
                 }
 
@@ -9469,10 +9468,6 @@ void *radio_check_statusloader(void *data) {
 
 
 
-
-
-
-
 //
 // phread dataload Music
 //
@@ -9544,8 +9539,6 @@ void *datainfoloader_movie(void *data) {
 
 
 
-
-
 //
 // phread dataload stream
 //
@@ -9579,23 +9572,12 @@ void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
   printf("Thread xmltv file parser starting....\n");
-  // parse last tvguide loaded
-  if (strcmp(configbackend,"mythtv")==0) {
-    // aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-    error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    //if (error==0)
-    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-  } else {
-    error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    //if (error==0)
-    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-  }
   //
+  // multi thread
   // load xmltvguide from web
   if (get_tvguide_fromweb()!=-1) {
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    //if (error==0)
-    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0); else printf("Parse xmltv error (mysql connection error)\n");
   }
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
