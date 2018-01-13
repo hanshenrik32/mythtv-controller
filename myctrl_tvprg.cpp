@@ -1145,7 +1145,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
-    printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
+    printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -1433,34 +1433,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
 
 
-
-
-
-void tv_oversigt::show_canal_names() {
-    int i;
-    int kanalantal;
-    float yofset=4.2f;
-//    float zofset=-110.0f;
-    // make boxes bihint canal name
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, _tvbar3);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    kanalantal=16;
-    i=0;
-    while (i<kanalantal) {
-        glLoadIdentity();
-        glTranslatef(-98, 27.8-(i*(yofset)), -99.5f-40); 	//
-        glRotatef(45.0f,0.0f, 0.0f, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(-10, -0.6, -10.0);
-        glTexCoord2f(1.0, 0.0); glVertex3f(7.0, -0.6 , -10.0);
-        glTexCoord2f(1.0, 1.0); glVertex3f(7.0, -6.4,-10.0);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-10, -6.4,-10.0);
-        glEnd();
-        i++;
-    }
-}
 
 
 
@@ -1870,9 +1842,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
-    //
+    // mytime = overskrift tid
+    // tt = tid som går fra maxtid nederst på skærmen starttid + 2 timer
 
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
+
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
 
@@ -1881,6 +1855,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
       prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
+
+      //printf("tt=%d %s progrm start tid %d \n",tt,ctime(&tt),prgstarttid);
+
       // show program start before over view time start and end tine after view time start
       if ((prgstarttid<=mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
