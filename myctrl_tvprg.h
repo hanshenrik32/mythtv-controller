@@ -49,6 +49,7 @@ class tv_oversigt_pr_kanal {
         tv_oversigt_pr_kanal();
         ~tv_oversigt_pr_kanal();
         void putkanalname(char *kname);
+        char *getkanalname(void) { return(chanel_name); };
         int program_antal() { return programantal; }
         void set_program_antal(int antal) { programantal=antal; }
         void cleanprogram_kanal();
