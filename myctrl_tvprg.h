@@ -10,6 +10,8 @@ const int maxprogram_antal=400;
 const int MAXKANAL_ANTAL=200;
 const int description_length=2048;
 
+const char tvguidedbfilename[]={"tvguidedb.dat"};
+
 // tv oversigt
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
 
@@ -29,6 +31,7 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
         bool brugt;           						// findes der et prg
         bool updated;                     // er den updated
         int recorded;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
+        bool settorecord;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
 
         bool getprogramupdated() { return (updated); }
         tv_oversigt_prgtype();
@@ -96,6 +99,9 @@ class tv_oversigt {
         unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
         char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
         void reset_tvguide_time();                                                                            // reset show tv guide to now (time)
+        int saveparsexmltvdb();                                     // tvguidedbfilename
+        int loadparsexmltvdb();                                     // tvguidedbfilename
+        void set_program_torecord(int selectchanel,int selectprg);                                     // tvguidedbfilename
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 

@@ -29,7 +29,7 @@
 #define MAXSIZE 16000+1;
 
 extern GLuint setupnetworkwlanback;
-
+extern bool ask_tv_record;
 extern tv_graber_config aktiv_tv_graber;                                        // xmltv graber config
 
 extern int screen_size;
@@ -360,6 +360,43 @@ void expand_escapes(char* dest, const char* src) {
   }
 
   *dest = '\0'; /* Ensure nul terminator */
+}
+
+
+
+//
+//
+//
+
+int tv_oversigt::saveparsexmltvdb() {
+  int n=0;
+  FILE *dbfil;
+  dbfil=fopen(tvguidedbfilename,"w");
+  if (dbfil) {
+    while(n<this->kanal_antal) {
+      fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
+      n++;
+    }
+    fclose(dbfil);
+  }
+}
+
+
+//
+//
+//
+
+int tv_oversigt::loadparsexmltvdb() {
+  int n=0;
+  FILE *dbfil;
+  dbfil=fopen(tvguidedbfilename,"r");
+  if (dbfil) {
+    while(!(feof(dbfil))) {
+      fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
+      n++;
+    }
+    fclose(dbfil);
+  }
 }
 
 
@@ -725,6 +762,7 @@ tv_oversigt_prgtype::tv_oversigt_prgtype() {
     brugt=true;
     recorded=0;
     updated=false;
+    settorecord=false;
 }
 
 
@@ -827,6 +865,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
+    // get time now
     time(&rawtime);
     // convert clovk to localtime
     timelist=localtime(&rawtime);
@@ -1080,7 +1119,6 @@ int tv_oversigt::findguidetvtidspunkt(int kanalnr,time_t tidspunkt) {
 time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
     if ((kanalnr>=0) && (kanalnr<kanal_antal)) return(tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix); else return(0);
 }
-
 
 
 //
@@ -1564,7 +1602,9 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 }
 
 
-
+void tv_oversigt::set_program_torecord(int selectchanel,int selectprg) {
+  if (selectchanel<=tv_kanal_antal()) tvkanaler[selectchanel].tv_prog_guide[selectprg].settorecord=true;
+}
 
 // vis_tv_oversigt
 // new
@@ -2089,6 +2129,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
+
+          if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
+            glColor3f(1.0f,0.0f,0.0f);
+            glcRenderString(" R");
+            ask_tv_record=false;
+          }
+
           glPopMatrix();
         } else {
           glPushMatrix();
@@ -2100,6 +2147,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);   // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
+
+          if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
+            glColor3f(1.0f,0.0f,0.0f);
+            glcRenderString(" R");
+            ask_tv_record=false;
+          }
+
           glPopMatrix();
         }
         barsize=barsize+(prglength*5);
@@ -2507,6 +2561,8 @@ char *read_stream(char *stream,size_t size, void *d) {
     char *c=fgets(stream,size,(FILE *) d);
     return c;
 }
+
+
 
 //
 // load recorded history not programs
