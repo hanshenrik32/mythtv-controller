@@ -1602,9 +1602,14 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 }
 
 
+// set program to record flag
+
 void tv_oversigt::set_program_torecord(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) tvkanaler[selectchanel].tv_prog_guide[selectprg].settorecord=true;
 }
+
+
+
 
 // vis_tv_oversigt
 // new
