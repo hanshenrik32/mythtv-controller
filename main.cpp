@@ -5861,13 +5861,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                     if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
                     ask_tv_record=false;
                     fundet=true;
-                    // do it
+                    returnfunc=3;
+                    do_zoom_tvprg_aktiv_nr=0;
                     // set start record tv prgoram
                     //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
-//// slal aktiveres
                     aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
                     // opdatere tv guide med nyt info
-                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
                 }
             }
         }
@@ -9577,7 +9577,11 @@ void *datainfoloader_xmltv(void *data) {
   // load xmltvguide from web
   if (get_tvguide_fromweb()!=-1) {
     error=aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    if (error==0) aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0); else printf("Parse xmltv error (mysql connection error)\n");
+    if (error==0) {
+      aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+      //save array to disk
+      aktiv_tv_oversigt.saveparsexmltvdb();
+    } else printf("Parse xmltv error (mysql connection error)\n");
   }
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
