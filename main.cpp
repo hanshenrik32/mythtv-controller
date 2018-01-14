@@ -6970,12 +6970,12 @@ void handlespeckeypress(int key,int x,int y) {
                 if (vis_tv_oversigt) {
                     // reset tvgide time to now
                     aktiv_tv_oversigt.reset_tvguide_time();
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                     if (ask_tv_record) {
                       ask_tv_record=false;
                       tvknapnr=0;
                       do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
                     }
+
                 }
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                     if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
