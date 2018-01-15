@@ -7495,7 +7495,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         firsttime_xmltvupdate=true;
                         // close tv graber windows again
                         do_show_tvgraber=false;
-
+                        do_show_setup=false;
                       } else if (do_show_videoplayer) do_show_videoplayer=false; else
                       if (do_show_setup_sql) do_show_setup_sql=false; else
                       if (do_show_setup_font) do_show_setup_font=false; else
@@ -7511,7 +7511,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                     else if (vis_stream_oversigt) vis_stream_oversigt=false;
                     else if (vis_tv_oversigt) vis_tv_oversigt=false;
                     else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
-                    else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                     else {
                       remove("mythtv-controller.lock");
                       exit(0);
@@ -7521,8 +7520,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                     if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
                     if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
                     if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
+                    if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
+                      do_zoom_tvprg_aktiv_nr=0;
+                    } else if (vis_tv_oversigt) {
+                      // spørg kan/skal vi optage den ?
+                      ask_tv_record=true;
+                      tvknapnr=tvsubvalgtrecordnr;
+                      do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                    }
                     break;
-
             case optionmenukey:
                     if (vis_film_oversigt) {
                         vis_movie_options=!vis_movie_options;
@@ -7533,10 +7539,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (do_zoom_radio) do_zoom_radio=false;
                     }
                     break;
-            case 'r':
+            case 'g':
                     if (vis_movie_options) {
                         vis_movie_sort_option=1;
-                        vis_movie_options=false;			// luk option window igen
+                        vis_movie_options=false;                        // luk option window igen
+                    }
+                    break;
+            case 'l':
+                    // load tv guide
+                    if (vis_tv_oversigt) {
+                      // load tv guide
+                      if (debugmode) printf("Loading tvguidedb file\n");
+                      aktiv_tv_oversigt.loadparsexmltvdb();
                     }
                     break;
             case 'p':
@@ -7544,6 +7558,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                         vis_tvrec_list=!vis_tvrec_list;
                     } else if (!(vis_old_recorded)) {
                         vis_tvrec_list=!vis_tvrec_list;
+                    }
+                    break;
+            case 'r':
+                    if (vis_movie_options) {
+                      vis_movie_sort_option=1;
+                      vis_movie_options=false;			// luk option window igen
                     }
                     break;
             case 't':
@@ -7565,12 +7585,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                       }
                     }
                     break;
-            case 'g':
-                    if (vis_movie_options) {
-                        vis_movie_sort_option=1;
-                        vis_movie_options=false;                        // luk option window igen
-                    }
-                    break;
             case 13:
                     if (debugmode) {
                         if (vis_music_oversigt) fprintf(stderr,"Enter key pressed, update music list.\n");
@@ -7578,6 +7592,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
                         else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
                         else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
+                        else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
                     }
                     if (vis_radio_oversigt) {
                         rknapnr=0;

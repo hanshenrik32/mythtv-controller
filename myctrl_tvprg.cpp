@@ -696,9 +696,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
                 prg_antal++;
-                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
+//                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
+//                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
             // save rec
@@ -1121,6 +1121,10 @@ time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
 }
 
 
+
+
+
+
 //
 // henter aktiv tv overigt fra mythtv or internal localdb created like mythtv in use
 //
@@ -1218,7 +1222,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
 
-        if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
+  //      if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
