@@ -3167,7 +3167,6 @@ int channel_configfile::graber_configbuild() {
 
 
 
-
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
 //
@@ -3379,9 +3378,45 @@ int load_channel_list() {
 }
 
 
+//
+// sort record after selected
+//
+
+void order_channel_list() {
+  struct channel_list_struct tmpchannel;
+  int n;
+  bool swap=true;
+  while(swap) {
+    n=0;
+    swap=false;
+    while(n<MAXCHANNEL_ANTAL-1) {
+      if ((channel_list[n].selected==false) && (channel_list[n+1].selected)) {
+        swap=true;
+        tmpchannel.selected=channel_list[n].selected;
+        tmpchannel.ordernr=channel_list[n].ordernr;
+        tmpchannel.changeordernr=channel_list[n].changeordernr;
+        strcpy(tmpchannel.name,channel_list[n].name);
+        strcpy(tmpchannel.id,channel_list[n].id);
+
+        channel_list[n].selected=channel_list[n+1].selected;                                             // is program channel active
+        channel_list[n].ordernr=channel_list[n+1].ordernr;                                                  // show ordernr
+        channel_list[n].changeordernr=channel_list[n+1].changeordernr;                                        // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n].name,channel_list[n+1].name);                                            // channel name
+        strcpy(channel_list[n].id,channel_list[n+1].id);                                              // internal dbid
+
+        channel_list[n+1].selected=tmpchannel.selected;                                             // is program channel active
+        channel_list[n+1].ordernr=tmpchannel.ordernr;                                                  // show ordernr
+        channel_list[n+1].changeordernr=tmpchannel.changeordernr;                                        // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n+1].name,tmpchannel.name);                                            // channel name
+        strcpy(channel_list[n+1].id,tmpchannel.id);                                              // internal dbid
+      }
+      n++;
+    }
+  }
+}
 
 //
-// order tv channels in tvguide db
+// order tv channels in tvguide db (mysql)
 // by order in channel_list array
 //
 
