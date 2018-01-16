@@ -2332,7 +2332,8 @@ void display() {
     // make xmltv update
     today=time(NULL);
     // update interval
-    if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
+    // set in main.h
+    if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;                                      // rember last update
       do_update_xmltv=true;                                 // do update tvguide
@@ -6028,8 +6029,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
                         tvvalgtrecordnr=(tvknapnr / 100);
                         tvsubvalgtrecordnr=tvknapnr-(tvvalgtrecordnr*100);
-                        fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
-                        fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
+                        if (debugmode & 256) fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
+                        if (debugmode & 256) fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
 
                     }
 
@@ -7470,6 +7471,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         // clear old tvguide in db
                         aktiv_tv_oversigt.cleartvguide();
                         // save chennel list info to internal datafile
+                        order_channel_list();
                         save_channel_list();
                         // buid new config file for xmltv from saved db
                         xmltv_configcontrol.graber_configbuild();
@@ -7477,7 +7479,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         //if (get_tvguide_fromweb()!=-1)
                         // update db med tvguide
                         aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-                        // order channels in db
+                        // order channels in db (mysqldb)
                         order_channel_list_in_tvguide_db();
                         // hent/update tv guide from db
                         aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
@@ -7567,6 +7569,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       // u key
                       // Update tv guide
                       printf("Update tv guide\n");
+                      // set flag for show update
                       do_update_xmltv_show=true;
                       loading_tv_guide=true;
                       if (strcmp(configbackend,"mythtv")==0) {
