@@ -5,10 +5,12 @@
 #include <string.h>
 
 // antal programer pr kanal
-const int maxprogram_antal=200;
+const int maxprogram_antal=400;
 // antal kanaler max
 const int MAXKANAL_ANTAL=200;
-const int description_length=4096;
+const int description_length=2048;
+
+const char tvguidedbfilename[]={"tvguidedb.dat"};
 
 // tv oversigt
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
@@ -29,6 +31,7 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
         bool brugt;           						// findes der et prg
         bool updated;                     // er den updated
         int recorded;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
+        bool settorecord;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
 
         bool getprogramupdated() { return (updated); }
         tv_oversigt_prgtype();
@@ -49,6 +52,7 @@ class tv_oversigt_pr_kanal {
         tv_oversigt_pr_kanal();
         ~tv_oversigt_pr_kanal();
         void putkanalname(char *kname);
+        char *getkanalname(void) { return(chanel_name); };
         int program_antal() { return programantal; }
         void set_program_antal(int antal) { programantal=antal; }
         void cleanprogram_kanal();
@@ -71,12 +75,13 @@ class tv_oversigt {
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
         time_t lastupdated;                                                                                   // last updated unix date
     public:
+        int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
         ~tv_oversigt();                                                                                       // destructor
         int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
-        void show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show);        //
+        void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
         void show_canal_names();                                                                              //
         void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //
@@ -92,9 +97,11 @@ class tv_oversigt {
         int find_start_pointinarray(int selectchanel);
         unsigned long getprogram_endunixtume(int selectchanel,int selectprg);
         unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
-
         char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
-
+        void reset_tvguide_time();                                                                            // reset show tv guide to now (time)
+        int saveparsexmltvdb();                                     // tvguidedbfilename
+        int loadparsexmltvdb();                                     // tvguidedbfilename
+        void set_program_torecord(int selectchanel,int selectprg);                                     // tvguidedbfilename
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 

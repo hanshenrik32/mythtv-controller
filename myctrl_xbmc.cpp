@@ -26,11 +26,11 @@ int xbmcsqlite::getxmlfilepath() {
   document = xmlReadFile(path, NULL, 0);
   if (document) {
     root = xmlDocGetRootElement(document);
-    fprintf(stdout, "Root is <%s> \n", root->name);
+    //fprintf(stdout, "Root is <%s> \n", root->name);
 
     first_child = root->children;
     for (node = first_child; node; node = node->next) {
-      fprintf(stdout, "\t Child is <%s> (%i) \n", node->name,node->type);
+      //fprintf(stdout, "\t Child is <%s> (%i) \n", node->name,node->type);
       if (strcmp((char *) node->name,"<video>")==0) {
 
 

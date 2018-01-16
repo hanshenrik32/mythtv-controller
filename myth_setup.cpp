@@ -1099,23 +1099,18 @@ void show_wlan_networks(int valgtnr) {
     int i;
     int si;
     char tmptxt[80];
-
     int winsizx=100;
     int winsizy=200;
     int xpos=0;
     int ypos=0;
-
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
     glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),200 , 0.0);
     glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
@@ -1123,8 +1118,6 @@ void show_wlan_networks(int valgtnr) {
     glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,200 , 0.0);
     glEnd();
     glPopMatrix();
-
-
     winsizx=200;
     winsizy=30;
     xpos=300;
@@ -2794,11 +2787,16 @@ void show_setup_keys() {
 // by pipe the command in shell
 
 int txmltvgraber_createconfig() {
+  char path[1024];
   char exebuffer[1024];
   int sysresult;
+  strcpy(exebuffer,"rm ");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(exebuffer,path);
   // delete old config from dir
   if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
-    sprintf(exebuffer,"rm ~/.xmltv/%s.conf",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     sysresult=system(exebuffer);
     // create new config
     switch (aktiv_tv_graber.graberaktivnr) {
@@ -2907,15 +2905,15 @@ int txmltvgraber_createconfig() {
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     switch(aktiv_tv_graber.graberaktivnr) {
-      case 8: sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf /home/hans/.xmltv/");
+      case 8: sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
       default:
               sysresult=system(exebuffer);
               break;
 
     }
-  }
-  return(1);
+    return(1);
+  } else return(0);
 }
 
 
@@ -2926,14 +2924,17 @@ int txmltvgraber_createconfig() {
 //
 
 int channel_configfile::readgraber_configfile() {
+  char path[1024];
   char buffer[1024];
   char filename[1024];
   bool errors=false;
   FILE *fil;
   int line=0;
-  strcpy(filename,"~/.xmltv/");
-  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(filename,".conf");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(path,".conf");
+  strcpy(filename,path);
   fil=fopen(filename,"r");
   if (fil) {
     while(!(feof(fil))) {
@@ -2958,14 +2959,17 @@ int channel_configfile::readgraber_configfile() {
 //
 
 int channel_configfile::writegraber_configfile() {
+  char path[1024];
   char buffer[1024];
   char filename[1024];
   bool errors=false;
   FILE *fil;
   int line=0;
-  strcpy(filename,"~/.xmltv/");
-  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(filename,".conf");
+  getuserhomedir(path);
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(path,".conf");
+  strcpy(filename,path);
   fil=fopen(filename,"w");
   if (fil) {
     while(line<configfilesize) {
@@ -3029,7 +3033,7 @@ int channel_configfile::graber_configbuild() {
       case 2: fputs("# Channel ID                              Channel name\n",fil);
               break;
       // tv_grab_es_laguiatv
-      case 3: fputs("configversion 3\nusecache yes\ncachedir /home/hans/.xmltv/cache\ngetdescriptions yes\n",fil);
+      case 3: fputs("configversion 3\nusecache yes\ncachedir ~/.xmltv/cache\ngetdescriptions yes\n",fil);
               break;
       // tv_grab_il
       case 4: fputs("Do not work graber error.",fil);
@@ -3046,10 +3050,10 @@ int channel_configfile::graber_configbuild() {
       case 7: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
               break;
       // tv_grab_eu_dotmedia
-      case 8: fputs("country=Denmark\ncachedir=/home/hans/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
+      case 8: fputs("country=Denmark\ncachedir=~/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
               break;
       // tv_grab_se_swedb
-      case 9:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);     // tv_grab_se_swedb
+      case 9:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);     // tv_grab_se_swedb
               break;
       // tv_grab_pt_meo
       case 10:fputs("maxchannels=5\n",fil);                                  // tv_grab_pt_meo
@@ -3079,16 +3083,16 @@ int channel_configfile::graber_configbuild() {
       case 18:fputs("No tv graber config exist for this land. Use --configure\n",fil);
               break;
       // tv_grab_tr
-      case 19:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+      case 19:fputs("cachedir=~/.xmltv/cache\n",fil);
               break;
       // tv_grab_eu_egon
-      case 20:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+      case 20:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);
               break;
       // tv_grab_dk_dr
       case 21:fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
               break;
       // tv_grab_se_tvzon
-      case 22:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=/home/hans/.xmltv/cache\n",fil);
+      case 22:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);
               break;
       // tv_grab_ar
       case 23:fputs("location 683 CAPITAL FEDERAL\n",fil);
@@ -3097,7 +3101,7 @@ int channel_configfile::graber_configbuild() {
       case 24:fputs("",fil);
               break;
       // tv_grab_uk_tvguide
-      case 25:fputs("cachedir=/home/hans/.xmltv/cache\n",fil);
+      case 25:fputs("cachedir=~/.xmltv/cache\n",fil);
               break;
       default:fputs("No tv graber exist for this land\n",fil);
     }
@@ -3160,7 +3164,6 @@ int channel_configfile::graber_configbuild() {
   } else errors=true;
   if (errors==false) return(1); else return(0);
 }
-
 
 
 
@@ -3375,9 +3378,45 @@ int load_channel_list() {
 }
 
 
+//
+// sort record after selected
+//
+
+void order_channel_list() {
+  struct channel_list_struct tmpchannel;
+  int n;
+  bool swap=true;
+  while(swap) {
+    n=0;
+    swap=false;
+    while(n<MAXCHANNEL_ANTAL-1) {
+      if ((channel_list[n].selected==false) && (channel_list[n+1].selected)) {
+        swap=true;
+        tmpchannel.selected=channel_list[n].selected;
+        tmpchannel.ordernr=channel_list[n].ordernr;
+        tmpchannel.changeordernr=channel_list[n].changeordernr;
+        strcpy(tmpchannel.name,channel_list[n].name);
+        strcpy(tmpchannel.id,channel_list[n].id);
+
+        channel_list[n].selected=channel_list[n+1].selected;                                             // is program channel active
+        channel_list[n].ordernr=channel_list[n+1].ordernr;                                                  // show ordernr
+        channel_list[n].changeordernr=channel_list[n+1].changeordernr;                                        // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n].name,channel_list[n+1].name);                                            // channel name
+        strcpy(channel_list[n].id,channel_list[n+1].id);                                              // internal dbid
+
+        channel_list[n+1].selected=tmpchannel.selected;                                             // is program channel active
+        channel_list[n+1].ordernr=tmpchannel.ordernr;                                                  // show ordernr
+        channel_list[n+1].changeordernr=tmpchannel.changeordernr;                                        // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n+1].name,tmpchannel.name);                                            // channel name
+        strcpy(channel_list[n+1].id,tmpchannel.id);                                              // internal dbid
+      }
+      n++;
+    }
+  }
+}
 
 //
-// order tv channels in tvguide db
+// order tv channels in tvguide db (mysql)
 // by order in channel_list array
 //
 
@@ -3436,7 +3475,7 @@ void show_setup_tv_graber(int startofset) {
         // it is a first time program thing
         hent_tv_channels=true;
         // crete mew config file
-        txmltvgraber_createconfig();
+        if (txmltvgraber_createconfig()==0) printf("error xmltv graber confg \n");
         // load mew chanel config data from file
         load_channel_list_from_graber();
         // save config

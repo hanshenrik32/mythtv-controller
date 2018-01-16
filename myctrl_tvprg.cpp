@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-
 #include <GL/glut.h>    // Header File For The GLUT Library
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
 #include <GL/glu.h>     // Header File For The GLu32 Library
@@ -29,6 +28,8 @@
 
 #define MAXSIZE 16000+1;
 
+extern GLuint setupnetworkwlanback;
+extern bool ask_tv_record;
 extern tv_graber_config aktiv_tv_graber;                                        // xmltv graber config
 
 extern int screen_size;
@@ -48,6 +49,7 @@ extern GLuint _tvprgrecorded1;
 extern GLuint _tvprgrecorded_mask;
 extern GLuint _tvrecordbutton;
 GLuint _textureId13;
+extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
 extern GLuint _tvoldrecorded;
 //extern GLuint _tvoldrecordedmask;
@@ -137,7 +139,10 @@ bool check_tvguide_process_running(char *processname) {
 }
 
 
+//
 // intern function for _xmltv
+// used to cmd/download the tvguide.xml file to xmlparser
+// use 2 days for tv_grab_eu_dotmedia it is fast as hell
 
 int get_tvguide_fromweb() {
   char exestring[2048];
@@ -145,10 +150,10 @@ int get_tvguide_fromweb() {
   // check if active xml_tv graber is running
   if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
     strcpy(exestring,configbackend_tvgraber);
-    strcat(exestring," > ~/tvguide.xml 2> ~/tvguide.log");
+    if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
+    else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     printf("Start tv graber background process %s\n",configbackend_tvgraber);
-    result=system(exestring);
-    //  if (WIFSIGNALED(result) && (WTERMSIG(result) == SIGINT || WTERMSIG(result) == SIGQUIT)) break;
+    result=system(exestring);   // do it
     printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");
   return(result);
@@ -358,9 +363,46 @@ void expand_escapes(char* dest, const char* src) {
 }
 
 
+
+//
+//
+//
+
+int tv_oversigt::saveparsexmltvdb() {
+  int n=0;
+  FILE *dbfil;
+  dbfil=fopen(tvguidedbfilename,"w");
+  if (dbfil) {
+    while(n<this->kanal_antal) {
+      fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
+      n++;
+    }
+    fclose(dbfil);
+  }
+}
+
+
+//
+//
+//
+
+int tv_oversigt::loadparsexmltvdb() {
+  int n=0;
+  FILE *dbfil;
+  dbfil=fopen(tvguidedbfilename,"r");
+  if (dbfil) {
+    while(!(feof(dbfil))) {
+      fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
+      n++;
+    }
+    fclose(dbfil);
+  }
+}
+
+
 //
 // read tv guide from file. And update tvguide db (create if not exist)
-//
+// return >0 on error
 
 int tv_oversigt::parsexmltv(const char *filename) {
   xmlChar *content;
@@ -371,7 +413,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   unsigned int prg_antal=0;
   char temptxt[1024];
 
-  char sql[4096];
+  char sql[8192];
   char *s;
   int error=0;
   bool cidfundet=false;
@@ -636,32 +678,30 @@ int tv_oversigt::parsexmltv(const char *filename) {
               channelid=get_cannel_id(channelname);
               // convert spec chars to esc string in string
               expand_escapes(temptxt,prgtitle);
-              strcpy(prgtitle,temptxt);
+              strncpy(prgtitle,temptxt,1024-1);
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
 
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,prgtitle);
-                strcpy(prgtitle,temptxt);
+                strncpy(prgtitle,temptxt,1024-1);
 
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,description);
-                strcpy(description,temptxt);
+                strncpy(description,temptxt,4096-1);
 
                 sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
                 prg_antal++;
-                if (debugmode & 256) fprintf(stdout,"prg_antal %4d Tvguide Program created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
+//                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
-                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist in db Channel %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
+//                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
               }
             }
-
             // save rec
-
           }
         } // for loop end
         fprintf(stdout, "...\n");
@@ -674,7 +714,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   }
   loading_tv_guide=false;
   mysql_close(conn);
-  return(!(error));
+  return(error);
 }
 
 
@@ -722,6 +762,7 @@ tv_oversigt_prgtype::tv_oversigt_prgtype() {
     brugt=true;
     recorded=0;
     updated=false;
+    settorecord=false;
 }
 
 
@@ -816,12 +857,20 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
 // constructor
 
 tv_oversigt::tv_oversigt() {
+    time_t rawtime;
+    struct tm *timelist;
     kanal_antal=0;
     strcpy(mysqllhost,"");
     strcpy(mysqlluser,"");
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
+    // get time now
+    time(&rawtime);
+    // convert clovk to localtime
+    timelist=localtime(&rawtime);
+    vistvguidekl=timelist->tm_hour;
+    if (vistvguidekl>24) vistvguidekl=0;
 }
 
 
@@ -831,7 +880,14 @@ tv_oversigt::~tv_oversigt() {
 }
 
 
-
+void tv_oversigt::reset_tvguide_time() {
+  time_t rawtime;
+  struct tm *timelist;
+  time(&rawtime);
+  timelist=localtime(&rawtime);
+  vistvguidekl=timelist->tm_hour;
+  if (vistvguidekl>24) vistvguidekl=0;
+}
 
 //
 // Clean tvprogram oversigt
@@ -1035,14 +1091,23 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 //
 // Find tv guide kanal med samme eller senere tidspunkt som tidspunkt og retunre hviken element i array som har den start tid
 // hvis ingen findes gå til start dvs array element 0
-// bruges ved pil up/down i tv kanal listen i vis_tv_oversigt
+// bruges ved pil up/down/left/right i tv kanal listen i vis_tv_oversigt
 //
 
 int tv_oversigt::findguidetvtidspunkt(int kanalnr,time_t tidspunkt) {
     int prgnr=0;
     bool fundet=false;
+    tidspunkt+=60*60;
     while((prgnr<tvkanaler[kanalnr].program_antal()) && (!(fundet))) {
-        if ((time_t) tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) prgnr++; else fundet=true;
+        if ((time_t) tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) {
+          if ((tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) && (tvkanaler[kanalnr].tv_prog_guide[prgnr].endtime_unix<tidspunkt)) prgnr++;
+          else fundet=true;
+        } else fundet=true;
+    }
+    if (fundet) {
+      while (((tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix<tidspunkt) && (tvkanaler[kanalnr].tv_prog_guide[prgnr].endtime_unix<tidspunkt)) && (prgnr<tvkanaler[kanalnr].program_antal())) {
+        prgnr++;
+      }
     }
     if (fundet) return(prgnr); else return(0);
 }
@@ -1054,6 +1119,9 @@ int tv_oversigt::findguidetvtidspunkt(int kanalnr,time_t tidspunkt) {
 time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
     if ((kanalnr>=0) && (kanalnr<kanal_antal)) return(tvkanaler[kanalnr].tv_prog_guide[prgnr].starttime_unix); else return(0);
 }
+
+
+
 
 
 
@@ -1074,6 +1142,9 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     time_t rawtime2;
     struct tm *timeinfo;
     struct tm *timeinfo2;
+    struct tm timeinfo3;
+    //struct tm timeinfo;
+    //struct tm timeinfo2;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -1088,26 +1159,39 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
     loading_tv_guide=true;
 
-    // is startid as args ?
+    // is startid as args ? 0
     if (nystarttid==0) {
-                                            // no get time now in a string format (yyyy-mm-dd hh:mm:ss)
-        rawtime=time(NULL);				     			// hent nu tid
-        rawtime2=time(NULL);					   	  // hent nu tid
-        rawtime2+=60*60*24;                 //  + 2 døgn
+        rawtime=rawtime2=time(NULL);				     			// hent nu tid
     } else {
         // hent ny starttid
-        rawtime=this->starttid;                // this
-        rawtime2=this->sluttid;                // this
+        rawtime=this->starttid;             // start tid type (time_t unix time)
+        rawtime2=this->starttid+(60*60*24); // end   tid type (time_t unix time)
     }
 
-    timeinfo = localtime (&rawtime);			                        		// lav om til local time
-    strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo );		      // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    timeinfo2= localtime ( &rawtime2 );	            		          		//
-    strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2 );		      // lav nu tids sting
+    timeinfo=localtime(&rawtime);			                        		// lav om til local time
+    timeinfo2=localtime(&rawtime2);	            		          		  // lav om til local time
+    // copy struct
+    timeinfo3.tm_mday=timeinfo->tm_mday;
+    timeinfo3.tm_mon=timeinfo->tm_mon;
+    timeinfo3.tm_year=timeinfo->tm_year;
+    timeinfo3.tm_min=timeinfo->tm_min;
+    timeinfo3.tm_sec=timeinfo->tm_sec;
+    timeinfo3.tm_hour=timeinfo->tm_hour;
+    timeinfo3.tm_wday=timeinfo->tm_wday;
+    timeinfo3.tm_isdst=timeinfo->tm_isdst;
+    timeinfo3.tm_mday+=1;
+    mktime(&timeinfo3);
+
+    //printf("raw start time %d  \nraw end time %d ",timeinfo->tm_mday,timeinfo2->tm_mday);
+
+    sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
+    sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
+    //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
+    //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
     printf("\nGet/update Tvguide.\n");
-    printf("Tvguide from %-20s to %-20s \n",dagsdato,enddate);
+    printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -1139,7 +1223,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
 
-        if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
+  //      if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -1151,11 +1235,49 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
                     strcpy(tmptxt,row[0]);                                        // rember channel name
+                    printf("Channel name : %s ",tvkanaler[kanalnr].getkanalname());
                 }
                 // select by tv_grab_xx nr in array
-                switch (aktiv_tv_graber.graberaktivnr) {
-                    // graber_dk
-                  case 0:
+                if (row[8]) {
+                  switch (aktiv_tv_graber.graberaktivnr) {
+                      // graber_dk
+                    case 0:
+                        if (strcmp(row[8],"None")!=0) {
+                          if (strcmp("series",row[9])==0) prgtype=1;
+                          else if (strcmp("movie",row[9])==0) prgtype=5;
+                          else if (strcmp("sport",row[9])==0) prgtype=2;
+                          else if (strcmp("cartoon",row[9])==0) prgtype=3;
+                          else if (strcmp("animation films",row[9])==0) prgtype=3;
+                          else if (strcmp("Animation films",row[9])==0) prgtype=3;
+                          else if (strcmp("news",row[9])==0) prgtype=4;
+                          else if (strcmp("nature",row[9])==0) prgtype=9;
+                          else prgtype=0;
+                        }
+                        break;
+                    case 1:
+                      // graber_dk
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
+                        else if (strcmp("dansk underholdning.",row[9])==0) prgtype=1;   //
+                        else if (strcmp("sport",row[9])==0) prgtype=2;                  //
+                        else if (strncmp("børn",row[9],4)==0) prgtype=3;                //
+                        else if (strncmp("dukkefilm",row[9],9)==0) prgtype=3;           //
+                        else if (strstr(row[9],"tegnefilm")!=0) prgtype=3;              //
+                        else if (strstr(row[9],"animationsfilm")!=0) prgtype=3;         //
+                        else if (strcmp("news",row[9])==0) prgtype=4;                   //
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                  //
+                        else if (strstr(row[9],"dokumentarserie")!=0) prgtype=6;        //
+                        else if (strcmp("engelsk madprogram",row[9])==0) prgtype=11;    //
+                        else if (strcmp("dansk reportageserie.",row[9])==0) prgtype=7;  //
+                        else if (strcmp("amerikansk krimi.",row[9])==0) prgtype=5;      //
+                        else if (strcmp("debatprogram.",row[9])==0) prgtype=7;          //
+                        else if (strcmp("music",row[9])==0) prgtype=8;                  //
+                        else if (strcmp("dyr",row[9])==0) prgtype=9;                    //
+                        else if (strcmp("none",row[9])==0) prgtype=0;                   //
+                        else prgtype=0;                                                 // default panic
+                      } else prgtype=0;                                                 // default panic
+                      break;
+                    case 2:
                       if (strcmp(row[8],"None")!=0) {
                         if (strcmp("series",row[9])==0) prgtype=1;
                         else if (strcmp("movie",row[9])==0) prgtype=5;
@@ -1168,208 +1290,174 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                         else prgtype=0;
                       }
                       break;
-                  case 1:
-                    // graber_dk
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
-                      else if (strcmp("dansk underholdning.",row[9])==0) prgtype=1;   //
-                      else if (strcmp("sport",row[9])==0) prgtype=2;                  //
-                      else if (strncmp("børn",row[9],4)==0) prgtype=3;                //
-                      else if (strncmp("dukkefilm",row[9],9)==0) prgtype=3;           //
-                      else if (strstr(row[9],"tegnefilm")!=0) prgtype=3;              //
-                      else if (strstr(row[9],"animationsfilm")!=0) prgtype=3;         //
-                      else if (strcmp("news",row[9])==0) prgtype=4;                   //
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                  //
-                      else if (strstr(row[9],"dokumentarserie")!=0) prgtype=6;        //
-                      else if (strcmp("engelsk madprogram",row[9])==0) prgtype=11;    //
-                      else if (strcmp("dansk reportageserie.",row[9])==0) prgtype=7;  //
-                      else if (strcmp("amerikansk krimi.",row[9])==0) prgtype=5;      //
-                      else if (strcmp("debatprogram.",row[9])==0) prgtype=7;          //
-                      else if (strcmp("music",row[9])==0) prgtype=8;                  //
-                      else if (strcmp("dyr",row[9])==0) prgtype=9;                    //
-                      else if (strcmp("none",row[9])==0) prgtype=0;                   //
-                      else prgtype=0;                                                 // default panic
-                    } else prgtype=0;                                                 // default panic
-                    break;
-                  case 2:
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("sport",row[9])==0) prgtype=2;
-                      else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                      else if (strcmp("animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("news",row[9])==0) prgtype=4;
-                      else if (strcmp("nature",row[9])==0) prgtype=9;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 3:
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("sport",row[9])==0) prgtype=2;
-                      else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                      else if (strcmp("animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                      else if (strcmp("news",row[9])==0) prgtype=4;
-                      else if (strcmp("nature",row[9])==0) prgtype=9;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 4:
-                    // graber_ar
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                      else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                      else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                      else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                      else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                      else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                      else if (strcmp("Cine",row[9])==0) prgtype=0;
-                      else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                      else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                      else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                  case 5:
-                      // graber_fi
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;
-                      else if (strcmp("movie",row[9])==0) prgtype=5;
-                      else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                      else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                      else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                      else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                      else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                      else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                      else if (strcmp("Cine",row[9])==0) prgtype=0;
-                      else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                      else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                      else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                      else if (strcmp("elokuvat",row[9])==0) prgtype=0;
-                      else if (strcmp("urheilu",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 6:
-                      // graber_tr
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          //
-                      else if (strcmp("film",row[9])==0) prgtype=5;                       //
-                      else if (strcmp("Life Style",row[9])==0) prgtype=7;                 //
-                      else if (strcmp("Aile",row[9])==0) prgtype=7;                       // Family
-                      else if (strcmp("Aksiyon",row[9])==0) prgtype=0;                    // Action film
-                      else if (strcmp("Animasyon",row[9])==0) prgtype=2;                  // Animation
-                      else if (strcmp("Belgesel",row[9])==0) prgtype=4;
-                      else if (strcmp("Bilim Kurgu",row[9])==0) prgtype=8;                // Science fiction
-                      else if (strcmp("Biyografi",row[9])==0) prgtype=0;
-                      else if (strcmp("Komedi",row[9])==0) prgtype=4;
-                      else if (strcmp("Animasyon",row[9])==0) prgtype=3;                  // kids
-                      else if (strcmp("Magazin",row[9])==0) prgtype=0;
-                      else if (strcmp("Eğlence",row[9])==0) prgtype=0;                    // Entertainment
-                      else if (strcmp("Haberler",row[9])==0) prgtype=4;                   // news
-                      else if (strcmp("Dram",row[9])==0) prgtype=1;                       // series
-                      else if (strcmp("Korku",row[9])==0) prgtype=0;
-                      else if (strcmp("Diğer",row[9])==0) prgtype=0;
-                      else if (strcmp("Gerilim",row[9])==0) prgtype=0;
-                      else if (strcmp("Yarışma",row[9])==0) prgtype=0;
-                      else if (strcmp("Polisiye",row[9])==0) prgtype=0;
-                      else if (strcmp("Çocuk",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 7:
-                    // graber_se_tvzon
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                      else if (strcmp("Adult",row[9])==0) prgtype=7;                 //
-                      else if (strcmp("Drama",row[9])==0) prgtype=7;                       // Family
-                      else if (strcmp("Crime",row[9])==0) prgtype=0;                    // Action film
-                      else if (strcmp("Mystery",row[9])==0) prgtype=2;                  // Animation
-                      else if (strcmp("sports",row[9])==0) prgtype=4;
-                      else if (strcmp("Sports",row[9])==0) prgtype=8;                // Science fiction
-                      else if (strcmp("Skiing",row[9])==0) prgtype=0;
-                      else if (strcmp("Soccer",row[9])==0) prgtype=4;
-                      else if (strcmp("Fencing",row[9])==0) prgtype=3;                  // kids
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                      else if (strcmp("Comedy",row[9])==0) prgtype=0;                    // Entertainment
-                      else if (strcmp("Adventure",row[9])==0) prgtype=4;                   // news
-                      else if (strcmp("Family",row[9])==0) prgtype=1;                       // series
-                      else if (strcmp("Fantasy",row[9])==0) prgtype=0;
-                      else if (strcmp("Series",row[9])==0) prgtype=0;
-                      else if (strcmp("Reality",row[9])==0) prgtype=0;
-                      else if (strcmp("Miniseries",row[9])==0) prgtype=0;
-                      else if (strcmp("TV Movie",row[9])==0) prgtype=0;
-                      else if (strcmp("Teleshopping",row[9])==0) prgtype=0;
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                      else if (strcmp("Sitcom",row[9])==0) prgtype=0;
-                      else if (strcmp("Documentary",row[9])==0) prgtype=0;
-                      else if (strcmp("Magazine",row[9])==0) prgtype=0;
-                      else if (strcmp("news",row[9])==0) prgtype=0;
-                      else if (strcmp("Romance",row[9])==0) prgtype=0;
-                      else if (strcmp("Sci-Fi",row[9])==0) prgtype=0;
-                      else if (strcmp("Action",row[9])==0) prgtype=0;
-                      else if (strcmp("Animation",row[9])==0) prgtype=0;
-                      else prgtype=0;
-                    }
-                    break;
-                  case 8:
-                    // tv_grab_eu_dotmedia dk ver
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;            //
-                      else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Drama",row[9])==0) prgtype=5;            //
-                      else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
-                      else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
-                      else if (strcmp("sports",row[9])==0) prgtype=4;           //
-                      else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
-                      else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
-                      else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
-                      else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
-                      else if (strcmp("Family",row[9])==0) prgtype=1;           // series
-                      else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
-                      else if (strcmp("Series",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Reality",row[9])==0) prgtype=0;          //
-                      else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
-                      else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
-                      else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
-                      else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
-                      else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
-                      else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
-                      else if (strcmp("news",row[9])==0) prgtype=4;             // news
-                      else if (strcmp("Romance",row[9])==0) prgtype=1;          //
-                      else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                      else if (strcmp("Animation",row[9])==0) prgtype=0;        //
-                      else prgtype=0;
-                    }
-                    break;
-                  case 10:
-                    // tv_grab_pt_meo
-                    if (strcmp(row[8],"None")!=0) {
-                      if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                      else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                      else prgtype=0;
-                    }
-                    break;
-                  default:
-                    prgtype=0;
-                }
+                    case 3:
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("sport",row[9])==0) prgtype=2;
+                        else if (strcmp("cartoon",row[9])==0) prgtype=3;
+                        else if (strcmp("animation films",row[9])==0) prgtype=3;
+                        else if (strcmp("Animation films",row[9])==0) prgtype=3;
+                        else if (strcmp("news",row[9])==0) prgtype=4;
+                        else if (strcmp("nature",row[9])==0) prgtype=9;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 4:
+                      // graber_ar
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
+                        else if (strcmp("Cine",row[9])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
+                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                    case 5:
+                        // graber_fi
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
+                        else if (strcmp("Cine",row[9])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
+                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
+                        else if (strcmp("elokuvat",row[9])==0) prgtype=0;
+                        else if (strcmp("urheilu",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 6:
+                        // graber_tr
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          //
+                        else if (strcmp("film",row[9])==0) prgtype=5;                       //
+                        else if (strcmp("Life Style",row[9])==0) prgtype=7;                 //
+                        else if (strcmp("Aile",row[9])==0) prgtype=7;                       // Family
+                        else if (strcmp("Aksiyon",row[9])==0) prgtype=0;                    // Action film
+                        else if (strcmp("Animasyon",row[9])==0) prgtype=2;                  // Animation
+                        else if (strcmp("Belgesel",row[9])==0) prgtype=4;
+                        else if (strcmp("Bilim Kurgu",row[9])==0) prgtype=8;                // Science fiction
+                        else if (strcmp("Biyografi",row[9])==0) prgtype=0;
+                        else if (strcmp("Komedi",row[9])==0) prgtype=4;
+                        else if (strcmp("Animasyon",row[9])==0) prgtype=3;                  // kids
+                        else if (strcmp("Magazin",row[9])==0) prgtype=0;
+                        else if (strcmp("Eğlence",row[9])==0) prgtype=0;                    // Entertainment
+                        else if (strcmp("Haberler",row[9])==0) prgtype=4;                   // news
+                        else if (strcmp("Dram",row[9])==0) prgtype=1;                       // series
+                        else if (strcmp("Korku",row[9])==0) prgtype=0;
+                        else if (strcmp("Diğer",row[9])==0) prgtype=0;
+                        else if (strcmp("Gerilim",row[9])==0) prgtype=0;
+                        else if (strcmp("Yarışma",row[9])==0) prgtype=0;
+                        else if (strcmp("Polisiye",row[9])==0) prgtype=0;
+                        else if (strcmp("Çocuk",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 7:
+                      // graber_se_tvzon
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
+                        else if (strcmp("Adult",row[9])==0) prgtype=7;                 //
+                        else if (strcmp("Drama",row[9])==0) prgtype=7;                       // Family
+                        else if (strcmp("Crime",row[9])==0) prgtype=0;                    // Action film
+                        else if (strcmp("Mystery",row[9])==0) prgtype=2;                  // Animation
+                        else if (strcmp("sports",row[9])==0) prgtype=4;
+                        else if (strcmp("Sports",row[9])==0) prgtype=8;                // Science fiction
+                        else if (strcmp("Skiing",row[9])==0) prgtype=0;
+                        else if (strcmp("Soccer",row[9])==0) prgtype=4;
+                        else if (strcmp("Fencing",row[9])==0) prgtype=3;                  // kids
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
+                        else if (strcmp("Comedy",row[9])==0) prgtype=0;                    // Entertainment
+                        else if (strcmp("Adventure",row[9])==0) prgtype=4;                   // news
+                        else if (strcmp("Family",row[9])==0) prgtype=1;                       // series
+                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;
+                        else if (strcmp("Series",row[9])==0) prgtype=0;
+                        else if (strcmp("Reality",row[9])==0) prgtype=0;
+                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;
+                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;
+                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
+                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;
+                        else if (strcmp("Documentary",row[9])==0) prgtype=0;
+                        else if (strcmp("Magazine",row[9])==0) prgtype=0;
+                        else if (strcmp("news",row[9])==0) prgtype=0;
+                        else if (strcmp("Romance",row[9])==0) prgtype=0;
+                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=0;
+                        else if (strcmp("Action",row[9])==0) prgtype=0;
+                        else if (strcmp("Animation",row[9])==0) prgtype=0;
+                        else prgtype=0;
+                      }
+                      break;
+                    case 8:
+                      // tv_grab_eu_dotmedia dk ver
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;            //
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Drama",row[9])==0) prgtype=5;            //
+                        else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
+                        else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
+                        else if (strcmp("sports",row[9])==0) prgtype=4;           //
+                        else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
+                        else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
+                        else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
+                        else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
+                        else if (strcmp("Family",row[9])==0) prgtype=1;           // series
+                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
+                        else if (strcmp("Series",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Reality",row[9])==0) prgtype=0;          //
+                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
+                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
+                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
+                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
+                        else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
+                        else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
+                        else if (strcmp("news",row[9])==0) prgtype=4;             // news
+                        else if (strcmp("Romance",row[9])==0) prgtype=1;          //
+                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
+                        else if (strcmp("Animation",row[9])==0) prgtype=0;        //
+                        else prgtype=0;
+                      }
+                      break;
+                    case 10:
+                      // tv_grab_pt_meo
+                      if (strcmp(row[8],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
+                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
+                        else prgtype=0;
+                      }
+                      break;
+                    default:
+                      prgtype=0;
+                  }
+                } else prgtype=0;
                 recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
                 if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
+                    printf(" Total programs loaded in channel %d \n",prgnr);
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;
@@ -1391,34 +1479,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
 
 
-
-
-
-void tv_oversigt::show_canal_names() {
-    int i;
-    int kanalantal;
-    float yofset=4.2f;
-//    float zofset=-110.0f;
-    // make boxes bihint canal name
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, _tvbar3);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    kanalantal=16;
-    i=0;
-    while (i<kanalantal) {
-        glLoadIdentity();
-        glTranslatef(-98, 27.8-(i*(yofset)), -99.5f-40); 	//
-        glRotatef(45.0f,0.0f, 0.0f, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(-10, -0.6, -10.0);
-        glTexCoord2f(1.0, 0.0); glVertex3f(7.0, -0.6 , -10.0);
-        glTexCoord2f(1.0, 1.0); glVertex3f(7.0, -6.4,-10.0);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-10, -6.4,-10.0);
-        glEnd();
-        i++;
-    }
-}
 
 
 
@@ -1547,6 +1607,13 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 }
 
 
+// set program to record flag
+
+void tv_oversigt::set_program_torecord(int selectchanel,int selectprg) {
+  if (selectchanel<=tv_kanal_antal()) tvkanaler[selectchanel].tv_prog_guide[selectprg].settorecord=true;
+}
+
+
 
 
 // vis_tv_oversigt
@@ -1554,7 +1621,12 @@ char * tv_oversigt::getprogram_prgname(int selectchanel,int selectprg) {
 // den som bruges
 
 
-void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,bool do_update_xmltv_show) {
+void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show) {
+
+  float now_text_color[3]={1.0f,1.0f,0.5f};
+  float now_text_clock_color[3]={1.0f,1.0f,0.0f};
+  float catalog_text_color[3]={1.0f,1.0f,1.0f};
+  float catalog_text_clock_color[3]={0.5f,1.0f,0.0f};
   struct tm *timeinfo;
   struct tm nowtime_h;
   time_t nutid;
@@ -1591,6 +1663,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   char tmptxt1[1024];
   time_t prgstarttid,prgendtid;
   starttid=time( NULL );
+  nutid=starttid;
   timeinfo=localtime(&starttid);
   switch(screen_size) {
     case 4: CHANELS_PR_LINE=5;
@@ -1683,11 +1756,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   timelist=localtime(&rawtime);
   // vis nu eller kl viskl ?
   //if (debugmode) printf("viskl=%d \n ",viskl);
-
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
-  if (viskl>24) viskl=0;
-  mytimelist.tm_hour=viskl;
-
+  if (vistvguidekl>24) vistvguidekl=0;
+  mytimelist.tm_hour=vistvguidekl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1698,7 +1769,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   //show do_update_xmltv_show
 
   // check if we get tvguide and show it
-  if (check_tvguide_process_running("tv_grab_dk_dr")==false) do_update_xmltv_show=false;
+  //if ((check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false)) do_update_xmltv_show=false;
   switch (configland) {
             // english
     case 0: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guiden %s %02d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
@@ -1757,9 +1828,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
   // reset to today after show time line
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
-  mytimelist.tm_hour=viskl;
-
-
+  mytimelist.tm_hour=vistvguidekl;
   mytimelist.tm_min=0;
   mytimelist.tm_mon=timelist->tm_mon;
   mytimelist.tm_sec=timelist->tm_sec;
@@ -1769,11 +1838,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   mytimelist.tm_isdst=timelist->tm_isdst;
   mktime(&mytimelist);
 
-  //if (mytimelist.tm_mday>1) mytimelist.tm_mday--;
-
   mytimelist.tm_hour=timelist->tm_hour;
-  //if (viskl>0) mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
-  mytimelist.tm_hour=viskl;                                 // timelist->tm_hour;
+  //if (viskl>0) mytimelist.tm_hour=viskl;                                      // timelist->tm_hour;
+  mytimelist.tm_hour=vistvguidekl;                                              // timelist->tm_hour;
 
   kanalnr=0+cstartofset;
 
@@ -1794,6 +1861,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
   //
   // loop for channel
   //
+
   while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -1823,13 +1891,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
     //printf("kanal nr %10d navn %40s \n",kanalnr,tvkanaler[kanalnr].chanel_name);
 
-
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
-    //
+    // mytime = overskrift tid
+    // tt = tid som går fra maxtid nederst på skærmen starttid + 2 timer
+
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
+
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
 
@@ -1838,7 +1908,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
       prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
-      // show program start before over view time start
+
+      //printf("tt=%d %s progrm start tid %d \n",tt,ctime(&tt),prgstarttid);
+
+      // show program start before over view time start and end tine after view time start
       if ((prgstarttid<=mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
         // calc new length for ysiz
@@ -1851,7 +1924,61 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+//        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
+          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+        } else {
+          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+            case 0:
+              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+              break;
+            case 1:
+              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+              break;
+            case 2:
+              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+              break;
+            case 3:
+              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+              break;
+            case 4:
+              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+              break;
+            case 5:
+              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+              break;
+            case 6:
+              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+              break;
+            case 7:
+              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+              break;
+            case 8:
+              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+              break;
+            case 9:
+              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+              break;
+            case 10:
+              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+              break;
+            case 11:
+              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+              break;
+            case 12:
+              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+              break;
+            case 13:
+              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+              break;
+            case 14:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+              break;
+            default:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              break;
+          }
+        }
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         //_textureutvbgmask
         if (_textureutvbgmask) {
@@ -1872,6 +1999,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
 
         // show program stat + end tid hvis plads
         if (prglength>13) {
+          // show start time
           glPushMatrix();
           glDisable(GL_TEXTURE_2D);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime+11);
@@ -1882,6 +2010,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
           glTranslatef(xpos+20,ypos-7, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
           glColor3f(0.5f,0.5f, 0.5f);		// rejser
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);	    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
           glPopMatrix();
@@ -1894,6 +2023,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         if (prglength>13) glTranslatef(xpos+20,ypos-22, 0.0f); else glTranslatef(xpos+20,ypos-7, 0.0f);
         glScalef(textsize1, textsize1, 1.0f);
         glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);    // active program color
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         glcRenderString(tmptxt);                                              // print program name
         glPopMatrix();
@@ -1911,57 +2041,61 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-        switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
-          case 0:
-            glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
-            break;
-          case 1:
-            glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
-            break;
-          case 2:
-            glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
-            break;
-          case 3:
-            glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
-            break;
-          case 4:
-            glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
-            break;
-          case 5:
-            glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
-            break;
-          case 6:
-            glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
-            break;
-          case 7:
-            glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
-            break;
-          case 8:
-            glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
-            break;
-          case 9:
-            glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
-            break;
-          case 10:
-            glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-            break;
-          case 11:
-            glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-            break;
-          case 12:
-            glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-            break;
-          case 13:
-            glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-            break;
-          case 14:
-            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-            break;
-          default:
-            glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
-            break;
+
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
+          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+        } else {
+          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+            case 0:
+              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+              break;
+            case 1:
+              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+              break;
+            case 2:
+              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+              break;
+            case 3:
+              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+              break;
+            case 4:
+              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+              break;
+            case 5:
+              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+              break;
+            case 6:
+              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+              break;
+            case 7:
+              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+              break;
+            case 8:
+              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+              break;
+            case 9:
+              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+              break;
+            case 10:
+              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
+              break;
+            case 11:
+              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
+              break;
+            case 12:
+              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
+              break;
+            case 13:
+              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
+              break;
+            case 14:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+              break;
+            default:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              break;
+          }
         }
-        //
         // if select program
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         if (_textureutvbgmask) {
@@ -1990,6 +2124,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
           *(tmptxt+21)='\0';
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);	    // active program color
           glcRenderString(tmptxt);
           glPopMatrix();
           glPushMatrix();
@@ -2001,8 +2136,16 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
+
+          if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
+            glColor3f(1.0f,0.0f,0.0f);
+            glcRenderString(" R");
+            ask_tv_record=false;
+          }
+
           glPopMatrix();
         } else {
           glPushMatrix();
@@ -2011,8 +2154,16 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
           glDisable(GL_TEXTURE_2D);
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
+          if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);   // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
           glcRenderString(tmptxt);
+
+          if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
+            glColor3f(1.0f,0.0f,0.0f);
+            glcRenderString(" R");
+            ask_tv_record=false;
+          }
+
           glPopMatrix();
         }
         barsize=barsize+(prglength*5);
@@ -2020,11 +2171,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,int viskl,
       }
       prg_nr++;                                                                 // next program
     }
+
     kanalomgang+=kanalomgangofset;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
   }
+
+
 
   // show clock line over tvguide
   //
@@ -2281,6 +2435,9 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
 
 
 
+
+
+
 //
 //*******************************************************************************************************************************//
 //
@@ -2292,8 +2449,9 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
 
 earlyrecorded::earlyrecorded() {
     for(int i=0;i<199;i++) {
-        strcpy(this->programinfo[i].name,"");
-        strcpy(this->programinfo[i].dato,"");
+        strcpy(this->programinfo[i].name,"ABC");
+        strcpy(this->programinfo[i].dato,"2017-01-01");
+        strcpy(this->programinfo[i].endtime,"");
     }
 }
 
@@ -2414,6 +2572,8 @@ char *read_stream(char *stream,size_t size, void *d) {
     return c;
 }
 
+
+
 //
 // load recorded history not programs
 //
@@ -2486,9 +2646,32 @@ void earlyrecorded::getrecordprogram(char *mysqlhost,char *mysqluser,char *mysql
 //
 
 void earlyrecorded::showtvreclist() {
-//    char tmptxt[200];
-    int i;
-//    glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+  // background
+  //glLoadIdentity();
+  int i=0;
+  glEnable(GL_TEXTURE);
+  glEnable(GL_BLEND);
+  glTranslatef(0.0f, 0.0f, 0.0f);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);                    //_texturemovieinfobox
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),100 , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
+  glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+800,800 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,100 , 0.0);
+  glEnd();
+  glcRenderString(upcommingrec);
+  glRasterPos2f(2.0f, 2.0f);
+  glcRenderString("fdfdsfd");
+  while((i<this->antal) && (i<50)) {
+    glcRenderString(this->programinfo[i].name);
+  }
+
+
+/*
 
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // mask
@@ -2561,6 +2744,6 @@ void earlyrecorded::showtvreclist() {
     glTexCoord2f(1.0, 1.0); glVertex3f(7.5f, 5, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-7.5f, 5, 0.0);
     glEnd();
-
+*/
     // End button 1
 }

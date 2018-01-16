@@ -1,6 +1,25 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
+// debug modes
+// 1  = wifi net
+// 2  = music
+// 4  = stream
+// 8  = keyboard/mouse move
+// 16 = movie
+// 32 = searcg
+// 128= stream search
+// 256 = tv program stuf
+// 512 = media importer
+// 1024 = flag loader
+
+
+//
+// xmltv update interval in sec
+// default 2 * 60 min
+//
+const int doxmltvupdateinterval=60*60*2;
+
 // screen saver options
 
 // 3D         - Do not work right now
