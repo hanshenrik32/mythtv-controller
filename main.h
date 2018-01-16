@@ -1,6 +1,12 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
+//
+// xmltv update interval in sec
+// default 2 * 60 min
+//
+const int doxmltvupdateinterval=60*60*2;
+
 // screen saver options
 
 // 3D         - Do not work right now

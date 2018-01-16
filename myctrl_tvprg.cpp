@@ -1182,7 +1182,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     timeinfo3.tm_mday+=1;
     mktime(&timeinfo3);
 
-    printf("raw start time %d  \nraw end time %d ",timeinfo->tm_mday,timeinfo2->tm_mday);
+    //printf("raw start time %d  \nraw end time %d ",timeinfo->tm_mday,timeinfo2->tm_mday);
+
     sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
     sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
     //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );

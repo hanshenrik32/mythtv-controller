@@ -2199,13 +2199,14 @@ void show_background() {
 // *********************** MAIN LOOP *********************************************************************************
 //
 
+static bool do_update_xmltv_show=false;
+
 void display() {
     // used by xmltv updater func
     static bool getstarttidintvguidefromarray=true;
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
-    static bool do_update_xmltv_show=false;
 
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2328,18 +2329,10 @@ void display() {
         visur=true;
     }
 
-    // first time startup (get hour)
-    // used in tvguide
-    /*
-    if (startup) {
-      aktiv_tv_oversigt.vistvguidekl=timeinfo->tm_hour;
-      startup=false;
-    }
-    */
-
     // make xmltv update
     today=time(NULL);
-    if (((lasttoday+(60*60*24)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
+    // update interval
+    if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {         //60*60*24
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
       lasttoday=today;                                      // rember last update
       do_update_xmltv=true;                                 // do update tvguide
@@ -2609,8 +2602,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
 
-
-
         if (vis_uv_meter==false) {
           if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt))) {
 
@@ -2631,8 +2622,6 @@ void display() {
         }
         glPopMatrix();
     }
-
-
 
     // radio stuf
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
@@ -2809,10 +2798,11 @@ void display() {
       } else if (vis_tv_oversigt) {
 
         // show tv guide
-        std::clock_t    start;
+        // take time on it
+        std::clock_t start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
+        if (debugmode & 1 ) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
 
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
@@ -7577,6 +7567,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       // u key
                       // Update tv guide
                       printf("Update tv guide\n");
+                      do_update_xmltv_show=true;
                       loading_tv_guide=true;
                       if (strcmp(configbackend,"mythtv")==0) {
                         update_xmltv_phread_loader();                   // start thred update flag in main loop
@@ -9601,6 +9592,8 @@ void *datainfoloader_xmltv(void *data) {
   // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
   printf("parser xmltv guide done.\n");
+  // set update flag for done
+  do_update_xmltv_show=false;
   //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }
@@ -10599,7 +10592,7 @@ int main(int argc, char** argv) {
     if (debugmode) {
       fprintf(stderr,"Debug mode selected %d",debugmode);
     }
-    if ((full_screen) && (debugmode)) fprintf(stderr,"Full screen mode.\n");
+    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
 
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
@@ -10770,12 +10763,7 @@ int main(int argc, char** argv) {
 
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
 
-    // test
-    //aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
     //aktivfont.updatefontlist();
-
     //aktivfont.selectfont((char *) "Tlwg Mono");
 
     // select font from configfile (/etc/mythtv-controller.conf)
