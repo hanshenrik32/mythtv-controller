@@ -76,25 +76,25 @@ extern bool loading_tv_guide;
 //extern earlyrecorded oldrecorded;
 //extern earlyrecorded newtcrecordlist;
 
+const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       0 - 5*/
+                              0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         6 - 11*/
+                              1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    12 - 17*/
+                               0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        18 - 23*/
+                               0.91f,0.76f, 0.65f ,0.0f,0.5f,0.9f,              /* Sci fi, Cimedies     24 - 29*/
+                              0.8f,0.8f,0.7f ,0.2f,0.3f,0.2f,                   /* Romance, Thriller    30 - 35*/
+                              0.8f,0.3f,0.8f ,0.3f,0.2f,0.5f,                   /* Fiction, Musical     36 - 41*/
+                              0.6f,0.6f,0.6f ,0.5f,0.5f,0.5f,                   /* wae,     Documentary 42 - 47*/
+                              0.2f,0.8f,0.3f ,0.8f,0.2f,0.6f,                   /* Series,  Kids        48 - 53*/
+                              0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      54 - 59*/
+                              0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      60 - 65*/
+                              0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    66 - 71*/
+                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f,                   /*none,  ukendt (last)  72 - 77*/
+                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f,                   /*none,  ukendt (last)  78 - 83*/
+                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  84 - 89*/
 
-const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
-                              0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         */
-                              1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    */
-                               0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        */
-                               0.91f,0.76f, 0.65f ,0.0f,0.5f,0.9f,              /* Sci fi, Cimedies     */
-                              0.8f,0.8f,0.7f ,0.2f,0.3f,0.2f,                   /* Romance, Thriller    */
-                              0.8f,0.3f,0.8f ,0.3f,0.2f,0.5f,                   /* Fiction, Musical     */
-                              0.6f,0.6f,0.6f ,0.5f,0.5f,0.5f,                   /* wae,     Documentary */
-                              0.2f,0.8f,0.3f ,0.8f,0.2f,0.6f,                   /* Series,  Kids        */
-                              0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      */
-                              0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      */
-                              0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    */
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  */
 
 
-
-
-const char *prgtypee[2*12]={"Action"," Series",
+const char *prgtypee[]={"Action"," Series",
                             "News","Kids",
                             " Music","Animation",
                             " Horror"," Drama",
@@ -104,6 +104,38 @@ const char *prgtypee[2*12]={"Action"," Series",
                             "War"," Doc.",
                             "Adventure","Comedie",
                             "Documentary","Adult",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
+                            "Sport","Miniseries",
                             "Sport","Miniseries",
                             "None","Unknown"};
 
@@ -2185,10 +2217,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
               glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
               break;
             case 15:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // sport
+              glColor3f(prgtypeRGB[45], prgtypeRGB[46], prgtypeRGB[47]);		    // sport
               break;
             default:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              glColor3f(prgtypeRGB[48], prgtypeRGB[49], prgtypeRGB[50]);		    // default
               break;
           }
         }
