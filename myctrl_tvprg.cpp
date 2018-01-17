@@ -405,6 +405,8 @@ int tv_oversigt::loadparsexmltvdb() {
 // return >0 on error
 
 int tv_oversigt::parsexmltv(const char *filename) {
+  char *token;
+  bool prgtype;
   xmlChar *content;
   xmlChar *content1;
   char userhomedir[200];
@@ -571,9 +573,90 @@ int tv_oversigt::parsexmltv(const char *filename) {
             if (strcmp((char *) node->name,"programme")==0) {
               content = xmlNodeGetContent(node);
               if (content) {
+                strcpy(category,"");
+                prgtype=false;
                 strcpy(result,(char *) content);
                 s=trimwhitespace(result);
                 getfirstlinefromstring(prgtitle,s);
+                token=strtok((char *) content,"\n");
+                while(token) {
+//                  printf("*%s*  %d \n ",token,strlen(token));
+                  if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                    strcpy(category,"Series");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                    strcpy(category,"Fantasy");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                    strcpy(category,"Dokumentar");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                    strcpy(category,"Reality");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                    strcpy(category,"Adventure");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                    strcpy(category,"Action");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                    strcpy(category,"Thriller");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                    strcpy(category,"Romance");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                    strcpy(category,"Mystery");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                    strcpy(category,"Sport");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                    strcpy(category,"Sport");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                    strcpy(category,"Comedy");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                    strcpy(category,"Tvshow");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                    strcpy(category,"War");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                    strcpy(category,"Documentary");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                    strcpy(category,"Lifestyle");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                    strcpy(category,"News");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                    strcpy(category,"Entertainment");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                    strcpy(category,"Movie");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                    strcpy(category,"Nature");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                    strcpy(category,"Gameshow");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                    strcpy(category,"Animation");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                    strcpy(category,"Animation");
+                    prgtype=true;
+                  } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                    strcpy(category,"Drama");
+                    prgtype=true;
+                  }
+                  token=strtok(NULL,"'\n");
+                }
+
                 //printf("\t Program : %s \n",s);
                 //xmlFree(content);
               }
@@ -1407,36 +1490,43 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     case 8:
                       // tv_grab_eu_dotmedia dk ver
                       if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;                // series
-                        else if (strcmp("movie",row[9])==0) prgtype=5;            //
-                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Drama",row[9])==0) prgtype=5;            //
-                        else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
-                        else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
-                        else if (strcmp("sports",row[9])==0) prgtype=4;           //
-                        else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
-                        else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
-                        else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
-                        else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
-                        else if (strcmp("Family",row[9])==0) prgtype=1;           // series
-                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
-                        else if (strcmp("Series",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Reality",row[9])==0) prgtype=0;          //
-                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
-                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
-                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
-                        else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
-                        else if (strcmp("news",row[9])==0) prgtype=4;             // news
-                        else if (strcmp("Romance",row[9])==0) prgtype=1;          //
-                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Animation",row[9])==0) prgtype=0;        //
+                        if (strcmp("series",row[8])==0) prgtype=1;                // series
+                        else if (strcmp("Movie",row[8])==0) prgtype=5;            //
+                        else if (strcmp("Action",row[8])==0) prgtype=5;           //
+                        else if (strcmp("Drama",row[8])==0) prgtype=5;            //
+                        else if (strcmp("Crime",row[8])==0) prgtype=5;            // Action film
+                        else if (strcmp("Mystery",row[8])==0) prgtype=5;          //
+                        else if (strcmp("sports",row[8])==0) prgtype=4;           //
+                        else if (strcmp("Sports",row[8])==0) prgtype=4;           //
+                        else if (strcmp("Skiing",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Soccer",row[8])==0) prgtype=4;           //
+                        else if (strcmp("Fencing",row[8])==0) prgtype=3;          // kids
+                        else if (strcmp("tvshow",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Tvshow",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Comedy",row[8])==0) prgtype=0;           // Entertainment
+                        else if (strcmp("Adventure",row[8])==0) prgtype=4;        // news
+                        else if (strcmp("Family",row[8])==0) prgtype=1;           // series
+                        else if (strcmp("Fantasy",row[8])==0) prgtype=5;          //
+                        else if (strcmp("Series",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Reality",row[8])==0) prgtype=0;          //
+                        else if (strcmp("Miniseries",row[8])==0) prgtype=0;       //
+                        else if (strcmp("TV Movie",row[8])==0) prgtype=0;         //
+                        else if (strcmp("Teleshopping",row[8])==0) prgtype=0;     //
+                        else if (strcmp("tvshow",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Sitcom",row[8])==0) prgtype=0;           //
+                        else if (strcmp("Documentary",row[8])==0) prgtype=0;      //
+                        else if (strcmp("Magazine",row[8])==0) prgtype=0;         //
+                        else if (strcmp("News",row[8])==0) prgtype=4;             // news
+                        else if (strcmp("Romance",row[8])==0) prgtype=1;          //
+                        else if (strcmp("Sci-Fi",row[8])==0) prgtype=5;           //
+                        else if (strcmp("Action",row[8])==0) prgtype=5;           //
+                        else if (strcmp("Animation",row[8])==0) prgtype=0;        //
+                        else if (strcmp("Documentary",row[8])==0) prgtype=0;      //
+                        else if (strcmp("Lifestyle",row[8])==0) prgtype=7;        //
+                        else if (strcmp("Entertainment",row[8])==0) prgtype=7;    //
+                        else if (strcmp("Nature",row[8])==0) prgtype=7;           //
+                        else if (strcmp("War",row[8])==0) prgtype=5;              //
+                        else if (strcmp("Animation",row[8])==0) prgtype=5;        //
                         else prgtype=0;
                       }
                       break;
@@ -1974,6 +2064,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
             case 14:
               glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
               break;
+            case 15:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // sport
+              break;
             default:
               glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
               break;
@@ -2090,6 +2183,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
               break;
             case 14:
               glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
+              break;
+            case 15:
+              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // sport
               break;
             default:
               glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
