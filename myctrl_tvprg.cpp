@@ -76,21 +76,16 @@ extern bool loading_tv_guide;
 //extern earlyrecorded oldrecorded;
 //extern earlyrecorded newtcrecordlist;
 
-const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       0 - 5*/
-                              0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         6 - 11*/
-                              1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    12 - 17*/
-                               0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        18 - 23*/
-                               0.91f,0.76f, 0.65f ,0.0f,0.5f,0.9f,              /* Sci fi, Cimedies     24 - 29*/
-                              0.8f,0.8f,0.7f ,0.2f,0.3f,0.2f,                   /* Romance, Thriller    30 - 35*/
-                              0.8f,0.3f,0.8f ,0.3f,0.2f,0.5f,                   /* Fiction, Musical     36 - 41*/
-                              0.6f,0.6f,0.6f ,0.5f,0.5f,0.5f,                   /* wae,     Documentary 42 - 47*/
-                              0.2f,0.8f,0.3f ,0.8f,0.2f,0.6f,                   /* Series,  Kids        48 - 53*/
-                              0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      54 - 59*/
-                              0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      60 - 65*/
-                              0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    66 - 71*/
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f,                   /*none,  ukendt (last)  72 - 77*/
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f,                   /*none,  ukendt (last)  78 - 83*/
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  84 - 89*/
+const float prgtypeRGB[]={    0.2f,0.8f,0.2f,               // 1 - kids
+                              0.5f,0.9f,0.0f,               // 2 - sport
+                              0.2f,0.8f,0.2f,               // 3 - cartoons
+                              0.5f,0.9f,0.0f,               // 4 - news
+                              1.0f,0.7f,1.0f,               // 5 - movies
+                              0.5f,0.9f,0.0f,               // 6 - natur
+                              0.0f,0.5f,0.0f,               // 7 - Documentary
+                              0.5f,0.1f,0.1f,               // 8 - Entertainment
+                              1.0f,0.498039f,0.0f,          // 9 - Sci-Fi
+                              0.1f,0.2f,0.1f};              // 10 - Series
 
 
 
@@ -1522,41 +1517,40 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     case 8:
                       // tv_grab_eu_dotmedia dk ver
                       if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[8])==0) prgtype=1;                // series
+                        if (strcmp("series",row[8])==0) prgtype=10;                // series
                         else if (strcmp("Movie",row[8])==0) prgtype=5;            //
                         else if (strcmp("Action",row[8])==0) prgtype=5;           //
                         else if (strcmp("Drama",row[8])==0) prgtype=5;            //
                         else if (strcmp("Crime",row[8])==0) prgtype=5;            // Action film
                         else if (strcmp("Mystery",row[8])==0) prgtype=5;          //
-                        else if (strcmp("sports",row[8])==0) prgtype=4;           //
-                        else if (strcmp("Sports",row[8])==0) prgtype=4;           //
+                        else if (strcmp("sports",row[8])==0) prgtype=2;           //
+                        else if (strcmp("Sports",row[8])==0) prgtype=2;           //
                         else if (strcmp("Skiing",row[8])==0) prgtype=0;           //
-                        else if (strcmp("Soccer",row[8])==0) prgtype=4;           //
+                        else if (strcmp("Soccer",row[8])==0) prgtype=2;           //
                         else if (strcmp("Fencing",row[8])==0) prgtype=3;          // kids
-                        else if (strcmp("tvshow",row[8])==0) prgtype=0;           //
-                        else if (strcmp("Tvshow",row[8])==0) prgtype=0;           //
-                        else if (strcmp("Comedy",row[8])==0) prgtype=0;           // Entertainment
-                        else if (strcmp("Adventure",row[8])==0) prgtype=4;        // news
+                        else if (strcmp("Tvshow",row[8])==0) prgtype=8;           //
+                        else if (strcmp("Comedy",row[8])==0) prgtype=8;           // Entertainment
+                        else if (strcmp("Adventure",row[8])==0) prgtype=5;        //
                         else if (strcmp("Family",row[8])==0) prgtype=1;           // series
                         else if (strcmp("Fantasy",row[8])==0) prgtype=5;          //
                         else if (strcmp("Series",row[8])==0) prgtype=0;           //
-                        else if (strcmp("Reality",row[8])==0) prgtype=0;          //
+                        else if (strcmp("Reality",row[8])==0) prgtype=8;          //
                         else if (strcmp("Miniseries",row[8])==0) prgtype=0;       //
-                        else if (strcmp("TV Movie",row[8])==0) prgtype=0;         //
+                        else if (strcmp("TV Movie",row[8])==0) prgtype=8;         //
                         else if (strcmp("Teleshopping",row[8])==0) prgtype=0;     //
-                        else if (strcmp("tvshow",row[8])==0) prgtype=0;           //
+                        else if (strcmp("tvshow",row[8])==0) prgtype=8;           //
                         else if (strcmp("Sitcom",row[8])==0) prgtype=0;           //
                         else if (strcmp("Documentary",row[8])==0) prgtype=0;      //
                         else if (strcmp("Magazine",row[8])==0) prgtype=0;         //
                         else if (strcmp("News",row[8])==0) prgtype=4;             // news
-                        else if (strcmp("Romance",row[8])==0) prgtype=1;          //
-                        else if (strcmp("Sci-Fi",row[8])==0) prgtype=5;           //
+                        else if (strcmp("Romance",row[8])==0) prgtype=5;          //
+                        else if (strcmp("Sci-Fi",row[8])==0) prgtype=9;           //
                         else if (strcmp("Action",row[8])==0) prgtype=5;           //
-                        else if (strcmp("Animation",row[8])==0) prgtype=0;        //
-                        else if (strcmp("Documentary",row[8])==0) prgtype=0;      //
-                        else if (strcmp("Lifestyle",row[8])==0) prgtype=7;        //
+                        else if (strcmp("Animation",row[8])==0) prgtype=3;        //
+                        else if (strcmp("Documentary",row[8])==0) prgtype=7;      //
+                        else if (strcmp("Lifestyle",row[8])==0) prgtype=8;        //
                         else if (strcmp("Entertainment",row[8])==0) prgtype=7;    //
-                        else if (strcmp("Nature",row[8])==0) prgtype=7;           //
+                        else if (strcmp("Nature",row[8])==0) prgtype=6;           //
                         else if (strcmp("War",row[8])==0) prgtype=5;              //
                         else if (strcmp("Animation",row[8])==0) prgtype=5;        //
                         else prgtype=0;
@@ -2052,55 +2046,40 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         } else {
           switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
             case 0:
-              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
+              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none
               break;
             case 1:
-              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
+              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // kids
               break;
             case 2:
-              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
+              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // sport
               break;
             case 3:
-              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
+              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // cartoon
               break;
             case 4:
-              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
+              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// news
               break;
             case 5:
-              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
+              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // movie
               break;
             case 6:
-              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
+              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// natur
               break;
             case 7:
-              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
+              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// Documentary
               break;
             case 8:
-              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
+              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// Entertainment
               break;
             case 9:
-              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
+              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // Sci-Fi
               break;
             case 10:
-              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-              break;
-            case 11:
-              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-              break;
-            case 12:
-              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-              break;
-            case 13:
-              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-              break;
-            case 14:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-              break;
-            case 15:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // sport
+              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // serier
               break;
             default:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
+              glColor3f(1.0f, 1.0f, 1.0f);		    // default
               break;
           }
         }
