@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+// opengl
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <IL/il.h>
@@ -9,7 +10,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <dirent.h>                     // dir functions
-#include <netinet/in.h>
+#include <netinet/in.h>                 // hostname
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <fcntl.h>
@@ -23,8 +24,9 @@
 #include <vlc/vlc.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
-
+// time
 #include <ctime>
+// file io
 #include <iostream>
 
 extern char   __BUILD_DATE;
@@ -100,6 +102,7 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
+bool xmltvguide_in_colors=true;                         // show tv guide in colors
 
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -10651,7 +10654,7 @@ int main(int argc, char** argv) {
       }
     }
 
-    
+
 
 /*
     // xmltv loader
