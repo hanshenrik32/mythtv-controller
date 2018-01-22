@@ -3502,7 +3502,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                         break;
                       // graber_dk
                       // Grab TV listings for Denamrk
-                    case 19:                                                    // tv_grab_tr
                     case 2:                                                     // tv_grab_nl
                     case 4:                                                     // tv_grab_il
                     case 5:                                                     // tv_grab_na_tvmedia
@@ -3516,7 +3515,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     case 15:                                                    // tv_grab_it
                     case 16:                                                    // tv_grab_is
                     case 17:                                                    // tv_grab_fi_sv
-                    case 18:                                                    // tv_grab_tr
+                    case 18:                                                    // tv_grab_na_dtv
+                    case 19:                                                    // tv_grab_tr
                     case 20:                                                    // tv_grab_eu_egon
                     case 21:                                                    // tv_grab_dk_dr
                     case 22:                                                    // tv_grab_se_tvzon

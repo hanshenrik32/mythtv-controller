@@ -669,6 +669,7 @@ GLuint _textureIdloading1;                  // empty window
 
 // setup menu textures
 GLuint setuptexture;
+GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
 GLuint setupnetworkback;
@@ -10124,6 +10125,7 @@ void loadgfx() {
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
+    setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
     _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "music");
     _textureIdfilm       	= loadgfxfile(temapath,(char *) "buttons/",(char *) "movie");
@@ -10318,6 +10320,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
+    glDeleteTextures( 1, &setuptvgraberback);           // bryges af setup tv graber
     glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
     glDeleteTextures( 1, &_textureIdmusic);			        // music
     glDeleteTextures( 1, &_textureIdfilm);			        // default film icon

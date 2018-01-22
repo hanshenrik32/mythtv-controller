@@ -72,6 +72,7 @@ extern int configdefaultplayer_screenmode;
 extern int configland;
 extern char *configlandsprog[];
 extern int configxbmcver;
+extern GLuint setuptvgraberback;
 extern GLuint _texturesetupclose;
 extern GLuint setuptexture;
 extern GLuint _texturesoundsetup;
@@ -3487,7 +3488,7 @@ void show_setup_tv_graber(int startofset) {
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
+    glBindTexture(GL_TEXTURE_2D,setuptvgraberback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
@@ -3574,10 +3575,13 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==0) {
-        strcpy(keybuffer,aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
-        myglprint4((char *) keybuffer);   // keybuffer
+      if (aktiv_tv_graber.graberaktivnr==1) sprintf(keybuffer,"%s (reg is required on homepage) %d",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr],aktiv_tv_graber.graberaktivnr);
+      else sprintf(keybuffer,"%s %d",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr],aktiv_tv_graber.graberaktivnr);
+      myglprint4((char *) keybuffer);   // keybuffer
     } else {
-        myglprint4((char *) aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      if (aktiv_tv_graber.graberaktivnr==1) sprintf(keybuffer,"%s (reg is required on homepage)",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      else sprintf(keybuffer,"%s",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      myglprint4((char *) keybuffer);
     }
     glPopMatrix();
 
