@@ -148,7 +148,7 @@ int get_tvguide_fromweb() {
     strcpy(exestring,configbackend_tvgraber);
     if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    printf("Start tv graber background process %s\n",configbackend_tvgraber);
+    printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
     result=system(exestring);   // do it
     printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");

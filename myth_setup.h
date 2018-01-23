@@ -13,8 +13,8 @@ struct tv_graber_config {
   int graberantal=25;
   int graberaktivnr=0;                                                          // active tvguide nr in list
   const char *graberland[35]={"None","North America","Netherlands","Spain","Israel","North America","Latin America (not working)","Osa 9/10","Europe tv (dk)","Sweden",
-                              "Portugal","France","United Kingdom","Hungary/Romania","Switzerland","Italy","Iceland","Finland","North America","Tyrkiye",
-                              "German speaking area","Danmark","Sweden","Argentina","France","UK","schedulesdirect"};
+                              "Portugal (Not work)","France (Not work)","United Kingdom","Hungary/Romania (Not work)","Switzerland","Italy","Iceland (Not work)","Finland (Not work)","North America (need zip reg)","Tyrkiye",
+                              "German speaking area","Danmark","Sweden","Argentina","France (reg req)","UK","schedulesdirect (reg req)"};
   const char *grabercmd[35]={"","tv_grab_na_dd","tv_grab_nl","tv_grab_es_laguiatv","tv_grab_il","tv_grab_na_tvmedia","tv_grab_dtv_la","tv_grab_fi","tv_grab_eu_dotmedia","tv_grab_se_swedb",
                             "tv_grab_pt_meo","tv_grab_fr","tv_grab_uk_bleb","tv_grab_huro","tv_grab_ch_search","tv_grab_it","tv_grab_is","tv_grab_fi_sv","tv_grab_na_dtv","tv_grab_tr",
                             "tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide","tv_grab_zz_sdjson"};
