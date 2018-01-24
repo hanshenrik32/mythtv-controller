@@ -6176,6 +6176,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
         }
 
+        // scroll tv guide up/down
+        if (vis_tv_oversigt) {
+          // scroll tv guide down
+          if ((retfunc==2) || (button==4)) { // scroll button
+            if (aktiv_tv_oversigt.vistvguidekl<24*2) aktiv_tv_oversigt.vistvguidekl++;
+          }
+          // scroll up
+          if ((retfunc==1) || (button==3)) {
+            if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
+          }
+        }
+
         // scroll film up/down
         if (vis_film_oversigt) {
             if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+16<film_oversigt.film_antal()-1)) {
@@ -6292,6 +6304,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     }
 //    printf("button = %d \n",button);
 }
+
+
 
 unsigned int hourtounixtime(int hour) {
   time_t nutid;
