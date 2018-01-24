@@ -565,7 +565,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
               }
             }
 
-            printf("aktiv_tv_graber.graberaktivnr %d graber %s \n ",aktiv_tv_graber.graberaktivnr,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+//            printf("aktiv_tv_graber.graberaktivnr %d graber %s \n ",aktiv_tv_graber.graberaktivnr,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
 
 
             // create tv programs in guide from xmltag programme
@@ -3493,7 +3493,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
                     strcpy(tmptxt,row[0]);                                        // rember channel name
-                    printf("Channel name : %s ",tvkanaler[kanalnr].getkanalname());
+                    printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
                 }
                 // select by tv_grab_xx nr in array
                 if (row[8]) {
@@ -3604,7 +3604,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
-                    printf(" Total programs loaded in channel %d \n",prgnr);
+                    printf(" Programs in channel : %3d \n",prgnr);
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;
@@ -3616,7 +3616,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
-            printf("Found nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
         mysql_close(conn);
     }
