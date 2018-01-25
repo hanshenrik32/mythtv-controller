@@ -8,7 +8,7 @@
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
 #include <GL/glu.h>     // Header File For The GLu32 Library
 #include <GL/glx.h>     // Header file fot the glx libraries.
-#include <GL/glc.h>             // danish ttf support
+#include <GL/glc.h>     // danish ttf support
 
 #include <IL/il.h>
 #include <IL/ilu.h>
@@ -19,7 +19,6 @@
 #include <ical.h>
 #include <libxml/parser.h>
 
-
 //#include "text3d.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
@@ -29,7 +28,6 @@
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
 extern tv_graber_config aktiv_tv_graber;                                       // xmltv graber config
-extern bool xmltvguide_in_colors;                                              // show tv guide in colors
 
 extern int screen_size;
 extern int debugmode;
@@ -3112,7 +3110,7 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
   strcpy(chanel_name,"");
 }
 
-// constructor
+// constructor tv_oversigt class
 
 tv_oversigt::tv_oversigt() {
     time_t rawtime;
@@ -3123,6 +3121,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
+    vistvguidecolors=true;
     // get time now
     time(&rawtime);
     // convert clovk to localtime
@@ -3132,7 +3131,7 @@ tv_oversigt::tv_oversigt() {
 }
 
 
-// destructor
+// destructor tv_oversigt class
 
 tv_oversigt::~tv_oversigt() {
 }
@@ -4048,7 +4047,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glColor3f(0.7f,0.7f, 0.7f);		    // active program color
         } else {
           // show tvguide in colors ?
-          if (xmltvguide_in_colors) {
+          if (vistvguidecolors) {
             switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
               case 0:
                 glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none
@@ -4156,7 +4155,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glColor3f(0.7f,0.7f, 0.7f);		    // active program color
         } else {
           // show tvguide in colors ?
-          if (xmltvguide_in_colors) {
+          if (vistvguidecolors) {
             switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
               case 0:
                 glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none
