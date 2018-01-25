@@ -1250,7 +1250,6 @@ void show_setup_network() {
     glEnd();
     glPopMatrix();
 
-
     glPushMatrix();
     // close buttons
     glEnable(GL_TEXTURE_2D);
@@ -3611,25 +3610,28 @@ void show_setup_tv_graber(int startofset) {
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
-    xmlupdatelasttime=localtime(&configtvguidelastupdate);
-    //
-    // Sprog struktur.
-    //
-    // English, danish, france, tysk, Arabic
-    switch (configland) {
-      case 0: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 1: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 2: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 3: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 4: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      default:
-              sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-    }
+    if (configtvguidelastupdate>0) {
+      // get last time from running config
+      xmlupdatelasttime=localtime(&configtvguidelastupdate);
+      //
+      // Sprog struktur. (date format)
+      //
+      // English, danish, france, tysk, Arabic
+      switch (configland) {
+        case 0: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 1: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 2: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 3: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 4: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        default:
+                sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+      }
+    } else sprintf(keybuffer,"Never.... ");
     myglprint4((char *) keybuffer);   // keybuffer
     glPopMatrix();
     //

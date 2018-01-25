@@ -102,8 +102,6 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
-bool xmltvguide_in_colors=true;                         // show tv guide in colors
-
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -853,7 +851,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor};
     int commandlength;
     char value[200];
     bool command=false;
@@ -947,7 +945,6 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=setconfigdefaultmoviepath;
                       commandlength=21;
-
                     } else if (strncmp(buffer+n,"videoplayer",10)==0) {
                         command=true;
                         command_nr=setvideoplayer;
@@ -975,13 +972,17 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=settvgraber;
                       commandlength=7;
+                    } else if (strncmp(buffer+n,"tvguidercolor",12)==0) {
+                      command=true;
+                      command_nr=tvguidercolor;
+                      commandlength=12;
                     } else command=false;
                 }
                 strcpy(value,"");
                 if (command) {
                     while((n<strlen(buffer)) && (!(valueok))) {
                         if ((buffer[n]!=10) && (buffer[n]!='=')) {
-                            if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!=13)) {
+                            if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
                                 valueok=true;
                                 strcpy(value,buffer+n+commandlength+2);
                                 nn=strlen(value);
@@ -1036,8 +1037,12 @@ int parse_config(char *filename) {
                       printf("Tv graber ....: %s\n",configbackend_tvgraber);
                       printf("*********************************************************\n");
                     } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
+                    // set tvguide color or no color
+                    else if (command_nr==tvguidercolor) {
+                     if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors=true;
+                     else aktiv_tv_oversigt.vistvguidecolors=false;
                     // set hostname
-                    else if (command_nr==sethostname) strcpy(configmythhost,value);
+                    } else if (command_nr==sethostname) strcpy(configmythhost,value);
                     // mysql host
                     else if (command_nr==setmysqlhost) strcpy(configmysqlhost,value);
                     // mysql user
@@ -1204,6 +1209,10 @@ int save_config(char * filename) {
         fputs(temp,file);
         sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
         fputs(temp,file);
+        //aktiv_tv_oversigt.vistvguidecolors=true;
+        if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
+        else sprintf(temp,"tvguidercolor=no\n");
+        fputs(temp,file);
         fclose(file);
     } else error=true;
     file = fopen("mythtv-controller.keys", "w");
@@ -1295,6 +1304,7 @@ void load_config(char * filename) {
            fputs("uvmetertype=1\n",file);
            fputs("tvgraber=tv_grab_uk_tvguide\n",file);
            fputs("tvgraberupdate=0\n",file);
+           fputs("tvgrabercolor=yes\n",file);
            fclose(file);
         } else {
           fprintf(stderr,"Config file not writeble ");
