@@ -12,6 +12,7 @@ const int description_length=2048;
 
 const char tvguidedbfilename[]={"tvguidedb.dat"};
 
+
 // tv oversigt
 // denne table inden holder aktiv tv program for i dag. hentet fra mythtv eller internal database samme format
 
@@ -75,6 +76,7 @@ class tv_oversigt {
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
         time_t lastupdated;                                                                                   // last updated unix date
     public:
+        bool vistvguidecolors;                                                                                     // vis tv guide kl 
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
         ~tv_oversigt();                                                                                       // destructor

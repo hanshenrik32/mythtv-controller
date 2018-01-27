@@ -72,6 +72,7 @@ extern int configdefaultplayer_screenmode;
 extern int configland;
 extern char *configlandsprog[];
 extern int configxbmcver;
+extern GLuint setuptvgraberback;
 extern GLuint _texturesetupclose;
 extern GLuint setuptexture;
 extern GLuint _texturesoundsetup;
@@ -1248,7 +1249,6 @@ void show_setup_network() {
     glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,200 , 0.0);
     glEnd();
     glPopMatrix();
-
 
     glPushMatrix();
     // close buttons
@@ -3398,17 +3398,17 @@ void order_channel_list() {
         strcpy(tmpchannel.name,channel_list[n].name);
         strcpy(tmpchannel.id,channel_list[n].id);
 
-        channel_list[n].selected=channel_list[n+1].selected;                                             // is program channel active
-        channel_list[n].ordernr=channel_list[n+1].ordernr;                                                  // show ordernr
-        channel_list[n].changeordernr=channel_list[n+1].changeordernr;                                        // used change ordernr in cobfig setup screen
-        strcpy(channel_list[n].name,channel_list[n+1].name);                                            // channel name
-        strcpy(channel_list[n].id,channel_list[n+1].id);                                              // internal dbid
+        channel_list[n].selected=channel_list[n+1].selected;                    // is program channel active
+        channel_list[n].ordernr=channel_list[n+1].ordernr;                      // show ordernr
+        channel_list[n].changeordernr=channel_list[n+1].changeordernr;          // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n].name,channel_list[n+1].name);                    // channel name
+        strcpy(channel_list[n].id,channel_list[n+1].id);                        // internal dbid
 
-        channel_list[n+1].selected=tmpchannel.selected;                                             // is program channel active
-        channel_list[n+1].ordernr=tmpchannel.ordernr;                                                  // show ordernr
-        channel_list[n+1].changeordernr=tmpchannel.changeordernr;                                        // used change ordernr in cobfig setup screen
-        strcpy(channel_list[n+1].name,tmpchannel.name);                                            // channel name
-        strcpy(channel_list[n+1].id,tmpchannel.id);                                              // internal dbid
+        channel_list[n+1].selected=tmpchannel.selected;                         // is program channel active
+        channel_list[n+1].ordernr=tmpchannel.ordernr;                           // show ordernr
+        channel_list[n+1].changeordernr=tmpchannel.changeordernr;               // used change ordernr in cobfig setup screen
+        strcpy(channel_list[n+1].name,tmpchannel.name);                         // channel name
+        strcpy(channel_list[n+1].id,tmpchannel.id);                             // internal dbid
       }
       n++;
     }
@@ -3487,14 +3487,14 @@ void show_setup_tv_graber(int startofset) {
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,setupnetworkwlanback);
+    glBindTexture(GL_TEXTURE_2D,setuptvgraberback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4),100 , 0.0);
-    glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),800 , 0.0);
-    glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+800,800 , 0.0);
-    glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+800,100 , 0.0);
+    glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,100 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
+    glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+950,800 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+950,100 , 0.0);
     glEnd();
     glPopMatrix();
 
@@ -3520,6 +3520,7 @@ void show_setup_tv_graber(int startofset) {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
+/*
     glPushMatrix();
     // overskrift
     glDisable(GL_TEXTURE_2D);
@@ -3528,7 +3529,7 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     myglprint4((char *) "TV Graber config");
     glPopMatrix();
-
+*/
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -3574,38 +3575,63 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==0) {
-        strcpy(keybuffer,aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
-        myglprint4((char *) keybuffer);   // keybuffer
+      if (aktiv_tv_graber.graberaktivnr==1) sprintf(keybuffer,"%s (reg is required on homepage) %d",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr],aktiv_tv_graber.graberaktivnr);
+      else sprintf(keybuffer,"%s %d",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr],aktiv_tv_graber.graberaktivnr);
+      myglprint4((char *) keybuffer);   // keybuffer
     } else {
-        myglprint4((char *) aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      if (aktiv_tv_graber.graberaktivnr==1) sprintf(keybuffer,"%s (reg is required on homepage)",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      else sprintf(keybuffer,"%s",aktiv_tv_graber.graberland[aktiv_tv_graber.graberaktivnr]);
+      myglprint4((char *) keybuffer);
     }
     glPopMatrix();
 
     // line 1 show last update date
     glPushMatrix();
+    winsizx=250;
+    winsizy=30;
+    xpos=300;
+    ypos=450;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd(); //End quadrilateral coordinates
+
+
     glDisable(GL_TEXTURE_2D);
     glTranslatef(680 , 600 , 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
-    xmlupdatelasttime=localtime(&configtvguidelastupdate);
-    //
-    // Sprog struktur.
-    //
-    // English, danish, france, tysk, Arabic
-    switch (configland) {
-      case 0: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 1: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 2: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 3: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      case 4: sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-              break;
-      default:
-              sprintf(keybuffer,"%s %d %d %d %d:%d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
-    }
+    if (configtvguidelastupdate>0) {
+      // get last time from running config
+      xmlupdatelasttime=localtime(&configtvguidelastupdate);
+      //
+      // Sprog struktur. (date format)
+      //
+      // English, danish, france, tysk, Arabic
+      switch (configland) {
+        case 0: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 1: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 2: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 3: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        case 4: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                break;
+        default:
+                sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+      }
+    } else sprintf(keybuffer,"Never.... ");
     myglprint4((char *) keybuffer);   // keybuffer
     glPopMatrix();
     //
@@ -3641,8 +3667,9 @@ void show_setup_tv_graber(int startofset) {
       glPopMatrix();
     }
 
+    // tv graber select line
     if (do_show_setup_select_linie==0) {
-      showcoursornow(311,500,strlen(keybuffer));
+      showcoursornow(111,500,strlen(keybuffer));
     }
 
     if (do_show_setup_select_linie>0) {

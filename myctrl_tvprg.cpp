@@ -8,7 +8,7 @@
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
 #include <GL/glu.h>     // Header File For The GLu32 Library
 #include <GL/glx.h>     // Header file fot the glx libraries.
-#include <GL/glc.h>             // danish ttf support
+#include <GL/glc.h>     // danish ttf support
 
 #include <IL/il.h>
 #include <IL/ilu.h>
@@ -19,18 +19,15 @@
 #include <ical.h>
 #include <libxml/parser.h>
 
-
 //#include "text3d.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
 #include "myth_setup.h"
 
-#define MAXSIZE 16000+1;
-
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
-extern tv_graber_config aktiv_tv_graber;                                        // xmltv graber config
+extern tv_graber_config aktiv_tv_graber;                                       // xmltv graber config
 
 extern int screen_size;
 extern int debugmode;
@@ -76,36 +73,33 @@ extern bool loading_tv_guide;
 //extern earlyrecorded oldrecorded;
 //extern earlyrecorded newtcrecordlist;
 
-
-const float prgtypeRGB[]={0.2f,0.8f,0.2f ,0.5f,0.9f,0.0f,                       /* Action, Series       */
-                              0.0f,0.5f,0.0f ,0.5f,0.1f,0.1f,                   /* news,   Kids         */
-                              1.0f,0.498039f,0.0f ,0.1f,0.2f,0.1f,              /* music,  animation    */
-                               0.556863f, 0.137255f, 0.419608f ,0.2f,0.2f,0.2f, /* Horror, drama        */
-                               0.91f,0.76f, 0.65f ,0.0f,0.5f,0.9f,              /* Sci fi, Cimedies     */
-                              0.8f,0.8f,0.7f ,0.2f,0.3f,0.2f,                   /* Romance, Thriller    */
-                              0.8f,0.3f,0.8f ,0.3f,0.2f,0.5f,                   /* Fiction, Musical     */
-                              0.6f,0.6f,0.6f ,0.5f,0.5f,0.5f,                   /* wae,     Documentary */
-                              0.2f,0.8f,0.3f ,0.8f,0.2f,0.6f,                   /* Series,  Kids        */
-                              0.0f,0.3f,0.8f ,0.2f,0.4f,0.7f,                   /* Animation,Drama      */
-                              0.0f,0.0f,0.8f ,0.0f,0.8f,0.0f,                   /*                      */
-                              0.5f,0.0f,0.5f ,0.0f,0.5f,0.4f,                   /* Adventure,Comedie    */
-                              0.4f,0.7f,0.7f ,0.1f,0.1f,0.1f};                  /*none,  ukendt (last)  */
+const float prgtypeRGB[]={    1.0f,1.0f,1.0f,               // 0 - none
+                              0.6f,0.6f,1.0f,               // 1 - children
+                              0.0f,0.8f,0.0f,               // 2 - sport
+                              0.6f,0.6f,0.8f,               // 3 - cartoons
+                              0.5f,0.9f,0.0f,               // 4 - news
+                              1.0f,0.4f,1.0f,               // 5 - movies
+                              0.5f,0.9f,0.0f,               // 6 - natur
+                              1.0f,0.8f,0.6f,               // 7 - Documentary
+                              0.7f,0.1f,0.1f,               // 8 - Entertainment
+                              1.0f,0.6f,0.0f,               // 9 - Sci-Fi
+                              0.1f,0.2f,0.1f,               // 10 - Series
+                              0.8f,0.2f,0.8f};              // 11 - Adult
 
 
 
-
-const char *prgtypee[2*12]={"Action"," Series",
-                            "News","Kids",
-                            " Music","Animation",
-                            " Horror"," Drama",
-                            " sci fi","Comedies",
-                            "Romance","Thriller",
-                            "Fiction","Musical",
-                            "War"," Doc.",
-                            "Adventure","Comedie",
-                            "Documentary","Adult",
-                            "Sport","Miniseries",
-                            "None","Unknown"};
+const char *prgtypee[]={"Unknown",
+                        "children",
+                        "Sport",
+                        "Cartoon",
+                        "News",
+                        "Movie",
+                        "Nature",
+                        "Documentary",
+                        "Entertainment",
+                        "Sci-Fi",
+                        "Serie",
+                        "Adult"};
 
 // bruges af show_tvoversigt
 
@@ -152,7 +146,7 @@ int get_tvguide_fromweb() {
     strcpy(exestring,configbackend_tvgraber);
     if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    printf("Start tv graber background process %s\n",configbackend_tvgraber);
+    printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
     result=system(exestring);   // do it
     printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");
@@ -405,6 +399,8 @@ int tv_oversigt::loadparsexmltvdb() {
 // return >0 on error
 
 int tv_oversigt::parsexmltv(const char *filename) {
+  char *token;
+  bool prgtype;
   xmlChar *content;
   xmlChar *content1;
   char userhomedir[200];
@@ -413,7 +409,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   unsigned int prg_antal=0;
   char temptxt[1024];
 
-  char sql[8192];
+  char sql[32738];
   char *s;
   int error=0;
   bool cidfundet=false;
@@ -567,17 +563,2277 @@ int tv_oversigt::parsexmltv(const char *filename) {
               }
             }
 
+//            printf("aktiv_tv_graber.graberaktivnr %d graber %s \n ",aktiv_tv_graber.graberaktivnr,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+
+
             // create tv programs in guide from xmltag programme
             if (strcmp((char *) node->name,"programme")==0) {
               content = xmlNodeGetContent(node);
               if (content) {
+                strcpy(category,"");
+                prgtype=false;
                 strcpy(result,(char *) content);
                 s=trimwhitespace(result);
                 getfirstlinefromstring(prgtitle,s);
-                //printf("\t Program : %s \n",s);
-                //xmlFree(content);
-              }
+                token=strtok((char *) content,"\n");
+                while(token) {
+                  switch (aktiv_tv_graber.graberaktivnr) {
+                    // none
+                    case 0:
+                      break;
+                    // 1 tv_grab_na_dd (username/pass required)
+                    // can auto config by --configure
+                    case 1:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+                    // 2 tv_grab_nl Grab TV listings for Netherlands
+                    // can auto config by --configure
+                    case 2:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+                    // 3 tv_grab_es_laguiatv TV listings for Spain
+                    // can auto config by --configure
+                    // graber have no prg type in xml file so
+                    case 3:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
 
+
+                    // tv_grab_il Grab TV listings for Israel
+                    //
+                    // DO NOT WORK
+                    case 4:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentales",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Realidad",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Aventuras",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Acción",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Deportes",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Infantiles",(char *) token)==0)) {
+                        strcpy(category,"children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Series",(char *) token)==0)) {
+                        strcpy(category,"Serie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Venta y Publicidad",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentales",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Noticias",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Películas",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Culturales",(char *) token)==0)) {
+                        strcpy(category,"Cultural");   // kultur programmer
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Musicales",(char *) token)==0)) {
+                        strcpy(category,"Music");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Series",(char *) token)==0)) {
+                        strcpy(category,"Serie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Variedades",(char *) token)==0)) {
+                        strcpy(category,"Other");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+                    // tv_grab_na_tvmedia
+                    // account at API Key found on your account dashboard page (https://www.xmltvlistings.com/account/)
+                    //
+                    case 5:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // tv_grab_dtv_la Grab TV listings for Direct TV Latin America
+                    // can not test from denmark Access Denied
+                    case 6:
+
+                    // tv_grab_fi Grab TV listings for Finland
+                    //
+                    case 7:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentales",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Culturales",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    urheilu",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    elokuvat",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Infantiles",(char *) token)==0)) {
+                        strcpy(category,"children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // tv_grab_eu_dotmedia Europe ver OK
+                    // need config by --gui
+                    // country's avable in xmlgraber is this list
+                    //
+                    // Austria,coratia
+                    // Denmark,Finland
+                    // germany,Gungary
+                    // Latvia, Lithuania
+                    // netherlands, Norway
+                    // Poland, Sweden
+                    // Switzerland
+                    // all radio stations
+                    // All tv channels
+                    case 8:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    //
+                    // tv_grab_se_swedb sweden
+                    //
+                    case 9:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    //
+                    //  tv_grab_pt_meo for Portugal
+                    //
+                    case 10:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    //
+                    // tv_grab_fr for france
+                    //
+                    case 11:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    //
+                    // tv_grab_uk_bleb uk
+                    //
+                    case 12:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_huro Hungary or Romania ok
+                    //
+                    case 13:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Talk",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Children",(char *) token)==0)) {
+                        strcpy(category,"Children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Educational",(char *) token)==0)) {
+                        strcpy(category,"Children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_ch_search ok
+                    //
+                    case 14:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    gemischte Themen",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Kriminalfilm",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sport",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Dokumentation",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Menschen",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nachrichten",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Unterhaltung",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Show",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Film",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Krimireihe",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Krimi",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Infomagazin",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    TV-Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    //
+                    // tv_grab_it ok
+                    //
+                    case 15:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    motori",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    atletica",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    ciclismo",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    SPORT",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    mondo e tendenze",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    fiction",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    cinema",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    film",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    documentario",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    intrattenimento",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    natura",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    animazione",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_is OK
+                    //
+                    case 16:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    children",(char *) token)==0)) {
+                        strcpy(category,"children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_fi_sv
+                    //
+                    case 17:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // tv_grab_na_dtv
+                    case 18:
+                    if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                      strcpy(category,"Series");
+  //                    prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                      strcpy(category,"Fantasy");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                      strcpy(category,"Dokumentar");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                      strcpy(category,"Reality");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                      strcpy(category,"Adventure");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                      strcpy(category,"Action");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                      strcpy(category,"Thriller");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                      strcpy(category,"Romance");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                      strcpy(category,"Mystery");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                      strcpy(category,"Sport");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                      strcpy(category,"Sport");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                      strcpy(category,"Comedy");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                      strcpy(category,"Tvshow");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                      strcpy(category,"War");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                      strcpy(category,"Documentary");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                      strcpy(category,"Lifestyle");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                      strcpy(category,"News");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                      strcpy(category,"Entertainment");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                      strcpy(category,"Movie");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                      strcpy(category,"Nature");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                      strcpy(category,"Gameshow");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                      strcpy(category,"Animation");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                      strcpy(category,"Animation");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                      strcpy(category,"Drama");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                      strcpy(category,"Adult");
+                      prgtype=true;
+                    } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                      // description
+                      prgtype=true;
+                    }
+                    break;
+                    //
+                    // tv_grab_tr Grab TV listings for Turkey
+                    //
+                    case 19:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Diğer",(char *) token)==0)) {
+                        strcpy(category,"Other");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Korku",(char *) token)==0)) {
+                        strcpy(category,"Thriller");  // or Fear
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Yarışma",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Çocuk",(char *) token)==0)) {
+                        strcpy(category,"children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Haberler",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Polisiye",(char *) token)==0)) {
+                        strcpy(category,"Crime");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    film",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Bilim Kurgu",(char *) token)==0)) {
+                        strcpy(category,"Sci-Fi");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Magazin",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Aile",(char *) token)==0)) {
+                        strcpy(category,"Family");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Dram",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Eğlence",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // tv_grab_eu_egon TV listings for German
+                    case 20:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // tv_grab_dk_dr TV listings for DK
+                    case 22:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sport",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Dokumentar",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Livsstil",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nyheder &amp; aktualitet",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Underholdning",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Film",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_se_tvzon TV listings for Sweden OK
+                    //
+                    case 23:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    movie",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Horror",(char *) token)==0)) {
+                        strcpy(category,"Horror");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    series",(char *) token)==0)) {
+                        strcpy(category,"series");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    //
+                    // tv_grab_ar TV listings for Argentina OK
+                    //
+                    case 24:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Deportes",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Infantiles",(char *) token)==0)) {
+                        strcpy(category,"Children");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Venta y Publicidad",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentales",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Periodístico",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Noticias",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Cine",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    // 25 tv_grab_fr_kazer
+                    case 25:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+
+                    // 26 tv_grab_uk_tvguide
+                    case 26:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // 27 tv_grab_zz_sdjson
+                    case 27:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+
+                    // > 27
+                    default:
+                      if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
+                        strcpy(category,"Series");
+    //                    prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Fantasy",(char *) token)==0)) {
+                        strcpy(category,"Fantasy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sci-Fi",(char *) token)==0)) {
+                        strcpy(category,"Dokumentar");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Reality",(char *) token)==0)) {
+                        strcpy(category,"Reality");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adventure",(char *) token)==0)) {
+                        strcpy(category,"Adventure");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Action",(char *) token)==0)) {
+                        strcpy(category,"Action");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Thriller",(char *) token)==0)) {
+                        strcpy(category,"Thriller");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Romance",(char *) token)==0)) {
+                        strcpy(category,"Romance");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Mystery",(char *) token)==0)) {
+                        strcpy(category,"Mystery");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    sports",(char *) token)==0)) {
+                        strcpy(category,"Sport");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Comedy",(char *) token)==0)) {
+                        strcpy(category,"Comedy");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    tvshow",(char *) token)==0)) {
+                        strcpy(category,"Tvshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    War",(char *) token)==0)) {
+                        strcpy(category,"War");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Documentary",(char *) token)==0)) {
+                        strcpy(category,"Documentary");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Lifestyle",(char *) token)==0)) {
+                        strcpy(category,"Lifestyle");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    News",(char *) token)==0)) {
+                        strcpy(category,"News");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Entertainment",(char *) token)==0)) {
+                        strcpy(category,"Entertainment");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Movies",(char *) token)==0)) {
+                        strcpy(category,"Movie");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Nature",(char *) token)==0)) {
+                        strcpy(category,"Nature");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Gameshow",(char *) token)==0)) {
+                        strcpy(category,"Gameshow");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Animation",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Family",(char *) token)==0)) {
+                        strcpy(category,"Animation");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Drama",(char *) token)==0)) {
+                        strcpy(category,"Drama");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("    Adult",(char *) token)==0)) {
+                        strcpy(category,"Adult");
+                        prgtype=true;
+                      } else if ((prgtype==false) && (strcmp("  ",(char *) token)==0)) {
+                        // description
+                        prgtype=true;
+                      }
+                      break;
+                  }
+                  token=strtok(NULL,"'\n");
+                }
+              }
               // get node childen
               subnode=node->xmlChildrenNode;
               while(subnode) {
@@ -854,7 +3110,7 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
   strcpy(chanel_name,"");
 }
 
-// constructor
+// constructor tv_oversigt class
 
 tv_oversigt::tv_oversigt() {
     time_t rawtime;
@@ -865,6 +3121,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(mysqllpass,"");
     strcpy(loadinginfotxt,"");
     lastupdated=0;
+    vistvguidecolors=true;
     // get time now
     time(&rawtime);
     // convert clovk to localtime
@@ -874,7 +3131,7 @@ tv_oversigt::tv_oversigt() {
 }
 
 
-// destructor
+// destructor tv_oversigt class
 
 tv_oversigt::~tv_oversigt() {
 }
@@ -1235,219 +3492,108 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     tvkanaler[kanalnr].putkanalname(row[0]);
                     tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
                     strcpy(tmptxt,row[0]);                                        // rember channel name
-                    printf("Channel name : %s ",tvkanaler[kanalnr].getkanalname());
+                    printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
                 }
                 // select by tv_grab_xx nr in array
                 if (row[8]) {
                   switch (aktiv_tv_graber.graberaktivnr) {
-                      // graber_dk
                     case 0:
-                        if (strcmp(row[8],"None")!=0) {
-                          if (strcmp("series",row[9])==0) prgtype=1;
-                          else if (strcmp("movie",row[9])==0) prgtype=5;
-                          else if (strcmp("sport",row[9])==0) prgtype=2;
-                          else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                          else if (strcmp("animation films",row[9])==0) prgtype=3;
-                          else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                          else if (strcmp("news",row[9])==0) prgtype=4;
-                          else if (strcmp("nature",row[9])==0) prgtype=9;
-                          else prgtype=0;
-                        }
                         break;
-                    case 1:
                       // graber_dk
+                      // Grab TV listings for Denamrk
+                    case 2:                                                     // tv_grab_nl
+                    case 4:                                                     // tv_grab_il
+                    case 5:                                                     // tv_grab_na_tvmedia
+                    case 7:                                                     // tv_grab_fi
+                    case 8:                                                     // tv_grab_eu_dotmedia
+                    case 10:                                                    // tv_grab_pt_meo
+                    case 11:                                                    // tv_grab_fr
+                    case 12:                                                    // tv_grab_uk_bleb
+                    case 13:                                                    // tv_grab_huro
+                    case 14:                                                    // tv_grab_ch_search
+                    case 15:                                                    // tv_grab_it
+                    case 16:                                                    // tv_grab_is
+                    case 17:                                                    // tv_grab_fi_sv
+                    case 18:                                                    // tv_grab_na_dtv
+                    case 19:                                                    // tv_grab_tr
+                    case 20:                                                    // tv_grab_eu_egon
+                    case 21:                                                    // tv_grab_dk_dr
+                    case 22:                                                    // tv_grab_se_tvzon
+                    case 23:                                                    // tv_grab_se_tvzon
+                    case 25:                                                    // tv_grab_fr_kazer
+                    case 26:                                                    // tv_grab_uk_tvguide
+                    case 27:                                                    // tv_grab_zz_sdjson
+                      // 2 tv_grab_nl Grab TV Netherlands ver OK
+                      // 5 tv_grab_fi Grab TV Finland ver OK
+                      // 7 tv_grab_se_tvzon Sweden ver OK
+                      // 8 tv_grab_eu_dotmedia Europe ver OK
+                      // 9 tv_grab_se_swedb Sweden ver OK
+                      // 18 tv_grab_tr Tyrkiye ver OK
                       if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;					           	// serie
-                        else if (strcmp("dansk underholdning.",row[9])==0) prgtype=1;   //
-                        else if (strcmp("sport",row[9])==0) prgtype=2;                  //
-                        else if (strncmp("børn",row[9],4)==0) prgtype=3;                //
-                        else if (strncmp("dukkefilm",row[9],9)==0) prgtype=3;           //
-                        else if (strstr(row[9],"tegnefilm")!=0) prgtype=3;              //
-                        else if (strstr(row[9],"animationsfilm")!=0) prgtype=3;         //
-                        else if (strcmp("news",row[9])==0) prgtype=4;                   //
-                        else if (strcmp("movie",row[9])==0) prgtype=5;                  //
-                        else if (strstr(row[9],"dokumentarserie")!=0) prgtype=6;        //
-                        else if (strcmp("engelsk madprogram",row[9])==0) prgtype=11;    //
-                        else if (strcmp("dansk reportageserie.",row[9])==0) prgtype=7;  //
-                        else if (strcmp("amerikansk krimi.",row[9])==0) prgtype=5;      //
-                        else if (strcmp("debatprogram.",row[9])==0) prgtype=7;          //
-                        else if (strcmp("music",row[9])==0) prgtype=8;                  //
-                        else if (strcmp("dyr",row[9])==0) prgtype=9;                    //
-                        else if (strcmp("none",row[9])==0) prgtype=0;                   //
-                        else prgtype=0;                                                 // default panic
-                      } else prgtype=0;                                                 // default panic
-                      break;
-                    case 2:
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;
-                        else if (strcmp("movie",row[9])==0) prgtype=5;
-                        else if (strcmp("sport",row[9])==0) prgtype=2;
-                        else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                        else if (strcmp("animation films",row[9])==0) prgtype=3;
-                        else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                        else if (strcmp("news",row[9])==0) prgtype=4;
-                        else if (strcmp("nature",row[9])==0) prgtype=9;
+                        if (strcmp("series",row[8])==0) prgtype=10;               // series
+                        else if (strcmp("Movie",row[8])==0) prgtype=5;            // movie type
+                        else if (strcmp("Action",row[8])==0) prgtype=5;           // movie type
+                        else if (strcmp("Drama",row[8])==0) prgtype=5;            //
+                        else if (strcmp("Crime",row[8])==0) prgtype=5;            // Action film
+                        else if (strcmp("Mystery",row[8])==0) prgtype=5;          // movie type
+                        else if (strcmp("sports",row[8])==0) prgtype=2;           //
+                        else if (strcmp("Sports",row[8])==0) prgtype=2;           //
+                        else if (strcmp("Soccer",row[8])==0) prgtype=2;           //
+                        else if (strcmp("Fencing",row[8])==0) prgtype=3;          // children
+                        else if (strcmp("Tvshow",row[8])==0) prgtype=8;           //
+                        else if (strcmp("Comedy",row[8])==0) prgtype=8;           // Entertainment
+                        else if (strcmp("Adventure",row[8])==0) prgtype=5;        //
+                        else if (strcmp("Family",row[8])==0) prgtype=1;           // series
+                        else if (strcmp("Fantasy",row[8])==0) prgtype=5;          // movie type
+                        else if (strcmp("Reality",row[8])==0) prgtype=8;          //
+                        else if (strcmp("Miniseries",row[8])==0) prgtype=0;       //
+                        else if (strcmp("TV Movie",row[8])==0) prgtype=8;         //
+                        else if (strcmp("Teleshopping",row[8])==0) prgtype=0;     //
+                        else if (strcmp("tvshow",row[8])==0) prgtype=8;           //
+                        else if (strcmp("Magazine",row[8])==0) prgtype=4;         //
+                        else if (strcmp("News",row[8])==0) prgtype=4;             // news
+                        else if (strcmp("Romance",row[8])==0) prgtype=5;          // movie type
+                        else if (strcmp("Sci-Fi",row[8])==0) prgtype=9;           //
+                        else if (strcmp("Action",row[8])==0) prgtype=5;           // movie type
+                        else if (strcmp("Animation",row[8])==0) prgtype=3;        //
+                        else if (strcmp("Documentary",row[8])==0) prgtype=7;      // Documentary
+                        else if (strcmp("Lifestyle",row[8])==0) prgtype=8;        //
+                        else if (strcmp("Entertainment",row[8])==0) prgtype=7;    //
+                        else if (strcmp("Nature",row[8])==0) prgtype=6;           //
+                        else if (strcmp("War",row[8])==0) prgtype=5;              // movie type
+                        else if (strcmp("Animation",row[8])==0) prgtype=5;        // movie type
+                        else if (strcmp("children",row[8])==0) prgtype=3;         // children
+                        else if (strcmp("Adult",row[8])==0) prgtype=11;           // Adult tv
                         else prgtype=0;
                       }
                       break;
-                    case 3:
+
+                    case 24:
+                      // graber_ar Grab TV listings for Argentina
+                      // Province avable in config mode is
+                      // Buenos,capital federal
+                      // chaco,cordoba
+                      // entre rios,formosa
+                      // la pampa,misones
+                      // neuquen,rio negro
+                      // salta,santa fe
+                      //
                       if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;
-                        else if (strcmp("movie",row[9])==0) prgtype=5;
-                        else if (strcmp("movie",row[9])==0) prgtype=5;
-                        else if (strcmp("sport",row[9])==0) prgtype=2;
-                        else if (strcmp("cartoon",row[9])==0) prgtype=3;
-                        else if (strcmp("animation films",row[9])==0) prgtype=3;
-                        else if (strcmp("Animation films",row[9])==0) prgtype=3;
-                        else if (strcmp("news",row[9])==0) prgtype=4;
-                        else if (strcmp("nature",row[9])==0) prgtype=9;
+                        if (strcmp("series",row[8])==0) prgtype=1;
+                        else if (strcmp("movie",row[8])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[8])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[8])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[8])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[8])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[8])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[8])==0) prgtype=8;
+                        else if (strcmp("Cine",row[8])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[8])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[8])==0) prgtype=3;         // children
+                        else if (strcmp("Reality Show",row[8])==0) prgtype=8;
                         else prgtype=0;
                       }
-                      break;
-                    case 4:
-                      // graber_ar
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;
-                        else if (strcmp("movie",row[9])==0) prgtype=5;
-                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                        else if (strcmp("Cine",row[9])==0) prgtype=0;
-                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                        else prgtype=0;
-                      }
-                    case 5:
-                        // graber_fi
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;
-                        else if (strcmp("movie",row[9])==0) prgtype=5;
-                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
-                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
-                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
-                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
-                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
-                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
-                        else if (strcmp("Cine",row[9])==0) prgtype=0;
-                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
-                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // kids
-                        else if (strcmp("Reality Show",row[9])==0) prgtype=0;
-                        else if (strcmp("elokuvat",row[9])==0) prgtype=0;
-                        else if (strcmp("urheilu",row[9])==0) prgtype=0;
-                        else prgtype=0;
-                      }
-                      break;
-                    case 6:
-                        // graber_tr
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;                          //
-                        else if (strcmp("film",row[9])==0) prgtype=5;                       //
-                        else if (strcmp("Life Style",row[9])==0) prgtype=7;                 //
-                        else if (strcmp("Aile",row[9])==0) prgtype=7;                       // Family
-                        else if (strcmp("Aksiyon",row[9])==0) prgtype=0;                    // Action film
-                        else if (strcmp("Animasyon",row[9])==0) prgtype=2;                  // Animation
-                        else if (strcmp("Belgesel",row[9])==0) prgtype=4;
-                        else if (strcmp("Bilim Kurgu",row[9])==0) prgtype=8;                // Science fiction
-                        else if (strcmp("Biyografi",row[9])==0) prgtype=0;
-                        else if (strcmp("Komedi",row[9])==0) prgtype=4;
-                        else if (strcmp("Animasyon",row[9])==0) prgtype=3;                  // kids
-                        else if (strcmp("Magazin",row[9])==0) prgtype=0;
-                        else if (strcmp("Eğlence",row[9])==0) prgtype=0;                    // Entertainment
-                        else if (strcmp("Haberler",row[9])==0) prgtype=4;                   // news
-                        else if (strcmp("Dram",row[9])==0) prgtype=1;                       // series
-                        else if (strcmp("Korku",row[9])==0) prgtype=0;
-                        else if (strcmp("Diğer",row[9])==0) prgtype=0;
-                        else if (strcmp("Gerilim",row[9])==0) prgtype=0;
-                        else if (strcmp("Yarışma",row[9])==0) prgtype=0;
-                        else if (strcmp("Polisiye",row[9])==0) prgtype=0;
-                        else if (strcmp("Çocuk",row[9])==0) prgtype=0;
-                        else prgtype=0;
-                      }
-                      break;
-                    case 7:
-                      // graber_se_tvzon
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                        else if (strcmp("Adult",row[9])==0) prgtype=7;                 //
-                        else if (strcmp("Drama",row[9])==0) prgtype=7;                       // Family
-                        else if (strcmp("Crime",row[9])==0) prgtype=0;                    // Action film
-                        else if (strcmp("Mystery",row[9])==0) prgtype=2;                  // Animation
-                        else if (strcmp("sports",row[9])==0) prgtype=4;
-                        else if (strcmp("Sports",row[9])==0) prgtype=8;                // Science fiction
-                        else if (strcmp("Skiing",row[9])==0) prgtype=0;
-                        else if (strcmp("Soccer",row[9])==0) prgtype=4;
-                        else if (strcmp("Fencing",row[9])==0) prgtype=3;                  // kids
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                        else if (strcmp("Comedy",row[9])==0) prgtype=0;                    // Entertainment
-                        else if (strcmp("Adventure",row[9])==0) prgtype=4;                   // news
-                        else if (strcmp("Family",row[9])==0) prgtype=1;                       // series
-                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;
-                        else if (strcmp("Series",row[9])==0) prgtype=0;
-                        else if (strcmp("Reality",row[9])==0) prgtype=0;
-                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;
-                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;
-                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;
-                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;
-                        else if (strcmp("Documentary",row[9])==0) prgtype=0;
-                        else if (strcmp("Magazine",row[9])==0) prgtype=0;
-                        else if (strcmp("news",row[9])==0) prgtype=0;
-                        else if (strcmp("Romance",row[9])==0) prgtype=0;
-                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=0;
-                        else if (strcmp("Action",row[9])==0) prgtype=0;
-                        else if (strcmp("Animation",row[9])==0) prgtype=0;
-                        else prgtype=0;
-                      }
-                      break;
-                    case 8:
-                      // tv_grab_eu_dotmedia dk ver
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;                // series
-                        else if (strcmp("movie",row[9])==0) prgtype=5;            //
-                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Drama",row[9])==0) prgtype=5;            //
-                        else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
-                        else if (strcmp("Mystery",row[9])==0) prgtype=5;          //
-                        else if (strcmp("sports",row[9])==0) prgtype=4;           //
-                        else if (strcmp("Sports",row[9])==0) prgtype=8;           // Science fiction
-                        else if (strcmp("Skiing",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Soccer",row[9])==0) prgtype=4;           //
-                        else if (strcmp("Fencing",row[9])==0) prgtype=3;          // kids
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Comedy",row[9])==0) prgtype=0;           // Entertainment
-                        else if (strcmp("Adventure",row[9])==0) prgtype=4;        // news
-                        else if (strcmp("Family",row[9])==0) prgtype=1;           // series
-                        else if (strcmp("Fantasy",row[9])==0) prgtype=0;          //
-                        else if (strcmp("Series",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Reality",row[9])==0) prgtype=0;          //
-                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
-                        else if (strcmp("TV Movie",row[9])==0) prgtype=0;         //
-                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
-                        else if (strcmp("tvshow",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Sitcom",row[9])==0) prgtype=0;           //
-                        else if (strcmp("Documentary",row[9])==0) prgtype=0;      //
-                        else if (strcmp("Magazine",row[9])==0) prgtype=0;         //
-                        else if (strcmp("news",row[9])==0) prgtype=4;             // news
-                        else if (strcmp("Romance",row[9])==0) prgtype=1;          //
-                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Action",row[9])==0) prgtype=5;           //
-                        else if (strcmp("Animation",row[9])==0) prgtype=0;        //
-                        else prgtype=0;
-                      }
-                      break;
-                    case 10:
-                      // tv_grab_pt_meo
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[9])==0) prgtype=1;                          // series
-                        else if (strcmp("movie",row[9])==0) prgtype=5;                       //
-                        else prgtype=0;
-                      }
-                      break;
+
                     default:
                       prgtype=0;
                   }
@@ -1457,7 +3603,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
-                    printf(" Total programs loaded in channel %d \n",prgnr);
+                    printf(" Programs in channel : %3d \n",prgnr);
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;
@@ -1469,7 +3615,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
-            printf("Found nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
         mysql_close(conn);
     }
@@ -1536,34 +3682,6 @@ void WordWrap( char *str, int N ) {
 }
 
 
-
-//
-// return prg number from findtime (hours only) on channel selectchanel where progran start time >= findtime
-//
-/*
-int tv_oversigt::find_start_kl_returnpointinarray(int selectchanel,int findtime) {
-  int prg_nr=0;
-  time_t rawtime;
-  struct tm *timelist;
-  struct tm mytimelist;
-  time(&rawtime);                                                               // get time
-  timelist=localtime(&rawtime);                                                 // convert to localtime
-  mytimelist.tm_hour=findtime;
-  mytimelist.tm_min=0;
-  mytimelist.tm_mon=timelist->tm_mon;
-  mytimelist.tm_sec=timelist->tm_sec;
-  mytimelist.tm_year=timelist->tm_year;
-  mytimelist.tm_mday=timelist->tm_mday;
-  mytimelist.tm_yday=timelist->tm_yday;
-  mytimelist.tm_isdst=timelist->tm_isdst;
-  mktime(&mytimelist);
-  time_t tt=mktime(&mytimelist);
-  while((tvkanaler[selectchanel].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<tvkanaler[selectchanel].program_antal())) {
-    prg_nr++;
-  }
-  return(prg_nr);
-}
-*/
 
 // find start time to change the start pos in array depaint on that the time is now
 
@@ -1926,58 +4044,49 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glTranslatef(10,10, 0.0f);
 //        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
-          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+          glColor3f(0.7f,0.7f, 0.7f);		    // active program color
         } else {
-          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
-            case 0:
-              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
-              break;
-            case 1:
-              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
-              break;
-            case 2:
-              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
-              break;
-            case 3:
-              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
-              break;
-            case 4:
-              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
-              break;
-            case 5:
-              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
-              break;
-            case 6:
-              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
-              break;
-            case 7:
-              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
-              break;
-            case 8:
-              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
-              break;
-            case 9:
-              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
-              break;
-            case 10:
-              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-              break;
-            case 11:
-              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-              break;
-            case 12:
-              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-              break;
-            case 13:
-              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-              break;
-            case 14:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-              break;
-            default:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
-              break;
-          }
+          // show tvguide in colors ?
+          if (vistvguidecolors) {
+            switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+              case 0:
+                glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none
+                break;
+              case 1:
+                glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // children
+                break;
+              case 2:
+                glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // sport
+                break;
+              case 3:
+                glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // cartoon
+                break;
+              case 4:
+                glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// news
+                break;
+              case 5:
+                glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // movie
+                break;
+              case 6:
+                glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// natur
+                break;
+              case 7:
+                glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// Documentary
+                break;
+              case 8:
+                glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// Entertainment
+                break;
+              case 9:
+                glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // Sci-Fi
+                break;
+              case 10:
+                glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // serier
+                break;
+              default:
+                glColor3f(1.0f, 1.0f, 1.0f);		    // default
+                break;
+            }
+          } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide in colors no use default
         }
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         //_textureutvbgmask
@@ -2022,7 +4131,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         *(tmptxt+21)='\0';
         if (prglength>13) glTranslatef(xpos+20,ypos-22, 0.0f); else glTranslatef(xpos+20,ypos-7, 0.0f);
         glScalef(textsize1, textsize1, 1.0f);
-        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+        glColor3f(0.7f,0.7f, 0.7f);		                                          // active program color
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);    // active program color
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
         glcRenderString(tmptxt);                                              // print program name
@@ -2043,58 +4152,49 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glTranslatef(10,10, 0.0f);
 
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
-          glColor3f(0.5f,0.5f, 0.5f);		    // active program color
+          glColor3f(0.7f,0.7f, 0.7f);		    // active program color
         } else {
-          switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
-            case 0:
-              glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none (default)
-              break;
-            case 1:
-              glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // serier
-              break;
-            case 2:
-              glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // div
-              break;
-            case 3:
-              glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // action
-              break;
-            case 4:
-              glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// nyheder
-              break;
-            case 5:
-              glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // komedier
-              break;
-            case 6:
-              glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// underholdning
-              break;
-            case 7:
-              glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// music
-              break;
-            case 8:
-              glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// andet
-              break;
-            case 9:
-              glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // sifi
-              break;
-            case 10:
-              glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // ukdentd
-              break;
-            case 11:
-              glColor3f(prgtypeRGB[33], prgtypeRGB[34], prgtypeRGB[35]);		    // rejser
-              break;
-            case 12:
-              glColor3f(prgtypeRGB[36], prgtypeRGB[37], prgtypeRGB[38]);		    //
-              break;
-            case 13:
-              glColor3f(prgtypeRGB[39], prgtypeRGB[40], prgtypeRGB[41]);		    // ukendt
-              break;
-            case 14:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // rejser
-              break;
-            default:
-              glColor3f(prgtypeRGB[42], prgtypeRGB[43], prgtypeRGB[44]);		    // default
-              break;
-          }
+          // show tvguide in colors ?
+          if (vistvguidecolors) {
+            switch(tvkanaler[kanalnr].tv_prog_guide[prg_nr].prg_type) {
+              case 0:
+                glColor3f(prgtypeRGB[0], prgtypeRGB[1], prgtypeRGB[2]);		         // none
+                break;
+              case 1:
+                glColor3f(prgtypeRGB[3], prgtypeRGB[4], prgtypeRGB[5]);      	    // children
+                break;
+              case 2:
+                glColor3f(prgtypeRGB[6], prgtypeRGB[7], prgtypeRGB[8]);      	    // sport
+                break;
+              case 3:
+                glColor3f(prgtypeRGB[9], prgtypeRGB[10], prgtypeRGB[11]);      	  // cartoon
+                break;
+              case 4:
+                glColor3f(prgtypeRGB[12], prgtypeRGB[13], prgtypeRGB[14]);      	// news
+                break;
+              case 5:
+                glColor3f(prgtypeRGB[15], prgtypeRGB[16], prgtypeRGB[17]);		    // movie
+                break;
+              case 6:
+                glColor3f(prgtypeRGB[18], prgtypeRGB[19], prgtypeRGB[20]);      	// natur
+                break;
+              case 7:
+                glColor3f(prgtypeRGB[21], prgtypeRGB[22], prgtypeRGB[23]);      	// Documentary
+                break;
+              case 8:
+                glColor3f(prgtypeRGB[24], prgtypeRGB[25], prgtypeRGB[26]);      	// Entertainment
+                break;
+              case 9:
+                glColor3f(prgtypeRGB[27], prgtypeRGB[28], prgtypeRGB[29]);		    // Sci-Fi
+                break;
+              case 10:
+                glColor3f(prgtypeRGB[30], prgtypeRGB[31], prgtypeRGB[32]);		    // serier
+                break;
+              default:
+                glColor3f(1.0f, 1.0f, 1.0f);		    // default
+                break;
+            }
+          } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide in colors no use default
         }
         // if select program
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
@@ -2336,9 +4436,9 @@ void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
-    if (tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type<=7)
+    if (tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type<=10)
         sprintf(tmptxt,"Type     : %-10s",prgtypee[tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type]);
-    else strcpy(tmptxt,"Type     :           ");
+    else sprintf(tmptxt,"Type     : %d nr  ",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type);
     glcRenderString(tmptxt);
 
     glTranslatef(-10.0f, -2.0f, 0.0f);
