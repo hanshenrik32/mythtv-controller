@@ -409,7 +409,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   unsigned int prg_antal=0;
   char temptxt[1024];
 
-  char sql[8192];
+  char sql[32738];
   char *s;
   int error=0;
   bool cidfundet=false;
