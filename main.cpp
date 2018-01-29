@@ -4379,7 +4379,6 @@ void display() {
             spec2[i] = specRight[i]*2;
           }
 
-
           // draw uv meter
           if ((configuvmeter==1) && (screen_size!=4)) {
             glPushMatrix();
@@ -4439,7 +4438,9 @@ void display() {
                 uvypos+=16;
               }
             }
+
             glPopMatrix();
+
           } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
 
@@ -4575,6 +4576,7 @@ void display() {
         } else printf("Saving config ok.\n");
         // load all new textures
         // free all loaded menu + icon gfx
+
         freegfx();
         // reload all menu + icon gfx
         loadgfx();
@@ -5355,7 +5357,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 do_show_setup=false;
                 do_show_tvgraber=false;
                 fundet=true;
-                do_save_config=true;             // save setup
+                do_save_config=true;             // save setup now
 
             }
 
@@ -10633,7 +10635,6 @@ int main(int argc, char** argv) {
     strcpy(configbackend_tvgraber_old,"");
 
     if (strncmp(configbackend,"xbmc",4)==0) {
-
       // music loader
       pthread_t loaderthread;           // the load
       int rc=pthread_create(&loaderthread,NULL,xbmcdatainfoloader,NULL);
@@ -10784,18 +10785,19 @@ int main(int argc, char** argv) {
     loadgfx();
     if (full_screen) glutFullScreen();                  // set full screen mode
     glutDisplayFunc(display);
-
-    //glutIdleFunc(display);                            // idle func
-
+    glutIdleFunc(NULL);                            // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
     glutTimerFunc(25, update, 0);                     // set start loop
-
     // init fonts
     init_ttf_fonts();
-
+    // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
+    if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt=true;
+    if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt=true;
+    if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt=true;
+    if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt=true;
 
     //aktivfont.updatefontlist();
     //aktivfont.selectfont((char *) "Tlwg Mono");
