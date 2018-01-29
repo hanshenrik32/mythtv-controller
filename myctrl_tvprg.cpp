@@ -73,14 +73,14 @@ extern bool loading_tv_guide;
 //extern earlyrecorded oldrecorded;
 //extern earlyrecorded newtcrecordlist;
 
-const float prgtypeRGB[]={    1.0f,1.0f,1.0f,               // 0 - none
+const float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
                               0.6f,0.6f,1.0f,               // 1 - children
                               0.0f,0.8f,0.0f,               // 2 - sport
                               0.6f,0.6f,0.8f,               // 3 - cartoons
                               0.5f,0.9f,0.0f,               // 4 - news
                               1.0f,0.4f,1.0f,               // 5 - movies
                               0.5f,0.9f,0.0f,               // 6 - natur
-                              1.0f,0.8f,0.6f,               // 7 - Documentary
+                              0.5f,0.8f,0.6f,               // 7 - Documentary
                               0.7f,0.1f,0.1f,               // 8 - Entertainment
                               1.0f,0.6f,0.0f,               // 9 - Sci-Fi
                               0.1f,0.2f,0.1f,               // 10 - Series
@@ -3122,6 +3122,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(loadinginfotxt,"");
     lastupdated=0;
     vistvguidecolors=true;
+    vis_kanal_antal=8;                                                        // nr of channels to display
     // get time now
     time(&rawtime);
     // convert clovk to localtime
@@ -3740,7 +3741,8 @@ void tv_oversigt::set_program_torecord(int selectchanel,int selectprg) {
 
 
 void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show) {
-
+  float selectcolor[3]={1.0f,1.0f,1.0f};
+  float timenow_color[3]={0.8f,0.8f,0.8f};
   float now_text_color[3]={1.0f,1.0f,0.5f};
   float now_text_clock_color[3]={1.0f,1.0f,0.0f};
   float catalog_text_color[3]={1.0f,1.0f,1.0f};
@@ -3754,12 +3756,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   struct tm *timelist;
   struct tm mytimelist;
   struct tm *prgtime;
-  float selectcolor=1.0f;
-
   unsigned int kanalomgang=100;                                                 //
   unsigned int kanalomgangofset=100;
-  int vis_kanal_antal;
-
   int n;
   int chanid;
   int kanalnr=0;
@@ -3774,21 +3772,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   int yypos=0;
   int prg_nr=0;
   int startyofset;
-  int CHANELS_PR_LINE=7;
   char tmptxt[1024];
   char tmptim[1024];
   char tmpmin[1024];
   char tmptxt1[1024];
+  bool grayaktivprg=false;                                                      // show aktiv program in gray color
   time_t prgstarttid,prgendtid;
-  starttid=time( NULL );
+  starttid=time(NULL);
   nutid=starttid;
   timeinfo=localtime(&starttid);
-  switch(screen_size) {
-    case 4: CHANELS_PR_LINE=5;
-            break;
-    default:CHANELS_PR_LINE=7;
-            break;
-  }
   if (loading_tv_guide) {
     // show loading tv guide
     xsiz=450;
@@ -3821,7 +3813,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     }
     glPopMatrix();
   }
-  if (selectchanel>(CHANELS_PR_LINE-1)) cstartofset=selectchanel-(CHANELS_PR_LINE-1);
+  if (selectchanel>(this->vis_kanal_antal-1)) cstartofset=selectchanel-(this->vis_kanal_antal-1);
   else cstartofset=0;
   xpos=20;
   ypos=orgwinsizey-200;
@@ -3959,6 +3951,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   mytimelist.tm_hour=timelist->tm_hour;
   //if (viskl>0) mytimelist.tm_hour=viskl;                                      // timelist->tm_hour;
   mytimelist.tm_hour=vistvguidekl;                                              // timelist->tm_hour;
+  mktime(&mytimelist);
 
   kanalnr=0+cstartofset;
 
@@ -3968,19 +3961,19 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   xpos=50+40;
   int do_kanal_nr=0;
   switch (screen_size) {
-    case 4: vis_kanal_antal=5;                        // antal kanler som vises
+    case 4: this->vis_kanal_antal=5;                        // antal kanler som vises 768*1024
             break;
-    default:vis_kanal_antal=7;                        // antal kanler som vises
+    case 3: this->vis_kanal_antal=8;                        // antal kanler som vises 1080p
+            break;
+    default:this->vis_kanal_antal=7;                        // antal kanler som vises
             break;
   }
-
-  if (kanal_antal<vis_kanal_antal) vis_kanal_antal=kanal_antal;
-
+  if (kanal_antal<this->vis_kanal_antal) this->vis_kanal_antal=kanal_antal;
   //
   // loop for channel
   //
 
-  while ((xpos<orgwinsizex) && (do_kanal_nr<vis_kanal_antal)) {
+  while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
     switch (screen_size) {
@@ -3990,7 +3983,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
               break;
     }
     glScalef(24.0, 24.0, 1.0);
-    if (selectchanel==kanalnr) glColor3f(selectcolor,selectcolor,selectcolor); else glColor3f(0.6f, 0.6f, 0.6f);
+    if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
     chanid=tvkanaler[0].chanid;
     strcpy(tmptxt," ");
     strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
@@ -4043,8 +4036,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
 //        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
-        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
-          glColor3f(0.7f,0.7f, 0.7f);		    // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0)) && (grayaktivprg)) {
+          glColor3f(timenow_color[0],timenow_color[1], timenow_color[2]);		    // active program color
         } else {
           // show tvguide in colors ?
           if (vistvguidecolors) {
@@ -4088,7 +4081,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
             }
           } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide in colors no use default
         }
-        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[0]);
         //_textureutvbgmask
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
@@ -4120,7 +4113,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glScalef(textsize2, textsize2, 1.0);
           glColor3f(0.5f,0.5f, 0.5f);		// rejser
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);	    // active program color
-          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           glcRenderString(tmptxt);
           glPopMatrix();
         }
@@ -4133,7 +4126,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glScalef(textsize1, textsize1, 1.0f);
         glColor3f(0.7f,0.7f, 0.7f);		                                          // active program color
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);    // active program color
-        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
         glcRenderString(tmptxt);                                              // print program name
         glPopMatrix();
       } else if (prgstarttid>=mktime(&mytimelist)) {
@@ -4150,9 +4143,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-
-        if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) {
-          glColor3f(0.7f,0.7f, 0.7f);		    // active program color
+        if ((prgstarttid<=time(0)) && (prgendtid>=time(0)) && (grayaktivprg)) {
+          glColor3f(timenow_color[0],timenow_color[1], timenow_color[2]);		    // active program color
         } else {
           // show tvguide in colors ?
           if (vistvguidecolors) {
@@ -4197,7 +4189,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide in colors no use default
         }
         // if select program
-        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+        if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
         if (_textureutvbgmask) {
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
@@ -4221,7 +4213,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           //glTranslatef(xpos,820-(yypos+18), 0.0f);
           glTranslatef(xpos+20,ypos-28, 0.0f);
           glScalef(textsize1, textsize1, 1.0);
-          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
           *(tmptxt+21)='\0';
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);	    // active program color
@@ -4237,7 +4229,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);    // active program color
-          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           glcRenderString(tmptxt);
 
           if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
@@ -4255,7 +4247,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glTranslatef(xpos+20,ypos-8, 0.0f);
           glScalef(textsize2, textsize2, 1.0);
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);   // active program color
-          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor,selectcolor,selectcolor);
+          if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           glcRenderString(tmptxt);
 
           if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
@@ -4278,9 +4270,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     do_kanal_nr++;
   }
 
-
-
-  // show clock line over tvguide
+  // show clock line all over tvguide
   //
   if (!(loading_tv_guide)) {
     time(&rawtime);
@@ -4289,6 +4279,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       xpos=35;
       ypos=orgwinsizey-298;
       xsiz=(orgwinsizex-280);
+      if (this->vis_kanal_antal>7) xsiz+=190;
       ysiz=2;
       float timelineofset=(timelist->tm_min*4.5);
       ypos-=timelineofset;
