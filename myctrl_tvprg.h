@@ -64,7 +64,7 @@ class tv_oversigt {
     private:
         tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int kanal_antal;
-        //int vis_kanal_antal;
+        int vis_kanal_antal;                                                                                  // # of channels show in tv guide on same screen
         time_t starttid;
         time_t sluttid;
         char mysqllhost[200];
@@ -76,7 +76,7 @@ class tv_oversigt {
         int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
         time_t lastupdated;                                                                                   // last updated unix date
     public:
-        bool vistvguidecolors;                                                                                     // vis tv guide kl 
+        bool vistvguidecolors;                                                                                     // vis tv guide kl
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
         ~tv_oversigt();                                                                                       // destructor
