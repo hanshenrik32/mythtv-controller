@@ -3781,38 +3781,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   starttid=time(NULL);
   nutid=starttid;
   timeinfo=localtime(&starttid);
-  if (loading_tv_guide) {
-    // show loading tv guide
-    xsiz=450;
-    ysiz=100;
-    xpos=(orgwinsizex/2)-xsiz/2;
-    ypos=(orgwinsizey/2)-ysiz/2;
-    glPushMatrix();
-    glTranslatef(10,50, 1.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D,_tvbar3);
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glEnd(); //End quadrilateral coordinates
-    // print
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+120,ypos, 0.0f);
-    glScalef(20.0, 20.0,1);
-    glDisable(GL_TEXTURE_2D);
-    glcRenderString("Loading tv guide....");
-    glTranslatef(-9.0f,-1.5f, 0.0f);
-    if (strcmp("",this->loadinginfotxt)!=0) {
-      strcpy(tmptxt,"Updating ch ");
-      strcat(tmptxt,this->loadinginfotxt);
-      glcRenderString(tmptxt);
-    }
-    glPopMatrix();
-  }
   if (selectchanel>(this->vis_kanal_antal-1)) cstartofset=selectchanel-(this->vis_kanal_antal-1);
   else cstartofset=0;
   xpos=20;
@@ -3821,7 +3789,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   ysiz=150;
   glPushMatrix();
   glTranslatef(10,50, 0.0f);
-  // top
+  // top bar
   glEnable(GL_TEXTURE_2D);
   //glBlendFunc(GL_ONE, GL_ONE);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -3833,8 +3801,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   aktivfont.selectfont((char *) "Norasi");
   chanid=tvkanaler[1].chanid;
   strcpy(tmptxt,tvkanaler[1].chanel_name);
-//  glScalef(70.0, 70.0, 1.0);
-//  glcRenderString("TEST");
   glBegin(GL_QUADS); //Begin quadrilateral coordinates
   glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
   glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
