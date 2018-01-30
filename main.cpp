@@ -2817,7 +2817,8 @@ void display() {
         std::clock_t start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        if (debugmode & 1 ) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
+
+//        if (debugmode & 1 ) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
 
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
@@ -5814,7 +5815,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((vis_tv_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==27) {
                 if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
-                //vis_tv_oversigt=false;
+                vis_tv_oversigt=false;
                 fundet=true;
             }
             if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
