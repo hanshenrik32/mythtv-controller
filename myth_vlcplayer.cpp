@@ -14,6 +14,8 @@ const char * const vlc_args[] = {
 };
 
 
+// constructor
+
 vlc_controller::vlc_controller() {
   //vlc_inst = libvlc_new(5,opt);
   vlc_inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);

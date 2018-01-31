@@ -248,13 +248,14 @@ void film_oversigt_typem::resetallefilm() {
 
 void film_oversigt_typem::stopmovie() {
   vlc_controller::stopmedia();
+  film_is_playing=false;
 }
 
-
-// stop player
+// vlc stop player
 
 void film_oversigt_typem::softstopmovie() {
   vlc_controller::stopmedia();
+  film_is_playing=false;
 }
 
 
@@ -265,8 +266,8 @@ void film_oversigt_typem::softstopmovie() {
 
 int film_oversigt_typem::playmovie(int nr) {
     char path[PATH_MAX];                                  // max path length from os
-    if (this->film_is_playing) stopmovie();               // stop last played movie
     strcpy(path,"");
+    film_is_playing=true;
     strcat(path,this->filmoversigt[nr].getfilmfilename());
     vlc_controller::playmedia(path);
 }
@@ -967,8 +968,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
       if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[film_nr+sofset].gettextureid()) {
-
-
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -999,10 +998,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
         glEnd(); //End quadrilateral coordinates
-
       } else {
-
-        // print cover dvd
+        // do default cover dvd
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_DST_COLOR, GL_ZERO);
         //glBlendFunc(GL_ONE, GL_ONE);

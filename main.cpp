@@ -2680,7 +2680,7 @@ void display() {
     }
 
 
-    // stream stuf
+    // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
         // img
         glPushMatrix();
@@ -4613,6 +4613,7 @@ void display() {
             }
             #endif
             #if defined USE_SDL_MIXER
+            Mix_PauseMusic();
             Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
             sdlmusicplayer=NULL;
             #endif
@@ -4623,21 +4624,17 @@ void display() {
             aktiv_playlist.clean_playlist();                // clean play list (reset) play list
             do_play_music_aktiv_table_nr=1;			// reset play start nr
 
-            if (debugmode & 16)  fprintf(stderr,"Stop playing media/wideo if any \n");
-
-/*
+            if (debugmode & 16) fprintf(stderr,"Stop playing media/wideo if any \n");
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
               // stop playing (active movie)
               film_oversigt.softstopmovie();
             }
-*/
             // start movie
             if (film_oversigt.playmovie(fknapnr-1)==0) {
               vis_error=true;
               vis_error_timeout=60;
             }
-
         }
         startmovie=false;                   // start kun 1 instans
     }
@@ -4723,10 +4720,9 @@ void display() {
             do_play_recorded_aktiv_nr=0;                        // start kun 1 player
         }
     }
-
-
+    //
     // show movie info
-
+    //
     if (((vis_nyefilm_oversigt) || (vis_film_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
       do_zoom_film_aktiv_nr=fknapnr-1;
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfronttextureid()==0)) {
@@ -4736,8 +4732,7 @@ void display() {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
-
-      // window
+      // draw window
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400,400,0);
@@ -4760,12 +4755,12 @@ void display() {
 
       // show play movie icon
       glPushMatrix();
-      glDisable(GL_BLEND);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400+20,400+20,0);
       glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemplay);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4783,7 +4778,8 @@ void display() {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(490+20,400+20,0);
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemstop);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4796,7 +4792,7 @@ void display() {
       glEnd();
       glPopMatrix();
 
-
+      glDisable(GL_BLEND);
       // show movie dvd cover
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
@@ -9844,6 +9840,7 @@ void *xbmcdatainfoloader(void *data) {
 
 
 // load xbmc/kodi movies to db
+// create movie db if not exist
 
 void *xbmcdatainfoloader_movie(void *data) {
   char userhomedir[200];
