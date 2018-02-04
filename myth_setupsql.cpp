@@ -11,9 +11,9 @@ extern char configmysqlhost[256];                              //
 extern char configmusicpath[256];
 
 
-const char *create_sql_radiostations="CREATE TABLE IF NOT EXISTS `radio_stations` (`name` varchar(80) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`beskriv` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`stream_url` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`homepage` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`gfx_link` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`art` int(4) NOT NULL,`bitrate` int(11) NOT NULL,`popular` int(11) NOT NULL,`aktiv` int(1) NOT NULL,`createdate` date NOT NULL, `intnr` int(11) NOT NULL AUTO_INCREMENT,`landekode` int(11) NOT NULL, `lastplayed` datetime DEFAULT NULL,`online` tinyint(1) NOT NULL DEFAULT '1', PRIMARY KEY (`intnr`), KEY `art` (`art`), KEY `aktiv` (`aktiv`), KEY `popular` (`popular`), KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='rss radio stations'";
-const char *create_sql_radio_countries="CREATE TABLE IF NOT EXISTS `radio_countries` (`land` varchar(80) NOT NULL,`landekode` int(11) NOT NULL,`imgpath` varchar(80) NOT NULL,PRIMARY KEY (`landekode`)) ENGINE=MyISAM DEFAULT CHARSET=latin1";
-const char *create_sql_radio_types="CREATE TABLE IF NOT EXISTS `radiotypes` (`typename` varchar(80) NOT NULL, `art` int(2) NOT NULL, `sort` int(11) NOT NULL, PRIMARY KEY (`art`), KEY `sort` (`sort`)) ENGINE=MyISAM DEFAULT CHARSET=latin1";
+const char *create_sql_radiostations="CREATE TABLE IF NOT EXISTS `radio_stations` (`name` varchar(80) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`beskriv` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`stream_url` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`homepage` varchar(200) CHARACTER SET latin1 COLLATE latin1_danish_ci NOT NULL,`gfx_link` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,`art` int(4) NOT NULL,`bitrate` int(11) NOT NULL,`popular` int(11) NOT NULL,`aktiv` int(1) NOT NULL,`createdate` date NOT NULL, `intnr` int(11) NOT NULL AUTO_INCREMENT,`landekode` int(11) NOT NULL, `lastplayed` datetime DEFAULT NULL,`online` tinyint(1) NOT NULL DEFAULT '1', PRIMARY KEY (`intnr`), KEY `art` (`art`), KEY `aktiv` (`aktiv`), KEY `popular` (`popular`), KEY `name` (`name`)) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='rss radio stations'";
+const char *create_sql_radio_countries="CREATE TABLE IF NOT EXISTS `radio_countries` (`land` varchar(80) NOT NULL,`landekode` int(11) NOT NULL,`imgpath` varchar(80) NOT NULL,PRIMARY KEY (`landekode`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
+const char *create_sql_radio_types="CREATE TABLE IF NOT EXISTS `radiotypes` (`typename` varchar(80) NOT NULL, `art` int(2) NOT NULL, `sort` int(11) NOT NULL, PRIMARY KEY (`art`), KEY `sort` (`sort`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
 const char *create_sql_radio_types_data="REPLACE INTO `radiotypes` (`typename`, `art`, `sort`) VALUES \
                                                                                     ('Rock/Classic Rock',  1,  5), \
                                                                                     ('Blues',              2,  2), \
@@ -125,18 +125,19 @@ const char *create_sql_lande_db="REPLACE INTO `radio_countries` (`land`, `landek
 // select to db the start
 // select name,stream_url,homepage,art,beskriv,gfx_link,intnr,bitrate,online,landekode from radio_stations where aktiv=1 and online=1 order by intnr
 //
-
+// \xE6 = æ
+// \xF8 = ø
 const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('P1 DK', 'Danish radio play clasisk music [Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A03H.mp3', '', 'DR-P1-908.png', 8, 320, 63, 1, '2011-07-29', 1, 45, '2011-09-16 21:50:41', 1), \
 ('P2 DK', 'Dansk radio', 'http://live-icy.gss.dr.dk:8000/A/A04H.mp3', 'www.dr.dk/P2', 'DR-P2-1023.png', 1, 320, 62, 1, '2011-07-28', 2, 45, '2011-09-15 22:20:34', 1), \
 ('P3 DK', 'www.p3.dk Dansk radio.', 'http://live-icy.gss.dr.dk:8000/A/A05H.mp3', 'www.dr.dk', 'DR-P3-939.png', 1, 128, 77, 1, '2011-07-28', 3, 45, '2011-10-20 15:37:44', 1), \
-('DR P4 København', '', 'http://live-icy.gss.dr.dk:8000/A/A08H.mp3', 'http://www.dr.dk/p4/kbh/', 'DR-P4-Koebenhavn-965.png', 0, 0, 0, 1, '2011-11-11', 17, 0, '2017-01-01 00:00:00', 1), \
-('DR P4 Esbjerg', '', 'http://live-icy.gss.dr.dk:8000/A/A15H.mp3', 'http://www.dr.dk/Regioner/Esbjerg/', 'DR-P4-Esbjerg-990.png', 0, 0, 0, 1, '2011-11-11', 18, 0, '2017-01-01 00:00:00', 1), \
-('DR P6 Beat', '', 'http://live-icy.gss.dr.dk:8000/A/A29H.mp3', 'http://www.dr.dk/p6beat/', 'DR-P6-Beat.png', 0, 0, 0, 1, '2011-11-11', 19, 0, '2017-01-01 00:00:00', 1), \
-('DR P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 20, 45, '2011-09-29 13:40:49', 1), \
+('P4 K0benhavn', '', 'http://live-icy.gss.dr.dk:8000/A/A08H.mp3', 'http://www.dr.dk/p4/kbh/', 'DR-P4-Koebenhavn-965.png', 0, 0, 0, 1, '2011-11-11', 17, 0, '2017-01-01 00:00:00', 1), \
+('P4 Esbjerg', '', 'http://live-icy.gss.dr.dk:8000/A/A15H.mp3', 'http://www.dr.dk/Regioner/Esbjerg/', 'DR-P4-Esbjerg-990.png', 0, 0, 0, 1, '2011-11-11', 18, 0, '2017-01-01 00:00:00', 1), \
+('P6 Beat', '', 'http://live-icy.gss.dr.dk:8000/A/A29H.mp3', 'http://www.dr.dk/p6beat/', 'DR-P6-Beat.png', 0, 0, 0, 1, '2011-11-11', 19, 0, '2017-01-01 00:00:00', 1), \
+('P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 20, 45, '2011-09-29 13:40:49', 1), \
 ('Radio24syv', '', 'http://rrr.sz.xlcdn.com/?account=Radio24syv&file=ENC1_Web128&type=live&service=icecast&port=8000&output=pls', 'radio24syv', '', 0, 0, 0, 1, '2017-01-01', 21, 0, '2017-01-01 00:00:00', 1), \
-('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente værter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 22, 45, '2011-10-09 16:13:11', 1), \
-('Næstved Lokal Radio', 'http://78.47.115.218:8007/stream.m3u', 'http://næstvedlokalradio.dk/', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 23, 0, '2017-01-01 00:00:00', 1), \
+('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente v\xE6rter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 22, 45, '2011-10-09 16:13:11', 1), \
+('N\xE6stved Lokal Radio', 'http://78.47.115.218:8007/stream.m3u', 'http://næstvedlokalradio.dk/', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 23, 0, '2017-01-01 00:00:00', 1), \
 ('Radio Aura DK', 'DK', 'http://icecast.xstream.dk:80/aura', '', 'Radio-Aura-1054.png', 40, 128, 46, 1, '2011-08-02', 26, 45, '2011-10-11 23:05:02', 1), \
 ('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8020', '', '', 41, 128, 0, 1, '2011-08-11', 27, 8, '2011-10-20 15:37:44', 1), \
 ('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', 'Maxxima.png', 4, 0, 10, 1, '2011-08-02', 28, 4, '2011-10-02 02:25:35', 1), \
@@ -164,18 +165,18 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('RADIO MUNDUS', '[Bitrate: 192]', 'http://85.25.141.128:8010', '', '', 40, 192, 2, 1, '2011-08-10', 113, 9, '2011-09-15 18:30:33', 1), \
 ('Gold24 [trinity-32 relay]', '[Bitrate: 192]', 'http://85.195.17.209:8080', '', '', 8, 192, 0, 1, '2011-08-10', 123, 23, NULL, 1), \
 ('Kleine Piraat Internetradio', '[Bitrate: 192]', 'http://91.213.69.145:7030', '', '', 40, 192, 0, 1, '2011-08-10', 166, 6, NULL, 1), \
-('BABELSBERG-HITRADIO.DE', '[Bitrate: 192]', 'http://46.163.75.84:8000', '', '', 40, 192, 1, 1, '2011-08-10', 171, 42, NULL, 1), \
+('BABELSBERG HITRADIO', '[Bitrate: 192]', 'http://46.163.75.84:8000', '', '', 40, 192, 1, 1, '2011-08-10', 171, 42, NULL, 1), \
 ('PIRATENFAMILIE', '[Bitrate: 192] ', 'http://46.231.87.20:8154', '', '', 40, 192, 0, 1, '2011-08-10', 192, 30, NULL, 1), \
 ('Radio 8FM Classics & Hits', '[Bitrate: 192]', 'http://46.231.87.21:8804', '', '', 40, 192, 0, 1, '2011-08-10', 196, 30, NULL, 1), \
 ('Singlestreff', '[Bitrate: 192]', 'http://87.118.119.128:10300', '', '', 46, 192, 0, 1, '2011-08-10', 199, 8, NULL, 1), \
 ('Ohrfunk.de Studio Marburg 3', '[Bitrate: 192]  ', 'http://46.4.77.21:8000', '', '', 1, 192, 0, 1, '2011-08-10', 214, 8, NULL, 1), \
-('www.gezelligheidsradio.nl', '[Bitrate: 192]', 'http://178.20.171.32:8032', '', '', 40, 192, 0, 1, '2011-08-10', 217, 3, NULL, 1), \
+('gezelligheids radio', '[Bitrate: 192]', 'http://178.20.171.32:8032', '', '', 40, 192, 0, 1, '2011-08-10', 217, 3, NULL, 1), \
 ('radio decadas', '[Bitrate: 192]', 'http://174.37.194.139:8316', '', '', 46, 192, 0, 1, '2011-08-10', 227, 7, NULL, 1), \
 ('Nashville FM', '[Bitrate: 192]', 'http://46.231.87.21:8300', '', '', 27, 192, 0, 1, '2011-08-10', 228, 30, NULL, 1), \
-('Radio 8FM [West Brabant]', '[Bitrate: 192]  ', 'http://46.231.87.21:8418', '', '', 0, 192, 0, 1, '2011-08-10', 257, 30, NULL, 1), \
+('Radio 8FM', '[Bitrate: 192]  ', 'http://46.231.87.21:8418', '', '', 0, 192, 0, 1, '2011-08-10', 257, 30, NULL, 1), \
 ('Dance Fm Live', '[Bitrate: 192]', 'http://109.123.114.74:8006', '', '', 0, 192, 1, 1, '2011-08-10', 279, 31, '2011-10-17 23:43:04', 1), \
 ('Varia FM', 'Varia FM - Met Live Dj`s En Nonstop Muziek  [Bitrate: 192]', 'http://62.212.132.9:8704', '', '', 4, 192, 0, 1, '2011-08-10', 298, 6, NULL, 1), \
-('ERDE Audio (www.Euer - Radio.DE)', '[Bitrate: 192]', 'http://188.165.201.141:9666', '', '', 0, 192, 0, 1, '2011-08-10', 331, 8, NULL, 1), \
+('ERDE Audio', '[Bitrate: 192]', 'http://188.165.201.141:9666', '', '', 0, 192, 0, 1, '2011-08-10', 331, 8, NULL, 1), \
 ('MuzsikusRadio', '[Bitrate: 192]  ', 'http://212.40.96.44:8011', '', '', 40, 192, 0, 1, '2011-08-10', 348, 50, NULL, 1), \
 ('NetBeatz BurnWeb', '[Bitrate: 192]', 'http://87.118.109.60:4444', '', '', 40, 192, 0, 1, '2011-08-10', 357, 8, NULL, 1), \
 ('Frequence Orange ', '[Bitrate: 192] ', 'http://94.23.213.103:8000', '', '', 40, 192, 0, 1, '2011-08-10', 358, 37, NULL, 1), \
@@ -224,7 +225,7 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('Radio 80', '[Bitrate: 128]  ', 'http://94.23.2.73:7020', '', '', 13, 128, 0, 1, '2011-08-11', 1232, 4, NULL, 1), \
 ('Radio Free Americana', '[Bitrate: 128]  ', 'http://212.48.125.67:8000', '', '', 0, 128, 0, 1, '2011-08-11', 1260, 8, NULL, 1), \
 ('Radio Twilight', 'Live vanuit Heusden met DJ Jo en Coba Flamingo  [Bitrate: 128]  ', 'http://81.18.165.234:8000', 'www.radio-twilight.nl', '', 0, 128, 0, 1, '2011-08-11', 1282, 6, NULL, 1), \
-('A State Of Trance.com.ua', '[Bitrate: 128]  ', 'http://89.252.2.4:8000', '', '', 41, 128, 1, 1, '2011-08-11', 1300, 49, NULL, 1), \
+('A State Of Trance', '[Bitrate: 128]  ', 'http://89.252.2.4:8000', '', '', 41, 128, 1, 1, '2011-08-11', 1300, 49, NULL, 1), \
 ('Radio GARDARICA', 'Russia S-Petersburg', 'http://195.182.132.18:8260', '', '', 0, 128, 0, 1, '2011-08-11', 1316, 29, NULL, 1), \
 ('Memoryradio 2', '[Bitrate: 128]  ', 'http://188.165.247.175:5000', '', '', 0, 128, 0, 1, '2011-08-11', 1331, 4, NULL, 1), \
 ('KCSN Classical 88.5 HD2 - from Cal. State', ' Northridge ', 'http://130.166.82.14:8002', '', '', 8, 128, 0, 1, '2011-08-11', 1347, 7, NULL, 1), \
@@ -241,12 +242,12 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('KPOP @ Big B Radio', '[Bitrate: 128]', 'http://184.95.62.170:9002', '', '', 46, 128, 0, 1, '2011-08-11', 1572, 7, NULL, 1), \
 ('Star FM - Rock Classics', '[Bitrate: 128] ', 'http://87.230.53.43:8008', '', '', 46, 128, 0, 1, '2011-08-11', 1617, 12, NULL, 1), \
 ('Bienvenue', '[Bitrate: 128]  ', 'http://188.165.32.218:9042', '', '', 46, 128, 0, 1, '2011-08-11', 1623, 26, NULL, 1), \
-('~BlackSection.FM', '[Bitrate: 128] ', 'http://89.31.134.145:80', '', '', 46, 128, 0, 1, '2011-08-11', 1648, 12, NULL, 1), \
+('BlackSection.FM', '[Bitrate: 128] ', 'http://89.31.134.145:80', '', '', 46, 128, 0, 1, '2011-08-11', 1648, 12, NULL, 1), \
 ('swissradio Modern Jazz', '[Bitrate: 128]  ', 'http://82.197.165.140:80', '', '', 9, 128, 0, 1, '2011-08-11', 1651, 24, NULL, 1), \
 ('RadioMusic - RadioSals4te', '[Bitrate: 128]  ', 'http://188.165.206.81:8100', '', '', 46, 128, 0, 1, '2011-08-11', 1689, 33, NULL, 1), \
 ('TheBlast.FM: Christian Rock', '[Bitrate: 128]  ', 'http://199.58.164.238:80', '', '', 46, 128, 0, 1, '2011-08-11', 1696, 7, '2017-01-10', 1), \
 ('Public Domain', '[Bitrate: 128] [Max Listeners: 900]', 'http://82.197.165.137:80', '', '', 46, 128, 0, 1, '2011-08-11', 1710, 24, NULL, 1), \
-('Radio Limfjord 107.8 FM', '[Bitrate: 128]', 'http://media.wlmm.dk/limfjord', '', '', 46, 128, 0, 1, '2017-06-10', 1711, 45, NULL, 1), \
+('Radio Limfjord', '[Bitrate: 128]', 'http://media.wlmm.dk/limfjord', '', '', 46, 128, 0, 1, '2017-06-10', 1711, 45, NULL, 1), \
 ('ihart Radio', '[Bitrate: 128]', 'http://radionetwork-iheart-ice.streamguys1.com/flava2', '', '', 46, 128, 0, 1, '2017-06-10', 1712, 7, NULL, 1), \
 ('Radio Nova', '[Bitrate: 128]  ', 'http://85.159.16.93:80', '', '', 1, 128, 0, 1, '2011-08-11', 1717, 18, NULL, 1);";
 
@@ -760,7 +761,7 @@ const char *radio_station_setupsql17="REPLACE INTO `radio_stations` (`name`, `be
 ('NERadio-Sweden', 'NERadio og Hardstyle.nu eies og drives av NElite Music AS.<BR>NElite Music AS driver flere web radio stasjoner p&#229; forskjellige spr&#229;k og lyttere rundt om i verdenm ofte med live radiovert p&#', 'http://007.neradio.com:9000/', 'http://no.neradio.fm/', 'NERadio-Sweden.png', 0, 0, 0, 1, '2011-11-11', 9150, 0, '2017-01-01 00:00:00', 1), \
 ('Active-Gaydance', 'Night club music all the day 24/7 on RainbowWebradio.com', 'http://listen.radionomy.com/Rainbow-Webradio', 'http://www.rainbowwebradio.com', 'Active-Gaydance.png', 0, 0, 0, 1, '2011-11-11', 9172, 0, '2017-01-01 00:00:00', 1), \
 ('Antwerpen-fm-1054', '', 'http://streams.lazernet.be:2710/', 'http://www.antwerpen.fm', 'Antwerpen-fm-1054.png', 0, 0, 0, 1, '2011-11-11', 9180, 0, '2017-01-01 00:00:00', 1), \
-('DR P4 Sjælland', '', 'http://live-icy.gss.dr.dk:8000/A/A11H.mp3', 'http://www.dr.dk/p4/sjaelland/', 'DR-P4-Sjaelland-975.png', 0, 0, 0, 1, '2011-11-11', 9226, 0, '2017-01-01 00:00:00', 1), \
+('DR P4 Sj\xE6lland', '', 'http://live-icy.gss.dr.dk:8000/A/A11H.mp3', 'http://www.dr.dk/p4/sjaelland/', 'DR-P4-Sjaelland-975.png', 0, 0, 0, 1, '2011-11-11', 9226, 0, '2017-01-01 00:00:00', 1), \
 ('Hit-FM-1067', '', 'http://online-hitfm.tavrmedia.ua:7000/HitFM', 'http://www.hitfm.ua/', 'Hit-FM-1067.png', 0, 0, 0, 1, '2011-11-11', 9295, 0, '2017-01-01 00:00:00', 1), \
 ('Radio-DeeGay', 'Il pi&#249; cool del nostro network con la musica pi&#249; nuova, l&#39;informazione, i programmi in voce e le dirette degli eventi pi&#249; importanti del mondo GLBT italiano.<BR>Le HIT dance e pop p', 'http://ss1.deegay.it:80/', 'http://www.deegay.it/', 'Radio-DeeGay.png', 0, 0, 0, 1, '2011-11-11', 9296, 0, '2017-01-01 00:00:00', 1), \
 ('KBIM-FM-949', '', 'http://crystalout.surfernetwork.com:8001/KBIM_MP3', 'http://kbim949.com/', 'KBIM-FM-949.png', 0, 0, 0, 1, '2011-11-11', 9302, 0, '2017-01-01 00:00:00', 1), \
@@ -913,7 +914,7 @@ const char *radio_station_setupsql44="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio-Tunisie24 Dance', 'Among the stations Radio Tunisie24, users can discover Urban Radio Tunisie devoted to the Underground Music Rap Hip-Hop Rb.', 'http://tunisie24.net/radio-tunisie24-dance.m3u', 'http://www.tunisie24.net/', 'Radio-Tunisie24---Dance.png', 0, 0, 0, 1, '2011-11-11', 14259, 0, '2017-01-01 00:00:00', 0), \
 ('Energy-98', '', 'http://listen.181fm.com/181-energy98_128k.mp3', 'http://www.energy981.com/', 'Energy-98.png', 0, 0, 0, 1, '2011-11-11', 14263, 0, '2017-01-01 00:00:00', 1);";
 
- 
+
 const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `beskriv`, `stream_url`, `homepage`, `gfx_link`, `art`, `bitrate`, `popular`, `aktiv`, `createdate`, `intnr`, `landekode`, `lastplayed`, `online`) VALUES \
 ('Voivod', '', 'http://stream.laut.fm/eisradio', '', 'Voivod.png', 0, 0, 0, 1, '2011-11-11', 14271, 0, '2017-01-01 00:00:00', 1), \
 ('Radio-Deejay', '', 'http://live.radiodeejay.hr:7002', 'http://www.radiodeejay.hr/', 'Radio-Deejay.png', 0, 0, 0, 1, '2011-11-11', 14324, 0, '2017-01-01 00:00:00', 1), \
@@ -929,7 +930,7 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('Santa Radio', 'Santa Radio', 'http://149.255.59.164:8041/listen.pls?sid=1', '', '', 1, 128, 0, 1, '2017-12-01', 14357, 0, '2017-12-01 00:00:00', 1), \
 ('Christmas Music Station', 'Christmas Music Station', 'http://51.255.235.165:5192', '', '', 1, 128, 0, 1, '2017-12-01', 14358, 0, '2017-12-01 00:00:00', 1), \
 ('Jule radio', 'jule radio', 'http://itunedradio.fr:8765/jul', '', '', 1, 128, 0, 1, '2017-12-01', 14359, 0, '2017-12-01 00:00:00', 1), \
-('Jule radio 2', 'jule radio 2', 'http://stream.anr.dk/nordjyske', '', '', 1, 128, 0, 1, '2017-12-01', 14360, 0, '2017-12-01 00:00:00', 1), \
+('Nordjyske', 'jule radio 2', 'http://stream.anr.dk/nordjyske', '', '', 1, 128, 0, 1, '2017-12-01', 14360, 0, '2017-12-01 00:00:00', 1), \
 ('Radio Alfa jule radio', 'Radio Alfa juleradio', 'http://netradio.radioalfa.dk/alfajul', '', '', 1, 128, 0, 1, '2017-12-01', 14361, 0, '2017-12-01 00:00:00', 1), \
 ('Globus jule radio', 'Globus juleradio', 'http://globusguld.dk/juleradio/', '', '', 1, 128, 0, 1, '2017-12-01', 14362, 0, '2017-12-01 00:00:00', 1), \
 ('Jule radio', 'Jule radio', 'http://jule-radio.dk/', '', '', 1, 128, 0, 1, '2017-12-01', 14363, 0, '2017-12-01 00:00:00', 1), \
