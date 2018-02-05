@@ -81,7 +81,7 @@ uninstall:
 	rm -f $(BINPROG)
 
 clean: 
-	rm mythtv-controller
+	@if test -e mythtv-controller; then rm mythtv-controller; fi
 
 installsound:
 	@echo "Install fmod sound system ver 4.44.41"
