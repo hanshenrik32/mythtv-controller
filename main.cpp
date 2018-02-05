@@ -611,9 +611,8 @@ GLuint _textureId7_2;	                    // folder image
 GLuint _textureId7_3;	                    // folder mask image
 GLuint _textureId7_4;	                    // folder trans mask image
 GLuint _texturemusicplayer; 	            // music image		// show player
-GLuint _textureId9; 	                    // askbox image
-GLuint _textureId9_1; 	                  // askbox image
-GLuint _textureId9_2; 	                  // askbox image
+GLuint _textureId9_askbox; 	              // askbox image
+GLuint _textureId9_2; 	                  // askbox music image
 GLuint _textureId10; 	                    // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
@@ -3020,7 +3019,7 @@ void display() {
           //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBindTexture(GL_TEXTURE_2D, _textureId9);						// texture9
+          glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS); // draw ask box
@@ -10114,7 +10113,7 @@ void loadgfx() {
     _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
     _textureId7_4       	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
-    _textureId9          	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
+    _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
     _textureId10         	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
@@ -10314,7 +10313,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId7_2);			  // cd/dir icon in music oversigt mask (hvis cd cover findes)
     glDeleteTextures( 1, &_textureId7_4);			  // bruges til billed af cdcover i show music play
     glDeleteTextures( 1, &_texturemusicplayer); // show music info player
-    glDeleteTextures( 1, &_textureId9);				  // ask box
+    glDeleteTextures( 1, &_textureId9_askbox);				  // ask box
     glDeleteTextures( 1, &_textureId9_2);			  // ask box
     glDeleteTextures( 1, &_textureId10);			  // play icon
     glDeleteTextures( 1, &_textureopen);        // open icon
