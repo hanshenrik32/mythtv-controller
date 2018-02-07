@@ -32,6 +32,22 @@ const int doxmltvupdateinterval=60*60*2;
 
 // end,danish
 
+
+
+const char *prgtypee[]={"Unknown",
+                        "children",
+                        "Sport",
+                        "Cartoon",
+                        "News",
+                        "Movie",
+                        "Nature",
+                        "Documentary",
+                        "Entertainment",
+                        "Sci-Fi",
+                        "Serie",
+                        "Adult"};
+
+
 //
 // Sprog struktur.
 //

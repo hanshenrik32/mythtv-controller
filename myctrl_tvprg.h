@@ -62,7 +62,6 @@ class tv_oversigt_pr_kanal {
 
 class tv_oversigt {
     private:
-        tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int kanal_antal;
         int vis_kanal_antal;                                                                                  // # of channels show in tv guide on same screen
         time_t starttid;
@@ -71,11 +70,12 @@ class tv_oversigt {
         char mysqlluser[200];
         char mysqllpass[200];
         char loadinginfotxt[200];
-        int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);                              //
-        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
         time_t lastupdated;                                                                                   // last updated unix date
     public:
+        tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
+        int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
+        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //        
         bool vistvguidecolors;                                                                                     // vis tv guide kl
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
