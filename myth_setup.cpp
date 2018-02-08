@@ -1694,7 +1694,7 @@ void show_setup_sound() {
 //
 // *********************************** setup sql database info ***********************************************
 // db mythtv or xbmc ok
-//
+// backend
 
 void show_setup_sql() {
     char text[200];
