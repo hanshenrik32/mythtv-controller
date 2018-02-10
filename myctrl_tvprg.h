@@ -75,7 +75,7 @@ class tv_oversigt {
     public:
         tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
-        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //        
+        int tvprgrecordedbefore(char *ftitle,unsigned int fchannelid);                                        //
         bool vistvguidecolors;                                                                                     // vis tv guide kl
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
@@ -85,7 +85,8 @@ class tv_oversigt {
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
         void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
         void show_canal_names();                                                                              //
-        void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
+        //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
+        void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	  // show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //
         bool changetime(time_t difftime) { starttid+=difftime; sluttid+=difftime; return(true); }             //
         int cleanchannels();                                                                                  // clear all tv channels
