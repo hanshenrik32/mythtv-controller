@@ -624,8 +624,6 @@ GLuint _textureId14; 	                    // pause knap
 GLuint _textureId15; 	                    // lille cover mask
 GLuint _textureId16; 	                    // box2.bmp
 GLuint _dvdcovermask; 	                  // dvdcovermask
-GLuint _textureId18; 	                    // movie options box
-GLuint _textureId18_1; 	                  // mask movie options box
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
@@ -635,7 +633,6 @@ GLuint _textureId25; 	                    //
 GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
-GLuint _textureId28_1; 	                  // mask
 GLuint _textureIdback; 	                  //
 GLuint _textureId29_1; 	                  // mask
 GLuint _textureuv1;                       // uv img
@@ -711,8 +708,6 @@ GLuint _tvrecordcancelbutton;
 
 GLuint _tvrecordbutton;
 GLuint _tvoldprgrecordedbutton;
-GLuint _tvprgrecorded_mask;
-GLuint _tvprgrecorded1;
 GLuint _tvprgrecorded;
 GLuint _tvprgrecordedr;
 GLuint tvprginfobig;
@@ -2799,7 +2794,7 @@ void display() {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
-        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
+        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley);
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
@@ -10139,8 +10134,6 @@ void loadgfx() {
     _textureId15         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _textureId16         	= loadgfxfile(temapath,(char *) "images/",(char *) "box2");
     _dvdcovermask       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
-    _textureId18         	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox1");
-    _textureId18_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_mask");
     _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
     _textureId21         	= loadgfxfile(temapath,(char *) "images/",(char *) "textbox");
     _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
@@ -10150,7 +10143,6 @@ void loadgfx() {
     _textureId26         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar");
     _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
-    _textureId28_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist_mask");
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
@@ -10200,8 +10192,6 @@ void loadgfx() {
     tvprginfobig      		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprginfo");
     _tvprgrecorded    		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded");
     _tvprgrecordedr   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecordedr");
-    _tvprgrecorded1   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded1");
-    _tvprgrecorded_mask  	= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded_mask");
     _tvrecordbutton   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord");
     _tvrecordcancelbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord_cancel");
     _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
@@ -10334,8 +10324,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId15);					   		// bruges ikk
     glDeleteTextures( 1, &_textureId16);		          	// hvis ingen texture (music cover) set default (box2.bmp)
     glDeleteTextures( 1, &_dvdcovermask);	          		// dvd cover mask
-    glDeleteTextures( 1, &_textureId18);	             	// ask display order
-    glDeleteTextures( 1, &_textureId18_1);        			// ask box mask
     glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
     glDeleteTextures( 1, &_textureId21);		  					// bruges ikke
     glDeleteTextures( 1, &_textureId22);		          	// bruges ved recorded programs
@@ -10345,7 +10333,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId26);			          // vol control
     glDeleteTextures( 1, &_textureId27);	           		// vol control
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
-    glDeleteTextures( 1, &_textureId28_1);		        	// playlist default icon mask
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
@@ -10391,8 +10378,6 @@ void freegfx() {
     glDeleteTextures( 1, &_tvoverskrift);     // tv oversigt top window
     glDeleteTextures( 1, &_tvprgrecorded);			// tv
     glDeleteTextures( 1, &_tvprgrecordedr);						// bruges ikke mere
-    glDeleteTextures( 1, &_tvprgrecorded1);			// tv
-    glDeleteTextures( 1, &_tvprgrecorded_mask);			// tv
     glDeleteTextures( 1, &_tvrecordbutton);			// tv
     glDeleteTextures( 1, &_tvrecordcancelbutton);
     glDeleteTextures( 1, &_tvoldprgrecordedbutton);
