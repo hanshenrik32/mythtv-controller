@@ -2813,13 +2813,12 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-
         // show tv guide
         // take time on it
         std::clock_t start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -2830,7 +2829,7 @@ void display() {
           aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
           glPopMatrix();
         }
-
+        // show record program menu
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
       }
@@ -6205,7 +6204,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
         // scroll film up/down
         if (vis_film_oversigt) {
-            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+16<film_oversigt.film_antal()-1)) {
+            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+8<film_oversigt.film_antal()-1)) {
                 do_movie_icon_anim_icon_ofset=1;
                 switch(screen_size) {
                     case 1: _fangley+=(41.0f);					// 51 scroll 1 line

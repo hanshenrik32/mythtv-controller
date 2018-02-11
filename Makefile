@@ -1,6 +1,7 @@
 CC = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
-CFLAGS = -Wall -pthread -m32
+# -Wall
+CFLAGS = -Wformat-truncation -pthread -m32
 PROG     = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
