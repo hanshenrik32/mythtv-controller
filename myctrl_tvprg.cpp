@@ -88,19 +88,6 @@ const float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
 
 
 
-const char *prgtypee[]={"Unknown",
-                        "children",
-                        "Sport",
-                        "Cartoon",
-                        "News",
-                        "Movie",
-                        "Nature",
-                        "Documentary",
-                        "Entertainment",
-                        "Sci-Fi",
-                        "Serie",
-                        "Adult"};
-
 // bruges af show_tvoversigt
 
 void myglprinttv(char *string) {
@@ -3781,38 +3768,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   starttid=time(NULL);
   nutid=starttid;
   timeinfo=localtime(&starttid);
-  if (loading_tv_guide) {
-    // show loading tv guide
-    xsiz=450;
-    ysiz=100;
-    xpos=(orgwinsizex/2)-xsiz/2;
-    ypos=(orgwinsizey/2)-ysiz/2;
-    glPushMatrix();
-    glTranslatef(10,50, 1.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D,_tvbar3);
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glEnd(); //End quadrilateral coordinates
-    // print
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(xpos+120,ypos, 0.0f);
-    glScalef(20.0, 20.0,1);
-    glDisable(GL_TEXTURE_2D);
-    glcRenderString("Loading tv guide....");
-    glTranslatef(-9.0f,-1.5f, 0.0f);
-    if (strcmp("",this->loadinginfotxt)!=0) {
-      strcpy(tmptxt,"Updating ch ");
-      strcat(tmptxt,this->loadinginfotxt);
-      glcRenderString(tmptxt);
-    }
-    glPopMatrix();
-  }
   if (selectchanel>(this->vis_kanal_antal-1)) cstartofset=selectchanel-(this->vis_kanal_antal-1);
   else cstartofset=0;
   xpos=20;
@@ -3821,7 +3776,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   ysiz=150;
   glPushMatrix();
   glTranslatef(10,50, 0.0f);
-  // top
+  // top bar
   glEnable(GL_TEXTURE_2D);
   //glBlendFunc(GL_ONE, GL_ONE);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -3833,8 +3788,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   aktivfont.selectfont((char *) "Norasi");
   chanid=tvkanaler[1].chanid;
   strcpy(tmptxt,tvkanaler[1].chanel_name);
-//  glScalef(70.0, 70.0, 1.0);
-//  glcRenderString("TEST");
   glBegin(GL_QUADS); //Begin quadrilateral coordinates
   glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
   glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
@@ -4313,218 +4266,272 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
 
 
 
+const char *prgtypee[]={"Unknown",
+                        "children",
+                        "Sport",
+                        "Cartoon",
+                        "News",
+                        "Movie",
+                        "Nature",
+                        "Documentary",
+                        "Entertainment",
+                        "Sci-Fi",
+                        "Serie",
+                        "Adult"};
+
+
 
 //
 // viser et prgrams record info.
 // har store problemer med formatering (SKAL FIXES)
 
-void tv_oversigt::showandsetprginfo(int kanalnr,int tvprgnr) {
-    char tmptxt[200];
-    char tmptxt1[17000];
-    time_t aktueltid;
-    time_t prgtid;
-    time(&aktueltid);					// hent hvad klokken er
-    struct tm *timeinfo;
-    struct tm prgtidinfo;
-    static int antalrec=-1;
-    int xpos,ypos;
-    int xsiz,ysiz;
-    timeinfo=localtime(&aktueltid);				// convert to localtime
-    // window size
-    xsiz=850;
-    ysiz=400;
-    xpos=(orgwinsizex/2)-xsiz/2;
-    ypos=(orgwinsizey/2)-ysiz/2;
-    //glPushMatrix();
-    glTranslatef(10.0f, 50.0f, 0.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D,_tvbar3);
-    glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_BLEND);
+void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) {
+  char temptxt[8192];
+  char temprgtxt[8192];
+  struct tm prgtidinfo;
+  time_t prgtid;
+  time_t aktueltid;
+
+  struct tm *timeinfo;
+
+  int xpos,ypos,xsiz,ysiz;
+  int antalrec=0;
+  // windows background
+  glPushMatrix();
+  glBindTexture(GL_TEXTURE_2D, _tvbar3);
+  glEnable(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  //glBlendFunc(GL_ONE, GL_ONE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  glLoadName(81);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/4)+0, 0.0);
+  glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/4)+400, 0.0);
+  glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+850, (orgwinsizey/4)+400, 0.0);
+  glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+850, (orgwinsizey/4)+0, 0.0);
+  glEnd();
+  glPopMatrix();
+
+  glPushMatrix();
+  switch (configland) {
+    case 0: snprintf(temprgtxt,65,"Channel  : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+            break;
+    case 1: snprintf(temprgtxt,65,"Kanal    : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+            break;
+    case 2: snprintf(temprgtxt,65,"Channel  : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+            break;
+    case 3: snprintf(temprgtxt,65,"Channel  : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+            break;
+    case 4: snprintf(temprgtxt,65,"Channel  : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+            break;
+    default:
+            sprintf(temprgtxt,"Channel  : %-10s",tvkanaler[tvvalgtrecordnr].chanel_name);
+  }
+  glTranslatef(700,575, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+  glPushMatrix();
+  switch (configland) {
+    case 0: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+            break;
+    case 1: snprintf(temprgtxt,65,"Prg navn : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+            break;
+    case 2: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+            break;
+    case 3: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+            break;
+    case 4: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+            break;
+    default:
+          snprintf(temprgtxt,65,"Prg name : %-20s",65,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+  }
+  glTranslatef(700,525, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+  glPushMatrix();
+  switch (configland) {
+    case 0: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            break;
+    case 1: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            break;
+    case 2: snprintf(temprgtxt,65,"début    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            break;
+    case 3: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            break;
+    case 4: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            break;
+    default:snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+
+  }
+  glTranslatef(700,500, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+
+  glPushMatrix();
+  switch (configland) {
+    case 0: snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            break;
+    case 1: snprintf(temprgtxt,65,"Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            break;
+    case 2: snprintf(temprgtxt,65,"durée du : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            break;
+    case 3: snprintf(temprgtxt,65,"Programmlänge : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            break;
+    case 4: snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            break;
+    default:
+            snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+  }
+  glTranslatef(700,475, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+
+  glPushMatrix();
+  if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,tvkanaler[tvvalgtrecordnr].chanid);
+  switch (configland) {
+    case 0: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            break;
+    case 1: snprintf(temprgtxt,65,"Optaget  : %d gange før.",antalrec);
+            break;
+    case 2: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            break;
+    case 3: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            break;
+    case 4: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            break;
+    default: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+
+  }
+  if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].recorded) strcat(temprgtxt," Set to record");
+  glTranslatef(700,450, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+
+
+  glPushMatrix();
+  if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type<=10)
+  sprintf(temprgtxt,"Type     : %-10s",prgtypee[tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type]);
+  else sprintf(temprgtxt,"Type     : %d nr  ",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].prg_type);
+  glTranslatef(700,425, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+  glPushMatrix();
+  switch (configland) {
+    case 0: sprintf(temprgtxt,"Description : ");
+            break;
+    case 1: sprintf(temprgtxt,"Beskrivelse : ");
+            break;
+    case 2: sprintf(temprgtxt,"Description : ");
+            break;
+    case 3: sprintf(temprgtxt,"Description : ");
+            break;
+    case 4: sprintf(temprgtxt,"Description : ");
+            break;
+    default: sprintf(temprgtxt,"Description :");
+  }
+  glTranslatef(700,375, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+  // show description
+  glPushMatrix();
+  snprintf(temprgtxt,65,"%s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description);
+  glTranslatef(700,350, 0.0f);
+  glScalef(20.0, 20.0,1);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
+  glcRenderString(temprgtxt);
+  glPopMatrix();
+
+
+  if (strptime(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
+      printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
+  }
+  //
+  // can we record program
+  // if we can show icon for record
+  //
+  prgtid=mktime(&prgtidinfo);
+  time(&aktueltid);					            // hent hvad klokken er
+  timeinfo=localtime(&aktueltid);				// convert to localtime
+  if ((difftime(aktueltid,prgtid)<=0) && (tvprgrecorded(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,temptxt)==0)) {
+
+    glPushMatrix();
+    // close button
+    xsiz=100;
+    ysiz=100;
+    xpos=((orgwinsizex/2)-xsiz/2)-200;
+    ypos=((orgwinsizey/2)-ysiz/2)-200;
+    xpos=10.0f;
+    ypos=-50.0f;
+    glTranslatef(1400,400, 0.0f);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,_tvrecordbutton);
+    glEnable(GL_TEXTURE_2D);
+    glLoadName(41);                                                           // func Set program to record.
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+225-(xsiz/2), ypos-(ysiz/2), 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+225-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+225+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
     glEnd(); //End quadrilateral coordinates
-    // print
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(400,470, 0.0f);
-    glScalef(20.0, 20.0,1);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glDisable(GL_TEXTURE_2D);
-    switch (configland) {
-      case 0: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
-              break;
-      case 1: sprintf(tmptxt,"Kanal    : %-10s",tvkanaler[kanalnr].chanel_name);
-              break;
-      case 2: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
-              break;
-      case 3: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
-              break;
-      case 4: sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
-              break;
-      default:
-              sprintf(tmptxt,"Channel  : %-10s",tvkanaler[kanalnr].chanel_name);
-    }
-    glcRenderString(tmptxt);
-
+    glPopMatrix();
+  } else {
+    glPushMatrix();
+    // close button
+    xsiz=100;
+    ysiz=100;
+    xpos=((orgwinsizex/2)-xsiz/2)-200;
+    ypos=((orgwinsizey/2)-ysiz/2)-200;
     glTranslatef(-10.0f, -2.0f, 0.0f);
-    switch (configland) {
-      case 0: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-              break;
-      case 1: sprintf(tmptxt,"Prg navn : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-              break;
-      case 2: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-              break;
-      case 3: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-              break;
-      case 4: sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-              break;
-      default:
-            sprintf(tmptxt,"Prg name : %-20s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn);
-    }
-    glcRenderString(tmptxt);
+    xpos=15.0f;
+    ypos=-50.0f;
+    glTranslatef(1400,400, 0.0f);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
+    glLoadName(40);                                        // func close window
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
+    glEnd(); //End quadrilateral coordinates
+    glPopMatrix();
+  }
 
-    //glLoadIdentity();
-    //glTranslatef(400,470, 0.0f);
-    glTranslatef(-15.0f, -2.0f, 0.0f);
-    switch (configland) {
-      case 0: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-              break;
-      case 1: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-              break;
-      case 2: sprintf(tmptxt,"début    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-              break;
-      case 3: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-              break;
-      case 4: sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-              break;
-      default:sprintf(tmptxt,"Start    : %10s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime);
-
-    }
-    glcRenderString(tmptxt);
-
-//   *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
-
-    glTranslatef(-15.0f, -2.0f, 0.0f);
-    switch (configland) {
-      case 0: sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-              break;
-      case 1: sprintf(tmptxt,"Længde   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-              break;
-      case 2: sprintf(tmptxt,"durée du : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-              break;
-      case 3: sprintf(tmptxt,"Programmlänge : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-              break;
-      case 4: sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-              break;
-      default:
-              sprintf(tmptxt,"Length   : %4d min.",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_length_minuter);
-    }
-    glcRenderString(tmptxt);
-
-    glTranslatef(-10.0f, -2.0f, 0.0f);
-    if (tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type<=10)
-        sprintf(tmptxt,"Type     : %-10s",prgtypee[tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type]);
-    else sprintf(tmptxt,"Type     : %d nr  ",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].prg_type);
-    glcRenderString(tmptxt);
-
-    glTranslatef(-10.0f, -2.0f, 0.0f);
-    if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn,tvkanaler[kanalnr].chanid);
-    switch (configland) {
-      case 0: sprintf(tmptxt,"recorded %d times before.",antalrec);
-              break;
-      case 1: sprintf(tmptxt,"optaget %d gange før.",antalrec);
-              break;
-      case 2: sprintf(tmptxt,"recorded %d times before.",antalrec);
-              break;
-      case 3: sprintf(tmptxt,"recorded %d times before.",antalrec);
-              break;
-      case 4: sprintf(tmptxt,"recorded %d times before.",antalrec);
-              break;
-      default: sprintf(tmptxt,"recorded %d times before.",antalrec);
-
-    }
-    if (tvkanaler[kanalnr].tv_prog_guide[tvprgnr].recorded) strcat(tmptxt," Set to record");
-    glcRenderString(tmptxt);
-
-    glTranslatef(-10.0f, -2.0f, 0.0f);
-    switch (configland) {
-      case 0: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-              break;
-      case 1: sprintf(tmptxt1,"Beskrivelse : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-              break;
-      case 2: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-              break;
-      case 3: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-              break;
-      case 4: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-              break;
-      default: sprintf(tmptxt1,"Description : %s",tvkanaler[kanalnr].tv_prog_guide[tvprgnr].description);
-    }
-    glcRenderString(tmptxt1);
-    if (strptime(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
-        printf("RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
-    }
-    prgtid=mktime(&prgtidinfo);
-    if ((difftime(aktueltid,prgtid)<=0) && (tvprgrecorded(tvkanaler[kanalnr].tv_prog_guide[tvprgnr].starttime,tvkanaler[kanalnr].tv_prog_guide[tvprgnr].program_navn,tmptxt)==0)) {
-      xsiz=5;
-      ysiz=5;
-      xpos=((orgwinsizex/2)-xsiz/2)-200;
-      ypos=((orgwinsizey/2)-ysiz/2)-200;
-
-      glTranslatef(-10.0f, -2.0f, 0.0f);
-      xpos=10.0f;
-      ypos=-50.0f;
-      glTranslatef(10.0f, 50.0f, 0.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_tvrecordbutton);
-      glEnable(GL_TEXTURE_2D);
-      glLoadName(41);                                                           // func Set program to record.
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glEnd(); //End quadrilateral coordinates
-      // close button
-      xpos=15.0f;
-      glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
-      glLoadName(40);                                        // func close window
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glEnd(); //End quadrilateral coordinates
-    } else {
-      // close button
-      xsiz=5;
-      ysiz=5;
-      xpos=((orgwinsizex/2)-xsiz/2)-200;
-      ypos=((orgwinsizey/2)-ysiz/2)-200;
-      glTranslatef(-10.0f, -2.0f, 0.0f);
-      xpos=15.0f;
-      ypos=-50.0f;
-      glTranslatef(10.0f, 50.0f, 0.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D,_textureclose);            // old _tvrecordcancelbutton
-      glLoadName(40);                                        // func close window
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.0, 0.0); glVertex3f(xpos-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(xpos-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos+ysiz-(ysiz/2), 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz-(xsiz/2), ypos-(ysiz/2), 0.0);
-      glEnd(); //End quadrilateral coordinates
-    }
+  //glPopMatrix();
 }
-
-
-
 
 
 

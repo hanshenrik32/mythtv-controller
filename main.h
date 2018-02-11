@@ -31,7 +31,6 @@ const int doxmltvupdateinterval=60*60*2;
 //
 
 // end,danish
-
 //
 // Sprog struktur.
 //
@@ -62,8 +61,6 @@ const char *music_nomberofsongs[]={"# of songs: %2d Artist : %s","# of sange: %2
 const char *music_nomberofdirs[]={"Numbers of directorys is :%d","Antal af directorys er :%d","","",""};
 const char *music_numberinplaylist[]={"%d/%d in playlist ","%d/%d i playlisten",""};
 
-
-
 // radio stuf
 const char *radio_artistname[]={"Artist name","Artist navn","","",""};
 const char *radio_songname[]={"Song name","Sang navn","","",""};
@@ -75,8 +72,6 @@ const char *radio_nowplaying[]={"Now Playing.","Spiller nu","","",""};
 const char *radio_connecting[]={"Connecting..","Connecting..","","",""};
 const char *radio_buffing[]={"Buffering.. %d %%","Buffering.. %d %%","","",""};
 const char *radio_playing[]={"Playing..     ","Afspiller. ","","",""};
-
-
 
 // movie stuf
 const char *movie_rating[]={"Rating","Rating","Rating","Rating","Rating"};
@@ -96,19 +91,6 @@ const char *other_icon_anim_files[]={"recorded","lille_knap1_1"};
 const char *tv_icon_anim_files[]={"tv","tv1"};
 
 void *radio_check_statusloader(void *data);
-
 void *update_xmltv_phread_loader();
-
-float music_icon_anim_files_ofset=0.0f;
-int music_icon_anim_files_numbers=19;
-
-float tv_icon_anim_files_ofset=0.0f;
-int tv_icon_anim_files_numbers=19;
-
-float movie_icon_anim_files_ofset=0.0f;
-int movie_icon_anim_files_numbers=19;
-const int SINTABLE_SIZE=11*22*20;
-
-const char *music_zoom_anim_files[]={"stor_knap3_2_mask_10.jpg","stor_knap3_2_mask_9.jpg","stor_knap3_2_mask_8.jpg","stor_knap3_2_mask_7.jpg","stor_knap3_2_mask_6.jpg","stor_knap3_2_mask_5.jpg","stor_knap3_2_mask_4.jpg","stor_knap3_2_mask_3.jpg","stor_knap3_2_mask_2.jpg","stor_knap3_2_mask_1.jpg","stor_knap3_2_mask.jpg"};
 
 #endif

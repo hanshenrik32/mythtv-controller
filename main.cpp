@@ -195,7 +195,7 @@ bool full_screen=true;
 int do_play_music_aktiv_table_nr=0;                     // aktiv sang nr
 int do_play_music_aktiv_nr_select_array=0;
 bool show_uv=true;                                      // default show uv under menu
-bool vis_uv_meter=true;                                 // uv meter er igang med at blive vist
+bool vis_uv_meter=false;                                 // uv meter er igang med at blive vist
 bool hent_music_search=false;                           // skal vi søge efter music
 bool keybufferopenwin=false;                            // er vindue open
 bool do_play_music_cover=false;
@@ -611,9 +611,8 @@ GLuint _textureId7_2;	                    // folder image
 GLuint _textureId7_3;	                    // folder mask image
 GLuint _textureId7_4;	                    // folder trans mask image
 GLuint _texturemusicplayer; 	            // music image		// show player
-GLuint _textureId9; 	                    // askbox image
-GLuint _textureId9_1; 	                  // askbox image
-GLuint _textureId9_2; 	                  // askbox image
+GLuint _textureId9_askbox; 	              // askbox image
+GLuint _textureId9_2; 	                  // askbox music image
 GLuint _textureId10; 	                    // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
@@ -625,8 +624,6 @@ GLuint _textureId14; 	                    // pause knap
 GLuint _textureId15; 	                    // lille cover mask
 GLuint _textureId16; 	                    // box2.bmp
 GLuint _dvdcovermask; 	                  // dvdcovermask
-GLuint _textureId18; 	                    // movie options box
-GLuint _textureId18_1; 	                  // mask movie options box
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
@@ -636,7 +633,6 @@ GLuint _textureId25; 	                    //
 GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
-GLuint _textureId28_1; 	                  // mask
 GLuint _textureIdback; 	                  //
 GLuint _textureId29_1; 	                  // mask
 GLuint _textureuv1;                       // uv img
@@ -712,8 +708,6 @@ GLuint _tvrecordcancelbutton;
 
 GLuint _tvrecordbutton;
 GLuint _tvoldprgrecordedbutton;
-GLuint _tvprgrecorded_mask;
-GLuint _tvprgrecorded1;
 GLuint _tvprgrecorded;
 GLuint _tvprgrecordedr;
 GLuint tvprginfobig;
@@ -1107,9 +1101,10 @@ int parse_config(char *filename) {
                       if (strcmp(value,"true")==0) full_screen=true; else full_screen=false;
                     } else if (command_nr==setconfigdefaultmusicpath) {
                       strcpy(configdefaultmusicpath,value);
+                      strcpy(configmusicpath,value);
                     } else if (command_nr==setconfigdefaultmoviepath) {
                       strcpy(configdefaultmoviepath,value);
-                      strcpy(configmoviepath,configdefaultmoviepath);
+                      strcpy(configmoviepath,value);
                     }
 
                     // use 3d effect
@@ -2225,6 +2220,7 @@ void display() {
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
+    char temprgtxt[2000];
     int i;
     struct tm *timeinfo;
     float mgrader,tgrader;
@@ -2680,7 +2676,7 @@ void display() {
     }
 
 
-    // stream stuf
+    // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
         // img
         glPushMatrix();
@@ -2798,12 +2794,13 @@ void display() {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
-        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,_textureId28_1,_mangley);
+        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley);
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
+
       } else if (vis_stream_oversigt) {
         glPushMatrix();
         streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
@@ -2811,14 +2808,15 @@ void display() {
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
-
         // show tv guide
         // take time on it
         std::clock_t start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        if (debugmode & 1 ) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << " " << sizeof(tv_oversigt) << std::endl;
-
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //
+        // show tv program info about selected program in tv guide
+        //
         if ((do_zoom_tvprg_aktiv_nr)>0) {
           glPushMatrix();
           // show info om program selected
@@ -2826,8 +2824,7 @@ void display() {
           aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
           glPopMatrix();
         }
-
-
+        // show record program menu
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
       }
@@ -3019,7 +3016,7 @@ void display() {
           //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBindTexture(GL_TEXTURE_2D, _textureId9);						// texture9
+          glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS); // draw ask box
@@ -4612,6 +4609,7 @@ void display() {
             }
             #endif
             #if defined USE_SDL_MIXER
+            Mix_PauseMusic();
             Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
             sdlmusicplayer=NULL;
             #endif
@@ -4622,21 +4620,17 @@ void display() {
             aktiv_playlist.clean_playlist();                // clean play list (reset) play list
             do_play_music_aktiv_table_nr=1;			// reset play start nr
 
-            if (debugmode & 16)  fprintf(stderr,"Stop playing media/wideo if any \n");
-
-/*
+            if (debugmode & 16) fprintf(stderr,"Stop playing media/wideo if any \n");
             if (film_oversigt.film_is_playing) {
               if (debugmode) printf("Stop playing last movie before start new\n");
               // stop playing (active movie)
               film_oversigt.softstopmovie();
             }
-*/
             // start movie
             if (film_oversigt.playmovie(fknapnr-1)==0) {
               vis_error=true;
               vis_error_timeout=60;
             }
-
         }
         startmovie=false;                   // start kun 1 instans
     }
@@ -4722,10 +4716,9 @@ void display() {
             do_play_recorded_aktiv_nr=0;                        // start kun 1 player
         }
     }
-
-
+    //
     // show movie info
-
+    //
     if (((vis_nyefilm_oversigt) || (vis_film_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
       do_zoom_film_aktiv_nr=fknapnr-1;
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfronttextureid()==0)) {
@@ -4735,8 +4728,7 @@ void display() {
       if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
         film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
       }
-
-      // window
+      // draw window
       glPushMatrix();
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400,400,0);
@@ -4759,12 +4751,12 @@ void display() {
 
       // show play movie icon
       glPushMatrix();
-      glDisable(GL_BLEND);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(400+20,400+20,0);
       glDisable(GL_DEPTH_TEST);
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemplay);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4782,7 +4774,8 @@ void display() {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glTranslatef(490+20,400+20,0);
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemstop);        //
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4795,7 +4788,7 @@ void display() {
       glEnd();
       glPopMatrix();
 
-
+      glDisable(GL_BLEND);
       // show movie dvd cover
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
@@ -4814,27 +4807,31 @@ void display() {
       glEnd();
       glPopMatrix();
 
-
+      //
+      // show movie info
       // show movie icon over dvd cover
-      glPushMatrix();
+      //
       textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfronttextureid();
       if (textureId==0) textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid();
-      if (textureId==0) textureId=_defaultdvdcover;                               // hvis ingen dvdcover findes
-      glBindTexture(GL_TEXTURE_2D, textureId);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glTranslatef(420,600,0);
-      glDisable(GL_DEPTH_TEST);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 0+30, 100 +5, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320-5, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 0+220-3, 0+320-5 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 0+220-3, 100+5 , 0.0);
-      glEnd();
-      glPopMatrix();
+      if (textureId) {
+        glPushMatrix();
+        if (textureId==0) textureId=_defaultdvdcover;                               // hvis ingen dvdcover findes
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        glTranslatef(420,600,0);
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_DST_COLOR, GL_ZERO);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( 0+30, 100 +5, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 0+30, 0+320-5, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( 0+220-3, 0+320-5 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( 0+220-3, 100+5 , 0.0);
+        glEnd();
+        glPopMatrix();
+      }
 
       // text genre
       glDisable(GL_TEXTURE_2D);
@@ -5814,7 +5811,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((vis_tv_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==27) {
                 if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
-                //vis_tv_oversigt=false;
+                vis_tv_oversigt=false;
                 fundet=true;
             }
             if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
@@ -6202,7 +6199,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
         // scroll film up/down
         if (vis_film_oversigt) {
-            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+16<film_oversigt.film_antal()-1)) {
+            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+8<film_oversigt.film_antal()-1)) {
                 do_movie_icon_anim_icon_ofset=1;
                 switch(screen_size) {
                     case 1: _fangley+=(41.0f);					// 51 scroll 1 line
@@ -9843,6 +9840,7 @@ void *xbmcdatainfoloader(void *data) {
 
 
 // load xbmc/kodi movies to db
+// create movie db if not exist
 
 void *xbmcdatainfoloader_movie(void *data) {
   char userhomedir[200];
@@ -10116,7 +10114,7 @@ void loadgfx() {
     _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
     _textureId7_4       	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
-    _textureId9          	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
+    _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
     _textureId10         	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
@@ -10136,8 +10134,6 @@ void loadgfx() {
     _textureId15         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _textureId16         	= loadgfxfile(temapath,(char *) "images/",(char *) "box2");
     _dvdcovermask       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
-    _textureId18         	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox1");
-    _textureId18_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_mask");
     _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
     _textureId21         	= loadgfxfile(temapath,(char *) "images/",(char *) "textbox");
     _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
@@ -10147,7 +10143,6 @@ void loadgfx() {
     _textureId26         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar");
     _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
-    _textureId28_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist_mask");
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
@@ -10197,8 +10192,6 @@ void loadgfx() {
     tvprginfobig      		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprginfo");
     _tvprgrecorded    		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded");
     _tvprgrecordedr   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecordedr");
-    _tvprgrecorded1   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded1");
-    _tvprgrecorded_mask  	= loadgfxfile(temapath,(char *) "images/",(char *) "tvprgrecorded_mask");
     _tvrecordbutton   		= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord");
     _tvrecordcancelbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord_cancel");
     _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
@@ -10316,7 +10309,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId7_2);			  // cd/dir icon in music oversigt mask (hvis cd cover findes)
     glDeleteTextures( 1, &_textureId7_4);			  // bruges til billed af cdcover i show music play
     glDeleteTextures( 1, &_texturemusicplayer); // show music info player
-    glDeleteTextures( 1, &_textureId9);				  // ask box
+    glDeleteTextures( 1, &_textureId9_askbox);				  // ask box
     glDeleteTextures( 1, &_textureId9_2);			  // ask box
     glDeleteTextures( 1, &_textureId10);			  // play icon
     glDeleteTextures( 1, &_textureopen);        // open icon
@@ -10331,8 +10324,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId15);					   		// bruges ikk
     glDeleteTextures( 1, &_textureId16);		          	// hvis ingen texture (music cover) set default (box2.bmp)
     glDeleteTextures( 1, &_dvdcovermask);	          		// dvd cover mask
-    glDeleteTextures( 1, &_textureId18);	             	// ask display order
-    glDeleteTextures( 1, &_textureId18_1);        			// ask box mask
     glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
     glDeleteTextures( 1, &_textureId21);		  					// bruges ikke
     glDeleteTextures( 1, &_textureId22);		          	// bruges ved recorded programs
@@ -10342,7 +10333,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId26);			          // vol control
     glDeleteTextures( 1, &_textureId27);	           		// vol control
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
-    glDeleteTextures( 1, &_textureId28_1);		        	// playlist default icon mask
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
@@ -10388,8 +10378,6 @@ void freegfx() {
     glDeleteTextures( 1, &_tvoverskrift);     // tv oversigt top window
     glDeleteTextures( 1, &_tvprgrecorded);			// tv
     glDeleteTextures( 1, &_tvprgrecordedr);						// bruges ikke mere
-    glDeleteTextures( 1, &_tvprgrecorded1);			// tv
-    glDeleteTextures( 1, &_tvprgrecorded_mask);			// tv
     glDeleteTextures( 1, &_tvrecordbutton);			// tv
     glDeleteTextures( 1, &_tvrecordcancelbutton);
     glDeleteTextures( 1, &_tvoldprgrecordedbutton);
