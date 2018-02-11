@@ -8,7 +8,17 @@
 #include <unistd.h>
 #include "myctrl_readwebfile.h"
 
-
+                                                                // 1  = wifi net
+                                                                // 2  = music
+                                                                // 4  = stream
+                                                                // 8  = keyboard/mouse move
+                                                                // 16 = movie
+                                                                // 32 = searcg
+extern int debugmode;                                           // 64 = radio station land icon loader
+                                                                // 128= stream search
+                                                                // 256 = tv program stuf
+                                                                // 512 = media importer
+                                                                // 1024 = flag loader
 
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
@@ -176,7 +186,7 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) {
       fil=fopen(outfile,"w");
       if (!(fil)) {
-        fprintf(stderr," Open file for write error %s \n",outfile);
+        if (debugmode & 1) fprintf(stderr," Open file for write error %s \n",outfile);
         loaderror=true;							// not posible to save file
 //        exit(0);
       }
