@@ -540,6 +540,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 s=trimwhitespace(result);
                 if (debugmode & 256) printf("TV chanel found : %s \n",s);
               }
+              
               subnode=node->xmlChildrenNode;
               while(subnode) {
                 xmltvid=xmlGetProp(node,( xmlChar *) "id");
