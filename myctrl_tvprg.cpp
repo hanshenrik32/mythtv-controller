@@ -24,6 +24,7 @@
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
 #include "myth_setup.h"
+#include "myctrl_readwebfile.h"
 
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
@@ -395,7 +396,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char result[1024];
   unsigned int prg_antal=0;
   char temptxt[1024];
-
+  char downloadfile[1024];
   char sql[32738];
   char *s;
   int error=0;
@@ -404,6 +405,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
   xmlDoc *document;
   xmlNode *root, *first_child, *node, *node1 ,*subnode;
   xmlChar *xmltvid;
+  xmlChar *xmltvicon_url;
+  char iconfile[1024];
   char starttime[64];
   bool getstart=false;
   char endtime[64];
@@ -413,6 +416,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char channelidname[1024];
   char category[1924];
   char description[4096];
+  char realfilename[1024];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -540,6 +544,21 @@ int tv_oversigt::parsexmltv(const char *filename) {
               while(subnode) {
                 xmltvid=xmlGetProp(node,( xmlChar *) "id");
                 strcpy(channelidname,(char *) xmltvid);
+                if (strcmp((char *) subnode->name,"icon")==0) {
+                  // get icon source
+                  xmltvicon_url=xmlGetProp(subnode,( xmlChar *) "src");
+                  if (xmltvicon_url) {
+                    strcpy(iconfile,(char *) xmltvicon_url);
+                    // get file name from url (realfilename)
+                    get_webfilename(realfilename,iconfile);
+                    // downloadfile
+                    strcpy(downloadfile,"tv_icons/");
+                    strcat(downloadfile,realfilename);
+                    // download tv channel iconfile
+                    // if not exist
+                    if (!(file_exists(downloadfile))) get_webfile(iconfile,downloadfile);
+                  }
+                }
                 subnode=subnode->next;
               }
               cidfundet=do_cannel_exist(channelidname);
