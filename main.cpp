@@ -81,6 +81,7 @@ extern char __BUILD_NUMBER;
 
 
 // struct used by keyboard config of functions keys
+
 struct configkeytype {
     char cmdname[200];
     unsigned int scrnr;
