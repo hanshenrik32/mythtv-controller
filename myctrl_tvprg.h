@@ -46,6 +46,8 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
 class tv_oversigt_pr_kanal {
     private:
         unsigned int programantal;                                  // # of program guide records
+        GLuint channel_icon;
+        char channel_icon_name[200];
     public:
         char chanel_name[20];						                         		// kanal navn
         unsigned int chanid;
@@ -56,6 +58,8 @@ class tv_oversigt_pr_kanal {
         char *getkanalname(void) { return(chanel_name); };
         int program_antal() { return programantal; }
         void set_program_antal(int antal) { programantal=antal; }
+        GLuint get_kanal_icon() { return(channel_icon); }
+        void set_kanal_icon(GLuint icon) { channel_icon=icon; }
         void cleanprogram_kanal();
 };
 
