@@ -123,5 +123,5 @@ int loadTexture ( char *filename ) {
     return 0;
   }
   return retval;
-} 
+}
 
