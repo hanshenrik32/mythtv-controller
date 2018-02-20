@@ -3394,22 +3394,22 @@ time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
 
 
 
+// load kanal icons
 
-
-GLuint loadicon(char *dir,char *file) {
-    GLuint gl_img=0;
-    char fileload[2000];
-    strcpy(fileload,"");
-    strcat(fileload,dir);
-    strcat(fileload,file);							// filename - type
-    if (file_exists(fileload)) gl_img = loadTexture ((char *) fileload);
-    if (gl_img==0) printf("GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
-    return(gl_img);
+void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
+  char file[2048];
+  char tmp[2048];
+  GLuint icon=0;
+  for (int i=0;i<kanal_antal;i++) {
+    if (!(tvkanaler[i].get_kanal_icon())) {
+      strcpy(file,"images/tv_icons/");
+      tvkanaler[i].get_kanal_icon_file(tmp);
+      strcat(file,tmp);
+//      icon=loadTexture(file);
+      tvkanaler[i].set_kanal_icon(icon);
+    }
+  }
 }
-
-
-
-
 
 //
 // henter aktiv tv overigt fra mythtv or internal localdb created like mythtv in use
@@ -3522,8 +3522,13 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                     tvkanaler[kanalnr].chanid=atoi(row[12]);                      // set chanelid in array
                     // load tv kanal icon
                     if (tvkanaler[kanalnr].get_kanal_icon()==0) {
-                      GLuint icon=0; //loadicon("images/tv_icons/",row[1]);
-                      tvkanaler[kanalnr].set_kanal_icon(icon);
+                      GLuint icon=0;
+                      char tmp[2000];
+                      strcpy(tmp,"images/tv_icons/");
+                      strcat(tmp,row[1]);
+//                      if (file_exists(tmp)) icon=loadTexture((char *) tmp);
+                      tvkanaler[kanalnr].set_kanal_icon_file(row[1]);
+                      //tvkanaler[kanalnr].set_kanal_icon(icon);
                     }
                     strcpy(tmptxt,row[0]);                                        // rember channel name
                     printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
@@ -3653,6 +3658,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         }
         mysql_close(conn);
     }
+    opdatere_tv_oversigt_kanal_icons();
     loading_tv_guide=false;
 }
 
