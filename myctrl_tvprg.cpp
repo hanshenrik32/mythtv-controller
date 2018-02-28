@@ -3978,6 +3978,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   // loop for channel
   //
 
+  int xx=xpos-50;
+
   while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -3988,27 +3990,32 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
               break;
     }
 
-    ysiz=40;
-    xsiz=80;
-    //
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D,tvkanaler[kanalnr].get_kanal_icon());
-    glBegin(GL_QUADS);                                                    // box
-    glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    //
-
-    glScalef(24.0, 24.0, 1.0);
-    if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
-    chanid=tvkanaler[0].chanid;
-    strcpy(tmptxt," ");
-    strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
-    *(tmptim+14)='\0';
-    glcRenderString(tmptxt);
+    // box show the icon for the tv channel loaded from xmltv file if exist in file
+    // loaded other place
+    if (tvkanaler[kanalnr].get_kanal_icon()) {
+      // icon size
+      ysiz=72;
+      xsiz=98;
+      //
+      glColor3f(1.0f, 1.0f, 1.0f);		                                      // default
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,tvkanaler[kanalnr].get_kanal_icon());
+      glBegin(GL_QUADS);                                                    // box
+      glTexCoord2f(0.0, 0.0); glVertex3f(xx, 70, 0.0f);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xx, 70-ysiz, 0.0f);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xx+xsiz, 70-ysiz, 0.0f);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xx+xsiz, 70, 0.0f);
+      glEnd();
+      glDisable(GL_TEXTURE_2D);
+    } else {
+      glScalef(24.0, 24.0, 1.0);
+      if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
+      chanid=tvkanaler[0].chanid;
+      strcpy(tmptxt," ");
+      strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
+      *(tmptim+14)='\0';
+      glcRenderString(tmptxt);
+    }
     glPopMatrix();
 
     int xsiz=210;

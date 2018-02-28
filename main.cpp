@@ -155,7 +155,7 @@ int configland=0;
 const int configlandantal=5;
 char *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(char *) "Tysk",(char *) "Arabic"};
 // ************************************************************************************************
-int tema=3;       					                            // aktiv tema
+int tema=3;       					                            // aktiv tema (default is 3)
 int screen_size=3;		                            			// default screen size
 bool do_shift_song=false;				                        // jump to next song to play
 bool do_stop_music=false;                               // stop all play
@@ -7682,6 +7682,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                             do_swing_music_cover=true;
                         } else ask_open_dir_or_play=true;
 //                        do_zoom_music_cover_remove_timeout=showtimeout;		// set show music info timeout
+                    }
+
+                    // enter key pressed
+                    if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
+                      ask_open_dir_or_play=false;                 // flag luk vindue igen
+                      do_play_music_cover=1;                      // der er trykket på cover play det
+                      do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
+                      do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
                     }
 
 
