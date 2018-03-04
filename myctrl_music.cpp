@@ -40,7 +40,6 @@ extern int screensizey;
 extern int screeny;
 extern int debugmode;
 extern unsigned int musicoversigt_antal;
-extern int music_key_selected;
 extern int music_select_iconnr;
 extern int do_music_icon_anim_icon_ofset;
 
@@ -1422,7 +1421,7 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
 // this in use in main
 
 
-void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley) {
+void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected) {
     int buttonsize=180;
     int buttonsizey=180;
     int i=0;
@@ -1639,7 +1638,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
 
 
 
-
+/*
 
 
 
@@ -1955,3 +1954,4 @@ void show_newmusic_oversigt(music_oversigt_type *musicoversigt,GLuint normal_ico
         }
     } // end while
 }
+*/

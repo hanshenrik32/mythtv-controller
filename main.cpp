@@ -2795,7 +2795,7 @@ void display() {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
-        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley);
+        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
@@ -6648,9 +6648,11 @@ void handlespeckeypress(int key,int x,int y) {
                 // hvis ikke ask_open_dir_or_play
                 if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr+mnumbersoficonline<=musicoversigt_antal)) {
                     if ((unsigned int) music_key_selected>=((mnumbersoficonline*3)+1)) {
-                        _mangley+=MUSIC_CS;								//scroll gfx down
-                        music_select_iconnr+=mnumbersoficonline;
-                        do_music_icon_anim_icon_ofset=1;                       // set scroll
+                        if (music_key_selected<(music_select_iconnr+mnumbersoficonline)) {
+                          _mangley+=MUSIC_CS;								//scroll gfx down
+                          music_select_iconnr+=mnumbersoficonline;
+                          do_music_icon_anim_icon_ofset=1;                       // set scroll
+                        }
                     } else {
                         music_key_selected+=mnumbersoficonline;
                         music_select_iconnr+=mnumbersoficonline;
@@ -6795,8 +6797,9 @@ void handlespeckeypress(int key,int x,int y) {
                          _mangley-=MUSIC_CS;
                          do_music_icon_anim_icon_ofset=-1;			// set scroll
                          music_select_iconnr-=mnumbersoficonline;
-                    } else music_select_iconnr-=mnumbersoficonline;
-
+                    } else if ((music_select_iconnr-mnumbersoficonline)>0) {
+                      music_select_iconnr-=mnumbersoficonline;
+                    }
                     if (music_key_selected>(int ) mnumbersoficonline) music_key_selected-=mnumbersoficonline;
                 }
                 // movie stuf
@@ -6985,6 +6988,13 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_HOME:
+                // reset music oversigt
+                if (vis_music_oversigt) {
+                  _mangley=0;     	                      							  // scroll start ofset reset to start
+                  music_select_iconnr=1;                                  // first icon in view left top conner
+                  do_music_icon_anim_icon_ofset=1;                        // set scroll
+                  music_key_selected=1;
+                }
                 // if indside tv overview reset show time to now (localtime)
                 if (vis_tv_oversigt) {
                     // reset tvgide time to now
@@ -7016,6 +7026,13 @@ void handlespeckeypress(int key,int x,int y) {
 
                 break;
         case GLUT_KEY_END:
+                if (vis_music_oversigt) {
+                  _mangley=0;     	                      							  // scroll start ofset reset to start
+                  music_select_iconnr=1;                                  // first icon in view left top conner
+                  do_music_icon_anim_icon_ofset=1;                        // set scroll
+                  music_key_selected=1;
+                }
+
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime((60*60*24));
@@ -7025,11 +7042,9 @@ void handlespeckeypress(int key,int x,int y) {
                 if (do_show_setup) {
                   if (do_show_tvgraber) {
                     // select lasy line
-
                   }
                 }
                 break;
-
     }
     if (debugmode) {
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
