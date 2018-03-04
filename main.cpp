@@ -6569,13 +6569,13 @@ void handlespeckeypress(int key,int x,int y) {
 
                 break;
         case 102: // key right
-                if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal-1)) {
+                if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal)) {
                     if ((music_key_selected % (mnumbersoficonline*4)==0) || ((music_select_iconnr==((mnumbersoficonline*4)-1)) && (music_key_selected % mnumbersoficonline==0))) {
                         _mangley+=MUSIC_CS;
                         music_key_selected-=mnumbersoficonline;			// den viste på skærm af 1 til 20
-                        music_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                        music_select_iconnr++;	                 		// den rigtige valgte af 1 til cd antal
                     } else {
-                        music_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                        music_select_iconnr++;			                // den rigtige valgte af 1 til cd antal
                     }
                     music_key_selected++;
                 }
@@ -6646,7 +6646,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 // hvis ikke ask_open_dir_or_play
-                if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+mnumbersoficonline<musicoversigt_antal)) {
+                if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr+mnumbersoficonline<=musicoversigt_antal)) {
                     if ((unsigned int) music_key_selected>=((mnumbersoficonline*3)+1)) {
                         _mangley+=MUSIC_CS;								//scroll gfx down
                         music_select_iconnr+=mnumbersoficonline;
