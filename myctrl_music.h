@@ -12,14 +12,14 @@
 struct music_oversigt_type {
     unsigned int album_id;
     unsigned int artist_id;
-    char album_name[256];			// music name
+    char album_name[256];			      // music name
     int album_year;
     unsigned int directory_id;			// dir id fra myth mysql database
     unsigned int parent_id;
     char album_coverfile[256];			// coverfilename
-    char album_path[256];			// path to cover
-    GLuint textureId;				// texture id hvis der findes en cover til musiken
-    char oversigttype;				// type =0 normal dir oversigt 1 = playlist
+    char album_path[256];	      		// path to cover
+    GLuint textureId;			        	// texture id hvis der findes en cover til musiken
+    char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
 

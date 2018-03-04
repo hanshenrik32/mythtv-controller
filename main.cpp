@@ -6129,7 +6129,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     } else {
                       // opdatere music oversigt fra internpath
                       fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
-
                       if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
                         fprintf(stderr,"No Music loaded/found by internal loader\n");
                       }
@@ -6934,6 +6933,8 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_PAGE_UP:
+                if (vis_music_oversigt) {
+                }
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                     aktiv_tv_oversigt.changetime(60);
@@ -6963,6 +6964,8 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_PAGE_DOWN:
+                if (vis_music_oversigt) {
+                }
                 // if indside tv overoview
                 if ((vis_tv_oversigt) && ((aktiv_tv_oversigt.vistvguidekl>1) || (aktiv_tv_oversigt.vistvguidekl==0))) {
                     aktiv_tv_oversigt.changetime(-(60));
@@ -7647,18 +7650,58 @@ void handleKeypress(unsigned char key, int x, int y) {
                         do_play_stream=1;
                     }
 
+                    // start music search
                     if ((vis_music_oversigt) && (keybufferopenwin)) {
-                        hent_music_search=true;                         // start music search  (set flag)
                         mknapnr=0;				                            	// reset mouse/key pos in vis_music_overs
+                        _mangley=0.0f;
+                        hent_music_search=true;                         // start music search  (set flag)
                         music_key_selected=1;
                         music_select_iconnr=0;
                         music_icon_anim_icon_ofset=0;
                         music_icon_anim_icon_ofsety=0;
-                        _mangley=0.0f;
                     }
 
 
                     if ((vis_music_oversigt) && (!(do_zoom_music_cover))) {
+                      mknapnr=music_key_selected;	                     	// hent valget
+                      // normal dir
+                      if (musicoversigt[mknapnr-1].oversigttype==0) {
+                        if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
+                        if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
+                        do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
+                        if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
+                        if (do_play_music_aktiv_nr>0) {
+                          antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
+                        } else antal_songs=0;
+                        if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                        if (antal_songs==0) {
+                          ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                        } else {
+                          ask_open_dir_or_play_aopen=false;
+                        }
+                        ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
+                        //do_zoom_music_cover=true;
+                      } else {
+                        // do playlist
+                        if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
+                        // playlist loader
+                        do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
+                        if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
+                        if (do_play_music_aktiv_nr>0) {
+//                          antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
+                        } else antal_songs=0;
+                        if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+
+                        if (antal_songs==0) {
+                          ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                        } else {
+                          ask_open_dir_or_play_aopen=false;
+                        }
+
+                        ask_open_dir_or_play=true;							// yes ask om vi skal spille den
+                      }
+
+                      /*
                         mknapnr=music_key_selected;					// hent valget
                         if (musicoversigt[mknapnr-1].oversigttype==0) {
                             // dirid som skal vises
@@ -7696,7 +7739,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                             ask_open_dir_or_play=true;							// yes ask om vi skal spille den
                             do_swing_music_cover=true;
                         } else ask_open_dir_or_play=true;
-//                        do_zoom_music_cover_remove_timeout=showtimeout;		// set show music info timeout
+//                      do_zoom_music_cover_remove_timeout=showtimeout;		// set show music info timeout
+                      */
                     }
 
                     // enter key pressed
