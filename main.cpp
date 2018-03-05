@@ -1845,7 +1845,6 @@ unsigned int hent_antal_dir_songs(int dirid) {
 }
 
 
-
 // init lirc
 
 int initlirc() {
@@ -1853,10 +1852,10 @@ int initlirc() {
   int flags;
   sock=lirc_init((char *) "mythtv-controller",1);                  // print error to stderr
   if (sock!=-1) {
-    if (lirc_readconfig(NULL,&lircconfig,NULL)!=0) {
+    if (lirc_readconfig("~/.config/lirc/mythtv-controller.lircrc",&lircconfig,NULL)!=0) {
       if (debugmode) fprintf(stderr,"No lirc mythtv-controller config file found.\n");
       lirc_deinit();
-      sock=-1;				// lirc error code
+      sock=-1;                                              				// lirc error code
     } else {
       // fjern vente tid fra lirc getchar
       fcntl(sock,F_SETOWN,getpid());
@@ -1866,12 +1865,12 @@ int initlirc() {
       }
       printf("Lirc mythtv-controller info loaded.\n");
     }
-    printf("Remote control init finish.\n");
+    printf("Remote control init done ok (config file found at %s.\n","~/.config/lirc/mythtv-controller.lircrc");
     return(sock);
   } else {
+    // no lirc support error
     printf("Remote control not found...\n");
     printf("No lirc. (No remote control support)\n");
-    // no lirc support error
   }
   return(-1);
 }
@@ -7910,7 +7909,7 @@ void update(int value) {
             if (code==NULL) continue;
             if (lircconfig) {
                 while((ret=lirc_code2char(lircconfig,code,&c))==0 && c!=NULL) {
-                    if (debugmode & 1) fprintf(stderr,"Lirc Command %s \n ",c);
+                    if (debugmode) fprintf(stderr,"Lirc Command %s \n ",c);
 
                     saver_irq=true;				// RESET (sluk hvis aktiv) screen saver
 
@@ -10768,7 +10767,7 @@ int main(int argc, char** argv) {
     //libvlc_media_player_stop(vlc_mp);
     //libvlc_media_player_release(vlc_mp);
 
-    initlirc();
+    sock=initlirc();
 
     // bruges til at checke_copy radio icons som virker til nyt dir
     //check_radio_stations_icons();
