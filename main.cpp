@@ -7911,7 +7911,7 @@ void update2(int value) {
             n--;
         }
         cmd[n]='\0';
-        if (debugmode) printf("Lirc say %s\n",cmd);
+        if (debugmode) fprintf(stderr,"Lirc say %s\n",cmd);
 
         if (strcmp(cmd,"KEY_AUDIO")==0) {							// show music directoy
             vis_tv_oversigt=false;
@@ -7984,9 +7984,6 @@ void update2(int value) {
             }
           }
 
-
-
-
         }
 
         if (strcmp(cmd,"KEY_LEFT")==0) {
@@ -8010,8 +8007,48 @@ void update2(int value) {
         }
 
         if (strcmp(cmd,"KEY_OK")==0) {
+          if (vis_music_oversigt) {
+            if (ask_open_dir_or_play) {
+                ask_open_dir_or_play=0;			                                    // flag luk vindue igen
+                do_play_music_cover=1;			                                    // der er trykket på cover play det
+                do_zoom_music_cover=false;		                                  // ja den skal spilles lav zoom cover info window
+                do_find_playlist=true;			                                    // find de sange som skal indsættes til playlist (og load playlist andet sted)
+                mknapnr=music_select_iconnr;	                                 	// OLD VER music_key_selected;
+                if (debugmode & 2) fprintf(stderr,"music_key_selected =%d \n",music_key_selected);
+            } else {
+            }
+          }
+
+          if (vis_film_oversigt) {				// select movie to show info for
+          }
+
+          if (vis_tv_oversigt) {
+              tvknapnr=tvsubvalgtrecordnr;
+              do_zoom_tvprg_aktiv_nr=tvknapnr;
+              ask_tv_record=!ask_tv_record;
+              if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
+          }
+
         }
 
+
+        if (strcmp("KEY_VOLUMEUP",cmd)==0) {
+            if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+            #if defined USE_FMOD_MIXER
+            if (sndsystem) channel->setVolume(configsoundvolume);
+            #endif
+            show_volume_info=true;					// show volume info window
+            vis_volume_timeout=80;
+        }
+
+        if (strcmp("KEY_VOLUMEDOWN",cmd)==0) {
+            if (configsoundvolume>0) configsoundvolume-=0.1f;
+            #if defined USE_FMOD_MIXER
+            if (sndsystem) channel->setVolume(configsoundvolume);
+            #endif
+            show_volume_info=true;					// show volume info window
+            vis_volume_timeout=80;
+        }
 
 
       }
