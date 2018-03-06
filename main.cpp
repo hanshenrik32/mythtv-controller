@@ -7884,6 +7884,158 @@ void handleKeypress(unsigned char key, int x, int y) {
 
 // controll by the remove controller
 
+void update2(int value) {
+  char cmd[200];
+  int ret;
+  int n;
+  char *code=0;
+
+  int numbers_film_covers_on_line;
+  int numbers_cd_covers_on_line;
+  int numbers_radio_covers_on_line;
+  int numbers_stream_covers_on_line;
+
+
+  if ((sock!=0) && (sock!=-1)) {
+    while ((ret=lirc_nextcode(&code))==0 && code!=NULL) {
+      if (code==NULL) continue;
+      if (lircconfig) {
+        // sample lirc data
+        // 0000000080010069 00 KEY_LEFT devinput-32
+        // 000000008001006a 00 KEY_RIGHT devinput-32
+        // 0000000080010201 00 KEY_NUMERIC_1 devinput-32
+        // get command from string
+        strcpy(cmd,code+20);
+        n=strlen(cmd)-1;
+        while((cmd[n]!=32) && (n>0)) {
+            n--;
+        }
+        cmd[n]='\0';
+        if (debugmode) printf("Lirc say %s\n",cmd);
+
+        if (strcmp(cmd,"KEY_AUDIO")==0) {							// show music directoy
+            vis_tv_oversigt=false;
+            vis_film_oversigt=false;
+            do_zoom_film_cover=false;
+            vis_music_oversigt=!vis_music_oversigt;
+            vis_recorded_oversigt=false;
+            vis_radio_oversigt=false;
+        }
+        if (strcmp(cmd,"KEY_RADIO")==0) {							// show music directoy
+            vis_tv_oversigt=false;
+            vis_film_oversigt=false;
+            do_zoom_film_cover=false;
+            vis_music_oversigt=false;
+            vis_radio_oversigt=!vis_radio_oversigt;
+            vis_recorded_oversigt=false;
+        }
+        if (strcmp(cmd,"KEY_VIDEO")==0) {						// Show video directory
+            vis_tv_oversigt=false;
+            vis_film_oversigt=!vis_film_oversigt;
+            vis_music_oversigt=false;
+            vis_recorded_oversigt=false;
+            vis_radio_oversigt=false;
+        }
+        if (strcmp(cmd,"KEY_HOME")==0) {
+            do_play_music_aktiv=false;							// sluk music info cover
+            vis_tv_oversigt=false;								// sluk tv oversigt
+            vis_film_oversigt=false; 							// sluk film oversigt
+            vis_music_oversigt=false;  							// sluk music oversigt
+            do_zoom_music_cover=false;							// sluk zoom cd cover
+            vis_recorded_oversigt=false;							// sluk recorded program oversigt
+            vis_radio_oversigt=false;							// sluk radio oversigt
+        }
+        // Pause music player
+        if (strcmp(cmd,"P")==0) {
+            #if defined USE_FMOD_MIXER
+            if (channel) {
+                //channel->setMute(true);
+                channel->setVolume(0.0);
+                ERRCHECK(result,0);
+            }
+            #endif
+        }
+
+        if (strcmp(cmd,"KEY_UP")==0) {
+          if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
+              if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
+                  if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
+          }
+          if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
+          }
+        }
+
+
+        if (strcmp(cmd,"KEY_DOWN")==0) {
+          if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
+            if ((unsigned int) do_show_play_open_select_line+do_show_play_open_select_line_ofset<(unsigned int) dirmusic.numbersinlist()-1) {
+                if ((int) do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
+            }
+          }
+          // hvis ikke ask_open_dir_or_play
+          if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+9<musicoversigt_antal)) {
+            if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*4)+1)) {
+              do_music_icon_anim_icon_ofset=1;						// do anim
+              _mangley+=41.0f;								//scroll gfx down
+              music_select_iconnr+=numbers_cd_covers_on_line;
+            } else {
+              music_key_selected+=numbers_cd_covers_on_line;
+              music_select_iconnr+=numbers_cd_covers_on_line;
+            }
+          }
+
+
+
+
+        }
+
+        if (strcmp(cmd,"KEY_LEFT")==0) {
+        }
+
+        if (strcmp(cmd,"KEY_RIGHT")==0) {
+
+          if (vis_tv_oversigt) {
+              if (tvvisvalgtnrtype==1) {
+                  if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
+                      tvvalgtrecordnr++;
+                      tvsubvalgtrecordnr=0;
+                  }
+              } else if (tvvisvalgtnrtype==2) {
+                  if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                      tvsubvalgtrecordnr++;
+                  }
+              }
+          }
+
+        }
+
+        if (strcmp(cmd,"KEY_OK")==0) {
+        }
+
+
+
+      }
+    }
+    if (code) free(code);
+  }
+  #if defined USE_FMOD_MIXER
+  sndsystem->update();				// run update on fmod sound system
+  #endif
+  glutTimerFunc(25, update2, 0);
+  glutPostRedisplay();
+}
+
+
+
+
+
+
+
+
+
+
+
+// old ver
 
 void update(int value) {
     float MOVIE_CS;		// movie dvd cover side
@@ -8264,7 +8416,6 @@ void update(int value) {
 
 
                         if (vis_tv_oversigt) {
-
                             if (tvvisvalgtnrtype==1) {
                                 if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
                                     tvvalgtrecordnr++;
@@ -8275,8 +8426,6 @@ void update(int value) {
                                     tvsubvalgtrecordnr++;
                                 }
                             }
-
-//                           _anglex+=1.0*5;
                         }
                     }
 
@@ -9385,8 +9534,6 @@ void update(int value) {
 //    printf("music_key_selected %d musik knap nr = %d  husk knapnr %d  music_select_iconnr= %d \n ",music_key_selected,mknapnr,music_select_iconnr);
     glutTimerFunc(25, update, 0);
     glutPostRedisplay();
-
-
 }
 
 
@@ -10844,7 +10991,7 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
-    glutTimerFunc(25, update, 0);                     // set start loop
+    glutTimerFunc(25, update2, 0);                     // set start loop
     // init fonts
     init_ttf_fonts();
     // select start func if argc is this
