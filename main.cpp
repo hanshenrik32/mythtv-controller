@@ -8458,6 +8458,12 @@ void update2(int value) {
                   }
               }
           }
+          if (vis_nyefilm_oversigt) {
+            if (film_key_selected>0) {
+              film_key_selected--;
+              film_select_iconnr--;
+            }
+          }
           if (vis_radio_oversigt) {							// ved film oversigt
               if (radio_key_selected>1) {
                   switch (screen_size) {
@@ -8693,6 +8699,12 @@ void update2(int value) {
                 }
             }
           }
+          if (vis_nyefilm_oversigt) {
+            if ((film_key_selected+1<film_oversigt.film_antal()) && (film_key_selected<6)) {
+              film_key_selected++;
+              film_select_iconnr++;
+            }
+          }
 
           if (vis_radio_oversigt) {
             if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
@@ -8820,10 +8832,24 @@ void update2(int value) {
             if (do_zoom_film_cover) {
               // start play movie
               // need fix
-              startmovie=true;
+//              startmovie=true;
             }
-
           }
+          // start menu (show movies for some time)
+          if (vis_nyefilm_oversigt) {
+            if (do_zoom_film_cover==false) {
+              do_zoom_film_cover=true;
+              do_swing_movie_cover=0;
+              do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
+              fknapnr=film_select_iconnr+1;		           		// OLD film_key_selected;
+            }
+            if (do_zoom_film_cover) {
+              // start play movie
+              // need fix
+//              startmovie=true;
+            }
+          }
+
           if (vis_recorded_oversigt) {
               // play record/rss fil
               do_play_recorded_aktiv_nr=1;
