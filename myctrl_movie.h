@@ -134,6 +134,7 @@ class film_oversigt_typem : vlc_controller {
       bool film_oversigt_loaded;
       bool film_is_pause;                        // pause ?
       unsigned int filmoversigt_antal;			  	 // loaded antal
+      int volume;
       // load vlc stuf
 //      libvlc_instance_t *vlc_inst;              //
 //      libvlc_media_player_t *vlc_mp;            //
@@ -154,6 +155,11 @@ class film_oversigt_typem : vlc_controller {
       int load_film_dvcovers();
       int playmovie(int nr);
       void stopmovie();
+      void next_movie_chapther();
+      void prevous_movie_chapther();
+      void volumeup();
+      void volumedown();
+      void setcolume(int volume);                                         // do not store volume in volume member int vaule 
       void softstopmovie();
       void pausemovie();
       film_oversigt_typem(unsigned int antal);

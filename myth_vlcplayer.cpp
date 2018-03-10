@@ -40,8 +40,6 @@ int vlc_controller::playmedia(char *path) {
   libvlc_media_t *vlc_m;
   vlc_m=libvlc_media_new_path(vlc_inst,path);
   if (vlc_m) {
-    // set playing flag in class
-    is_playing=true;
     // Create a media player playing environement
     vlc_mp=libvlc_media_player_new_from_media(vlc_m);
     libvlc_media_add_option(vlc_m,"no-video-title-show");
@@ -69,6 +67,8 @@ int vlc_controller::playmedia(char *path) {
     #endif
     // start play
     libvlc_media_player_play(vlc_mp);
+    // set playing flag in class
+    is_playing=true;
     return(1);
   } else return(0);
 }
@@ -78,8 +78,10 @@ int vlc_controller::playmedia(char *path) {
 
 void vlc_controller::stopmedia() {
   if (vlc_mp) {
-    libvlc_media_player_stop(vlc_mp);
-    libvlc_media_player_release(vlc_mp);
+    if (libvlc_media_player_is_playing(vlc_mp)) {
+      libvlc_media_player_stop(vlc_mp);
+      libvlc_media_player_release(vlc_mp);
+    }
   } else {
     printf("Error stop movie player\n");
     exit(1);
@@ -91,6 +93,27 @@ void vlc_controller::stopmedia() {
 
 float vlc_controller::get_position() {
   return(libvlc_media_player_get_position(vlc_mp));
+}
+
+void vlc_controller::pnext_chapter() {
+  libvlc_media_player_next_chapter(vlc_mp);
+}
+
+void vlc_controller::plast_chapter() {
+  //libvlc_media_player_last_chapter(vlc_mp);
+}
+
+
+void vlc_controller::volume_up(int volume) {
+  libvlc_audio_set_volume(vlc_mp,volume);
+}
+
+void vlc_controller::volume_down(int volume) {
+  libvlc_audio_set_volume(vlc_mp,volume);
+}
+
+void vlc_controller::setvolume(int volume) {
+  libvlc_audio_set_volume(vlc_mp,volume);
 }
 
 
