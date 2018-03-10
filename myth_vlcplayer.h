@@ -17,6 +17,11 @@ class vlc_controller {
     int playmedia(char *path);
     void stopmedia();
     float get_position();
+    void pnext_chapter();
+    void plast_chapter();
+    void volume_up(int volume);
+    void volume_down(int volume);
+    void setvolume(int volume);
     void pause();
 };
 

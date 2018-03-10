@@ -223,6 +223,7 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
     film_oversigt_loaded=false;
     film_is_playing=false;
     film_is_pause=false;
+    volume=100;
 }
 
 // destructor
@@ -242,19 +243,18 @@ void film_oversigt_typem::resetallefilm() {
 }
 
 
-
 // default player
 // stop playing movie
 
 void film_oversigt_typem::stopmovie() {
-  vlc_controller::stopmedia();
+  if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
   film_is_playing=false;
 }
 
 // vlc stop player
 
 void film_oversigt_typem::softstopmovie() {
-  vlc_controller::stopmedia();
+  if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
   film_is_playing=false;
 }
 
@@ -283,6 +283,30 @@ void film_oversigt_typem::pausemovie() {
 float film_oversigt_typem::getmovieposition() {
   vlc_controller::get_position();
 }
+
+void film_oversigt_typem::next_movie_chapther() {
+  vlc_controller::pnext_chapter();
+}
+
+void film_oversigt_typem::prevous_movie_chapther() {
+  vlc_controller::plast_chapter();
+}
+
+void film_oversigt_typem::volumeup() {
+  if (volume<100) volume+=10;
+  vlc_controller::volume_up(volume);
+}
+
+void film_oversigt_typem::volumedown() {
+  if (volume>0) volume-=10;
+  vlc_controller::volume_down(volume);
+}
+
+void film_oversigt_typem::setcolume(int volume) {
+  //if ((volume>=0) && (volume<=100)) this->volume=volume;
+  vlc_controller::setvolume(volume);
+}
+
 
 // sort movies after type
 
