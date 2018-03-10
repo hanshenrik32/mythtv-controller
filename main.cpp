@@ -8801,6 +8801,12 @@ void update2(int value) {
                    do_zoom_film_cover=false;
                } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
             }
+            if (vis_radio_oversigt) {
+              do_zoom_radio=!do_zoom_radio;
+            }
+            if (vis_stream_oversigt) {
+
+            }
             if (do_zoom_film_cover) {
                 do_zoom_film_cover=false;
                 fknapnr=0;
@@ -8808,17 +8814,21 @@ void update2(int value) {
             }
         }
 
-        // start play media file
-        if ((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) {
+        // start info or play media file
+        if (((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_INFO")==0)) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) {
           if (vis_music_oversigt) {
             if (ask_open_dir_or_play) {
               ask_open_dir_or_play=0;			                                                        // flag luk vindue igen
               do_play_music_cover=1;			                                                        // der er trykket på cover play det
+              do_find_playlist=1;
               do_zoom_music_cover=false;		                                                      // ja den skal spilles lav zoom cover info window
               do_find_playlist=true;			                                                        // find de sange som skal indsættes til playlist (og load playlist andet sted)
               mknapnr=music_select_iconnr;	                                 	                    // OLD VER music_key_selected;
+              do_play_music_aktiv_play=1;
               if (debugmode & 2) fprintf(stderr,"music_key_selected =%d \n",music_key_selected);
+
             } else {
+              do_play_music_aktiv_play=1;
               // er det et normal dir
               mknapnr=music_select_iconnr; // OLD VER music_key_selected-1;
               if (debugmode & 2) fprintf(stderr,"Lirc music selected:%d \n",mknapnr);
@@ -8853,7 +8863,7 @@ void update2(int value) {
             }
           }
           if (vis_film_oversigt) {				                                                          // select movie to show info for
-            if (do_zoom_film_cover==false) {
+            if ((do_zoom_film_cover==false) || (strcmp(cmd,"KEY_INFO")==0)) {
               do_zoom_film_cover=true;
               do_swing_movie_cover=0;
               do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
@@ -8976,9 +8986,7 @@ void update2(int value) {
         }
         if (strcmp(cmd,"KEY_STOP")==0) {
           // stop all music
-          if (do_play_music_cover) {
-            do_stop_music=true;
-          }
+          do_stop_music=true;
           if (do_play_stream) {
             do_stop_music=true;
           }
