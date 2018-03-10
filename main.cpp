@@ -7934,30 +7934,53 @@ void update2(int value) {
             vis_recorded_oversigt=false;
             vis_radio_oversigt=false;
         }
-        if (strcmp(cmd,"KEY_RADIO")==0) {							// show music directoy
+        if (strcmp(cmd,"KEY_RADIO")==0) {							                  // show radio overview
             vis_tv_oversigt=false;
             vis_film_oversigt=false;
             do_zoom_film_cover=false;
+            do_zoom_music_cover=false;							                  // sluk zoom cd cover
             vis_music_oversigt=false;
             vis_radio_oversigt=!vis_radio_oversigt;
             vis_recorded_oversigt=false;
         }
-        if (strcmp(cmd,"KEY_VIDEO")==0) {						// Show video directory
+        if (strcmp(cmd,"KEY_VIDEO")==0) {						                  // Show video overview
             vis_tv_oversigt=false;
             vis_film_oversigt=!vis_film_oversigt;
             vis_music_oversigt=false;
             vis_recorded_oversigt=false;
-            vis_radio_oversigt=false;
+            vis_radio_oversigt=false;				   			                  // sluk radio oversigt
+            do_zoom_music_cover=false;							                  // sluk zoom cd cover
         }
+        if (strcmp(cmd,"KEY_PVR")==0) {                               // show recorded overview
+            do_play_music_aktiv=false;							                  // sluk music info cover
+            vis_tv_oversigt=false;								                    // sluk tv oversigt
+            vis_film_oversigt=false; 						   	                  // sluk film oversigt
+            vis_music_oversigt=false;  							                  // sluk music oversigt
+            do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            vis_recorded_oversigt=!vis_recorded_oversigt;							// on recorded program oversigt
+            vis_radio_oversigt=false;						   	                   // sluk radio oversigt
+        }
+
+        if (strcmp(cmd,"KEY_EPG")==0) {                               // show tv guide
+            do_play_music_aktiv=false;							                  // sluk music info cover
+            vis_tv_oversigt=!vis_tv_oversigt; 		                    // vis tv oversigt
+            vis_film_oversigt=false; 						   	                  // sluk film oversigt
+            vis_music_oversigt=false;  							                  // sluk music oversigt
+            do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            vis_recorded_oversigt=false;                							// sluk recorded program oversigt
+            vis_radio_oversigt=false;						   	                  // sluk radio oversigt
+        }
+
         if (strcmp(cmd,"KEY_HOME")==0) {
-            do_play_music_aktiv=false;							// sluk music info cover
-            vis_tv_oversigt=false;								// sluk tv oversigt
-            vis_film_oversigt=false; 							// sluk film oversigt
-            vis_music_oversigt=false;  							// sluk music oversigt
-            do_zoom_music_cover=false;							// sluk zoom cd cover
-            vis_recorded_oversigt=false;							// sluk recorded program oversigt
-            vis_radio_oversigt=false;							// sluk radio oversigt
+            do_play_music_aktiv=false;							                  // sluk music info cover
+            vis_tv_oversigt=false;								                    // sluk tv oversigt
+            vis_film_oversigt=false; 						   	                  // sluk film oversigt
+            vis_music_oversigt=false;  							                  // sluk music oversigt
+            do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            vis_recorded_oversigt=false;						                  // sluk recorded program oversigt
+            vis_radio_oversigt=false;				   			                  // sluk radio oversigt
         }
+
         // Pause music player
         if (strcmp(cmd,"P")==0) {
             #if defined USE_FMOD_MIXER
