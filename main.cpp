@@ -607,10 +607,6 @@ GLuint _defaultdvdcover;                	// The id of the texture
 GLuint _defaultdvdcover2;	                // The id of the texture
 GLuint _texturemovieinfobox;	            //  movie image
 GLuint _textureId7; 	                    // folder image
-GLuint _textureId7_1; 	                  // folder image
-GLuint _textureId7_2;	                    // folder image
-GLuint _textureId7_3;	                    // folder mask image
-GLuint _textureId7_4;	                    // folder trans mask image
 GLuint _texturemusicplayer; 	            // music image		// show player
 GLuint _textureId9_askbox; 	              // askbox image
 GLuint _textureId9_2; 	                  // askbox music image
@@ -623,7 +619,7 @@ GLuint _textureId12; 	                    // background 1
 GLuint _textureId12_1; 	                  // background 2
 GLuint _textureId14; 	                    // pause knap
 GLuint _textureId15; 	                    // lille cover mask
-GLuint _texture_nocdcover; 	                    // box2.bmp
+GLuint _texture_nocdcover; 	              // cdnocover big icon
 GLuint _dvdcovermask; 	                  // dvdcovermask
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
@@ -635,11 +631,9 @@ GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
 GLuint _textureIdback; 	                  //
-GLuint _textureId29_1; 	                  // mask
 GLuint _textureuv1;                       // uv img
 GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
-
 
 // radio view icons
 GLuint onlineradio;                       //
@@ -654,13 +648,12 @@ GLuint musicbutton;                       //
 GLuint streambutton;                      //
 GLuint moviebutton;                       //
 
-GLuint gfxlandemask;
-GLuint gfxlande[80];
-GLuint texturedot;
-
+GLuint gfxlandemask;                      //
+GLuint gfxlande[80];                      //
+GLuint texturedot;                        //
 // loading window
-GLuint _textureIdloading;                   // loading window
-GLuint _textureIdloading1;                  // empty window
+GLuint _textureIdloading;                 // loading window
+GLuint _textureIdloading1;                // empty window
 
 // setup menu textures
 GLuint setuptexture;
@@ -2444,7 +2437,7 @@ void display() {
                 mybox.settexture(musicoversigt);
             }
 
-            mybox.show_music_3d(_angle,_texture_nocdcover,_texture_nocdcover,_textureId7_2);
+            mybox.show_music_3d(_angle,_texture_nocdcover,_texture_nocdcover,0);
             break;
         case SAVER3D2:
             // reset pos
@@ -2806,7 +2799,7 @@ void display() {
         streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
         glPopMatrix();
       } else if (vis_radio_oversigt) {
-          radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,_textureId7_1,_textureIdback,_textureId28,_rangley);
+          radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -11326,9 +11319,6 @@ void loadgfx() {
     else
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
     _textureId7           = loadgfxfile(temapath,(char *) "images/",(char *) "dir1");
-    _textureId7_1         = loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask");
-    _textureId7_2       	= loadgfxfile(temapath,(char *) "images/",(char *) "dir1_mask1");
-    _textureId7_4       	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
     _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
@@ -11360,7 +11350,6 @@ void loadgfx() {
     _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
-    _textureId29_1       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon_mask");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
     setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
@@ -11521,9 +11510,6 @@ void freegfx() {
     glDeleteTextures( 1, &_defaultdvdcover2);		// default dvd cover 2 hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_texturemovieinfobox);		  // movie info box
     glDeleteTextures( 1, &_textureId7);				  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
-    glDeleteTextures( 1, &_textureId7_1);			  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
-    glDeleteTextures( 1, &_textureId7_2);			  // cd/dir icon in music oversigt mask (hvis cd cover findes)
-    glDeleteTextures( 1, &_textureId7_4);			  // bruges til billed af cdcover i show music play
     glDeleteTextures( 1, &_texturemusicplayer); // show music info player
     glDeleteTextures( 1, &_textureId9_askbox);				  // ask box
     glDeleteTextures( 1, &_textureId9_2);			  // ask box
@@ -11550,7 +11536,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId27);	           		// vol control
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
-    glDeleteTextures( 1, &_textureId29_1);							// bruges ikke
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
     glDeleteTextures( 1, &setuptvgraberback);           // bryges af setup tv graber
     glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
