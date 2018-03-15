@@ -623,7 +623,7 @@ GLuint _textureId12; 	                    // background 1
 GLuint _textureId12_1; 	                  // background 2
 GLuint _textureId14; 	                    // pause knap
 GLuint _textureId15; 	                    // lille cover mask
-GLuint _textureId16; 	                    // box2.bmp
+GLuint _texture_nocdcover; 	                    // box2.bmp
 GLuint _dvdcovermask; 	                  // dvdcovermask
 GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId21; 	                    // mask movie options box
@@ -2444,7 +2444,7 @@ void display() {
                 mybox.settexture(musicoversigt);
             }
 
-            mybox.show_music_3d(_angle,_textureId16,_textureId16,_textureId7_2);
+            mybox.show_music_3d(_angle,_texture_nocdcover,_texture_nocdcover,_textureId7_2);
             break;
         case SAVER3D2:
             // reset pos
@@ -3133,17 +3133,18 @@ void display() {
           glTexCoord2f(1, 1); glVertex3f(200+ xof+buttonsize, yof+buttonsize , 0.0);
           glTexCoord2f(1, 0); glVertex3f(200+ xof+buttonsize,yof , 0.0);
           glEnd();
-// ****************************************************************
+          // ****************************************************************
+          // draw cd cover
           no_open_dir=1;
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
-          glBlendFunc(GL_ONE, GL_ONE);
+          //glBlendFunc(GL_ONE, GL_ONE);
+          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           if (dirmusic.textureId) {
               glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
           } else {
-              glBindTexture(GL_TEXTURE_2D, _textureId16);                	// box no cd cover
+              glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
           }
-          // draw cd cover
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS); 							//	Begin quadrilateral coordinates
@@ -3180,7 +3181,7 @@ void display() {
 
 
         i=0;
-        if (dirmusic.numbersindirlist()==0) dirmusiclistemax=20; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
+        if (dirmusic.numbersindirlist()==0) dirmusiclistemax=16; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
 
         // show cd song list så man kan vælge
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
@@ -3193,6 +3194,7 @@ void display() {
             if (pos>0) temptxt[pos-temptxt]=0;
             if (i<12) temptxt[54]=0; else temptxt[35]=0;
             sprintf(temptxt1,"%-45s",temptxt);
+            temptxt1[45]='\0';
 
 //  	              printf("******* sang nr %d, name = %s \n",i,temptxt);
 //                    glLoadIdentity();
@@ -3680,7 +3682,7 @@ void display() {
             glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
             glBlendFunc(GL_ONE, GL_ONE);
             textureId=aktiv_playlist.get_textureid(do_play_music_aktiv_table_nr-1);		// get cd texture opengl id
-            if (textureId==0) textureId=_textureId16;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
+            if (textureId==0) textureId=_texture_nocdcover;		                       				// hvis ingen texture (music cover) set default (box2.bmp) / use default if no cover
             glBindTexture(GL_TEXTURE_2D, textureId);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -6642,7 +6644,7 @@ void handlespeckeypress(int key,int x,int y) {
                 // bruges af ask_open_dir_or_play
                 if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
                     if ((int) (do_show_play_open_select_line+do_show_play_open_select_line_ofset)<dirmusic.numbersinlist()-1) {
-                        if (do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
+                        if (do_show_play_open_select_line<15) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
                     }
                 }
                 // hvis ikke ask_open_dir_or_play
@@ -7078,7 +7080,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
 
     if (key=='+') {
-      if (configsoundvolume<1.0f) configsoundvolume+=0.05f;
+      if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
       #endif
@@ -7088,7 +7090,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     }
 
     if (key=='-') {                               // volume down
-      if (configsoundvolume>0) configsoundvolume-=0.05f;
+      if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
       #if defined USE_FMOD_MIXER
       if (sndsystem) channel->setVolume(configsoundvolume);
       #endif
@@ -11346,7 +11348,7 @@ void loadgfx() {
     // mask for knap
     _textureId14         	= loadgfxfile(temapath,(char *) "images/",(char *) "stor_knap3_2_pause");
     _textureId15         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
-    _textureId16         	= loadgfxfile(temapath,(char *) "images/",(char *) "box2");
+    _texture_nocdcover   	= loadgfxfile(temapath,(char *) "images/",(char *) "nocdcover");
     _dvdcovermask       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
     _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
     _textureId21         	= loadgfxfile(temapath,(char *) "images/",(char *) "textbox");
@@ -11536,7 +11538,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback_other);		    // other background
     glDeleteTextures( 1, &_textureId14);	           		//pause knap
     glDeleteTextures( 1, &_textureId15);					   		// bruges ikk
-    glDeleteTextures( 1, &_textureId16);		          	// hvis ingen texture (music cover) set default (box2.bmp)
+    glDeleteTextures( 1, &_texture_nocdcover);         	// hvis ingen texture (music cover) set default (box2.bmp)
     glDeleteTextures( 1, &_dvdcovermask);	          		// dvd cover mask
     glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
     glDeleteTextures( 1, &_textureId21);		  					// bruges ikke
