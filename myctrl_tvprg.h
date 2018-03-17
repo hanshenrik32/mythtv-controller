@@ -46,6 +46,8 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
 class tv_oversigt_pr_kanal {
     private:
         unsigned int programantal;                                  // # of program guide records
+        GLuint channel_icon;                                        // channel icon
+        char channel_icon_name[200];                                // channel icon file name
     public:
         char chanel_name[20];						                         		// kanal navn
         unsigned int chanid;
@@ -56,6 +58,10 @@ class tv_oversigt_pr_kanal {
         char *getkanalname(void) { return(chanel_name); };
         int program_antal() { return programantal; }
         void set_program_antal(int antal) { programantal=antal; }
+        GLuint get_kanal_icon() { return(channel_icon); }
+        void set_kanal_icon(GLuint icon) { channel_icon=icon; }
+        void set_kanal_icon_file(char *file) { strcpy(channel_icon_name,file); }
+        void get_kanal_icon_file(char *file) { strcpy(file,channel_icon_name); }
         void cleanprogram_kanal();
 };
 
@@ -84,6 +90,7 @@ class tv_oversigt {
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
         void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
+        void opdatere_tv_oversigt_kanal_icons();      // load kanal icons
         void show_canal_names();                                                                              //
         //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
         void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	  // show the prg info in

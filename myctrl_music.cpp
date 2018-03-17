@@ -40,7 +40,6 @@ extern int screensizey;
 extern int screeny;
 extern int debugmode;
 extern unsigned int musicoversigt_antal;
-extern int music_key_selected;
 extern int music_select_iconnr;
 extern int do_music_icon_anim_icon_ofset;
 
@@ -1422,7 +1421,7 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
 // this in use in main
 
 
-void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley) {
+void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected) {
     int buttonsize=180;
     int buttonsizey=180;
     int i=0;
@@ -1433,21 +1432,15 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
     int yof=orgwinsizey-(buttonsize);
     char *lastslash;
     char temptxt[200];
-    int bonline=8;
-//    int pos,k,j;
-//    char word[200];
-//    int ytextofset=0;
+    int bonline=8;                    //# of element pr line
     int ofs;
-
     sofset=(_mangley/40)*8;
-
     while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
-
+        // do new line (if not first line)
         if (((i % bonline)==0) && (i>0)) {
             xof=0;
             yof=yof-(buttonsizey+44);
         }
-
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1485,14 +1478,19 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
                 }
             }
         }
+
+        // if selected icon
+        if (i+1==music_key_selected) buttonsize=190.0f;
+        else buttonsize=180.0f;
+
         glEnable(GL_TEXTURE_2D);
         //glBlendFunc(GL_ONE, GL_ONE);
         //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glLoadName(100+i);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
         glEnd();
         glPopMatrix();
@@ -1640,7 +1638,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
 
 
 
-
+/*
 
 
 
@@ -1956,3 +1954,4 @@ void show_newmusic_oversigt(music_oversigt_type *musicoversigt,GLuint normal_ico
         }
     } // end while
 }
+*/

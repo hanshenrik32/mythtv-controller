@@ -24,6 +24,8 @@
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
 #include "myth_setup.h"
+#include "myctrl_readwebfile.h"
+#include "readjpg.h"
 
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
@@ -395,7 +397,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char result[1024];
   unsigned int prg_antal=0;
   char temptxt[1024];
-
+  char downloadfile[1024];
   char sql[32738];
   char *s;
   int error=0;
@@ -404,6 +406,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
   xmlDoc *document;
   xmlNode *root, *first_child, *node, *node1 ,*subnode;
   xmlChar *xmltvid;
+  xmlChar *xmltvicon_url;
+  char iconfile[1024];
   char starttime[64];
   bool getstart=false;
   char endtime[64];
@@ -413,6 +417,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   char channelidname[1024];
   char category[1924];
   char description[4096];
+  char realfilename[1024];
   xmlChar *title;
   bool gettchannel=false;
   xmlChar *desc;
@@ -427,6 +432,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   struct tm* lastmod;           //
 
   loading_tv_guide=true;        // set loadtv guide flag to show in show_tv_guide then xml files is passed
+
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
@@ -458,7 +464,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   mysql_free_result(res);
   if (!(fundet)) {
     // if tvguide db not exist create it.
-    strcpy(sql,"create table IF NOT EXISTS channel(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,channum varchar(10),freqid varchar(10) ,sourceid int(10) unsigned,callsign varchar(20),name  varchar(64), icon varchar(255), finetune int(11) , videofilters varchar(255), xmltvid varchar(64), recpriority int(10), contrast int(11) DEFAULT 32768, brightness int(11) DEFAULT 32768, colour int(11) DEFAULT 32768, hue int(11) DEFAULT 32768, tvformat varchar(10), visible tinyint(1) DEFAULT 1, outputfilters  varchar(255) ,useonairguide tinyint(1)  DEFAULT 0, mplexid  smallint(6), serviceid  mediumint(8) unsigned, atsc_major_chan int(10) unsigned DEFAULT 0, atsc_minor_chan int(10) unsigned DEFAULT 0, last_record datetime, default_authority varchar(32), commmethod int(11) DEFAULT +1, iptvid smallint(6) unsigned,orderid int(12) unsigned DEFAULT 0)");
+    strcpy(sql,"create table IF NOT EXISTS channel(chanid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,channum varchar(10),freqid varchar(10) ,sourceid int(10) unsigned,callsign varchar(20),name  varchar(64), icon varchar(255), finetune int(11) , videofilters varchar(255), xmltvid varchar(64), recpriority int(10), contrast int(11) DEFAULT 32768, brightness int(11) DEFAULT 32768, colour int(11) DEFAULT 32768, hue int(11) DEFAULT 32768, tvformat varchar(10), visible tinyint(1) DEFAULT 1, outputfilters varchar(255), useonairguide tinyint(1) DEFAULT 0, mplexid smallint(6), serviceid mediumint(8) unsigned, atsc_major_chan int(10) unsigned DEFAULT 0, atsc_minor_chan int(10) unsigned DEFAULT 0, last_record datetime, default_authority varchar(32), commmethod int(11) DEFAULT +1, iptvid smallint(6) unsigned,orderid int(12) unsigned DEFAULT 0,iconfile varchar(200))");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
@@ -505,6 +511,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
   }
 
   if (conn) {
+    if (stat("images/tv_icons/", &t_stat)!=0) {
+      mkdir("images/tv_icons",0777);
+    }
     //  add user homedir and open file
     getuserhomedir(userhomedir);
     strcpy(path,userhomedir);
@@ -536,15 +545,33 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 s=trimwhitespace(result);
                 if (debugmode & 256) printf("TV chanel found : %s \n",s);
               }
+
               subnode=node->xmlChildrenNode;
               while(subnode) {
                 xmltvid=xmlGetProp(node,( xmlChar *) "id");
                 strcpy(channelidname,(char *) xmltvid);
+                if (strcmp((char *) subnode->name,"icon")==0) {
+                  // get icon source http link from xmlfile
+                  xmltvicon_url=xmlGetProp(subnode,( xmlChar *) "src");
+                  if (xmltvicon_url) {
+                    strcpy(iconfile,(char *) xmltvicon_url);
+                    // get file name from url (realfilename)
+                    get_webfilename(realfilename,iconfile);
+                    // set downloadfile path
+                    strcpy(downloadfile,"images/tv_icons/");
+                    strcat(downloadfile,realfilename);
+                    // download tv channel iconfile
+                    // if not exist in images/tv_icons directory
+                    if (!(file_exists(downloadfile))) {
+                      get_webfile(iconfile,downloadfile);
+                    }
+                  }
+                }
                 subnode=subnode->next;
               }
               cidfundet=do_cannel_exist(channelidname);
               if (cidfundet==0) {
-                sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid) values(0,'%s','%s','%s')",channelidname,s,xmltvid);
+                sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid,iconfile) values(0,'%s','%s','%s','%s')",channelidname,s,xmltvid,realfilename);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
               }
@@ -3367,8 +3394,22 @@ time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
 
 
 
+// load kanal icons
 
-
+void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
+  char file[2048];
+  char tmp[2048];
+  GLuint icon=0;
+  for (int i=0;i<kanal_antal;i++) {
+    if (!(tvkanaler[i].get_kanal_icon())) {
+      strcpy(file,"images/tv_icons/");
+      tvkanaler[i].get_kanal_icon_file(tmp);
+      strcat(file,tmp);
+//      icon=loadTexture(file);
+      tvkanaler[i].set_kanal_icon(icon);
+    }
+  }
+}
 
 //
 // henter aktiv tv overigt fra mythtv or internal localdb created like mythtv in use
@@ -3462,7 +3503,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         }
 
         // do select from db
-        strcpy(sqlselect,"SELECT channel.name,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
+        strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
@@ -3478,7 +3519,17 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             while (((row = mysql_fetch_row(res)) != NULL) && (prgnr<=maxprogram_antal-1) && (kanalnr<MAXKANAL_ANTAL-1)) {
                 if ((prgnr==0) && (strcmp(tmptxt,row[0])!=0)) {
                     tvkanaler[kanalnr].putkanalname(row[0]);
-                    tvkanaler[kanalnr].chanid=atoi(row[11]);                      // set chanelid in array
+                    tvkanaler[kanalnr].chanid=atoi(row[12]);                      // set chanelid in array
+                    // load tv kanal icon
+                    if (tvkanaler[kanalnr].get_kanal_icon()==0) {
+                      GLuint icon=0;
+                      char tmp[2000];
+                      strcpy(tmp,"images/tv_icons/");
+                      strcat(tmp,row[1]);
+//                      if (file_exists(tmp)) icon=loadTexture((char *) tmp);
+                      tvkanaler[kanalnr].set_kanal_icon_file(row[1]);
+                      //tvkanaler[kanalnr].set_kanal_icon(icon);
+                    }
                     strcpy(tmptxt,row[0]);                                        // rember channel name
                     printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
                 }
@@ -3517,41 +3568,41 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                       // 8 tv_grab_eu_dotmedia Europe ver OK
                       // 9 tv_grab_se_swedb Sweden ver OK
                       // 18 tv_grab_tr Tyrkiye ver OK
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[8])==0) prgtype=10;               // series
-                        else if (strcmp("Movie",row[8])==0) prgtype=5;            // movie type
-                        else if (strcmp("Action",row[8])==0) prgtype=5;           // movie type
-                        else if (strcmp("Drama",row[8])==0) prgtype=5;            //
-                        else if (strcmp("Crime",row[8])==0) prgtype=5;            // Action film
-                        else if (strcmp("Mystery",row[8])==0) prgtype=5;          // movie type
-                        else if (strcmp("sports",row[8])==0) prgtype=2;           //
-                        else if (strcmp("Sports",row[8])==0) prgtype=2;           //
-                        else if (strcmp("Soccer",row[8])==0) prgtype=2;           //
-                        else if (strcmp("Fencing",row[8])==0) prgtype=3;          // children
-                        else if (strcmp("Tvshow",row[8])==0) prgtype=8;           //
-                        else if (strcmp("Comedy",row[8])==0) prgtype=8;           // Entertainment
-                        else if (strcmp("Adventure",row[8])==0) prgtype=5;        //
-                        else if (strcmp("Family",row[8])==0) prgtype=1;           // series
-                        else if (strcmp("Fantasy",row[8])==0) prgtype=5;          // movie type
-                        else if (strcmp("Reality",row[8])==0) prgtype=8;          //
-                        else if (strcmp("Miniseries",row[8])==0) prgtype=0;       //
-                        else if (strcmp("TV Movie",row[8])==0) prgtype=8;         //
-                        else if (strcmp("Teleshopping",row[8])==0) prgtype=0;     //
-                        else if (strcmp("tvshow",row[8])==0) prgtype=8;           //
-                        else if (strcmp("Magazine",row[8])==0) prgtype=4;         //
-                        else if (strcmp("News",row[8])==0) prgtype=4;             // news
-                        else if (strcmp("Romance",row[8])==0) prgtype=5;          // movie type
-                        else if (strcmp("Sci-Fi",row[8])==0) prgtype=9;           //
-                        else if (strcmp("Action",row[8])==0) prgtype=5;           // movie type
-                        else if (strcmp("Animation",row[8])==0) prgtype=3;        //
-                        else if (strcmp("Documentary",row[8])==0) prgtype=7;      // Documentary
-                        else if (strcmp("Lifestyle",row[8])==0) prgtype=8;        //
-                        else if (strcmp("Entertainment",row[8])==0) prgtype=7;    //
-                        else if (strcmp("Nature",row[8])==0) prgtype=6;           //
-                        else if (strcmp("War",row[8])==0) prgtype=5;              // movie type
-                        else if (strcmp("Animation",row[8])==0) prgtype=5;        // movie type
-                        else if (strcmp("children",row[8])==0) prgtype=3;         // children
-                        else if (strcmp("Adult",row[8])==0) prgtype=11;           // Adult tv
+                      if (strcmp(row[9],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=10;               // series
+                        else if (strcmp("Movie",row[9])==0) prgtype=5;            // movie type
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           // movie type
+                        else if (strcmp("Drama",row[9])==0) prgtype=5;            //
+                        else if (strcmp("Crime",row[9])==0) prgtype=5;            // Action film
+                        else if (strcmp("Mystery",row[9])==0) prgtype=5;          // movie type
+                        else if (strcmp("sports",row[9])==0) prgtype=2;           //
+                        else if (strcmp("Sports",row[9])==0) prgtype=2;           //
+                        else if (strcmp("Soccer",row[9])==0) prgtype=2;           //
+                        else if (strcmp("Fencing",row[9])==0) prgtype=3;          // children
+                        else if (strcmp("Tvshow",row[9])==0) prgtype=8;           //
+                        else if (strcmp("Comedy",row[9])==0) prgtype=8;           // Entertainment
+                        else if (strcmp("Adventure",row[9])==0) prgtype=5;        //
+                        else if (strcmp("Family",row[9])==0) prgtype=1;           // series
+                        else if (strcmp("Fantasy",row[9])==0) prgtype=5;          // movie type
+                        else if (strcmp("Reality",row[9])==0) prgtype=8;          //
+                        else if (strcmp("Miniseries",row[9])==0) prgtype=0;       //
+                        else if (strcmp("TV Movie",row[9])==0) prgtype=8;         //
+                        else if (strcmp("Teleshopping",row[9])==0) prgtype=0;     //
+                        else if (strcmp("tvshow",row[9])==0) prgtype=8;           //
+                        else if (strcmp("Magazine",row[9])==0) prgtype=4;         //
+                        else if (strcmp("News",row[9])==0) prgtype=4;             // news
+                        else if (strcmp("Romance",row[9])==0) prgtype=5;          // movie type
+                        else if (strcmp("Sci-Fi",row[9])==0) prgtype=9;           //
+                        else if (strcmp("Action",row[9])==0) prgtype=5;           // movie type
+                        else if (strcmp("Animation",row[9])==0) prgtype=3;        //
+                        else if (strcmp("Documentary",row[9])==0) prgtype=7;      // Documentary
+                        else if (strcmp("Lifestyle",row[9])==0) prgtype=8;        //
+                        else if (strcmp("Entertainment",row[9])==0) prgtype=7;    //
+                        else if (strcmp("Nature",row[9])==0) prgtype=6;           //
+                        else if (strcmp("War",row[9])==0) prgtype=5;              // movie type
+                        else if (strcmp("Animation",row[9])==0) prgtype=5;        // movie type
+                        else if (strcmp("children",row[9])==0) prgtype=3;         // children
+                        else if (strcmp("Adult",row[9])==0) prgtype=11;           // Adult tv
                         else prgtype=0;
                       }
                       break;
@@ -3566,19 +3617,19 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                       // neuquen,rio negro
                       // salta,santa fe
                       //
-                      if (strcmp(row[8],"None")!=0) {
-                        if (strcmp("series",row[8])==0) prgtype=1;
-                        else if (strcmp("movie",row[8])==0) prgtype=5;
-                        else if (strcmp("Documentales",row[8])==0) prgtype=7;
-                        else if (strcmp("Culturales",row[8])==0) prgtype=7;
-                        else if (strcmp("Variedades",row[8])==0) prgtype=0;
-                        else if (strcmp("Deportes",row[8])==0) prgtype=2;
-                        else if (strcmp("Noticias",row[8])==0) prgtype=4;
-                        else if (strcmp("Musicales",row[8])==0) prgtype=8;
-                        else if (strcmp("Cine",row[8])==0) prgtype=0;
-                        else if (strcmp("Periodístico",row[8])==0) prgtype=4;
-                        else if (strcmp("Infantiles",row[8])==0) prgtype=3;         // children
-                        else if (strcmp("Reality Show",row[8])==0) prgtype=8;
+                      if (strcmp(row[9],"None")!=0) {
+                        if (strcmp("series",row[9])==0) prgtype=1;
+                        else if (strcmp("movie",row[9])==0) prgtype=5;
+                        else if (strcmp("Documentales",row[9])==0) prgtype=7;
+                        else if (strcmp("Culturales",row[9])==0) prgtype=7;
+                        else if (strcmp("Variedades",row[9])==0) prgtype=0;
+                        else if (strcmp("Deportes",row[9])==0) prgtype=2;
+                        else if (strcmp("Noticias",row[9])==0) prgtype=4;
+                        else if (strcmp("Musicales",row[9])==0) prgtype=8;
+                        else if (strcmp("Cine",row[9])==0) prgtype=0;
+                        else if (strcmp("Periodístico",row[9])==0) prgtype=4;
+                        else if (strcmp("Infantiles",row[9])==0) prgtype=3;         // children
+                        else if (strcmp("Reality Show",row[9])==0) prgtype=8;
                         else prgtype=0;
                       }
 
@@ -3586,8 +3637,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                       prgtype=0;
                   }
                 } else prgtype=0;
-                recorded=tvprgrecorded(row[1],row[3],row[11]);			              // get recorded status from backend
-                if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[3],row[1],row[2],row[5],row[6],row[7],row[10],row[4],prgtype,recorded);
+                recorded=tvprgrecorded(row[2],row[4],row[12]);			              // get recorded status from backend
+                if (prgnr<maxprogram_antal-1) tvkanaler[kanalnr].tv_prog_guide[prgnr].putprograminfo(row[4],row[2],row[3],row[6],row[7],row[8],row[11],row[5],prgtype,recorded);
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
@@ -3607,6 +3658,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         }
         mysql_close(conn);
     }
+    opdatere_tv_oversigt_kanal_icons();
     loading_tv_guide=false;
 }
 
@@ -3926,6 +3978,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   // loop for channel
   //
 
+  int xx=xpos-50;
+
   while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -3935,13 +3989,33 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       default:glTranslatef(xpos+11,860, 0.0f);
               break;
     }
-    glScalef(24.0, 24.0, 1.0);
-    if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
-    chanid=tvkanaler[0].chanid;
-    strcpy(tmptxt," ");
-    strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
-    *(tmptim+14)='\0';
-    glcRenderString(tmptxt);
+
+    // box show the icon for the tv channel loaded from xmltv file if exist in file
+    // loaded other place
+    if (tvkanaler[kanalnr].get_kanal_icon()) {
+      // icon size
+      ysiz=72;
+      xsiz=98;
+      //
+      glColor3f(1.0f, 1.0f, 1.0f);		                                      // default
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,tvkanaler[kanalnr].get_kanal_icon());
+      glBegin(GL_QUADS);                                                    // box
+      glTexCoord2f(0.0, 0.0); glVertex3f(xx, 70, 0.0f);
+      glTexCoord2f(0.0, 1.0); glVertex3f(xx, 70-ysiz, 0.0f);
+      glTexCoord2f(1.0, 1.0); glVertex3f(xx+xsiz, 70-ysiz, 0.0f);
+      glTexCoord2f(1.0, 0.0); glVertex3f(xx+xsiz, 70, 0.0f);
+      glEnd();
+      glDisable(GL_TEXTURE_2D);
+    } else {
+      glScalef(24.0, 24.0, 1.0);
+      if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
+      chanid=tvkanaler[0].chanid;
+      strcpy(tmptxt," ");
+      strcat(tmptxt,tvkanaler[kanalnr].chanel_name);
+      *(tmptim+14)='\0';
+      glcRenderString(tmptxt);
+    }
     glPopMatrix();
 
     int xsiz=210;
@@ -4223,7 +4297,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     do_kanal_nr++;
   }
 
-  // show clock line all over tvguide
+  // show clock line over tvguide banner gfx
   //
   if (!(loading_tv_guide)) {
     time(&rawtime);

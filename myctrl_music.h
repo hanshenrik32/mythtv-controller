@@ -8,18 +8,19 @@
 
 //#include <irrKlang.h>
 
+//used in music oversigt
 
 struct music_oversigt_type {
     unsigned int album_id;
     unsigned int artist_id;
-    char album_name[256];			// music name
+    char album_name[256];			      // music name
     int album_year;
     unsigned int directory_id;			// dir id fra myth mysql database
     unsigned int parent_id;
     char album_coverfile[256];			// coverfilename
-    char album_path[256];			// path to cover
-    GLuint textureId;				// texture id hvis der findes en cover til musiken
-    char oversigttype;				// type =0 normal dir oversigt 1 = playlist
+    char album_path[256];	      		// path to cover
+    GLuint textureId;			        	// texture id hvis der findes en cover til musiken
+    char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
 
@@ -52,8 +53,8 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
 // henter playlist oversigt
 int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]);				// mythtv playlist
 //void show_music_oversigt1(music_oversigt_type musicoversigt[],GLuint textureId,GLuint textureId_mask,GLuint textureId_covermask,GLuint textureId_playlist,GLuint textureId_playlist_mask,GLuint textureId_playlistback,GLuint textureId_playlistback_mask,float music_angley);
-void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley);		// new ver
-void show_newmusic_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley);
+void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected);		// new ver
+//void show_newmusic_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley);
 // load playliste find_dir_id
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
 void zoom_music_info();
