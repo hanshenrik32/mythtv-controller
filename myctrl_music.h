@@ -8,6 +8,7 @@
 
 //#include <irrKlang.h>
 
+//used in music oversigt
 
 struct music_oversigt_type {
     unsigned int album_id;
