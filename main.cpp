@@ -7997,10 +7997,12 @@ void update2(int value) {
         }
 
         if (strcmp(cmd,"KEY_UP")==0) {
+          // up key
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
               if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
                   if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
           }
+          // up key
           if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
               switch (screen_size) {
                   case 1:
@@ -8055,7 +8057,7 @@ void update2(int value) {
                           break;
               }
           }
-
+          // up key
           if (vis_film_oversigt) {
               switch(screen_size) {
                   case 1:
@@ -8099,8 +8101,7 @@ void update2(int value) {
               }
           }
 
-
-
+          // up key
           if ((vis_radio_oversigt) && (show_radio_options==false)) {
             if ((vis_radio_oversigt) && (radio_select_iconnr>(numbers_radio_covers_on_line-1)) ) {
               if ((radio_key_selected<=numbers_radio_covers_on_line) && (radio_select_iconnr>(numbers_radio_covers_on_line-1))) {
@@ -8152,11 +8153,11 @@ void update2(int value) {
               }
 */
           }
-
+          // up key
           if ((vis_radio_oversigt) && (show_radio_options)) {
               radiooversigt.lastradiooptselect();
           }
-
+          // up key
           // stream
           if ((vis_stream_oversigt) && (show_stream_options==false)) {
             if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
@@ -8168,6 +8169,7 @@ void update2(int value) {
             }
           }
 
+          // up key
           if (vis_recorded_oversigt) {
               if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                   valgtrecordnr--;
@@ -8177,17 +8179,21 @@ void update2(int value) {
           }
 
 
-
+          // up key
           if (vis_tv_oversigt) {
-              if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
-                  tvvalgtrecordnr--;
-                  tvsubvalgtrecordnr=0;
-              } else if ((tvvisvalgtnrtype==2) && (tvsubvalgtrecordnr>0)) tvsubvalgtrecordnr--;	// bruges til visning af optaget programmer
-
-// old ver                           _anglex-=1.0*5;
+            // tv stuf up key
+            // if indside tv overoview
+            if (vis_tv_oversigt) {
+              if (tvsubvalgtrecordnr>0) {
+                tvsubvalgtrecordnr--;
+                if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)<hourtounixtime(aktiv_tv_oversigt.vistvguidekl)) {
+                  if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--;
+                }
+              }
+            }
           }
 
-
+          // up key
           if (do_show_setup) {
              if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
           }
@@ -8197,11 +8203,13 @@ void update2(int value) {
 
 
         if (strcmp(cmd,"KEY_DOWN")==0) {
+          // down key
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
             if ((unsigned int) do_show_play_open_select_line+do_show_play_open_select_line_ofset<(unsigned int) dirmusic.numbersinlist()-1) {
                 if ((int) do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
             }
           }
+          // down key
           // hvis ikke ask_open_dir_or_play
           if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+9<musicoversigt_antal)) {
             if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*4)+1)) {
@@ -8214,7 +8222,7 @@ void update2(int value) {
             }
           }
 
-
+          // down key
           if (vis_film_oversigt) {
               switch (screen_size) {					// filmoversigt_antal
                   case 1: if (((int) film_select_iconnr<(int) film_oversigt.film_antal()-5) && (movie_icon_anim_icon_ofset==0)) {
@@ -8265,7 +8273,7 @@ void update2(int value) {
                   }
           }
 
-
+          // down key
           // radio
           if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+numbers_radio_covers_on_line)<radiooversigt.radioantal())) {
               if (radio_key_selected>=20) {
@@ -8293,7 +8301,7 @@ void update2(int value) {
               }
           }
 */
-
+          // down key
           // stream stuf
           if (vis_stream_oversigt) {
               switch (screen_size) {
@@ -8344,6 +8352,7 @@ void update2(int value) {
                           break;
                   }
           }
+          // down key
           if (vis_recorded_oversigt) {
               if (visvalgtnrtype==1) {
                   if ((int) valgtrecordnr<(int) recordoversigt.top_antal()) {
@@ -8357,7 +8366,25 @@ void update2(int value) {
               }
               reset_recorded_texture=true;
           }
+
+          // down key
           if (vis_tv_oversigt) {
+
+            // tv overview
+            // if indside tv overoview
+            if (vis_tv_oversigt) {
+              if (debugmode) fprintf(stderr,"prg antal in tv kanal %d \n ",aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr));
+              if (tvsubvalgtrecordnr+1<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                tvsubvalgtrecordnr++;
+              }
+              // check hvor vi er
+              if (aktiv_tv_oversigt.getprogram_endunixtume(tvvalgtrecordnr,tvsubvalgtrecordnr)>hourtounixtime(aktiv_tv_oversigt.vistvguidekl+3)) {
+                if (aktiv_tv_oversigt.vistvguidekl<24*2) aktiv_tv_oversigt.vistvguidekl++;
+              }
+            }
+
+
+/*
               if (tvvisvalgtnrtype==1) {
                   if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
                       tvvalgtrecordnr++;
@@ -8368,13 +8395,17 @@ void update2(int value) {
                       tvsubvalgtrecordnr++;
                   }
               }
+*/
           }
+
         }
 
         if (strcmp(cmd,"KEY_LEFT")==0) {
+          // left key
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
               dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
           }
+          // left key
           if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
               if (music_key_selected>1) {
                   if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
@@ -8391,6 +8422,7 @@ void update2(int value) {
                   }
               }
           }
+          // left key
           if (vis_film_oversigt) {							// ved film oversigt
               if (film_key_selected>1) {
                   switch (screen_size) {
@@ -8485,12 +8517,14 @@ void update2(int value) {
                   }
               }
           }
+          // left key
           if (vis_nyefilm_oversigt) {
             if (film_key_selected>0) {
               film_key_selected--;
               film_select_iconnr--;
             }
           }
+          // left key
           if (vis_radio_oversigt) {							// ved film oversigt
               if (radio_key_selected>1) {
                   switch (screen_size) {
@@ -8585,7 +8619,7 @@ void update2(int value) {
                   }
               }
           }
-
+          // left key
           // stream
           if (vis_stream_oversigt) {							// ved film oversigt
               if (stream_key_selected>1) {
@@ -8681,20 +8715,29 @@ void update2(int value) {
                   }
               }
           }
+          // left key
           if (vis_recorded_oversigt) {
               visvalgtnrtype=1;
           }
+          // left key
           if (vis_tv_oversigt) {
-              tvvisvalgtnrtype=1;
+            if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
+                tvvalgtrecordnr--;
+                tvsubvalgtrecordnr=0;
+            } else if ((tvvisvalgtnrtype==2) && (tvsubvalgtrecordnr>0)) tvsubvalgtrecordnr--;	// bruges til visning af optaget programmer
+
+//              tvvisvalgtnrtype=1;
           }
 
 
         }
 
         if (strcmp(cmd,"KEY_RIGHT")==0) {
+          // right key
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
               dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
           }
+          // right key
           if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
               if (((int) music_key_selected<(int) musicoversigt_antal) && (music_icon_anim_icon_ofset==0)) {
                   if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal)) {
@@ -8711,7 +8754,7 @@ void update2(int value) {
           }
 
 
-
+          // right key
           if (vis_film_oversigt) {
             if ((vis_film_oversigt) && ((int unsigned) film_select_iconnr<film_oversigt.film_antal()-1)) {
                 if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
@@ -8726,13 +8769,14 @@ void update2(int value) {
                 }
             }
           }
+          // right key
           if (vis_nyefilm_oversigt) {
             if ((film_key_selected+1<film_oversigt.film_antal()) && (film_key_selected<6)) {
               film_key_selected++;
               film_select_iconnr++;
             }
           }
-
+          // right key
           if (vis_radio_oversigt) {
             if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
               if (radio_select_iconnr<(int) radiooversigt_antal) {
@@ -8747,7 +8791,7 @@ void update2(int value) {
               }
             }
           }
-
+          // right key
           // stream
           if (vis_stream_oversigt) {
             if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
@@ -8763,16 +8807,18 @@ void update2(int value) {
               }
             }
           }
-
+          // right key
           if (vis_recorded_oversigt) {
               visvalgtnrtype=2;
           }
 
+/*
           if (vis_tv_oversigt) {
               tvvisvalgtnrtype=2;
           }
+*/
 
-
+          // right key
           if (vis_tv_oversigt) {
               if (tvvisvalgtnrtype==1) {
                   if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
@@ -8785,27 +8831,48 @@ void update2(int value) {
                   }
               }
           }
+
+/*
+          if (vis_tv_oversigt) {
+            if (tvvisvalgtnrtype==1) {
+              if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
+                tvvalgtrecordnr++;
+                tvsubvalgtrecordnr=0;
+              }
+            } else if (tvvisvalgtnrtype==2) {
+              if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
+                tvsubvalgtrecordnr++;
+              }
+            }
+          }
+          */
+          // End right key
         }
 
         // lirc back button
         if (strcmp(cmd,"KEY_EXIT")==0) {
-            if (vis_music_oversigt) {
-               if (ask_open_dir_or_play) {
-                   ask_open_dir_or_play=false;
-                   do_zoom_film_cover=false;
-               } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
+          if (vis_music_oversigt) {
+             if (ask_open_dir_or_play) {
+               ask_open_dir_or_play=false;
+               do_zoom_film_cover=false;
+             } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
+          }
+          if (vis_radio_oversigt) {
+            do_zoom_radio=!do_zoom_radio;
+          }
+          if (vis_stream_oversigt) {
+          }
+          if (do_zoom_film_cover) {
+            do_zoom_film_cover=false;
+            fknapnr=0;
+            mknapnr=0;					// reset knapnr i alt
+          }
+          if (vis_tv_oversigt) {
+            if (ask_tv_record) {
+              ask_tv_record=false;
+              if ((ask_tv_record) && (debugmode)) fprintf(stderr,"lirc Hide tvprogram info.\n");
             }
-            if (vis_radio_oversigt) {
-              do_zoom_radio=!do_zoom_radio;
-            }
-            if (vis_stream_oversigt) {
-
-            }
-            if (do_zoom_film_cover) {
-                do_zoom_film_cover=false;
-                fknapnr=0;
-                mknapnr=0;					// reset knapnr i alt
-            }
+          }
         }
 
         // start info or play media file
