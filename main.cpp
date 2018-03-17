@@ -7657,7 +7657,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                         music_icon_anim_icon_ofsety=0;
                     }
 
-
                     if ((vis_music_oversigt) && (!(do_zoom_music_cover))) {
                       mknapnr=music_key_selected;	                     	// hent valget
                       // normal dir
@@ -7665,7 +7664,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                         if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
                         if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
                         do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
-                        if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
+                        if (debugmode & 2) fprintf(stderr,"dir id %d  ",do_play_music_aktiv_nr);
                         if (do_play_music_aktiv_nr>0) {
                           antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
                         } else antal_songs=0;
@@ -7739,7 +7738,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                       */
                     }
 
-                    // enter key pressed
+                    // enter key pressed og ask open dir or play er åben så start play
                     if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
                       ask_open_dir_or_play=false;                 // flag luk vindue igen
                       do_play_music_cover=1;                      // der er trykket på cover play det
@@ -8811,55 +8810,53 @@ void update2(int value) {
 
         // start info or play media file
         if (((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_INFO")==0)) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) {
+          // music
           if (vis_music_oversigt) {
-            if (ask_open_dir_or_play) {
-              ask_open_dir_or_play=0;			                                                        // flag luk vindue igen
-              do_play_music_cover=1;			                                                        // der er trykket på cover play det
-              do_find_playlist=1;
-              do_zoom_music_cover=false;		                                                      // ja den skal spilles lav zoom cover info window
-              do_find_playlist=true;			                                                        // find de sange som skal indsættes til playlist (og load playlist andet sted)
-              mknapnr=music_select_iconnr;	                                 	                    // OLD VER music_key_selected;
-              do_play_music_aktiv_play=1;
-              if (debugmode & 2) fprintf(stderr,"music_key_selected =%d \n",music_key_selected);
-            } else {
-              do_play_music_aktiv_play=1;
-              // er det et normal dir
-              mknapnr=music_select_iconnr;                                                        //
-              if (debugmode & 2) fprintf(stderr,"Lirc music selected:%d \n",mknapnr);
-
-              // if (debugmode & 2) printf("Mouse pressed over %d husk knap= %d \n",mknapnr,husk_knapnr);
-              // ja hvis felts oversigttype=0
-
-              if (musicoversigt[mknapnr].oversigttype==0) {
+            if ((!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {
+              //mknapnr=music_key_selected;	                     	// hent valget
+              mknapnr=music_select_iconnr+1;                                                        //
+              // normal dir
+              if (musicoversigt[mknapnr-1].oversigttype==0) {
                 if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
-                do_play_music_aktiv_nr=musicoversigt[mknapnr].directory_id; 	// set det aktiv dir id
-                antal_songs=hent_antal_dir_songs(musicoversigt[mknapnr].directory_id);    // loader antal dir/song i dir id
-                if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d name %s \n",antal_songs,musicoversigt[mknapnr].album_name);
-                if ((antal_songs==0) || (musicoversigt[mknapnr].directory_id==0)) {
-                  ask_open_dir_or_play_aopen=true;
+                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
+                do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
+                if (debugmode & 2) fprintf(stderr,"dir id %d ",do_play_music_aktiv_nr);
+                if (do_play_music_aktiv_nr>0) {
+                  antal_songs=hent_antal_dir_songs(do_play_music_aktiv_nr);
+                } else antal_songs=0;
+                if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                if (antal_songs==0) {
+                  ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
                 } else {
                   ask_open_dir_or_play_aopen=false;
                 }
-                do_play_music_aktiv_play=1;
-
+                ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
+                //do_zoom_music_cover=true;
               } else {
-                  // no this is a playlist
-                  mknapnr=music_select_iconnr;
-                  do_play_music_aktiv_nr=musicoversigt[mknapnr].directory_id;			// = playlistnr
-                  if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
-                  if (do_play_music_aktiv_nr>0) {
-                      antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
-                  } else antal_songs=0;
-                  if (antal_songs==0) {							                                                // er der ingen sange i dir lav en auto open
-                      ask_open_dir_or_play_aopen=1; 						                                    // flag auto open
-                  } else {
-                      ask_open_dir_or_play_aopen=0;						                                      // ingen auto open
-                  }
-                  do_play_music_aktiv_play=1;
-                  ask_open_dir_or_play=true;                                      						// yes ask om de skal spilles
+                // do playlist
+                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
+                // playlist loader
+                do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
+                if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
+                if (do_play_music_aktiv_nr>0) {
+                            antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
+                } else antal_songs=0;
+                if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                if (antal_songs==0) {
+                  ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                } else {
+                  ask_open_dir_or_play_aopen=false;
+                }
+                ask_open_dir_or_play=true;							// yes ask om vi skal spille den
               }
+            } else if (ask_open_dir_or_play) {
+              ask_open_dir_or_play=false;                 // flag luk vindue igen
+              do_play_music_cover=1;                      // der er trykket på cover play det
+              do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
+              do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
             }
           }
+
           if (vis_film_oversigt) {				                                                          // select movie to show info for
             if ((do_zoom_film_cover==false) || (strcmp(cmd,"KEY_INFO")==0)) {
               do_zoom_film_cover=true;
