@@ -52,6 +52,7 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
+
 // constructor
 stream_class::stream_class() : antal(0) {
     int i;
@@ -94,6 +95,42 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
+
+int stream_class::loadrssfile() {
+  // mysql vars
+  char sqlselect[2048];
+  char totalurl[2048];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char *database = (char *) "mythconverg";
+  conn=mysql_init(NULL);
+  // Connect to database
+  //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+  strcpy(sqlselect,"select title,url from internetcontentarticles");
+
+  printf("sql=%s \n",sqlselect);
+
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        printf("Hent info om stream title %s %-20s\n",row['title'],row['url']);
+        if (strcmp(row['url'],"")!=0) {
+          strcpy(totalurl,"wget ");
+          strcat(totalurl,row['url']);
+          strcat(totalurl," -O /home/hans/rss/");
+          strcat(totalurl,row['title']);
+          strcat(totalurl,".rss");
+          system(totalurl);
+        }
+      }
+      mysql_free_result(res);
+    }
+  }
+}
 
 
 
@@ -142,6 +179,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         if (conn) mysql_close(conn);
       }
+      loadrssfile();
     }
 
     clean_stream_oversigt();                // clean old list
