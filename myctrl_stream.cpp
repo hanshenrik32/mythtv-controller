@@ -100,7 +100,7 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 // load felt 7 = mythtv gfx icon
 
 int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
-    char sqlselect[512];
+    char sqlselect[1024];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
     char downloadfilename[1024];
@@ -113,7 +113,36 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     bool online;
     int getart=0;
     bool loadstatus=true;
+    bool dbexist=false;
     antal=0;
+    conn=mysql_init(NULL);
+    // Connect to database
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      // test fpom musik table exist
+      mysql_query(conn,"SELECT feedtitle from internetcontentarticles");
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dbexist=1;
+        }
+      }
+      if (!(dbexist)) {
+        if (debugmode & 4) printf("Creating database for rss feed\n");
+        sprintf(sqlselect,"create table internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language  varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"create table internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search  tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (conn) mysql_close(conn);
+      }
+    }
 
     clean_stream_oversigt();                // clean old list
 
@@ -157,9 +186,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
                         strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-                        strcpy(stack[antal]->feed_name,"");		                    // mythtv db feedtitle
-                        strcpy(stack[antal]->feed_desc,"");                          // desc
-                        strcpy(stack[antal]->feed_path,"");                         // mythtv db path
+                        strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+                        strcpy(stack[antal]->feed_desc,"");                           // desc
+                        strcpy(stack[antal]->feed_path,"");                           // mythtv db path
                         strcpy(stack[antal]->feed_gfx_url,"");
                         strcpy(stack[antal]->feed_gfx_mythtv,"");
                         strcpy(stack[antal]->feed_streamurl,"");
@@ -361,12 +390,6 @@ int stream_class::loadweb_stream_iconoversigt()
   this->gfx_loaded=true;
   return(1);
 }
-
-
-
-
-
-
 
 
 // load all streams gfx and save it
@@ -765,9 +788,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
           antal_loaded+=1;
         } else if (file_exists(downloadfilenamelong)) {
-           texture=loadTexture ((char *) downloadfilenamelong);
-           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-           antal_loaded+=1;
+          texture=loadTexture ((char *) downloadfilenamelong);
+          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+          antal_loaded+=1;
         } else texture=0;
       }
 
@@ -890,13 +913,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
 
     if (stack[i+sofset]->textureId) {
-        glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     } else {
-        glBindTexture(GL_TEXTURE_2D,icon_mask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBindTexture(GL_TEXTURE_2D,icon_mask);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
     glTranslatef(xof,yof,xvgaz);
     glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
@@ -930,10 +953,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
         glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
         glEnd(); //End quadrilateral coordinates
-
-
-
-
 
 /*
         //
@@ -1040,21 +1059,20 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     char word[16000];
 
     if (strlen(temptxt)<=14) {
-        glLoadIdentity();
-        ofs=(strlen(temptxt)/2)*9;
-        switch(screen_size) {
-            case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
-                    break;
-            case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
-                    break;
-            default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
-                    break;
-
-        }
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(14.0, 14.0, 1.0);
-        glcRenderString(temptxt);
+      glLoadIdentity();
+      ofs=(strlen(temptxt)/2)*9;
+      switch(screen_size) {
+        case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
+                break;
+        case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
+                break;
+        default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
+                break;
+      }
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(14.0, 14.0, 1.0);
+      glcRenderString(temptxt);
     } else {
 
         temptxt[26]='\0';
@@ -1076,63 +1094,62 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
         while((1) && (ytextofset<=10.0)) {		// max 2 linier
             j=0;
             while(!isspace(temptxt[ii])) {
-                if (temptxt[ii]=='\0') break;
-                word[j]=temptxt[ii];
-                ii++;
-                j++;
+              if (temptxt[ii]=='\0') break;
+              word[j]=temptxt[ii];
+              ii++;
+              j++;
             }
 
             word[j]='\0';	// j = word length
 
             if (j>13) {		// print char by char
-                k=0;
-                while(word[k]!='\0') {
-                    if (pos>=13) {
-                        if ( k != 0 ) glcRenderChar('-');
-                        pos=0;
-                        ytextofset+=15.0f;
-                        glLoadIdentity();
-                        ofs=0;
-                        switch(screen_size) {
-                            case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                                    break;
-                            case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                                    break;
-                            default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                    break;
-                        }
-                        glRasterPos2f(0.0f, 0.0f);
-                        glScalef(14.0, 14.0, 1.0);
-                    }
-                    glcRenderChar(word[k]);
-                    pos++;
-                    k++;
+              k=0;
+              while(word[k]!='\0') {
+                if (pos>=13) {
+                  if ( k != 0 ) glcRenderChar('-');
+                  pos=0;
+                  ytextofset+=15.0f;
+                  glLoadIdentity();
+                  ofs=0;
+                  switch(screen_size) {
+                      case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
+                              break;
+                      case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
+                              break;
+                      default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
+                              break;
+                  }
+                  glRasterPos2f(0.0f, 0.0f);
+                  glScalef(14.0, 14.0, 1.0);
                 }
+                glcRenderChar(word[k]);
+                pos++;
+                k++;
+              }
             } else {
-                if (pos+j>13) {	// word doesn't fit line
-                    ytextofset+=15.0f;
-                    pos=0;
-                    glLoadIdentity();
-                    ofs=(int) (strlen(word)/2)*9;
-                    switch(screen_size) {
-                        case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                                break;
-                        case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                                break;
-                        default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                break;
-                    }
-                    glRasterPos2f(0.0f, 0.0f);
-                    glScalef(14.0, 14.0, 1.0);
+              if (pos+j>13) {	// word doesn't fit line
+                ytextofset+=15.0f;
+                pos=0;
+                glLoadIdentity();
+                ofs=(int) (strlen(word)/2)*9;
+                switch(screen_size) {
+                    case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
+                            break;
+                    case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
+                            break;
+                    default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
+                            break;
                 }
-                glcRenderString(word);
-                pos+=j;
+                glRasterPos2f(0.0f, 0.0f);
+                glScalef(14.0, 14.0, 1.0);
+              }
+              glcRenderString(word);
+              pos+=j;
             }
             if (pos<12) {
-                glcRenderChar(' ');
-                pos++;
+              glcRenderChar(' ');
+              pos++;
             }
-
             if (temptxt[ii]=='\0') break;
             ii++;	// skip space
         }
