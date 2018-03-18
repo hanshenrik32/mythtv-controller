@@ -6286,7 +6286,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             stream_select_iconnr=0;
             _sangley=0.0f;
           } else {
-            //streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
