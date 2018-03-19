@@ -8840,12 +8840,13 @@ void update2(int value) {
              if (ask_open_dir_or_play) {
                ask_open_dir_or_play=false;
                do_zoom_film_cover=false;
-             } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
+             } else do_zoom_music_cover=!do_zoom_music_cover;		                 // show/hide music info
           }
           if (vis_radio_oversigt) {
             do_zoom_radio=!do_zoom_radio;
           }
           if (vis_stream_oversigt) {
+
           }
           if (do_zoom_film_cover) {
             do_zoom_film_cover=false;
@@ -8855,7 +8856,7 @@ void update2(int value) {
           if (vis_tv_oversigt) {
             if (ask_tv_record) {
               ask_tv_record=false;
-              if ((ask_tv_record) && (debugmode)) fprintf(stderr,"lirc Hide tvprogram info.\n");
+              if (debugmode) fprintf(stderr,"lirc Hide tvprogram info.\n");
             }
           }
         }
@@ -8903,12 +8904,11 @@ void update2(int value) {
               }
             } else if (ask_open_dir_or_play) {
               ask_open_dir_or_play=false;                 // flag luk vindue igen
-              do_play_music_cover=1;                      // der er trykket på cover play det
+              do_play_music_cover=true;                   // der er trykket på cover play det
               do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
               do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
             }
           }
-
           if (vis_film_oversigt) {				                                                          // select movie to show info for
             if ((do_zoom_film_cover==false) || (strcmp(cmd,"KEY_INFO")==0)) {
               do_zoom_film_cover=true;
@@ -8947,9 +8947,9 @@ void update2(int value) {
               rknapnr=radio_key_selected;		// hent button
               if (rknapnr>0) do_play_radio=1;
           }
-          // opdatere radio oversigt efter efter pressed on the remorte control from lirc
+          // opdatere radio oversigt efter pressed on the remorte control from lirc
           if ((vis_radio_oversigt) && (show_radio_options)) {
-              radiooversigt.clean_radio_oversigt();			// clean old liste
+              radiooversigt.clean_radio_oversigt();			                        // clean old liste
               radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
               radiooversigt.load_radio_stations_gfx();
               show_radio_options=false;
@@ -8968,7 +8968,6 @@ void update2(int value) {
             #if defined USE_FMOD_MIXER
             if (sndsystem) channel->setVolume(configsoundvolume);
             #endif
-
             if (vis_film_oversigt) {
               film_oversigt.volumeup();
               configsoundvolume+=0.1f;
@@ -10786,6 +10785,8 @@ void *datainfoloader_stream(void *data) {
       //create_radio_oversigt();										                          // Create radio mysql database if not exist
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       // stream
+      streamoversigt.loadrssfile();
+
       streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
   }
   printf("loader thread done loaded stream stations \n");
@@ -10864,8 +10865,8 @@ void *datainfoloader(void *data) {
 */
       //create_radio_oversigt();										                          // Create radio mysql database if not exist
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-      // stream
-      streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
+
+
   }
   printf("loader thread done loaded %d radio stations \n",radiooversigt_antal);
   pthread_exit(NULL);

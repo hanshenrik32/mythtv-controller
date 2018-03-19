@@ -107,13 +107,14 @@ int stream_class::loadrssfile() {
   conn=mysql_init(NULL);
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-  strcpy(sqlselect,"select title,url from internetcontentarticles");
-
+  strcpy(sqlselect,"select * from internetcontentarticles");
   printf("sql=%s \n",sqlselect);
-
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    // test fpom musik table exist
+    mysql_query(conn,"SELECT feedtitle from internetcontentarticles");
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
@@ -127,9 +128,10 @@ int stream_class::loadrssfile() {
           system(totalurl);
         }
       }
-      mysql_free_result(res);
     }
-  }
+    mysql_close(conn);
+  } else return(-1);
+  return(1);
 }
 
 
@@ -177,10 +179,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        if (conn) mysql_close(conn);
       }
-      loadrssfile();
+      mysql_close(conn);
     }
+
+    //loadrssfile();
 
     clean_stream_oversigt();                // clean old list
 
@@ -509,6 +512,7 @@ void *load_all_stream_gfx(void *data) {
             if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
             stream_loadergfx_started_break=false;
         }
+        if (conn) mysql_close(conn);
     }
      printf("End gfx thread loader\n ");
 }
