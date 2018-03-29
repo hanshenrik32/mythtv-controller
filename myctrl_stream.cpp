@@ -364,7 +364,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                printf("Hent info om stream nr %s %-20s\n",row[6],row[0]);
+                printf("Hent info om stream nr %4s %-20s\n",row[6],row[0]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
@@ -512,7 +512,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
         return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    printf("Stream loader done.\n");
+    printf("Mythtv stream loader done... \n");
     return(0);
 }
 
