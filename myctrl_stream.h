@@ -58,6 +58,7 @@ class stream_class {
         void clean_stream_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
         int loadrssfile();
+        int parsexmlrssfile(char *filename);
 //        int opdatere_stream_oversigt(char *searchtxt);
         void show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley);
         void show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley);

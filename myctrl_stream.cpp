@@ -7,6 +7,7 @@
 #include <mysql.h>
 #include <GL/glc.h>
 #include <pthread.h>                   // multi thread support
+#include <libxml/parser.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -16,7 +17,6 @@
 #include "loadpng.h"
 // web file loader
 #include "myctrl_readwebfile.h"
-
 
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
@@ -86,9 +86,6 @@ void stream_class::clean_stream_oversigt() {
     stream_oversigt_nowloading=0;
 }
 
-
-
-
 // set en stream icon image
 
 void stream_class::set_texture(int nr,GLuint idtexture) {
@@ -96,10 +93,13 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 }
 
 
+//
+
 int stream_class::loadrssfile() {
   // mysql vars
   char sqlselect[2048];
   char totalurl[2048];
+  char parsefilename[2048];
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -107,32 +107,168 @@ int stream_class::loadrssfile() {
   conn=mysql_init(NULL);
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-  strcpy(sqlselect,"select * from internetcontentarticles");
-  printf("sql=%s \n",sqlselect);
+  //strcpy(sqlselect,"select * from internetcontentarticles");
+  strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
   if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    // test fpom musik table exist
-    mysql_query(conn,"SELECT feedtitle from internetcontentarticles");
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        printf("Hent info om stream title %s %-20s\n",row['title'],row['url']);
-        if (strcmp(row['url'],"")!=0) {
-          strcpy(totalurl,"wget ");
-          strcat(totalurl,row['url']);
-          strcat(totalurl," -O /home/hans/rss/");
-          strcat(totalurl,row['title']);
-          strcat(totalurl,".rss");
+        printf("Hent info om stream title %-10s\n",row[3]);
+        if (strcmp(row[3],"")!=0) {
+          strcpy(totalurl,"wget '");
+          if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
+          strcat(totalurl,"' -o '/home/hans/rss/wget.log");
+          strcat(totalurl,"' -O '/home/hans/rss/");
+          if (row[3]) strcat(totalurl,row[3]);
+          strcat(totalurl,".rss'");
           system(totalurl);
+          // parse file
+          strcpy(parsefilename,"/home/hans/rss/");
+          strcat(parsefilename,row[3]);
+          strcat(parsefilename,".rss");
+          if (strcmp(row[3],"")!=0) {
+            // parse downloaded xmlfile now (create db records)
+            parsexmlrssfile(parsefilename);
+          }
         }
       }
+      mysql_free_result(res);
     }
     mysql_close(conn);
   } else return(-1);
   return(1);
 }
+
+
+//
+// xml parser
+
+int stream_class::parsexmlrssfile(char *filename) {
+  xmlChar *tmpdat;
+  xmlDoc *document;
+  xmlNode *root, *first_child, *node, *node1 ,*subnode,*subnode2;
+  xmlChar *xmlrssid;
+  xmlChar *content;
+  char rssprgtitle[2048];
+  char rssprgfeedtitle[2048];
+  char rssprgdesc[2048];
+  char rssvideolink[2048];
+  char rsstime[2048];
+  char rssauthor[2048];
+  int rssepisode;
+  int rssseason;
+  char result[2048+1];
+  char sqlinsert[32768];
+  char *database = (char *) "mythconverg";
+  bool recordexist=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  strcpy(rssprgtitle,"");
+  strcpy(rssprgfeedtitle,"");
+  strcpy(rssprgdesc,"");
+  strcpy(rssvideolink,"");
+  strcpy(rsstime,"");
+  strcpy(rssauthor,"");
+  conn=mysql_init(NULL);
+  document = xmlReadFile(filename, NULL, 0);            // open xml file
+  // if exist do all the parse and update db
+  // it use REPLACE in mysql to create/update records if changed in xmlfile
+  if ((document) && (conn)) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    root = xmlDocGetRootElement(document);
+    first_child = root->children;
+    for (node = first_child; node; node = node->next) {
+      if (node->type==XML_ELEMENT_NODE) {
+        if (strcmp((char *) node->name,"channel")==0) {
+          content = xmlNodeGetContent(node);
+          if (content) {
+            //strcpy(result,(char *) content);
+          }
+          subnode=node->xmlChildrenNode;
+          while(subnode) {
+            xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
+            content = xmlNodeGetContent(subnode);
+            if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
+              content = xmlNodeGetContent(subnode);
+              strcpy(rssprgtitle,(char *) content);
+            }
+            if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
+              subnode2=subnode->xmlChildrenNode;
+              while(subnode2) {
+                if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  strcpy(rssprgfeedtitle,(char *) content);
+                }
+                if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                  if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+                }
+                if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) strcpy(rsstime,(char *) content);
+                }
+
+                if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) rssepisode=atoi((char *) content);
+                }
+                if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) rssseason=atoi((char *) content);
+                }
+
+                if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) strcpy(rssauthor,(char *) content);
+                }
+
+                if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) {
+                    xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
+                    if (xmlrssid) strcpy(rssprgdesc,(char *) content);
+                    xmlFree(xmlrssid);
+                  }
+                }
+                subnode2=subnode2->next;
+              }
+              // check if exist
+              if (strcmp(rssvideolink,"")!=0) {
+                recordexist=false;
+                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s' and title like '%s' and episode=%d and season=%d and author like '%s' and path like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
+                mysql_query(conn,sqlinsert);
+                res = mysql_store_result(conn);
+                if (res) {
+                  while ((row = mysql_fetch_row(res)) != NULL) {
+                    recordexist=true;
+                  }
+                }
+                // creoate record if not exist
+                if (!(recordexist)) {
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description) values('%s','%s','%s',%d,%d,'%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
+                  //printf("sql=%s\n",sqlinsert);
+                  mysql_query(conn,sqlinsert);
+                  res = mysql_store_result(conn);
+                }
+              }
+            }
+            subnode=subnode->next;
+          }
+          printf("\n");
+        }
+      }
+    }
+    xmlFreeDoc(document);
+    mysql_close(conn);
+  } else {
+    printf(" ******************************************* Read error on xmlfile downloaded to rss dir\n");
+  }
+}
+
 
 
 
@@ -157,11 +293,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (conn) {
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test fpom musik table exist
-      mysql_query(conn,"SELECT feedtitle from internetcontentarticles");
+      mysql_query(conn,"SELECT feedtitle from internetcontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
@@ -170,6 +306,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       if (!(dbexist)) {
         if (debugmode & 4) printf("Creating database for rss feed\n");
+        // thumbnail   = name of an local image file
+        // commandline = Program to fetch content with
+        // updated     = Time of last update
         sprintf(sqlselect,"create table internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language  varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -183,7 +322,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_close(conn);
     }
 
-    //loadrssfile();
+
+    printf("****************************************************** art = %s fpath=%s \n");
+
 
     clean_stream_oversigt();                // clean old list
 
@@ -193,16 +334,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by (internetcontent.name)");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select feedtitle,path,title,description,url,thumbnail,count(path),paththumb from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
       strcat(sqlselect,art);
-      strcat(sqlselect,"' group by path order by path,title asc");
+      //strcat(sqlselect,"' group by path order by path,title asc");
+      strcat(sqlselect,"' order by path,title asc");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select feedtitle,path,title,description,url,thumbnail,paththumb from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' and path like '");
       strcat(sqlselect,fpath);
@@ -241,31 +383,30 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                         if (getart==0) {
                           strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
                           strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                          strcpy(stack[antal]->feed_path,row[1]);
-                          stack[antal]->feed_group_antal=atoi(row[6]);				// antal
-                          strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                          if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
+                          if (row[6]) stack[antal]->feed_group_antal=atoi(row[6]);				          // antal
+                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
 
                           strcpy(tmpfilename,"/usr/share/mythtv/mythnetvision/icons/");
 
                           if (row[7]) strncat(tmpfilename,row[7],20);
 
-                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);			// mythtv icon file
+                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);	       		// mythtv icon file
                           antal++;
                         } else {
                           // if first creat back button
                           if (antal==0) {
-                            stack[antal]->textureId=_textureIdback;				// back icon
+                            stack[antal]->textureId=_textureIdback;			                    // back icon
                             strcpy(stack[antal]->feed_showtxt,"BACK");
                             strncpy(stack[antal]->feed_name,row[0],feed_namelength);
                             strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
                             //strcpy(stack[antal]->feed_streamurl,row[4]);
                             strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                            strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                            strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
                             stack[antal]->feed_group_antal=0;
-                            stack[antal]->intnr=0;						// intnr=0 = back button type
+                            stack[antal]->intnr=0;	                               					// intnr=0 = back button type
                             antal++;
                           }
-
 
                           if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
                           stack[antal]->intnr=1;
@@ -385,6 +526,8 @@ void *loadweb(void *data) {
   streamoversigt.loadweb_stream_iconoversigt();
   printf("Stop web loader thread\n");
 }
+
+
 
 // downloading all web gfx
 

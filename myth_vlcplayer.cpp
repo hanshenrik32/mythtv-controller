@@ -7,10 +7,12 @@
 // constructor
 
 const char * const vlc_args[] = {
-  "--verbose", "1",
+  "--verbose", "0",
   "--no-xlib",
   "--play-and-stop",
-  "no-video-title-show"
+//  "--quiet",
+  "no-video-title-show",
+
 };
 
 
