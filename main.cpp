@@ -5957,6 +5957,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     numbers_radio_covers_on_line=8;
     numbers_stream_covers_on_line=9;
 
+    strcpy(temptxt,"");
     saver_irq=true;					// stop screen saver
     if (visur==false) {
         switch(button) {
@@ -6287,6 +6288,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             _sangley=0.0f;
           } else {
             streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            // working
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
@@ -10754,10 +10756,6 @@ void *datainfoloader_movie(void *data) {
       // load new tv schecule program
       newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
 */
-      //create_radio_oversigt();										                          // Create radio mysql database if not exist
-      //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-      // stream
-      //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
   } else {
     printf("Load movie from xbmc/kodi\n");
   }
@@ -10774,20 +10772,8 @@ void *datainfoloader_movie(void *data) {
 void *datainfoloader_stream(void *data) {
   printf("loader thread starting - Loading stream info from mythtv.\n");
   if (strcmp(configbackend,"mythtv")==0) {
-                                                                    // load record file list
-/*
-      recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
-      // load old recorded list not some recorded any more
-      oldrecorded.earlyrecordedload(configmysqlhost,configmysqluser,configmysqlpass);
-      // load new tv schecule program
-      newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
-*/
-      //create_radio_oversigt();										                          // Create radio mysql database if not exist
-      //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-      // stream
-      streamoversigt.loadrssfile();
-
-      streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
+    streamoversigt.loadrssfile();
+    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
   }
   printf("loader thread done loaded stream stations \n");
   pthread_exit(NULL);
@@ -11846,14 +11832,14 @@ int main(int argc, char** argv) {
         }
       }
       // stram loader
-      if (configmythtvver>0) {
+      //if (configmythtvver>0) {
         pthread_t loaderthread2;           // the load
         int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
         if (rc2) {
           printf("ERROR; return code from pthread_create() is %d\n", rc2);
       	  exit(-1);
         }
-      }
+      //}
     }
 
 
