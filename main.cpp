@@ -5753,7 +5753,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((vis_stream_oversigt) && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
                 sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
-                if (debugmode & 128) fprintf(stderr,"stream selected=%u  \n",sknapnr);
+                //if (debugmode & 128)
+                fprintf(stderr,"stream selected=%u  \n",sknapnr);
                 fundet=true;
             }
 
@@ -6052,6 +6053,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_swing_movie_cover=1;
                     }
 
+
+
+
                 }
 
 
@@ -6103,8 +6107,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                     vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
                 }
-
-
 
                 break;
         }
@@ -6247,16 +6249,20 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         // update or scroll stream up/down/play
         if (vis_stream_oversigt) {
           if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
-            if (debugmode) fprintf(stderr,"knapnr %d  path_antal=%d type %d antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
+            if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
             if (streamoversigt.type==0) {
+              //
               strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
               streamoversigt.clean_stream_oversigt();
               printf("stream nr %d name %s \n ",sknapnr-1,temptxt);
               streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
               do_play_stream=false;
             } else if ((sknapnr-1>0) && (streamoversigt.type!=2)) {
+              //
               streamoversigt.clean_stream_oversigt();
+
               streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
+
               do_play_stream=false;
             } else {
               // back button
@@ -6287,7 +6293,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             stream_select_iconnr=0;
             _sangley=0.0f;
           } else {
-            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            //strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
+            printf("Stream to play is %d\n",sknapnr); //streamoversigt.get_stream_name(sknapnr));
+
+            //streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
             // working
           }
 

@@ -341,7 +341,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
       strcat(sqlselect,art);
       //strcat(sqlselect,"' group by path order by path,title asc");
-      strcat(sqlselect,"' order by path,title asc");
+      strcat(sqlselect,"' group by title order by title asc");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
@@ -398,11 +398,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           if (antal==0) {
                             stack[antal]->textureId=_textureIdback;			                    // back icon
                             strcpy(stack[antal]->feed_showtxt,"BACK");
-                            strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                            strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
+                            if (row[0]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);
+                            if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
                             //strcpy(stack[antal]->feed_streamurl,row[4]);
-                            strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                            strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
+                            if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                            if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
                             stack[antal]->feed_group_antal=0;
                             stack[antal]->intnr=0;	                               					// intnr=0 = back button type
                             antal++;
@@ -410,20 +410,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
                           if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
                           stack[antal]->intnr=1;
-
-                          strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-
-                          if (getart==1) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                          else strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                          strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                          strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                          strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		// save play url
+                          if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                          if (getart==1) {
+                            if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                          } else {
+                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                          }
+                          if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                          if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                          if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
                           switch(getart) {
-                            case 0: strcpy(tmpfilename,row[6]);
+                            case 0: if (row[6]) strcpy(tmpfilename,row[6]);
                                     break;
-                            case 1: strcpy(tmpfilename,row[7]);
+                            case 1: if (row[7]) strcpy(tmpfilename,row[7]);
                                     break;
-                            case 2: strcpy(tmpfilename,row[5]);
+                            case 2: if (row[5]) strcpy(tmpfilename,row[5]);
                                     break;
                           }
 
@@ -431,8 +432,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                               if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
                                 strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
                                 if (strlen(row[7])>10) {
-                                  if (getart==1) strncat(tmpfilename,row[7]+10,100);
-                                  if (getart==2) strncat(tmpfilename,row[6]+10,100);
+                                  if (getart==1) {
+                                    if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                                  }
+                                  if (getart==2) {
+                                    if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                                  }
                                 }
                               } else {
                                 // downloadfilename = name on file, from tmpfilename = full web url
@@ -479,7 +484,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           } else strcpy(tmpfilename,"");
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	// mythtv icon file
 //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                          strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
                           stack[antal]->textureId=0;
                           // opdatere group antal
                           if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
@@ -602,7 +607,7 @@ void *load_all_stream_gfx(void *data) {
 
     printf("Start gfx thread loader\n ");
     strcpy(lastfile,"");
-    strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+    strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -732,19 +737,17 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
       stream_oversigt_loaded=false;
     }
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
-
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
       }
-
       // stream har et icon in db
       if (stack[i+sofset]->textureId) {
-
         // stream icon
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,empty_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -758,9 +761,10 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glPopMatrix();
 
         glPushMatrix();
-        // indsite draw radio station icon
+        // indsite draw icon
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -791,10 +795,12 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glEnd();
         glPopMatrix();
 */
+        // show default icon
         glPushMatrix();
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -814,7 +820,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         // show numbers in group
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef(xof+22,yof+14,0);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(14.0, 14.0, 1.0);
@@ -878,7 +885,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
     if (stream_oversigt_loaded_nr<streamoversigt.streamantal()) {
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -915,6 +923,98 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
