@@ -47,6 +47,25 @@ class channel_configfile {
 };
 
 
+struct rss_stream_struct {
+  char stream_name[255];
+  char stream_url[2048];
+};
+
+class rss_stream_class {
+  private:
+    rss_stream_struct rss_source_feed[100];
+    int antal;
+  public:
+    int load_rss_data();
+    int streamantal() { return(antal); }
+    rss_stream_class();
+    ~rss_stream_class();
+    char *get_stream_name(int nr) { return (rss_source_feed[nr].stream_name); }
+    char *get_stream_url(int nr) { return (rss_source_feed[nr].stream_url); }
+};
+
+
 // create xml channel config file
 int txmltvgraber_createconfig();
 //
@@ -73,6 +92,7 @@ void show_setup_network();
 void show_setup_font(int startofset);
 void show_setup_keys();
 void show_setup_tv_graber(int startofset);
+void show_setup_rss();                                                          // rss reader setup
 void show_wlan_networks(int valgtnr);
 
 #endif

@@ -252,8 +252,10 @@ bool do_show_setup_sql=false;
 bool do_show_setup_network=false;
 bool do_show_setup_font=false;
 bool do_show_setup_keys=false;
+bool do_show_setup_rss=false;
 bool do_show_videoplayer=false;
 bool do_show_tvgraber=false;
+bool do_show_rss=false;                                 // show rss config
 bool use3deffect=false;                                 // use 3d scroll effect default no
 bool do_zoom_music_cover=false;
 bool do_zoom_radio=false;
@@ -666,6 +668,7 @@ GLuint setupscreenback;
 GLuint setuptemaback;
 GLuint setupfontback;
 GLuint setupkeysback;
+GLuint setuprssback;
 GLuint _texturesetupclose;
 
 // setup menu textures
@@ -676,6 +679,7 @@ GLuint _texturetemasetup;                   //
 GLuint _texturemythtvsql;                   //
 GLuint _texturesetupfont;                   //
 GLuint _texturekeyssetup;                   //
+GLuint _texturekeysrss;                      //
 GLuint _texturevideoplayersetup;            //
 GLuint _texturetvgrabersetup;            //
 
@@ -2796,7 +2800,7 @@ void display() {
 
       } else if (vis_stream_oversigt) {
         glPushMatrix();
-        streamoversigt.show_stream_oversigt1(onlineradio, onlinestreammask , onlineradio_empty ,_sangley);
+        streamoversigt.show_stream_oversigt1(onlineradio, onlineradio_empty ,_sangley);
         glPopMatrix();
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
@@ -4556,6 +4560,7 @@ void display() {
             if (do_show_setup_font) show_setup_font(setupfontselectofset);
             if (do_show_setup_keys) show_setup_keys();
             if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);
+            if (do_show_setup_rss) show_setup_rss();
         }
         glPopMatrix();
     }
@@ -4647,71 +4652,60 @@ void display() {
     // start play stream
     // still use the old system call bach file
     if (startstream) {
-        if (strcmp("default",configdefaultplayer)!=0)  {
-            printf("Start stream nr %d Player is firefox \n",sknapnr);
-            strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
+      if (strcmp("default",configdefaultplayer)!=0)  {
+        printf("Start stream nr %d Player is firefox \n",sknapnr);
+        strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
+        strcat(systemcommand,"'");
+        if (sknapnr-1>0) {
+            if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
+                strcat(systemcommand,"http://");
+                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
+            } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
             strcat(systemcommand,"'");
-            if (sknapnr-1>0) {
-                if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
-                    strcat(systemcommand,"http://");
-                    strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
-                } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
-                strcat(systemcommand,"'");
-
-                printf("start web stream %s \n",systemcommand);
-
-                system(systemcommand);
-            }
-//        spawn("./startmovie.pl","");
-//        posix_spawn(0,"./startmovie.pl","",0);
-        } else {
-            printf("Start play use default firefox player \n");
-            strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
-            strcat(systemcommand,"'");
-            if ((sknapnr-1)>0) {
-                if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
-                    strcat(systemcommand,"http://");
-                    strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
-               } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
-            }
-            strcat(systemcommand,"'");
-
-            printf("start web stream %s \n",systemcommand);
-
             system(systemcommand);
-
         }
-        sknapnr=0;
-        stream_key_selected=1;
-        stream_select_iconnr=0;
-        startstream=false;                      // start kun 1 instans
+      } else {
+        printf("Start play use default firefox player \n");
+        strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
+        strcat(systemcommand,"'");
+        if ((sknapnr-1)>0) {
+            if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
+                strcat(systemcommand,"http://");
+                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
+           } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+        }
+        strcat(systemcommand,"'");
+        system(systemcommand);
+        // start play stream or show rss page
+        //streamoversigt.playstream(1,systemcommand);
+      }
+      sknapnr=0;
+      stream_key_selected=1;
+      stream_select_iconnr=0;
+      startstream=false;                      // start kun 1 instans
     }
 
     // play recorded program
     if (do_play_recorded_aktiv_nr) {
-        if (debugmode & 64) fprintf(stderr,"Start playing recorded program\n");
-        if (strcmp("default",configdefaultplayer)!=0) {
-            strcpy(systemcommand,"./startrecorded.sh ");
-            recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
-            //strcat(systemcommand,configrecordpath);
-            strcat(systemcommand,temptxt);
-
-            printf("Start command :%s \n",systemcommand);
-
-            system(systemcommand);
-            do_play_recorded_aktiv_nr=0;                        // start kun 1 player
-        } else {
-            if (debugmode & 64) fprintf(stderr,"Start default playing recorded program\n");
-            strcpy(systemcommand,"./startrecorded.sh ");
-            recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
-            //strcat(systemcommand,configrecordpath);
-            strcat(systemcommand,temptxt);
-
-             if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
-
-            system(systemcommand);
-            do_play_recorded_aktiv_nr=0;                        // start kun 1 player
-        }
+      if (debugmode & 64) fprintf(stderr,"Start playing recorded program\n");
+      if (strcmp("default",configdefaultplayer)!=0) {
+        strcpy(systemcommand,"./startrecorded.sh ");
+        recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
+        //strcat(systemcommand,configrecordpath);
+        strcat(systemcommand,temptxt);
+        if (debugmode & 64) printf("Start command :%s \n",systemcommand);
+        system(systemcommand);
+        do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
+      } else {
+        if (debugmode & 64) fprintf(stderr,"Start default playing recorded program\n");
+        strcpy(systemcommand,"./startrecorded.sh ");
+        recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
+        //strcat(systemcommand,configrecordpath);
+        strcat(systemcommand,temptxt);
+         if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
+        system(systemcommand);
+        do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
+      }
     }
     //
     // show movie info
@@ -5381,8 +5375,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet=true;
             }
 
-
-
             // test for close windows again icon for all other windows
             if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
                 do_show_setup_sound=false;
@@ -5393,6 +5385,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 do_show_setup_font=false;
                 do_show_setup_keys=false;
                 do_show_videoplayer=false;
+                do_show_setup_rss=false;
                 do_show_tvgraber=false;
                 fundet=true;
             }
@@ -5403,6 +5396,24 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 if (tema>TEMA_ANTAL) tema=1;
                 fundet=true;
             }
+
+            // test for rss
+            if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+                do_show_setup_sound=false;
+                do_show_setup_sql=false;
+                do_show_setup_network=false;
+                do_show_setup_screen=false;
+                do_show_setup_tema=false;
+                do_show_setup_font=false;
+                do_show_setup_keys=false;
+                do_show_videoplayer=false;
+                do_show_tvgraber=false;
+                do_show_rss=false;
+                do_show_setup_rss=true;
+                fundet=true;
+            }
+
+
         }
 
         // main menu
@@ -6257,12 +6268,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               printf("stream nr %d name %s \n ",sknapnr-1,temptxt);
               streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
               do_play_stream=false;
-            } else if ((sknapnr-1>0) && (streamoversigt.type!=2)) {
-              //
+            } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
+              // update
               streamoversigt.clean_stream_oversigt();
-
               streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
-
               do_play_stream=false;
             } else {
               // back button
@@ -6293,11 +6302,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             stream_select_iconnr=0;
             _sangley=0.0f;
           } else {
-            //strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
-            printf("Stream to play is %d\n",sknapnr); //streamoversigt.get_stream_name(sknapnr));
-
-            //streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
-            // working
+            printf("Stream to play is %d\n",sknapnr-1); //streamoversigt.get_stream_name(sknapnr));
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
@@ -6754,6 +6759,10 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                       if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
+                    // setup videoplayer window
+                    if (do_show_setup_rss) {
+                      if (do_show_setup_select_linie<17) do_show_setup_select_linie++;
+                    }
                     // tv graber setup
                     if (do_show_tvgraber) {
                       if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
@@ -6887,6 +6896,9 @@ void handlespeckeypress(int key,int x,int y) {
                       if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
                   if (do_show_videoplayer) {
+                      if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                  }
+                  if (do_show_setup_rss) {
                       if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
                   // config af xmltv graber
@@ -7289,6 +7301,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                       keybufferindex++;
                       keybuffer[keybufferindex]='\0';	// else input key text in buffer
                     }
+                  } else if (do_show_setup_rss) {
+                    if (key!=13) {
+                      keybuffer[keybufferindex]=key;
+                      keybufferindex++;
+                      keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                    }
                   } else if (do_show_videoplayer) {
                     // video player setting
                     if (do_show_setup_select_linie==0) {
@@ -7432,6 +7450,35 @@ void handleKeypress(unsigned char key, int x, int y) {
                    case 7: strcpy(configrecordpath,keybuffer);
                            break;
               }
+           } else if (do_show_setup_rss) {
+
+               switch(do_show_setup_select_linie) {
+                 case 0:  streamoversigt.set_stream_url(0,keybuffer);
+                          break;
+                 case 1:  streamoversigt.set_stream_url(1,keybuffer);
+                          break;
+                 case 2:  streamoversigt.set_stream_url(2,keybuffer);
+                          break;
+                 case 3:  streamoversigt.set_stream_url(3,keybuffer);
+                          break;
+                 case 4:  streamoversigt.set_stream_url(4,keybuffer);
+                          break;
+                 case 5:  streamoversigt.set_stream_url(5,keybuffer);
+                          break;
+                 case 6:  streamoversigt.set_stream_url(6,keybuffer);
+                          break;
+                 case 7:  streamoversigt.set_stream_url(7,keybuffer);
+                          break;
+                 case 8:  streamoversigt.set_stream_url(8,keybuffer);
+                          break;
+                 case 9:  streamoversigt.set_stream_url(9,keybuffer);
+                          break;
+                 case 10: streamoversigt.set_stream_url(10,keybuffer);
+                          break;
+                 case 11: streamoversigt.set_stream_url(11,keybuffer);
+                          break;
+               }
+
            } else if (do_show_setup_keys) {
                switch(do_show_setup_select_linie) {
                    case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
@@ -11369,6 +11416,7 @@ void loadgfx() {
     _texturemythtvsql 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsql");
     _texturesetupfont 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupfont");
     _texturekeyssetup 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeys");
+    _texturekeysrss		    = loadgfxfile(temapath,(char *) "images/",(char *) "setuprss");
     _texturevideoplayersetup	= loadgfxfile(temapath,(char *) "images/",(char *) "setupplayer");
     _texturetvgrabersetup = loadgfxfile(temapath,(char *) "images/",(char *) "setupxmltv");
     _texturesetupclose		= loadgfxfile(temapath,(char *) "images/",(char *) "setupclose");
@@ -11393,6 +11441,7 @@ void loadgfx() {
     setupscreenback     	= loadgfxfile(temapath,(char *) "images/",(char *) "setupscreenback");
     setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
+    setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
 
 
 // ************************* screen shot *******************************
@@ -11551,6 +11600,7 @@ void freegfx() {
     glDeleteTextures( 1, &_texturesetupfont);			    // setup
     glDeleteTextures( 1, &_texturesetupclose);		  	//
     glDeleteTextures( 1, &_texturekeyssetup);		     	// setup
+    glDeleteTextures( 1, &_texturekeysrss);	  	     	// setup
     glDeleteTextures( 1, &_texturevideoplayersetup);  // setup
     glDeleteTextures( 1, &_texturetvgrabersetup);     //
     glDeleteTextures( 1, &setupkeysbar1);			// bruges af myth_setup.cpp
@@ -11572,6 +11622,7 @@ void freegfx() {
     glDeleteTextures( 1, &setupscreenback);
     glDeleteTextures( 1, &setupfontback);
     glDeleteTextures( 1, &setupkeysback);
+    glDeleteTextures( 1, &setuprssback);
     glDeleteTextures( 1, &screenshot1);		                   		// screen shots
     glDeleteTextures( 1, &screenshot2);			                  	// screen shots
     glDeleteTextures( 1, &screenshot3);			                  	// screen shots
