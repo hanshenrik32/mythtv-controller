@@ -5,10 +5,11 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "myth_vlcplayer.h"
 
 
 //const char *radioiconpath="/usr/share/mythtv-controller/images/radiostations/";
-const int feed_namelength=40;
+const int feed_namelength=80;
 const int feed_desclength=200;
 const int feed_pathlength=200;
 const int feed_url=400;
@@ -27,7 +28,7 @@ struct stream_oversigt_type {
     long intnr;
 };
 
-class stream_class {
+class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal radio stationer
         stream_oversigt_type *stack[maxantal];			                            // radio stack
@@ -47,6 +48,7 @@ class stream_class {
         char *get_stream_mythtvgfx_path(int nr) { return (stack[nr]->feed_gfx_mythtv); }
         char *get_stream_path(int nr) { return (stack[nr]->feed_path); }
         char *get_stream_url(int nr) { return (stack[nr]->feed_streamurl); }
+        void set_stream_url(int typ,char *value);
         char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
         unsigned int get_stream_groupantal(unsigned int nr) { return (stack[nr]->feed_group_antal); }
         unsigned int get_stream_pathantal(unsigned int nr) { return (stack[nr]->feed_path_antal); }
@@ -57,11 +59,12 @@ class stream_class {
         int streamantal() { return(antal); }
         void clean_stream_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
-        int loadrssfile();
-        int parsexmlrssfile(char *filename);
+        int loadrssfile();                                                      // download file from web
+        int parsexmlrssfile(char *filename);                                    // parse file from web
 //        int opdatere_stream_oversigt(char *searchtxt);
+        void playstream(char *url);
         void show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley);
-        void show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley);
+        void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int _mangley);
 };
 
 void *loadweb(void *data);

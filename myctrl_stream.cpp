@@ -115,7 +115,7 @@ int stream_class::loadrssfile() {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        printf("Hent info om stream title %-10s\n",row[3]);
+        printf("Hent info om stream title %10s \n",row[0]);
         if (strcmp(row[3],"")!=0) {
           strcpy(totalurl,"wget '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
@@ -322,29 +322,26 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_close(conn);
     }
 
-
-    printf("****************************************************** art = %s fpath=%s \n");
-
+    printf("****************************************************** art = %s fpath=%s \n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
-
     strcpy(lasttmpfilename,"");    					// reset
     if (debugmode & 4) printf("loading stream mythtv data.\n");
 
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by (internetcontent.name)");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name)");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL) from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       //strcat(sqlselect,"' group by path order by path,title asc");
       strcat(sqlselect,"' group by title order by title asc");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' and path like '");
       strcat(sqlselect,fpath);
@@ -364,7 +361,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                printf("Hent info om stream nr %4s %-20s\n",row[6],row[0]);
+                printf("Hent info om stream nr %d %-20s\n",antal,row[2]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
@@ -386,12 +383,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
                           if (row[6]) stack[antal]->feed_group_antal=atoi(row[6]);				          // antal
                           if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-
-                          strcpy(tmpfilename,"/usr/share/mythtv/mythnetvision/icons/");
-
-                          if (row[7]) strncat(tmpfilename,row[7],20);
-
-                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);	       		// mythtv icon file
+                          if (row[7]) strncat(tmpfilename,row[7],20);                               //
+                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
                           antal++;
                         } else {
                           // if first creat back button
@@ -412,13 +405,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           stack[antal]->intnr=1;
                           if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
                           if (getart==1) {
-                            if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                            // old ver used path from mysql
+                            //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                           } else {
                             if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                           }
                           if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
                           if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                          if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                          // old ver
+                          //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                          if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
                           switch(getart) {
                             case 0: if (row[6]) strcpy(tmpfilename,row[6]);
                                     break;
@@ -441,15 +438,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 }
                               } else {
                                 // downloadfilename = name on file, from tmpfilename = full web url
-
-                                printf("update db : %s \n",tmpfilename);
-
+                                printf("download gfx icon data: %s \n",tmpfilename);
                                 get_webfilename(downloadfilename,tmpfilename);
-
                                 strcpy(lasttmpfilename,tmpfilename);			// husk file name
-
                                 // save file in  /usr/share/mythtv-controller/images/mythnetvision
-                                strcpy(downloadfilenamelong,"/usr/share/mythtv-controller/images/mythnetvision/");
+                                strcpy(downloadfilenamelong,"/home/hans/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
 
 //                                if ((strcmp(lasttmpfilename,tmpfilename)==0) && (antal>1)) loadstatus=false;
@@ -667,9 +660,23 @@ void *load_all_stream_gfx(void *data) {
 
 
 
+void stream_class::playstream(char *url) {
+    //char path[PATH_MAX];                                  // max path length from os
+    //strcpy(path,"");
+    //film_is_playing=true;
+    //strcat(path,this->filmoversigt[nr].getfilmfilename());
+    vlc_controller::playmedia(url);
+}
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley)
 
+
+void stream_class::set_stream_url(int typ,char *value) {
+
+}
+
+
+
+void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int _mangley)
 
 {
     int j,ii,k,pos;
@@ -816,7 +823,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
       }
 
       // draw numbers in group
-      if (stack[i+sofset]->feed_group_antal>0) {
+      if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
@@ -831,13 +838,24 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glPopMatrix();
       }
 
+      float fontsiz=16.0f;
+
       glPushMatrix();
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       //glScalef(14.0, 14.0, 1.0);
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(20.0, 20.0, 1.0);
+
+      glScalef(fontsiz, fontsiz, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+
+      // temp
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      temptxt[17]='\0';
+      glcRenderString(temptxt);
+
+/*
       if (strlen(temptxt)<=14) {
         glRasterPos2f(0.0f, 0.0f);
         glDisable(GL_TEXTURE_2D);
@@ -876,6 +894,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
           pos+=j;
         }
       }
+*/
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
