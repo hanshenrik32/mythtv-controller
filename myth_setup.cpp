@@ -192,7 +192,9 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
 
 rss_stream_class::rss_stream_class() {
   antal=0;
-  for(int n=0;n<100;n++) {
+  for(int n=0;n<maxantal;n++) {
+    rss_source_feed[n].stream_name=new char[255];
+    rss_source_feed[n].stream_url=new char[2048];
     strcpy(rss_source_feed[n].stream_name,"");
     strcpy(rss_source_feed[n].stream_url,"");
   }
@@ -201,7 +203,10 @@ rss_stream_class::rss_stream_class() {
 
 
 rss_stream_class::~rss_stream_class() {
-
+  for(int n=0;n<maxantal;n++) {
+    delete[] rss_source_feed[n].stream_name;
+    delete[] rss_source_feed[n].stream_url;
+  }
 }
 
 
@@ -2962,7 +2967,7 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>0) myglprint4((char *) rssstreamoversigt.get_stream_name(0));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==0) showcoursornow(011,500,strlen(keybuffer));
+    if (do_show_setup_select_linie==0) showcoursornow(-071,500,strlen(keybuffer));
 
     // line 0
     glPushMatrix();
@@ -2977,6 +2982,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==1) showcoursornow(311,500,strlen(keybuffer));
+    //if (do_show_setup_select_linie==1) showcoursornow(-071,500,strlen(keybuffer));
 
 
     // line 1
@@ -2992,7 +2998,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>1) myglprint4((char *) rssstreamoversigt.get_stream_name(1));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==2) showcoursornow(011,450,strlen(keybuffer));
+    //if (do_show_setup_select_linie==2) showcoursornow(011,450,strlen(keybuffer));
+    if (do_show_setup_select_linie==2) showcoursornow(-071,450,strlen(keybuffer));
 
     // line 1
     glPushMatrix();
@@ -3007,6 +3014,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==3) showcoursornow(311,450,strlen(keybuffer));
+    //if (do_show_setup_select_linie==3) showcoursornow(-071,450,strlen(keybuffer));
 
 
     // line 2
@@ -3022,7 +3030,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>2) myglprint4((char *) rssstreamoversigt.get_stream_name(2));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==4) showcoursornow(011,400,strlen(keybuffer));
+    //if (do_show_setup_select_linie==4) showcoursornow(011,400,strlen(keybuffer));
+    if (do_show_setup_select_linie==4) showcoursornow(-071,400,strlen(keybuffer));
 
     // line 2
     glPushMatrix();
@@ -3037,7 +3046,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==5) showcoursornow(311,400,strlen(keybuffer));
-
+    //if (do_show_setup_select_linie==5) showcoursornow(-071,400,strlen(keybuffer));
 
     // line 3
     glPushMatrix();
@@ -3052,7 +3061,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>3) myglprint4((char *) rssstreamoversigt.get_stream_name(3));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==6) showcoursornow(011,350,strlen(keybuffer));
+    //if (do_show_setup_select_linie==6) showcoursornow(011,350,strlen(keybuffer));
+    if (do_show_setup_select_linie==6) showcoursornow(-071,350,strlen(keybuffer));
 
     // line 3
     glPushMatrix();
@@ -3067,7 +3077,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==7) showcoursornow(311,350,strlen(keybuffer));
-
+    //if (do_show_setup_select_linie==7) showcoursornow(-071,350,strlen(keybuffer));
 
     // line 4
     glPushMatrix();
@@ -3082,7 +3092,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>4) myglprint4((char *) rssstreamoversigt.get_stream_name(4));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==8) showcoursornow(011,300,strlen(keybuffer));
+    //if (do_show_setup_select_linie==8) showcoursornow(011,300,strlen(keybuffer));
+    if (do_show_setup_select_linie==8) showcoursornow(-071,300,strlen(keybuffer));
 
     // line 4
     glPushMatrix();
@@ -3097,7 +3108,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==9) showcoursornow(311,300,strlen(keybuffer));
-
+    //if (do_show_setup_select_linie==9) showcoursornow(-071,300,strlen(keybuffer));
 
     // line 5
     glPushMatrix();
@@ -3112,7 +3123,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>5) myglprint4((char *) rssstreamoversigt.get_stream_name(5));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==10) showcoursornow(011,250,strlen(keybuffer));
+    //if (do_show_setup_select_linie==10) showcoursornow(011,250,strlen(keybuffer));
+    if (do_show_setup_select_linie==10) showcoursornow(-071,250,strlen(keybuffer));
 
     // line 5
     glPushMatrix();
@@ -3127,6 +3139,7 @@ void show_setup_rss() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==11) showcoursornow(311,250,strlen(keybuffer));
+    //if (do_show_setup_select_linie==11) showcoursornow(-071,250,strlen(keybuffer));
 
 
     // line 6
@@ -3142,7 +3155,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>6) myglprint4((char *) rssstreamoversigt.get_stream_name(6));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==12) showcoursornow(011,200,strlen(keybuffer));
+    //if (do_show_setup_select_linie==12) showcoursornow(011,200,strlen(keybuffer));
+    if (do_show_setup_select_linie==12) showcoursornow(-071,200,strlen(keybuffer));
 
     // line 6
     glPushMatrix();
@@ -3172,7 +3186,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>7) myglprint4((char *) rssstreamoversigt.get_stream_name(7));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==14) showcoursornow(011,150,strlen(keybuffer));
+    //if (do_show_setup_select_linie==14) showcoursornow(011,150,strlen(keybuffer));
+    if (do_show_setup_select_linie==14) showcoursornow(-071,150,strlen(keybuffer));
 
     // line 7
     glPushMatrix();
@@ -3188,7 +3203,6 @@ void show_setup_rss() {
     glPopMatrix();
     if (do_show_setup_select_linie==15) showcoursornow(311,150,strlen(keybuffer));
 
-
     // line 8
     glPushMatrix();
     glTranslatef(310 , 250 , 0.0f);
@@ -3202,7 +3216,8 @@ void show_setup_rss() {
         if (rssstreamoversigt.streamantal()>7) myglprint4((char *) rssstreamoversigt.get_stream_name(8));
     }
     glPopMatrix();
-    if (do_show_setup_select_linie==16) showcoursornow(011,100,strlen(keybuffer));
+    //if (do_show_setup_select_linie==16) showcoursornow(011,100,strlen(keybuffer));
+    if (do_show_setup_select_linie==16) showcoursornow(-071,100,strlen(keybuffer));
 
     // line 8
     glPushMatrix();
