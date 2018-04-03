@@ -32,7 +32,9 @@ struct channel_list_struct {
   bool changeordernr;                                                           // do change ordre nr (used in setup)
 };
 
-
+//
+// used for tv channel db config
+//
 
 
 class channel_configfile {
@@ -47,15 +49,22 @@ class channel_configfile {
 };
 
 
+//
+// used for rss db config of rss feeds
+//
+
 struct rss_stream_struct {
-  char stream_name[255];
-  char stream_url[2048];
+  char *stream_name;
+  char *stream_url;
 };
+
+// class for edit rss feeds
 
 class rss_stream_class {
   private:
     rss_stream_struct rss_source_feed[100];
     int antal;
+    const int maxantal=100;                                                       // max # of records
   public:
     int load_rss_data();
     int streamantal() { return(antal); }
