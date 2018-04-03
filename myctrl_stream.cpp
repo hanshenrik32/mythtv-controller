@@ -669,13 +669,6 @@ void stream_class::playstream(char *url) {
 }
 
 
-
-void stream_class::set_stream_url(int typ,char *value) {
-
-}
-
-
-
 void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int _mangley)
 
 {

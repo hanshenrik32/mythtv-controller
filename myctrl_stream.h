@@ -48,7 +48,6 @@ class stream_class : vlc_controller {
         char *get_stream_mythtvgfx_path(int nr) { return (stack[nr]->feed_gfx_mythtv); }
         char *get_stream_path(int nr) { return (stack[nr]->feed_path); }
         char *get_stream_url(int nr) { return (stack[nr]->feed_streamurl); }
-        void set_stream_url(int typ,char *value);
         char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
         unsigned int get_stream_groupantal(unsigned int nr) { return (stack[nr]->feed_group_antal); }
         unsigned int get_stream_pathantal(unsigned int nr) { return (stack[nr]->feed_path_antal); }
