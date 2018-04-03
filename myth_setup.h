@@ -64,14 +64,19 @@ class rss_stream_class {
   private:
     rss_stream_struct rss_source_feed[100];
     int antal;
-    const int maxantal=100;                                                       // max # of records
+    const int maxantal=100;                                                            // max # of records
+    const int namemaxlength=80;                                                       // max length
+    const int urlmaxlength=2048;                                                       // max length
   public:
-    int load_rss_data();
+    int load_rss_data();                              // loaddb
+    int save_rss_data();                              // update db
     int streamantal() { return(antal); }
     rss_stream_class();
     ~rss_stream_class();
     char *get_stream_name(int nr) { return (rss_source_feed[nr].stream_name); }
     char *get_stream_url(int nr) { return (rss_source_feed[nr].stream_url); }
+    int set_stream_url(int nr,char *url);
+    int set_stream_name(int nr,char *name);
 };
 
 
