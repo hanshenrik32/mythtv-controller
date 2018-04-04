@@ -227,7 +227,7 @@ int rss_stream_class::load_rss_data() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    mysql_query(conn,"select feedtitle,title,url from internetcontentarticles where mediaURL is NULL");
+    mysql_query(conn,"select feedtitle,title,url from internetcontentarticles where mediaURL is NULL order by feedtitle asc");
     res = mysql_store_result(conn);
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (antal<100)) {
@@ -240,11 +240,15 @@ int rss_stream_class::load_rss_data() {
   }
 }
 
+
 // save/update rss db
 
 int rss_stream_class::save_rss_data() {
+  bool doexist;
   char sqlstring[2048];
   char ftitle[2048];
+  char ftitle2[2048];
+  char furl[2048];
   // mysql vars
   MYSQL *conn;
   MYSQL_RES *res,*res1;
@@ -257,18 +261,29 @@ int rss_stream_class::save_rss_data() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    mysql_query(conn,"select feedtitle,title,url from internetcontentarticles where mediaURL is NULL");
-    res = mysql_store_result(conn);
-    if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (antal<100)) {
-        // update rss url
-        for(n=0;n<antal;n++) {
-          // update if fundet
-          if (strcmp(row[0],rss_source_feed[n].stream_name)==0) {
+    for(n=0;n<antal;n++) {
+      // find record
+      doexist=false;
+      strcpy(ftitle,"");
+      strcpy(ftitle2,"");
+      strcpy(furl,"");
+      sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where title like '%s' limit 1",rss_source_feed[n].stream_name);
+      mysql_query(conn,sqlstring);
+      res = mysql_store_result(conn);
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        doexist=true;
+        strcpy(ftitle,row[0]);
+        strcpy(furl,row[0]);
+      }
+
+      if (doexist) {
+        // find record in db abd change for any change
+        if (ftitle) {
+          if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
             sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
             mysql_query(conn,sqlstring);
             res1 = mysql_store_result(conn);
-          } else if (strcmp(row[2],rss_source_feed[n].stream_url)==0) {
+          } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
             //
             // update name
             //
@@ -278,7 +293,7 @@ int rss_stream_class::save_rss_data() {
             mysql_query(conn,sqlstring);
             res1 = mysql_store_result(conn);
             while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
-              strcpy(ftitle,row[0]);
+              strcpy(ftitle2,row1[0]);
             }
             // update db record with new name
             sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
@@ -287,7 +302,7 @@ int rss_stream_class::save_rss_data() {
             if (res1) {
               // if okay update
               // chnage/update name
-              sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle);
+              sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
@@ -301,11 +316,10 @@ int rss_stream_class::save_rss_data() {
             sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
             mysql_query(conn,sqlstring);
             res1 = mysql_store_result(conn);
-
           }
         }
       }
-    }
+    } //for next
     mysql_close(conn);
   }
 }
