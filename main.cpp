@@ -358,6 +358,7 @@ int do_stream_icon_anim_icon_ofset=0;                   //
 int stream_icon_anim_icon_ofset=0;                      //
 unsigned int streamoversigt_antal=0;                            // antal radio stationer
 
+unsigned int configrss_ofset=0;
 
 int do_radio_icon_anim_icon_ofset=0;                    //
 int radio_icon_anim_icon_ofset=0;                       //
@@ -4562,7 +4563,7 @@ void display() {
             if (do_show_setup_font) show_setup_font(setupfontselectofset);
             if (do_show_setup_keys) show_setup_keys();
             if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);
-            if (do_show_setup_rss) show_setup_rss();
+            if (do_show_setup_rss) show_setup_rss(configrss_ofset);
         }
         glPopMatrix();
     }
@@ -6770,10 +6771,12 @@ void handlespeckeypress(int key,int x,int y) {
                     // setup videoplayer window
                     if (do_show_setup_rss) {
                       if (do_show_setup_select_linie<17) do_show_setup_select_linie++;
+                      else configrss_ofset++;
                     }
                     // tv graber setup
                     if (do_show_tvgraber) {
                       if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
+                        // if we wants to change order by the changeorderflag
                         if (channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].changeordernr) {
                           //swap channels (key down)
                           channel_list_struct tempch;
@@ -6908,6 +6911,7 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   if (do_show_setup_rss) {
                       if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                      else if (configrss_ofset>0) configrss_ofset--;
                   }
                   // config af xmltv graber
                   if (do_show_tvgraber) {
