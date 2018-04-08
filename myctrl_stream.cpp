@@ -8,6 +8,7 @@
 #include <GL/glc.h>
 #include <pthread.h>                   // multi thread support
 #include <libxml/parser.h>
+#include <sys/stat.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -100,11 +101,16 @@ int stream_class::loadrssfile() {
   char sqlselect[2048];
   char totalurl[2048];
   char parsefilename[2048];
+  char homedir[2048];
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   char *database = (char *) "mythconverg";
   conn=mysql_init(NULL);
+  // get homedir
+  getuserhomedir(homedir);
+  strcat(homedir,"/rss");
+  if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
   //strcpy(sqlselect,"select * from internetcontentarticles");
@@ -117,15 +123,21 @@ int stream_class::loadrssfile() {
       while ((row = mysql_fetch_row(res)) != NULL) {
         printf("Hent info om stream title %10s \n",row[0]);
         if (strcmp(row[3],"")!=0) {
+          getuserhomedir(homedir);
           strcpy(totalurl,"wget '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
-          strcat(totalurl,"' -o '/home/hans/rss/wget.log");
-          strcat(totalurl,"' -O '/home/hans/rss/");
+          strcat(totalurl,"' -o '");
+          strcat(totalurl,homedir);
+          strcat(totalurl,"/rss/wget.log'");
+          strcat(totalurl," -O '");
+          strcat(totalurl,homedir);
+          strcat(totalurl,"/rss/");
           if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,".rss'");
           system(totalurl);
           // parse file
-          strcpy(parsefilename,"/home/hans/rss/");
+          strcpy(parsefilename,homedir);
+          strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
           if (strcmp(row[3],"")!=0) {
@@ -381,6 +393,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char downloadfilename[1024];
     char downloadfilename1[1024];
     char downloadfilenamelong[1024];
+    char homedir[1024];
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -548,8 +561,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                   mmm++;
                                 }
                                 strcpy(lasttmpfilename,tmpfilename);			              // husk file name
-                                // save file in  /home/rss/
-                                strcpy(downloadfilenamelong,"/home/hans/rss/");
+                                // save file in  user homedir rss/
+                                getuserhomedir(homedir);
+                                strcpy(downloadfilenamelong,homedir);
+                                strcat(downloadfilenamelong,"/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
                                 if (!(file_exists(downloadfilenamelong))) {
                                   if (debugmode) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
@@ -686,6 +701,7 @@ void *load_all_stream_gfx(void *data) {
     char downloadfilenamelong[1024];
     char tmpfilename[1024];
     char lastfile[1024];
+    char homedir[2048];
     bool online;
     int getart=0;
     bool loadstatus;
@@ -721,25 +737,38 @@ void *load_all_stream_gfx(void *data) {
                   strcpy(tmpfilename,row1[5]);
 
                   if (stream_loadergfx_started_break) break;
-
+                  // http
                   if (strncmp(tmpfilename,"http://",7)==0) {
-
                     strcpy(lastfile,downloadfilename);
-
                     get_webfilename(downloadfilename,tmpfilename);
-                    strcpy(downloadfilenamelong,"/usr/share/mythtv-controller/images/mythnetvision/");
+                    getuserhomedir(homedir);
+                    strcpy(downloadfilenamelong,homedir);
+                    strcat(downloadfilenamelong,"/rss/");
                     strcat(downloadfilenamelong,downloadfilename);
-
                     filechange=strcmp(lastfile,downloadfilename);
-
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
                       printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                       nr++;
                     } else {
                       printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
-                    //this->stream_oversigt_nowloading=total_antal;
+                    total_antal++;
+                  } else if (strncmp(tmpfilename,"https://",8)==0) {
+                    strcpy(lastfile,downloadfilename);
+                    get_webfilename(downloadfilename,tmpfilename);
+                    getuserhomedir(homedir);
+                    strcpy(downloadfilenamelong,homedir);
+                    strcat(downloadfilenamelong,"/rss/");
+                    strcat(downloadfilenamelong,downloadfilename);
+                    filechange=strcmp(lastfile,downloadfilename);
+                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                      printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                      nr++;
+                    } else {
+                      printf("nr %3d exist : %s \n",nr,tmpfilename);
+                    }
                     total_antal++;
                   }
                 }
