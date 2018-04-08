@@ -148,15 +148,18 @@ int stream_class::loadrssfile() {
 int stream_class::parsexmlrssfile(char *filename) {
   xmlChar *tmpdat;
   xmlDoc *document;
-  xmlNode *root, *first_child, *node, *node1 ,*subnode,*subnode2;
+  xmlNode *root, *first_child, *node, *node1 ,*subnode,*subnode2,*subnode3;
   xmlChar *xmlrssid;
   xmlChar *content;
   char rssprgtitle[2048];
   char rssprgfeedtitle[2048];
   char rssprgdesc[2048];
+  char rssprgimage[2048];
   char rssvideolink[2048];
+  char rssprgpubdate[256];
   char rsstime[2048];
   char rssauthor[2048];
+  char rssduration[2048];
   int rssepisode;
   int rssseason;
   char result[2048+1];
@@ -182,7 +185,7 @@ int stream_class::parsexmlrssfile(char *filename) {
     first_child = root->children;
     for (node = first_child; node; node = node->next) {
       if (node->type==XML_ELEMENT_NODE) {
-        if (strcmp((char *) node->name,"channel")==0) {
+        if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
           content = xmlNodeGetContent(node);
           if (content) {
             //strcpy(result,(char *) content);
@@ -195,6 +198,17 @@ int stream_class::parsexmlrssfile(char *filename) {
               content = xmlNodeGetContent(subnode);
               strcpy(rssprgtitle,(char *) content);
             }
+
+            // images
+            // rssprgimage
+            // paththumb
+            //
+            if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
+              content = xmlNodeGetContent(subnode);
+              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+              if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+            }
+
             if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
               subnode2=subnode->xmlChildrenNode;
               while(subnode2) {
@@ -202,30 +216,40 @@ int stream_class::parsexmlrssfile(char *filename) {
                   content = xmlNodeGetContent(subnode2);
                   strcpy(rssprgfeedtitle,(char *) content);
                 }
+                // get play url
                 if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
                   if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
                 }
+
+                // rssprgpubdate
+                if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  strcpy(rssprgpubdate,(char *) content);
+                }
+
+                // get length
                 if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   if (content) strcpy(rsstime,(char *) content);
                 }
-
+                // get episode
                 if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   if (content) rssepisode=atoi((char *) content);
                 }
+                // get season
                 if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   if (content) rssseason=atoi((char *) content);
                 }
-
+                // get author
                 if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   if (content) strcpy(rssauthor,(char *) content);
                 }
-
+                // get description
                 if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   if (content) {
@@ -239,7 +263,7 @@ int stream_class::parsexmlrssfile(char *filename) {
               // check if exist
               if (strcmp(rssvideolink,"")!=0) {
                 recordexist=false;
-                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s' and title like '%s' and episode=%d and season=%d and author like '%s' and path like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
+                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s' and episode=%d and season=%d and author like '%s' and path like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
                 mysql_query(conn,sqlinsert);
                 res = mysql_store_result(conn);
                 if (res) {
@@ -249,7 +273,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 // creoate record if not exist
                 if (!(recordexist)) {
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description) values('%s','%s','%s',%d,%d,'%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
                   //printf("sql=%s\n",sqlinsert);
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
@@ -259,6 +283,82 @@ int stream_class::parsexmlrssfile(char *filename) {
             subnode=subnode->next;
           }
           printf("\n");
+        }
+        // youtube type
+        // get title
+        if (strcmp((char *) node->name,"title")==0) {
+            strcpy(rssprgtitle,"");
+            content = xmlNodeGetContent(node);
+            if (content) strcpy(rssprgtitle,(char *) content);
+        }
+
+        if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
+          // reset for earch element loading
+          strcpy(rssvideolink,"");
+          strcpy(rssprgfeedtitle,"");
+          rssepisode=0;
+          rssseason=0;
+          strcpy(rssauthor,"");
+          strcpy(rssprgdesc,"");
+          strcpy(rssprgimage,"");
+          if (strcmp((char *) node->name,"entry")==0) {
+            subnode2=node->xmlChildrenNode;
+            while(subnode2) {
+              if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                content = xmlNodeGetContent(subnode2);
+                strcpy(rssprgfeedtitle,(char *) content);
+              }
+
+              // get play url
+              if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
+                content = xmlNodeGetContent(subnode2);
+                tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
+                if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+              }
+
+              if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
+                subnode3=subnode2->xmlChildrenNode;
+                while(subnode3) {
+                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgtitle,(char *) content);
+                  }
+
+                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgdesc,(char *) content);
+                  }
+
+                  // get icon gfx
+                  if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
+                      content = xmlNodeGetContent(subnode3);
+                      tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
+                      if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+                      //if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+                  }
+                  subnode3=subnode3->next;
+                }
+              }
+              subnode2=subnode2->next;
+            }
+
+            recordexist=false;
+            sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssprgdesc);
+            mysql_query(conn,sqlinsert);
+            res = mysql_store_result(conn);
+            if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                    recordexist=true;
+                }
+            }
+
+            if (!(recordexist)) {
+                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
+                //printf("sql=%s\n",sqlinsert);
+                mysql_query(conn,sqlinsert);
+                res = mysql_store_result(conn);
+            }
+          }
         }
       }
     }
@@ -279,6 +379,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char tmpfilename[1024];
     char lasttmpfilename[1024];
     char downloadfilename[1024];
+    char downloadfilename1[1024];
     char downloadfilenamelong[1024];
     // mysql vars
     MYSQL *conn;
@@ -322,7 +423,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_close(conn);
     }
 
-    printf("****************************************************** art = %s fpath=%s \n",art,fpath);
+    printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
@@ -438,22 +539,29 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 }
                               } else {
                                 // downloadfilename = name on file, from tmpfilename = full web url
-                                printf("download gfx icon data: %s \n",tmpfilename);
-                                get_webfilename(downloadfilename,tmpfilename);
-                                strcpy(lasttmpfilename,tmpfilename);			// husk file name
-                                // save file in  /usr/share/mythtv-controller/images/mythnetvision
+                                get_webfilename(downloadfilename,tmpfilename);          // get file name from url
+                                // check filename
+                                strcpy(downloadfilename1,downloadfilename);           // back name before change
+                                int mmm=0;
+                                while(mmm<strlen(downloadfilename)) {
+                                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                                  mmm++;
+                                }
+                                strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                                // save file in  /home/rss/
                                 strcpy(downloadfilenamelong,"/home/hans/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
-
+                                if (!(file_exists(downloadfilenamelong))) {
+                                  if (debugmode) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                                    printf("Download error \n");
+                                  } else strcpy(tmpfilename,"");
+                                }
+                                strcpy(tmpfilename,downloadfilenamelong);
 //                                if ((strcmp(lasttmpfilename,tmpfilename)==0) && (antal>1)) loadstatus=false;
-
 /*
-
-
                                 if ((loadstatus) && (!(file_exists(downloadfilenamelong)))) {
-//	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
-                                  // download image file to /usr/share/mythtv-controller/images/mythnetvision
-
+	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
                                   if ((strcmp(lasttmpfilename,tmpfilename)==false) && (loadstatus=true)) {
                                     if (loadstatus=get_webfile(tmpfilename,downloadfilenamelong)) {
                                       strcpy(tmpfilename,downloadfilenamelong);
@@ -464,15 +572,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                   }
                                 } else strcpy(tmpfilename,downloadfilenamelong);
                                 */
-
-
-/*
-                                // or use wget
-                                strcpy(tmpfilename1,"wget ");
-                                strcat(tmpfilename1,tmpfilename);
-                                strcat(tmpfilename1," tmp/");
-                                system(tmpfilename1);
-*/
                               }
                           } else strcpy(tmpfilename,"");
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	// mythtv icon file
@@ -483,9 +582,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
                           antal++;
                         }
-
-
-//                        if (debugmode & 4) printf("Gem texture filename %s \n",tmpfilename);
                     }
                 }
             }
@@ -760,6 +856,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glEnd();
         glPopMatrix();
 
+
         glPushMatrix();
         // indsite draw icon
         glEnable(GL_TEXTURE_2D);
@@ -777,6 +874,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
         glEnd();
         glPopMatrix();
+
+
       } else {
 /*
         // stream default icon
@@ -795,6 +894,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glEnd();
         glPopMatrix();
 */
+
         // show default icon
         glPushMatrix();
         // indsite draw radio station icon
@@ -813,7 +913,10 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPopMatrix();
+
+
       }
+
 
       // draw numbers in group
       if (stack[i+sofset]->feed_group_antal>1) {
@@ -919,6 +1022,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
       glcRenderString(temptxt);
       glPopMatrix();
     }
+
     if (i==0) {
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
