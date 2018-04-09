@@ -94,6 +94,10 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 }
 
 
+
+//
+// used to download rss file from db info (url is flag for master rss file (mediaURL IS NULL))
+// in db if mediaURL have url this is the rss feed loaded from rss file
 //
 
 int stream_class::loadrssfile() {
@@ -156,6 +160,7 @@ int stream_class::loadrssfile() {
 
 //
 // xml parser
+//
 
 int stream_class::parsexmlrssfile(char *filename) {
   xmlChar *tmpdat;
