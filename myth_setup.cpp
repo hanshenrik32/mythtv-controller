@@ -212,7 +212,10 @@ rss_stream_class::~rss_stream_class() {
   }
 }
 
+
+//
 // loader from db
+//
 
 int rss_stream_class::load_rss_data() {
   // mysql vars
@@ -241,7 +244,9 @@ int rss_stream_class::load_rss_data() {
 }
 
 
+//
 // save/update rss db
+//
 
 int rss_stream_class::save_rss_data() {
   bool doexist;

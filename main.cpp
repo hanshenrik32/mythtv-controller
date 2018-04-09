@@ -651,6 +651,8 @@ GLuint radiooptionsmask;                  //
 GLuint radiobutton;                       //
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
+GLuint onlinestream;                      // stream default icon
+GLuint onlinestream_empty;                // stream default icon
 GLuint moviebutton;                       //
 
 GLuint gfxlandemask;                      //
@@ -2803,7 +2805,7 @@ void display() {
 
       } else if (vis_stream_oversigt) {
         glPushMatrix();
-        streamoversigt.show_stream_oversigt1(onlineradio, onlineradio_empty ,_sangley);
+        streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty ,_sangley);
         glPopMatrix();
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
@@ -11511,6 +11513,10 @@ void loadgfx() {
     radiooptionsmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptionsmask");
     onlinestreammask=loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_mask");
     onlinestreammaskicon=loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_mask");
+
+    onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
+    onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
+
     // stream stuf
     // stream/movie button mask
     streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
@@ -11672,6 +11678,8 @@ void freegfx() {
     glDeleteTextures( 1, &onlineradio320);			                // radio icon
     glDeleteTextures( 1, &onlineradiomask);			                // radio icon mask
     glDeleteTextures( 1, &radiobutton);
+    glDeleteTextures( 1, &onlinestream);                        // stream default icons
+    glDeleteTextures( 1, &onlinestream_empty);                  // stream default icons
     glDeleteTextures( 1, &musicbutton);
     glDeleteTextures( 1, &radiooptions);
     glDeleteTextures( 1, &radiooptionsmask);
