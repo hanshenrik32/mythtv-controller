@@ -158,6 +158,8 @@ int stream_class::loadrssfile() {
 }
 
 
+
+
 //
 // xml parser
 //
@@ -277,10 +279,10 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 subnode2=subnode2->next;
               }
-              // check if exist
+              // check if record exist
               if (strcmp(rssvideolink,"")!=0) {
                 recordexist=false;
-                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s' and episode=%d and season=%d and author like '%s' and path like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc);
+                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
                 mysql_query(conn,sqlinsert);
                 res = mysql_store_result(conn);
                 if (res) {
@@ -360,7 +362,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
 
             recordexist=false;
-            sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s' and description like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssprgdesc);
+            sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
             mysql_query(conn,sqlinsert);
             res = mysql_store_result(conn);
             if (res) {
@@ -382,7 +384,7 @@ int stream_class::parsexmlrssfile(char *filename) {
     xmlFreeDoc(document);
     mysql_close(conn);
   } else {
-    printf(" ******************************************* Read error on xmlfile downloaded to rss dir\n");
+    printf(" ******************************************* Read error on %s xmlfile downloaded to rss dir \n",filename);
   }
 }
 
@@ -412,7 +414,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (conn) {
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      if (!(mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
+          //mysql_create_db(conn,"mythconverg CHARACTER SET utf8 COLLATE utf8_general_ci");
+      }
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test fpom musik table exist
@@ -433,7 +438,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"create table internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search  tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
+        sprintf(sqlselect,"create table internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
@@ -480,7 +485,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                printf("Hent info om stream nr %d %-20s\n",antal,row[2]);
+                printf("Get info from stream nr %d %-20s\n",antal,row[2]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
@@ -790,11 +795,12 @@ void *load_all_stream_gfx(void *data) {
 
 
 
+//
+// play stream by vlc
+//
+
 void stream_class::playstream(char *url) {
-    //char path[PATH_MAX];                                  // max path length from os
-    //strcpy(path,"");
-    //film_is_playing=true;
-    //strcat(path,this->filmoversigt[nr].getfilmfilename());
+//    media_is_playing=true;
     vlc_controller::playmedia(url);
 }
 

@@ -6686,7 +6686,7 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
                 // radio
-                if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+rnumbersoficonline)<radiooversigt.radioantal())) {
+                if ((vis_radio_oversigt) && (show_radio_options==false) && ((radio_select_iconnr+rnumbersoficonline)<radiooversigt.radioantal()-1)) {
                     if (radio_key_selected>=20) {
                         _rangley+=RADIO_CS;
                         radio_select_iconnr+=rnumbersoficonline;
