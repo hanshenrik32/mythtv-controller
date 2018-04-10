@@ -1166,11 +1166,11 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glEnable(GL_TEXTURE_2D);
     glPopMatrix();
   }
-  if (film_nr==0) {
-    sprintf(temptxt,"No info from %s backend. ",configbackend);
+  if ((film_nr==0) || (this->filmoversigt_antal==0)) {
+    sprintf(temptxt,"No info from %s backend.",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
-    xpos=700;
+    xpos=600;
     ypos=400;
     glTranslatef(xpos+10, ypos+40 ,0.0f);
     glRasterPos2f(0.0f, 0.0f);
