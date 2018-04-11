@@ -805,7 +805,7 @@ void stream_class::playstream(char *url) {
 }
 
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,int _mangley)
+void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley)
 
 {
     int j,ii,k,pos;
@@ -877,15 +877,22 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         yof=yof-(buttonsizey+20);
         xof=0;
       }
+
+
+      // error is in this IF block
+
+
       // stream har et icon in db
       if (stack[i+sofset]->textureId) {
+
+
         // stream icon
-        glPushMatrix();
+//        glPushMatrix();
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,empty_icon1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -894,15 +901,14 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
-        glPopMatrix();
+//        glPopMatrix();
 
-
-        glPushMatrix();
+        //glPushMatrix();
         // indsite draw icon
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -913,35 +919,17 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
         glEnd();
-        glPopMatrix();
-
+        //glPopMatrix();
 
       } else {
-/*
-        // stream default icon
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,icon_mask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd();
-        glPopMatrix();
-*/
 
         // show default icon
         glPushMatrix();
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -953,6 +941,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPopMatrix();
+
 
 
       }
@@ -975,7 +964,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
       }
 
       float fontsiz=16.0f;
-
       glPushMatrix();
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       //glScalef(14.0, 14.0, 1.0);
@@ -991,46 +979,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
       temptxt[17]='\0';
       glcRenderString(temptxt);
 
-/*
-      if (strlen(temptxt)<=14) {
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glcRenderString(temptxt);
-      } else {
-        j=0;
-        ii=0;
-        while(!isspace(temptxt[ii])) {
-          if (temptxt[ii]=='\0') break;
-          word[j]=temptxt[ii];
-          ii++;
-          j++;
-        }
-        word[j]='\0';	// j = word length
-        pos=0;
-        if (j>13) {		// print char by char
-          k=0;
-          while(word[k]!='\0') {
-            if (pos>=13) {
-              glcRenderChar('-');
-              //glRasterPos2f(0.0f, 0.0f);
-              //glScalef(20.0, 20.0, 1.0);
-            }
-            glcRenderChar(word[k]);
-            pos++;
-            k++;
-          }
-        } else {
-          if (pos+j>13) {	// word doesn't fit line
-            pos=0;
-            //ofs=(int) (strlen(word)/2)*9;
-            //glRasterPos2f(0.0f, 0.0f);
-            //glScalef(14.0, 14.0, 1.0);
-          }
-          glcRenderString(word);
-          pos+=j;
-        }
-      }
-*/
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
@@ -1040,9 +988,9 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,in
     if (stream_oversigt_loaded_nr<streamoversigt.streamantal()) {
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
-      //glBlendFunc(GL_ONE, GL_ONE);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBlendFunc(GL_ONE, GL_ONE);
+      //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

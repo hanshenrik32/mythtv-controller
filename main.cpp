@@ -653,6 +653,7 @@ GLuint musicbutton;                       //
 GLuint streambutton;                      //
 GLuint onlinestream;                      // stream default icon
 GLuint onlinestream_empty;                // stream default icon
+GLuint onlinestream_empty1;               // stream default icon
 GLuint moviebutton;                       //
 
 GLuint gfxlandemask;                      //
@@ -2805,7 +2806,7 @@ void display() {
 
       } else if (vis_stream_oversigt) {
         glPushMatrix();
-        streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty ,_sangley);
+        streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley);
         glPopMatrix();
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
@@ -11516,6 +11517,7 @@ void loadgfx() {
 
     onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
     onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
+    onlinestream_empty1  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
 
     // stream stuf
     // stream/movie button mask
@@ -11680,6 +11682,7 @@ void freegfx() {
     glDeleteTextures( 1, &radiobutton);
     glDeleteTextures( 1, &onlinestream);                        // stream default icons
     glDeleteTextures( 1, &onlinestream_empty);                  // stream default icons
+    glDeleteTextures( 1, &onlinestream_empty1);                 // stream default icons
     glDeleteTextures( 1, &musicbutton);
     glDeleteTextures( 1, &radiooptions);
     glDeleteTextures( 1, &radiooptionsmask);
