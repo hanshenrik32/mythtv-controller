@@ -7,7 +7,8 @@
 // 4  = stream
 // 8  = keyboard/mouse move
 // 16 = movie
-// 32 = searcg
+// 32 = search
+// 64 =
 // 128= stream search
 // 256 = tv program stuf
 // 512 = media importer

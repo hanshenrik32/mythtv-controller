@@ -42,7 +42,7 @@ extern bool vis_uv_meter;                                 // uv meter er igang m
 extern int orgwinsizey;
 extern int orgwinsizex;
 
-
+extern int debugmode;
 
 // constructor
 
@@ -467,7 +467,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     int checkdirexist=0;
 //    gotoxy(10,16);
-    printf("Opdatere Film oversigt fra mythtv :");
+    if (debugmode & 16) printf("Opdatere Film oversigt fra mythtv :");
     sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
 //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
@@ -734,7 +734,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     if (filhandle) fclose(filhandle);							// close log file again
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
-    printf(" %d dvd covers loaded\n",filmantal);
+    if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
     mysql_close(conn);
     return(filmantal);
 }

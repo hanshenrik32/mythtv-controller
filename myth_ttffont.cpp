@@ -43,12 +43,12 @@ int fontctrl::updatefontlist()
     glcAppendCatalog("/usr/share/fonts/type1/");
     /* Choose a master and a face. */
     mastercount=glcGeti(GLC_MASTER_COUNT);		// gem antal af fonte
-    printf("Numbers of fonts found %d \n",mastercount);
+    if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
     master = 0;
     i=0;
     // Print the path to the catalogs
     count = glcGeti(GLC_FONT_COUNT);                                       // GLC_FONT_COUNT GLC_CATALOG_COUNT
-    printf("\nTrue type fonts is found in this path\n");
+    if (debugmode) printf("\nTrue type fonts is found in this path\n");
     for (i = 0; i<count; i++) printf("%s\n",(char *) glcGetListc(GLC_CATALOG_LIST, i));
     // load font list
     i=0;
@@ -78,7 +78,7 @@ int fontctrl::selectfont(char *fontname)
     glcFont(myFont);
     if (glcFontFace(myFont, "Bold")==GL_TRUE) {
       //glcFontFace(myFont, "Bold"); // Select the face of my font
-    } else printf("Not a face type font (select error).\n");  // Regular
+    } else if (debugmode) printf("Not a face type font (select error).\n");  // Regular
     return(1);
 }
 
