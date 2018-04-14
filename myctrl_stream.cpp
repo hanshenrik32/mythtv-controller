@@ -432,6 +432,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           dbexist=1;
         }
       }
+      //
+      // create db if not exist
+      // and dump some default rss feeed in
+      //
       if (!(dbexist)) {
         if (debugmode & 4) printf("Creating database for rss feed\n");
         // thumbnail   = name of an local image file
