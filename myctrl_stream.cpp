@@ -7,6 +7,8 @@
 #include <mysql.h>
 #include <GL/glc.h>
 #include <pthread.h>                   // multi thread support
+#include <libxml/parser.h>
+#include <sys/stat.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -16,7 +18,6 @@
 #include "loadpng.h"
 // web file loader
 #include "myctrl_readwebfile.h"
-
 
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
@@ -52,6 +53,7 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
+
 // constructor
 stream_class::stream_class() : antal(0) {
     int i;
@@ -85,9 +87,6 @@ void stream_class::clean_stream_oversigt() {
     stream_oversigt_nowloading=0;
 }
 
-
-
-
 // set en stream icon image
 
 void stream_class::set_texture(int nr,GLuint idtexture) {
@@ -96,15 +95,316 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 
 
 
+//
+// used to download rss file from db info (url is flag for master rss file (mediaURL IS NULL))
+// in db if mediaURL have url this is the rss feed loaded from rss file
+//
+
+int stream_class::loadrssfile() {
+  // mysql vars
+  char sqlselect[2048];
+  char totalurl[2048];
+  char parsefilename[2048];
+  char homedir[2048];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char *database = (char *) "mythconverg";
+  conn=mysql_init(NULL);
+  // get homedir
+  getuserhomedir(homedir);
+  strcat(homedir,"/rss");
+  if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  // Connect to database
+  //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+  //strcpy(sqlselect,"select * from internetcontentarticles");
+  strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
+        if (strcmp(row[3],"")!=0) {
+          getuserhomedir(homedir);
+          strcpy(totalurl,"wget '");
+          if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
+          strcat(totalurl,"' -o '");
+          strcat(totalurl,homedir);
+          strcat(totalurl,"/rss/wget.log'");
+          strcat(totalurl," -O '");
+          strcat(totalurl,homedir);
+          strcat(totalurl,"/rss/");
+          if (row[3]) strcat(totalurl,row[3]);
+          strcat(totalurl,".rss'");
+          // download file
+          system(totalurl);
+          // parse file
+          strcpy(parsefilename,homedir);
+          strcat(parsefilename,"/rss/");
+          strcat(parsefilename,row[3]);
+          strcat(parsefilename,".rss");
+          if (strcmp(row[3],"")!=0) {
+            // parse downloaded xmlfile now (create db records)
+            parsexmlrssfile(parsefilename);
+          }
+        }
+      }
+      mysql_free_result(res);
+    }
+    mysql_close(conn);
+  } else return(-1);
+  return(1);
+}
+
+
+
+
+//
+// xml parser
+//
+
+int stream_class::parsexmlrssfile(char *filename) {
+  xmlChar *tmpdat;
+  xmlDoc *document;
+  xmlNode *root, *first_child, *node, *node1 ,*subnode,*subnode2,*subnode3;
+  xmlChar *xmlrssid;
+  xmlChar *content;
+  char rssprgtitle[2048];
+  char rssprgfeedtitle[2048];
+  char rssprgdesc[2048];
+  char rssprgimage[2048];
+  char rssvideolink[2048];
+  char rssprgpubdate[256];
+  char rsstime[2048];
+  char rssauthor[2048];
+  char rssduration[2048];
+  int rssepisode;
+  int rssseason;
+  char result[2048+1];
+  char sqlinsert[32768];
+  char *database = (char *) "mythconverg";
+  bool recordexist=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  strcpy(rssprgtitle,"");
+  strcpy(rssprgfeedtitle,"");
+  strcpy(rssprgdesc,"");
+  strcpy(rssvideolink,"");
+  strcpy(rsstime,"");
+  strcpy(rssauthor,"");
+  conn=mysql_init(NULL);
+  document = xmlReadFile(filename, NULL, 0);            // open xml file
+  // if exist do all the parse and update db
+  // it use REPLACE in mysql to create/update records if changed in xmlfile
+  if ((document) && (conn)) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    root = xmlDocGetRootElement(document);
+    first_child = root->children;
+    for (node = first_child; node; node = node->next) {
+      if (node->type==XML_ELEMENT_NODE) {
+        if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
+          content = xmlNodeGetContent(node);
+          if (content) {
+            //strcpy(result,(char *) content);
+          }
+          subnode=node->xmlChildrenNode;
+          while(subnode) {
+            xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
+            content = xmlNodeGetContent(subnode);
+            if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
+              content = xmlNodeGetContent(subnode);
+              strcpy(rssprgtitle,(char *) content);
+            }
+
+            // images
+            // rssprgimage
+            // paththumb
+            //
+            if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
+              content = xmlNodeGetContent(subnode);
+              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+              if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+            }
+
+            if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
+              subnode2=subnode->xmlChildrenNode;
+              while(subnode2) {
+                if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  strcpy(rssprgfeedtitle,(char *) content);
+                }
+                // get play url
+                if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                  if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+                }
+
+                // rssprgpubdate
+                if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  strcpy(rssprgpubdate,(char *) content);
+                }
+
+                // get length
+                if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) strcpy(rsstime,(char *) content);
+                }
+                // get episode
+                if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) rssepisode=atoi((char *) content);
+                }
+                // get season
+                if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) rssseason=atoi((char *) content);
+                }
+                // get author
+                if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) strcpy(rssauthor,(char *) content);
+                }
+                // get description
+                if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                  content = xmlNodeGetContent(subnode2);
+                  if (content) {
+                    xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
+                    if (xmlrssid) strcpy(rssprgdesc,(char *) content);
+                    xmlFree(xmlrssid);
+                  }
+                }
+                subnode2=subnode2->next;
+              }
+              // check if record exist
+              if (strcmp(rssvideolink,"")!=0) {
+                recordexist=false;
+                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
+                mysql_query(conn,sqlinsert);
+                res = mysql_store_result(conn);
+                if (res) {
+                  while ((row = mysql_fetch_row(res)) != NULL) {
+                    recordexist=true;
+                  }
+                }
+                // creoate record if not exist
+                if (!(recordexist)) {
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
+                  //printf("sql=%s\n",sqlinsert);
+                  mysql_query(conn,sqlinsert);
+                  res = mysql_store_result(conn);
+                }
+              }
+            }
+            subnode=subnode->next;
+          }
+          printf("\n");
+        }
+        // youtube type
+        // get title
+        if (strcmp((char *) node->name,"title")==0) {
+            strcpy(rssprgtitle,"");
+            content = xmlNodeGetContent(node);
+            if (content) strcpy(rssprgtitle,(char *) content);
+        }
+
+        if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
+          // reset for earch element loading
+          strcpy(rssvideolink,"");
+          strcpy(rssprgfeedtitle,"");
+          rssepisode=0;
+          rssseason=0;
+          strcpy(rssauthor,"");
+          strcpy(rssprgdesc,"");
+          strcpy(rssprgimage,"");
+          if (strcmp((char *) node->name,"entry")==0) {
+            subnode2=node->xmlChildrenNode;
+            while(subnode2) {
+              if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                content = xmlNodeGetContent(subnode2);
+                strcpy(rssprgfeedtitle,(char *) content);
+              }
+
+              // get play url
+              if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
+                content = xmlNodeGetContent(subnode2);
+                tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
+                if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+              }
+
+              if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
+                subnode3=subnode2->xmlChildrenNode;
+                while(subnode3) {
+                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgtitle,(char *) content);
+                  }
+
+                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgdesc,(char *) content);
+                  }
+
+                  // get icon gfx
+                  if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
+                      content = xmlNodeGetContent(subnode3);
+                      tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
+                      if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+                      //if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+                  }
+                  subnode3=subnode3->next;
+                }
+              }
+              subnode2=subnode2->next;
+            }
+
+            recordexist=false;
+            sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+            mysql_query(conn,sqlinsert);
+            res = mysql_store_result(conn);
+            if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                    recordexist=true;
+                }
+            }
+
+            if (!(recordexist)) {
+                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
+                //printf("sql=%s\n",sqlinsert);
+                mysql_query(conn,sqlinsert);
+                res = mysql_store_result(conn);
+            }
+          }
+        }
+      }
+    }
+    xmlFreeDoc(document);
+    mysql_close(conn);
+  } else {
+    if (debugmode & 4) printf(" ******************************************* Read error on %s xmlfile downloaded to rss dir \n",filename);
+  }
+}
+
+
+
+//
+// opdate show liste in view
+//
 
 // load felt 7 = mythtv gfx icon
 
 int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
-    char sqlselect[512];
+    char sqlselect[1024];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
     char downloadfilename[1024];
+    char downloadfilename1[1024];
     char downloadfilenamelong[1024];
+    char homedir[1024];
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -113,26 +413,63 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     bool online;
     int getart=0;
     bool loadstatus=true;
+    bool dbexist=false;
     antal=0;
+    conn=mysql_init(NULL);
+    // Connect to database
+    if (conn) {
+      if (!(mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
+          //mysql_create_db(conn,"mythconverg CHARACTER SET utf8 COLLATE utf8_general_ci");
+      }
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      // test fpom musik table exist
+      mysql_query(conn,"SELECT feedtitle from internetcontentarticles limit 1");
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dbexist=1;
+        }
+      }
+      if (!(dbexist)) {
+        if (debugmode & 4) printf("Creating database for rss feed\n");
+        // thumbnail   = name of an local image file
+        // commandline = Program to fetch content with
+        // updated     = Time of last update
+        sprintf(sqlselect,"create table internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language  varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"create table internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+      }
+      mysql_close(conn);
+    }
+
+    if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
-
     strcpy(lasttmpfilename,"");    					// reset
     if (debugmode & 4) printf("loading stream mythtv data.\n");
 
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name)");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select feedtitle,path,title,description,url,thumbnail,count(path),paththumb from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL) from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
-      strcat(sqlselect,"' group by path order by path,title asc");
+      //strcat(sqlselect,"' group by path order by path,title asc");
+      strcat(sqlselect,"' group by title order by title asc");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select feedtitle,path,title,description,url,thumbnail,paththumb from internetcontentarticles where feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' and path like '");
       strcat(sqlselect,fpath);
@@ -141,7 +478,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     }
     this->type=getart;					// husk sql type
 
-    printf("Mythtv stream loader started... \n");
+    if (debugmode & 4) printf("Mythtv stream loader started... \n");
 
     conn=mysql_init(NULL);
     // Connect to database
@@ -152,14 +489,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                printf("Hent info om stream nr %s %-20s\n",row[6],row[0]);
+                if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
                         strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-                        strcpy(stack[antal]->feed_name,"");		                    // mythtv db feedtitle
-                        strcpy(stack[antal]->feed_desc,"");                          // desc
-                        strcpy(stack[antal]->feed_path,"");                         // mythtv db path
+                        strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+                        strcpy(stack[antal]->feed_desc,"");                           // desc
+                        strcpy(stack[antal]->feed_path,"");                           // mythtv db path
                         strcpy(stack[antal]->feed_gfx_url,"");
                         strcpy(stack[antal]->feed_gfx_mythtv,"");
                         strcpy(stack[antal]->feed_streamurl,"");
@@ -171,48 +508,48 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                         if (getart==0) {
                           strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
                           strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                          strcpy(stack[antal]->feed_path,row[1]);
-                          stack[antal]->feed_group_antal=atoi(row[6]);				// antal
-                          strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-
-                          strcpy(tmpfilename,"/usr/share/mythtv/mythnetvision/icons/");
-
-                          if (row[7]) strncat(tmpfilename,row[7],20);
-
-                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);			// mythtv icon file
+                          if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
+                          if (row[6]) stack[antal]->feed_group_antal=atoi(row[6]);				          // antal
+                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                          if (row[7]) strncat(tmpfilename,row[7],20);                               //
+                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
                           antal++;
                         } else {
                           // if first creat back button
                           if (antal==0) {
-                            stack[antal]->textureId=_textureIdback;				// back icon
+                            stack[antal]->textureId=_textureIdback;			                    // back icon
                             strcpy(stack[antal]->feed_showtxt,"BACK");
-                            strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                            strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
+                            if (row[0]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);
+                            if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
                             //strcpy(stack[antal]->feed_streamurl,row[4]);
-                            strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                            strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                            if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                            if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
                             stack[antal]->feed_group_antal=0;
-                            stack[antal]->intnr=0;						// intnr=0 = back button type
+                            stack[antal]->intnr=0;	                               					// intnr=0 = back button type
                             antal++;
                           }
 
-
                           if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
                           stack[antal]->intnr=1;
-
-                          strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-
-                          if (getart==1) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                          else strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                          strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                          strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                          strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		// save play url
+                          if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                          if (getart==1) {
+                            // old ver used path from mysql
+                            //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                          } else {
+                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                          }
+                          if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                          if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                          // old ver
+                          //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                          if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
                           switch(getart) {
-                            case 0: strcpy(tmpfilename,row[6]);
+                            case 0: if (row[6]) strcpy(tmpfilename,row[6]);
                                     break;
-                            case 1: strcpy(tmpfilename,row[7]);
+                            case 1: if (row[7]) strcpy(tmpfilename,row[7]);
                                     break;
-                            case 2: strcpy(tmpfilename,row[5]);
+                            case 2: if (row[5]) strcpy(tmpfilename,row[5]);
                                     break;
                           }
 
@@ -220,31 +557,40 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                               if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
                                 strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
                                 if (strlen(row[7])>10) {
-                                  if (getart==1) strncat(tmpfilename,row[7]+10,100);
-                                  if (getart==2) strncat(tmpfilename,row[6]+10,100);
+                                  if (getart==1) {
+                                    if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                                  }
+                                  if (getart==2) {
+                                    if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                                  }
                                 }
                               } else {
                                 // downloadfilename = name on file, from tmpfilename = full web url
-
-                                printf("update db : %s \n",tmpfilename);
-
-                                get_webfilename(downloadfilename,tmpfilename);
-
-                                strcpy(lasttmpfilename,tmpfilename);			// husk file name
-
-                                // save file in  /usr/share/mythtv-controller/images/mythnetvision
-                                strcpy(downloadfilenamelong,"/usr/share/mythtv-controller/images/mythnetvision/");
+                                get_webfilename(downloadfilename,tmpfilename);          // get file name from url
+                                // check filename
+                                strcpy(downloadfilename1,downloadfilename);           // back name before change
+                                int mmm=0;
+                                while(mmm<strlen(downloadfilename)) {
+                                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                                  mmm++;
+                                }
+                                strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                                // save file in  user homedir rss/
+                                getuserhomedir(homedir);
+                                strcpy(downloadfilenamelong,homedir);
+                                strcat(downloadfilenamelong,"/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
-
+                                if (!(file_exists(downloadfilenamelong))) {
+                                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                                    printf("Download error \n");
+                                  } else strcpy(tmpfilename,"");
+                                }
+                                strcpy(tmpfilename,downloadfilenamelong);
 //                                if ((strcmp(lasttmpfilename,tmpfilename)==0) && (antal>1)) loadstatus=false;
-
 /*
-
-
                                 if ((loadstatus) && (!(file_exists(downloadfilenamelong)))) {
-//	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
-                                  // download image file to /usr/share/mythtv-controller/images/mythnetvision
-
+	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
                                   if ((strcmp(lasttmpfilename,tmpfilename)==false) && (loadstatus=true)) {
                                     if (loadstatus=get_webfile(tmpfilename,downloadfilenamelong)) {
                                       strcpy(tmpfilename,downloadfilenamelong);
@@ -255,35 +601,22 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                   }
                                 } else strcpy(tmpfilename,downloadfilenamelong);
                                 */
-
-
-/*
-                                // or use wget
-                                strcpy(tmpfilename1,"wget ");
-                                strcat(tmpfilename1,tmpfilename);
-                                strcat(tmpfilename1," tmp/");
-                                system(tmpfilename1);
-*/
                               }
                           } else strcpy(tmpfilename,"");
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	// mythtv icon file
 //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                          strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
                           stack[antal]->textureId=0;
                           // opdatere group antal
                           if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
                           antal++;
                         }
-
-
-//                        if (debugmode & 4) printf("Gem texture filename %s \n",tmpfilename);
                     }
                 }
             }
             mysql_close(conn);
         } else {
-            printf("No stream data loaded \n");
-
+          if (debugmode & 4) printf("No stream data loaded \n");
         }
         //load_stream_gfx();
         //
@@ -301,7 +634,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
         return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    printf("Stream loader done.\n");
+    if (debugmode & 4) printf("Mythtv stream loader done... \n");
     return(0);
 }
 
@@ -315,6 +648,8 @@ void *loadweb(void *data) {
   streamoversigt.loadweb_stream_iconoversigt();
   printf("Stop web loader thread\n");
 }
+
+
 
 // downloading all web gfx
 
@@ -344,7 +679,7 @@ int stream_class::loadweb_stream_iconoversigt()
         strcat(downloadfilenamelong,downloadfilename);
         if (!(file_exists(downloadfilenamelong))) {
 
-          if (debugmode) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
 
           loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
@@ -363,12 +698,6 @@ int stream_class::loadweb_stream_iconoversigt()
 }
 
 
-
-
-
-
-
-
 // load all streams gfx and save it
 // used as thread
 //
@@ -385,6 +714,7 @@ void *load_all_stream_gfx(void *data) {
     char downloadfilenamelong[1024];
     char tmpfilename[1024];
     char lastfile[1024];
+    char homedir[2048];
     bool online;
     int getart=0;
     bool loadstatus;
@@ -393,9 +723,9 @@ void *load_all_stream_gfx(void *data) {
     int total_antal=0;
     int nr;
 
-    printf("Start gfx thread loader\n ");
+    if (debugmode & 4) printf("Start gfx thread loader\n ");
     strcpy(lastfile,"");
-    strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
+    strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -403,7 +733,7 @@ void *load_all_stream_gfx(void *data) {
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-        printf("\n\nLoading RSS gfx..\n\n");
+        if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
         if (res) {
             while ((row = mysql_fetch_row(res)) != NULL) {
               sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
@@ -413,32 +743,45 @@ void *load_all_stream_gfx(void *data) {
               res1 = mysql_store_result(conn);
               if (res1) {
                 antal=0;
-                printf("Found : %40s ",row[1]);
+                if (debugmode & 4) printf("Found : %40s ",row[1]);
                 nr=0;
                 while ((row1 = mysql_fetch_row(res1)) != NULL) {
                   antal++;
                   strcpy(tmpfilename,row1[5]);
 
                   if (stream_loadergfx_started_break) break;
-
+                  // http
                   if (strncmp(tmpfilename,"http://",7)==0) {
-
                     strcpy(lastfile,downloadfilename);
-
                     get_webfilename(downloadfilename,tmpfilename);
-                    strcpy(downloadfilenamelong,"/usr/share/mythtv-controller/images/mythnetvision/");
+                    getuserhomedir(homedir);
+                    strcpy(downloadfilenamelong,homedir);
+                    strcat(downloadfilenamelong,"/rss/");
                     strcat(downloadfilenamelong,downloadfilename);
-
                     filechange=strcmp(lastfile,downloadfilename);
-
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                       nr++;
                     } else {
-                      printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
-                    //this->stream_oversigt_nowloading=total_antal;
+                    total_antal++;
+                  } else if (strncmp(tmpfilename,"https://",8)==0) {
+                    strcpy(lastfile,downloadfilename);
+                    get_webfilename(downloadfilename,tmpfilename);
+                    getuserhomedir(homedir);
+                    strcpy(downloadfilenamelong,homedir);
+                    strcat(downloadfilenamelong,"/rss/");
+                    strcat(downloadfilenamelong,downloadfilename);
+                    filechange=strcmp(lastfile,downloadfilename);
+                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                      nr++;
+                    } else {
+                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                    }
                     total_antal++;
                   }
                 }
@@ -448,15 +791,24 @@ void *load_all_stream_gfx(void *data) {
             if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
             stream_loadergfx_started_break=false;
         }
+        if (conn) mysql_close(conn);
     }
-     printf("End gfx thread loader\n ");
+    if (debugmode & 4) printf("End gfx thread loader\n ");
 }
 
 
 
+//
+// play stream by vlc
+//
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley)
+void stream_class::playstream(char *url) {
+//    media_is_playing=true;
+    vlc_controller::playmedia(url);
+}
 
+
+void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley)
 
 {
     int j,ii,k,pos;
@@ -524,21 +876,26 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
       stream_oversigt_loaded=false;
     }
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
-
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
       }
 
+
+      // error is in this IF block
+
+
       // stream har et icon in db
       if (stack[i+sofset]->textureId) {
 
+
         // stream icon
-        glPushMatrix();
+//        glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,empty_icon1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -547,13 +904,14 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
-        glPopMatrix();
+//        glPopMatrix();
 
-        glPushMatrix();
-        // indsite draw radio station icon
+        //glPushMatrix();
+        // indsite draw icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -564,30 +922,17 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
         glEnd();
-        glPopMatrix();
+        //glPopMatrix();
+
       } else {
-/*
-        // stream default icon
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,icon_mask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsizey, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsizey , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd();
-        glPopMatrix();
-*/
+
+        // show default icon
         glPushMatrix();
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -599,14 +944,19 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPopMatrix();
+
+
+
       }
 
+
       // draw numbers in group
-      if (stack[i+sofset]->feed_group_antal>0) {
+      if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef(xof+22,yof+14,0);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(14.0, 14.0, 1.0);
@@ -616,51 +966,22 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
         glPopMatrix();
       }
 
+      float fontsiz=16.0f;
       glPushMatrix();
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       //glScalef(14.0, 14.0, 1.0);
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(20.0, 20.0, 1.0);
+
+      glScalef(fontsiz, fontsiz, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      if (strlen(temptxt)<=14) {
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glcRenderString(temptxt);
-      } else {
-        j=0;
-        ii=0;
-        while(!isspace(temptxt[ii])) {
-          if (temptxt[ii]=='\0') break;
-          word[j]=temptxt[ii];
-          ii++;
-          j++;
-        }
-        word[j]='\0';	// j = word length
-        pos=0;
-        if (j>13) {		// print char by char
-          k=0;
-          while(word[k]!='\0') {
-            if (pos>=13) {
-              glcRenderChar('-');
-              //glRasterPos2f(0.0f, 0.0f);
-              //glScalef(20.0, 20.0, 1.0);
-            }
-            glcRenderChar(word[k]);
-            pos++;
-            k++;
-          }
-        } else {
-          if (pos+j>13) {	// word doesn't fit line
-            pos=0;
-            //ofs=(int) (strlen(word)/2)*9;
-            //glRasterPos2f(0.0f, 0.0f);
-            //glScalef(14.0, 14.0, 1.0);
-          }
-          glcRenderString(word);
-          pos+=j;
-        }
-      }
+
+      // temp
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      temptxt[17]='\0';
+      glcRenderString(temptxt);
+
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
@@ -671,7 +992,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -691,6 +1013,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
       glcRenderString(temptxt);
       glPopMatrix();
     }
+
     if (i==0) {
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
@@ -707,6 +1030,98 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint icon_mask,GLu
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -765,9 +1180,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
           antal_loaded+=1;
         } else if (file_exists(downloadfilenamelong)) {
-           texture=loadTexture ((char *) downloadfilenamelong);
-           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-           antal_loaded+=1;
+          texture=loadTexture ((char *) downloadfilenamelong);
+          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+          antal_loaded+=1;
         } else texture=0;
       }
 
@@ -890,13 +1305,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
 
     if (stack[i+sofset]->textureId) {
-        glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     } else {
-        glBindTexture(GL_TEXTURE_2D,icon_mask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBindTexture(GL_TEXTURE_2D,icon_mask);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
     glTranslatef(xof,yof,xvgaz);
     glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
@@ -930,10 +1345,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
         glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
         glEnd(); //End quadrilateral coordinates
-
-
-
-
 
 /*
         //
@@ -1040,21 +1451,20 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
     char word[16000];
 
     if (strlen(temptxt)<=14) {
-        glLoadIdentity();
-        ofs=(strlen(temptxt)/2)*9;
-        switch(screen_size) {
-            case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
-                    break;
-            case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
-                    break;
-            default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
-                    break;
-
-        }
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(14.0, 14.0, 1.0);
-        glcRenderString(temptxt);
+      glLoadIdentity();
+      ofs=(strlen(temptxt)/2)*9;
+      switch(screen_size) {
+        case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
+                break;
+        case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
+                break;
+        default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
+                break;
+      }
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(14.0, 14.0, 1.0);
+      glcRenderString(temptxt);
     } else {
 
         temptxt[26]='\0';
@@ -1076,63 +1486,62 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLui
         while((1) && (ytextofset<=10.0)) {		// max 2 linier
             j=0;
             while(!isspace(temptxt[ii])) {
-                if (temptxt[ii]=='\0') break;
-                word[j]=temptxt[ii];
-                ii++;
-                j++;
+              if (temptxt[ii]=='\0') break;
+              word[j]=temptxt[ii];
+              ii++;
+              j++;
             }
 
             word[j]='\0';	// j = word length
 
             if (j>13) {		// print char by char
-                k=0;
-                while(word[k]!='\0') {
-                    if (pos>=13) {
-                        if ( k != 0 ) glcRenderChar('-');
-                        pos=0;
-                        ytextofset+=15.0f;
-                        glLoadIdentity();
-                        ofs=0;
-                        switch(screen_size) {
-                            case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                                    break;
-                            case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                                    break;
-                            default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                    break;
-                        }
-                        glRasterPos2f(0.0f, 0.0f);
-                        glScalef(14.0, 14.0, 1.0);
-                    }
-                    glcRenderChar(word[k]);
-                    pos++;
-                    k++;
+              k=0;
+              while(word[k]!='\0') {
+                if (pos>=13) {
+                  if ( k != 0 ) glcRenderChar('-');
+                  pos=0;
+                  ytextofset+=15.0f;
+                  glLoadIdentity();
+                  ofs=0;
+                  switch(screen_size) {
+                      case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
+                              break;
+                      case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
+                              break;
+                      default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
+                              break;
+                  }
+                  glRasterPos2f(0.0f, 0.0f);
+                  glScalef(14.0, 14.0, 1.0);
                 }
+                glcRenderChar(word[k]);
+                pos++;
+                k++;
+              }
             } else {
-                if (pos+j>13) {	// word doesn't fit line
-                    ytextofset+=15.0f;
-                    pos=0;
-                    glLoadIdentity();
-                    ofs=(int) (strlen(word)/2)*9;
-                    switch(screen_size) {
-                        case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                                break;
-                        case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                                break;
-                        default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                                break;
-                    }
-                    glRasterPos2f(0.0f, 0.0f);
-                    glScalef(14.0, 14.0, 1.0);
+              if (pos+j>13) {	// word doesn't fit line
+                ytextofset+=15.0f;
+                pos=0;
+                glLoadIdentity();
+                ofs=(int) (strlen(word)/2)*9;
+                switch(screen_size) {
+                    case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
+                            break;
+                    case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
+                            break;
+                    default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
+                            break;
                 }
-                glcRenderString(word);
-                pos+=j;
+                glRasterPos2f(0.0f, 0.0f);
+                glScalef(14.0, 14.0, 1.0);
+              }
+              glcRenderString(word);
+              pos+=j;
             }
             if (pos<12) {
-                glcRenderChar(' ');
-                pos++;
+              glcRenderChar(' ');
+              pos++;
             }
-
             if (temptxt[ii]=='\0') break;
             ii++;	// skip space
         }

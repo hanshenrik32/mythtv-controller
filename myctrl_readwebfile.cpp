@@ -20,6 +20,9 @@ extern int debugmode;                                           // 64 = radio st
                                                                 // 512 = media importer
                                                                 // 1024 = flag loader
 
+
+// return string for filename
+
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
   npointer=strrchr(webpath,'/');
@@ -49,7 +52,8 @@ void get_host(char *hname,char *webpath,char *source) {
   char tmptxt2[1000];
   strcpy(tmptxt2,"");
   strcpy(tmptxt,source);
-  if (strlen(source)>7) strcpy(tmptxt,source+7); // remove http://
+  if ((strlen(source)>7) && (strncmp(source,"http://",7)==0)) strcpy(tmptxt,source+7); // remove http(s)://
+  else if ((strlen(source)>7) && (strncmp(source,"https://",8)==0)) strcpy(tmptxt,source+8); // remove http(s)://
   else strcpy(tmptxt,"");
   if (strchr(tmptxt,'/')>0) {
     while((tmptxt[n]!='/') && (n<strlen(source))) {
@@ -58,7 +62,9 @@ void get_host(char *hname,char *webpath,char *source) {
     tmptxt[n]=0;
     strcpy(hname,tmptxt);
     while(n<strlen(source)) {
-      tmptxt2[nn]=source[n+7];
+      if (strncmp(source,"http://",7)==0) tmptxt2[nn]=source[n+7];
+      else if (strncmp(source,"https://",8)==0) tmptxt2[nn]=source[n+8];
+      else tmptxt2[nn]=source[n];
       nn++;
       n++;
     }
@@ -67,6 +73,8 @@ void get_host(char *hname,char *webpath,char *source) {
   }
 }
 
+
+// downloader of files
 
 
 int get_webfile(char *webpath,char *outfile) {
@@ -174,6 +182,13 @@ int get_webfile(char *webpath,char *outfile) {
         loaderror=true;
       }
 
+      if (strstr(message,"Moved Parmanently")) {
+        webobjlength = 0;
+        loaderror=true;
+
+      }
+
+
 //      printf("%s \n",message);
 
     }
@@ -186,7 +201,7 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) {
       fil=fopen(outfile,"w");
       if (!(fil)) {
-        if (debugmode & 1) fprintf(stderr," Open file for write error %s \n",outfile);
+        if (debugmode) fprintf(stderr," Open file for write error %s \n",outfile);
         loaderror=true;							// not posible to save file
 //        exit(0);
       }
@@ -201,4 +216,15 @@ int get_webfile(char *webpath,char *outfile) {
     }
     close(sock_id);
     if (!(loaderror)) return(1); else return(0);
+}
+
+
+
+int get_webfile2(char *webpath,char *outfile) {
+  char command[2048];
+  strcpy(command,"wget ");
+  strcat(command,webpath);
+  strcat(command," -O ");
+  strcat(command,outfile);
+  system(command);
 }

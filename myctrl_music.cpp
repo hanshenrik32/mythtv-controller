@@ -759,15 +759,15 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
       strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_albums(album_id int  NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)");
+      strcpy(sqlselect,"create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
 
-      strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time  int, stop_time int, eq_preset   varchar(255) , relative_volume int, sample_rate int, bitrate  int,bpm int, directory_id int)");
+      strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time  int, stop_time int, eq_preset   varchar(255) , relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
 
-      strcpy(sqlselect,"create table IF NOT EXISTS music_artists(artist_id  int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))");
+      strcpy(sqlselect,"create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       strcpy(sqlselect,"create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))");

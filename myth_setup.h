@@ -32,7 +32,9 @@ struct channel_list_struct {
   bool changeordernr;                                                           // do change ordre nr (used in setup)
 };
 
-
+//
+// used for tv channel db config
+//
 
 
 class channel_configfile {
@@ -44,6 +46,37 @@ class channel_configfile {
     int readgraber_configfile();                                                // read graber file
     int writegraber_configfile();                                               // read graber file
     int graber_configbuild();                                                   // build xmltv config file
+};
+
+
+//
+// used for rss db config of rss feeds
+//
+
+struct rss_stream_struct {
+  char *stream_name;
+  char *stream_url;
+};
+
+// class for edit rss feeds in setup menu
+
+class rss_stream_class {
+  private:
+    rss_stream_struct rss_source_feed[100];
+    unsigned int antal;
+    const int maxantal=100;                                                           // # of records do create
+    const int namemaxlength=80;                                                       // max length
+    const int urlmaxlength=2048;                                                       // max length
+  public:
+    int load_rss_data();                              // loaddb
+    int save_rss_data();                              // update db
+    int streamantal() { return(antal); }
+    rss_stream_class();
+    ~rss_stream_class();
+    char *get_stream_name(int nr) { return (rss_source_feed[nr].stream_name); }
+    char *get_stream_url(int nr) { return (rss_source_feed[nr].stream_url); }
+    int set_stream_url(int nr,char *url);
+    int set_stream_name(int nr,char *name);
 };
 
 
@@ -73,6 +106,7 @@ void show_setup_network();
 void show_setup_font(int startofset);
 void show_setup_keys();
 void show_setup_tv_graber(int startofset);
+void show_setup_rss(unsigned int startofset);                                   // rss reader setup
 void show_wlan_networks(int valgtnr);
 
 #endif

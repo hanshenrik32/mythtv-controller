@@ -152,7 +152,7 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('The voice DK', 'The voice denmark.', 'http://195.184.101.203/voice128', '', 'The-Voice-1049.png', 40, 64, 5, 1, '2011-08-01', 37, 45, '2011-09-11 00:08:02', 1), \
 ('Private Investigations', '', 'http://listen.radionomy.com/private-investigations', '', '', 21, 0, 0, 1, '2011-08-02', 38, 7, NULL, 1), \
 ('Capital 95.8', '', 'http://media-ice.musicradio.com:80/CapitalMP3', '', '', 40, 192, 2, 1, '2011-08-05', 39, 9, NULL, 1), \
-('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 7, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
+('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 4, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
 ('TechnoBase.FM', '', 'http://listen.technobase.fm/tunein-dsl-pls', 'http://TechnoBase.FM', '', 50, 192, 1, 0, '2011-08-05', 43, 8, NULL, 1), \
 ('Hitparty fr', '', 'http://87.98.129.202:443', 'http://www.hitparty.fr/', 'hit-Party-Radio.png', 40, 192, 92, 1, '2011-08-05', 44, 4, '2011-10-18 18:33:39', 1), \
 ('Slow Radio', '(Love Songs & Easy Listening)', 'http://stream2.slowradio.com', 'http://en.slowradio.com/', '', 54, 192, 1, 1, '2011-08-05', 51, 4, NULL, 1), \

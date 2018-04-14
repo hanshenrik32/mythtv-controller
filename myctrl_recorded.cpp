@@ -11,11 +11,10 @@
 
 #include <X11/Intrinsic.h>    /* Display, Window */
 #include <GL/glx.h>           /* GLXContext */
-#include <GL/glc.h>		// danish ttf support
+#include <GL/glc.h>       		// danish ttf support
 
 
 //#include <irrKlang.h>
-
 
 // mysql support
 
@@ -176,55 +175,60 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     char filename[512];
     int storagegroupused=0;
     //gotoxy(10,17);
-    conn=mysql_init(NULL);
     // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    strcpy(sqlselect,"create table recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int.stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    printf("Update recorded programs from mythtv database.\n");
-    strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    n=-1;
-    nn=0;
-    strcpy(title,"");
-    if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
+    conn=mysql_init(NULL);
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      strcpy(sqlselect,"create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int.stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      strcpy(sqlselect,"create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      printf("Update recorded programs from mythtv database.\n");
+      strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      n=-1;
+      nn=0;
+      strcpy(title,"");
+      if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
 
-            if (strcmp(title,row[0])!=0) {
-                n++;
-                nn=0;
-                strcpy(title,row[0]);
-            } else {
-                if (n==-1) n++;
-                nn++;
-            }
+              if (strcmp(title,row[0])!=0) {
+                  n++;
+                  nn=0;
+                  strcpy(title,row[0]);
+              } else {
+                  if (n==-1) n++;
+                  nn++;
+              }
 
-// printf("title=%s n=%d nn=%d  \n",title,n,nn);
+  // printf("title=%s n=%d nn=%d  \n",title,n,nn);
 
-            strcpy(filename,row[4]);
-            storagegroupused=find_storagegroupfile(filename);						// hent storage group info
-            if (storagegroupused==0) strcpy(filename,row[4]);
+              strcpy(filename,row[4]);
+              storagegroupused=find_storagegroupfile(filename);						// hent storage group info
+              if (storagegroupused==0) strcpy(filename,row[4]);
 
-            if ((n<40) && (nn<200)) {
-                recordoversigt.programs[n].put_recorded_top(title);
-                recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],filename,row[5]);
-                recordoversigt.programs[n].prg_antal++;
-            }
-        }        	// end while
-    } else {
-        //gotoxy(10,18);
-        printf("SQL DATBASE ERROR                                                    \n");
-        n=0;
+              if ((n<40) && (nn<200)) {
+                  recordoversigt.programs[n].put_recorded_top(title);
+                  recordoversigt.programs[n].recorded_programs[nn].put_recorded(title,row[1],row[2],row[3],filename,row[5]);
+                  recordoversigt.programs[n].prg_antal++;
+              }
+          }        	// end while
+      } else {
+          //gotoxy(10,18);
+          printf("SQL DATBASE ERROR                                                    \n");
+          n=0;
+      }
+      set_top_antal(n);					// sætter hvor mange der er i array
+      if (n>0) {
+          //gotoxy(10,18);
+          printf("Fundet %d recorded programs.                                                \n",n);
+      }
+      mysql_close(conn);
     }
-    set_top_antal(n);					// sætter hvor mange der er i array
-    if (n>0) {
-        //gotoxy(10,18);
-        printf("Fundet %d recorded programs.                                                \n",n);
-    }
-    mysql_close(conn);
     return(n);
 }
 

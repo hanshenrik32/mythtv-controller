@@ -28,12 +28,8 @@ class recorded_top_type {
         char title[128+1];
     public:
         unsigned int prg_antal;
-
         recorded_oversigt_type recorded_programs[200+1];
-
         recorded_oversigt_type *recorded_programsp[];
-
-
         recorded_top_type();
         void put_recorded_top(char *title);
         void get_recorded_top(char *title);
@@ -43,9 +39,7 @@ class recorded_top_type {
 class recorded_overigt {
     private:
         recorded_top_type programs[40];
-
         recorded_top_type **programsp;
-
         unsigned int title_antal;
     public:
         recorded_overigt() { title_antal=0; }
