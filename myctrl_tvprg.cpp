@@ -135,9 +135,9 @@ int get_tvguide_fromweb() {
     strcpy(exestring,configbackend_tvgraber);
     if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
+    if (debugmode & 256) printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
     result=system(exestring);   // do it
-    printf("Done tv graber background process exit kode %d\n",result);
+    if (debugmode & 256) printf("Done tv graber background process exit kode %d\n",result);
   } else printf("Graber is already ruuning.\n");
   return(result);
 }
@@ -2979,7 +2979,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
         fprintf(stdout, "...\n");
         xmlFreeDoc(document);
       } else {
-        printf("tvguide.xml not found \n");
+        if (debugmode & 256) printf("tvguide.xml not found \n");
       }
 
     }
@@ -3341,11 +3341,9 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (doneok==false)) {
                 //tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn
-
                 sprintf(sqlselect,"INSERT INTO record values (0,1,%u,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
 
-                printf("sql record is %s\n",sqlselect);
-
+                if (debugmode & 256) printf("sql record is %s\n",sqlselect);
 
                 //sprintf(sqlselect,"INSERT INTO record values (0,1,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",'Default',0,0,1,0,0,0,'Default',6,15,\"%s\",%u,'',0,0,0,0,0,0,0,0,TIME('%s'),%lu,0,0,0,'Default',0,'0000-00-00 00:00:00','','0000-00-00 00:00:00','Default',100)", row[6], row[1], row[2], row[3],row[4], tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description, row[7],row[0], ELFHash(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn) , row[1], ((tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime_unix)/60/60/24)+719528);
                 mysql_query(conn1,sqlselect);
@@ -3478,8 +3476,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
-    printf("\nGet/update Tvguide.\n");
-    printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
+    if (debugmode & 256) printf("\nGet/update Tvguide.\n");
+    if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -3500,7 +3498,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-              printf("Antal channels/tvguide %s \n",row[0]);
+            if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
           }
         }
 
@@ -3533,7 +3531,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                       //tvkanaler[kanalnr].set_kanal_icon(icon);
                     }
                     strcpy(tmptxt,row[0]);                                        // rember channel name
-                    printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
+                    if (debugmode & 256) printf("Channel name : %-20s ",tvkanaler[kanalnr].getkanalname());
                 }
                 // select by tv_grab_xx nr in array
                 if (row[8]) {
@@ -3644,7 +3642,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
-                    printf(" Programs in channel : %3d \n",prgnr);
+                    if (debugmode & 256) printf(" Programs in channel : %3d \n",prgnr);
                     // if new channel id
                     tvkanaler[kanalnr].set_program_antal(prgnr-1);
                     huskprgantal=prgnr-1;
@@ -3656,7 +3654,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
-            printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            if (debugmode & 256) printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
         }
         mysql_close(conn);
     }

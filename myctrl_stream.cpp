@@ -125,7 +125,7 @@ int stream_class::loadrssfile() {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        printf("Hent info om stream title %10s \n",row[0]);
+        if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
         if (strcmp(row[3],"")!=0) {
           getuserhomedir(homedir);
           strcpy(totalurl,"wget '");
@@ -138,6 +138,7 @@ int stream_class::loadrssfile() {
           strcat(totalurl,"/rss/");
           if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,".rss'");
+          // download file
           system(totalurl);
           // parse file
           strcpy(parsefilename,homedir);
@@ -384,12 +385,15 @@ int stream_class::parsexmlrssfile(char *filename) {
     xmlFreeDoc(document);
     mysql_close(conn);
   } else {
-    printf(" ******************************************* Read error on %s xmlfile downloaded to rss dir \n",filename);
+    if (debugmode & 4) printf(" ******************************************* Read error on %s xmlfile downloaded to rss dir \n",filename);
   }
 }
 
 
 
+//
+// opdate show liste in view
+//
 
 // load felt 7 = mythtv gfx icon
 
@@ -446,7 +450,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_close(conn);
     }
 
-    printf("* art = %s fpath=%s *\n",art,fpath);
+    if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
@@ -474,7 +478,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     }
     this->type=getart;					// husk sql type
 
-    printf("Mythtv stream loader started... \n");
+    if (debugmode & 4) printf("Mythtv stream loader started... \n");
 
     conn=mysql_init(NULL);
     // Connect to database
@@ -485,7 +489,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                printf("Get info from stream nr %d %-20s\n",antal,row[2]);
+                if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
@@ -577,7 +581,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 strcat(downloadfilenamelong,"/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
                                 if (!(file_exists(downloadfilenamelong))) {
-                                  if (debugmode) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
                                   if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
                                     printf("Download error \n");
                                   } else strcpy(tmpfilename,"");
@@ -612,8 +616,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
             }
             mysql_close(conn);
         } else {
-            printf("No stream data loaded \n");
-
+          if (debugmode & 4) printf("No stream data loaded \n");
         }
         //load_stream_gfx();
         //
@@ -631,7 +634,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
         return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    printf("Mythtv stream loader done... \n");
+    if (debugmode & 4) printf("Mythtv stream loader done... \n");
     return(0);
 }
 
@@ -676,7 +679,7 @@ int stream_class::loadweb_stream_iconoversigt()
         strcat(downloadfilenamelong,downloadfilename);
         if (!(file_exists(downloadfilenamelong))) {
 
-          if (debugmode) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
 
           loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
@@ -720,7 +723,7 @@ void *load_all_stream_gfx(void *data) {
     int total_antal=0;
     int nr;
 
-    printf("Start gfx thread loader\n ");
+    if (debugmode & 4) printf("Start gfx thread loader\n ");
     strcpy(lastfile,"");
     strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
@@ -730,7 +733,7 @@ void *load_all_stream_gfx(void *data) {
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-        printf("\n\nLoading RSS gfx..\n\n");
+        if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
         if (res) {
             while ((row = mysql_fetch_row(res)) != NULL) {
               sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
@@ -740,7 +743,7 @@ void *load_all_stream_gfx(void *data) {
               res1 = mysql_store_result(conn);
               if (res1) {
                 antal=0;
-                printf("Found : %40s ",row[1]);
+                if (debugmode & 4) printf("Found : %40s ",row[1]);
                 nr=0;
                 while ((row1 = mysql_fetch_row(res1)) != NULL) {
                   antal++;
@@ -757,11 +760,11 @@ void *load_all_stream_gfx(void *data) {
                     strcat(downloadfilenamelong,downloadfilename);
                     filechange=strcmp(lastfile,downloadfilename);
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
                       loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                       nr++;
                     } else {
-                      printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
                     total_antal++;
                   } else if (strncmp(tmpfilename,"https://",8)==0) {
@@ -773,11 +776,11 @@ void *load_all_stream_gfx(void *data) {
                     strcat(downloadfilenamelong,downloadfilename);
                     filechange=strcmp(lastfile,downloadfilename);
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
                       loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                       nr++;
                     } else {
-                      printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
                     total_antal++;
                   }
@@ -790,7 +793,7 @@ void *load_all_stream_gfx(void *data) {
         }
         if (conn) mysql_close(conn);
     }
-     printf("End gfx thread loader\n ");
+    if (debugmode & 4) printf("End gfx thread loader\n ");
 }
 
 
