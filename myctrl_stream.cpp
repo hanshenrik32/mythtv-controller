@@ -103,11 +103,12 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 int stream_class::loadrssfile() {
   // mysql vars
   char sqlselect[2048];
+  char sqlinsert[32768];
   char totalurl[2048];
   char parsefilename[2048];
   char homedir[2048];
   MYSQL *conn;
-  MYSQL_RES *res;
+  MYSQL_RES *res,*res1;
   MYSQL_ROW row;
   char *database = (char *) "mythconverg";
   conn=mysql_init(NULL);
@@ -145,9 +146,21 @@ int stream_class::loadrssfile() {
           strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
-          if (strcmp(row[3],"")!=0) {
+          // if title ok and not podcast bud real rss feed
+          if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
             // parse downloaded xmlfile now (create db records)
             parsexmlrssfile(parsefilename);
+          }
+          // if podcast is rss
+          if (row[23]) {
+            if (atoi(row[23])==1) {
+              if (debugmode) {
+                printf("Create/update podcast from %s url in db\n",row[0]);
+              }
+              sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
+              mysql_query(conn,sqlinsert);
+              res1 = mysql_store_result(conn);
+            }
           }
         }
       }
@@ -570,6 +583,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
+        sprintf(sqlselect,"INSERT INTO internetcontentarticles (feedtitle,title,url,podcast) values('ISS Live FEED','ISS Live FEED','https://www.youtube.com/watch?v=RtU_mdL2vBM',1)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
       }
       mysql_close(conn);
     }
