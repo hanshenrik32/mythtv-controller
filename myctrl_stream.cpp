@@ -146,13 +146,14 @@ int stream_class::loadrssfile() {
           strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
+          // if podcast is rss
           // if title ok and not podcast bud real rss feed
           if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
             // parse downloaded xmlfile now (create db records)
             parsexmlrssfile(parsefilename);
           }
-          // if podcast is rss
-          if (row[23]) {
+          // if podcast is not rss and title ok
+          if ((strcmp(row[3],"")!=0) && (row[23])) {
             if (atoi(row[23])==1) {
               if (debugmode) {
                 printf("Create/update podcast from %s url in db\n",row[0]);
@@ -239,7 +240,10 @@ int stream_class::parsexmlrssfile(char *filename) {
             if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
               content = xmlNodeGetContent(subnode);
               tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+              if (tmpdat) {
+                strcpy(rssprgimage,(char *) tmpdat);
+                xmlFree(tmpdat);
+              }
             }
 
             if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
@@ -253,7 +257,10 @@ int stream_class::parsexmlrssfile(char *filename) {
                 if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
-                  if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+                  if (tmpdat) {
+                    strcpy(rssvideolink,(char *) tmpdat);
+                    xmlFree(tmpdat);
+                  }
                 }
 
                 // rssprgpubdate
@@ -337,6 +344,7 @@ int stream_class::parsexmlrssfile(char *filename) {
           if (strcmp((char *) node->name,"entry")==0) {
             subnode2=node->xmlChildrenNode;
             while(subnode2) {
+              strcpy(rssprgimage,"");
               if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
                 content = xmlNodeGetContent(subnode2);
                 strcpy(rssprgfeedtitle,(char *) content);
@@ -346,7 +354,10 @@ int stream_class::parsexmlrssfile(char *filename) {
               if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
                 content = xmlNodeGetContent(subnode2);
                 tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
-                if (tmpdat) strcpy(rssvideolink,(char *) tmpdat);
+                if (tmpdat) {
+                  strcpy(rssvideolink,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
               }
 
               if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
@@ -366,8 +377,10 @@ int stream_class::parsexmlrssfile(char *filename) {
                   if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
                       content = xmlNodeGetContent(subnode3);
                       tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
-                      if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
-                      //if (tmpdat) strcpy(rssprgimage,(char *) tmpdat);
+                      if (tmpdat) {
+                        strcpy(rssprgimage,(char *) tmpdat);
+                        xmlFree(tmpdat);
+                      }
                   }
                   subnode3=subnode3->next;
                 }
@@ -584,6 +597,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"INSERT INTO internetcontentarticles (feedtitle,title,url,podcast) values('ISS Live FEED','ISS Live FEED','https://www.youtube.com/watch?v=RtU_mdL2vBM',1)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"insert into internetcontentarticles (feedtitle,title,url,podcast) values('TechSNAP','TechSNAP','https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',1)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
