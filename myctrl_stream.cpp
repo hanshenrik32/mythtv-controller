@@ -215,6 +215,10 @@ int stream_class::parsexmlrssfile(char *filename) {
   // it use REPLACE in mysql to create/update records if changed in xmlfile
   if ((document) && (conn)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    if (conn) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+    }
     root = xmlDocGetRootElement(document);
     first_child = root->children;
     for (node = first_child; node; node = node->next) {
@@ -322,7 +326,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
             subnode=subnode->next;
           }
-          printf("\n");
+          if (debugmode & 4) printf("\n");
         }
         // youtube type
         // get title
@@ -998,7 +1002,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
     static int stream_oversigt_loaded_done=0;
     GLuint texture;
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
 
@@ -1034,6 +1037,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       stream_oversigt_loaded_nr=0;
       stream_oversigt_loaded=false;
     }
+    // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -1041,9 +1045,14 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       }
       // error is in this IF block
       // stream har et icon in db
+
+      if (i+1==(int) stream_key_selected) buttonsizey=170.0f;
+      else buttonsizey=160.0f;
+
       if (stack[i+sofset]->textureId) {
         // stream icon
 //        glPushMatrix();
+
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1076,9 +1085,9 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
         glEnd();
         //glPopMatrix();
-
       } else {
         // no show default icon
+
         glPushMatrix();
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
@@ -1097,6 +1106,10 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
         glEnd();
         glPopMatrix();
       }
+
+
+
+
       // draw numbers in group
       if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
