@@ -4665,10 +4665,10 @@ void display() {
         printf("Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
         strcat(systemcommand,"'");
-        if (sknapnr-1>0) {
-            if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
+        if (sknapnr>0) {
+            if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
                 strcat(systemcommand,"http://");
-                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
+                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
             } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
             strcat(systemcommand,"'");
             system(systemcommand);
@@ -4677,20 +4677,17 @@ void display() {
         printf("Start play use default firefox player \n");
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
         strcat(systemcommand,"'");
-        if ((sknapnr-1)>0) {
-            if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash:",10)==0) {
+        if ((sknapnr)>0) {
+            if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
                 strcat(systemcommand,"http://");
-                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1)+10);
-           } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
+           } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr));
         }
         strcat(systemcommand,"'");
         system(systemcommand);
         // start play stream or show rss page
         //streamoversigt.playstream(1,systemcommand);
       }
-      sknapnr=0;
-      stream_key_selected=1;
-      stream_select_iconnr=0;
       startstream=false;                      // start kun 1 instans
     }
 
@@ -5989,9 +5986,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     // retfunc er !=0 hvis der er trykket på en knap up/down
                     // give error
                     if (debugmode & 2) {
-                        if ((show_music_oversigt) && (vis_stream_oversigt==false)) fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
-                        else if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
-                        else if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
+                      if ((show_music_oversigt) && (vis_stream_oversigt==false)) fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
+                    }
+                    if (debugmode & 4) {
+                      if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
+                    }
+                    if (debugmode & 8) {
+                      if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
                     }
                     // any music buttons active
                     if (mknapnr>0) {
@@ -6530,6 +6531,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
 
+                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
 
                 if (vis_stream_oversigt) {
                     if (stream_key_selected>1) {
@@ -6619,11 +6621,13 @@ void handlespeckeypress(int key,int x,int y) {
                   radio_key_selected++;
                 }
 
+                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
+
                 if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal())) {
-                  if ((stream_key_selected % (snumbersoficonline*3)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
+                  if ((stream_key_selected % (snumbersoficonline*6)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
                     _sangley+=RADIO_CS;
                     stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
-                    stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
                   } else {
                       stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
                   }
@@ -6691,6 +6695,10 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
+
+
+                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
+
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
@@ -6841,6 +6849,10 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
+
+
+                printf("stream_select_iconnr=%d stream_key_selected=%d\n",stream_select_iconnr,stream_key_selected);
+
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
                   if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
@@ -7714,10 +7726,10 @@ void handleKeypress(unsigned char key, int x, int y) {
 
 
               if (vis_stream_oversigt) {
-                  hent_stream_search=true;				// start radio station search
+                  hent_stream_search=true;				// start stream station search
                   stream_key_selected=1;
                   _sangley=0.0f;
-                  sknapnr=stream_select_iconnr;
+                  sknapnr=stream_select_iconnr;   // selected
                   do_play_stream=1;
               }
 
@@ -7867,49 +7879,60 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
 
               // stream oversigt
-              if ((vis_stream_oversigt) && (sknapnr-1>=0)){
+              if ((vis_stream_oversigt) && (sknapnr>=0)){
+                  //if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr,streamoversigt.get_stream_groupantal(sknapnr),streamoversigt.type,streamoversigt.streamantal());
                   if (streamoversigt.type==0) {
-                      strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
-
-                      streamoversigt.clean_stream_oversigt();
-
-                      if (debugmode & 128) fprintf(stderr,"stream nr %d name %s \n ",sknapnr-1,temptxt);
-                      streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
-
-                      do_play_stream=false;
+                    strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
+                    streamoversigt.clean_stream_oversigt();
+                    if (debugmode & 4) fprintf(stderr,"stream nr %d name %s \n ",sknapnr,temptxt);
+                    streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+                    do_play_stream=false;
                   } else if (streamoversigt.type==1) {
-                      streamoversigt.clean_stream_oversigt();
-                      streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
-                      do_play_stream=false;
+                    if (sknapnr>0) do_play_stream=1;						// select button do play
+                    // do back
+                    if (sknapnr==0) {
+                        streamoversigt.clean_stream_oversigt();
+                        streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                        //streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),streamoversigt.get_stream_path(sknapnr));
+                        do_play_stream=false;
+                        stream_key_selected=1;
+                        stream_select_iconnr=0;
+                        _sangley=0.0f;
+                    }
                   } else {
-                      // back button
-                      if (debugmode & 128) fprintf(stderr,"stream nr %d \n ",sknapnr-1);
-                      if ((sknapnr-1)==0) {
-                          if (streamoversigt.type==2) {
-                              // one level up
-                              streamoversigt.clean_stream_oversigt();
-                              streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),(char *)"");
-                              do_play_stream=false;
-                          } else {
-                              // jump to top
-                              streamoversigt.clean_stream_oversigt();
-                              streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
-                              do_play_stream=false;
-                          }
+                    // back button
+                    if (debugmode & 4) fprintf(stderr,"stream nr %d \n ",sknapnr-1);
+                    if ((sknapnr)==0) {
+                      if (streamoversigt.type==2) {
+                        // one level up
+                        streamoversigt.clean_stream_oversigt();
+                        streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *)"");
+                        do_play_stream=false;
+                        do_play_stream=false;
+                        stream_key_selected=1;
+                        stream_select_iconnr=0;
+                        _sangley=0.0f;
+                      } else {
+                        // jump to top
+                        streamoversigt.clean_stream_oversigt();
+                        streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                        do_play_stream=false;
+                        do_play_stream=false;
+                        stream_key_selected=1;
+                        stream_select_iconnr=0;
+                        _sangley=0.0f;
+
                       }
+                    }
                   }
                   // play stream
-                  if ((sknapnr-1>=0) && (do_play_stream)) {
-                      if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0) {
+                  if ((sknapnr>=0) && (do_play_stream)) {
+                      if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
                           startstream=true;
                       } else {
                           startstream=true;
                       }
                   }
-                  //sknapnr=0;
-                  stream_key_selected=1;
-                  stream_select_iconnr=0;
-                  _sangley=0.0f;
               }
 
               // enter pressed in setup window xmltv
