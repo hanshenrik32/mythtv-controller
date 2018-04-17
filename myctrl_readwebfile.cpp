@@ -23,6 +23,35 @@ extern int debugmode;                                           // 64 = radio st
 
 // return string for filename
 
+int get_webfilenamelong(char *fname,char *webpath) {
+  char *npointer=NULL;
+  char *filename;                       // to save filename
+  char tmp[20000];
+  int firstslashpointer=0;
+  strcpy(tmp,webpath);
+  npointer=strrchr(tmp,'/');
+  if (npointer) {
+    firstslashpointer=npointer-tmp;
+    filename=new char[strlen(npointer)+1];
+    strcpy(filename,npointer+1);              // save filename
+    tmp[firstslashpointer-1]='\0';
+    npointer=strrchr(tmp,'/');
+    if (npointer) {
+      strcpy(fname,npointer+1);
+      fname[11]='\0';
+      strcat(fname,filename);
+    }
+
+    delete [] filename;
+    //strcpy(fname,npointer+1);
+    return(1);
+  }
+  return(0);
+}
+
+
+// return string for filename
+
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
   npointer=strrchr(webpath,'/');
@@ -32,7 +61,6 @@ int get_webfilename(char *fname,char *webpath) {
   }
   return(0);
 }
-
 
 
 
