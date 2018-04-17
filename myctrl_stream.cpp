@@ -189,6 +189,7 @@ int stream_class::parsexmlrssfile(char *filename) {
   char rssprgfeedtitle[2048];
   char rssprgdesc[2048];
   char rssprgimage[2048];
+  char rssprgimage1[2048];
   char rssvideolink[2048];
   char rssprgpubdate[256];
   char rsstime[2048];
@@ -209,6 +210,8 @@ int stream_class::parsexmlrssfile(char *filename) {
   strcpy(rssvideolink,"");
   strcpy(rsstime,"");
   strcpy(rssauthor,"");
+  strcpy(rssprgimage,"");
+  strcpy(rssprgimage1,"");
   conn=mysql_init(NULL);
   document = xmlReadFile(filename, NULL, 0);            // open xml file
   // if exist do all the parse and update db
@@ -344,6 +347,7 @@ int stream_class::parsexmlrssfile(char *filename) {
           rssseason=0;
           strcpy(rssauthor,"");
           strcpy(rssprgdesc,"");
+          strcpy(rssprgimage1,"");
           strcpy(rssprgimage,"");
           if (strcmp((char *) node->name,"entry")==0) {
             subnode2=node->xmlChildrenNode;
@@ -379,19 +383,18 @@ int stream_class::parsexmlrssfile(char *filename) {
 
                   // get icon gfx
                   if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
-                      content = xmlNodeGetContent(subnode3);
-                      tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
-                      if (tmpdat) {
-                        strcpy(rssprgimage,(char *) tmpdat);
-                        xmlFree(tmpdat);
-                      }
+                    content = xmlNodeGetContent(subnode3);
+                    tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
+                    if (tmpdat) {
+                      strcpy(rssprgimage1,(char *) tmpdat);
+                      xmlFree(tmpdat);
+                    }
                   }
                   subnode3=subnode3->next;
                 }
               }
               subnode2=subnode2->next;
             }
-
             recordexist=false;
             sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
             mysql_query(conn,sqlinsert);
@@ -403,8 +406,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
 
             if (!(recordexist)) {
-                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
-                //printf("sql=%s\n",sqlinsert);
+                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
                 mysql_query(conn,sqlinsert);
                 res = mysql_store_result(conn);
             }
@@ -691,7 +693,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                             stack[antal]->intnr=0;	                               					// intnr=0 = back button type
                             antal++;
                           }
-
+                          // alloc new element in array
                           if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
                           stack[antal]->intnr=1;
                           if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
@@ -729,7 +731,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 }
                               } else {
                                 // downloadfilename = name on file, from tmpfilename = full web url
-                                get_webfilename(downloadfilename,tmpfilename);          // get file name from url
+                                get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
                                 // check filename
                                 strcpy(downloadfilename1,downloadfilename);           // back name before change
                                 int mmm=0;
@@ -739,7 +741,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 }
                                 strcpy(lasttmpfilename,tmpfilename);			              // husk file name
                                 // save file in  user homedir rss/
-                                getuserhomedir(homedir);
+                                getuserhomedir(homedir);                                  // get homedir
                                 strcpy(downloadfilenamelong,homedir);
                                 strcat(downloadfilenamelong,"/rss/");
                                 strcat(downloadfilenamelong,downloadfilename);
