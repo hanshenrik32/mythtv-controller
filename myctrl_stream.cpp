@@ -334,9 +334,9 @@ int stream_class::parsexmlrssfile(char *filename) {
         // youtube type
         // get title
         if (strcmp((char *) node->name,"title")==0) {
-            strcpy(rssprgtitle,"");
-            content = xmlNodeGetContent(node);
-            if (content) strcpy(rssprgtitle,(char *) content);
+          strcpy(rssprgtitle,"");
+          content = xmlNodeGetContent(node);
+          if (content) strcpy(rssprgtitle,(char *) content);
         }
 
         if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
@@ -372,13 +372,13 @@ int stream_class::parsexmlrssfile(char *filename) {
                 subnode3=subnode2->xmlChildrenNode;
                 while(subnode3) {
                   if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                      content = xmlNodeGetContent(subnode2);
-                      strcpy(rssprgtitle,(char *) content);
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgtitle,(char *) content);
                   }
 
                   if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                      content = xmlNodeGetContent(subnode2);
-                      strcpy(rssprgdesc,(char *) content);
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgdesc,(char *) content);
                   }
 
                   // get icon gfx
@@ -400,15 +400,14 @@ int stream_class::parsexmlrssfile(char *filename) {
             mysql_query(conn,sqlinsert);
             res = mysql_store_result(conn);
             if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                    recordexist=true;
-                }
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                recordexist=true;
+              }
             }
-
             if (!(recordexist)) {
-                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
-                mysql_query(conn,sqlinsert);
-                res = mysql_store_result(conn);
+              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+              mysql_query(conn,sqlinsert);
+              res = mysql_store_result(conn);
             }
           }
         }

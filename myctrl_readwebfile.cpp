@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "myctrl_readwebfile.h"
 
+
                                                                 // 1  = wifi net
                                                                 // 2  = music
                                                                 // 4  = stream
@@ -20,8 +21,9 @@ extern int debugmode;                                           // 64 = radio st
                                                                 // 512 = media importer
                                                                 // 1024 = flag loader
 
-
-// return string for filename
+//
+// return string for filename long = last path + name as filename
+//
 
 int get_webfilenamelong(char *fname,char *webpath) {
   char *npointer=NULL;
@@ -31,23 +33,24 @@ int get_webfilenamelong(char *fname,char *webpath) {
   strcpy(tmp,webpath);
   npointer=strrchr(tmp,'/');
   if (npointer) {
-    firstslashpointer=npointer-tmp;
+    firstslashpointer=npointer-tmp;             // husk sted
     filename=new char[strlen(npointer)+1];
-    strcpy(filename,npointer+1);              // save filename
-    tmp[firstslashpointer-1]='\0';
-    npointer=strrchr(tmp,'/');
-    if (npointer) {
-      strcpy(fname,npointer+1);
-      fname[11]='\0';
-      strcat(fname,filename);
+    if (filename) {
+      strcpy(filename,npointer+1);              // save filename
+      tmp[firstslashpointer-1]='\0';
+      npointer=strrchr(tmp,'/');
+      if (npointer) {
+        strcpy(fname,npointer+1);
+        fname[11]='\0';
+        strcat(fname,filename);
+      }
+      delete [] filename;
     }
-
-    delete [] filename;
-    //strcpy(fname,npointer+1);
     return(1);
   }
   return(0);
 }
+
 
 
 // return string for filename
@@ -133,8 +136,6 @@ int get_webfile(char *webpath,char *outfile) {
 //    strcpy(request,"GET ");
 //    strcat(request,wpath);
 //    strcat(request," HTTP/1.0\r\nFrom: wget!!!\r\nUser-Agent: HTTPTool/1.0\r\n\r\n");
-
-
     // http 1.1
     sprintf(request,"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n",wpath,hostname);
     //Get a socket
@@ -144,11 +145,9 @@ int get_webfile(char *webpath,char *outfile) {
     } else {
       //fprintf(stderr,"Got a socket.  ");
     }
-
     //book uses bzero which my man pages say is deprecated
     //the man page said to use memset instead. :-)
     memset(&servaddr,0,sizeof(servaddr));
-
     //get address for google.com
     if((hp = gethostbyname(hostname)) == NULL) {
         fprintf(stderr,"Couldn't get an address.\n");
@@ -157,14 +156,11 @@ int get_webfile(char *webpath,char *outfile) {
     else {
         //fprintf(stderr,"Got an address.  ");
     }
-
     //bcopy is deprecated also, using memcpy instead
     memcpy((char *)&servaddr.sin_addr.s_addr, (char *)hp->h_addr, hp->h_length);
-
     //fill int port number and type
     servaddr.sin_port = htons(80);
     servaddr.sin_family = AF_INET;
-
     //make the connection
     if(connect(sock_id, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
         fprintf(stderr, "Couldn't connect.\n");
@@ -215,10 +211,6 @@ int get_webfile(char *webpath,char *outfile) {
         loaderror=true;
 
       }
-
-
-//      printf("%s \n",message);
-
     }
 
     //lpos=strstr(message, "Content-Length:");
