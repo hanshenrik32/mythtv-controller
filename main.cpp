@@ -10879,7 +10879,7 @@ void *datainfoloader_movie(void *data) {
 void *datainfoloader_stream(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading stream info from rss feed.\n");
   if (strcmp(configbackend,"mythtv")==0) {
-    streamoversigt.loadrssfile();                                                // download rss files
+    //streamoversigt.loadrssfile();                                                // download rss files (())
     streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");              // load all stream from rss files
   }
   if (debugmode & 4) printf("loader thread done loaded stream stations \n");
