@@ -4587,7 +4587,8 @@ void display() {
 
     // update rss db
     if (do_save_setup_rss) {
-      rssstreamoversigt.save_rss_data();
+      rssstreamoversigt.save_rss_data();                                           // save rss data in db
+      streamoversigt.loadrssfile();                                                // download rss files (())
       do_save_setup_rss=false;
     }
 
