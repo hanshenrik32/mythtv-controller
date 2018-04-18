@@ -544,6 +544,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"INSERT INTO `internetcontent` VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
         // create default master rss feed source
         sprintf(sqlselect,"INSERT INTO `internetcontentarticles` VALUES ('CNET',NULL,NULL,'CNET',0,0,NULL,'http://feed.cnet.com/feed/podcast/all/hd.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
@@ -605,7 +610,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
+
         sprintf(sqlselect,"insert into internetcontentarticles (feedtitle,title,url,podcast) values('TechSNAP','TechSNAP','https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',1)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"insert into internetcontentarticles (feedtitle,title,url,podcast) values('The Story from The Guardian','The Story from The Guardian','https://www.theguardian.com/news/series/the-story/podcast.xml',0)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
