@@ -3414,6 +3414,7 @@ void display() {
 
     }
 
+    // stop music
     if (vis_stream_oversigt) {
         if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
             #if defined USE_FMOD_MIXER
@@ -4689,6 +4690,7 @@ void display() {
         //streamoversigt.playstream(1,systemcommand);
       }
       startstream=false;                      // start kun 1 instans
+      do_play_stream=false;
     }
 
     // play recorded program
