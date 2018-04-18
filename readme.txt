@@ -6,6 +6,12 @@
 
 Version.
 
+mythtv-controller ver 0.36.4
+
+new rss feed default installed
+
+
+
 mythtv-controller ver 0.36.2
 
 
