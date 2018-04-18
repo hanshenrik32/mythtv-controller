@@ -96,7 +96,7 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 
 
 //
-// used to download rss file from db info (url is flag for master rss file (mediaURL IS NULL))
+// used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
 //
 
@@ -459,7 +459,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           sprintf(sqlselect,"create table IF NOT EXISTS mythconverg.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
           if (mysql_query(conn,sqlselect)!=0) printf("mysql create error.\n");
           res = mysql_store_result(conn);
-
           dbexist=false;
       }
       mysql_query(conn,"set NAMES 'utf8'");
