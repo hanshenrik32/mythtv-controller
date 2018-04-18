@@ -639,11 +639,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
+        mysql_close(conn);
+        // download new rrs files we just insert in db
+        loadrssfile();
       }
-      mysql_close(conn);
-      // download new rrs files we just insert in db
-      loadrssfile();
     }
 
     if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
