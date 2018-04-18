@@ -936,6 +936,7 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('Jule radio', 'Jule radio', 'http://jule-radio.dk/', '', '', 1, 128, 0, 1, '2017-12-01', 14363, 0, '2017-12-01 00:00:00', 1), \
 ('radio-xmas', 'jul', 'http://www.radio-xmas.at:443/xmas', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2017-12-01 00:00:00', 1), \
 ('jule radio', 'jul', 'http://tx-bauerdk.sharp-stream.com/http_live.php?i=395_dk_aacp&amsparams=playerid:SBS_RP_WEB;skey:1512330381;&awparams=loggedin:false', '', '', 1, 128, 0, 1, '2017-12-01', 14365, 0, '2017-12-01 00:00:00', 1), \
+('Vegas Alternative Rock', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 14366, 0, '2017-12-01 00:00:00', 1), \
 ('HBR1.COM', 'House music 24/7', 'http://ubuntu.hbr1.com:19800/tronic.ogg', 'http://ubuntu.hbr1.com:19800', '', 1, 320, 62, 1, '2012-07-28', 15000, 45, '2012-09-15 22:20:34', 1)";
 
 // 700 -> 1000 is free on intnr
