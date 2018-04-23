@@ -97,6 +97,43 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 
 
 //
+// vlc player interface
+//
+
+
+
+
+// default player
+// stop playing movie
+
+void stream_class::stopstream() {
+  if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
+  stream_is_playing=false;
+}
+
+// vlc stop player
+
+void stream_class::softstopstream() {
+  if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
+  stream_is_playing=false;
+}
+
+
+// to play streams from web
+//vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
+
+// start playing movie by vlclib
+
+int stream_class::playstream(int nr) {
+    char path[PATH_MAX];                                  // max path length from os
+    strcpy(path,"");
+    stream_is_playing=true;
+    strcat(path,get_stream_url(nr));
+    vlc_controller::playmedia(path);
+}
+
+
+//
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
 //
