@@ -55,6 +55,9 @@ class stream_class : vlc_controller {
         unsigned int get_stream_pathantal(unsigned int nr) { return (stack[nr]->feed_path_antal); }
         long get_stream_intnr(unsigned int nr) { return (stack[nr]->intnr); }
         GLuint get_texture(int nr) { return (stack[nr]->textureId); }
+        void stopstream();
+        void softstopstream();
+        int playstream(int nr);
         stream_class();
         ~stream_class();
         int streamantal() { return(antal); }

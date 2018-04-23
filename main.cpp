@@ -4756,6 +4756,11 @@ void display() {
     // start play stream
     // still use the old system call bach file
     if (startstream) {
+      if (streamoversigt.playstream(sknapnr-1)==0) {
+        vis_error=true;
+        vis_error_timeout=60;
+      }
+      /*
       if (strcmp("default",configdefaultplayer)!=0)  {
         printf("Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
@@ -4783,7 +4788,8 @@ void display() {
         // start play stream or show rss page
         //streamoversigt.playstream(1,systemcommand);
       }
-      streamoversigt.stream_is_playing=true;
+      */
+
       // reset play function
       startstream=false;                      // start kun 1 instans
       do_play_stream=false;                   //
