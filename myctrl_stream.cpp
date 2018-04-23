@@ -63,6 +63,7 @@ stream_class::stream_class() : antal(0) {
     stream_oversigt_loaded_nr=0;
     antal=0;
     gfx_loaded=false;			// gfx loaded
+    stream_is_playing=false;
 }
 
 
@@ -482,256 +483,305 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         // updated     = Time of last update
 
         // create default master rss feed source
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql create error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('CNET',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('CNET',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Anders Lund Madsen i Den Yderste By',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Anders Lund Madsen i Den Yderste By',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('So ein Ding',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('So ein Ding',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Verdens Bedste Filmklub',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Verdens Bedste Filmklub',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('The Verge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('The Verge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Dynamo',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Dynamo',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Jupiter Broadcasting',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Jupiter Broadcasting',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Bonderøven',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Bonderøven',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Kontant',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Kontant',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Movieclips Coming Soon',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Movieclips Coming Soon',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('NASA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('NASA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Troldspejlet Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Troldspejlet Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('GameSpot',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('GameSpot',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Droner og kanoner',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('DEN GRÅ SIDE',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Droner og kanoner',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('DEN GRÅ SIDE',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Bitch Sesh',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('2 Dope Queens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Ramajetterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('De Sorte Spejdere',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Nak & æd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Ubådssagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Videnskabens Verden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Bitch Sesh',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontent VALUES ('Why You Push That Button',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('2 Dope Queens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Ramajetterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('De Sorte Spejdere',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Nak & æd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Ubådssagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Videnskabens Verden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+/*
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Why You Push That Button',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+*/
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Gametest',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Gravity Assist',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TED',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TV 2 - Tech',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+
+
 
         // create default master rss feed source
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('CNET',NULL,NULL,'CNET',0,0,NULL,'http://feed.cnet.com/feed/podcast/all/hd.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('CNET',NULL,NULL,'CNET',0,0,NULL,'http://feed.cnet.com/feed/podcast/all/hd.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Anders Lund Madsen i Den Yderste By',NULL,NULL,'Anders lund massen i den udereste by',0,0,NULL,'http://www.dr.dk/mu/Feed/anders-lund-madsen-i-den-yderste-by.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Anders Lund Madsen i Den Yderste By',NULL,NULL,'Anders lund massen i den udereste by',0,0,NULL,'http://www.dr.dk/mu/Feed/anders-lund-madsen-i-den-yderste-by.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Aftenshowet',NULL,NULL,'Aftenshowet',0,0,NULL,'https://www.dr.dk/mu/Feed/aftenshowet.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Aftenshowet',NULL,NULL,'Aftenshowet',0,0,NULL,'https://www.dr.dk/mu/Feed/aftenshowet.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('So ein Ding',NULL,NULL,'So ein Ding',0,0,NULL,'https://www.dr.dk/mu/Feed/so-ein-ding?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('So ein Ding',NULL,NULL,'So ein Ding',0,0,NULL,'https://www.dr.dk/mu/Feed/so-ein-ding?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Verdens Bedste Filmklub',NULL,NULL,'Verdens Bedste Filmklub',0,0,NULL,'http://lytbar.dk/wordpress/?feed=rss2&cat=7',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Verdens Bedste Filmklub',NULL,NULL,'Verdens Bedste Filmklub',0,0,NULL,'http://lytbar.dk/wordpress/?feed=rss2&cat=7',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,NULL,'Krager og Drager - Dansk Game of Thrones Podcast',0,0,NULL,'http://www.kragerogdrager.dk/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,NULL,'Krager og Drager - Dansk Game of Thrones Podcast',0,0,NULL,'http://www.kragerogdrager.dk/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('The Verge',NULL,NULL,'The Verge',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('The Verge',NULL,NULL,'The Verge',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Dynamo',NULL,NULL,'Dynamo',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UC7SDsqJba5428-EOBZWOn3w',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Dynamo',NULL,NULL,'Dynamo',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UC7SDsqJba5428-EOBZWOn3w',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Tech snap',NULL,NULL,'Tech snap',0,0,NULL,'https://youtube.com/feeds/videos.xml?channel_id=UCHugE6eRhqB9_AZQh4DDbIw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Tech snap',NULL,NULL,'Tech snap',0,0,NULL,'https://youtube.com/feeds/videos.xml?channel_id=UCHugE6eRhqB9_AZQh4DDbIw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Bonderøven',NULL,NULL,'Bonderøven',0,0,NULL,'https://www.dr.dk/mu/Feed/bonderoven-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Bonderøven',NULL,NULL,'Bonderøven',0,0,NULL,'https://www.dr.dk/mu/Feed/bonderoven-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Kontant',NULL,NULL,'Kontant',0,0,NULL,'https://www.dr.dk/mu/Feed/kontant-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Kontant',NULL,NULL,'Kontant',0,0,NULL,'https://www.dr.dk/mu/Feed/kontant-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Movieclips Coming Soon',NULL,NULL,'Movieclips Coming Soon',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCkR0GY0ue02aMyM-oxwgg9g',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Movieclips Coming Soon',NULL,NULL,'Movieclips Coming Soon',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCkR0GY0ue02aMyM-oxwgg9g',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Troldspejlet Podcast',NULL,NULL,'Troldspejlet Podcast',0,0,NULL,'https://www.dr.dk/mu/feed/troldspejlet-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Troldspejlet Podcast',NULL,NULL,'Troldspejlet Podcast',0,0,NULL,'https://www.dr.dk/mu/feed/troldspejlet-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('GameSpot',NULL,NULL,'GameSpot',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCbu2SsF-Or3Rsn3NxqODImw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('GameSpot',NULL,NULL,'GameSpot',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCbu2SsF-Or3Rsn3NxqODImw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('ISS Live FEED','ISS Live FEED','https://www.youtube.com/watch?v=RtU_mdL2vBM',1)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('ISS Live FEED','ISS Live FEED','https://www.youtube.com/watch?v=RtU_mdL2vBM',1)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('TechSNAP','TechSNAP','https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',1)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('TechSNAP','TechSNAP','https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',1)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Droner og kanoner',NULL,NULL,'Droner og kanoner',0,0,NULL,'https://www.dr.dk/mu/Feed/droner-og-kanoner.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('DEN GRÅ SIDE',NULL,NULL,'DEN GRÅ SIDE',0,0,NULL,'http://www.spreaker.com/show/2108328/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Droner og kanoner',NULL,NULL,'Droner og kanoner',0,0,NULL,'https://www.dr.dk/mu/Feed/droner-og-kanoner.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('PersonalityHacker',NULL,NULL,'PersonalityHacker',0,0,NULL,'http://feeds.feedburner.com/PersonalityHackerPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('DEN GRÅ SIDE',NULL,NULL,'DEN GRÅ SIDE',0,0,NULL,'http://www.spreaker.com/show/2108328/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Bitch Sesh',NULL,NULL,'Bitch Sesh',0,0,NULL,'http://rss.earwolf.com/bitch-sesh',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('PersonalityHacker',NULL,NULL,'PersonalityHacker',0,0,NULL,'http://feeds.feedburner.com/PersonalityHackerPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('2 Dope Queens',NULL,NULL,'2 Dope Queens',0,0,NULL,'http://feeds.wnyc.org/2dopequeens',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Bitch Sesh',NULL,NULL,'Bitch Sesh',0,0,NULL,'http://rss.earwolf.com/bitch-sesh',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Ramajetterne',NULL,NULL,'Ramajetterne',0,0,NULL,'https://www.dr.dk/mu/Feed/ramajetterne-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('2 Dope Queens',NULL,NULL,'2 Dope Queens',0,0,NULL,'http://feeds.wnyc.org/2dopequeens',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('De Sorte Spejdere',NULL,NULL,'De Sorte Spejdere',0,0,NULL,'http://www.dr.dk/mu/Feed/de-sorte-spejdere-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Ramajetterne',NULL,NULL,'Ramajetterne',0,0,NULL,'https://www.dr.dk/mu/Feed/ramajetterne-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Nak & æd',NULL,NULL,'Nak & æd',0,0,NULL,'http://www.dr.dk/mu/Feed/nak-og-aed-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('De Sorte Spejdere',NULL,NULL,'De Sorte Spejdere',0,0,NULL,'http://www.dr.dk/mu/Feed/de-sorte-spejdere-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Ubådssagen',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/ubadssagen.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Nak & æd',NULL,NULL,'Nak & æd',0,0,NULL,'http://www.dr.dk/mu/Feed/nak-og-aed-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Videnskabens Verden',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/videnskabens-verden.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Ubådssagen',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/ubadssagen.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"INSERT INTO mythconverg.internetcontentarticles VALUES ('Why You Push That Button',NULL,NULL,'Why You Push That Button',0,0,NULL,'http://feeds.feedburner.com/WhydYouPushThatButton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Videnskabens Verden',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/videnskabens-verden.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+/*
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Why You Push That Button',NULL,NULL,'Why You Push That Button',0,0,NULL,'http://feeds.feedburner.com/WhydYouPushThatButton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+*/
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Gametest',NULL,NULL,'Gametest',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCuX8EWTbH--tyha5FUoBSrg',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Gravity Assist',NULL,NULL,'Gravity Assist',0,0,NULL,'https://www.nasa.gov/rss/dyn/Gravity-Assist.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('TED',NULL,NULL,'TED',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCAuUUnT6oDeKwE6v1NGQxug',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('TV 2 - Tech',NULL,NULL,'TV 2 - Tech',0,0,NULL,'http://feeds.tv2.dk/beep_seneste/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
@@ -1135,9 +1185,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
-
-      if (debugmode) printf(".");
-
       strcpy(gfxshortname,"");
       gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
       if (gfxshortnamepointer) {
@@ -1217,8 +1264,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
         glEnd();
         //glPopMatrix();
       } else {
-        // no show default icon
-
+        // no draw default icon
         glPushMatrix();
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
@@ -1237,9 +1283,6 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
         glEnd();
         glPopMatrix();
       }
-
-
-
 
       // draw numbers in group
       if (stack[i+sofset]->feed_group_antal>1) {
