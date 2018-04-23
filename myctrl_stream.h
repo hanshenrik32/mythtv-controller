@@ -41,13 +41,15 @@ class stream_class : vlc_controller {
         int stream_oversigt_loaded_nr;
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
     public:
+        bool stream_is_playing;
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
         int type;
         bool gfx_loaded;					                                              //
         char *get_stream_name(int nr) { return (stack[nr]->feed_name); }
-        char *get_stream_mythtvgfx_path(int nr) { return (stack[nr]->feed_gfx_mythtv); }
-        char *get_stream_path(int nr) { return (stack[nr]->feed_path); }
-        char *get_stream_url(int nr) { return (stack[nr]->feed_streamurl); }
+        char *get_stream_desc(int nr) { return (stack[nr]->feed_desc); }
+        char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
+        char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); }
+        char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
         char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
         unsigned int get_stream_groupantal(unsigned int nr) { return (stack[nr]->feed_group_antal); }
         unsigned int get_stream_pathantal(unsigned int nr) { return (stack[nr]->feed_path_antal); }
