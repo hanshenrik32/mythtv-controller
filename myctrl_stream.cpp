@@ -101,8 +101,6 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 //
 
 
-
-
 // default player
 // stop playing movie
 

@@ -266,6 +266,7 @@ bool do_zoom_stream=false;                              //
 bool show_wlan_select=false;
 
 bool do_zoom_film_cover=false;
+bool do_zoom_stream_cover=false;
 bool vis_movie_options=false;
 bool vis_movie_sort_option=false;
 
@@ -2805,9 +2806,12 @@ void display() {
         glPopMatrix();
 
       } else if (vis_stream_oversigt) {
+        std::clock_t start;
+        start = std::clock();
         glPushMatrix();
         streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley);
         glPopMatrix();
+        //if (debugmode & 4) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
           radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
       } else if (vis_tv_oversigt) {
@@ -3974,7 +3978,7 @@ void display() {
     // show player control
 
     if (!(visur)) {
-      if ((vis_stream_oversigt) && (do_zoom_stream)) {
+      if ((vis_stream_oversigt) && (do_zoom_stream_cover)) {
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         // window texture
         glEnable(GL_TEXTURE_2D);
@@ -4012,7 +4016,7 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,_texturemstop);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9	);                        // 9 = stop
+        glLoadName(9);                        // 9 = stop
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
         glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
@@ -4756,6 +4760,7 @@ void display() {
     // start play stream
     // still use the old system call bach file
     if (startstream) {
+      if (startstream) do_zoom_stream_cover=true;
       if (strcmp("default",configdefaultplayer)!=0)  {
         printf("Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
@@ -4777,6 +4782,11 @@ void display() {
           printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr));
           printf("Start stream. Player is internal \n",sknapnr);
         }
+        // stop playing stream
+        if (streamoversigt.stream_is_playing) {
+          streamoversigt.stopstream();
+        }
+        // start playing stream
         streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr));
       }
       // reset play function
@@ -5604,68 +5614,68 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
             // test for menu select setup
             if ((GLubyte) names[i*4+3]==5) {
-                do_show_setup=!do_show_setup;
-                vis_music_oversigt=false;
-                vis_film_oversigt=false;
-                vis_tv_oversigt=false;
-                vis_stream_oversigt=false;
-                vis_stream_or_movie_oversigt=false;
-                vis_radio_or_music_oversigt=false;
-                do_show_tvgraber=false;
-                fundet=true;
+              do_show_setup=!do_show_setup;
+              vis_music_oversigt=false;
+              vis_film_oversigt=false;
+              vis_tv_oversigt=false;
+              vis_stream_oversigt=false;
+              vis_stream_or_movie_oversigt=false;
+              vis_radio_or_music_oversigt=false;
+              do_show_tvgraber=false;
+              fundet=true;
             }
         }
 
         if (vis_stream_oversigt) {
-            if (!(fundet)) {
-                // we have a select mouse/touch element dirid
-                if ((GLubyte) names[i*4+3]==23) {
-                    printf("scroll down\n");
-                    returnfunc=1;
-                    fundet=true;
-                }
-                if ((GLubyte) names[i*4+3]==24) {
-                    printf("scroll up\n");
-                    returnfunc=2;
-                    fundet=true;
-                }
+          if (!(fundet)) {
+            // we have a select mouse/touch element dirid
+            if ((GLubyte) names[i*4+3]==23) {
+              printf("scroll down\n");
+              returnfunc=1;
+              fundet=true;
             }
+            if ((GLubyte) names[i*4+3]==24) {
+              printf("scroll up\n");
+              returnfunc=2;
+              fundet=true;
+            }
+          }
         }
 
 
         if (vis_film_oversigt) {
-            if (!(fundet)) {
-                // we have a select mouse/touch element dirid
-                if ((GLubyte) names[i*4+3]==23) {
-                    printf("scroll down\n");
-                    returnfunc=1;
-                    fundet=true;
-                }
-                if ((GLubyte) names[i*4+3]==24) {
-                    printf("scroll up\n");
-                    returnfunc=2;
-                    fundet=true;
-                }
+          if (!(fundet)) {
+            // we have a select mouse/touch element dirid
+            if ((GLubyte) names[i*4+3]==23) {
+              printf("scroll down\n");
+              returnfunc=1;
+              fundet=true;
             }
+            if ((GLubyte) names[i*4+3]==24) {
+              printf("scroll up\n");
+              returnfunc=2;
+              fundet=true;
+            }
+          }
         }
 
         if (vis_music_oversigt) {
             if (!(fundet)) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
                 // we have a select mouse/touch element dirid
                 if ((GLubyte) names[i*4+3]==23) {
-                    if (debugmode & 2) fprintf(stderr,"scroll down\n");
-                    returnfunc=1;
-                    fundet=true;
+                  if (debugmode & 2) fprintf(stderr,"scroll down\n");
+                  returnfunc=1;
+                  fundet=true;
                 }
                 if ((GLubyte) names[i*4+3]==24) {
-                    if (debugmode & 2) fprintf(stderr,"scroll up\n");
-                    returnfunc=2;
-                    fundet=true;
+                  if (debugmode & 2) fprintf(stderr,"scroll up\n");
+                  returnfunc=2;
+                  fundet=true;
                 }
                 if ((GLubyte) names[i*4+3]==27) {
-                    if (debugmode & 2) fprintf(stderr,"Show music info\n");
-                    do_zoom_music_cover=!do_zoom_music_cover;
-                    fundet=true;
+                  if (debugmode & 2) fprintf(stderr,"Show music info\n");
+                  do_zoom_music_cover=!do_zoom_music_cover;
+                  fundet=true;
                 }
             }
 
@@ -5673,9 +5683,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
                 // we have a select mouse/touch element dirid
                 if ((GLuint) names[i*4+3]>=100) {
-                    mknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
-                    if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
-                    fundet=true;
+                  mknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
+                  if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
+                  fundet=true;
                 }
                 if (mknapnr!=0) swknapnr=mknapnr;
 //                mknapnr=mknapnr+(music_icon_anim_icon_ofsety*4);
@@ -5727,45 +5737,45 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // use as controller
             if ((!(fundet)) && (do_zoom_music_cover)) {
                 if ((GLubyte) names[i*4+3]==5) {
-                    // if touch/mouse click on window then close windows again
-                    do_zoom_music_cover=false;
-                    fundet=true;
+                  // if touch/mouse click on window then close windows again
+                  do_zoom_music_cover=false;
+                  fundet=true;
                 }
                 // last song
                 if ((GLubyte) names[i*4+3]==6) {
-                    if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
-                        do_play_music_aktiv_table_nr--;                                         // skift aktiv sang
-                        do_shift_song=true;                                                     // sæt flag til skift
-                    }
-                    fundet=true;
+                  if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
+                    do_play_music_aktiv_table_nr--;                                         // skift aktiv sang
+                    do_shift_song=true;                                                     // sæt flag til skift
+                  }
+                  fundet=true;
                 }
                 // next song
                 if ((GLubyte) names[i*4+3]==7) {
-                    if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
-                        do_play_music_aktiv_table_nr++;
-                        do_shift_song=true;
-                    }
-                    fundet=true;
+                  if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
+                    do_play_music_aktiv_table_nr++;
+                    do_shift_song=true;
+                  }
+                  fundet=true;
                 }
                 // stop song
                 if ((GLubyte) names[i*4+3]==9) {
-                    do_stop_music=1;
-                    fundet=true;
+                  do_stop_music=1;
+                  fundet=true;
                 }
                 // play song
                 if ((GLubyte) names[i*4+3]==8) {
-                    do_stop_music=0;
-                    do_shift_song=true;
-                    if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
-                        if (aktiv_playlist.numbers_in_playlist()==0) {
-                            do_stop_music_all=true;            // stop play music
-                            do_shift_song=false;
-                        } else {
-                            do_play_music_aktiv_table_nr=1;
-                        }
-                    }
-                    fundet=true;
-                    if (debugmode & 2) fprintf(stderr,"Start play \n");
+                  do_stop_music=0;
+                  do_shift_song=true;
+                  if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
+                      if (aktiv_playlist.numbers_in_playlist()==0) {
+                          do_stop_music_all=true;            // stop play music
+                          do_shift_song=false;
+                      } else {
+                          do_play_music_aktiv_table_nr=1;
+                      }
+                  }
+                  fundet=true;
+                  if (debugmode & 2) fprintf(stderr,"Start play \n");
                 }
             }
         }
@@ -5773,245 +5783,266 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         // vælg skal der spilles music eller radio
         if ((vis_radio_or_music_oversigt) && (!(fundet))) {
-            // Radio
-            if ((GLubyte) names[i*4+3]==80) {
-                fundet=true;
-                vis_radio_oversigt=true;
-                vis_radio_or_music_oversigt=false;
-            }
-            // Music
-            if ((GLubyte) names[i*4+3]==81) {
-                fundet=true;
-                vis_music_oversigt=true;
-                vis_radio_or_music_oversigt=false;
-            }
+          // Radio
+          if ((GLubyte) names[i*4+3]==80) {
+            fundet=true;
+            vis_radio_oversigt=true;
+            vis_radio_or_music_oversigt=false;
+          }
+          // Music
+          if ((GLubyte) names[i*4+3]==81) {
+            fundet=true;
+            vis_music_oversigt=true;
+            vis_radio_or_music_oversigt=false;
+          }
         }
 
         // kun til mus/touch skærm (radio stationer)
         // luk show play radio
         if ((vis_radio_oversigt)  && (!(fundet))) {
-            if ((GLubyte) names[i*4+3]==23) {
-                if (debugmode & 8) fprintf(stderr,"scroll down\n");
-                returnfunc=1;
-                fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==24) {
-                if (debugmode & 8) fprintf(stderr,"scroll up\n");
-                returnfunc=2;
-                fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==27) {
-                if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
-                do_zoom_radio=!do_zoom_radio;
-                fundet=true;
-            }
+          if ((GLubyte) names[i*4+3]==23) {
+            if (debugmode & 8) fprintf(stderr,"scroll down\n");
+            returnfunc=1;
+            fundet=true;
+          }
+          if ((GLubyte) names[i*4+3]==24) {
+            if (debugmode & 8) fprintf(stderr,"scroll up\n");
+            returnfunc=2;
+            fundet=true;
+          }
+          if ((GLubyte) names[i*4+3]==27) {
+            if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
+            do_zoom_radio=!do_zoom_radio;
+            fundet=true;
+          }
         }
 
 
         if ((vis_radio_oversigt) && (show_radio_options==false)) {
-            // Bruges vist kun til mus/touch skærm (radio stationer)
-            if (!(fundet)) {		// hvis ingen valgt
-                // we have a select mouse/touch element dirid
-                if ((GLuint) names[i*4+3]>=100) {
-                    rknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
-                    if (debugmode & 8) fprintf(stderr,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
-                    fundet=true;
-                }
-                // husk last
-                if (rknapnr!=0) swknapnr=rknapnr;
+          // Bruges vist kun til mus/touch skærm (radio stationer)
+          if (!(fundet)) {		// hvis ingen valgt
+              // we have a select mouse/touch element dirid
+              if ((GLuint) names[i*4+3]>=100) {
+                rknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
+                if (debugmode & 8) fprintf(stderr,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
+                fundet=true;
+              }
+              // husk last
+              if (rknapnr!=0) swknapnr=rknapnr;
 
-                rknapnr=rknapnr+(_mangley/41)*8;
+              rknapnr=rknapnr+(_mangley/41)*8;
 /*
-                switch(screen_size) {
-                    case 1: rknapnr=rknapnr+(_mangley/41)*5;
-                            break;
-                    case 2: rknapnr=rknapnr+(_mangley/41)*5;
-                           break;
-                    case 3: rknapnr=rknapnr+(_mangley/41)*8;
-                            break;
-                    case 4: rknapnr=rknapnr+(_mangley/41)*8;
-                            break;
-                }
+              switch(screen_size) {
+                  case 1: rknapnr=rknapnr+(_mangley/41)*5;
+                          break;
+                  case 2: rknapnr=rknapnr+(_mangley/41)*5;
+                         break;
+                  case 3: rknapnr=rknapnr+(_mangley/41)*8;
+                          break;
+                  case 4: rknapnr=rknapnr+(_mangley/41)*8;
+                          break;
+              }
 */
+          }
+          // stop radio player if vis_radio_oversigt
+          if (!(fundet)) {
+            // tryk stop radio
+            if ((GLubyte) names[i*4+3]==9) {
+              if (debugmode & 8) fprintf(stderr,"stop radio\n");
+              do_stop_radio=1;
+              do_play_radio=false;			// no playing
+              fundet=true;
+              rknapnr=0;
             }
-            // stop radio player if vis_radio_oversigt
-            if (!(fundet)) {
-                // tryk stop radio
-                if ((GLubyte) names[i*4+3]==9) {
-                    if (debugmode & 8) fprintf(stderr,"stop radio\n");
-                    do_stop_radio=1;
-                    do_play_radio=false;			// no playing
-                    fundet=true;
-                    rknapnr=0;
-                }
-            }
+          }
         }
 
         // vælg skal der spilles film eller stream
         if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
-            // stream
-            if ((GLubyte) names[i*4+3]==80) {
-                fundet=true;
-                vis_stream_oversigt=true;
-                vis_stream_or_movie_oversigt=false;
-            }
-            // stream
-            if ((GLubyte) names[i*4+3]==81) {
-                fundet=true;
-                vis_film_oversigt=true;
-                vis_stream_or_movie_oversigt=false;
-            }
-
+          // stream
+          if ((GLubyte) names[i*4+3]==80) {
+            fundet=true;
+            vis_stream_oversigt=true;
+            vis_stream_or_movie_oversigt=false;
+          }
+          // stream
+          if ((GLubyte) names[i*4+3]==81) {
+            fundet=true;
+            vis_film_oversigt=true;
+            vis_stream_or_movie_oversigt=false;
+          }
         }
 
         if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
-            if ((GLubyte) names[i*4+3]==3) {
-                fundet=true;
-                vis_stream_oversigt=false;
-                vis_stream_or_movie_oversigt=false;
-            }
+          if ((GLubyte) names[i*4+3]==3) {
+            fundet=true;
+            vis_stream_oversigt=false;
+            vis_stream_or_movie_oversigt=false;
+          }
         }
 
         // stream oversigt
         if ((vis_stream_oversigt) && (!(fundet))) {
-            if ((GLuint) names[i*4+3]>=100) {
-                sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
-                //if (debugmode & 128)
-                fprintf(stderr,"stream selected=%u  \n",sknapnr);
-                fundet=true;
-            }
+          if ((GLuint) names[i*4+3]>=100) {
+            sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
+            //if (debugmode & 128)
+            fprintf(stderr,"stream selected=%u  \n",sknapnr);
+            fundet=true;
+          }
 
-            if ((GLubyte) names[i*4+3]==3) {
-                fundet=true;
-                vis_stream_or_movie_oversigt=false;
-                vis_stream_oversigt=false;
+          if ((GLubyte) names[i*4+3]==3) {
+            fundet=true;
+            vis_stream_or_movie_oversigt=false;
+            vis_stream_oversigt=false;
+          }
+
+          if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover)) {
+            // start play
+            //do_zoom_stream_cover=!do_zoom_stream_cover;
+            fundet=true;
+            if (sknapnr>0) {
+              do_play_stream=1;						// select button do play
+              if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
             }
+          }
+
+          // stop stream by stop button
+          if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover)) {
+            //do_zoom_stream_cover=!do_zoom_stream_cover;
+            fundet=true;
+            //streamoversigt.stopstream();
+            do_zoom_stream_cover=false;
+            do_stop_stream=true;                                            // flag to stop play
+            stopstream=true;                                                // flag to stop play
+            do_play_stream=false;
+            if (streamoversigt.stream_is_playing) streamoversigt.stopstream();
+          }
         }
 
         // film oversigt
         if ((vis_film_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==25) {
-                if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
-                fundet=true;
-                startmovie=true;
+              if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+              fundet=true;
+              startmovie=true;
             }
             if ((GLubyte) names[i*4+3]==26) {
-                if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
-                fundet=true;
-                // stop movie playing
-                stopmovie=true;
+              if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+              fundet=true;
+              // stop movie playing
+              stopmovie=true;
             }
             // we have a select mouse/touch
             if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-                fknapnr=(GLuint) names[i*4+3]-99;			// hent filmknap nr
-                printf("Film selected=%d\n",fknapnr);
-                fundet=true;
+              fknapnr=(GLuint) names[i*4+3]-99;			// hent filmknap nr
+              printf("Film selected=%d\n",fknapnr);
+              fundet=true;
             }
         }
 
         // vis ny film oversigt
         if ((vis_nyefilm_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==25) {
-                if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
-                fundet=true;
-                startmovie=true;
+              if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+              fundet=true;
+              startmovie=true;
             }
             if ((GLubyte) names[i*4+3]==26) {
-                if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
-                fundet=true;
-                stopmovie=true;
+              if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+              fundet=true;
+              stopmovie=true;
             }
             if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-                fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
-                printf("Film new selected=%d\n",fknapnr);
-                fundet=true;
+              fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
+              printf("Film new selected=%d\n",fknapnr);
+              fundet=true;
             }
         }
 
 
         if ((vis_tv_oversigt) && (!(fundet))) {
             if ((GLubyte) names[i*4+3]==27) {
-                if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
-                vis_tv_oversigt=false;
-                fundet=true;
+              if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
+              vis_tv_oversigt=false;
+              fundet=true;
             }
             if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
-                if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
-                vis_tv_oversigt=false;
-                fundet=true;
+              if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
+              vis_tv_oversigt=false;
+              fundet=true;
             }
             if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
-                if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
-                ask_tv_record=true;
-                do_zoom_tvprg_aktiv_nr=0;
-                //                vis_tv_oversigt=false;
-                fundet=true;
+              if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
+              ask_tv_record=true;
+              do_zoom_tvprg_aktiv_nr=0;
+              //                vis_tv_oversigt=false;
+              fundet=true;
             }
             //
             // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
             //
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
-                // er der trykket på et tv program
-                if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-                    tvknapnr=(GLuint) names[i*4+3]-100;					                // hent tv knap nr
-                    fundet=true;
-                }
+              // er der trykket på et tv program
+              if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
+                tvknapnr=(GLuint) names[i*4+3]-100;					                // hent tv knap nr
+                fundet=true;
+              }
             }
 
             // show old recordings
             if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
-                fprintf(stderr,"Show old recordings \n");
-                vis_old_recorded=!vis_old_recorded;							// SKAL fixes
-                fundet=true;
+              fprintf(stderr,"Show old recordings \n");
+              vis_old_recorded=!vis_old_recorded;							// SKAL fixes
+              fundet=true;
             }
 
             // show new recordings
             if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
-                fprintf(stderr,"Show new recordings \n");
-                vis_tvrec_list=!vis_tvrec_list;
-                fundet=true;
+              fprintf(stderr,"Show new recordings \n");
+              vis_tvrec_list=!vis_tvrec_list;
+              fundet=true;
             }
 
 
             // er vi igang med at spørge om vi skal optage programmet
             if (ask_tv_record) {
-                if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
-                    if (debugmode & 256) fprintf(stderr,"Close window again.\n");
-                    ask_tv_record=false;
-                    fundet=true;
-                    returnfunc=3;
-                    do_zoom_tvprg_aktiv_nr=0;
-                }
-                if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
-                    if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
-                    ask_tv_record=false;
-                    fundet=true;
-                    returnfunc=3;
-                    do_zoom_tvprg_aktiv_nr=0;
-                    // set start record tv prgoram
-                    //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
-                    aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
-                    // opdatere tv guide med nyt info
-                    aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
-                }
+              if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
+                if (debugmode & 256) fprintf(stderr,"Close window again.\n");
+                ask_tv_record=false;
+                fundet=true;
+                returnfunc=3;
+                do_zoom_tvprg_aktiv_nr=0;
+              }
+              if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
+                if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
+                ask_tv_record=false;
+                fundet=true;
+                returnfunc=3;
+                do_zoom_tvprg_aktiv_nr=0;
+                // set start record tv prgoram
+                //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
+                aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
+                // opdatere tv guide med nyt info
+                aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
+              }
             }
         }
         if (!(ask_tv_record)) {
-            // show old recorded and close
-            if ((!(fundet)) && (vis_old_recorded)) {
-                if ((GLubyte) names[i*4+3]==40) {
-                    vis_old_recorded=!vis_old_recorded;
-                    fundet=1;
-                    returnfunc=3;
-                }
+          // show old recorded and close
+          if ((!(fundet)) && (vis_old_recorded)) {
+            if ((GLubyte) names[i*4+3]==40) {
+              vis_old_recorded=!vis_old_recorded;
+              fundet=1;
+              returnfunc=3;
             }
-            // show active tv rec list and close
-            if ((!(fundet)) && (vis_tvrec_list)) {
-                if ((GLubyte) names[i*4+3]==40) {
-                    vis_tvrec_list=!vis_tvrec_list;
-                    fundet=1;
-                }
+          }
+          // show active tv rec list and close
+          if ((!(fundet)) && (vis_tvrec_list)) {
+            if ((GLubyte) names[i*4+3]==40) {
+              vis_tvrec_list=!vis_tvrec_list;
+              fundet=1;
             }
+          }
         }
         i--;
     } while ((i>=0) && (!(fundet)));
@@ -6135,10 +6166,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       }
                     }
 
-                    // stream stuf
-                    if ((vis_stream_oversigt) && (retfunc==0)) {
+                    // stream stuf open stram and show rss feeds
+                    if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false)) {
                       if (sknapnr>0) {
-                        do_play_stream=1;						// select button do play
+                        do_play_stream=1;						// select button do open or play
                         if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
                       }
                     }
@@ -6224,16 +6255,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     ask_tv_record=true;
                     do_zoom_tvprg_aktiv_nr=0;
                 }
-
                 if (vis_stream_oversigt) {
-                  if (do_zoom_stream) do_zoom_stream=false;
-                  else do_zoom_stream=true;
+                //  do_zoom_stream_cover=!do_zoom_stream_cover;
                 }
-
                 if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                     vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
                 }
-
                 break;
         }
         if (vis_music_oversigt) {
@@ -6412,14 +6439,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               } else {
                   startstream=true;
               }
-              do_zoom_stream=true;                    // show player
+              do_zoom_stream=true;                    // set show player
+              printf("Set show playing stream\n ");
             }
             //sknapnr=0;
             stream_key_selected=1;
             stream_select_iconnr=0;
             _sangley=0.0f;
-          } else {
-            if (sknapnr>-1) printf("Stream to play is %d\n",sknapnr-1); //streamoversigt.get_stream_name(sknapnr));
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
@@ -7696,6 +7722,7 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
            }
        }
+    // end if ******************************************
     } else {
         switch(key) {
             case 27:
@@ -7736,7 +7763,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   do_save_setup_rss=true;
                 } else do_show_setup=false;
               }
-              else if (vis_music_oversigt) vis_music_oversigt=false;
+              if (vis_music_oversigt) vis_music_oversigt=false;
               else if (vis_radio_oversigt) vis_radio_oversigt=false;
               else if (vis_film_oversigt) vis_film_oversigt=false;
               else if (vis_stream_oversigt) vis_stream_oversigt=false;
@@ -7751,6 +7778,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
+              if (vis_stream_oversigt) do_zoom_stream_cover=!do_zoom_stream_cover;
               if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
@@ -8134,6 +8162,7 @@ void update2(int value) {
             vis_tv_oversigt=false;
             vis_film_oversigt=false;
             do_zoom_film_cover=false;
+            do_zoom_stream_cover=false;
             vis_music_oversigt=true;
             vis_recorded_oversigt=false;
             vis_radio_oversigt=false;
@@ -8145,6 +8174,7 @@ void update2(int value) {
             vis_film_oversigt=false;
             do_zoom_film_cover=false;
             do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            do_zoom_stream_cover=false;
             vis_music_oversigt=false;
             vis_radio_oversigt=true;
             vis_recorded_oversigt=false;
@@ -8158,6 +8188,7 @@ void update2(int value) {
             vis_recorded_oversigt=false;
             vis_radio_oversigt=false;				   			                  // sluk radio oversigt
             do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            do_zoom_stream_cover=false;
             vis_nyefilm_oversigt=false;
         }
         // lirc
@@ -8167,6 +8198,7 @@ void update2(int value) {
             vis_film_oversigt=false; 						   	                  // sluk film oversigt
             vis_music_oversigt=false;  							                  // sluk music oversigt
             do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            do_zoom_stream_cover=false;
             vis_recorded_oversigt=true;	                  						// on recorded program oversigt
             vis_radio_oversigt=false;						   	                  // sluk radio oversigt
             vis_nyefilm_oversigt=false;
@@ -8179,6 +8211,7 @@ void update2(int value) {
             vis_music_oversigt=false;  							                  // sluk music oversigt
             do_zoom_film_cover=false;
             do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            do_zoom_stream_cover=false;
             vis_recorded_oversigt=false;                							// sluk recorded program oversigt
             vis_radio_oversigt=false;						   	                  // sluk radio oversigt
             vis_nyefilm_oversigt=false;
@@ -8190,6 +8223,7 @@ void update2(int value) {
             vis_film_oversigt=false; 						   	                  // sluk film oversigt
             vis_music_oversigt=false;  							                  // sluk music oversigt
             do_zoom_music_cover=false;							                  // sluk zoom cd cover
+            do_zoom_stream_cover=false;
             do_zoom_film_cover=false;
             vis_recorded_oversigt=false;						                  // sluk recorded program oversigt
             vis_radio_oversigt=false;				   			                  // sluk radio oversigt
