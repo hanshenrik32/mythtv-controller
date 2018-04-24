@@ -15,6 +15,7 @@ class vlc_controller {
     vlc_controller();
     ~vlc_controller();
     int playmedia(char *path);
+    int playwebmedia(char *path);
     void stopmedia();
     float get_position();
     void pnext_chapter();

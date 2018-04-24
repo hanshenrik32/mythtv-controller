@@ -133,6 +133,13 @@ int stream_class::playstream(int nr) {
 }
 
 
+
+int stream_class::playstream_url(char *path) {
+    stream_is_playing=true;
+    vlc_controller::playwebmedia(path);
+}
+
+
 //
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file

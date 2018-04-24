@@ -37,27 +37,27 @@ struct radiotype_type {
 };
 
 
-int set_radio_popular(int stationid);                // 
+int set_radio_popular(int stationid);                //
 const int radiooptionsmax=40;				                 // mxa antal typer af radio stationer
 
 
 class radiostation_class {
     private:
-        enum { maxantal=753 };				          		// MAX antal radio stationer
-        radio_oversigt_type *stack[maxantal];				// radio stack
-        int antal;							// Antal
-        radiotype_type radiosortopt[radiooptionsmax];			// radio typer
-        int radiooptionsselect;						// bruges til valgt af radio type som skal vises
+        enum { maxantal=753 };				          		                            // MAX antal radio stationer
+        radio_oversigt_type *stack[maxantal];				                            // radio stack
+        int antal;							                                                // Antal
+        radiotype_type radiosortopt[radiooptionsmax];			                      // radio typer
+        int radiooptionsselect;						                                      // bruges til valgt af radio type som skal vises
         void set_texture(int nr,GLuint idtexture);
-        int opdatere_radiostation_gfx(int nr,char *gfxpath);		//
-        bool startup_loaded;						// load radio statios list
+        int opdatere_radiostation_gfx(int nr,char *gfxpath);		                //
+        bool startup_loaded;			                                         			// load radio statios list
         bool check_radio_online_bool();
 
     public:
-        unsigned long check_radio_online(unsigned int startrecnr);	// check and set radio station online flag
-        void nextradiooptselect();					// select next type in radio type oversigt
-        void lastradiooptselect();        				//
-        void show_radio_options();					//
+        unsigned long check_radio_online(unsigned int startrecnr);	            // check and set radio station online flag
+        void nextradiooptselect();		                                    			// select next type in radio type oversigt
+        void lastradiooptselect();                                      				//
+        void show_radio_options();			                                     		//
         int getradiooptionsselect()  { return(radiosortopt[radiooptionsselect].radiosortoptart); }
         int set_radio_populars(int stationid);
         //
@@ -67,7 +67,7 @@ class radiostation_class {
         char *get_homepage(int nr) { return (stack[nr]->homepage); }
         char *get_desc(int nr) { return (stack[nr]->desc); }
         void set_kbps(int nr,int kbps) { stack[nr]->kbps=kbps; }
-        int load_radio_stations_gfx();					// load all radio stations gfx
+        int load_radio_stations_gfx();		                                			// load all radio stations gfx
         GLuint get_texture(int nr) { return (stack[nr]->textureId); }
         int get_kbps(int nr) { return (stack[nr]->kbps); }
         int set_radio_popular(int stationid);
