@@ -4756,40 +4756,29 @@ void display() {
     // start play stream
     // still use the old system call bach file
     if (startstream) {
-      if (streamoversigt.playstream(sknapnr-1)==0) {
-        vis_error=true;
-        vis_error_timeout=60;
-      }
-      /*
       if (strcmp("default",configdefaultplayer)!=0)  {
         printf("Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
         strcat(systemcommand,"'");
         if (sknapnr>0) {
-            if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
-                strcat(systemcommand,"http://");
-                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
-            } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
-            strcat(systemcommand,"' &");
-            system(systemcommand);
+          if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
+            strcat(systemcommand,"http://");
+            strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
+          } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+          strcat(systemcommand,"' &");
+          if (system(systemcommand)!=0) {
+            vis_error=true;
+            vis_error_timeout=60;
+          }
         }
       } else {
-        printf("Start play use default firefox player \n");
-        strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
-        strcat(systemcommand,"'");
-        if ((sknapnr)>0) {
-            if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash:",10)==0) {
-                strcat(systemcommand,"http://");
-                strcat(systemcommand,streamoversigt.get_stream_url(sknapnr)+10);
-           } else strcat(systemcommand,streamoversigt.get_stream_url(sknapnr));
-        }
-        strcat(systemcommand,"' &");
-        system(systemcommand);
         // start play stream or show rss page
-        //streamoversigt.playstream(1,systemcommand);
+        if (debugmode & 4) {
+          printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr));
+          printf("Start stream. Player is internal \n",sknapnr);
+        }
+        streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr));
       }
-      */
-
       // reset play function
       startstream=false;                      // start kun 1 instans
       do_play_stream=false;                   //

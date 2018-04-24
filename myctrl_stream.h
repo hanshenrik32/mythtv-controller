@@ -58,6 +58,7 @@ class stream_class : vlc_controller {
         void stopstream();
         void softstopstream();
         int playstream(int nr);
+        int playstream_url(char *path);
         stream_class();
         ~stream_class();
         int streamantal() { return(antal); }
