@@ -4795,6 +4795,7 @@ void display() {
             if (p) {
               strcpy(temprgtxt,"https://www.youtube.com/embed/");
               strcat(temprgtxt,p+8);                                            // add/get video id
+              strcat(temprgtxt,"?autoplay=1");
             } else strcpy(temprgtxt,streamoversigt.get_stream_url(sknapnr-1));
             strcat(systemcommand,temprgtxt);
             strcat(systemcommand,"' &");
