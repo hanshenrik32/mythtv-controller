@@ -677,7 +677,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Hva så?! med Christian Fuhlendorff',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
 
 
 
@@ -827,6 +830,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Hva så?! med Christian Fuhlendorff',NULL,NULL,'Hva så?! med Christian Fuhlendorff',0,0,NULL,'http://hva-saa.podomatic.com/rss2.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+
 
 
         mysql_close(conn);
