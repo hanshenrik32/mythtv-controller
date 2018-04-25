@@ -101,8 +101,6 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
 //
 
 
-
-
 // default player
 // stop playing movie
 
@@ -152,6 +150,7 @@ int stream_class::loadrssfile() {
   char totalurl[2048];
   char parsefilename[2048];
   char homedir[2048];
+  unsigned int recantal;
   MYSQL *conn;
   MYSQL_RES *res,*res1;
   MYSQL_ROW row;
@@ -164,9 +163,17 @@ int stream_class::loadrssfile() {
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
   //strcpy(sqlselect,"select * from internetcontentarticles");
-  strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+
+    strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL is NULL");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    while ((row = mysql_fetch_row(res)) != NULL) {
+      recantal=atoi(row[0]);
+    }
+    mysql_free_result(res);
+    strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
@@ -200,7 +207,7 @@ int stream_class::loadrssfile() {
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
             if (atoi(row[23])==1) {
-              if (debugmode) {
+              if (debugmode & 4) {
                 printf("Create/update podcast from %s url in db\n",row[0]);
               }
               sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
@@ -374,7 +381,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
             subnode=subnode->next;
           }
-          if (debugmode & 4) printf("\n");
+          //if (debugmode & 4) printf("\n");
         }
         // youtube type
         // get title
@@ -679,7 +686,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Hva så?! med Christian Fuhlendorff',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
 
 
 
@@ -830,6 +840,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Hva så?! med Christian Fuhlendorff',NULL,NULL,'Hva så?! med Christian Fuhlendorff',0,0,NULL,'http://hva-saa.podomatic.com/rss2.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
 
         mysql_close(conn);
         // download new rrs files we just insert in db
@@ -846,21 +861,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name)");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL) from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       //strcat(sqlselect,"' group by path order by path,title asc");
-      strcat(sqlselect,"' group by title order by title asc");
+      strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title ASC");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
-      strcat(sqlselect,"' and path like '");
+      strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
-      strcat(sqlselect,"' ORDER BY title ASC");
+      strcat(sqlselect,"' ORDER BY length(title),title ASC");
       getart=2;
     }
     this->type=getart;					// husk sql type
