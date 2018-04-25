@@ -4779,15 +4779,29 @@ void display() {
       } else {
         // start play stream or show rss page
         if (debugmode & 4) {
-          printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr));
+          printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
           printf("Start stream. Player is internal \n",sknapnr);
         }
         // stop playing stream
         if (streamoversigt.stream_is_playing) {
           streamoversigt.stopstream();
         }
-        // start playing stream
-        streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr));
+        if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"https://www.youtube.com",23)==0) {
+          // play by firefox
+          if (sknapnr>0) {
+            strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
+            strcat(systemcommand,"'");
+            strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+            strcat(systemcommand,"' &");
+            if (system(systemcommand)!=0) {
+              vis_error=true;
+              vis_error_timeout=60;
+            }
+          }
+        } else {
+          // start playing stream by libvlc
+          streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr-1));
+        }
       }
       // reset play function
       startstream=false;                      // start kun 1 instans

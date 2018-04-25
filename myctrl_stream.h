@@ -30,7 +30,7 @@ struct stream_oversigt_type {
 
 class stream_class : vlc_controller {
     private:
-        enum { maxantal=3000 };					                                        // MAX antal radio stationer
+        enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         stream_oversigt_type *stack[maxantal];			                            // radio stack
         int antal;					                       	                            // Antal
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
