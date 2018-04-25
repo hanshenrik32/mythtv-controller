@@ -4786,12 +4786,17 @@ void display() {
         if (streamoversigt.stream_is_playing) {
           streamoversigt.stopstream();
         }
-        if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"https://www.youtube.com",23)==0) {
+        if (strncmp(streamoversigt.get_stream_url(sknapnr-1),"https://www.youtube.com/watch?v=",32)==0) {
           // play by firefox
           if (sknapnr>0) {
             strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
             strcat(systemcommand,"'");
-            strcat(systemcommand,streamoversigt.get_stream_url(sknapnr-1));
+            char *p=strstr(streamoversigt.get_stream_url(sknapnr-1),"watch?v=");
+            if (p) {
+              strcpy(temprgtxt,"https://www.youtube.com/embed/");
+              strcat(temprgtxt,p+8);                                            // add/get video id
+            } else strcpy(temprgtxt,streamoversigt.get_stream_url(sknapnr-1));
+            strcat(systemcommand,temprgtxt);
             strcat(systemcommand,"' &");
             if (system(systemcommand)!=0) {
               vis_error=true;
