@@ -150,6 +150,7 @@ int stream_class::loadrssfile() {
   char totalurl[2048];
   char parsefilename[2048];
   char homedir[2048];
+  unsigned int recantal;
   MYSQL *conn;
   MYSQL_RES *res,*res1;
   MYSQL_ROW row;
@@ -162,9 +163,17 @@ int stream_class::loadrssfile() {
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
   //strcpy(sqlselect,"select * from internetcontentarticles");
-  strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+
+    strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL is NULL");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    while ((row = mysql_fetch_row(res)) != NULL) {
+      recantal=atoi(row[0]);
+    }
+    mysql_free_result(res);
+    strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
@@ -198,7 +207,7 @@ int stream_class::loadrssfile() {
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
             if (atoi(row[23])==1) {
-              if (debugmode) {
+              if (debugmode & 4) {
                 printf("Create/update podcast from %s url in db\n",row[0]);
               }
               sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
@@ -372,7 +381,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
             subnode=subnode->next;
           }
-          if (debugmode & 4) printf("\n");
+          //if (debugmode & 4) printf("\n");
         }
         // youtube type
         // get title
@@ -835,9 +844,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-
 
 
         mysql_close(conn);
