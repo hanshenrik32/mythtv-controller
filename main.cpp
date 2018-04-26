@@ -6481,7 +6481,10 @@ unsigned int hourtounixtime(int hour) {
 }
 
 
+//
 // handle keys
+// like functions keys
+//
 
 void handlespeckeypress(int key,int x,int y) {
     float MOVIE_CS;
@@ -6671,7 +6674,8 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 
-                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
+
 
                 if (vis_stream_oversigt) {
                     if (stream_key_selected>1) {
@@ -6761,7 +6765,7 @@ void handlespeckeypress(int key,int x,int y) {
                   radio_key_selected++;
                 }
 
-                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal())) {
                   if ((stream_key_selected % (snumbersoficonline*6)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
@@ -6837,7 +6841,7 @@ void handlespeckeypress(int key,int x,int y) {
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
 
 
-                printf("stream_select_iconnr=%d \n",stream_select_iconnr);
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
@@ -6990,8 +6994,8 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
 
-
-                printf("stream_select_iconnr=%d stream_key_selected=%d\n",stream_select_iconnr,stream_key_selected);
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
+                
 
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
