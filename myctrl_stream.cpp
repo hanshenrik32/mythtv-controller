@@ -39,6 +39,8 @@ extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
 
+extern int _sangley;
+
 extern GLuint _textureIdloading,_textureIdloading1;
 //extern GLuint _textureIdloading_mask;
 
@@ -1377,6 +1379,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       stream_oversigt_loaded=false;
     }
     // draw icons
+    sofset=(_sangley/40)*8;
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -1620,7 +1623,7 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
 
 
 
-
+// old
 
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley)
 
