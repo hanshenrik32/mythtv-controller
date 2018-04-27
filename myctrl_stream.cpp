@@ -138,6 +138,11 @@ int stream_class::playstream_url(char *path) {
 }
 
 
+float stream_class::getstream_pos() {
+    return(vlc_controller::get_position());
+}
+
+
 //
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
@@ -1318,22 +1323,15 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 
 {
     int j,ii,k,pos;
-    int buttonsize=200;
-    float buttonsizey=160.0f;
-    float yof=orgwinsizey-(buttonsizey);         // start ypos
+    int buttonsize=200;                                                         // button size
+    float buttonsizey=160.0f;                                                   // button size
+    float yof=orgwinsizey-(buttonsizey);                                        // start ypos
     float xof=0.0f;
     int lstreamoversigt_antal=9*6;
     int i=0;
-//    float ofs=0.0f;		// used to calc the text length
-//    char *lastslash;
-//    float xvgaz=0.0f;
-//    char temptxt[200];
     unsigned int sofset=0;
-    int bonline=8;                // antal pr linie
-//    float buttonzoom=0.0f;
+    int bonline=8;                                                              // antal pr linie
     float boffset;
-//    int loader_xpos,loader_ypos;
-//    char tmpfilename[200];
     char gfxfilename[200];
     char downloadfilename[200];
     char downloadfilenamelong[1024];
@@ -1341,9 +1339,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     char gfxshortname[200];
     char temptxt[200];
     char word[200];
+    char downloadfilename_last[1024];
     int antal_loaded=0;
     static int stream_oversigt_loaded_done=0;
     GLuint texture;
+    strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
@@ -1357,18 +1357,23 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           // check om der findes en downloaded icon
           strcpy(downloadfilenamelong,"");
           strcat(downloadfilenamelong,gfxfilename);
-          // check om filen findes i cache dir eller i mythtv netvision dir
-          if (file_exists(gfxfilename)) {
-            texture=loadTexture ((char *) gfxfilename);
-            if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-            antal_loaded+=1;
-          } else if (file_exists(downloadfilenamelong)) {
-             texture=loadTexture ((char *) downloadfilenamelong);
-             if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-             antal_loaded+=1;
-          } else texture=0;
+          if (strcmp(downloadfilename_last,gfxfilename)!=0) {
+            // check om filen findes i cache dir eller i mythtv netvision dir
+            if (file_exists(gfxfilename)) {
+              texture=loadTexture ((char *) gfxfilename);
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              antal_loaded+=1;
+            } else if (file_exists(downloadfilenamelong)) {
+              texture=loadTexture ((char *) downloadfilenamelong);
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              antal_loaded+=1;
+            } else texture=0;
+          } else if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+          // husk last file name
+          strcpy(downloadfilename_last,gfxfilename);
         }
       }
+      // down loading ?
       if (stream_oversigt_loaded_nr==this->streamantal()) {
         stream_oversigt_loaded=true;
         stream_oversigt_loaded_done=true;
@@ -1469,19 +1474,15 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       float fontsiz=16.0f;
       glPushMatrix();
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      //glScalef(14.0, 14.0, 1.0);
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-
       glScalef(fontsiz, fontsiz, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
       // temp
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       temptxt[17]='\0';
       glcRenderString(temptxt);
-
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
