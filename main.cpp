@@ -6698,28 +6698,31 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 
+
+                if (vis_stream_oversigt) {
+                  if (stream_key_selected>1) {
+                    stream_key_selected--;
+//                    stream_select_iconnr--;
+                  } else {
+                    if ((stream_select_iconnr>0) && (_sangley>0)) {
+                      _sangley-=RADIO_CS;
+                      stream_key_selected+=snumbersoficonline-1;	// den viste på skærm af 1 til 20
+//                      stream_select_iconnr--;			                // den rigtige valgte af 1 til cd antal
+                    }
+                  }
+                  if (stream_select_iconnr>0) stream_select_iconnr--;
+                }
+
                 printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
 
-                if (vis_stream_oversigt) {
-                    if (stream_key_selected>1) {
-                      stream_key_selected--;
-                      stream_select_iconnr--;
-                    } else {
-                        if ((stream_select_iconnr>0) && (_sangley>0)) {
-                          _sangley-=RADIO_CS;
-                          stream_key_selected+=snumbersoficonline-1;	// den viste på skærm af 1 til 20
-                          stream_select_iconnr--;			// den rigtige valgte af 1 til cd antal
-                        }
-                    }
-                }
 
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
-                    if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
-                      tvvalgtrecordnr--;
-                      tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
-                    }
+                  if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
+                    tvvalgtrecordnr--;
+                    tvsubvalgtrecordnr=aktiv_tv_oversigt.findguidetvtidspunkt(tvvalgtrecordnr,aktiv_tv_oversigt.hentprgstartklint(tvvalgtrecordnr+1,tvsubvalgtrecordnr));
+                  }
                 }
 
 /*
@@ -6789,9 +6792,7 @@ void handlespeckeypress(int key,int x,int y) {
                   radio_key_selected++;
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-
-                if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal())) {
+                if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal()-1)) {
                   if ((stream_key_selected % (snumbersoficonline*6)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
                     _sangley+=RADIO_CS;
                     stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
@@ -6801,6 +6802,9 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   stream_key_selected++;
                 }
+
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
+
 
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -6865,18 +6869,21 @@ void handlespeckeypress(int key,int x,int y) {
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
 
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
                         _sangley+=RADIO_CS;
-                        stream_select_iconnr+=fnumbersoficonline;
+//                        stream_select_iconnr+=fnumbersoficonline;
                     } else {
                         stream_key_selected+=snumbersoficonline;
-                        stream_select_iconnr+=snumbersoficonline;
+//                        stream_select_iconnr+=snumbersoficonline;
                     }
+                    if (stream_select_iconnr>0) stream_select_iconnr+=snumbersoficonline;
                 }
+
+
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) {
@@ -7018,21 +7025,19 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-
-
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
+                                                                                                    //if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
                   if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
                     if ((_sangley>0) && (stream_key_selected<=snumbersoficonline) && (stream_select_iconnr>(snumbersoficonline-1))) {
                        _sangley-=MOVIE_CS;
                        stream_select_iconnr-=snumbersoficonline;
                     } else stream_select_iconnr-=snumbersoficonline;
-
                     if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                   }
                 }
 
+                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if (vis_recorded_oversigt) {
                   if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
@@ -7895,10 +7900,11 @@ void handleKeypress(unsigned char key, int x, int y) {
 
               if (vis_stream_oversigt) {
                   hent_stream_search=true;				// start stream station search
-                  stream_key_selected=1;
-                  _sangley=0.0f;
                   sknapnr=stream_select_iconnr;   // selected
-                  do_play_stream=1;
+                  stream_key_selected=1;
+                  stream_select_iconnr=0;         // tmp
+                  _sangley=0.0f;                  
+                  do_play_stream=0;
               }
 
               // start music search
@@ -8257,7 +8263,7 @@ void update2(int value) {
         // lirc show rss stream oversigt
         if (strcmp(cmd,"KEY_TUNER")==0) {                               // show tv guide
           do_play_music_aktiv=false;							                  // sluk music info cover
-          vis_tv_oversigt=true;             		                    // vis tv oversigt
+          vis_tv_oversigt=false;             		                    // vis tv oversigt
           vis_film_oversigt=false; 						   	                  // sluk film oversigt
           vis_music_oversigt=false;  							                  // sluk music oversigt
           do_zoom_film_cover=false;
@@ -9263,6 +9269,10 @@ void update2(int value) {
               do_zoom_tvprg_aktiv_nr=tvknapnr;
               ask_tv_record=!ask_tv_record;
               if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
+          }
+          if (vis_stream_oversigt) {
+              do_zoom_stream_cover=!do_zoom_stream_cover;
+              if (debugmode & 4) fprintf(stderr,"lirc Show/hide rss stream info.\n"); else fprintf(stderr,"lirc Show/hide rss stream info.\n");
           }
         }
         // end start play
