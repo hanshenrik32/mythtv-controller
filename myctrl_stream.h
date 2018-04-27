@@ -68,8 +68,7 @@ class stream_class : vlc_controller {
         int parsexmlrssfile(char *filename);                                    // parse file from web
 //        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
-        void show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley);
-        void show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley);
+        void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 
 void *loadweb(void *data);

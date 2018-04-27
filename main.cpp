@@ -283,7 +283,7 @@ int tvknapnr=0;
 int fknapnr=0;
 int swknapnr=0;
 
-int stream_key_selected=0;
+int stream_key_selected=1;
 int stream_select_iconnr=0;
 int do_zoom_tvprg_aktiv_nr=0;
 
@@ -2798,22 +2798,31 @@ void display() {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
+        std::clock_t start;
+        start = std::clock();
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
+        std::clock_t start;
+        start = std::clock();
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
       } else if (vis_stream_oversigt) {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
-        streamoversigt.show_stream_oversigt1(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley);
+        streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
-        //if (debugmode & 4) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
-          radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
+        std::clock_t start;
+        start = std::clock();
+        radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -2825,22 +2834,27 @@ void display() {
         // show tv program info about selected program in tv guide
         //
         if ((do_zoom_tvprg_aktiv_nr)>0) {
+          std::clock_t start;
+          start = std::clock();
           glPushMatrix();
           // show info om program selected
           aktivfont.selectfont("FreeMono");
           aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
           glPopMatrix();
+          //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         }
         // show record program menu
       } else if (vis_recorded_oversigt) {
+        std::clock_t start;
+        start = std::clock();
         recordoversigt.show_recorded_oversigt1(0,0);
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
         // show radio options menu
       if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
         radiooversigt.show_radio_options();
       }
     }
-
 
     if (vis_tvrec_list) {
       glPushMatrix();
@@ -6995,7 +7009,7 @@ void handlespeckeypress(int key,int x,int y) {
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.lastradiooptselect();
 
                 printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-                
+
 
                 // stream stuf
                 if ((vis_stream_oversigt) && (show_stream_options==false)) {
@@ -8119,8 +8133,10 @@ void handleKeypress(unsigned char key, int x, int y) {
 }
 
 
-
+//
+// in use
 // lirc remove controller
+//
 
 void update2(int value) {
   char cmd[200];
@@ -8163,18 +8179,19 @@ void update2(int value) {
         }
         cmd[n]='\0';
         if (debugmode) fprintf(stderr,"Lirc say %s\n",cmd);
-        // lirc
+        // lirc vis_music_oversigt
         if (strcmp(cmd,"KEY_AUDIO")==0) {							// show music directoy
           vis_tv_oversigt=false;
           vis_film_oversigt=false;
           do_zoom_film_cover=false;
           do_zoom_stream_cover=false;
-          vis_music_oversigt=true;
+          vis_music_oversigt=true;                                    // show music oversigt
           vis_recorded_oversigt=false;
           vis_radio_oversigt=false;
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
-        // lirc
+        // lirc vis_radio_oversigt
         if (strcmp(cmd,"KEY_RADIO")==0) {							                  // show radio overview
           vis_tv_oversigt=false;
           vis_film_oversigt=false;
@@ -8185,8 +8202,9 @@ void update2(int value) {
           vis_radio_oversigt=true;
           vis_recorded_oversigt=false;
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
-        // lirc
+        // lirc vis_film_oversigt
         if (strcmp(cmd,"KEY_VIDEO")==0) {						                  // Show video overview
           vis_tv_oversigt=false;
           vis_film_oversigt=true;
@@ -8196,8 +8214,9 @@ void update2(int value) {
           do_zoom_music_cover=false;							                  // sluk zoom cd cover
           do_zoom_stream_cover=false;
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
-        // lirc
+        // lirc vis_recorded_oversigt
         if (strcmp(cmd,"KEY_PVR")==0) {                               // show recorded overview
           do_play_music_aktiv=false;							                  // sluk music info cover
           vis_tv_oversigt=false;								                    // sluk tv oversigt
@@ -8208,8 +8227,9 @@ void update2(int value) {
           vis_recorded_oversigt=true;	                  						// on recorded program oversigt
           vis_radio_oversigt=false;						   	                  // sluk radio oversigt
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
-        // lirc
+        // lirc vis_tv_oversigt
         if (strcmp(cmd,"KEY_EPG")==0) {                               // show tv guide
           do_play_music_aktiv=false;							                  // sluk music info cover
           vis_tv_oversigt=true;             		                    // vis tv oversigt
@@ -8221,7 +8241,24 @@ void update2(int value) {
           vis_recorded_oversigt=false;                							// sluk recorded program oversigt
           vis_radio_oversigt=false;						   	                  // sluk radio oversigt
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
+
+        // lirc show rss stream oversigt
+        if (strcmp(cmd,"KEY_TUNER")==0) {                               // show tv guide
+          do_play_music_aktiv=false;							                  // sluk music info cover
+          vis_tv_oversigt=true;             		                    // vis tv oversigt
+          vis_film_oversigt=false; 						   	                  // sluk film oversigt
+          vis_music_oversigt=false;  							                  // sluk music oversigt
+          do_zoom_film_cover=false;
+          do_zoom_music_cover=false;							                  // sluk zoom cd cover
+          do_zoom_stream_cover=false;
+          vis_recorded_oversigt=false;                							// sluk recorded program oversigt
+          vis_radio_oversigt=false;						   	                  // sluk radio oversigt
+          vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=true;                                 // show rss stream oversigt
+        }
+
         // lirc
         if ((strcmp(cmd,"KEY_HOME")==0) || (strcmp(cmd,"KEY_MEDIA")==0)) {
           do_play_music_aktiv=false;							                  // sluk music info cover
@@ -8234,6 +8271,7 @@ void update2(int value) {
           vis_recorded_oversigt=false;						                  // sluk recorded program oversigt
           vis_radio_oversigt=false;				   			                  // sluk radio oversigt
           vis_nyefilm_oversigt=false;
+          vis_stream_oversigt=false;                                 // show rss stream oversigt
         }
         // lirc
         // Pause music player

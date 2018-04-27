@@ -30,8 +30,6 @@ extern int screensizey;
 extern int screeny;
 extern int debugmode;
 extern unsigned int musicoversigt_antal;
-extern int stream_key_selected;
-extern int stream_select_iconnr;
 extern int do_stream_icon_anim_icon_ofset;
 extern GLuint radiooptions,radiooptionsmask;			//
 extern GLuint _textureIdback;  					// back icon
@@ -956,7 +954,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
     }
 
-    if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
+    //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
@@ -1151,9 +1149,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 //
 
 void *loadweb(void *data) {
-  if (debugmode & 4) printf("Start web loader thread\n");
+  if (debugmode & 4) printf("Start web icon loader thread\n");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("Stop web loader thread\n");
+  if (debugmode & 4) printf("Stop web icon loader thread\n");
 }
 
 
@@ -1192,7 +1190,7 @@ int stream_class::loadweb_stream_iconoversigt()
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
+          //printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -1274,6 +1272,7 @@ void *load_all_stream_gfx(void *data) {
                       if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
                     total_antal++;
+                  // https
                   } else if (strncmp(tmpfilename,"https://",8)==0) {
                     strcpy(lastfile,downloadfilename);
                     get_webfilename(downloadfilename,tmpfilename);
@@ -1315,7 +1314,7 @@ void stream_class::playstream(char *url) {
 }
 
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley)
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
 
 {
     int j,ii,k,pos;
@@ -1353,20 +1352,22 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       if (gfxshortnamepointer) {
         strcpy(gfxshortname,gfxshortnamepointer);
       }
-      if (strcmp(gfxfilename,"")!=0) {
-        // check om der findes en downloaded icon
-        strcpy(downloadfilenamelong,"");
-        strcat(downloadfilenamelong,gfxfilename);
-        // check om filen findes i cache dir eller i mythtv netvision dir
-        if (file_exists(gfxfilename)) {
-          texture=loadTexture ((char *) gfxfilename);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else if (file_exists(downloadfilenamelong)) {
-           texture=loadTexture ((char *) downloadfilenamelong);
-           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-           antal_loaded+=1;
-        } else texture=0;
+      if (get_texture(stream_oversigt_loaded_nr)==0) {
+        if (strcmp(gfxfilename,"")!=0) {
+          // check om der findes en downloaded icon
+          strcpy(downloadfilenamelong,"");
+          strcat(downloadfilenamelong,gfxfilename);
+          // check om filen findes i cache dir eller i mythtv netvision dir
+          if (file_exists(gfxfilename)) {
+            texture=loadTexture ((char *) gfxfilename);
+            if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+            antal_loaded+=1;
+          } else if (file_exists(downloadfilenamelong)) {
+             texture=loadTexture ((char *) downloadfilenamelong);
+             if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+             antal_loaded+=1;
+          } else texture=0;
+        }
       }
       if (stream_oversigt_loaded_nr==this->streamantal()) {
         stream_oversigt_loaded=true;
@@ -1378,8 +1379,9 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       stream_oversigt_loaded_nr=0;
       stream_oversigt_loaded=false;
     }
-    // draw icons
+    // calc start pos (ofset)
     sofset=(_sangley/40)*8;
+    // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -1527,688 +1529,4 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       glPopMatrix();
     }
 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// old
-
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley)
-
-{
-
-  int lstreamoversigt_antal;
-  int i=0;
-  float ofs=0.0f;		// used to calc the text length
-  float yof=0.0f;
-  float xof=0.0f;
-//  char *lastslash;
-  float xvgaz=0.0f;
-  char temptxt[200];
-  unsigned int sofset=0;
-  int bonline;
-  float buttonsizex=68.0f;
-  float buttonsizey=58.0f;
-  float buttonzoom=0.0f;
-  float boffset;
-  int loader_xpos,loader_ypos;
-//  char tmpfilename[200];
-  char gfxfilename[200];
-  char downloadfilename[200];
-  char downloadfilenamelong[1024];
-  char *gfxshortnamepointer;
-  char gfxshortname[200];
-//  char tmp[200];
-  static int stream_oversigt_loaded_done=0;
-  GLuint texture;
-
-  static int antal_loaded=0;
-  bool finish=false;
-
-  if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-
-      if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
-      else strcpy(gfxfilename,"");
-
-      strcpy(gfxshortname,"");
-      gfxshortnamepointer=strrchr(gfxfilename,'.');	// get last char = type of file
-      if (gfxshortnamepointer) {
-        strcpy(gfxshortname,gfxshortnamepointer);
-      }
-
-      if (strcmp(gfxfilename,"")!=0) {
-        // check om der findes en downloaded icon
-        strcpy(downloadfilenamelong,"");
-        strcat(downloadfilenamelong,gfxfilename);
-        // check om filen findes i cache dir eller i mythtv netvision dir
-        if (file_exists(gfxfilename)) {
-          texture=loadTexture ((char *) gfxfilename);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else if (file_exists(downloadfilenamelong)) {
-          texture=loadTexture ((char *) downloadfilenamelong);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else texture=0;
-      }
-
-      //if (debugmode & 4) printf("load mythtv named %s or %s \n", gfxfilename,downloadfilenamelong);
-
-      if (stream_oversigt_loaded_nr==this->streamantal()) {
-        stream_oversigt_loaded=true;
-        stream_oversigt_loaded_done=true;
-      } else stream_oversigt_loaded_nr++;
-  }
-
-  // check om vi har loaded alle images in thread
-  //if (antal_loaded>=this->streamantal()) finish=true; else finish=false;
-
-//	    printf("gfxloaded %d \n",gfx_loaded);
-
-  if (!(gfx_loaded)) {
-    stream_oversigt_loaded_nr=0;
-    stream_oversigt_loaded=false;
-  }
-
-
-
-
-  switch(screen_size) {
-      case 1: xof=-370.0f;
-              yof= 260.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;					// numbers of icons in x direction
-              xvgaz=-800.0f;					// 800
-              lstreamoversigt_antal=5*5;			// numbers of icons in y direction
-              buttonsizex=88.0f;				// 68
-              buttonsizey=68.0f;
-              break;
-      case 2: xof=-380.0f;
-              yof= 270.0f;				// 250.0f
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-850.0f;
-              lstreamoversigt_antal=6*4;
-              buttonsizex=88.0f;
-              buttonsizey=78.0f;
-              break;
-      case 3: xof=-660.0f;			// mode 3 1080p
-              yof= 336.0f;
-              sofset=(_mangley/41)*9;
-              bonline=9;
-              xvgaz=-1000.0f;			// -1000
-              lstreamoversigt_antal=9*6;
-              buttonsizex=84.0f+5;		// 84
-              buttonsizey=74.0f+5;		// 74
-              break;
-      case 4: xof=-660.0f;
-              yof= 336.0f;
-              sofset=(_mangley/41)*8;
-              bonline=8;
-              xvgaz=-1000.0f;
-              lstreamoversigt_antal=8*5;
-              buttonsizex=96.0f;
-              buttonsizey=86.0f;
-              break;
-      default:
-              xof=-380.0;
-              yof= 250.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-800.0f;
-              lstreamoversigt_antal=5*4;
-              buttonsizex=68.0f;
-              buttonsizey=58.0f;
-              break;
-  }
-  boffset=buttonsizey*1.4;
-  //
-  // hvis der ikke brugfes nvidia core ret størelser
-  //
-  if (cur_avail_mem_kb==0) {
-      buttonsizex-=20.0f;
-      buttonsizey-=20.0f;
-  }
-
-  // viser det antal streams som kan være på skærmen på en gang
-  // ellers er der et start ofset (sofset) som beskriver start ofset fra array (bliver rettet andet sted) pilup/pildown osv osv
-  while((i<lstreamoversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
-    switch(screen_size) {
-      case 1:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-370;
-        }
-        break;
-      case 2:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-380;
-        }
-        break;
-      case 3:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-660;
-        }
-        break;
-      case 4:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-660;
-        }
-        break;
-    }
-
-
-    glLoadIdentity();
-    glEnable(GL_TEXTURE_2D);
-    // draw mask
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-    if (stack[i+sofset]->textureId) {
-      glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    } else {
-      glBindTexture(GL_TEXTURE_2D,icon_mask);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
-    glTranslatef(xof,yof,xvgaz);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-
-    glLoadIdentity();
-    glBlendFunc(GL_ONE, GL_ONE);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-    // stream har et icon in db
-    if (stack[i+sofset]->textureId) {
-        // draw icon no indhold
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;
-        else buttonzoom=12.0f;					// default 0.0f
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-/*
-        //
-        // draw icon mask
-        //
-        glLoadIdentity();
-        glBindTexture(GL_TEXTURE_2D,onlinestreammask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glBlendFunc(GL_ONE, GL_ONE);
-        // To be able to render transparent PNGs, you have to enable blending like this
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=0.0f;
-        else buttonzoom=-12.0f;
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-*/
-
-        //
-        // draw icon indhold
-        //
-        glLoadIdentity();
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBlendFunc(GL_ONE, GL_ONE);
-        // To be able to render transparent PNGs, you have to enable blending like this
-//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;		// 0.0f
-        else buttonzoom=12.0f;		// -12.0f
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom)+5, -(buttonsizey+buttonzoom)+5, 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom)+5,  (buttonsizey+buttonzoom)-5, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( (buttonsizex+buttonzoom)-5,  (buttonsizey+buttonzoom)-5, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( (buttonsizex+buttonzoom)-5, -(buttonsizey+buttonzoom)+5, 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-    } else {
-        glBindTexture(GL_TEXTURE_2D,normal_icon);		// default icon
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;
-        else buttonzoom=12.0f;
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-    }
-
-    // draw numbers in group
-    if (stack[i+sofset]->feed_group_antal>0) {
-        // show numbers in group
-        glLoadIdentity();
-        glDisable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTranslatef(xof+10,yof-36,xvgaz);		// +38 - 27
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(14.0, 14.0, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-        sprintf(temptxt,"%4d",stack[i+sofset]->feed_group_antal);
-        glcRenderString(temptxt);
-    }
-
-
-    buttonzoom=0.0f;
-
-    strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-    //lastslash=strrchr(temptxt,'/');
-    //if (lastslash) strcpy(temptxt,lastslash+1);
-//    temptxt[13]=0;
-//    txtbrede=t3dDrawWidth(musicoversigt[i+sofset].album_name);
-
-    glPushMatrix();
-
-    float ytextofset=0.0f;
-    int ii,j,k,pos;
-    ii=pos=0;
-    char word[16000];
-
-    if (strlen(temptxt)<=14) {
-      glLoadIdentity();
-      ofs=(strlen(temptxt)/2)*9;
-      switch(screen_size) {
-        case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
-                break;
-        case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
-                break;
-        default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
-                break;
-      }
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(14.0, 14.0, 1.0);
-      glcRenderString(temptxt);
-    } else {
-
-        temptxt[26]='\0';
-        glLoadIdentity();
-        ofs=(strlen(temptxt)/2)*9;
-        switch(screen_size) {
-            case 3: glTranslatef(xof-50,  yof-60-4 ,xvgaz);
-                    break;
-            case 4: glTranslatef(xof-50,  yof-60-10 ,xvgaz);
-                    break;
-            default:glTranslatef(xof-50,  yof-60 ,xvgaz);
-                    break;
-        }
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(14.0, 14.0, 1.0);
-
-
-        while((1) && (ytextofset<=10.0)) {		// max 2 linier
-            j=0;
-            while(!isspace(temptxt[ii])) {
-              if (temptxt[ii]=='\0') break;
-              word[j]=temptxt[ii];
-              ii++;
-              j++;
-            }
-
-            word[j]='\0';	// j = word length
-
-            if (j>13) {		// print char by char
-              k=0;
-              while(word[k]!='\0') {
-                if (pos>=13) {
-                  if ( k != 0 ) glcRenderChar('-');
-                  pos=0;
-                  ytextofset+=15.0f;
-                  glLoadIdentity();
-                  ofs=0;
-                  switch(screen_size) {
-                      case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                              break;
-                      case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                              break;
-                      default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                              break;
-                  }
-                  glRasterPos2f(0.0f, 0.0f);
-                  glScalef(14.0, 14.0, 1.0);
-                }
-                glcRenderChar(word[k]);
-                pos++;
-                k++;
-              }
-            } else {
-              if (pos+j>13) {	// word doesn't fit line
-                ytextofset+=15.0f;
-                pos=0;
-                glLoadIdentity();
-                ofs=(int) (strlen(word)/2)*9;
-                switch(screen_size) {
-                    case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                            break;
-                    case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                            break;
-                    default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                            break;
-                }
-                glRasterPos2f(0.0f, 0.0f);
-                glScalef(14.0, 14.0, 1.0);
-              }
-              glcRenderString(word);
-              pos+=j;
-            }
-            if (pos<12) {
-              glcRenderChar(' ');
-              pos++;
-            }
-            if (temptxt[ii]=='\0') break;
-            ii++;	// skip space
-        }
-    }
-/*
-     // lav ramme om valgte radio station
-     if (i+1==radio_key_selected) {
-          // lav valgte border
-          glLoadIdentity();
-          glTranslatef((xof), (yof), xvgaz);
-          glColor3f(1.0f,1.0f,1.0f);
-          glBindTexture(GL_TEXTURE_2D,0);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-          // left
-          glTexCoord2f(0.0, 0.0); glVertex3f(-72, -75, 0.0);
-          glTexCoord2f(0.0, 1.0); glVertex3f(-75, -75, 0.0);
-          glTexCoord2f(1.0, 1.0); glVertex3f(-75, 75-15, 0.0);
-          glTexCoord2f(1.0, 0.0); glVertex3f(-72, 75-15, 0.0);
-          // right
-          glTexCoord2f(0.0, 0.0); glVertex3f(72, -75, 0.0);
-          glTexCoord2f(0.0, 1.0); glVertex3f(75, -75, 0.0);
-          glTexCoord2f(1.0, 1.0); glVertex3f(75, 75-15, 0.0);
-          glTexCoord2f(1.0, 0.0); glVertex3f(72, 75-15, 0.0);
-
-          // button
-          glVertex3f(-75, -72, 0.0);
-          glVertex3f(-75, -75, 0.0);
-          glVertex3f(75, -75, 0.0);
-          glVertex3f(75, -72, 0.0);
-
-          // top
-          glVertex3f(-75, 72-15, 0.0);
-          glVertex3f(-75, 75-15, 0.0);
-          glVertex3f(75, 75-15, 0.0);
-          glVertex3f(75, 72-15, 0.0);
-          glEnd();
-    }
-
-*/
-
-    glPopMatrix();
-    i++;
-
-  //
-  // hvis der ikke brugfes nvidia core ret størelser
-  //
-
-    switch(screen_size) {
-        case 1: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else  xof+=(buttonsizex*1.6);
-                break;
-        case 2: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.6);
-                break;
-        case 3: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.7);
-                break;
-        case 4: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.65);
-                break;
-        default:xof+=(buttonsizex*2)+8;
-                break;
-    }
-  }
-
-  // show loading status
-  if (stream_oversigt_loaded_nr<this->streamantal()) {
-    switch (screen_size) {
-          case 1: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          case 2: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          case 3: loader_xpos=-380;
-                  loader_ypos=-230+2;
-                  break;
-          case 4: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          default:loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-    }
-
-    glLoadIdentity();
-
-    glEnable(GL_TEXTURE_2D);
-//    glDisable(GL_BLEND);
-//    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-//    glBlendFunc(GL_ONE, GL_ONE);
-
-
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-/*
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading_mask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-*/
-    glLoadIdentity();
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-    glLoadIdentity();
-    glTranslatef(loader_xpos-36,loader_ypos-16,-600);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-
-    sprintf(temptxt,"%4d of %4d ",this->stream_oversigt_nowloading,this->streamantal());
-
-    glcRenderString(temptxt);
-  }
-
-  if (this->streamantal()<1) {
-
-    glLoadIdentity();
-    glTranslatef(-10,10,-600);
-
-    if (_textureIdloading1) {
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glBlendFunc(GL_ONE,GL_ZERO);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(-170, -60, 0.0);
-      glTexCoord2f(0, 1); glVertex3f(-170,  60, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 170,  60, 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 170, -60, 0.0);
-      glEnd(); //End quadrilateral coordinates
-    }
-    glLoadIdentity();
-    glTranslatef(-52,6,-300);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-    sprintf(temptxt,"No stations loaded.");
-    glcRenderString(temptxt);
-
-    if (configmythtvver==0) {
-        glLoadIdentity();
-        glTranslatef(-52,-6,-300);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(8.0, 8.0, 1.0);
-        strcpy(temptxt,"No backend ");
-        strcat(temptxt,configmysqlhost);
-        glcRenderString(temptxt);
-    }
-  }
 }
