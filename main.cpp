@@ -4065,7 +4065,7 @@ void display() {
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"DESC %-30s",streamoversigt.get_stream_desc(sknapnr));
+        sprintf(temptxt,"%-30s",streamoversigt.get_stream_desc(sknapnr));
         temptxt[30]='\0';
         glcRenderString(temptxt);
         glPopMatrix();
@@ -4087,7 +4087,6 @@ void display() {
         }
       }
     }
-
 
 
     //
@@ -4834,7 +4833,7 @@ void display() {
           streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr-1));
         }
       }
-      // reset play function
+                                              // reset play function to new select
       startstream=false;                      // start kun 1 instans
       do_play_stream=false;                   //
     }

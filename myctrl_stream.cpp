@@ -125,16 +125,17 @@ void stream_class::softstopstream() {
 int stream_class::playstream(int nr) {
     char path[PATH_MAX];                                  // max path length from os
     strcpy(path,"");
-    stream_is_playing=true;
     strcat(path,get_stream_url(nr));
+    stream_is_playing=true;
     vlc_controller::playmedia(path);
+    return(1);
 }
-
 
 
 int stream_class::playstream_url(char *path) {
     stream_is_playing=true;
     vlc_controller::playwebmedia(path);
+    return(1);
 }
 
 
