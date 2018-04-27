@@ -3923,8 +3923,6 @@ void display() {
 
             }
 
-
-
             // play list status
 
             glPushMatrix();
@@ -3935,7 +3933,6 @@ void display() {
             glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
             glcRenderString(music_playsong[configland]);
             glPopMatrix();
-
 
             glPushMatrix();
             glTranslatef(700.0f, 540.0f, 0.0f);
@@ -3948,8 +3945,6 @@ void display() {
             glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
             glcRenderString(temptxt);
             glPopMatrix();
-
-
 
 
             // show next song in status window
@@ -4048,12 +4043,29 @@ void display() {
         glcRenderString(temptxt);
         glPopMatrix();
 
+        // play position
+        playtime=streamoversigt.getstream_pos()*1000;
+        playtime_hour=(playtime/60)/60;
+        playtime_min=(playtime/60);
+        playtime_sec=(int) playtime % 60;
+
         glPushMatrix();
-        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+96, 0);
+        glColor3f(0.6f, 0.6f, 0.6f);
+        // show artist name
+        sprintf(temptxt,"Playing     %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
+        temptxt[40]=0;
+        glTranslatef((orgwinsizex/4)+20,  (orgwinsizey/2)+96, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glcRenderString(temptxt);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48, 0);
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"%-30s",streamoversigt.get_stream_desc(sknapnr));
+        sprintf(temptxt,"DESC %-30s",streamoversigt.get_stream_desc(sknapnr));
         temptxt[30]='\0';
         glcRenderString(temptxt);
         glPopMatrix();
@@ -4073,7 +4085,6 @@ void display() {
           glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+400+200 , 480, 0.0);
           glEnd();
         }
-
       }
     }
 
