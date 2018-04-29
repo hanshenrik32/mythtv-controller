@@ -360,7 +360,6 @@ int vis_error_songnr;
 
 int do_stream_icon_anim_icon_ofset=0;                   //
 int stream_icon_anim_icon_ofset=0;                      //
-unsigned int streamoversigt_antal=0;                            // antal radio stationer
 
 unsigned int configrss_ofset=0;
 
@@ -4044,7 +4043,8 @@ void display() {
         glPopMatrix();
 
         // play position
-        playtime=streamoversigt.getstream_pos()*1000;
+        if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
+        else playtime=0;
         playtime_hour=(playtime/60)/60;
         playtime_min=(playtime/60);
         playtime_sec=(int) playtime % 60;
@@ -4052,7 +4052,8 @@ void display() {
         glPushMatrix();
         glColor3f(0.6f, 0.6f, 0.6f);
         // show artist name
-        sprintf(temptxt,"Playing     %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
+        if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing     %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
+        else sprintf(temptxt,"                                        ");
         temptxt[40]=0;
         glTranslatef((orgwinsizex/4)+20,  (orgwinsizey/2)+96, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
@@ -4804,7 +4805,7 @@ void display() {
         // start play stream or show rss page
         if (debugmode & 4) {
           printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
-          printf("Start stream. Player is internal \n",sknapnr);
+          printf("Start stream. Player is internal \n");
         }
         // stop playing stream
         if (streamoversigt.stream_is_playing) {
@@ -7903,7 +7904,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   sknapnr=stream_select_iconnr;   // selected
                   stream_key_selected=1;
                   stream_select_iconnr=0;         // tmp
-                  _sangley=0.0f;                  
+                  _sangley=0.0f;
                   do_play_stream=0;
               }
 
@@ -8176,7 +8177,7 @@ void update2(int value) {
   numbers_cd_covers_on_line=8;        // 9
   numbers_film_covers_on_line=8;
   numbers_radio_covers_on_line=8;
-  numbers_stream_covers_on_line=9;
+  numbers_stream_covers_on_line=8;
 
 
   if ((sock!=0) && (sock!=-1)) {
@@ -8506,11 +8507,7 @@ void update2(int value) {
           if (do_show_setup) {
              if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
           }
-
-
         }
-
-
         if (strcmp(cmd,"KEY_DOWN")==0) {
           // lirc
           // down key
@@ -8597,26 +8594,22 @@ void update2(int value) {
           }
           if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
 
-/*
-          // old ver
-          if ((vis_radio_oversigt) && (show_radio_options==false)) {
-              if (((int) radio_select_iconnr<(int) radiomoversigt_antal-5) && (radio_icon_anim_icon_ofset==0)) {
-                if (radio_select_iconnr+numbers_radio_covers_on_line>16) {		// skal vi scroll liste up
-                  do_radio_icon_anim_icon_ofset=1;
-                  _rangley+=RADIO_CS;
-                  //radio_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
-                  if ((radio_key_selected-numbers_radio_covers_on_line)>0) radio_key_selected-=numbers_radio_covers_on_line;
-                }
-                radio_key_selected+=numbers_radio_covers_on_line;
-                radio_select_iconnr+=numbers_radio_covers_on_line;
-              }
-          }
-*/
           // down key
           // stream stuf
           if (vis_stream_oversigt) {
+            if ((vis_stream_oversigt) && (show_stream_options==false) && ((stream_select_iconnr+numbers_stream_covers_on_line)<streamoversigt.streamantal())) {
+              if (stream_key_selected>=20) {
+                _rangley+=RADIO_CS;
+                stream_select_iconnr+=numbers_stream_covers_on_line;
+              } else {
+                stream_key_selected+=numbers_stream_covers_on_line;
+                stream_select_iconnr+=numbers_stream_covers_on_line;
+              }
+            }
+/*
+
               switch (screen_size) {
-                  case 1: if ((stream_select_iconnr<(int ) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                  case 1: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                             if (stream_select_iconnr+numbers_stream_covers_on_line>11) {		// skal vi scroll liste up
                               do_stream_icon_anim_icon_ofset=1;
                               _rangley+=RADIO_CS;
@@ -8627,7 +8620,7 @@ void update2(int value) {
                             stream_select_iconnr+=numbers_stream_covers_on_line;
                           }
                           break;
-                  case 2: if ((stream_select_iconnr<(int ) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                  case 2: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                               if (stream_select_iconnr+numbers_stream_covers_on_line>13) {		// skal vi scroll liste up
                                   do_stream_icon_anim_icon_ofset=1;
                                   _rangley+=RADIO_CS;
@@ -8639,7 +8632,7 @@ void update2(int value) {
                           }
                           break;
                   case 3:
-                          if (((int) stream_select_iconnr<(int) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                          if (((int) stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                               if (stream_select_iconnr+numbers_stream_covers_on_line>19) {		// skal vi scroll liste up
                                   do_stream_icon_anim_icon_ofset=1;
                                   _rangley+=RADIO_CS;
@@ -8650,7 +8643,7 @@ void update2(int value) {
                               stream_select_iconnr+=numbers_stream_covers_on_line;
                           }
                           break;
-                  case 4: if ((stream_select_iconnr<(int) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                  case 4: if ((stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                               if (stream_select_iconnr+numbers_stream_covers_on_line>17) {		// skal vi scroll liste up
                                   do_stream_icon_anim_icon_ofset=1;
                                   _rangley+=RADIO_CS;
@@ -8662,7 +8655,9 @@ void update2(int value) {
                           }
                           break;
                   }
+*/
           }
+
           // lirc
           // down key
           if (vis_recorded_oversigt) {
@@ -9113,8 +9108,8 @@ void update2(int value) {
           // right key
           // stream
           if (vis_stream_oversigt) {
-            if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
-              if (stream_select_iconnr<(int) streamoversigt_antal) {
+            if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
+              if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                 if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
                   _rangley+=MOVIE_CS;
                   stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
@@ -9706,7 +9701,7 @@ void update(int value) {
                         // stream stuf
                         if (vis_stream_oversigt) {
                             switch (screen_size) {
-                                case 1: if ((stream_select_iconnr<(int ) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                                case 1: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                             if (stream_select_iconnr+numbers_stream_covers_on_line>11) {		// skal vi scroll liste up
                                                 do_stream_icon_anim_icon_ofset=1;
                                                 _rangley+=RADIO_CS;
@@ -9717,7 +9712,7 @@ void update(int value) {
                                             stream_select_iconnr+=numbers_stream_covers_on_line;
                                         }
                                         break;
-                                case 2: if ((stream_select_iconnr<(int ) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                                case 2: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                             if (stream_select_iconnr+numbers_stream_covers_on_line>13) {		// skal vi scroll liste up
                                                 do_stream_icon_anim_icon_ofset=1;
                                                 _rangley+=RADIO_CS;
@@ -9729,7 +9724,7 @@ void update(int value) {
                                         }
                                         break;
                                 case 3:
-                                        if (((int) stream_select_iconnr<(int) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                                        if (((int) stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                             if (stream_select_iconnr+numbers_stream_covers_on_line>19) {		// skal vi scroll liste up
                                                 do_stream_icon_anim_icon_ofset=1;
                                                 _rangley+=RADIO_CS;
@@ -9740,7 +9735,7 @@ void update(int value) {
                                             stream_select_iconnr+=numbers_stream_covers_on_line;
                                         }
                                         break;
-                                case 4: if ((stream_select_iconnr<(int) streamoversigt_antal-5) && (stream_icon_anim_icon_ofset==0)) {
+                                case 4: if ((stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                             if (stream_select_iconnr+numbers_stream_covers_on_line>17) {		// skal vi scroll liste up
                                                 do_stream_icon_anim_icon_ofset=1;
                                                 _rangley+=RADIO_CS;
@@ -10556,8 +10551,8 @@ void update(int value) {
                         if (vis_stream_oversigt) {
                           switch (screen_size) {
                             case 1:
-                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
-                                if (stream_select_iconnr<(int) streamoversigt_antal) {
+                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
+                                if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                                   if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
                                     _rangley+=MOVIE_CS;
                                     stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
@@ -10570,8 +10565,8 @@ void update(int value) {
                               }
                               break;
                             case 2:
-                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt_antal) {
+                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
+                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                                       if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
                                           _rangley+=MOVIE_CS;
                                           stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
@@ -10584,8 +10579,8 @@ void update(int value) {
                               }
                               break;
                             case 3:
-                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt_antal) {
+                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
+                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                                       if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
                                           _rangley+=MOVIE_CS;
                                           stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
@@ -10598,8 +10593,8 @@ void update(int value) {
                               }
                               break;
                             case 4:
-                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt_antal-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt_antal) {
+                              if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
+                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                                       if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
                                           _rangley+=MOVIE_CS;
                                           stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
@@ -12054,8 +12049,8 @@ int check_radio_stations_icons() {
 
 int main(int argc, char** argv) {
 
-    printf("Build date  : %u\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %u\n", (unsigned long) &__BUILD_NUMBER);
+    printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
 
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
