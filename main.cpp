@@ -266,7 +266,7 @@ bool do_zoom_stream=false;                              //
 bool show_wlan_select=false;
 
 bool do_zoom_film_cover=false;
-bool do_zoom_stream_cover=false;
+bool do_zoom_stream_cover=false;                        // show played cover
 bool vis_movie_options=false;
 bool vis_movie_sort_option=false;
 
@@ -8179,6 +8179,7 @@ void update2(int value) {
   numbers_radio_covers_on_line=8;
   numbers_stream_covers_on_line=8;
 
+  char temptxt[200];
 
   if ((sock!=0) && (sock!=-1)) {
     while ((ret=lirc_nextcode(&code))==0 && code!=NULL) {
@@ -8606,56 +8607,6 @@ void update2(int value) {
                 stream_select_iconnr+=numbers_stream_covers_on_line;
               }
             }
-/*
-
-              switch (screen_size) {
-                  case 1: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
-                            if (stream_select_iconnr+numbers_stream_covers_on_line>11) {		// skal vi scroll liste up
-                              do_stream_icon_anim_icon_ofset=1;
-                              _rangley+=RADIO_CS;
-                              //stream_select_iconnr-=numbers_stream_covers_on_line;		// husk at trække fra da vi står samme sted
-                              if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
-                            }
-                            stream_key_selected+=numbers_stream_covers_on_line;
-                            stream_select_iconnr+=numbers_stream_covers_on_line;
-                          }
-                          break;
-                  case 2: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
-                              if (stream_select_iconnr+numbers_stream_covers_on_line>13) {		// skal vi scroll liste up
-                                  do_stream_icon_anim_icon_ofset=1;
-                                  _rangley+=RADIO_CS;
-                                  //stream_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
-                                  if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
-                              }
-                              stream_key_selected+=numbers_stream_covers_on_line;
-                              stream_select_iconnr+=numbers_stream_covers_on_line;
-                          }
-                          break;
-                  case 3:
-                          if (((int) stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
-                              if (stream_select_iconnr+numbers_stream_covers_on_line>19) {		// skal vi scroll liste up
-                                  do_stream_icon_anim_icon_ofset=1;
-                                  _rangley+=RADIO_CS;
-                                  //stream select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
-                                  if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
-                              }
-                              stream_key_selected+=numbers_stream_covers_on_line;
-                              stream_select_iconnr+=numbers_stream_covers_on_line;
-                          }
-                          break;
-                  case 4: if ((stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
-                              if (stream_select_iconnr+numbers_stream_covers_on_line>17) {		// skal vi scroll liste up
-                                  do_stream_icon_anim_icon_ofset=1;
-                                  _rangley+=RADIO_CS;
-                                  //stream_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
-                                  if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
-                              }
-                              stream_key_selected+=numbers_stream_covers_on_line;
-                              stream_select_iconnr+=numbers_stream_covers_on_line;
-                          }
-                          break;
-                  }
-*/
           }
 
           // lirc
@@ -8676,7 +8627,6 @@ void update2(int value) {
           // lirc
           // down key
           if (vis_tv_oversigt) {
-
             // tv overview
             // if indside tv overoview
             if (vis_tv_oversigt) {
@@ -9151,7 +9101,8 @@ void update2(int value) {
             do_zoom_radio=!do_zoom_radio;
           }
           if (vis_stream_oversigt) {
-
+            do_zoom_stream_cover=false;
+            sknapnr=0;
           }
           if (do_zoom_film_cover) {
             do_zoom_film_cover=false;
@@ -9266,9 +9217,74 @@ void update2(int value) {
               if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
           }
           if (vis_stream_oversigt) {
-              do_zoom_stream_cover=!do_zoom_stream_cover;
-              if (debugmode & 4) fprintf(stderr,"lirc Show/hide rss stream info.\n"); else fprintf(stderr,"lirc Show/hide rss stream info.\n");
+              //do_zoom_stream_cover=!do_zoom_stream_cover;
+              hent_stream_search=true;				                                  // start stream station search
+              sknapnr=stream_select_iconnr;                                   // selected
+              stream_key_selected=1;
+              stream_select_iconnr=0;         // tmp
+              _sangley=0.0f;
+              do_play_stream=0;
           }
+
+
+          // stream oversigt do it
+          if ((vis_stream_oversigt) && (sknapnr>=0)) {
+              //if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr,streamoversigt.get_stream_groupantal(sknapnr),streamoversigt.type,streamoversigt.streamantal());
+              if (streamoversigt.type==0) {
+                strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
+                streamoversigt.clean_stream_oversigt();
+                if (debugmode & 4) fprintf(stderr,"stream nr %d name %s \n ",sknapnr,temptxt);
+                streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+                do_play_stream=false;
+              } else if (streamoversigt.type==1) {
+                if (sknapnr>0) do_play_stream=1;						// select button do play
+                // do back
+                if (sknapnr==0) {
+                  streamoversigt.clean_stream_oversigt();
+                  streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                  //streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),streamoversigt.get_stream_path(sknapnr));
+                  do_play_stream=false;
+                  stream_key_selected=1;
+                  stream_select_iconnr=0;
+                  _sangley=0.0f;
+                }
+              } else {
+                // back button
+                fprintf(stderr,"stream nr %d \n ",sknapnr-1);
+                if ((sknapnr)==0) {
+                  if (streamoversigt.type==2) {
+                    // one level up
+                    streamoversigt.clean_stream_oversigt();
+                    streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *)"");
+                    do_play_stream=false;
+                    do_play_stream=false;
+                    stream_key_selected=1;
+                    stream_select_iconnr=0;
+                    _sangley=0.0f;
+                  } else {
+                    // jump to top
+                    streamoversigt.clean_stream_oversigt();
+                    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                    do_play_stream=false;
+                    do_play_stream=false;
+                    stream_key_selected=1;
+                    stream_select_iconnr=0;
+                    _sangley=0.0f;
+                  }
+                }
+              }
+              // play stream
+              if ((sknapnr>=0) && (do_play_stream)) {
+                if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
+                  startstream=true;
+                  sknapnr+=1;
+                } else {
+                  startstream=true;
+                  sknapnr+=1;
+                }
+              }
+          }
+
         }
         // end start play
 
@@ -9341,12 +9357,14 @@ void update2(int value) {
         if (strcmp(cmd,"KEY_STOP")==0) {
           // stop all music
           do_stop_music=true;
-          if (do_play_stream) {
-            do_stop_music=true;
-          }
           // stop movie
-          //film_oversigt.stopmovie();
-          stopmovie=true;
+          film_oversigt.stopmovie();
+          if (streamoversigt.stream_is_playing) {
+            // stop player
+            streamoversigt.stopstream();
+            do_zoom_stream_cover=false;                                          // close window again after stop play
+            do_zoom_stream=false;
+          }
         }
 
         if (strcmp(cmd,"KEY_CHANNELUP")==0) {
@@ -10825,7 +10843,9 @@ void update(int value) {
                     if (!remove("mythtv-controler.lock")) {
                       if (debugmode) fprintf(stderr,"No lock file.\n");
                     }
+                    system("/sbin/shutdown -P");                    
                     exit(2);				// QUIT program
+
                   }
                 }
             }
