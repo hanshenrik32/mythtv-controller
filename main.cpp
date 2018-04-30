@@ -4829,7 +4829,15 @@ void display() {
               vis_error_timeout=60;
             }
           }
+          // update db
+          streamoversigt.update_rss_nr_of_view(streamoversigt.get_stream_url(sknapnr-1));
+          // set played flag
+          streamoversigt.set_rss_new(sknapnr-1,false);
         } else {
+          // update db
+          streamoversigt.update_rss_nr_of_view(streamoversigt.get_stream_url(sknapnr-1));
+          // set played flag
+          streamoversigt.set_rss_new(sknapnr-1,false);
           // start playing stream by libvlc
           streamoversigt.playstream_url(streamoversigt.get_stream_url(sknapnr-1));
         }
@@ -10843,7 +10851,7 @@ void update(int value) {
                     if (!remove("mythtv-controler.lock")) {
                       if (debugmode) fprintf(stderr,"No lock file.\n");
                     }
-                    system("/sbin/shutdown -P");                    
+                    system("/sbin/shutdown -P");
                     exit(2);				// QUIT program
 
                   }
