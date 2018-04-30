@@ -24,6 +24,7 @@ struct stream_oversigt_type {
     char feed_streamurl[feed_url+1];
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
+    bool nyt;
     GLuint textureId;
     long intnr;
 };
@@ -45,6 +46,8 @@ class stream_class : vlc_controller {
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
         int type;
         bool gfx_loaded;					                                              //
+        void update_rss_nr_of_view(char *url);                                  //
+        void set_rss_new(int nr,bool ny) { stack[nr]->nyt=ny; }
         char *get_stream_name(int nr) { return (stack[nr]->feed_name); }
         char *get_stream_desc(int nr) { return (stack[nr]->feed_desc); }
         char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
@@ -68,7 +71,7 @@ class stream_class : vlc_controller {
         int parsexmlrssfile(char *filename);                                    // parse file from web
 //        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
-        float getstream_pos();        
+        float getstream_pos();
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 

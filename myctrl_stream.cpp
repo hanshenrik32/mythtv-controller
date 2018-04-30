@@ -9,6 +9,7 @@
 #include <pthread.h>                   // multi thread support
 #include <libxml/parser.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -144,6 +145,26 @@ float stream_class::getstream_pos() {
 }
 
 
+void stream_class::update_rss_nr_of_view(char *url) {
+  // mysql vars
+  char sqlinsert[32768];
+  MYSQL *conn;
+  MYSQL_RES *res,*res1;
+  MYSQL_ROW row;
+  char *database = (char *) "mythconverg";
+  conn=mysql_init(NULL);
+  // get homedir
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    sprintf(sqlinsert,"update mythconverg.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
+    mysql_query(conn,sqlinsert);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    mysql_close(conn);
+  }
+}
+
+
 //
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
@@ -259,6 +280,10 @@ int stream_class::parsexmlrssfile(char *filename) {
   char sqlinsert[32768];
   char *database = (char *) "mythconverg";
   bool recordexist=false;
+  time_t raw_tid;
+  struct tm *opret_dato;
+  char rssopretdato[200];
+
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -274,6 +299,12 @@ int stream_class::parsexmlrssfile(char *filename) {
   document = xmlReadFile(filename, NULL, 0);            // open xml file
   // if exist do all the parse and update db
   // it use REPLACE in mysql to create/update records if changed in xmlfile
+
+  raw_tid=time(NULL);
+  opret_dato=localtime(&raw_tid);
+  strftime(rssopretdato,28,"%F %T",opret_dato);
+
+
   if ((document) && (conn)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     if (conn) {
@@ -365,6 +396,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 subnode2=subnode2->next;
               }
+
               // check if record exist
               if (strcmp(rssvideolink,"")!=0) {
                 recordexist=false;
@@ -378,8 +410,8 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 // creoate record if not exist
                 if (!(recordexist)) {
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
-                  //printf("sql=%s\n",sqlinsert);
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+                  printf("sql=%s\n",sqlinsert);
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
                 }
@@ -463,7 +495,8 @@ int stream_class::parsexmlrssfile(char *filename) {
               }
             }
             if (!(recordexist)) {
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+              //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               mysql_query(conn,sqlinsert);
               res = mysql_store_result(conn);
             }
@@ -748,6 +781,22 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Vergecast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Elektronista',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Thirdear',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
 
 
 
@@ -953,6 +1002,22 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Vergecast',NULL,NULL,'Vergecast',0,0,NULL,'http://feeds.feedburner.com/ThisIsMyNextPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Elektronista',NULL,NULL,'Elektronista',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3843152',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Thirdear',NULL,NULL,'Thirdear',0,0,NULL,'https://thirdear.podbean.com/feed/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
 
         mysql_close(conn);
         // download new rrs files we just insert in db
@@ -969,17 +1034,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL) from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       //strcat(sqlselect,"' group by path order by path,title asc");
       strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title ASC");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
@@ -1015,7 +1080,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                         stack[antal]->feed_path_antal=0;
                         stack[antal]->textureId=0;
                         stack[antal]->intnr=0;
-
+                        stack[antal]->nyt=false;
+                        // top level
                         if (getart==0) {
                           strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
                           strncpy(stack[antal]->feed_name,row[0],feed_namelength);
@@ -1062,6 +1128,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                     break;
                             case 2: if (row[5]) strcpy(tmpfilename,row[5]);
                                     break;
+                          }
+
+                          // test antal afspillinger this 0 set som new rss
+                          if (row[9]) {
+                            if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
                           }
 
                           if (strlen(tmpfilename)>7) {
@@ -1469,6 +1540,20 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
         glcRenderString(temptxt);
+        glPopMatrix();
+      }
+
+      if (stack[i+sofset]->nyt) {
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glTranslatef(xof+150,yof+14,0);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(14.0, 14.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        //sprintf(temptxt,"NEW");
+        glcRenderString("NEW");
         glPopMatrix();
       }
 
