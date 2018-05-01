@@ -2212,6 +2212,7 @@ void show_background() {
 //
 
 static bool do_update_xmltv_show=false;
+static bool do_update_rss_show=true;
 
 void display() {
     // used by xmltv updater func
@@ -2219,6 +2220,9 @@ void display() {
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
+    static bool do_update_rss=false;
+    static bool firsttime_rssupdate=false;                          // only used first time
+
 
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2353,6 +2357,16 @@ void display() {
       do_update_xmltv_show=true;                            // show we are updating
       firsttime_xmltvupdate=false;                          // only used first time
     }
+
+    if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
+      if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
+      lasttoday=today;                                      // rember last update
+      do_update_rss=true;                                  // do update rss
+      do_update_rss_show=true;                            // show we are updating rss
+      firsttime_rssupdate=false;                         // only used first time
+    }
+
+
 
     glPushMatrix();
     // background picture
@@ -2814,7 +2828,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
-        streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
+        streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected,do_update_rss_show);
         glPopMatrix();
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
@@ -5389,6 +5403,16 @@ void display() {
       //do_update_xmltv_show=false;
     }
 
+    if (do_update_rss) {
+      // call update xmltv multi phread
+      update_rss_phread_loader();
+
+      //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+      do_update_rss=false;
+      //do_update_xmltv_show=false;
+    }
+
+
 /*  don't wait!
  *  start processing buffered OpenGL routines
  */
@@ -7889,6 +7913,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                   update_xmltv_phread_loader();
                 }
               }
+              if (vis_stream_oversigt) {
+                do_update_rss_show=true;
+              }
+
               break;
             case 13:
               if (debugmode) {
@@ -11106,10 +11134,16 @@ void *datainfoloader_movie(void *data) {
 void *datainfoloader_stream(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading stream info from rss feed.\n");
   if (strcmp(configbackend,"mythtv")==0) {
-    //streamoversigt.loadrssfile();                                                // download rss files (())
-    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");              // load all stream from rss files
+                                                                                // update all
+    streamoversigt.loadrssfile();                                               // download rss files (())
+    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
+  } else {
+                                                                                // update all
+    streamoversigt.loadrssfile();                                               // download rss files (())
+    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
   }
   if (debugmode & 4) printf("loader thread done loaded stream stations \n");
+  do_update_rss_show=false;
   pthread_exit(NULL);
 }
 
@@ -11153,6 +11187,22 @@ void *update_xmltv_phread_loader() {
   if (true) {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_xmltv,NULL);
+    if (rc2) {
+      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+  }
+}
+
+
+//
+// rss loader start from main loop then trigged by date
+//
+
+void *update_rss_phread_loader() {
+  if (true) {
+    pthread_t loaderthread2;           // load tvguide xml file in to db
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
     if (rc2) {
       printf("ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
