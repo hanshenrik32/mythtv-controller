@@ -196,10 +196,12 @@ int stream_class::loadrssfile() {
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
-    while ((row = mysql_fetch_row(res)) != NULL) {
-      recantal=atoi(row[0]);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        recantal=atoi(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
     strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
@@ -411,7 +413,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                 // creoate record if not exist
                 if (!(recordexist)) {
                   sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                  printf("sql=%s\n",sqlinsert);
+                  printf(".");
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
                 }
@@ -495,6 +497,7 @@ int stream_class::parsexmlrssfile(char *filename) {
               }
             }
             if (!(recordexist)) {
+              printf(".");
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               mysql_query(conn,sqlinsert);
@@ -1169,20 +1172,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                   } else strcpy(tmpfilename,"");
                                 }
                                 strcpy(tmpfilename,downloadfilenamelong);
-//                                if ((strcmp(lasttmpfilename,tmpfilename)==0) && (antal>1)) loadstatus=false;
-/*
-                                if ((loadstatus) && (!(file_exists(downloadfilenamelong)))) {
-	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
-                                  if ((strcmp(lasttmpfilename,tmpfilename)==false) && (loadstatus=true)) {
-                                    if (loadstatus=get_webfile(tmpfilename,downloadfilenamelong)) {
-                                      strcpy(tmpfilename,downloadfilenamelong);
-                                    } else {
-                                      // fejl load
-                                      strcpy(tmpfilename,"");
-                                    }
-                                  }
-                                } else strcpy(tmpfilename,downloadfilenamelong);
-                                */
                               }
                           } else strcpy(tmpfilename,"");
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	// mythtv icon file
@@ -1391,7 +1380,7 @@ void stream_class::playstream(char *url) {
 }
 
 
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected,bool do_update_rss_show)
 
 {
     int j,ii,k,pos;
@@ -1573,15 +1562,38 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       i++;
       xof+=(buttonsize+10);
     }
+    // show rss file loading status
+    if (do_update_rss_show) {
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
+      glEnd();
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+20,95,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"RSS FEED LOAD");
+      glcRenderString(temptxt);
+      glPopMatrix();
+    }
 
-    // show loader status
-    if (stream_oversigt_loaded_nr<streamoversigt.streamantal()) {
+    // show icon gfx loader status
+    // do not show while loading new rss
+    if ((do_update_rss_show==false) && (stream_oversigt_loaded_nr<streamoversigt.streamantal())) {
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -1593,6 +1605,15 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
+
+      glTranslatef(1680+20,140,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"Loading icons");
+      glcRenderString(temptxt);
+      glPopMatrix();
+
+      glPushMatrix();
       glTranslatef(1680+20,95,0);
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
@@ -1600,8 +1621,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glcRenderString(temptxt);
       glPopMatrix();
     }
-
-    if (i==0) {
+    // no records loaded error
+    if ((i==0) && (do_update_rss_show==false)) {
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
       glPushMatrix();

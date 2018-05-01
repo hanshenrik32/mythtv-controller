@@ -20,6 +20,7 @@
 // default 2 * 60 min
 //
 const int doxmltvupdateinterval=60*60*2;
+const int dorssupdateinterval=60*60*2;
 
 // screen saver options
 
@@ -93,5 +94,8 @@ const char *tv_icon_anim_files[]={"tv","tv1"};
 
 void *radio_check_statusloader(void *data);
 void *update_xmltv_phread_loader();
+
+void *datainfoloader_stream(void *data);
+void *update_rss_phread_loader();
 
 #endif
