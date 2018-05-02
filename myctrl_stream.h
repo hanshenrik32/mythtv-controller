@@ -41,6 +41,7 @@ class stream_class : vlc_controller {
         bool stream_oversigt_loaded;
         int stream_oversigt_loaded_nr;
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
+        int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
         int parsexmlrssfile(char *filename);                                    // parse file from web
     public:
         bool stream_is_playing;

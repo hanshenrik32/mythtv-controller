@@ -181,7 +181,10 @@ int stream_class::loadrssfile() {
   MYSQL *conn;
   MYSQL_RES *res,*res1;
   MYSQL_ROW row;
+  time_t timenow;
   char *database = (char *) "mythconverg";
+  struct stat attr;
+  time(&timenow);
   conn=mysql_init(NULL);
   // get homedir
   getuserhomedir(homedir);
@@ -192,7 +195,6 @@ int stream_class::loadrssfile() {
   //strcpy(sqlselect,"select * from internetcontentarticles");
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
@@ -202,13 +204,15 @@ int stream_class::loadrssfile() {
       }
       mysql_free_result(res);
     }
+    stream_rssparse_nowloading=0;
     strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
+        stream_rssparse_nowloading++;
         if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
-        if (strcmp(row[3],"")!=0) {
+        if ((row[3]) && (strcmp(row[3],"")!=0)) {
           getuserhomedir(homedir);
           strcpy(totalurl,"wget '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
@@ -220,18 +224,39 @@ int stream_class::loadrssfile() {
           strcat(totalurl,"/rss/");
           if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,".rss'");
-          // download file
-          system(totalurl);
-          // parse file
           strcpy(parsefilename,homedir);
           strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
-          // if podcast is rss
-          // if title ok and not podcast bud real rss feed
-          if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
-            // parse downloaded xmlfile now (create db records)
-            parsexmlrssfile(parsefilename);
+          stat(parsefilename, &attr);
+          if ((file_exists(parsefilename)) && (attr.st_mtime+86400<timenow)) {
+            // download rss file
+            system(totalurl);
+            // parse file
+            strcpy(parsefilename,homedir);
+            strcat(parsefilename,"/rss/");
+            strcat(parsefilename,row[3]);
+            strcat(parsefilename,".rss");
+            // if podcast is rss
+            // if title ok and not podcast bud real rss feed
+            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
+              // parse downloaded xmlfile now (create db records)
+              parsexmlrssfile(parsefilename);
+            }
+          } else if (!(file_exists(parsefilename))) {
+            // download rss file
+            system(totalurl);
+            // parse file
+            strcpy(parsefilename,homedir);
+            strcat(parsefilename,"/rss/");
+            strcat(parsefilename,row[3]);
+            strcat(parsefilename,".rss");
+            // if podcast is rss
+            // if title ok and not podcast bud real rss feed
+            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
+              // parse downloaded xmlfile now (create db records)
+              parsexmlrssfile(parsefilename);
+            }
           }
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
@@ -247,6 +272,7 @@ int stream_class::loadrssfile() {
         }
       }
       mysql_free_result(res);
+      stream_rssparse_nowloading=0;
     }
     mysql_close(conn);
   } else return(-1);
@@ -413,7 +439,6 @@ int stream_class::parsexmlrssfile(char *filename) {
                 // creoate record if not exist
                 if (!(recordexist)) {
                   sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                  printf(".");
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
                 }
@@ -497,7 +522,6 @@ int stream_class::parsexmlrssfile(char *filename) {
               }
             }
             if (!(recordexist)) {
-              printf(".");
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               mysql_query(conn,sqlinsert);
@@ -1623,12 +1647,23 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
       glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
       glEnd();
+
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+20,95,0);
+      glTranslatef(1680+6,140,0);
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"RSS FEED LOAD");
+      sprintf(temptxt,"FEED IS LOADING");
+      glcRenderString(temptxt);
+      glPopMatrix();
+
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+60,95,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"%4d",streamoversigt.stream_rssparse_nowloading);
       glcRenderString(temptxt);
       glPopMatrix();
     }
