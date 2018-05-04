@@ -846,6 +846,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
 
 
+
+
  //       sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('sex-i-kaelderen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
  //      mysql_query(conn,sqlselect);
  //       res = mysql_store_result(conn);
@@ -853,6 +855,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Her går det godt',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
 
 
 
@@ -1104,6 +1110,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 //        mysql_query(conn,sqlselect);
 //        res = mysql_store_result(conn);
 //        mysql_free_result(res);
+
+
+        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Her går det godt',NULL,NULL,'Her går det godt',0,0,NULL,'http://www.spreaker.com/show/2093919/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
  
 
 
