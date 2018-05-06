@@ -2213,6 +2213,7 @@ void show_background() {
 
 static bool do_update_xmltv_show=false;
 static bool do_update_rss_show=true;
+static bool do_update_rss=false;
 
 void display() {
     // used by xmltv updater func
@@ -2220,10 +2221,7 @@ void display() {
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv=false;
-    static bool do_update_rss=false;
     static bool firsttime_rssupdate=false;                          // only used first time
-
-
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
@@ -4723,8 +4721,8 @@ void display() {
 
     // update rss db
     if (do_save_setup_rss) {
-      rssstreamoversigt.save_rss_data();                                           // save rss data in db
-      streamoversigt.loadrssfile();                                                // download rss files (())
+      rssstreamoversigt.save_rss_data();                                        // save rss data in db
+      streamoversigt.loadrssfile(1);                                            // download rss files (())
       do_save_setup_rss=false;
     }
 
@@ -7915,6 +7913,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if (vis_stream_oversigt) {
                 do_update_rss_show=true;
+                do_update_rss=true;
               }
 
               break;
@@ -11135,11 +11134,11 @@ void *datainfoloader_stream(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading stream info from rss feed.\n");
   if (strcmp(configbackend,"mythtv")==0) {
                                                                                 // update all
-    streamoversigt.loadrssfile();                                               // download rss files (())
+    streamoversigt.loadrssfile(0);                                               // download rss files (())
     streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
   } else {
                                                                                 // update all
-    streamoversigt.loadrssfile();                                               // download rss files (())
+    streamoversigt.loadrssfile(0);                                               // download rss files (())
     streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
   }
   if (debugmode & 4) printf("loader thread done loaded stream stations \n");

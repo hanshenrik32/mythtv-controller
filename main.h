@@ -20,7 +20,7 @@
 // default 2 * 60 min
 //
 const int doxmltvupdateinterval=60*60*2;
-const int dorssupdateinterval=60*60*2;
+const int dorssupdateinterval=60*60;
 
 // screen saver options
 
