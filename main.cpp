@@ -11132,15 +11132,8 @@ void *datainfoloader_movie(void *data) {
 
 void *datainfoloader_stream(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading stream info from rss feed.\n");
-  if (strcmp(configbackend,"mythtv")==0) {
-                                                                                // update all
-    streamoversigt.loadrssfile(0);                                               // download rss files (())
-    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-  } else {
-                                                                                // update all
-    streamoversigt.loadrssfile(0);                                               // download rss files (())
-    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-  }
+  streamoversigt.loadrssfile(0);                                              // download rss files (())
+  streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
   if (debugmode & 4) printf("loader thread done loaded stream stations \n");
   do_update_rss_show=false;
   pthread_exit(NULL);
@@ -12137,7 +12130,11 @@ int main(int argc, char** argv) {
           printf("\n\n");
           printf("-f For full screen mode\n");
           printf("-b For border less screen mode\n");
-          printf("-p For program guide screen mode\n");
+          printf("-p For program guide mode\n");
+          printf("-m For music mode\n");
+          printf("-r For radio mode\n");
+          printf("-f For film mode\n");
+          printf("-s For podcast mode\n");
           printf("-h This help screen\n");
           exit(0);
       }
@@ -12202,12 +12199,9 @@ int main(int argc, char** argv) {
       }
     }
     if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
-
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-
     strcpy(configbackend_tvgraber_old,"");
-
     if (strncmp(configbackend,"xbmc",4)==0) {
       // music loader
       pthread_t loaderthread;           // the load
@@ -12216,7 +12210,6 @@ int main(int argc, char** argv) {
           printf("ERROR; return code from pthread_create() is %d\n", rc);
           exit(-1);
       }
-
       // movie loader
       pthread_t loaderthread1;           // the load
       int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
@@ -12224,6 +12217,7 @@ int main(int argc, char** argv) {
         printf("ERROR; return code from pthread_create() is %d\n", rc1);
         exit(-1);
       }
+
     }
 
     if (strncmp(configbackend,"mythtv",5)==0) {
@@ -12245,15 +12239,13 @@ int main(int argc, char** argv) {
           exit(-1);
         }
       }
-      // stram loader
-      //if (configmythtvver>0) {
-        pthread_t loaderthread2;           // the load
-        int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
-        if (rc2) {
-          printf("ERROR; return code from pthread_create() is %d\n", rc2);
-      	  exit(-1);
-        }
-      //}
+    }
+    // stream loader
+    pthread_t loaderthread2;           // the load
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
+    if (rc2) {
+      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
     }
 
     // Load the VLC engine
