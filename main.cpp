@@ -12118,25 +12118,26 @@ int check_radio_stations_icons() {
 
 
 int main(int argc, char** argv) {
-
+    Display *dpy=NULL;
+    Window rootxwindow;
     printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
     printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
-
+    printf("\n\nMythtv-controller Version ");
+    printf("%s",SHOWVER);
+    printf("\n");
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
-          printf("\n\nMythtv-controller Version ");
-//          printf("%s",SHOWVER);
-          printf("\n\n");
-          printf("-f For full screen mode\n");
-          printf("-b For border less screen mode\n");
-          printf("-p For program guide mode\n");
-          printf("-m For music mode\n");
-          printf("-r For radio mode\n");
-          printf("-f For film mode\n");
-          printf("-s For podcast mode\n");
-          printf("-h This help screen\n");
-          exit(0);
+        printf("\n");
+        printf("-f For full screen mode\n");
+        printf("-b For border less screen mode\n");
+        printf("-p For program guide mode\n");
+        printf("-m For music mode\n");
+        printf("-r For radio mode\n");
+        printf("-f For film mode\n");
+        printf("-s For podcast mode\n");
+        printf("-h This help screen\n\n");
+        exit(0);
       }
     }
 
@@ -12147,31 +12148,31 @@ int main(int argc, char** argv) {
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
-        printf("mythtv - Backend\n");
-        printf("Mythtv database version %d\n",configmythtvver);
-        printf("configmysqluser   =%s \n",configmysqluser);
-        //printf("configmysqlpass   =%s \n",configmysqlpass);
-        printf("configmysqlhost   =%s \n",configmysqlhost);
-        printf("config movie path =%s \n",configmoviepath);
-        printf("config music path =%s \n",configmusicpath);
-        printf("config record path=%s \n",configrecordpath);
-        printf("config hostname   =%s \n",confighostname);
-        printf("config fontname   =%s \n",configfontname);
-        printf("Sound interface   =%s \n",configsoundoutport);
-        printf("Default player    =%s \n",configdefaultplayer);
+      printf("mythtv - Backend\n");
+      printf("Mythtv database version %d\n",configmythtvver);
+      printf("configmysqluser   =%s \n",configmysqluser);
+      //printf("configmysqlpass   =%s \n",configmysqlpass);
+      printf("configmysqlhost   =%s \n",configmysqlhost);
+      printf("config movie path =%s \n",configmoviepath);
+      printf("config music path =%s \n",configmusicpath);
+      printf("config record path=%s \n",configrecordpath);
+      printf("config hostname   =%s \n",confighostname);
+      printf("config fontname   =%s \n",configfontname);
+      printf("Sound interface   =%s \n",configsoundoutport);
+      printf("Default player    =%s \n",configdefaultplayer);
     }
     if (strncmp(configbackend,"xbmc",4)==0) {
-        printf("XBMC - Backend\n");
-        printf("sqluser           =%s \n",configmysqluser);
-        //printf("sqlpass           =%s \n",configmysqlpass);
-        printf("host              =%s \n",configmysqlhost);
-        printf("config movie path =%s \n",configmoviepath);
-        printf("config music path =%s \n",configmusicpath);
-        printf("config record path=%s \n",configrecordpath);
-        printf("config hostname   =%s \n",confighostname);
-        printf("config fontname   =%s \n",configfontname);
-        printf("Sound interface   =%s \n",configsoundoutport);
-        printf("Default player    =%s \n",configdefaultplayer);
+      printf("XBMC - Backend\n");
+      printf("sqluser           =%s \n",configmysqluser);
+      //printf("sqlpass           =%s \n",configmysqlpass);
+      printf("host              =%s \n",configmysqlhost);
+      printf("config movie path =%s \n",configmoviepath);
+      printf("config music path =%s \n",configmusicpath);
+      printf("config record path=%s \n",configrecordpath);
+      printf("config hostname   =%s \n",confighostname);
+      printf("config fontname   =%s \n",configfontname);
+      printf("Sound interface   =%s \n",configsoundoutport);
+      printf("Default player    =%s \n",configdefaultplayer);
     }
     if (debugmode) {
       fprintf(stderr,"Debug mode selected ");
@@ -12207,8 +12208,8 @@ int main(int argc, char** argv) {
       pthread_t loaderthread;           // the load
       int rc=pthread_create(&loaderthread,NULL,xbmcdatainfoloader,NULL);
       if (rc) {
-          printf("ERROR; return code from pthread_create() is %d\n", rc);
-          exit(-1);
+        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        exit(-1);
       }
       // movie loader
       pthread_t loaderthread1;           // the load
@@ -12285,8 +12286,6 @@ int main(int argc, char** argv) {
     printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
     printf("Screen mode %d\n",screen_size);
 
-    Display *dpy=NULL;
-    Window rootxwindow;
     // get first monitor screen size (pixel)
 
     dpy = XOpenDisplay(":0");
