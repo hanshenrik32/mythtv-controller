@@ -3476,7 +3476,7 @@ int txmltvgraber_createconfig() {
       case 24:sprintf(exebuffer,"'\nall\n' |");
               break;
       case 25:// tv_grab_zz_sdjson
-              sprintf(exebuffer,"");
+              exebuffer[0]='\0';
               break;
       default: sprintf(exebuffer,"'\nall\n' |");
     }
@@ -4035,7 +4035,7 @@ int order_channel_list_in_tvguide_db() {
 
 
 void show_setup_tv_graber(int startofset) {
-    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","l\ørdag","s\øndag"};
+    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","l\\ørdag","s\\øndag"};
     const char *weekdaysuk[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};

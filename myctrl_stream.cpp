@@ -9,6 +9,7 @@
 #include <pthread.h>                   // multi thread support
 #include <libxml/parser.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -30,14 +31,14 @@ extern int screensizey;
 extern int screeny;
 extern int debugmode;
 extern unsigned int musicoversigt_antal;
-extern int stream_key_selected;
-extern int stream_select_iconnr;
 extern int do_stream_icon_anim_icon_ofset;
 extern GLuint radiooptions,radiooptionsmask;			//
 extern GLuint _textureIdback;  					// back icon
 extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
+
+extern int _sangley;
 
 extern GLuint _textureIdloading,_textureIdloading1;
 //extern GLuint _textureIdloading_mask;
@@ -125,16 +126,42 @@ void stream_class::softstopstream() {
 int stream_class::playstream(int nr) {
     char path[PATH_MAX];                                  // max path length from os
     strcpy(path,"");
-    stream_is_playing=true;
     strcat(path,get_stream_url(nr));
+    stream_is_playing=true;
     vlc_controller::playmedia(path);
+    return(1);
 }
-
 
 
 int stream_class::playstream_url(char *path) {
     stream_is_playing=true;
     vlc_controller::playwebmedia(path);
+    return(1);
+}
+
+
+float stream_class::getstream_pos() {
+    return(vlc_controller::get_position());
+}
+
+
+void stream_class::update_rss_nr_of_view(char *url) {
+  // mysql vars
+  char sqlinsert[32768];
+  MYSQL *conn;
+  MYSQL_RES *res,*res1;
+  MYSQL_ROW row;
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // get homedir
+  if (conn) {
+    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+    sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
+    mysql_query(conn,sqlinsert);
+    res = mysql_store_result(conn);
+    mysql_free_result(res);
+    mysql_close(conn);
+  }
 }
 
 
@@ -143,7 +170,7 @@ int stream_class::playstream_url(char *path) {
 // in db if mediaURL have url this is the rss feed loaded from rss file
 //
 
-int stream_class::loadrssfile() {
+int stream_class::loadrssfile(bool updaterssfile) {
   // mysql vars
   char sqlselect[2048];
   char sqlinsert[32768];
@@ -154,7 +181,10 @@ int stream_class::loadrssfile() {
   MYSQL *conn;
   MYSQL_RES *res,*res1;
   MYSQL_ROW row;
-  char *database = (char *) "mythconverg";
+  time_t timenow;
+  char *database = (char *) "mythtvcontroller";
+  struct stat attr;
+  time(&timenow);
   conn=mysql_init(NULL);
   // get homedir
   getuserhomedir(homedir);
@@ -165,21 +195,24 @@ int stream_class::loadrssfile() {
   //strcpy(sqlselect,"select * from internetcontentarticles");
   if (conn) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
-    while ((row = mysql_fetch_row(res)) != NULL) {
-      recantal=atoi(row[0]);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        recantal=atoi(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
+    stream_rssparse_nowloading=0;
     strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
+        stream_rssparse_nowloading++;
         if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
-        if (strcmp(row[3],"")!=0) {
+        if ((row[3]) && (strcmp(row[3],"")!=0)) {
           getuserhomedir(homedir);
           strcpy(totalurl,"wget '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
@@ -191,18 +224,39 @@ int stream_class::loadrssfile() {
           strcat(totalurl,"/rss/");
           if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,".rss'");
-          // download file
-          system(totalurl);
-          // parse file
           strcpy(parsefilename,homedir);
           strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
-          // if podcast is rss
-          // if title ok and not podcast bud real rss feed
-          if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
-            // parse downloaded xmlfile now (create db records)
-            parsexmlrssfile(parsefilename);
+          stat(parsefilename, &attr);
+          if ((file_exists(parsefilename)) && (attr.st_mtime+86400<timenow)) {
+            // download rss file
+            system(totalurl);
+            // parse file
+            strcpy(parsefilename,homedir);
+            strcat(parsefilename,"/rss/");
+            strcat(parsefilename,row[3]);
+            strcat(parsefilename,".rss");
+            // if podcast is rss
+            // if title ok and not podcast bud real rss feed
+            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
+              // parse downloaded xmlfile now (create db records)
+              parsexmlrssfile(parsefilename);
+            }
+          } else if ((!(file_exists(parsefilename))) || (updaterssfile)) {
+            // download rss file
+            system(totalurl);
+            // parse file
+            strcpy(parsefilename,homedir);
+            strcat(parsefilename,"/rss/");
+            strcat(parsefilename,row[3]);
+            strcat(parsefilename,".rss");
+            // if podcast is rss
+            // if title ok and not podcast bud real rss feed
+            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
+              // parse downloaded xmlfile now (create db records)
+              parsexmlrssfile(parsefilename);
+            }
           }
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
@@ -218,6 +272,7 @@ int stream_class::loadrssfile() {
         }
       }
       mysql_free_result(res);
+      stream_rssparse_nowloading=0;
     }
     mysql_close(conn);
   } else return(-1);
@@ -251,8 +306,12 @@ int stream_class::parsexmlrssfile(char *filename) {
   int rssseason;
   char result[2048+1];
   char sqlinsert[32768];
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   bool recordexist=false;
+  time_t raw_tid;
+  struct tm *opret_dato;
+  char rssopretdato[200];
+
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -268,6 +327,12 @@ int stream_class::parsexmlrssfile(char *filename) {
   document = xmlReadFile(filename, NULL, 0);            // open xml file
   // if exist do all the parse and update db
   // it use REPLACE in mysql to create/update records if changed in xmlfile
+
+  raw_tid=time(NULL);
+  opret_dato=localtime(&raw_tid);
+  strftime(rssopretdato,28,"%F %T",opret_dato);
+
+
   if ((document) && (conn)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     if (conn) {
@@ -359,6 +424,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 subnode2=subnode2->next;
               }
+
               // check if record exist
               if (strcmp(rssvideolink,"")!=0) {
                 recordexist=false;
@@ -372,8 +438,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 // creoate record if not exist
                 if (!(recordexist)) {
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage);
-                  //printf("sql=%s\n",sqlinsert);
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
                 }
@@ -457,7 +522,8 @@ int stream_class::parsexmlrssfile(char *filename) {
               }
             }
             if (!(recordexist)) {
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+              //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               mysql_query(conn,sqlinsert);
               res = mysql_store_result(conn);
             }
@@ -492,7 +558,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     bool online;
     int getart=0;
     bool loadstatus=true;
@@ -501,22 +567,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (conn) {
-      if (!(mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
-          if (mysql_query(conn,"CREATE database mythconverg")!=0) printf("mysql create error.\n");
-          res = mysql_store_result(conn);
-          sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythconverg.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
-          if (mysql_query(conn,sqlselect)!=0) printf("mysql create error.\n");
-          res = mysql_store_result(conn);
-          sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythconverg.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
-          if (mysql_query(conn,sqlselect)!=0) printf("mysql create error.\n");
-          res = mysql_store_result(conn);
+      if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
           dbexist=false;
       }
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test about rss table exist
-      mysql_query(conn,"SELECT feedtitle from mythconverg.internetcontentarticles limit 1");
+      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.internetcontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
@@ -532,323 +589,451 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         // thumbnail   = name of an local image file
         // commandline = Program to fetch content with
         // updated     = Time of last update
+        if (mysql_query(conn,"CREATE database mythtvcontroller")!=0) printf("mysql db create error.\n");
+        res = mysql_store_result(conn);
+        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql create table error.\n");
+        res = mysql_store_result(conn);
+        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql create table error.\n");
+        res = mysql_store_result(conn);
+        // create default master rss feed source
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('CNET',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Anders Lund Madsen i Den Yderste By',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('So ein Ding',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Verdens Bedste Filmklub',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('The Verge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Dynamo',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Jupiter Broadcasting',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Bonderøven',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Kontant',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Movieclips Coming Soon',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('NASA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Troldspejlet Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('GameSpot',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Droner og kanoner',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('DEN GRÅ SIDE',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Bitch Sesh',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('2 Dope Queens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Ramajetterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('De Sorte Spejdere',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Nak & æd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Ubådssagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Videnskabens Verden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Why You Push That Button',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Gametest',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Gravity Assist',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('TED',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('TV 2 - Tech',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Hva så?! med Christian Fuhlendorff',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Mads & Monopolet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Det røde rum',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Den Korte Weekendavis',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Radio24syv Nyheder',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Selvsving',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Lille Nørd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('DR Sofus',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Best of YouTube',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('CBS This Morning',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('CBS Evening News',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Vergecast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Elektronista',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Thirdear',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Linux Action News',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Linux Action Show',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('GNU World Order',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('The Command Line Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('sex-i-kaelderen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Her går det godt',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('he RC Newb Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
 
         // create default master rss feed source
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql create error.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Aftenshowet',NULL,NULL,'Aftenshowet',0,0,NULL,'https://www.dr.dk/mu/Feed/aftenshowet.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('CNET',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('CNET',NULL,NULL,'CNET',0,0,NULL,'http://feed.cnet.com/feed/podcast/all/hd.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Anders Lund Madsen i Den Yderste By',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Anders Lund Madsen i Den Yderste By',NULL,NULL,'Anders lund massen i den udereste by',0,0,NULL,'http://www.dr.dk/mu/Feed/anders-lund-madsen-i-den-yderste-by.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('So ein Ding',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('So ein Ding',NULL,NULL,'So ein Ding',0,0,NULL,'https://www.dr.dk/mu/Feed/so-ein-ding?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Verdens Bedste Filmklub',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Verdens Bedste Filmklub',NULL,NULL,'Verdens Bedste Filmklub',0,0,NULL,'http://lytbar.dk/wordpress/?feed=rss2&cat=7',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,NULL,'Krager og Drager - Dansk Game of Thrones Podcast',0,0,NULL,'http://www.kragerogdrager.dk/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('The Verge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The Verge',NULL,NULL,'The Verge',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Dynamo',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Dynamo',NULL,NULL,'Dynamo',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UC7SDsqJba5428-EOBZWOn3w',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Jupiter Broadcasting',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Tech snap',NULL,NULL,'Tech snap',0,0,NULL,'https://youtube.com/feeds/videos.xml?channel_id=UCHugE6eRhqB9_AZQh4DDbIw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Bonderøven',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Bonderøven',NULL,NULL,'Bonderøven',0,0,NULL,'https://www.dr.dk/mu/Feed/bonderoven-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Kontant',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Kontant',NULL,NULL,'Kontant',0,0,NULL,'https://www.dr.dk/mu/Feed/kontant-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Movieclips Coming Soon',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Movieclips Coming Soon',NULL,NULL,'Movieclips Coming Soon',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCkR0GY0ue02aMyM-oxwgg9g',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('NASA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Troldspejlet Podcast',NULL,NULL,'Troldspejlet Podcast',0,0,NULL,'https://www.dr.dk/mu/feed/troldspejlet-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Troldspejlet Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('GameSpot',NULL,NULL,'GameSpot',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCbu2SsF-Or3Rsn3NxqODImw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('GameSpot',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('ISS Live FEED',NULL,NULL,'ISS Live FEED',0,0,NULL,'https://www.youtube.com/watch?v=RtU_mdL2vBM',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TechSNAP',NULL,NULL,'TechSNAP',0,0,NULL,'https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Droner og kanoner',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('DEN GRÅ SIDE',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Droner og kanoner',NULL,NULL,'Droner og kanoner',0,0,NULL,'https://www.dr.dk/mu/Feed/droner-og-kanoner.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('DEN GRÅ SIDE',NULL,NULL,'DEN GRÅ SIDE',0,0,NULL,'http://www.spreaker.com/show/2108328/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('PersonalityHacker',NULL,NULL,'PersonalityHacker',0,0,NULL,'http://feeds.feedburner.com/PersonalityHackerPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Bitch Sesh',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Bitch Sesh',NULL,NULL,'Bitch Sesh',0,0,NULL,'http://rss.earwolf.com/bitch-sesh',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('2 Dope Queens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('2 Dope Queens',NULL,NULL,'2 Dope Queens',0,0,NULL,'http://feeds.wnyc.org/2dopequeens',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Ramajetterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Ramajetterne',NULL,NULL,'Ramajetterne',0,0,NULL,'https://www.dr.dk/mu/Feed/ramajetterne-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('De Sorte Spejdere',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('De Sorte Spejdere',NULL,NULL,'De Sorte Spejdere',0,0,NULL,'http://www.dr.dk/mu/Feed/de-sorte-spejdere-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Nak & æd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Nak & æd',NULL,NULL,'Nak & æd',0,0,NULL,'http://www.dr.dk/mu/Feed/nak-og-aed-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Ubådssagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Ubådssagen',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/ubadssagen.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Videnskabens Verden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Videnskabens Verden',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/videnskabens-verden.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-/*
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Why You Push That Button',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Why You Push That Button',NULL,NULL,'Why You Push That Button',0,0,NULL,'http://feeds.feedburner.com/WhydYouPushThatButton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-*/
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Gametest',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Gametest',NULL,NULL,'Gametest',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCuX8EWTbH--tyha5FUoBSrg',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Gravity Assist',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Gravity Assist',NULL,NULL,'Gravity Assist',0,0,NULL,'https://www.nasa.gov/rss/dyn/Gravity-Assist.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TED',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TED',NULL,NULL,'TED',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCAuUUnT6oDeKwE6v1NGQxug',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('TV 2 - Tech',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TV 2 - Tech',NULL,NULL,'TV 2 - Tech',0,0,NULL,'http://feeds.tv2.dk/beep_seneste/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontent VALUES ('Hva så?! med Christian Fuhlendorff',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Hva så?! med Christian Fuhlendorff',NULL,NULL,'Hva så?! med Christian Fuhlendorff',0,0,NULL,'http://hva-saa.podomatic.com/rss2.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
-
-
-        // create default master rss feed source
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('CNET',NULL,NULL,'CNET',0,0,NULL,'http://feed.cnet.com/feed/podcast/all/hd.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Mads & Monopolet',NULL,NULL,'Mads & Monopolet',0,0,NULL,'https://www.dr.dk/mu/feed/mads-monopolet-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Anders Lund Madsen i Den Yderste By',NULL,NULL,'Anders lund massen i den udereste by',0,0,NULL,'http://www.dr.dk/mu/Feed/anders-lund-madsen-i-den-yderste-by.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Det røde rum',NULL,NULL,'Det røde rum',0,0,NULL,'https://www.dr.dk/mu/Feed/det-roede-rum-radio.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Aftenshowet',NULL,NULL,'Aftenshowet',0,0,NULL,'https://www.dr.dk/mu/Feed/aftenshowet.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Den Korte Weekendavis',NULL,NULL,'Den Korte Weekendavis',0,0,NULL,'http://arkiv.radio24syv.dk/audiopodcast/channel/10839671',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('So ein Ding',NULL,NULL,'So ein Ding',0,0,NULL,'https://www.dr.dk/mu/Feed/so-ein-ding?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Radio24syv Nyheder',NULL,NULL,'Radio24syv Nyheder',0,0,NULL,'http://arkiv.radio24syv.dk/audiopodcast/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Verdens Bedste Filmklub',NULL,NULL,'Verdens Bedste Filmklub',0,0,NULL,'http://lytbar.dk/wordpress/?feed=rss2&cat=7',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Selvsving',NULL,NULL,'Selvsving',0,0,NULL,'https://www.dr.dk/mu/Feed/selvsving?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,NULL,'Krager og Drager - Dansk Game of Thrones Podcast',0,0,NULL,'http://www.kragerogdrager.dk/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Lille Nørd',NULL,NULL,'Lille Nørd',0,0,NULL,'https://www.dr.dk/mu/Feed/lille-noerd?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('The Verge',NULL,NULL,'The Verge',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCddiUEpeqJcYeBxX1IVBKvQ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('DR Sofus',NULL,NULL,'DR Sofus',0,0,NULL,'https://www.dr.dk/mu/Feed/sofus-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Dynamo',NULL,NULL,'Dynamo',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UC7SDsqJba5428-EOBZWOn3w',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Best of YouTube',NULL,NULL,'DR Sofus',0,0,NULL,'http://feeds.feedburner.com/boyt',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Tech snap',NULL,NULL,'Tech snap',0,0,NULL,'https://youtube.com/feeds/videos.xml?channel_id=UCHugE6eRhqB9_AZQh4DDbIw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('CBS This Morning',NULL,NULL,'CBS This Morning',0,0,NULL,'http://cbsradionewsfeed.com/rss.php?id=149&ud=12',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Bonderøven',NULL,NULL,'Bonderøven',0,0,NULL,'https://www.dr.dk/mu/Feed/bonderoven-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('CBS Evening News',NULL,NULL,'CBS Evening News',0,0,NULL,'http://cbsradionewsfeed.com/rss.php?id=126&ud=12',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Kontant',NULL,NULL,'Kontant',0,0,NULL,'https://www.dr.dk/mu/Feed/kontant-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Vergecast',NULL,NULL,'Vergecast',0,0,NULL,'http://feeds.feedburner.com/ThisIsMyNextPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Movieclips Coming Soon',NULL,NULL,'Movieclips Coming Soon',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCkR0GY0ue02aMyM-oxwgg9g',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Elektronista',NULL,NULL,'Elektronista',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3843152',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Troldspejlet Podcast',NULL,NULL,'Troldspejlet Podcast',0,0,NULL,'https://www.dr.dk/mu/feed/troldspejlet-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Thirdear',NULL,NULL,'Thirdear',0,0,NULL,'https://thirdear.podbean.com/feed/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('GameSpot',NULL,NULL,'GameSpot',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCbu2SsF-Or3Rsn3NxqODImw',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Linux Action News',NULL,NULL,'Linux Action News',0,0,NULL,'http://linuxactionnews.com/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('ISS Live FEED','ISS Live FEED','https://www.youtube.com/watch?v=RtU_mdL2vBM',1)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('GNU World Order',NULL,NULL,'GNU World Order',0,0,NULL,'http://gnuworldorder.info/ogg.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles (feedtitle,title,url,podcast) values('TechSNAP','TechSNAP','https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',1)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Linux Action Show',NULL,NULL,'Linux Action Show',0,0,NULL,'http://feeds.feedburner.com/linuxashd?format=xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The Command Line Podcast',NULL,NULL,'The Command Line Podcast',0,0,NULL,'https://thecommandline.net/cmdln_free',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('sex-i-kaelderen',NULL,NULL,'sex-i-kaelderen',0,0,NULL,'https://w.soundcloud.com/player/?url&#x3D;https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F349118252&amp;auto_play&#x3D;false&amp;show_artwork&#x3D;true&amp;visual&#x3D;true&amp;origin&#x3D;schema.org',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Her går det godt',NULL,NULL,'Her går det godt',0,0,NULL,'http://www.spreaker.com/show/2093919/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Droner og kanoner',NULL,NULL,'Droner og kanoner',0,0,NULL,'https://www.dr.dk/mu/Feed/droner-og-kanoner.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The RC Newb Podcast',NULL,NULL,'The RC Newb Podcast',0,0,NULL,'https://rcnewb.com/feed/podcast/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('DEN GRÅ SIDE',NULL,NULL,'DEN GRÅ SIDE',0,0,NULL,'http://www.spreaker.com/show/2108328/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('PersonalityHacker',NULL,NULL,'PersonalityHacker',0,0,NULL,'http://feeds.feedburner.com/PersonalityHackerPodcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Bitch Sesh',NULL,NULL,'Bitch Sesh',0,0,NULL,'http://rss.earwolf.com/bitch-sesh',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('2 Dope Queens',NULL,NULL,'2 Dope Queens',0,0,NULL,'http://feeds.wnyc.org/2dopequeens',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Ramajetterne',NULL,NULL,'Ramajetterne',0,0,NULL,'https://www.dr.dk/mu/Feed/ramajetterne-2.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('De Sorte Spejdere',NULL,NULL,'De Sorte Spejdere',0,0,NULL,'http://www.dr.dk/mu/Feed/de-sorte-spejdere-podcast.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Nak & æd',NULL,NULL,'Nak & æd',0,0,NULL,'http://www.dr.dk/mu/Feed/nak-og-aed-alle.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Ubådssagen',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/ubadssagen.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Videnskabens Verden',NULL,NULL,'Ubådssagen',0,0,NULL,'http://www.dr.dk/mu/Feed/videnskabens-verden.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-/*
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Why You Push That Button',NULL,NULL,'Why You Push That Button',0,0,NULL,'http://feeds.feedburner.com/WhydYouPushThatButton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-*/
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Gametest',NULL,NULL,'Gametest',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCuX8EWTbH--tyha5FUoBSrg',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Gravity Assist',NULL,NULL,'Gravity Assist',0,0,NULL,'https://www.nasa.gov/rss/dyn/Gravity-Assist.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('TED',NULL,NULL,'TED',0,0,NULL,'https://www.youtube.com/feeds/videos.xml?channel_id=UCAuUUnT6oDeKwE6v1NGQxug',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('TV 2 - Tech',NULL,NULL,'TV 2 - Tech',0,0,NULL,'http://feeds.tv2.dk/beep_seneste/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-
-        sprintf(sqlselect,"REPLACE INTO mythconverg.internetcontentarticles VALUES ('Hva så?! med Christian Fuhlendorff',NULL,NULL,'Hva så?! med Christian Fuhlendorff',0,0,NULL,'http://hva-saa.podomatic.com/rss2.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
 
 
         mysql_close(conn);
         // download new rrs files we just insert in db
-        loadrssfile();
+        loadrssfile(1);
       }
     }
 
@@ -861,17 +1046,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
+      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL) from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       //strcat(sqlselect,"' group by path order by path,title asc");
       strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title ASC");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb) from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
@@ -888,7 +1073,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
@@ -907,7 +1092,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                         stack[antal]->feed_path_antal=0;
                         stack[antal]->textureId=0;
                         stack[antal]->intnr=0;
-
+                        stack[antal]->nyt=false;
+                        // top level
                         if (getart==0) {
                           strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
                           strncpy(stack[antal]->feed_name,row[0],feed_namelength);
@@ -956,6 +1142,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                     break;
                           }
 
+                          // test antal afspillinger this 0 set som new rss
+                          if (row[9]) {
+                            if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                          }
+
                           if (strlen(tmpfilename)>7) {
                               if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
                                 strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
@@ -990,20 +1181,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                   } else strcpy(tmpfilename,"");
                                 }
                                 strcpy(tmpfilename,downloadfilenamelong);
-//                                if ((strcmp(lasttmpfilename,tmpfilename)==0) && (antal>1)) loadstatus=false;
-/*
-                                if ((loadstatus) && (!(file_exists(downloadfilenamelong)))) {
-	                                printf("Loading web file %s realname %s \n",tmpfilename,downloadfilename);
-                                  if ((strcmp(lasttmpfilename,tmpfilename)==false) && (loadstatus=true)) {
-                                    if (loadstatus=get_webfile(tmpfilename,downloadfilenamelong)) {
-                                      strcpy(tmpfilename,downloadfilenamelong);
-                                    } else {
-                                      // fejl load
-                                      strcpy(tmpfilename,"");
-                                    }
-                                  }
-                                } else strcpy(tmpfilename,downloadfilenamelong);
-                                */
                               }
                           } else strcpy(tmpfilename,"");
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	// mythtv icon file
@@ -1047,9 +1224,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 //
 
 void *loadweb(void *data) {
-  if (debugmode & 4) printf("Start web loader thread\n");
+  if (debugmode & 4) printf("Start web icon loader thread\n");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("Stop web loader thread\n");
+  if (debugmode & 4) printf("Stop web icon loader thread\n");
 }
 
 
@@ -1088,7 +1265,7 @@ int stream_class::loadweb_stream_iconoversigt()
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
+          //printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -1110,7 +1287,7 @@ void *load_all_stream_gfx(void *data) {
     MYSQL *conn;
     MYSQL_RES *res,*res1;
     MYSQL_ROW row,row1;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     char sqlselect[1024];
     char sqlselect1[1024];
     char downloadfilename[1024];
@@ -1170,6 +1347,7 @@ void *load_all_stream_gfx(void *data) {
                       if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
                     }
                     total_antal++;
+                  // https
                   } else if (strncmp(tmpfilename,"https://",8)==0) {
                     strcpy(lastfile,downloadfilename);
                     get_webfilename(downloadfilename,tmpfilename);
@@ -1211,26 +1389,19 @@ void stream_class::playstream(char *url) {
 }
 
 
-void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley)
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected,bool do_update_rss_show)
 
 {
     int j,ii,k,pos;
-    int buttonsize=200;
-    float buttonsizey=160.0f;
-    float yof=orgwinsizey-(buttonsizey);         // start ypos
+    int buttonsize=200;                                                         // button size
+    float buttonsizey=160.0f;                                                   // button size
+    float yof=orgwinsizey-(buttonsizey);                                        // start ypos
     float xof=0.0f;
     int lstreamoversigt_antal=9*6;
     int i=0;
-//    float ofs=0.0f;		// used to calc the text length
-//    char *lastslash;
-//    float xvgaz=0.0f;
-//    char temptxt[200];
     unsigned int sofset=0;
-    int bonline=8;                // antal pr linie
-//    float buttonzoom=0.0f;
+    int bonline=8;                                                              // antal pr linie
     float boffset;
-//    int loader_xpos,loader_ypos;
-//    char tmpfilename[200];
     char gfxfilename[200];
     char downloadfilename[200];
     char downloadfilenamelong[1024];
@@ -1238,9 +1409,11 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
     char gfxshortname[200];
     char temptxt[200];
     char word[200];
+    char downloadfilename_last[1024];
     int antal_loaded=0;
     static int stream_oversigt_loaded_done=0;
     GLuint texture;
+    strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
@@ -1249,21 +1422,28 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       if (gfxshortnamepointer) {
         strcpy(gfxshortname,gfxshortnamepointer);
       }
-      if (strcmp(gfxfilename,"")!=0) {
-        // check om der findes en downloaded icon
-        strcpy(downloadfilenamelong,"");
-        strcat(downloadfilenamelong,gfxfilename);
-        // check om filen findes i cache dir eller i mythtv netvision dir
-        if (file_exists(gfxfilename)) {
-          texture=loadTexture ((char *) gfxfilename);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else if (file_exists(downloadfilenamelong)) {
-           texture=loadTexture ((char *) downloadfilenamelong);
-           if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-           antal_loaded+=1;
-        } else texture=0;
+      if (get_texture(stream_oversigt_loaded_nr)==0) {
+        if (strcmp(gfxfilename,"")!=0) {
+          // check om der findes en downloaded icon
+          strcpy(downloadfilenamelong,"");
+          strcat(downloadfilenamelong,gfxfilename);
+          if (strcmp(downloadfilename_last,gfxfilename)!=0) {
+            // check om filen findes i cache dir eller i mythtv netvision dir
+            if (file_exists(gfxfilename)) {
+              texture=loadTexture ((char *) gfxfilename);
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              antal_loaded+=1;
+            } else if (file_exists(downloadfilenamelong)) {
+              texture=loadTexture ((char *) downloadfilenamelong);
+              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              antal_loaded+=1;
+            } else texture=0;
+          } else if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+          // husk last file name
+          strcpy(downloadfilename_last,gfxfilename);
+        }
       }
+      // down loading ?
       if (stream_oversigt_loaded_nr==this->streamantal()) {
         stream_oversigt_loaded=true;
         stream_oversigt_loaded_done=true;
@@ -1274,6 +1454,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       stream_oversigt_loaded_nr=0;
       stream_oversigt_loaded=false;
     }
+    // calc start pos (ofset)
+    sofset=(_sangley/40)*8;
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -1359,35 +1541,41 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
         glPopMatrix();
       }
 
+      if (stack[i+sofset]->nyt) {
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glTranslatef(xof+150,yof+14,0);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(14.0, 14.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        //sprintf(temptxt,"NEW");
+        glcRenderString("NEW");
+        glPopMatrix();
+      }
+
       float fontsiz=16.0f;
       glPushMatrix();
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      //glScalef(14.0, 14.0, 1.0);
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-
       glScalef(fontsiz, fontsiz, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
       // temp
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       temptxt[17]='\0';
       glcRenderString(temptxt);
-
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
     }
-
-    // show loader status
-    if (stream_oversigt_loaded_nr<streamoversigt.streamantal()) {
-      // show radio icon loader status
+    // show rss file loading status
+    if (do_update_rss_show) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -1399,6 +1587,53 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
 
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+6,140,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"FEED IS LOADING");
+      glcRenderString(temptxt);
+      glPopMatrix();
+
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+60,95,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"%4d",streamoversigt.stream_rssparse_nowloading);
+      glcRenderString(temptxt);
+      glPopMatrix();
+    }
+
+    // show icon gfx loader status
+    // do not show while loading new rss
+    if ((do_update_rss_show==false) && (stream_oversigt_loaded_nr<streamoversigt.streamantal())) {
+      // show radio icon loader status
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
+      glEnd();
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+
+      glTranslatef(1680+20,140,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"Loading icons");
+      glcRenderString(temptxt);
+      glPopMatrix();
+
+      glPushMatrix();
       glTranslatef(1680+20,95,0);
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
@@ -1406,8 +1641,8 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       glcRenderString(temptxt);
       glPopMatrix();
     }
-
-    if (i==0) {
+    // no records loaded error
+    if ((i==0) && (do_update_rss_show==false)) {
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
       glPushMatrix();
@@ -1422,688 +1657,4 @@ void stream_class::show_stream_oversigt1(GLuint normal_icon,GLuint empty_icon,GL
       glPopMatrix();
     }
 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint icon_mask,GLuint empty_icon,int _mangley)
-
-{
-
-  int lstreamoversigt_antal;
-  int i=0;
-  float ofs=0.0f;		// used to calc the text length
-  float yof=0.0f;
-  float xof=0.0f;
-//  char *lastslash;
-  float xvgaz=0.0f;
-  char temptxt[200];
-  unsigned int sofset=0;
-  int bonline;
-  float buttonsizex=68.0f;
-  float buttonsizey=58.0f;
-  float buttonzoom=0.0f;
-  float boffset;
-  int loader_xpos,loader_ypos;
-//  char tmpfilename[200];
-  char gfxfilename[200];
-  char downloadfilename[200];
-  char downloadfilenamelong[1024];
-  char *gfxshortnamepointer;
-  char gfxshortname[200];
-//  char tmp[200];
-  static int stream_oversigt_loaded_done=0;
-  GLuint texture;
-
-  static int antal_loaded=0;
-  bool finish=false;
-
-  if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-
-      if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
-      else strcpy(gfxfilename,"");
-
-      strcpy(gfxshortname,"");
-      gfxshortnamepointer=strrchr(gfxfilename,'.');	// get last char = type of file
-      if (gfxshortnamepointer) {
-        strcpy(gfxshortname,gfxshortnamepointer);
-      }
-
-      if (strcmp(gfxfilename,"")!=0) {
-        // check om der findes en downloaded icon
-        strcpy(downloadfilenamelong,"");
-        strcat(downloadfilenamelong,gfxfilename);
-        // check om filen findes i cache dir eller i mythtv netvision dir
-        if (file_exists(gfxfilename)) {
-          texture=loadTexture ((char *) gfxfilename);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else if (file_exists(downloadfilenamelong)) {
-          texture=loadTexture ((char *) downloadfilenamelong);
-          if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-          antal_loaded+=1;
-        } else texture=0;
-      }
-
-      //if (debugmode & 4) printf("load mythtv named %s or %s \n", gfxfilename,downloadfilenamelong);
-
-      if (stream_oversigt_loaded_nr==this->streamantal()) {
-        stream_oversigt_loaded=true;
-        stream_oversigt_loaded_done=true;
-      } else stream_oversigt_loaded_nr++;
-  }
-
-  // check om vi har loaded alle images in thread
-  //if (antal_loaded>=this->streamantal()) finish=true; else finish=false;
-
-//	    printf("gfxloaded %d \n",gfx_loaded);
-
-  if (!(gfx_loaded)) {
-    stream_oversigt_loaded_nr=0;
-    stream_oversigt_loaded=false;
-  }
-
-
-
-
-  switch(screen_size) {
-      case 1: xof=-370.0f;
-              yof= 260.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;					// numbers of icons in x direction
-              xvgaz=-800.0f;					// 800
-              lstreamoversigt_antal=5*5;			// numbers of icons in y direction
-              buttonsizex=88.0f;				// 68
-              buttonsizey=68.0f;
-              break;
-      case 2: xof=-380.0f;
-              yof= 270.0f;				// 250.0f
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-850.0f;
-              lstreamoversigt_antal=6*4;
-              buttonsizex=88.0f;
-              buttonsizey=78.0f;
-              break;
-      case 3: xof=-660.0f;			// mode 3 1080p
-              yof= 336.0f;
-              sofset=(_mangley/41)*9;
-              bonline=9;
-              xvgaz=-1000.0f;			// -1000
-              lstreamoversigt_antal=9*6;
-              buttonsizex=84.0f+5;		// 84
-              buttonsizey=74.0f+5;		// 74
-              break;
-      case 4: xof=-660.0f;
-              yof= 336.0f;
-              sofset=(_mangley/41)*8;
-              bonline=8;
-              xvgaz=-1000.0f;
-              lstreamoversigt_antal=8*5;
-              buttonsizex=96.0f;
-              buttonsizey=86.0f;
-              break;
-      default:
-              xof=-380.0;
-              yof= 250.0f;
-              sofset=(_mangley/41)*5;
-              bonline=5;
-              xvgaz=-800.0f;
-              lstreamoversigt_antal=5*4;
-              buttonsizex=68.0f;
-              buttonsizey=58.0f;
-              break;
-  }
-  boffset=buttonsizey*1.4;
-  //
-  // hvis der ikke brugfes nvidia core ret størelser
-  //
-  if (cur_avail_mem_kb==0) {
-      buttonsizex-=20.0f;
-      buttonsizey-=20.0f;
-  }
-
-  // viser det antal streams som kan være på skærmen på en gang
-  // ellers er der et start ofset (sofset) som beskriver start ofset fra array (bliver rettet andet sted) pilup/pildown osv osv
-  while((i<lstreamoversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
-    switch(screen_size) {
-      case 1:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-370;
-        }
-        break;
-      case 2:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-380;
-        }
-        break;
-      case 3:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-660;
-        }
-        break;
-      case 4:
-        if (((i % bonline)==0) && (i>0)) {
-          yof=yof-(boffset+30);
-          xof=-660;
-        }
-        break;
-    }
-
-
-    glLoadIdentity();
-    glEnable(GL_TEXTURE_2D);
-    // draw mask
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    //glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-    if (stack[i+sofset]->textureId) {
-      glBindTexture(GL_TEXTURE_2D,icon_mask);					// stack[i+sofset]->textureId
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    } else {
-      glBindTexture(GL_TEXTURE_2D,icon_mask);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
-    glTranslatef(xof,yof,xvgaz);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-
-    glLoadIdentity();
-    glBlendFunc(GL_ONE, GL_ONE);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-    // stream har et icon in db
-    if (stack[i+sofset]->textureId) {
-        // draw icon no indhold
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;
-        else buttonzoom=12.0f;					// default 0.0f
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-/*
-        //
-        // draw icon mask
-        //
-        glLoadIdentity();
-        glBindTexture(GL_TEXTURE_2D,onlinestreammask);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glBlendFunc(GL_ONE, GL_ONE);
-        // To be able to render transparent PNGs, you have to enable blending like this
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//        glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=0.0f;
-        else buttonzoom=-12.0f;
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-*/
-
-        //
-        // draw icon indhold
-        //
-        glLoadIdentity();
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBlendFunc(GL_ONE, GL_ONE);
-        // To be able to render transparent PNGs, you have to enable blending like this
-//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;		// 0.0f
-        else buttonzoom=12.0f;		// -12.0f
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom)+5, -(buttonsizey+buttonzoom)+5, 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom)+5,  (buttonsizey+buttonzoom)-5, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( (buttonsizex+buttonzoom)-5,  (buttonsizey+buttonzoom)-5, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( (buttonsizex+buttonzoom)-5, -(buttonsizey+buttonzoom)+5, 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-    } else {
-        glBindTexture(GL_TEXTURE_2D,normal_icon);		// default icon
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        // zoom valgte
-        if (i+1==(int) stream_key_selected) buttonzoom=18.0f;
-        else buttonzoom=12.0f;
-
-        glTranslatef(xof,yof,xvgaz);
-        glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(-(buttonsizex+buttonzoom), -(buttonsizey+buttonzoom), 0.0);
-        glTexCoord2f(0, 1); glVertex3f(-(buttonsizex+buttonzoom),  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsizex+buttonzoom,  buttonsizey+buttonzoom, 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsizex+buttonzoom, -(buttonsizey+buttonzoom), 0.0);
-        glEnd(); //End quadrilateral coordinates
-
-    }
-
-    // draw numbers in group
-    if (stack[i+sofset]->feed_group_antal>0) {
-        // show numbers in group
-        glLoadIdentity();
-        glDisable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTranslatef(xof+10,yof-36,xvgaz);		// +38 - 27
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(14.0, 14.0, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-
-        sprintf(temptxt,"%4d",stack[i+sofset]->feed_group_antal);
-        glcRenderString(temptxt);
-    }
-
-
-    buttonzoom=0.0f;
-
-    strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-    //lastslash=strrchr(temptxt,'/');
-    //if (lastslash) strcpy(temptxt,lastslash+1);
-//    temptxt[13]=0;
-//    txtbrede=t3dDrawWidth(musicoversigt[i+sofset].album_name);
-
-    glPushMatrix();
-
-    float ytextofset=0.0f;
-    int ii,j,k,pos;
-    ii=pos=0;
-    char word[16000];
-
-    if (strlen(temptxt)<=14) {
-      glLoadIdentity();
-      ofs=(strlen(temptxt)/2)*9;
-      switch(screen_size) {
-        case 3: glTranslatef(xof-ofs,  yof-60-4 ,xvgaz);
-                break;
-        case 4: glTranslatef(xof-ofs,  yof-60-10 ,xvgaz);
-                break;
-        default:glTranslatef(xof-ofs,  yof-60 ,xvgaz);
-                break;
-      }
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(14.0, 14.0, 1.0);
-      glcRenderString(temptxt);
-    } else {
-
-        temptxt[26]='\0';
-        glLoadIdentity();
-        ofs=(strlen(temptxt)/2)*9;
-        switch(screen_size) {
-            case 3: glTranslatef(xof-50,  yof-60-4 ,xvgaz);
-                    break;
-            case 4: glTranslatef(xof-50,  yof-60-10 ,xvgaz);
-                    break;
-            default:glTranslatef(xof-50,  yof-60 ,xvgaz);
-                    break;
-        }
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(14.0, 14.0, 1.0);
-
-
-        while((1) && (ytextofset<=10.0)) {		// max 2 linier
-            j=0;
-            while(!isspace(temptxt[ii])) {
-              if (temptxt[ii]=='\0') break;
-              word[j]=temptxt[ii];
-              ii++;
-              j++;
-            }
-
-            word[j]='\0';	// j = word length
-
-            if (j>13) {		// print char by char
-              k=0;
-              while(word[k]!='\0') {
-                if (pos>=13) {
-                  if ( k != 0 ) glcRenderChar('-');
-                  pos=0;
-                  ytextofset+=15.0f;
-                  glLoadIdentity();
-                  ofs=0;
-                  switch(screen_size) {
-                      case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                              break;
-                      case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                              break;
-                      default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                              break;
-                  }
-                  glRasterPos2f(0.0f, 0.0f);
-                  glScalef(14.0, 14.0, 1.0);
-                }
-                glcRenderChar(word[k]);
-                pos++;
-                k++;
-              }
-            } else {
-              if (pos+j>13) {	// word doesn't fit line
-                ytextofset+=15.0f;
-                pos=0;
-                glLoadIdentity();
-                ofs=(int) (strlen(word)/2)*9;
-                switch(screen_size) {
-                    case 3: glTranslatef(xof-50,  yof-60-4-ytextofset ,xvgaz);
-                            break;
-                    case 4: glTranslatef(xof-50,  yof-60-10-ytextofset ,xvgaz);
-                            break;
-                    default:glTranslatef(xof-50,  yof-60-ytextofset ,xvgaz);
-                            break;
-                }
-                glRasterPos2f(0.0f, 0.0f);
-                glScalef(14.0, 14.0, 1.0);
-              }
-              glcRenderString(word);
-              pos+=j;
-            }
-            if (pos<12) {
-              glcRenderChar(' ');
-              pos++;
-            }
-            if (temptxt[ii]=='\0') break;
-            ii++;	// skip space
-        }
-    }
-/*
-     // lav ramme om valgte radio station
-     if (i+1==radio_key_selected) {
-          // lav valgte border
-          glLoadIdentity();
-          glTranslatef((xof), (yof), xvgaz);
-          glColor3f(1.0f,1.0f,1.0f);
-          glBindTexture(GL_TEXTURE_2D,0);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-          // left
-          glTexCoord2f(0.0, 0.0); glVertex3f(-72, -75, 0.0);
-          glTexCoord2f(0.0, 1.0); glVertex3f(-75, -75, 0.0);
-          glTexCoord2f(1.0, 1.0); glVertex3f(-75, 75-15, 0.0);
-          glTexCoord2f(1.0, 0.0); glVertex3f(-72, 75-15, 0.0);
-          // right
-          glTexCoord2f(0.0, 0.0); glVertex3f(72, -75, 0.0);
-          glTexCoord2f(0.0, 1.0); glVertex3f(75, -75, 0.0);
-          glTexCoord2f(1.0, 1.0); glVertex3f(75, 75-15, 0.0);
-          glTexCoord2f(1.0, 0.0); glVertex3f(72, 75-15, 0.0);
-
-          // button
-          glVertex3f(-75, -72, 0.0);
-          glVertex3f(-75, -75, 0.0);
-          glVertex3f(75, -75, 0.0);
-          glVertex3f(75, -72, 0.0);
-
-          // top
-          glVertex3f(-75, 72-15, 0.0);
-          glVertex3f(-75, 75-15, 0.0);
-          glVertex3f(75, 75-15, 0.0);
-          glVertex3f(75, 72-15, 0.0);
-          glEnd();
-    }
-
-*/
-
-    glPopMatrix();
-    i++;
-
-  //
-  // hvis der ikke brugfes nvidia core ret størelser
-  //
-
-    switch(screen_size) {
-        case 1: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else  xof+=(buttonsizex*1.6);
-                break;
-        case 2: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.6);
-                break;
-        case 3: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.7);
-                break;
-        case 4: if (cur_avail_mem_kb==0) xof+=(buttonsizex*2.0)+8; else xof+=(buttonsizex*1.65);
-                break;
-        default:xof+=(buttonsizex*2)+8;
-                break;
-    }
-  }
-
-  // show loading status
-  if (stream_oversigt_loaded_nr<this->streamantal()) {
-    switch (screen_size) {
-          case 1: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          case 2: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          case 3: loader_xpos=-380;
-                  loader_ypos=-230+2;
-                  break;
-          case 4: loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-          default:loader_xpos=-250;
-                  loader_ypos=-230+2;
-                  break;
-    }
-
-    glLoadIdentity();
-
-    glEnable(GL_TEXTURE_2D);
-//    glDisable(GL_BLEND);
-//    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-//    glBlendFunc(GL_ONE, GL_ONE);
-
-
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-/*
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading_mask);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-*/
-    glLoadIdentity();
-    glTranslatef(loader_xpos,loader_ypos,-600);
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex3f(-170/2, -60/2, 0.0);
-    glTexCoord2f(0, 1); glVertex3f(-170/2,  60/2, 0.0);
-    glTexCoord2f(1, 1); glVertex3f( 170/2,  60/2, 0.0);
-    glTexCoord2f(1, 0); glVertex3f( 170/2, -60/2, 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-    glLoadIdentity();
-    glTranslatef(loader_xpos-36,loader_ypos-16,-600);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-
-    sprintf(temptxt,"%4d of %4d ",this->stream_oversigt_nowloading,this->streamantal());
-
-    glcRenderString(temptxt);
-  }
-
-  if (this->streamantal()<1) {
-
-    glLoadIdentity();
-    glTranslatef(-10,10,-600);
-
-    if (_textureIdloading1) {
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glBlendFunc(GL_ONE,GL_ZERO);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(-170, -60, 0.0);
-      glTexCoord2f(0, 1); glVertex3f(-170,  60, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( 170,  60, 0.0);
-      glTexCoord2f(1, 0); glVertex3f( 170, -60, 0.0);
-      glEnd(); //End quadrilateral coordinates
-    }
-    glLoadIdentity();
-    glTranslatef(-52,6,-300);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(8.0, 8.0, 1.0);
-    sprintf(temptxt,"No stations loaded.");
-    glcRenderString(temptxt);
-
-    if (configmythtvver==0) {
-        glLoadIdentity();
-        glTranslatef(-52,-6,-300);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(8.0, 8.0, 1.0);
-        strcpy(temptxt,"No backend ");
-        strcat(temptxt,configmysqlhost);
-        glcRenderString(temptxt);
-    }
-  }
 }
