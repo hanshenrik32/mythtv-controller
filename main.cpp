@@ -4050,7 +4050,7 @@ void display() {
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"%-30s",streamoversigt.get_stream_name(sknapnr));
+        sprintf(temptxt,"%-30s",streamoversigt.get_stream_name(sknapnr-1));
         glcRenderString(temptxt);
         glPopMatrix();
 
@@ -4078,13 +4078,13 @@ void display() {
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"%-30s",streamoversigt.get_stream_desc(sknapnr));
+        sprintf(temptxt,"%-30s",streamoversigt.get_stream_desc(sknapnr-1));
         temptxt[30]='\0';
         glcRenderString(temptxt);
         glPopMatrix();
 
         // get stream texture
-        textureId=streamoversigt.get_texture(sknapnr);                           // get stream texture opengl id
+        textureId=streamoversigt.get_texture(sknapnr-1);                           // get stream texture opengl id
         if (textureId) {
           glEnable(GL_TEXTURE_2D);
           glEnable(GL_BLEND);
