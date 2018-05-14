@@ -50,8 +50,8 @@ class stream_class : vlc_controller {
         bool gfx_loaded;					                                              //
         void update_rss_nr_of_view(char *url);                                  // save rss to db file (struct)
         void set_rss_new(int nr,bool ny) { if (nr<antal) stack[nr]->nyt=ny; }                 // set new flag
-        char *get_stream_name(int nr) { if (nr<antal) return (stack[nr]->feed_name); }        // get name
-        char *get_stream_desc(int nr) { if (nr<antal) return (stack[nr]->feed_desc); }        // get desc
+        char *get_stream_name(int nr);        // get name
+        char *get_stream_desc(int nr);        // get desc
         char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
         char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); }
         char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
