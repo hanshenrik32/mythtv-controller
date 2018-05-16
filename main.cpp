@@ -283,6 +283,12 @@ int tvknapnr=0;
 int fknapnr=0;
 int swknapnr=0;
 
+// aktiv stream play
+int stream_playnr=0;
+char stream_playing_name[80];
+char stream_playing_desc[80];
+GLuint stream_playing_icon=0;
+
 int stream_key_selected=1;
 int stream_select_iconnr=0;
 int do_zoom_tvprg_aktiv_nr=0;
@@ -3447,6 +3453,7 @@ void display() {
     }
 
     // stop music
+    // if play
     if (vis_stream_oversigt) {
         if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
             #if defined USE_FMOD_MIXER
@@ -3995,7 +4002,7 @@ void display() {
 
     //
     // *************** Stream stuf *******************************************************************************
-    // show player control
+    // show stream player control
 
     if (!(visur)) {
       if ((vis_stream_oversigt) && (do_zoom_stream_cover)) {
@@ -4044,13 +4051,12 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
         glEnd();
 
-
         glPushMatrix();
-        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
+        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"%-30s",streamoversigt.get_stream_name(sknapnr-1));
+        sprintf(temptxt,"Name :%-30s",stream_playing_name);
         glcRenderString(temptxt);
         glPopMatrix();
 
@@ -4067,28 +4073,27 @@ void display() {
         if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing     %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
         else sprintf(temptxt,"                                        ");
         temptxt[40]=0;
-        glTranslatef((orgwinsizex/4)+20,  (orgwinsizey/2)+96, 0.0f);
+        glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
         glcRenderString(temptxt);
         glPopMatrix();
 
         glPushMatrix();
-        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48, 0);
+        glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+0, 0);
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"%-30s",streamoversigt.get_stream_desc(sknapnr-1));
+        sprintf(temptxt,"%-30s",stream_playing_desc);
         temptxt[30]='\0';
         glcRenderString(temptxt);
         glPopMatrix();
 
         // get stream texture
-        textureId=streamoversigt.get_texture(sknapnr-1);                           // get stream texture opengl id
-        if (textureId) {
+        if (stream_playing_icon) {
           glEnable(GL_TEXTURE_2D);
           glEnable(GL_BLEND);
-          glBindTexture(GL_TEXTURE_2D,textureId);
+          glBindTexture(GL_TEXTURE_2D,stream_playing_icon);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS);
@@ -4797,7 +4802,13 @@ void display() {
     // start play stream
     // still use the old system call bach file
     if (startstream) {
-      if (startstream) do_zoom_stream_cover=true;
+      if ((do_play_stream) && (stream_playnr==0)) {
+        do_zoom_stream_cover=true;
+        stream_playnr=sknapnr;                                                  // rember the stream we play
+        strcpy(stream_playing_name,streamoversigt.get_stream_name(stream_playnr-1));
+        strcpy(stream_playing_desc,streamoversigt.get_stream_desc(stream_playnr-1));
+        stream_playing_icon=streamoversigt.get_texture(stream_playnr-1);
+      }
       if (strcmp("default",configdefaultplayer)!=0)  {
         printf("Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
@@ -4857,12 +4868,18 @@ void display() {
                                               // reset play function to new select
       startstream=false;                      // start kun 1 instans
       do_play_stream=false;                   //
+      stream_playnr=sknapnr;                  //
     }
 
     // stop stream if play
+    //
     if (do_stop_stream) {
       if (stopstream) {
         stopstream=false;                     // start kun 1 instans
+        stream_playnr=0;
+        strcpy(stream_playing_name,"");
+        strcpy(stream_playing_desc,"");
+        stream_playing_icon=0;
         if (streamoversigt.stream_is_playing) {
           if (debugmode) printf("Stop playing stream\n");
           // stop playing (active movie)
