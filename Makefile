@@ -1,7 +1,7 @@
 CC = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow
+CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
 PROG     = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf

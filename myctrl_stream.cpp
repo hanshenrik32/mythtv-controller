@@ -20,6 +20,8 @@
 // web file loader
 #include "myctrl_readwebfile.h"
 
+extern int tema;
+
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -74,6 +76,14 @@ stream_class::~stream_class() {
     clean_stream_oversigt();
 }
 
+
+char *stream_class::get_stream_name(int nr) {
+  if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
+}
+
+char *stream_class::get_stream_desc(int nr) {
+  if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
+}
 
 // clean up number of created
 
@@ -584,8 +594,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // create db if not exist
       // and dump some default rss feeed in
       //
-      if (!(dbexist)) {
-        printf("Creating database for rss feed\n");
+      if ((!(dbexist))) {
+        printf("Creating/Update database for new rss feed\n");
         // thumbnail   = name of an local image file
         // commandline = Program to fetch content with
         // updated     = Time of last update
@@ -670,10 +680,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+/*
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+*/
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -812,6 +824,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('NASA What Up',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
 
 
         // create default master rss feed source
@@ -875,10 +893,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+/*
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TechSNAP',NULL,NULL,'TechSNAP',0,0,NULL,'https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+*/
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -1015,7 +1035,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('sex-i-kaelderen',NULL,NULL,'sex-i-kaelderen',0,0,NULL,'https://w.soundcloud.com/player/?url&#x3D;https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F349118252&amp;auto_play&#x3D;false&amp;show_artwork&#x3D;true&amp;visual&#x3D;true&amp;origin&#x3D;schema.org',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('sex-i-kaelderen',NULL,NULL,'sex-i-kaelderen',0,0,NULL,'https://w.soundcloud.com/player/?url&#x3D;https://api.soundcloud.com/tracks/349118252&amp;auto_play&#x3D;false&amp;show_artwork&#x3D;true&amp;visual&#x3D;true&amp;origin&#x3D;schema.org',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
@@ -1029,6 +1049,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('NASA What Up',NULL,NULL,'NASA What Up',0,0,NULL,'https://www.nasa.gov/rss/dyn/whats_up.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
 
 
         mysql_close(conn);
@@ -1471,9 +1495,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       if (stack[i+sofset]->textureId) {
         // stream icon
 //        glPushMatrix();
-
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,empty_icon1);
@@ -1487,23 +1511,31 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glEnd();
 //        glPopMatrix();
 
-        //glPushMatrix();
+        glPushMatrix();
         // indsite draw icon
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+        if (tema==5) {
+          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
+        } else {
+          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+        }
         glEnd();
-        //glPopMatrix();
+        glPopMatrix();
       } else {
         // no draw default icon
         glPushMatrix();
@@ -1512,7 +1544,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glBlendFunc(GL_ONE, GL_ONE);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,normal_icon);
+        //glBindTexture(GL_TEXTURE_2D,normal_icon);
+        glBindTexture(GL_TEXTURE_2D,empty_icon1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
