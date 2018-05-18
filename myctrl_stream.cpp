@@ -1437,6 +1437,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     int antal_loaded=0;
     static int stream_oversigt_loaded_done=0;
     GLuint texture;
+
+    char *base,*right_margin;
+    int length,width;
+    int pline=0;
+
     strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
@@ -1573,7 +1578,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glcRenderString(temptxt);
         glPopMatrix();
       }
-
+      // show new if new
       if (stack[i+sofset]->nyt) {
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
@@ -1587,19 +1592,109 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glcRenderString("NEW");
         glPopMatrix();
       }
-
-      float fontsiz=16.0f;
+      // show text of element
+      float fontsiz=15.0f;
       glPushMatrix();
-      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
       glScalef(fontsiz, fontsiz, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      // temp
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
-      temptxt[17]='\0';
-      glcRenderString(temptxt);
+      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      base=temptxt;
+      length=strlen(temptxt);
+      width = 21;
+      while(*base) {
+        if(length <= width) {
+          glcRenderString(base);
+          pline++;
+          glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
+          //puts(base);                                       // display string
+          break;
+        }
+        right_margin = base+width;
+        while(!isspace(*right_margin)) {
+          right_margin--;
+          if(right_margin == base) {
+            right_margin += width;
+            while(!isspace(*right_margin)) {
+              if (*right_margin == '\0') break;
+              right_margin++;
+            }
+          }
+        }
+        *right_margin = '\0';
+        glcRenderString(base);
+        pline++;
+        glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
+        //puts(base);
+        length -= right_margin-base+1;                         // +1 for the space
+        base = right_margin+1;
+        if (pline>=2) break;
+      }
+
+/*
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+#define COLUMN 40
+
+int main()
+{
+    char preamble[] = "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.";
+    char *base,*right_margin;
+    int length,width;
+
+    length = strlen(preamble);
+    base = preamble;
+    width = COLUMN;
+
+    while(*base)
+    {
+        if(length <= width)
+        {
+            puts(base);     // display string
+            return(0);      // and leave
+        }
+        right_margin = base+width;
+        while(!isspace(*right_margin))
+        {
+            right_margin--;
+            if( right_margin == base)
+            {
+                right_margin += width;
+                while(!isspace(*right_margin))
+                {
+                    if( *right_margin == '\0')
+                        break;
+                    right_margin++;
+                }
+            }
+        }
+        *right_margin = '\0';
+        puts(base);
+        length -= right_margin-base+1;      // +1 for the space
+        base = right_margin+1;
+    }
+
+    return(0);
+}
+
+*/
+
+//      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+//      glTranslatef(xof+20,yof-10,0);
+//      glDisable(GL_TEXTURE_2D);
+//      glScalef(fontsiz, fontsiz, 1.0);
+//      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+//      glRasterPos2f(0.0f, 0.0f);
+//      glDisable(GL_TEXTURE_2D);
+//      temptxt[17]='\0';
+//      glcRenderString(temptxt);
+
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);
