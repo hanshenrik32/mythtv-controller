@@ -602,52 +602,55 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         // print radios station name
         glPushMatrix();
 
-/*
         float fontsiz=15.0f;
         pline=0;
-        glTranslatef(xof,yof-218,0);
+        glTranslatef(xof,yof-18,0);
         glDisable(GL_TEXTURE_2D);
         glScalef(fontsiz, fontsiz, 1.0);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glRasterPos2f(0.0f, 0.0f);
         glDisable(GL_TEXTURE_2D);
 
+        bool stop=false;
+
         strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
         base=temptxt;
         length=strlen(temptxt);
-        width = 20;
+        width = 22;
         while(*base) {
           if(length <= width) {
             glcRenderString(base);
             pline++;
-            glTranslatef(xof,yof-218,0);
+            glTranslatef(xof,(yof-18)-pline*1.2f,0);
             //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
             //puts(base);                                       // display string
             break;
           }
           right_margin = base+width;
-          while(!isspace(*right_margin)) {
+          while((!isspace(*right_margin)) && (stop==false)) {
             right_margin--;
             if (right_margin == base) {
               right_margin += width;
               while(!isspace(*right_margin)) {
                 if (*right_margin == '\0') break;
+                else stop=true;
                 right_margin++;
               }
             }
           }
+          if (stop) *(base+width)='\0';
           *right_margin = '\0';
           glcRenderString(base);
           pline++;
-          glTranslatef(xof,yof-218,0);
+          glTranslatef(xof,(yof-18)-pline*1.2f,0);
           //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
           //puts(base);
           length -= right_margin-base+1;                         // +1 for the space
           base = right_margin+1;
           if (pline>=2) break;
         }
-*/
 
+/*
         float fontsiz=15.0f;
         glDisable(GL_TEXTURE_2D);
         glTranslatef(xof,yof-18,0);
@@ -668,7 +671,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             glcRenderString(temptxt);
 
         }
-
+*/
 
         glPopMatrix();
 
