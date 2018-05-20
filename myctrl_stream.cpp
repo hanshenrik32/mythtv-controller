@@ -1605,7 +1605,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
       length=strlen(temptxt);
-      width = 21;
+      width = 20;
       while(*base) {
         if(length <= width) {
           glcRenderString(base);
@@ -1617,13 +1617,19 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         right_margin = base+width;
         while(!isspace(*right_margin)) {
           right_margin--;
-          if(right_margin == base) {
+          if (right_margin == base) {
             right_margin += width;
             while(!isspace(*right_margin)) {
               if (*right_margin == '\0') break;
               right_margin++;
             }
           }
+          /*
+          // my break if word lenth is higher that show max
+          if (right_margin>=base) {
+            break;
+          }
+          */
         }
         *right_margin = '\0';
         glcRenderString(base);
