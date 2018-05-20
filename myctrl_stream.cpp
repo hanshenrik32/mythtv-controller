@@ -1606,6 +1606,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       base=temptxt;
       length=strlen(temptxt);
       width = 20;
+      bool stop=false;
       while(*base) {
         if(length <= width) {
           glcRenderString(base);
@@ -1615,22 +1616,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           break;
         }
         right_margin = base+width;
-        while(!isspace(*right_margin)) {
+        while((!isspace(*right_margin)) && (stop==false)) {
           right_margin--;
           if (right_margin == base) {
             right_margin += width;
             while(!isspace(*right_margin)) {
               if (*right_margin == '\0') break;
+              else stop=true;
               right_margin++;
             }
           }
-          /*
-          // my break if word lenth is higher that show max
-          if (right_margin>=base) {
-            break;
-          }
-          */
         }
+        if (stop) *(base+width)='\0';
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
