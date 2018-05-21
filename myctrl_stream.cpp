@@ -1638,65 +1638,16 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         if (pline>=2) break;
       }
 
-/*
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
 
-#define COLUMN 40
-
-int main()
-{
-    char preamble[] = "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility, provide for the common defense, promote the general Welfare, and secure the Blessings of Liberty to ourselves and our Posterity, do ordain and establish this Constitution for the United States of America.";
-    char *base,*right_margin;
-    int length,width;
-
-    length = strlen(preamble);
-    base = preamble;
-    width = COLUMN;
-
-    while(*base)
-    {
-        if(length <= width)
-        {
-            puts(base);     // display string
-            return(0);      // and leave
-        }
-        right_margin = base+width;
-        while(!isspace(*right_margin))
-        {
-            right_margin--;
-            if( right_margin == base)
-            {
-                right_margin += width;
-                while(!isspace(*right_margin))
-                {
-                    if( *right_margin == '\0')
-                        break;
-                    right_margin++;
-                }
-            }
-        }
-        *right_margin = '\0';
-        puts(base);
-        length -= right_margin-base+1;      // +1 for the space
-        base = right_margin+1;
-    }
-
-    return(0);
-}
-
-*/
-
-//      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-//      glTranslatef(xof+20,yof-10,0);
-//      glDisable(GL_TEXTURE_2D);
-//      glScalef(fontsiz, fontsiz, 1.0);
-//      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-//      glRasterPos2f(0.0f, 0.0f);
-//      glDisable(GL_TEXTURE_2D);
-//      temptxt[17]='\0';
-//      glcRenderString(temptxt);
+      //      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      //      glTranslatef(xof+20,yof-10,0);
+      //      glDisable(GL_TEXTURE_2D);
+      //      glScalef(fontsiz, fontsiz, 1.0);
+      //      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      //      glRasterPos2f(0.0f, 0.0f);
+      //      glDisable(GL_TEXTURE_2D);
+      //      temptxt[17]='\0';
+      //      glcRenderString(temptxt);
 
       glPopMatrix();
       i++;
