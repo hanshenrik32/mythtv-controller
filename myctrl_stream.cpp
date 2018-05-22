@@ -36,6 +36,7 @@ extern unsigned int musicoversigt_antal;
 extern int do_stream_icon_anim_icon_ofset;
 extern GLuint radiooptions,radiooptionsmask;			//
 extern GLuint _textureIdback;  					// back icon
+extern GLuint newstuf_icon;
 extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
@@ -178,7 +179,7 @@ void stream_class::update_rss_nr_of_view(char *url) {
 //
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
-//
+// updaterssfile bool is do it now (u key in overview)
 
 int stream_class::loadrssfile(bool updaterssfile) {
   // mysql vars
@@ -513,6 +514,7 @@ int stream_class::parsexmlrssfile(char *filename) {
                     content = xmlNodeGetContent(subnode3);
                     tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
                     if (tmpdat) {
+                      if (debugmode & 4) printf("Get image url %s \n",tmpdat);
                       strcpy(rssprgimage1,(char *) tmpdat);
                       xmlFree(tmpdat);
                     }
@@ -889,10 +891,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+
+/*
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('ISS Live FEED',NULL,NULL,'ISS Live FEED',0,0,NULL,'https://www.youtube.com/watch?v=RtU_mdL2vBM',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
+*/
 /*
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TechSNAP',NULL,NULL,'TechSNAP',0,0,NULL,'https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
@@ -1451,6 +1456,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       if (gfxshortnamepointer) {
         strcpy(gfxshortname,gfxshortnamepointer);
       }
+      // load texture
       if (get_texture(stream_oversigt_loaded_nr)==0) {
         if (strcmp(gfxfilename,"")!=0) {
           // check om der findes en downloaded icon
@@ -1517,9 +1523,10 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
 //        glPopMatrix();
 
         glPushMatrix();
-        // indsite draw icon
+        // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -1540,6 +1547,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
         }
         glEnd();
+        // show nyt icon note
+        if (stack[i+sofset]->nyt) {
+          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+          glEnd();
+        }
         glPopMatrix();
       } else {
         // no draw default icon
@@ -1560,6 +1579,17 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
+        // show nyt icon note
+        if (stack[i+sofset]->nyt) {
+          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+          glEnd();
+        }
         glPopMatrix();
       }
 
@@ -1578,20 +1608,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glcRenderString(temptxt);
         glPopMatrix();
       }
-      // show new if new
-      if (stack[i+sofset]->nyt) {
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTranslatef(xof+150,yof+14,0);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(14.0, 14.0, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        //sprintf(temptxt,"NEW");
-        glcRenderString("NEW");
-        glPopMatrix();
-      }
+
       // show text of element
       float fontsiz=15.0f;
       glPushMatrix();
@@ -1637,18 +1654,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         base = right_margin+1;
         if (pline>=2) break;
       }
-
-
-      //      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      //      glTranslatef(xof+20,yof-10,0);
-      //      glDisable(GL_TEXTURE_2D);
-      //      glScalef(fontsiz, fontsiz, 1.0);
-      //      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      //      glRasterPos2f(0.0f, 0.0f);
-      //      glDisable(GL_TEXTURE_2D);
-      //      temptxt[17]='\0';
-      //      glcRenderString(temptxt);
-
       glPopMatrix();
       i++;
       xof+=(buttonsize+10);

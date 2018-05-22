@@ -751,6 +751,8 @@ GLuint _tvbar1_1;
 GLuint radiomusicbuttonmask;
 GLuint streammoviebuttonmask;
 
+GLuint newstuf_icon;                        // icon for new stuf in stream view
+
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
 fontctrl aktivfont;                     // font control
@@ -11842,6 +11844,8 @@ void loadgfx() {
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
 
+    newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
+
 // *********************************************************************
 /*
     i=0;
@@ -12013,7 +12017,7 @@ void freegfx() {
     glDeleteTextures( 1,&_textureIdmusic_aktiv);
     glDeleteTextures( 1,&screensaverbox);
     glDeleteTextures( 1,&screensaverbox_mask);
-
+    glDeleteTextures( 1,&newstuf_icon);
 
     //_textureIdmusic_anim[i].textureId;
     //film_oversigt.filmoversigt[i]
