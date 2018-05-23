@@ -17,6 +17,7 @@
 #include "myth_vlcplayer.h"
 
 #include "myctrl_music.h"
+extern char configdefaultmoviepath[256];
 extern char configbackend[];
 extern const char *dbname;
 extern char configmysqluser[256];                              // /mythtv/mysql access info
@@ -444,14 +445,13 @@ int countEntriesInDir(const char* dirname) {
 
 
 
-
-
 // hent film oversigt
 
 int film_oversigt_typem::opdatere_film_oversigt() {
     char convert_command[2000];
     char convert_command1[2000];
-    char sqlselect[2000];
+    char sqlselect[4000];
+    char mainsqlselect[2000];
     char temptxt[1000];
 //    char tmptxt1[200];
     unsigned int i;
@@ -459,279 +459,397 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     FILE *filhandle;
     char resl[200];
     char database[200];
+    bool allokay=false;
+    bool dbexist=false;
+    DIR *dirp=NULL;
+    struct dirent *moviefil=NULL;
+    char *ext;
+    char filename[256];
+    char userhomedir[200];
+    char movietitle[200];
+    char moviepath1[200];
+
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
     // mysql stuf
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
+    strcpy(database,dbname);
     int checkdirexist=0;
 //    gotoxy(10,16);
-    if (debugmode & 16) printf("Opdatere Film oversigt fra mythtv :");
-    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
+    if (debugmode & 16) printf("Opdatere Film oversigt fra db :");
+    sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
 //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    i=0;
-    filhandle=fopen("filmcover_gfx.log","w");
-    if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
-            filmantal++;
-            filmoversigt[i].setfilmid(atoi(row[0]));
-            filmoversigt[i].setfilmtitle(row[1]);
 
-            hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
-            hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+    if (conn) {
+      allokay=true;
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      // test fpom musik table exist
+      sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dbexist=true;
+      }
+      // create databases/tables if not exist
+      // needed by movie loader
+      if (!(dbexist)) {
+        strcpy(sqlselect,"create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            if (row[8]) {							// hent film beskrivelse
-                filmoversigt[i].setfilmsubtitle(row[8]);
-            } else filmoversigt[i].setfilmsubtitle((char *) "");
+        strcpy(sqlselect,"create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
-            filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
-            filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
-            filmoversigt[i].setfilmaar(atoi(row[5]));
-            filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
-            filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
-            filmoversigt[i].setfilmimdbnummer(row[9]);
-            if (row[10]) {							                              // category (type text)
-                strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
-            } else strcpy(filmoversigt[i].category_name,"");
+        strcpy(sqlselect,"create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
-            // hvis cover ikke findes som jpg fil lav dem med convert kommandoen.
+        strcpy(sqlselect,"create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            strcpy(convert_command,"convert/");
-            strcat(convert_command,filmoversigt[i].getfilmtitle());
-            strcat(convert_command,"_3d.jpg");
+        strcpy(sqlselect,"create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            // temp test om file exist
-            strcpy(convert_command1,"convert/");
-            strcat(convert_command1,filmoversigt[i].getfilmtitle());
-            strcat(convert_command1,".jpg");
+        strcpy(sqlselect,"create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
 
-            // set der findes 3dcover flag i struct
-            if (file_exists(convert_command)) filmoversigt[i].setcover3d(true);
-             // henter antal af filer i dir
-            checkdirexist=countEntriesInDir("/usr/share/mythtv-controller/convert/hires/");
-            if (checkdirexist==2) checkdirexist=0;
-            if ((checkdirexist>0) && (!(file_exists(convert_command))) && (!(file_exists(convert_command1)))) {
-                strcpy(convert_command,"convert/hires/");
-                strcat(convert_command,filmoversigt[i].getfilmtitle());
-                strcat(convert_command,".jpg");
-                if (file_exists(convert_command)) {									// findes der et hires billede fra cc covers
-                                                                                                                        // yes convert to mythtv use
-                    strcpy(convert_command,"/usr/bin/convert -quiet -resize 1024x687! \"convert/hires/");		// first convert and resize dvd cover
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,".jpg\" \"convert/");
-                    strcat(convert_command,row[1]);
-                    strcat(convert_command,".jpg\" > /dev/null 2>&1");
-                    system(convert_command);
+        strcpy(sqlselect,"create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'txt','',1,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'log','',1,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'mpg','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'avi','',0,1)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'vob','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'mpeg','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'VIDEO_TS','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'iso','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        strcpy(sqlselect,"insert into videotypes values (0,'img','',0,0)");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+      }
 
+      dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
+      if (dirp==NULL) {
+        printf("No %s dir found \nOpen dir error %s \n",userhomedir);
+        exit(0);
+      }
+      // loop dir and update music songs db
+      // and find kodi db version
+      conn=mysql_init(NULL);
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
+      while((moviefil = readdir(dirp))) {
+        if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
+          ext = strrchr(moviefil->d_name, '.');
+          if (ext) strcpy(filename,moviefil->d_name);
+          strcpy(movietitle,filename);
+          strcpy(moviepath1,filename);
+          sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                                    (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                                    movietitle,"moviesubtitle","movieplot","movieimdb","movieyear","movieuserrating","movielength" ,moviepath1,"filetodownload");
 
-                    // cut front
-                    strcpy(convert_command,"/usr/bin/convert -quiet ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,".jpg\"");
-                    strcat(convert_command," -gravity West -chop 542x0 \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_front.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-
-                    // cut ryg
-                    strcpy(convert_command,"/usr/bin/convert -quiet ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,".jpg\"");
-                    strcat(convert_command," -gravity West -chop 486x0 -gravity East -chop 486x0 \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-
-                    // cut back
-                    strcpy(convert_command,"/usr/bin/convert -quiet ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,".jpg\"");
-                    strcat(convert_command," -gravity East -chop 542x0 \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_back.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-
-                    // create 3d dvd cover
-                    strcpy(convert_command,"/usr/bin/convert -quiet -virtual-pixel transparent");
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_ryg.jpg\" -matte +distort Perspective '0,0 -45,20 0,687 -45,667  52,687 0,687  52,0 0,0'"); //  '0,0 -30,20  0,200 -30,179  19.5,200 0,200  19.5,0 0.5,0'
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_front.jpg\" -matte +distort Perspective '0,0 0,5   0,687 0,907   558,687 551,859  558,0 551,47'"); // '0.5,0 0.5,0  0.5,200  0.5,200  150,200 100,156  150,0 100,30'
-                    strcat(convert_command," -background black -layers merge  +repage -bordercolor black  \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_3d_big.jpg\" > /dev/null 2>&1");
-
-                    system(convert_command);
-
-                    // scale and convert cover to BMP
-                    strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_3d_big.jpg\"");
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-                    // scale and convert front cover to BMP
-                    strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_front.jpg\"");
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_front.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-
-                    // scale and convert back cover to BMP
-                    strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_back.jpg\"");
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_back.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-
-
-                    // scale and convert ryg cover to BMP
-                    strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
-                    strcat(convert_command,"\"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_ryg.jpg\"");
-                    strcat(convert_command," \"convert/");
-                    strcat(convert_command,filmoversigt[i].getfilmtitle());
-                    strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
-                    system(convert_command);
-//                    filmoversigt[i].setcover3d(true);				// husk der er 3d cover til denne
-                } else {  // else create cover from mythtv database
-
-                    if (strcmp(filmoversigt[i].getfilmcoverfile(),"")!=0) {			// der findes et cover
-                        strcpy(convert_command,"convert  -quiet -resize 128x200! '");		// first convert and resize dvd cover
-                        strcat(convert_command,row[3]);
-                        strcat(convert_command,"' \"convert/");
-                        strcat(convert_command,row[1]);
-                        strcat(convert_command,".jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-
-                    } else {								// lav front cover selv
-                        strcpy(convert_command,"convert -quiet -size 128x200 xc:gray  -fill white -pointsize 12 -gravity north -annotate +0+15 \"");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"\"  -stroke white -strokewidth 1 -draw 'line 0,0 0,200' ");
-                        strcat(convert_command," -fill black -pointsize 15 -gravity south -annotate +0+5 '");
-                        strcat(convert_command,"DVD Film");
-                        strcat(convert_command,"' -stroke blue -strokewidth 2 -draw 'line 0,169 150,169' \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,".jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-                    }
-
-                    strcpy(convert_command,filmoversigt[i].getfilmtitle());
-                    if (file_exists(convert_command)) {
-                        // create dvd cover ryg
-                        strcpy(convert_command,"convert -quiet -size 200x20 xc:gray -fill white -pointsize 12 -gravity north -annotate +0+5 \"");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"\" -stroke blue -strokewidth 2 -draw 'line 30,0 30,40' -rotate -90 \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-
-                        // create 3d dvd cover
-                        strcpy(convert_command,"convert -quiet -virtual-pixel transparent");
-                        strcat(convert_command," \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"_ryg.jpg\" -matte  +distort Perspective '0,0 -10,5  0,200 -10,195  19.5,200 0,200  19.5,0 0.5,0'"); //  '0,0 -30,20  0,200 -30,179  19.5,200 0,200  19.5,0 0.5,0'
-                        strcat(convert_command," \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,".jpg\" -matte  +distort Perspective '0.5,0 0.5,0  0.5,200  0.5,200  100,200 100,192  100,0 100,5'"); // '0.5,0 0.5,0  0.5,200  0.5,200  150,200 100,156  150,0 100,30'
-                        strcat(convert_command," -background black -layers merge  +repage -bordercolor black  \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-
-                        // scale
-                        strcpy(convert_command,"/usr/bin/convert -quiet -scale 128 ");
-                        strcat(convert_command,"\"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"_3d.jpg\"");
-                        strcat(convert_command," \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-
-                        // scale
-                        strcpy(convert_command,"/usr/bin/convert -quiet -scale 128 ");
-                        strcat(convert_command,"\"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,".jpg\"");
-                        strcat(convert_command," \"convert/");
-                        strcat(convert_command,filmoversigt[i].getfilmtitle());
-                        strcat(convert_command,".jpg\" > /dev/null 2>&1");
-                        system(convert_command);
-                    }
-                }
-            } else {
-                sprintf(resl,"Movie Cover missing: %s \n",row[1]);
-                fputs(resl,filhandle);
-
-            }
-
-            // set 3d cover
-            strcpy(temptxt,"convert/");					// gem fil navn til image loader
-            strcat(temptxt,filmoversigt[i].getfilmtitle());		// fil navn
-            strcat(temptxt,"_3d.jpg");
-
-            if (file_exists(temptxt)) {
-                filmoversigt[i].setfilmcoverfile(temptxt);
-            }
-            // set front dvd cover
-            strcpy(temptxt,"convert/");					// gem fil navn til image loader
-            strcat(temptxt,filmoversigt[i].getfilmtitle());         	// fil navn
-            strcat(temptxt,"_front.jpg");
-
-            if (file_exists(temptxt)) {
-                filmoversigt[i].setfilmfcoverfile(temptxt);
-            }
-
-            // set back cover
-            strcpy(temptxt,"convert/");         		    	// gem fil navn til image loader
-            strcat(temptxt,filmoversigt[i].getfilmtitle());          	// fil navn
-            strcat(temptxt,"_back.jpg");
-
-            if (file_exists(temptxt)) {
-                filmoversigt[i].setfilmbcoverfile(temptxt);
-            }
-            // set ryg cover
-            strcpy(temptxt,"convert/");         		    	// gem fil navn til image loader
-            strcat(temptxt,filmoversigt[i].getfilmtitle());          	// fil navn
-            strcat(temptxt,"_ryg.jpg");
-
-            if (file_exists(temptxt)) {
-                filmoversigt[i].setfilmscoverfile(temptxt);
-            }
-  	        i++;
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if ((mysql_error(conn)) && (debugmode & 512)) {
+            printf("%s\n",mysql_error(conn));
+            exit(0);
+          }
         }
+      }
+      mysql_close(conn);
     }
-    if (filhandle) fclose(filhandle);							// close log file again
+    conn=mysql_init(NULL);
+    // Connect to database
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,mainsqlselect);
+      res = mysql_store_result(conn);
+      i=0;
+      filhandle=fopen("filmcover_gfx.log","w");
+      if (res) {
+          while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+              filmantal++;
+              filmoversigt[i].setfilmid(atoi(row[0]));
+              filmoversigt[i].setfilmtitle(row[1]);
+
+              hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
+              hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+
+              if (row[8]) {							// hent film beskrivelse
+                  filmoversigt[i].setfilmsubtitle(row[8]);
+              } else filmoversigt[i].setfilmsubtitle((char *) "");
+
+              filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
+              filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
+              filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
+              filmoversigt[i].setfilmaar(atoi(row[5]));
+              filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
+              filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
+              filmoversigt[i].setfilmimdbnummer(row[9]);
+              if (row[10]) {							                              // category (type text)
+                strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
+              } else strcpy(filmoversigt[i].category_name,"");
+
+              if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
+              // hvis cover ikke findes som jpg fil lav dem med convert kommandoen.
+
+              strcpy(convert_command,"convert/");
+              strcat(convert_command,filmoversigt[i].getfilmtitle());
+              strcat(convert_command,"_3d.jpg");
+
+              // temp test om file exist
+              strcpy(convert_command1,"convert/");
+              strcat(convert_command1,filmoversigt[i].getfilmtitle());
+              strcat(convert_command1,".jpg");
+
+              // set der findes 3dcover flag i struct
+              if (file_exists(convert_command)) filmoversigt[i].setcover3d(true);
+               // henter antal af filer i dir
+              checkdirexist=countEntriesInDir("/usr/share/mythtv-controller/convert/hires/");
+              if (checkdirexist==2) checkdirexist=0;
+              if ((checkdirexist>0) && (!(file_exists(convert_command))) && (!(file_exists(convert_command1)))) {
+                  strcpy(convert_command,"convert/hires/");
+                  strcat(convert_command,filmoversigt[i].getfilmtitle());
+                  strcat(convert_command,".jpg");
+                  if (file_exists(convert_command)) {									// findes der et hires billede fra cc covers
+                                                                                                            // yes convert to mythtv use
+                      strcpy(convert_command,"/usr/bin/convert -quiet -resize 1024x687! \"convert/hires/");		// first convert and resize dvd cover
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,".jpg\" \"convert/");
+                      strcat(convert_command,row[1]);
+                      strcat(convert_command,".jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // cut front
+                      strcpy(convert_command,"/usr/bin/convert -quiet ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,".jpg\"");
+                      strcat(convert_command," -gravity West -chop 542x0 \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_front.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // cut ryg
+                      strcpy(convert_command,"/usr/bin/convert -quiet ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,".jpg\"");
+                      strcat(convert_command," -gravity West -chop 486x0 -gravity East -chop 486x0 \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // cut back
+                      strcpy(convert_command,"/usr/bin/convert -quiet ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,".jpg\"");
+                      strcat(convert_command," -gravity East -chop 542x0 \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_back.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // create 3d dvd cover
+                      strcpy(convert_command,"/usr/bin/convert -quiet -virtual-pixel transparent");
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_ryg.jpg\" -matte +distort Perspective '0,0 -45,20 0,687 -45,667  52,687 0,687  52,0 0,0'"); //  '0,0 -30,20  0,200 -30,179  19.5,200 0,200  19.5,0 0.5,0'
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_front.jpg\" -matte +distort Perspective '0,0 0,5   0,687 0,907   558,687 551,859  558,0 551,47'"); // '0.5,0 0.5,0  0.5,200  0.5,200  150,200 100,156  150,0 100,30'
+                      strcat(convert_command," -background black -layers merge  +repage -bordercolor black  \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_3d_big.jpg\" > /dev/null 2>&1");
+
+                      system(convert_command);
+
+                      // scale and convert cover to BMP
+                      strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_3d_big.jpg\"");
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+                      // scale and convert front cover to BMP
+                      strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_front.jpg\"");
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_front.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // scale and convert back cover to BMP
+                      strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_back.jpg\"");
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_back.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+
+
+                      // scale and convert ryg cover to BMP
+                      strcpy(convert_command,"/usr/bin/convert -quiet -scale 512 ");
+                      strcat(convert_command,"\"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_ryg.jpg\"");
+                      strcat(convert_command," \"convert/");
+                      strcat(convert_command,filmoversigt[i].getfilmtitle());
+                      strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
+                      system(convert_command);
+  //                    filmoversigt[i].setcover3d(true);				// husk der er 3d cover til denne
+                  } else {  // else create cover from mythtv database
+
+                      if (strcmp(filmoversigt[i].getfilmcoverfile(),"")!=0) {			// der findes et cover
+                          strcpy(convert_command,"convert  -quiet -resize 128x200! '");		// first convert and resize dvd cover
+                          strcat(convert_command,row[3]);
+                          strcat(convert_command,"' \"convert/");
+                          strcat(convert_command,row[1]);
+                          strcat(convert_command,".jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+
+                      } else {								// lav front cover selv
+                          strcpy(convert_command,"convert -quiet -size 128x200 xc:gray  -fill white -pointsize 12 -gravity north -annotate +0+15 \"");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"\"  -stroke white -strokewidth 1 -draw 'line 0,0 0,200' ");
+                          strcat(convert_command," -fill black -pointsize 15 -gravity south -annotate +0+5 '");
+                          strcat(convert_command,"DVD Film");
+                          strcat(convert_command,"' -stroke blue -strokewidth 2 -draw 'line 0,169 150,169' \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,".jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+                      }
+
+                      strcpy(convert_command,filmoversigt[i].getfilmtitle());
+                      if (file_exists(convert_command)) {
+                          // create dvd cover ryg
+                          strcpy(convert_command,"convert -quiet -size 200x20 xc:gray -fill white -pointsize 12 -gravity north -annotate +0+5 \"");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"\" -stroke blue -strokewidth 2 -draw 'line 30,0 30,40' -rotate -90 \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"_ryg.jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+
+                          // create 3d dvd cover
+                          strcpy(convert_command,"convert -quiet -virtual-pixel transparent");
+                          strcat(convert_command," \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"_ryg.jpg\" -matte  +distort Perspective '0,0 -10,5  0,200 -10,195  19.5,200 0,200  19.5,0 0.5,0'"); //  '0,0 -30,20  0,200 -30,179  19.5,200 0,200  19.5,0 0.5,0'
+                          strcat(convert_command," \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,".jpg\" -matte  +distort Perspective '0.5,0 0.5,0  0.5,200  0.5,200  100,200 100,192  100,0 100,5'"); // '0.5,0 0.5,0  0.5,200  0.5,200  150,200 100,156  150,0 100,30'
+                          strcat(convert_command," -background black -layers merge  +repage -bordercolor black  \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+
+                          // scale
+                          strcpy(convert_command,"/usr/bin/convert -quiet -scale 128 ");
+                          strcat(convert_command,"\"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"_3d.jpg\"");
+                          strcat(convert_command," \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,"_3d.jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+
+                          // scale
+                          strcpy(convert_command,"/usr/bin/convert -quiet -scale 128 ");
+                          strcat(convert_command,"\"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,".jpg\"");
+                          strcat(convert_command," \"convert/");
+                          strcat(convert_command,filmoversigt[i].getfilmtitle());
+                          strcat(convert_command,".jpg\" > /dev/null 2>&1");
+                          system(convert_command);
+                      }
+                  }
+              } else {
+                  sprintf(resl,"Movie Cover missing: %s \n",row[1]);
+                  fputs(resl,filhandle);
+
+              }
+
+              // set 3d cover
+              strcpy(temptxt,"convert/");					// gem fil navn til image loader
+              strcat(temptxt,filmoversigt[i].getfilmtitle());		// fil navn
+              strcat(temptxt,"_3d.jpg");
+
+              if (file_exists(temptxt)) {
+                  filmoversigt[i].setfilmcoverfile(temptxt);
+              }
+              // set front dvd cover
+              strcpy(temptxt,"convert/");					// gem fil navn til image loader
+              strcat(temptxt,filmoversigt[i].getfilmtitle());         	// fil navn
+              strcat(temptxt,"_front.jpg");
+
+              if (file_exists(temptxt)) {
+                  filmoversigt[i].setfilmfcoverfile(temptxt);
+              }
+
+              // set back cover
+              strcpy(temptxt,"convert/");         		    	// gem fil navn til image loader
+              strcat(temptxt,filmoversigt[i].getfilmtitle());          	// fil navn
+              strcat(temptxt,"_back.jpg");
+
+              if (file_exists(temptxt)) {
+                  filmoversigt[i].setfilmbcoverfile(temptxt);
+              }
+              // set ryg cover
+              strcpy(temptxt,"convert/");         		    	// gem fil navn til image loader
+              strcat(temptxt,filmoversigt[i].getfilmtitle());          	// fil navn
+              strcat(temptxt,"_ryg.jpg");
+
+              if (file_exists(temptxt)) {
+                  filmoversigt[i].setfilmscoverfile(temptxt);
+              }
+    	        i++;
+          }
+      }
+    }
+    if (filhandle) {
+        fputs("No db avable\n",filhandle);
+        fclose(filhandle);							// close log file again
+    }
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
     if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
