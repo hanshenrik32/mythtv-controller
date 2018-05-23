@@ -12254,7 +12254,7 @@ int main(int argc, char** argv) {
         }
       }
       // movie loader
-      if (configmythtvver>0) {
+      if (configmythtvver>=0) {
         pthread_t loaderthread1;           // the load
         int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
         if (rc1) {
