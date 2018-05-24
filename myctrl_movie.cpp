@@ -125,7 +125,6 @@ void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type 
         tempfilm.frontcover= film1->frontcover;
         tempfilm.backcover = film1->backcover;
         tempfilm.sidecover = film1->sidecover;
-
         tempfilm.film_id   = film1->film_id;
         tempfilm.length    = film1->length;
         tempfilm.year      = film1->year;
@@ -446,6 +445,7 @@ int countEntriesInDir(const char* dirname) {
 
 
 // hent film oversigt
+// create if not exist (mythtv/internal)
 
 int film_oversigt_typem::opdatere_film_oversigt() {
     char convert_command[2000];
@@ -454,6 +454,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     char mainsqlselect[2000];
     char temptxt[1000];
 //    char tmptxt1[200];
+    unsigned int recnr=0;
     unsigned int i;
     int filmantal=0;
     FILE *filhandle;
@@ -468,7 +469,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     char userhomedir[200];
     char movietitle[200];
     char moviepath1[200];
-
+    bool fundet;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
@@ -569,16 +570,34 @@ int film_oversigt_typem::opdatere_film_oversigt() {
             ext = strrchr(moviefil->d_name, '.');
             if (ext) strcpy(filename,moviefil->d_name);
             strcpy(movietitle,filename);
+            //make real title from filename
+            ext=strrchr(movietitle,'.');
+            if (ext) {
+              *(ext)='\0';
+            }
             strcpy(moviepath1,filename);
-            sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                                      (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                      movietitle,"moviesubtitle","movieplot","movieimdb","movieyear","movieuserrating","movielength" ,moviepath1,"filetodownload");
-                                                      
+            int movieyear=2000;
+            float movieuserrating=1.0f;
+            int movielength=120;
+            fundet=false;
+            sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
             mysql_query(conn,sqlselect);
             res = mysql_store_result(conn);
-            if ((mysql_error(conn)) && (debugmode & 512)) {
-              printf("%s\n",mysql_error(conn));
-              exit(0);
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+            }
+            if (!(fundet)) {
+              sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                                        (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                                        movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+              recnr++;
+              printf("recnr %d \n",recnr);
+              mysql_query(conn,sqlselect);
+              res = mysql_store_result(conn);
+              if ((mysql_error(conn)) && (debugmode & 512)) {
+                printf("%s\n",mysql_error(conn));
+                exit(0);
+              }
             }
           }
         }
