@@ -562,22 +562,24 @@ int film_oversigt_typem::opdatere_film_oversigt() {
       // loop dir and update music songs db
       // and find kodi db version
       conn=mysql_init(NULL);
-      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
-      while((moviefil = readdir(dirp))) {
-        if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
-          ext = strrchr(moviefil->d_name, '.');
-          if (ext) strcpy(filename,moviefil->d_name);
-          strcpy(movietitle,filename);
-          strcpy(moviepath1,filename);
-          sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                                    (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                    movietitle,"moviesubtitle","movieplot","movieimdb","movieyear","movieuserrating","movielength" ,moviepath1,"filetodownload");
-
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if ((mysql_error(conn)) && (debugmode & 512)) {
-            printf("%s\n",mysql_error(conn));
-            exit(0);
+      if ((conn) && (dirp)) {
+        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
+        while (moviefil = readdir(dirp)) {
+          if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
+            ext = strrchr(moviefil->d_name, '.');
+            if (ext) strcpy(filename,moviefil->d_name);
+            strcpy(movietitle,filename);
+            strcpy(moviepath1,filename);
+            sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                                      (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                                      movietitle,"moviesubtitle","movieplot","movieimdb","movieyear","movieuserrating","movielength" ,moviepath1,"filetodownload");
+                                                      
+            mysql_query(conn,sqlselect);
+            res = mysql_store_result(conn);
+            if ((mysql_error(conn)) && (debugmode & 512)) {
+              printf("%s\n",mysql_error(conn));
+              exit(0);
+            }
           }
         }
       }
