@@ -10940,9 +10940,9 @@ bool init(void) {
         return 1;
     }
     #endif
-/*  select clearing (background) color       */
+    // select clearing (background) color
     glClearColor (0.0, 0.0, 0.0, 0.0);
-/*  initialize viewing values  */
+    // initialize viewing values
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0.0, orgwinsizex, 0.0, orgwinsizey, -0.0,10.0);
