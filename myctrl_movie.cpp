@@ -556,8 +556,8 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 
       dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
       if (dirp==NULL) {
-        printf("No %s dir found \nOpen dir error %s \n",userhomedir);
-        exit(0);
+        printf("No %s dir found \nOpen dir error \n",userhomedir);
+        //exit(0);
       }
       // loop dir and update music songs db
       // and find kodi db version
