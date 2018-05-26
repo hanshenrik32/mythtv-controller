@@ -586,6 +586,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
             if (res) {
               while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
             }
+            // create record if not exist
             if (!(fundet)) {
               sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                                         (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
