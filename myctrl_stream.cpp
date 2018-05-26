@@ -269,6 +269,12 @@ int stream_class::loadrssfile(bool updaterssfile) {
               parsexmlrssfile(parsefilename);
             }
           }
+          // update master icon
+          if (strcmp(row[0],"")!=0) {
+            sprintf(sqlinsert,"UPDATE internetcontentarticles set paththumb='' where feedtitle like '%s' and paththumb=NULL and url not NULL",row[0]);
+            mysql_query(conn,sqlinsert);
+            res1 = mysql_store_result(conn);
+          }
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
             if (atoi(row[23])==1) {
@@ -444,10 +450,9 @@ int stream_class::parsexmlrssfile(char *filename) {
                 }
                 subnode2=subnode2->next;
               }
-
+              recordexist=false;
               // check if record exist
               if (strcmp(rssvideolink,"")!=0) {
-                recordexist=false;
                 sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
                 mysql_query(conn,sqlinsert);
                 res = mysql_store_result(conn);
@@ -466,7 +471,7 @@ int stream_class::parsexmlrssfile(char *filename) {
             }
             subnode=subnode->next;
           }
-          //if (debugmode & 4) printf("\n");
+          // end while loop
         }
         // youtube type
         // get title
@@ -691,12 +696,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-/*
+
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('TechSNAP',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-*/
+
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Tech Talk Today',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
+
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('PersonalityHacker',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -905,12 +916,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 */
-/*
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TechSNAP',NULL,NULL,'TechSNAP',0,0,NULL,'https://www.youtube.com/watch?v=jJe_NVqCQnU&list=PL995EBE645950DFF5',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('TechSNAP',NULL,NULL,'TechSNAP',0,0,NULL,'http://techsnap.systems/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-*/
+
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Tech Talk Today',NULL,NULL,'TechSNAP',0,0,NULL,'http://techtalk.today/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('The Story from The Guardian',NULL,NULL,'The Story from The Guardian',0,0,NULL,'https://www.theguardian.com/news/series/the-story/podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
