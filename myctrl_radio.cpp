@@ -126,8 +126,8 @@ int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-        mysql_close(conn);
     }
+    if (conn) mysql_close(conn);
     return(1);
 }
 
@@ -253,13 +253,13 @@ int radiostation_class::opdatere_radio_oversigt() {
       } else {
         fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
       }
-      mysql_close(conn);
       //load_radio_stations_gfx();
       return(antal-1);
   } else {
     fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
   //  exit(0);
   }
+  if (conn) mysql_close(conn);
   return(0);
 }
 
@@ -317,9 +317,9 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
                 }
             }
         }
-        if (conn) mysql_close(conn);
         if (antal>0) return(antal-1); else return(0);
     } else fprintf(stderr,"Failed to connect to database: Error: %s\n",mysql_error(conn));
+    if (conn) mysql_close(conn);
     return(0);
 }
 
@@ -391,13 +391,14 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
         } else {
           fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
         }
-        mysql_close(conn);
+        if (conn) mysql_close(conn);
         //load_radio_stations_gfx();
         return(antal-1);
     } else {
       fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
     //  exit(0);
     }
+    if (conn) mysql_close(conn);
     return(0);
 }
 
@@ -1100,13 +1101,13 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
 
                             error=(init_sockaddr(&servername,ipadresse,port));
                             if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
-                                if (cerror==0) {
-                                    if (debugmode & 1) fprintf(stderr," Station OK. \n ");
-                                    radiook=true;
-                                } else radiook=false;
+                              if (cerror==0) {
+                                if (debugmode & 1) fprintf(stderr," Station OK. \n ");
+                                radiook=true;
+                              } else radiook=false;
                             } else {
-                                if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
-                                radiook=false;
+                              if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
+                              radiook=false;
                             }
                             close (sock);
                         }
@@ -1118,26 +1119,26 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 // find radio station
                 nfundet=false;
                 while ((nn<antal) && (nfundet==false)) {
-                    if  (stack[nn]->station_name) {
-                        // if found set active again
-                        if (strcmp(stack[nn]->station_name,st_name)==0) {
-                            stack[nn]->online=1;
-                            nfundet=true;
-                        } else nn++;
+                  if  (stack[nn]->station_name) {
+                    // if found set active again
+                    if (strcmp(stack[nn]->station_name,st_name)==0) {
+                      stack[nn]->online=1;
+                      nfundet=true;
                     } else nn++;
+                  } else nn++;
                 }
             }
             if ((conn) && (radiostation)) {
-                if ((radiook) && (nfundet)) {
-                    sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
-                } else {
-                    sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
-                }
-                mysql_query(conn,sqlselect);
-                res = mysql_store_result(conn);
+              if ((radiook) && (nfundet)) {
+                sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
+              } else {
+                sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
+              }
+              mysql_query(conn,sqlselect);
+              res = mysql_store_result(conn);
             }
-            mysql_close(conn);
         }
+        if (conn) mysql_close(conn);
     }
     return(radiostation);		// we are done check all radio stations in database
 //	    return(1);			// enable to task to check 4 ever

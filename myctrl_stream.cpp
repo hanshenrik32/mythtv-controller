@@ -1105,12 +1105,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
 
 
-        mysql_close(conn);
+        if (conn) mysql_close(conn);
         // download new rrs files we just insert in db
         loadrssfile(1);
       }
     }
-
+    if (conn) mysql_close(conn);
     if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
@@ -1138,7 +1138,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       getart=2;
     }
     this->type=getart;					// husk sql type
-
 
     if (debugmode & 4) printf("RSS stream loader started... \n");
 
