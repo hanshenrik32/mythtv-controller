@@ -134,10 +134,23 @@ void vlc_controller::stopmedia() {
 }
 
 
+float vlc_controller::jump_position(float ofset) {
+  float pos=get_position();
+  pos+=pos+(ofset/100);
+  set_position(pos);
+}
+
+
 // return play pos
 
 float vlc_controller::get_position() {
   return(libvlc_media_player_get_position(vlc_mp));
+}
+
+
+float vlc_controller::set_position(float pos) {
+  libvlc_media_player_set_position(vlc_mp,pos);
+  return(pos);
 }
 
 void vlc_controller::pnext_chapter() {

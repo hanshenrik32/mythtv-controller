@@ -31,11 +31,22 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-extern int debugmode;
-extern unsigned int musicoversigt_antal;
-extern int do_stream_icon_anim_icon_ofset;
-extern GLuint radiooptions,radiooptionsmask;			//
-extern GLuint _textureIdback;  					// back icon
+// debug mode
+// 1  = wifi net
+// 2  = music
+// 4  = stream
+// 8  = keyboard/mouse move
+// 16 = movie
+// 32 = searcg
+extern int debugmode;                                           // 64 = radio station land icon loader
+// 128= stream search
+// 256 = tv program stuf
+// 512 = media importer
+// 1024 = flag loader
+extern unsigned int musicoversigt_antal;                                        //
+extern int do_stream_icon_anim_icon_ofset;                                      //
+extern GLuint radiooptions,radiooptionsmask;			                              //
+extern GLuint _textureIdback;  					                                        // back icon
 extern GLuint newstuf_icon;
 extern int fonttype;
 extern fontctrl aktivfont;
@@ -106,15 +117,12 @@ void stream_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
-
-
 //
 // vlc player interface
 //
 
-
 // default player
-// stop playing movie
+// stop playing stream sound or video
 
 void stream_class::stopstream() {
   if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
@@ -128,6 +136,12 @@ void stream_class::softstopstream() {
   stream_is_playing=false;
 }
 
+// jump in player
+
+float stream_class::jump_position(float ofset) {
+    ofset=vlc_controller::jump_position(ofset);
+    return(ofset);
+}
 
 // to play streams from web
 //vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
@@ -200,6 +214,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
   // get homedir
   getuserhomedir(homedir);
   strcat(homedir,"/rss");
+  if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  strcat(homedir,"/images");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
@@ -1225,7 +1241,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                                 // save file in  user homedir rss/
                                 getuserhomedir(homedir);                                  // get homedir
                                 strcpy(downloadfilenamelong,homedir);
-                                strcat(downloadfilenamelong,"/rss/");
+                                strcat(downloadfilenamelong,"/rss/images/");
                                 strcat(downloadfilenamelong,downloadfilename);
                                 if (!(file_exists(downloadfilenamelong))) {
                                   if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
@@ -1393,7 +1409,7 @@ void *load_all_stream_gfx(void *data) {
                     get_webfilename(downloadfilename,tmpfilename);
                     getuserhomedir(homedir);
                     strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/");
+                    strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     filechange=strcmp(lastfile,downloadfilename);
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
@@ -1410,7 +1426,7 @@ void *load_all_stream_gfx(void *data) {
                     get_webfilename(downloadfilename,tmpfilename);
                     getuserhomedir(homedir);
                     strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/");
+                    strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     filechange=strcmp(lastfile,downloadfilename);
                     if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
