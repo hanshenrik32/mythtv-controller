@@ -135,10 +135,27 @@ void vlc_controller::stopmedia() {
 
 
 float vlc_controller::jump_position(float ofset) {
+  int totallengths;
+  float addval;
   float pos=get_position();
-  pos+=pos+(ofset/100);
+  totallengths=(get_length_in_ms()/1000/60);
+  addval=(float) totallengths/100;
+
+  //printf("(addval/100) is %f \n ",(addval/100));
+
+  if (ofset>0) {
+    if (pos+addval<1.0f) pos+=pos+(addval/100); else if (pos+(addval/100)*10>0.0f) pos-=pos+((addval/100)*10);
+  }
   set_position(pos);
 }
+
+
+unsigned long vlc_controller::get_length_in_ms() {
+  libvlc_time_t length;
+  length=libvlc_media_player_get_length(vlc_mp);
+  return((unsigned long) length);
+}
+
 
 
 // return play pos
