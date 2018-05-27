@@ -32,6 +32,8 @@
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
+bool stream_jump=false;
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -4054,6 +4056,35 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
         glEnd();
 
+        // backward button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemlast);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(10);                        // 10 = forward(10)
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
+        glEnd();
+
+        // forward button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemnext);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(11);                        // 10 = forward(10)
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+350 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+350,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
+        glEnd();
+
+
         glPushMatrix();
         glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
         glScalef(20,20, 1.0);                    // danish charset ttf
@@ -5994,8 +6025,23 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_stop_stream=true;                                            // flag to stop play
             stopstream=true;                                                // flag to stop play
             do_play_stream=false;
+            stream_jump=false;
             if (streamoversigt.stream_is_playing) streamoversigt.stopstream();
           }
+
+          // jump forward button stream
+          if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover)) {
+            fundet=true;
+            stream_jump=true;
+            if (streamoversigt.stream_is_playing) streamoversigt.jump_position(10.0f);
+          }
+          // jump backward button stream
+          if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover)) {
+            fundet=true;
+            stream_jump=true;
+            if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
+          }
+
         }
 
         // film oversigt
@@ -6480,7 +6526,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
 
         // update or scroll stream up/down/play
-        if (vis_stream_oversigt) {
+        if ((vis_stream_oversigt) && (stream_jump==false)) {
           if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
             if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
             if (streamoversigt.type==0) {

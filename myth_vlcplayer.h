@@ -18,6 +18,8 @@ class vlc_controller {
     int playwebmedia(char *path);
     void stopmedia();
     float get_position();
+    float set_position(float pos);
+    float jump_position(float ofset);
     void pnext_chapter();
     void plast_chapter();
     void volume_up(int volume);
