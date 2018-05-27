@@ -136,6 +136,11 @@ void stream_class::softstopstream() {
   stream_is_playing=false;
 }
 
+
+unsigned long stream_class::get_length_in_ms() {
+  vlc_controller::get_length_in_ms();
+}
+
 // jump in player
 
 float stream_class::jump_position(float ofset) {
