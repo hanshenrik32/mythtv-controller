@@ -1346,6 +1346,7 @@ int stream_class::loadweb_stream_iconoversigt()
   char tmpfilename[200];
   char downloadfilename[200];
   char downloadfilenamelong[200];
+  char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
   while(nr<antal) {
@@ -1353,26 +1354,36 @@ int stream_class::loadweb_stream_iconoversigt()
       loadstatus=0;
       // return downloadfilename from stack[nr]->feed_gfx_mythtv
       strcpy(tmpfilename,stack[nr]->feed_gfx_mythtv);
-      if (strncmp(tmpfilename,"https://",8)==0) {
-        printf("Https site \n");
-      }
       if (strncmp(tmpfilename,"http://",7)==0) {
         // download file from web
         // return dowloadfilebame = file downloaded name no path
         get_webfilename(downloadfilename,tmpfilename);
         // add download path
         // add download filename to class opbject
-        strcpy(downloadfilenamelong,"/usr/share/mythtv-controller/images/mythnetvision/");
+        getuserhomedir(downloadfilenamelong);
+        strcpy(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if (!(file_exists(downloadfilenamelong))) {
-
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-
           loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
           //printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
+        }
+      } else if (strncmp(tmpfilename,"https://",8)==0) {
+        //strcpy(lastfile,downloadfilename);
+        get_webfilename(downloadfilename,tmpfilename);
+        getuserhomedir(downloadfilenamelong);
+        // build path
+        strcat(downloadfilenamelong,"/rss/images/");
+        strcat(downloadfilenamelong,downloadfilename);
+        if (!(file_exists(downloadfilenamelong))) {
+          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+        } else {
+          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view

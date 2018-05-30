@@ -246,5 +246,6 @@ int get_webfile2(char *webpath,char *outfile) {
   strcat(command,webpath);
   strcat(command," -O ");
   strcat(command,outfile);
+  strcat(command," 2>%1 ");
   system(command);
 }
