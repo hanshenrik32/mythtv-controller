@@ -1361,7 +1361,7 @@ int stream_class::loadweb_stream_iconoversigt()
         // add download path
         // add download filename to class opbject
         getuserhomedir(downloadfilenamelong);
-        strcpy(downloadfilenamelong,"/rss/images/");
+        strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if (!(file_exists(downloadfilenamelong))) {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
