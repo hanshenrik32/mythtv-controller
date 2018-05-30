@@ -238,7 +238,7 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) return(1); else return(0);
 }
 
-
+// used to download images from web
 
 int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
@@ -246,5 +246,6 @@ int get_webfile2(char *webpath,char *outfile) {
   strcat(command,webpath);
   strcat(command," -O ");
   strcat(command,outfile);
+  strcat(command," 2>%1 ");
   system(command);
 }

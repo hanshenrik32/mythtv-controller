@@ -126,8 +126,8 @@ int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-        mysql_close(conn);
     }
+    if (conn) mysql_close(conn);
     return(1);
 }
 
@@ -253,18 +253,15 @@ int radiostation_class::opdatere_radio_oversigt() {
       } else {
         fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
       }
-      mysql_close(conn);
       //load_radio_stations_gfx();
       return(antal-1);
   } else {
     fprintf(stderr,"\nFailed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
   //  exit(0);
   }
+  if (conn) mysql_close(conn);
   return(0);
 }
-
-
-
 
 
 
@@ -320,9 +317,9 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
                 }
             }
         }
-        if (conn) mysql_close(conn);
         if (antal>0) return(antal-1); else return(0);
     } else fprintf(stderr,"Failed to connect to database: Error: %s\n",mysql_error(conn));
+    if (conn) mysql_close(conn);
     return(0);
 }
 
@@ -394,13 +391,14 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
         } else {
           fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
         }
-        mysql_close(conn);
+        if (conn) mysql_close(conn);
         //load_radio_stations_gfx();
         return(antal-1);
     } else {
       fprintf(stderr,"Failed to update radiodb, can not connect to database: mythtvcontroller Error: %s\n",mysql_error(conn));
     //  exit(0);
     }
+    if (conn) mysql_close(conn);
     return(0);
 }
 
@@ -432,6 +430,12 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     char *lastslash;
     bool radio_pictureloaded=true;
     const char *radiostation_iconsgfx="/usr/share/mythtv-controller/images/radiostations/";
+
+    char *base,*right_margin;
+    int length,width;
+    int pline=0;
+
+
     sofset=(_mangley/40)*8;
     //static bool radio_oversigt_loaded=false;
     static int radio_oversigt_loaded_nr=0;
@@ -598,25 +602,78 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 
         // print radios station name
         glPushMatrix();
+
+        float fontsiz=15.0f;
+        pline=0;
+        glTranslatef(xof,yof-18,0);
         glDisable(GL_TEXTURE_2D);
-        glTranslatef(xof,yof-218,0);
-        glScalef(20.0, 20.0, 1.0);
+        glScalef(fontsiz, fontsiz, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glDisable(GL_TEXTURE_2D);
+
+        bool stop=false;
+
+        strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
+        base=temptxt;
+        length=strlen(temptxt);
+        width = 22;
+        while(*base) {
+          if(length <= width) {
+            glcRenderString(base);
+            pline++;
+            glTranslatef(xof,(yof-18)-pline*1.2f,0);
+            //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
+            //puts(base);                                       // display string
+            break;
+          }
+          right_margin = base+width;
+          while((!isspace(*right_margin)) && (stop==false)) {
+            right_margin--;
+            if (right_margin == base) {
+              right_margin += width;
+              while(!isspace(*right_margin)) {
+                if (*right_margin == '\0') break;
+                else stop=true;
+                right_margin++;
+              }
+            }
+          }
+          if (stop) *(base+width)='\0';
+          *right_margin = '\0';
+          glcRenderString(base);
+          pline++;
+          glTranslatef(xof,(yof-18)-pline*1.2f,0);
+          //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
+          //puts(base);
+          length -= right_margin-base+1;                         // +1 for the space
+          base = right_margin+1;
+          if (pline>=2) break;
+        }
+
+/*
+        float fontsiz=15.0f;
+        glDisable(GL_TEXTURE_2D);
+        glTranslatef(xof,yof-18,0);
+        glScalef(fontsiz, fontsiz, 1.0);
         strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
         lastslash=strrchr(temptxt,'/');
         if (lastslash) strcpy(temptxt,lastslash+1);
-        float ytextofset=0.0f;
+        //float ytextofset=0.0f;
         int ii,j,k,pos,ofs;
         ii=pos=0;
         char word[16000];
         ofs=(strlen(temptxt)/2)*9;
 
-        glTranslatef(1,10,0);
+        //glTranslatef(1,10,0);
         if (strlen(temptxt)<=14) glcRenderString(temptxt);
         else {
             temptxt[14]=0;
             glcRenderString(temptxt);
 
         }
+*/
+
         glPopMatrix();
 
         xof=xof+buttonsize+6;
@@ -1044,13 +1101,13 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
 
                             error=(init_sockaddr(&servername,ipadresse,port));
                             if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
-                                if (cerror==0) {
-                                    if (debugmode & 1) fprintf(stderr," Station OK. \n ");
-                                    radiook=true;
-                                } else radiook=false;
+                              if (cerror==0) {
+                                if (debugmode & 1) fprintf(stderr," Station OK. \n ");
+                                radiook=true;
+                              } else radiook=false;
                             } else {
-                                if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
-                                radiook=false;
+                              if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
+                              radiook=false;
                             }
                             close (sock);
                         }
@@ -1062,26 +1119,26 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 // find radio station
                 nfundet=false;
                 while ((nn<antal) && (nfundet==false)) {
-                    if  (stack[nn]->station_name) {
-                        // if found set active again
-                        if (strcmp(stack[nn]->station_name,st_name)==0) {
-                            stack[nn]->online=1;
-                            nfundet=true;
-                        } else nn++;
+                  if  (stack[nn]->station_name) {
+                    // if found set active again
+                    if (strcmp(stack[nn]->station_name,st_name)==0) {
+                      stack[nn]->online=1;
+                      nfundet=true;
                     } else nn++;
+                  } else nn++;
                 }
             }
             if ((conn) && (radiostation)) {
-                if ((radiook) && (nfundet)) {
-                    sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
-                } else {
-                    sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
-                }
-                mysql_query(conn,sqlselect);
-                res = mysql_store_result(conn);
+              if ((radiook) && (nfundet)) {
+                sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
+              } else {
+                sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
+              }
+              mysql_query(conn,sqlselect);
+              res = mysql_store_result(conn);
             }
-            mysql_close(conn);
         }
+        if (conn) mysql_close(conn);
     }
     return(radiostation);		// we are done check all radio stations in database
 //	    return(1);			// enable to task to check 4 ever
