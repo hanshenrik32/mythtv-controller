@@ -244,7 +244,7 @@ int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
   strcpy(command,"wget ");
   strcat(command,webpath);
-  strcat(command," -O ");
+  strcat(command," -O- | convert -resize '320x320>' - - > ");
   strcat(command,outfile);
   strcat(command," 2>%1 ");
   system(command);
