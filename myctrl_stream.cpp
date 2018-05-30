@@ -554,7 +554,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                     content = xmlNodeGetContent(subnode3);
                     tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
                     if (tmpdat) {
-                      if (debugmode & 4) printf("Get image url %s \n",tmpdat);
+                      //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
                       strcpy(rssprgimage1,(char *) tmpdat);
                       xmlFree(tmpdat);
                     }
@@ -1115,7 +1115,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         loadrssfile(1);
       }
     }
-    if (conn) mysql_close(conn);
+//    if (conn) mysql_close(conn);
     if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
 
     clean_stream_oversigt();                // clean old list
