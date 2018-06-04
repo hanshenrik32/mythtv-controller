@@ -31,23 +31,23 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-// debug mode
-// 1  = wifi net
-// 2  = music
-// 4  = stream
-// 8  = keyboard/mouse move
-// 16 = movie
-// 32 = searcg
+                                                                // debug mode
+                                                                // 1  = wifi net
+                                                                // 2  = music
+                                                                // 4  = stream
+                                                                // 8  = keyboard/mouse move
+                                                                // 16 = movie
+                                                                // 32 = searcg
 extern int debugmode;                                           // 64 = radio station land icon loader
-// 128= stream search
-// 256 = tv program stuf
-// 512 = media importer
-// 1024 = flag loader
-extern unsigned int musicoversigt_antal;                                        //
-extern int do_stream_icon_anim_icon_ofset;                                      //
-extern GLuint radiooptions,radiooptionsmask;			                              //
-extern GLuint _textureIdback;  					                                        // back icon
-extern GLuint newstuf_icon;
+                                                                // 128= stream search
+                                                                // 256 = tv program stuf
+                                                                // 512 = media importer
+                                                                // 1024 = flag loader
+extern unsigned int musicoversigt_antal;                        //
+extern int do_stream_icon_anim_icon_ofset;                      //
+extern GLuint radiooptions,radiooptionsmask;			              //
+extern GLuint _textureIdback;  					                        // back icon
+extern GLuint newstuf_icon;                                     //
 extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
