@@ -31,23 +31,23 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-// debug mode
-// 1  = wifi net
-// 2  = music
-// 4  = stream
-// 8  = keyboard/mouse move
-// 16 = movie
-// 32 = searcg
+                                                                // debug mode
+                                                                // 1  = wifi net
+                                                                // 2  = music
+                                                                // 4  = stream
+                                                                // 8  = keyboard/mouse move
+                                                                // 16 = movie
+                                                                // 32 = searcg
 extern int debugmode;                                           // 64 = radio station land icon loader
-// 128= stream search
-// 256 = tv program stuf
-// 512 = media importer
-// 1024 = flag loader
-extern unsigned int musicoversigt_antal;                                        //
-extern int do_stream_icon_anim_icon_ofset;                                      //
-extern GLuint radiooptions,radiooptionsmask;			                              //
-extern GLuint _textureIdback;  					                                        // back icon
-extern GLuint newstuf_icon;
+                                                                // 128= stream search
+                                                                // 256 = tv program stuf
+                                                                // 512 = media importer
+                                                                // 1024 = flag loader
+extern unsigned int musicoversigt_antal;                        //
+extern int do_stream_icon_anim_icon_ofset;                      //
+extern GLuint radiooptions,radiooptionsmask;			              //
+extern GLuint _textureIdback;  					                        // back icon
+extern GLuint newstuf_icon;                                     //
 extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
@@ -875,6 +875,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('going linux',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
 
 
 
@@ -1109,29 +1114,30 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('going linux',NULL,NULL,'going linux',0,0,NULL,'http://goinglinux.com/mp3podcast.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+
 
         if (conn) mysql_close(conn);
         // download new rrs files we just insert in db
         loadrssfile(1);
       }
     }
-//    if (conn) mysql_close(conn);
-    if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
-
+    //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
-    if (debugmode & 4) printf("loading stream mythtv data.\n");
+    if (debugmode & 4) printf("loading rss/stream data.\n");
 
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
-//      sprintf(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontentarticles.paththumb from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
       sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
       getart=0;
     }
     if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
-      //strcat(sqlselect,"' group by path order by path,title asc");
       strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title ASC");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
@@ -1527,16 +1533,16 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     char gfxshortname[200];
     char temptxt[200];
     char word[200];
-    char downloadfilename_last[1024];
+    static char downloadfilename_last[1024];
     int antal_loaded=0;
     static int stream_oversigt_loaded_done=0;
     GLuint texture;
-
+    static GLuint last_texture;
     char *base,*right_margin;
     int length,width;
     int pline=0;
 
-    strcpy(downloadfilename_last,"");
+    if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
@@ -1546,6 +1552,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         strcpy(gfxshortname,gfxshortnamepointer);
       }
       // load texture if none loaded
+      // get_texture return 0 if not loaded
       if (get_texture(stream_oversigt_loaded_nr)==0) {
         if (strcmp(gfxfilename,"")!=0) {
           // check om der findes en downloaded icon
@@ -1556,15 +1563,22 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
             if (file_exists(gfxfilename)) {
               texture=loadTexture ((char *) gfxfilename);
               if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              last_texture=texture;
               antal_loaded+=1;
             } else if (file_exists(downloadfilenamelong)) {
+              // er det ikke samme texture som sidst loaded så load it
+              // else set last used
               texture=loadTexture ((char *) downloadfilenamelong);
               if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              last_texture=texture;
               antal_loaded+=1;
             } else texture=0;
-          } else if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+          } else {
+            if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+            antal_loaded+=1;
+          }
           // husk last file name
-          strcpy(downloadfilename_last,gfxfilename);
+          strcpy(downloadfilename_last,downloadfilenamelong);
         }
       }
       // down loading ?
@@ -1832,5 +1846,4 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
-
 }
