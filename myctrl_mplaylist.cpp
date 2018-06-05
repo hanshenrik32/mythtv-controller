@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
-#include <string.h> 
+#include <string.h>
 #include <stdio.h>
 //#include <irrKlang.h>
 #include <iostream>   // one of two
@@ -15,7 +15,7 @@ int mplaylist::m_play_playlist(char *path,int recnr) {
     if (recnr<=MAX_IN_PLAYLIST-1) {
         strcpy(path,aktiv_playlist[recnr].filename);			// return file name to mp3file
         return(1);
-    } else return(0);    
+    } else return(0);
 }
 
 int mplaylist::m_add_playlist(char *file,char *songid,char *artistid,char *albumname,char *songname,char *artistname,char *songlength,int position,GLuint texture) {
@@ -74,7 +74,7 @@ int mplaylist::get_artistname(char *resl,int recnr) {
         return(1);
     } else return(0);
 }
-    
+
 
 int mplaylist::get_albumname(char *resl,int recnr) {
     if (recnr<playlist_length) {
@@ -122,5 +122,3 @@ mplaylist::mplaylist() {
 mplaylist::~mplaylist() {
 
 }
-
-
