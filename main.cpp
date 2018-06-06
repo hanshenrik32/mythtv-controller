@@ -6558,12 +6558,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
             }
             // play stream
-            if ((sknapnr>=0) && (do_play_stream)) {
-              if ((streamoversigt.get_stream_url(sknapnr)) && (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0)) {
+            if ((sknapnr-1>=0) && (do_play_stream)) {
+              if ((streamoversigt.get_stream_url(sknapnr-1)) && (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0)) {
                 startstream=true;
                 do_zoom_stream=true;                    // set show player
               } else {
-                if (streamoversigt.get_stream_url(sknapnr)) startstream=true;
+                if (streamoversigt.get_stream_url(sknapnr-1)) startstream=true;
                 do_zoom_stream=true;                    // set show player
               }
               printf("Set show playing stream\n ");
