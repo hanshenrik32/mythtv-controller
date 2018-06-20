@@ -95,6 +95,7 @@ char systemcommand[2000];                               // shell command to do t
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 // koki db names (by version)
 const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+const char *kodivermovie[7]={"MyVideos107.db","MyVideos104.db","MyVideos99.db","MyVideos99.db","MyVideos99.db","MyVideos99.db"};
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
@@ -11417,7 +11418,10 @@ void *xbmcdatainfoloader(void *data) {
     strcpy(videohomedirpath,userhomedir);
     strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
-      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+      case 17:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+                break;
+      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
       case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
@@ -11573,28 +11577,28 @@ void *xbmcdatainfoloader_movie(void *data) {
       if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
         ext = strrchr(de->d_name, '.');
         if (ext) strcpy(filename,de->d_name);
-        if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
-          if (strcmp(filename,kodiver[0])==0) {
-            kodiverfound=16;
-            printf("Kodi version 16 is found \n");
+        if ((strncmp(filename,"MyVideos",8)==0) && (!(kodiverfound))) {
+          if (strcmp(filename,kodivermovie[0])==0) {
+            kodiverfound=17;
+            printf("Kodi version 17 is found \n");
           }
-          if (strcmp(filename,kodiver[1])==0) {
+          if (strcmp(filename,kodivermovie[1])==0) {
             kodiverfound=15;
             printf("Kodi version 15 is found \n");
           }
-          if (strcmp(filename,kodiver[2])==0) {
+          if (strcmp(filename,kodivermovie[2])==0) {
             kodiverfound=14;
             printf("Kodi version 14 is found \n");
           }
-          if (strcmp(filename,kodiver[3])==0) {
+          if (strcmp(filename,kodivermovie[3])==0) {
             kodiverfound=13;
             printf("Kodi version 13 is found \n");
           }
-          if (strcmp(filename,kodiver[4])==0) {
+          if (strcmp(filename,kodivermovie[4])==0) {
             kodiverfound=12;
             printf("Kodi version 12 is found \n");
           }
-          if (strcmp(filename,kodiver[5])==0) {
+          if (strcmp(filename,kodivermovie[5])==0) {
             kodiverfound=11;
             printf("Kodi version 11 is found \n");
           }
@@ -11606,6 +11610,9 @@ void *xbmcdatainfoloader_movie(void *data) {
     strcpy(videohomedirpath,userhomedir);
     // add kodi dir ro db files
     switch (kodiverfound) {
+      case 17:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+                break;
       case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
