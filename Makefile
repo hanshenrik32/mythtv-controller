@@ -1,7 +1,7 @@
-CC = gcc
+C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
+CFLAGS = -Wformat-truncation -pthread -m32 -Wformat-overflow -std=c++11
 PROG     = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
@@ -38,23 +38,25 @@ endif
 
 
 ifeq ($(LBITS),64)
-      STDCLIB = /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-      GLLIB = /usr/lib/x86_64-linux-gnu/mesa/libGL.so
+	STDCLIB = /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 else
 	STDCLIB = /usr/lib/i386-linux-gnu/libstdc++.so.6
-	GLLIB = /usr/lib/i386-linux-gnu/mesa/libGL.so
+	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')	
 endif
 
 
 
-OPTS =  -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) /usr/lib/libGLC.so -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) -lXrandr -I/usr/include/libxml2
+OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
 
 SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myth_vlcplayer.cpp
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lcurl -lSDL_mixer -lpthread -lxml2
+	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2
 endif
 
 all:
