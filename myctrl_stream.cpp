@@ -296,6 +296,9 @@ int stream_class::loadrssfile(bool updaterssfile) {
           }
           // update master icon
           if ((strcmp(row[0],"")!=0) && (strcmp(baseicon,"")!=0)) {
+            if (debugmode & 4) {
+              printf("Create/update podcast from %s url in db\n",row[0]);
+            }
             sprintf(sqlinsert,"UPDATE internetcontentarticles set paththumb='%s' where feedtitle like '%s' and paththumb IS NULL",baseicon,row[0]);
             mysql_query(conn,sqlinsert);
             res1 = mysql_store_result(conn);
@@ -489,6 +492,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 }
                 // creoate record if not exist
                 if (!(recordexist)) {
+                  if (debugmode & 4) {
+                    printf("Create/update podcast %s in db\n",rssprgtitle);
+                  }
                   sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                   mysql_query(conn,sqlinsert);
                   res = mysql_store_result(conn);
