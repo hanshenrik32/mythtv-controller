@@ -791,8 +791,8 @@ int hentmythtvver() {
       while ((row = mysql_fetch_row(res)) != NULL) {
         strcpy(txtversion,row[0]);		// hent ver
       }
-      mysql_close(conn);
     }
+    if (conn) mysql_close(conn);
     return(atoi(txtversion));
 }
 
@@ -1484,6 +1484,7 @@ void load_config(char * filename) {
         fclose(file);
       } else printf("Disk write error, saving mythtv-controller.keys\n");
     }
+    if (conn) mysql_close(conn);
 }
 
 
