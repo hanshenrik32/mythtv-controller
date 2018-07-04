@@ -603,6 +603,8 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
 //
 
 // load felt 7 = mythtv gfx icon
+// fpath=stream path
+// atr = stream name
 
 int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char sqlselect[2048];
@@ -1134,7 +1136,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
-    if (debugmode & 4) printf("loading rss/stream data.\n");
+
+    if (debugmode & 4) {
+      printf("loading rss/stream data.\n");
+      printf("art = %s tpath = %s \n",art,fpath);
+    }
 
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
@@ -1167,7 +1173,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         if (res) {
             while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
+                //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
                 if (antal<maxantal) {
                     stack[antal]=new (struct stream_oversigt_type);
                     if (stack[antal]) {
@@ -1336,7 +1342,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 //
-// thread web loader
+// thread web loader (loading all icons)
 //
 
 void *loadweb(void *data) {
