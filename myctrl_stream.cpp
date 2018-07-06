@@ -89,10 +89,13 @@ stream_class::~stream_class() {
 }
 
 
+// return the name 
 char *stream_class::get_stream_name(int nr) {
   if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
 }
 
+
+// return the description
 char *stream_class::get_stream_desc(int nr) {
   if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
 }
@@ -111,8 +114,8 @@ void stream_class::clean_stream_oversigt() {
     stream_oversigt_nowloading=0;
 }
 
-// set en stream icon image
 
+// set en stream icon image
 void stream_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
