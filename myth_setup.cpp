@@ -2062,7 +2062,7 @@ void show_setup_sql() {
       glTranslatef(500.0f, 650.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       myglprint4((char *) text);
-    } else if (strcmp(configbackend,"xbmc")==0) {
+    } else if ((strcmp(configbackend,"xbmc")==0) || (strcmp(configbackend,"kodi")==0)) {
       if (configxbmcver) {
         if (configxbmcver==75) sprintf(text,"XBMC version     : 12 found"); else sprintf(text,"XBMC version     : %d found",configxbmcver);
       } else sprintf(text,"NO XBMC version found");
@@ -2098,7 +2098,7 @@ void show_setup_sql() {
     glTranslatef(10.0f, -100.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     if (strcmp(configbackend,"mythtv")==0) myglprint4((char *) "Mythtv server");
-    else myglprint4((char *) "XBMC server");
+    else myglprint4((char *) "XBMC/KODI server");
     glRasterPos2f(140.0f, 0.0f);
     myglprint4((char *) ":");
     if (do_show_setup_select_linie==1) {
