@@ -456,7 +456,6 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     char sqlselect[4000];
     char mainsqlselect[2000];
     char temptxt[1000];
-//    char tmptxt1[200];
     unsigned int recnr=0;
     unsigned int i;
     int filmantal=0;
@@ -557,13 +556,14 @@ int film_oversigt_typem::opdatere_film_oversigt() {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
       }
-
-      dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
+      //configdefaultmoviepath
+      dirp=opendir(configmoviepath);                                                          // "~/.kodi/userdata/Database/");
+      //dirp=opendir(configdefaultmoviepath);                                                          // "~/.kodi/userdata/Database/");
       if (dirp==NULL) {
         printf("No %s dir found \nOpen dir error \n",userhomedir);
         //exit(0);
       }
-      // loop dir and update music songs db
+      // loop dir and update movie db
       // and find kodi db version
       conn=mysql_init(NULL);
       if ((conn) && (dirp)) {
@@ -579,6 +579,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
               *(ext)='\0';
             }
             strcpy(moviepath1,filename);
+            if (debugmode & 16) printf("Checking/Update %s db :%s \n",movietitle);
             int movieyear=2000;
             float movieuserrating=1.0f;
             int movielength=120;
@@ -829,18 +830,16 @@ int film_oversigt_typem::opdatere_film_oversigt() {
                       }
                   }
               } else {
-                  sprintf(resl,"Movie Cover missing: %s \n",row[1]);
-                  fputs(resl,filhandle);
-
+                sprintf(resl,"Movie Cover missing: %s \n",row[1]);
+                fputs(resl,filhandle);
               }
-
               // set 3d cover
               strcpy(temptxt,"convert/");					// gem fil navn til image loader
               strcat(temptxt,filmoversigt[i].getfilmtitle());		// fil navn
               strcat(temptxt,"_3d.jpg");
 
               if (file_exists(temptxt)) {
-                  filmoversigt[i].setfilmcoverfile(temptxt);
+                filmoversigt[i].setfilmcoverfile(temptxt);
               }
               // set front dvd cover
               strcpy(temptxt,"convert/");					// gem fil navn til image loader
@@ -848,7 +847,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
               strcat(temptxt,"_front.jpg");
 
               if (file_exists(temptxt)) {
-                  filmoversigt[i].setfilmfcoverfile(temptxt);
+                filmoversigt[i].setfilmfcoverfile(temptxt);
               }
 
               // set back cover
@@ -857,7 +856,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
               strcat(temptxt,"_back.jpg");
 
               if (file_exists(temptxt)) {
-                  filmoversigt[i].setfilmbcoverfile(temptxt);
+                filmoversigt[i].setfilmbcoverfile(temptxt);
               }
               // set ryg cover
               strcpy(temptxt,"convert/");         		    	// gem fil navn til image loader
@@ -865,15 +864,15 @@ int film_oversigt_typem::opdatere_film_oversigt() {
               strcat(temptxt,"_ryg.jpg");
 
               if (file_exists(temptxt)) {
-                  filmoversigt[i].setfilmscoverfile(temptxt);
+                filmoversigt[i].setfilmscoverfile(temptxt);
               }
     	        i++;
           }
       }
     }
     if (filhandle) {
-        fputs("No db avable\n",filhandle);
-        fclose(filhandle);							// close log file again
+      fputs("No db avable\n",filhandle);
+      fclose(filhandle);							// close log file again
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
@@ -901,27 +900,23 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int bonline=8;
   float boffset;
   int ofs;
-
   static bool movie_oversigt_loaded=false;
   static int movie_oversigt_loaded_done=0;
   char tmpfilename[200];
   static int movie_oversigt_loaded_nr=0; // hent alle music convers
   int loader_xpos,loader_ypos;
-
   int winsizx,winsizy;
   int xpos,ypos;
-
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
-      strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
-
-      if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
-          this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
-      }
-      if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
-          movie_oversigt_loaded=true;
-          movie_oversigt_loaded_done=1;
-      } else movie_oversigt_loaded_nr++;
+    strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
+    if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
+      this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
+    }
+    if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
+      movie_oversigt_loaded=true;
+      movie_oversigt_loaded_done=1;
+    } else movie_oversigt_loaded_nr++;
   }
   glTranslatef(0.0f, 0.0f ,0.0f);
 
@@ -1107,15 +1102,14 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
-      strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
-
-      if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
-          this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
-      }
-      if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
-          movie_oversigt_loaded=true;
-          movie_oversigt_loaded_done=1;
-      } else movie_oversigt_loaded_nr++;
+    strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
+    if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
+        this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
+    }
+    if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
+        movie_oversigt_loaded=true;
+        movie_oversigt_loaded_done=1;
+    } else movie_oversigt_loaded_nr++;
   }
   glTranslatef(0.0f, 0.0f ,0.0f);
 

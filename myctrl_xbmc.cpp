@@ -86,8 +86,9 @@ void xbmcsqlite::xbmc_readmusicdb() {
 
 
 
+//
 // xbmc movie db loader
-
+//
 void xbmcsqlite::xbmc_readmoviedb() {
     int rc;
     const char *sql = "SELECT * from movie_view"; // order by dateAdded";
@@ -109,6 +110,9 @@ void xbmcsqlite::xbmc_readmoviedb() {
 }
 
 
+//
+//
+//
 
 char search_and_replace(char *text) {
   int n=0;
