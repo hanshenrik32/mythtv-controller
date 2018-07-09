@@ -94,8 +94,8 @@ int numCPU;                                             // have the numbers of c
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 // koki db names (by version)
-const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
-const char *kodivermovie[7]={"MyVideos107.db","MyVideos104.db","MyVideos99.db","MyVideos99.db","MyVideos99.db","MyVideos99.db"};
+const char *kodiver[7]={"MyMusic70.db","MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+const char *kodivermovie[7]={"MyVideos109.db","MyVideos107.db","MyVideos104.db","MyVideos99.db","MyVideos99.db","MyVideos99.db","MyVideos99.db"};
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
@@ -11419,6 +11419,9 @@ void *xbmcdatainfoloader(void *data) {
     strcpy(videohomedirpath,userhomedir);
     strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
+      case 19:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos109.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic70.db");
+                break;
       case 17:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
