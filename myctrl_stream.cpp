@@ -89,7 +89,7 @@ stream_class::~stream_class() {
 }
 
 
-// return the name 
+// return the name
 char *stream_class::get_stream_name(int nr) {
   if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
 }
@@ -140,9 +140,12 @@ void stream_class::softstopstream() {
 }
 
 
+// get length on stream
+
 unsigned long stream_class::get_length_in_ms() {
   vlc_controller::get_length_in_ms();
 }
+
 
 // jump in player
 
@@ -653,9 +656,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // updated     = Time of last update
       if (mysql_query(conn,"CREATE database mythtvcontroller")!=0) printf("mysql db create error.\n");
       res = mysql_store_result(conn);
+      // create db
       sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255))");
       if (mysql_query(conn,sqlselect)!=0) printf("mysql create table error.\n");
       res = mysql_store_result(conn);
+      // create db
       sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128))");
       if (mysql_query(conn,sqlselect)!=0) printf("mysql create table error.\n");
       res = mysql_store_result(conn);
@@ -894,6 +899,17 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
       res = mysql_store_result(conn);
       mysql_free_result(res);
+
+      sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Videnskab.dk',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+      if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+      res = mysql_store_result(conn);
+      mysql_free_result(res);
+
+
+
+
+
+
 
 
       // create default master rss feed source
@@ -1137,6 +1153,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
       res = mysql_store_result(conn);
       mysql_free_result(res);
+
+      sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Videnskab.dk',NULL,NULL,'Videnskab.dk',0,0,NULL,'http://feeds.soundcloud.com/users/soundcloud:users:4378703/sounds.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+      if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+      res = mysql_store_result(conn);
+      mysql_free_result(res);
+
+
+
 
 
       if (conn) mysql_close(conn);
