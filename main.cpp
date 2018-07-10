@@ -5970,7 +5970,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             vis_stream_or_movie_oversigt=false;
             vis_stream_oversigt=false;
           }
-          // play button
+          // play button pressed
           if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover)) {
             // start play
             //do_zoom_stream_cover=!do_zoom_stream_cover;
@@ -6340,9 +6340,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   ask_tv_record=true;
                   do_zoom_tvprg_aktiv_nr=0;
                 }
-                if (vis_stream_oversigt) {
-                  do_zoom_stream_cover=!do_zoom_stream_cover;
+                // close vis stream play
+                if ((vis_stream_oversigt) && (state==GLUT_UP)) {
+                  if (sknapnr>0) do_zoom_stream_cover=!do_zoom_stream_cover;
                 }
+                //
                 if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                   vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
                 }
@@ -7871,7 +7873,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
-              if (vis_stream_oversigt) do_zoom_stream_cover=!do_zoom_stream_cover;
+              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
               if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
@@ -9287,7 +9289,6 @@ void update2(int value) {
               _sangley=0.0f;
               do_play_stream=0;
           }
-
 
           // stream oversigt do it
           if ((vis_stream_oversigt) && (sknapnr>=0)) {
