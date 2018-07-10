@@ -1264,11 +1264,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                           strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
                           strncpy(stack[antal]->feed_name,row[0],feed_namelength);
                           if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
-                          if (row[6]) stack[antal]->feed_group_antal=atoi(row[6]);				          // antal
-
                           if (row[0]) stack[antal]->feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
                           else stack[antal]->feed_group_antal=0;
-
                           if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
                           if (row[7]) strncat(tmpfilename,row[7],20);                               //
                           strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
