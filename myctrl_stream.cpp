@@ -331,7 +331,26 @@ int stream_class::loadrssfile(bool updaterssfile) {
 }
 
 
-
+char search_and_replace2(char *text) {
+  int n=0;
+  int nn=0;
+  char newtext[2048];
+  strcpy(newtext,"");
+  while(n<strlen(text)) {
+    if (text[n]=='"') {
+      //strcat(newtext,"'");
+//      newtext[nn]='\'';
+      n++;
+//      nn+=1;
+    } else {
+      newtext[nn]=text[n];
+      nn++;
+      n++;
+    }
+  }
+  newtext[n]=0;
+  strcpy(text,newtext);
+}
 
 //
 // xml parser
@@ -502,8 +521,10 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                   if (debugmode & 4) {
                     printf("Create/update podcast %s in db\n",rssprgtitle);
                   }
-
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+                  search_and_replace2(rssprgtitle);
+                  search_and_replace2(rssprgfeedtitle);
+                  search_and_replace2(rssprgdesc);
+                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                   if (mysql_query(conn,sqlinsert)!=0) {
                     printf("mysql REPLACE table error. %s\n",sqlinsert);
                   }
@@ -590,7 +611,10 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               }
             }
             if (!(recordexist)) {
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,'%s','%s','%s','%s','%s',%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
+              search_and_replace2(rssprgtitle);
+              search_and_replace2(rssprgfeedtitle);
+              search_and_replace2(rssprgdesc);
+              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               if (mysql_query(conn,sqlinsert)!=0) {
                 printf("mysql REPLACE table error. %s\n",sqlinsert);
