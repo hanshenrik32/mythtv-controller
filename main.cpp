@@ -94,7 +94,8 @@ int numCPU;                                             // have the numbers of c
 char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 // koki db names (by version)
-const char *kodiver[6]={"MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+const char *kodiver[7]={"MyMusic70.db","MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
+const char *kodivermovie[7]={"MyVideos109.db","MyVideos107.db","MyVideos104.db","MyVideos99.db","MyVideos99.db","MyVideos99.db","MyVideos99.db"};
 // ************************************************************************************************
 char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
@@ -190,8 +191,8 @@ bool stopmovie=false;
 int film_key_selected=1;                                // den valgte med keyboard i film oversigt
 int vis_volume_timeout=0;
 int music_key_selected=1;                               // default music selected
-bool ask_open_dir_or_play=false;
-bool ask_open_dir_or_play_aopen=false;
+bool ask_open_dir_or_play=false;                        // ask open dir or play it ?
+bool ask_open_dir_or_play_aopen=false;                  // auto open dir
 bool do_swing_music_cover=true;                         // default swing music cover
 int music_selected_iconnr=0;                            // default valgt icon i music oversigt
 float _angle=0.00;                                      // bruges af 3d screen saver
@@ -202,8 +203,8 @@ bool show_uv=true;                                      // default show uv under
 bool vis_uv_meter=false;                                 // uv meter er igang med at blive vist
 bool hent_music_search=false;                           // skal vi søge efter music
 bool keybufferopenwin=false;                            // er vindue open
-bool do_play_music_cover=false;
-bool do_find_playlist=false;
+bool do_play_music_cover=false;                         // start play music
+bool do_find_playlist=false;                            // do find play list
 bool do_play_music_aktiv_play=false;
 
 bool do_play_music_aktiv=false;
@@ -248,8 +249,8 @@ int radio_select_iconnr=0;
 float _rangley;
 
 bool do_show_setup=false;                               // show setup menu
-bool do_show_setup_sound=false;
-bool do_show_setup_screen=false;
+bool do_show_setup_sound=false;                         //
+bool do_show_setup_screen=false;                        //
 bool do_show_setup_tema=false;
 bool do_show_setup_sql=false;
 bool do_show_setup_network=false;
@@ -278,12 +279,12 @@ bool do_play_stream=false;
 bool do_stop_stream=false;
 bool stopstream=false;
 
-int rknapnr=0;                                           // buttons vars
-int sknapnr=0;
-int mknapnr=0;
-int tvknapnr=0;
-int fknapnr=0;
-int swknapnr=0;
+int rknapnr=0;                                          // buttons vars
+int sknapnr=0;                                          // stream button
+int mknapnr=0;                                          // music
+int tvknapnr=0;                                         // tv
+int fknapnr=0;                                          // movie
+int swknapnr=0;                                         //
 
 // aktiv stream play
 int stream_playnr=0;
@@ -790,8 +791,8 @@ int hentmythtvver() {
       while ((row = mysql_fetch_row(res)) != NULL) {
         strcpy(txtversion,row[0]);		// hent ver
       }
-      mysql_close(conn);
     }
+    if (conn) mysql_close(conn);
     return(atoi(txtversion));
 }
 
@@ -1483,6 +1484,7 @@ void load_config(char * filename) {
         fclose(file);
       } else printf("Disk write error, saving mythtv-controller.keys\n");
     }
+    if (conn) mysql_close(conn);
 }
 
 
@@ -1699,10 +1701,6 @@ void opdatere_music_oversigt_icons() {
 }
 
 
-
-
-
-
 // hent antal af songs fra mythtv playlist database og fyld music play array
 
 unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
@@ -1891,7 +1889,7 @@ int initlirc() {
 
 
 
-// Load ttf fonts list
+// Load/init ttf fonts list
 
 int init_ttf_fonts() {
     // uni font config *****************************************************************************************
@@ -1913,7 +1911,7 @@ int init_ttf_fonts() {
     if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Open ttf font select error.\n");  // Regular
     glcFont(myFont);
 
-    aktivfont.updatefontlist();
+    aktivfont.updatefontlist();                                                          // update font list
 
     /* Draw letters as filled polygons. */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -2130,46 +2128,43 @@ unsigned int do_playlist_backup_playlist() {
     mysql_query(conn,sqlselect);
     res3 = mysql_store_result(conn);
     if (res3) {
-        while ((row3 = mysql_fetch_row(res3)) != NULL) {
-            playlistnr=atol(row3[0]);							// hent playlist nr
-            strcpy(playlistname,row3[1]);						// hent playlistname
-            finish=false;
-            printf("Save music info from playlist name:%s \n",playlistname);
-            i=0;
-            while(!(finish)) {
-                sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
-                mysql_query(conn,"set NAMES 'utf8'");
-                res = mysql_store_result(conn);
-                mysql_query(conn,sqlselect);
-                res = mysql_store_result(conn);
-                if (res) {
-                    while ((row = mysql_fetch_row(res)) != NULL) {
-                        songintnr=atoi(row[0]);
-                        songantal=atoi(row[1]);					// hent antal sange i playlist
-
-                        // find cd cover samt sange info i mythtv music database om denne aktive sang
-                        sprintf(sqlselect,"select song_id, filename, music_albums.album_name, name, music_artists.artist_name, music_genres.genre, length, numplays, rating, lastplay, date_entered, date_modified, music_directories.path,music_songs.year  from music_songs,music_artists,music_albums,music_genres,music_directories where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id and music_songs.genre_id=music_genres.genre_id and music_songs.directory_id=music_directories.directory_id",songintnr);
-                        mysql_query(conn,sqlselect);
-                        res1 = mysql_store_result(conn);
-                	if (debugmode & 2) fprintf(stderr,"Playlist %s Hentet music nummer = %ld af %ld \n",playlistname,i,songantal);
-                        if (res1) {
-                            while ((row = mysql_fetch_row(res1)) != NULL) {
-                                sprintf(sqlselect,"insert music_songs_tmp values (0,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%s','%d','%d','%d','%d','%d','%s','%d','%d','%d','%d','%s')",
-                                playlistname,row[1],row[3],row[4],row[2],row[5],row[13],row[6],row[7],row[8],row[11],row[12],row[13],row[14],0,"","", 0, 0, 0, 0, 0,"",0,0,0,0,row[12]);
-
-                                mysql_query(conn,sqlselect);
-                                res2 = mysql_store_result(conn);
-
-                                //printf("sql %s\n",sqlselect);
-                            }
-                        }
-                        songnr++;
-                    } // endwhile
-                } // endif
-                i++;
-                if (i>songantal) finish=true;
+      while ((row3 = mysql_fetch_row(res3)) != NULL) {
+        playlistnr=atol(row3[0]);							// hent playlist nr
+        strcpy(playlistname,row3[1]);						// hent playlistname
+        finish=false;
+        printf("Save music info from playlist name:%s \n",playlistname);
+        i=0;
+        while(!(finish)) {
+          sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              songintnr=atoi(row[0]);
+              songantal=atoi(row[1]);					// hent antal sange i playlist
+              // find cd cover samt sange info i mythtv music database om denne aktive sang
+              sprintf(sqlselect,"select song_id, filename, music_albums.album_name, name, music_artists.artist_name, music_genres.genre, length, numplays, rating, lastplay, date_entered, date_modified, music_directories.path,music_songs.year  from music_songs,music_artists,music_albums,music_genres,music_directories where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id and music_songs.genre_id=music_genres.genre_id and music_songs.directory_id=music_directories.directory_id",songintnr);
+              mysql_query(conn,sqlselect);
+              res1 = mysql_store_result(conn);
+        	    if (debugmode & 2) fprintf(stderr,"Playlist %s Hentet music nummer = %ld af %ld \n",playlistname,i,songantal);
+              if (res1) {
+                while ((row = mysql_fetch_row(res1)) != NULL) {
+                  sprintf(sqlselect,"insert music_songs_tmp values (0,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%s','%d','%d','%d','%d','%d','%s','%d','%d','%d','%d','%s')",
+                  playlistname,row[1],row[3],row[4],row[2],row[5],row[13],row[6],row[7],row[8],row[11],row[12],row[13],row[14],0,"","", 0, 0, 0, 0, 0,"",0,0,0,0,row[12]);
+                  mysql_query(conn,sqlselect);
+                  res2 = mysql_store_result(conn);
+                  //printf("sql %s\n",sqlselect);
+                }
+              }
+              songnr++;
             } // endwhile
+          } // endif
+          i++;
+          if (i>songantal) finish=true;
         } // endwhile
+      } // endwhile
     } // endif
     mysql_close(conn);
     return(songnr);		// antal sange fundet i dir id
@@ -2189,7 +2184,7 @@ void myglprint(char *string)
 }
 
 
-
+// show background picture
 void show_background() {
   // make background
   glPushMatrix();
@@ -2403,15 +2398,12 @@ void display() {
         case ANALOG:
             glDisable(GL_TEXTURE_2D);
             glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-
             // draw analog watch/ur
             for(i=0;i<360;i+=45) {
                 //glTranslatef(100.0f, 100.0f, 0.0f);
                 glColor3f(0.4f, 0.4f, 0.4f);
-
                 glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
                 glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
                 if ((i==0) || (i==90) || (i==180) || (i==270)) {
                     glTexCoord2f(0.0, 0.0); glVertex3f(300.0, 0.0, 0.0);
                     glTexCoord2f(0.0, 1.0); glVertex3f(300.0, 10.0, 0.0);
@@ -2878,6 +2870,7 @@ void display() {
       }
     }
 
+    // show tv record list
     if (vis_tvrec_list) {
       glPushMatrix();
       aktiv_crecordlist.showtvreclist();
@@ -3028,29 +3021,6 @@ void display() {
           xof=500;
           yof=200;
           buttonsize=200;
-            // background MASK
-
-/*
-          glPushMatrix();
-//            glLoadIdentity(); 					//Reset the drawing perspective
-          glEnable(GL_TEXTURE_2D);
-//            glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glColor4f(1.0f,1.0f,1.0f,0.2f);
-          glEnable(GL_BLEND);
-          glDisable(GL_DEPTH_TEST);
-          glBlendFunc(GL_DST_COLOR, GL_ZERO);
-          glBindTexture(GL_TEXTURE_2D, _textureId5_1);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-                                                                                    // draw ask box mask
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-*/
 
           glPushMatrix();
           glEnable(GL_TEXTURE_2D);
@@ -3458,22 +3428,22 @@ void display() {
     }
 
     // stop music
-    // if play
+    // if playing
     if (vis_stream_oversigt) {
-        if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
-            #if defined USE_FMOD_MIXER
-            if (snd) {
-               // stop old playing
-               sound->release();                                                                       // stop last playing song
-               ERRCHECK(result,0);
-               snd=0;
-            }
-            #endif
-            #if defined USE_SDL_MIXER
-            Mix_FreeMusic(sdlmusicplayer);
-            sdlmusicplayer=NULL;
-            #endif
+      if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
+        #if defined USE_FMOD_MIXER
+        if (snd) {
+           // stop old playing
+           sound->release();                                                                       // stop last playing song
+           ERRCHECK(result,0);
+           snd=0;
         }
+        #endif
+        #if defined USE_SDL_MIXER
+        Mix_FreeMusic(sdlmusicplayer);
+        sdlmusicplayer=NULL;
+        #endif
+      }
     }
 
 
@@ -4825,6 +4795,7 @@ void display() {
       //sleep(10); // play
       if (strcmp("default",configdefaultplayer)!=0) {
         // close non default player
+        // neeed to be coded
       } else {
         // close default player (vlc plugin)
         film_oversigt.stopmovie();
@@ -5213,11 +5184,7 @@ void display() {
         glDisable(GL_TEXTURE_2D);
         glcRenderString(temptxt);
         glPopMatrix();
-
     }
-
-
-
 
 
     //  STOP ALL sound
@@ -5964,7 +5931,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               rknapnr=0;
             }
           }
-        }
+        } // radio overview
 
         // vælg skal der spilles film eller stream
         if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
@@ -5994,19 +5961,16 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((vis_stream_oversigt) && (!(fundet))) {
           if ((GLuint) names[i*4+3]>=100) {
             sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
-            //if (debugmode & 128)
-            fprintf(stderr,"stream selected=%u  \n",sknapnr);
+            if (debugmode & 128) fprintf(stderr,"stream selected=%u\n",sknapnr);
             fundet=true;
           }
-
           // close open stream or movie
           if ((GLubyte) names[i*4+3]==3) {
             fundet=true;
             vis_stream_or_movie_oversigt=false;
             vis_stream_oversigt=false;
           }
-
-          // play button
+          // play button pressed
           if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover)) {
             // start play
             //do_zoom_stream_cover=!do_zoom_stream_cover;
@@ -6016,11 +5980,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
             }
           }
-
           // stop button
           if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover)) {
             fundet=true;
-            //streamoversigt.stopstream();
             do_zoom_stream_cover=false;
             do_stop_stream=true;                                            // flag to stop play
             stopstream=true;                                                // flag to stop play
@@ -6028,7 +5990,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             stream_jump=false;
             if (streamoversigt.stream_is_playing) streamoversigt.stopstream();
           }
-
           // jump forward button stream
           if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover)) {
             fundet=true;
@@ -6041,7 +6002,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             stream_jump=true;
             if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
           }
-
         }
 
         // film oversigt
@@ -6380,9 +6340,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   ask_tv_record=true;
                   do_zoom_tvprg_aktiv_nr=0;
                 }
-                if (vis_stream_oversigt) {
-                  do_zoom_stream_cover=!do_zoom_stream_cover;
+                // close vis stream play
+                if ((vis_stream_oversigt) && (state==GLUT_UP)) {
+                  if (sknapnr>0) do_zoom_stream_cover=!do_zoom_stream_cover;
                 }
+                //
                 if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                   vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
                 }
@@ -6558,12 +6520,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
             }
             // play stream
-            if ((sknapnr>=0) && (do_play_stream)) {
-              if ((streamoversigt.get_stream_url(sknapnr)) && (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0)) {
+            if ((sknapnr-1>=0) && (do_play_stream)) {
+              if ((streamoversigt.get_stream_url(sknapnr-1)) && (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0)) {
                 startstream=true;
                 do_zoom_stream=true;                    // set show player
               } else {
-                if (streamoversigt.get_stream_url(sknapnr)) startstream=true;
+                if (streamoversigt.get_stream_url(sknapnr-1)) startstream=true;
                 do_zoom_stream=true;                    // set show player
               }
               printf("Set show playing stream\n ");
@@ -7911,7 +7873,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
-              if (vis_stream_oversigt) do_zoom_stream_cover=!do_zoom_stream_cover;
+              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
               if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
@@ -9327,7 +9289,6 @@ void update2(int value) {
               _sangley=0.0f;
               do_play_stream=0;
           }
-
 
           // stream oversigt do it
           if ((vis_stream_oversigt) && (sknapnr>=0)) {
@@ -11417,7 +11378,13 @@ void *xbmcdatainfoloader(void *data) {
     strcpy(videohomedirpath,userhomedir);
     strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
-      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+      case 19:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos109.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic70.db");
+                break;
+      case 17:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+                break;
+      case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
       case 15:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos99.db");
@@ -11573,28 +11540,28 @@ void *xbmcdatainfoloader_movie(void *data) {
       if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
         ext = strrchr(de->d_name, '.');
         if (ext) strcpy(filename,de->d_name);
-        if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
-          if (strcmp(filename,kodiver[0])==0) {
-            kodiverfound=16;
-            printf("Kodi version 16 is found \n");
+        if ((strncmp(filename,"MyVideos",8)==0) && (!(kodiverfound))) {
+          if (strcmp(filename,kodivermovie[0])==0) {
+            kodiverfound=17;
+            printf("Kodi version 17 is found \n");
           }
-          if (strcmp(filename,kodiver[1])==0) {
+          if (strcmp(filename,kodivermovie[1])==0) {
             kodiverfound=15;
             printf("Kodi version 15 is found \n");
           }
-          if (strcmp(filename,kodiver[2])==0) {
+          if (strcmp(filename,kodivermovie[2])==0) {
             kodiverfound=14;
             printf("Kodi version 14 is found \n");
           }
-          if (strcmp(filename,kodiver[3])==0) {
+          if (strcmp(filename,kodivermovie[3])==0) {
             kodiverfound=13;
             printf("Kodi version 13 is found \n");
           }
-          if (strcmp(filename,kodiver[4])==0) {
+          if (strcmp(filename,kodivermovie[4])==0) {
             kodiverfound=12;
             printf("Kodi version 12 is found \n");
           }
-          if (strcmp(filename,kodiver[5])==0) {
+          if (strcmp(filename,kodivermovie[5])==0) {
             kodiverfound=11;
             printf("Kodi version 11 is found \n");
           }
@@ -11606,6 +11573,9 @@ void *xbmcdatainfoloader_movie(void *data) {
     strcpy(videohomedirpath,userhomedir);
     // add kodi dir ro db files
     switch (kodiverfound) {
+      case 17:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos107.db");
+                strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
+                break;
       case 16:  strcat(videohomedirpath,"/.kodi/userdata/Database/MyVideos104.db");
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic60.db");
                 break;
