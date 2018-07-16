@@ -3978,7 +3978,7 @@ void display() {
     //
     // *************** Stream stuf *******************************************************************************
     // show stream player control
-
+    // hvis show_stream_oversigt or zoom
     if (!(visur)) {
       if ((vis_stream_oversigt) && (do_zoom_stream_cover)) {
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -4056,11 +4056,13 @@ void display() {
 
 
         glPushMatrix();
-        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
+        //glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
+        glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
         glScalef(20,20, 1.0);                    // danish charset ttf
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glDisable(GL_TEXTURE_2D);
-        sprintf(temptxt,"Name :%-30s",stream_playing_name);
+        sprintf(temptxt,"Name      %-20s",stream_playing_name);
+        temptxt[26]=0;
         glcRenderString(temptxt);
         glPopMatrix();
 
@@ -4074,10 +4076,11 @@ void display() {
         glPushMatrix();
         glColor3f(0.6f, 0.6f, 0.6f);
         // show artist name
-        if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing     %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
+        if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing    %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
         else sprintf(temptxt,"                                        ");
         temptxt[40]=0;
-        glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
+        glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
+        //glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
         glcRenderString(temptxt);

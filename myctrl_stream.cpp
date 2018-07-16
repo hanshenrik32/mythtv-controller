@@ -331,6 +331,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
 }
 
 
+
 char search_and_replace2(char *text) {
   int n=0;
   int nn=0;
@@ -338,14 +339,14 @@ char search_and_replace2(char *text) {
   strcpy(newtext,"");
   while(n<strlen(text)) {
     if (text[n]=='"') {
-      //strcat(newtext,"'");
-//      newtext[nn]='\'';
+      strcat(newtext,"'");
       n++;
 //      nn+=1;
     } else {
       newtext[nn]=text[n];
       nn++;
       n++;
+      newtext[nn]='\0';
     }
   }
   newtext[n]=0;
@@ -717,14 +718,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       res = mysql_store_result(conn);
       // create db
       if (!(dbexist)) {
-        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY)");
+        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql create table error.\n");
           printf("SQL : %s\n",sqlselect);
         }
         res = mysql_store_result(conn);
         // create db
-        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128),id int NOT NULL AUTO_INCREMENT PRIMARY KEY)");
+        sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql create table error.\n");
+          printf("SQL : %s\n",sqlselect);
+        }
+
+        // create index
+        sprintf(sqlselect,"CREATE INDEX `internetcontentarticles_feedtitle`  ON `mythtvcontroller`.`internetcontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql create table error.\n");
           printf("SQL : %s\n",sqlselect);
@@ -1437,16 +1445,12 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         //
         // load all the data in phread datainfoloader
         // web gfx file loader in phread
-
         pthread_t loaderthread;           // the load
         int rc=pthread_create(&loaderthread,NULL,loadweb,NULL);
         if (rc) {
           printf("ERROR; return code from pthread_create() is %d\n", rc);
           exit(-1);
         }
-
-//        loadweb_stream_iconoversigt();
-
         return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
     if (debugmode & 4) printf("Mythtv stream loader done... \n");
