@@ -708,13 +708,9 @@ GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,s
 GLuint _textureIdback_main=0,_textureIdback_music=0;            // main background
 GLuint _textureIdback_setup;
 GLuint  screensaverbox;
-//GLuint _tvoldrecordedmask;
 GLuint _textureIdmusic_aktiv;
-GLuint _tvoldrecorded;
-GLuint screensaverbox_mask;
 GLuint _tvmaskprgrecordedbutton;
 GLuint _tvbar1,_tvbar3;
-GLuint _tv_prgtype;
 GLuint _mainlogo;
 GLuint _tvnewprgrecordedbutton;
 GLuint _tvrecordcancelbutton;
@@ -11846,10 +11842,6 @@ void loadgfx() {
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
 
-    _tvoldrecorded=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded");
-    //_tvoldrecordedmask=loadgfxfile(temapath,(char *) "images/",(char *) "oldrecorded_mask");
-    _tv_prgtype=loadgfxfile(temapath,(char *) "images/",(char *) "tvprgtype");
-
     // icons buttons
     // radio buttons
     onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
@@ -11882,7 +11874,6 @@ void loadgfx() {
     gfxlandemask=loadTexture (fileload);
     // screen saver boxes
     screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
-    screensaverbox_mask=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix_mask");
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
 
@@ -12021,8 +12012,6 @@ void freegfx() {
 
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar3);
-    glDeleteTextures( 1, &_tvoldrecorded);
-    glDeleteTextures( 1, &_tv_prgtype);
     glDeleteTextures( 1, &onlineradio_empty);
     glDeleteTextures( 1, &onlineradio);		                   		// radio icon
     glDeleteTextures( 1, &onlineradio192);			                // radio icon
@@ -12056,7 +12045,6 @@ void freegfx() {
     */
     glDeleteTextures( 1,&_textureIdmusic_aktiv);
     glDeleteTextures( 1,&screensaverbox);
-    glDeleteTextures( 1,&screensaverbox_mask);
     glDeleteTextures( 1,&newstuf_icon);
 
     //_textureIdmusic_anim[i].textureId;

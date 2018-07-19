@@ -50,14 +50,11 @@ extern GLuint _tvrecordbutton;
 GLuint _textureId13;
 extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
-extern GLuint _tvoldrecorded;
-//extern GLuint _tvoldrecordedmask;
 
 extern GLuint _tvoldprgrecordedbutton;
 extern GLuint _tvnewprgrecordedbutton;
 extern GLuint _tvmaskprgrecordedbutton;
 extern GLuint _tvoverskrift;
-extern GLuint _tv_prgtype;
 extern fontctrl aktivfont;
 extern int orgwinsizex,orgwinsizey;
 
@@ -4677,7 +4674,8 @@ void earlyrecorded::showearlyrecorded() {
     glTranslatef(-10.0f, 0.0f, -110.0f);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D, _tvoldrecorded);
+    //glBindTexture(GL_TEXTURE_2D, _tvoldrecorded);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
