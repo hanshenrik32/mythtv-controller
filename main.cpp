@@ -620,7 +620,6 @@ GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ænd
 GLuint _textureutvbgmask;                 // background in tv guide programs
 GLuint _textureId2;                     	// error window
 GLuint _defaultdvdcover;                	// The id of the texture
-GLuint _defaultdvdcover2;	                // The id of the texture
 GLuint _texturemovieinfobox;	            //  movie image
 GLuint _textureId7; 	                    // folder image
 GLuint _texturemusicplayer; 	            // music image		// show player
@@ -656,7 +655,6 @@ GLuint onlineradio;                       //
 GLuint onlineradio_empty;                 //
 GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
-GLuint onlineradiomask;                   //
 GLuint radiooptions;                      //
 GLuint radiooptionsmask;                  //
 GLuint radiobutton;                       //
@@ -765,6 +763,9 @@ unsigned int setupwlanselectofset=0;            // valgte wlan nr i oversigt
 
 const int TEMA_ANTAL=10;                                        // numbers of tema
 
+
+// define for use before function is created
+void *update_music_phread_loader();
 
 // hent mythtv version and return it
 
@@ -2219,6 +2220,7 @@ void show_background() {
 static bool do_update_xmltv_show=false;
 static bool do_update_rss_show=true;
 static bool do_update_rss=false;
+static bool do_update_music=false;
 
 void display() {
     // used by xmltv updater func
@@ -2814,7 +2816,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
         std::clock_t start;
         start = std::clock();
@@ -2822,28 +2824,26 @@ void display() {
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_stream_oversigt) {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected,do_update_rss_show);
-        //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         glPopMatrix();
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
         std::clock_t start;
         start = std::clock();
         radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
         std::clock_t start;
         start = std::clock();
         aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -2852,7 +2852,8 @@ void display() {
           start = std::clock();
           glPushMatrix();
           // show info om program selected
-          aktivfont.selectfont("FreeMono");
+          //aktivfont.selectfont("FreeMono");
+          aktivfont.selectfont(configfontname);
           aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
           glPopMatrix();
           //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
@@ -2862,19 +2863,21 @@ void display() {
         std::clock_t start;
         start = std::clock();
         recordoversigt.show_recorded_oversigt1(0,0);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
-        // show radio options menu
+      // show radio options menu
       if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
         radiooversigt.show_radio_options();
       }
-    }
-
-    // show tv record list
-    if (vis_tvrec_list) {
-      glPushMatrix();
-      aktiv_crecordlist.showtvreclist();
-      glPopMatrix();
+      // show tv record list
+      if (vis_tvrec_list) {
+        std::clock_t start;
+        start = std::clock();
+        glPushMatrix();
+        aktiv_crecordlist.showtvreclist();
+        glPopMatrix();
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+      }
     }
 
     // show search box and text for radio and music
@@ -5425,10 +5428,13 @@ void display() {
     if (do_update_rss) {
       // call update xmltv multi phread
       update_rss_phread_loader();
-
-      //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       do_update_rss=false;
       //do_update_xmltv_show=false;
+    }
+
+    if (do_update_music) {
+      update_music_phread_loader();
+      do_update_music=false;
     }
 
 
@@ -6374,6 +6380,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
                     // no update posible
                     fprintf(stderr,"No Music loaded/found by internal loader\n");
+
                   }
                 }
               }
@@ -7365,7 +7372,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       vis_volume_timeout=80;
     }
 
-    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
+    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
        // gem key pressed in buffer
        if (keybufferindex<80) {
           if (key==8) {						// back space
@@ -7947,7 +7954,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_update_rss_show=true;
                 do_update_rss=true;
               }
-
+              break;
+            case 'U':
+              if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
+                do_update_music=true;
+              }
               break;
             case 13:
               if (debugmode) {
@@ -11111,17 +11122,24 @@ void *datainfoloader_music(void *data) {
         if (debugmode & 2) printf("Done update db from datasource.\n");
         global_use_internal_music_loader_system=true;
       }
+      // update music db from disk
+      if (do_update_music) {
+        opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
+      }
       // load music db created by opdatere_music_oversigt_nodb function
       if (opdatere_music_oversigt(musicoversigt,0)>0) {
-          //opdatere_music_oversigt_icons(); 					// load gfx icons
-          if (debugmode & 2) printf("Nusic db loaded.\n");
+        //opdatere_music_oversigt_icons(); 					// load gfx icons
+        if (debugmode & 2) printf("Nusic db loaded.\n");
       }
   } else {
     if (debugmode % 2) printf("Search for music in :%s\n",configdefaultmusicpath);
+    // update music db from disk
     if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
       if (debugmode & 2) printf("No music db loaded\n");
     }
+    opdatere_music_oversigt(musicoversigt,0);
   }
+  do_update_music=false;
   if (debugmode & 2) printf("loader thread done loaded music info\n");
   pthread_exit(NULL);
 }
@@ -11139,15 +11157,7 @@ void *datainfoloader_movie(void *data) {
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
     if (debugmode & 16) printf("loader thread starting - Loading movie info from mythtv.\n");
-    film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.
-                                                            // load record file list
-/*
-      recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
-      // load old recorded list not some recorded any more
-      oldrecorded.earlyrecordedload(configmysqlhost,configmysqluser,configmysqlpass);
-      // load new tv schecule program
-      newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
-*/
+    film_oversigt.opdatere_film_oversigt();     	        // gen covers 3d hvis de ikke findes.                                                          // load record file list
   } else {
     if (debugmode & 16) printf("Load movie from xbmc/kodi\n");
   }
@@ -11235,6 +11245,22 @@ void *update_rss_phread_loader() {
 
 
 //
+// xmltv loader start from main loop then trigged by date
+//
+
+void *update_music_phread_loader() {
+  if (true) {
+    pthread_t loaderthread2;           // load tvguide xml file in to db
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_music,NULL);
+    if (rc2) {
+      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+  }
+}
+
+
+//
 // phread dataload
 // NOT IN USE
 
@@ -11266,8 +11292,6 @@ void *datainfoloader(void *data) {
   printf("loader thread done loaded %d radio stations \n",radiooversigt_antal);
   pthread_exit(NULL);
 }
-
-
 
 
 CXBMCClient *xbmcclient=new CXBMCClient("");
@@ -11701,7 +11725,6 @@ void loadgfx() {
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
-    _defaultdvdcover2	    = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover1");
     if (screen_size<3)
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
@@ -11833,7 +11856,6 @@ void loadgfx() {
     onlineradio      =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
     onlineradio192   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
     onlineradio320   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
-    onlineradiomask  =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_mask");
     radiobutton      =loadgfxfile(temapath,(char *) "images/",(char *) "radio_button");
     musicbutton      =loadgfxfile(temapath,(char *) "images/",(char *) "music_button");
     // radio/music button mask
@@ -11900,7 +11922,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureutvbgmask);
     glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
     glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade
-    glDeleteTextures( 1, &_defaultdvdcover2);		// default dvd cover 2 hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_texturemovieinfobox);		  // movie info box
     glDeleteTextures( 1, &_textureId7);				  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_texturemusicplayer); // show music info player
@@ -12006,7 +12027,6 @@ void freegfx() {
     glDeleteTextures( 1, &onlineradio);		                   		// radio icon
     glDeleteTextures( 1, &onlineradio192);			                // radio icon
     glDeleteTextures( 1, &onlineradio320);			                // radio icon
-    glDeleteTextures( 1, &onlineradiomask);			                // radio icon mask
     glDeleteTextures( 1, &radiobutton);
     glDeleteTextures( 1, &onlinestream);                        // stream default icons
     glDeleteTextures( 1, &onlinestream_empty);                  // stream default icons
@@ -12245,7 +12265,7 @@ int main(int argc, char** argv) {
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
     strcpy(configbackend_tvgraber_old,"");
-    if (strncmp(configbackend,"xbmc",4)==0) {
+    if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
       // music loader
       pthread_t loaderthread;           // the load
       int rc=pthread_create(&loaderthread,NULL,xbmcdatainfoloader,NULL);
@@ -12260,9 +12280,7 @@ int main(int argc, char** argv) {
         printf("ERROR; return code from pthread_create() is %d\n", rc1);
         exit(-1);
       }
-
     }
-
     if (strncmp(configbackend,"mythtv",5)==0) {
       // music loader
       if (configmythtvver>=0) {

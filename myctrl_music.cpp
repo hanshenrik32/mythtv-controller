@@ -393,7 +393,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
             if (debugmode & 2) printf("Checking dir %s%s \n",dirpath,row[1]);
 
             dirid=atoi(row[0]);
-            sprintf(checkdir,"%s%s",dirpath,row[1]);
+            sprintf(checkdir,"%s/%s",dirpath,row[1]);
             dirp1=opendir(checkdir);
             // error handler
             if (dirp1==NULL) {
@@ -1183,15 +1183,6 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
         glPopMatrix();
     }
 }
-
-
-
-
-
-
-
-
-
 
 
 
