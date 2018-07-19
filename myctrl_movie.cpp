@@ -1100,6 +1100,20 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int winsizx,winsizy;
   int xpos,ypos;
 
+
+
+  char *base,*right_margin;
+  int length,width;
+  int pline=0;
+  bool stop=false;
+
+  int buttonsize=200;
+  int buttonsizey=180;
+  int xof=5;
+  int yof=orgwinsizey-(buttonsizey);
+
+
+
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
@@ -1185,6 +1199,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
 
 
       glPushMatrix();
+
       if (strlen(temptxt)<=14) {
         ofs=(strlen(temptxt)/2)*12;
         glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
@@ -1237,9 +1252,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
               ytextofset+=15.0f;
               pos=0;
               ofs=(int) (strlen(word)/2)*9;
-
-            glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-
+              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
               glRasterPos2f(0.0f, 0.0f);
               glScalef(14.0, 14.0, 1.0);
             }
@@ -1254,16 +1267,53 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
           if (temptxt[ii]=='\0') break;
           ii++;	// skip space
         }
-
-
-
+      }
+/*
+      base=temptxt;
+      length=strlen(temptxt);
+      width = 22;
+      stop=false;
+      glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
+      glScalef(20.0, 20.0, 1.0);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glDisable(GL_TEXTURE_2D);
+      while(*base) {
+        if(length <= width) {
+          pline++;
+          ofs=(strlen(temptxt)/2)*12;
+          glDisable(GL_TEXTURE_2D);
+          glcRenderString(base);
+          break;
+        }
+        right_margin = base+width;
+        while((!isspace(*right_margin)) && (stop==false)) {
+          right_margin--;
+          if (right_margin == base) {
+            right_margin += width;
+            while(!isspace(*right_margin)) {
+              if (*right_margin == '\0') break;
+              else stop=true;
+              right_margin++;
+            }
+          }
+        }
+        if (stop) *(base+width)='\0';
+        *right_margin = '\0';
+        glcRenderString(base);
+        pline++;
+        glTranslatef(xpos+(100-ofs), ypos+120-pline*1.2f,0.0f);
+        length -= right_margin-base+1;                         // +1 for the space
+        base = right_margin+1;
+        if (pline>=2) break;
+      }
+*/
         //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
 //        glRasterPos2f(0.0f, 0.0f);
 //        glDisable(GL_TEXTURE_2D);
 //        glScalef(20.0, 20.0, 1.0);
 //        glcRenderString(temptxt);
 
-      }
+
 
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();

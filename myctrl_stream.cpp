@@ -344,9 +344,9 @@ char search_and_replace2(char *text) {
 //      nn+=1;
     } else {
       newtext[nn]=text[n];
+      newtext[nn+1]='\0';                               // null terminate string
       nn++;
       n++;
-      newtext[nn]='\0';
     }
   }
   newtext[n]=0;
