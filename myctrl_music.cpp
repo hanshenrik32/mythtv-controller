@@ -390,7 +390,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
           // loop dirs database names from root / (music dir start path)
           while ((row = mysql_fetch_row(res)) != NULL) {
 
-            if (debugmode & 2) printf("Checking dir %s%s \n",dirpath,row[1]);
+            if (debugmode & 2) printf("Checking dir %s/%s \n",dirpath,row[1]);
 
             dirid=atoi(row[0]);
             sprintf(checkdir,"%s/%s",dirpath,row[1]);
