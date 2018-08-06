@@ -2217,6 +2217,7 @@ static bool do_update_xmltv_show=false;
 static bool do_update_rss_show=true;
 static bool do_update_rss=false;
 static bool do_update_music=false;
+static bool do_update_music_now=false;                          // start the process to update music db from global dir
 
 void display() {
     // used by xmltv updater func
@@ -7926,6 +7927,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_movie_options=false;			// luk option window igen
               }
               break;
+            case 's':
+              if (vis_music_oversigt) {
+                
+              }
+              break;
             case 't':
               if (vis_movie_options) {
                   vis_movie_sort_option=2;
@@ -7953,7 +7959,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case 'U':
               if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
-                do_update_music=true;
+                do_update_music=true;                                               // show update
+                do_update_music_now=true;                                           // and do the update flag
               }
               break;
             case 13:
@@ -11103,40 +11110,43 @@ void *radio_check_statusloader(void *data) {
 
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode % 2) printf("loader thread starting - Loading music info from mythtv.\n");
+  if (debugmode % 1) printf("loader thread starting - Loading music info from mythtv.\n");
   if (strcmp(configbackend,"mythtv")==0) {
-      // opdatere music oversigt
-      // hent alt music info fra database
-      // check if internal music db exist if yes do set global use it
-      if (global_use_internal_music_loader_system_exist()==true) {
-        if (debugmode % 2) printf("******** Use global music database ********\n");
-        global_use_internal_music_loader_system=true;
-      } else {
-        if (debugmode & 2) printf("Search for music in :%s\n",configdefaultmusicpath);
-        // build new db (internal db loader)
-        opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
-        if (debugmode & 2) printf("Done update db from datasource.\n");
-        global_use_internal_music_loader_system=true;
-      }
-      // update music db from disk
-      if (do_update_music) {
-        opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
-      }
-      // load music db created by opdatere_music_oversigt_nodb function
-      if (opdatere_music_oversigt(musicoversigt,0)>0) {
-        //opdatere_music_oversigt_icons(); 					// load gfx icons
-        if (debugmode & 2) printf("Nusic db loaded.\n");
-      }
+    // opdatere music oversigt
+    // hent alt music info fra database
+    // check if internal music db exist if yes do set global use it
+    if (global_use_internal_music_loader_system_exist()==true) {
+      if (debugmode % 2) printf("******** Use global music database ********\n");
+      global_use_internal_music_loader_system=true;
+    } else {
+      if (debugmode & 2) printf("Search for music in :%s\n",configdefaultmusicpath);
+      // build new db (internal db loader)
+      opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
+      if (debugmode & 2) printf("Done update db from datasource.\n");
+      global_use_internal_music_loader_system=true;
+    }
+    // update music db from disk
+    if ((do_update_music) || (do_update_music_now)) {
+      // update the music db
+      opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
+      do_update_music_now=false;                                              // do not call update any more
+      do_update_music=false;                                                  // stop show music update
+    }
+    // load music db created by opdatere_music_oversigt_nodb function
+    if (opdatere_music_oversigt(musicoversigt,0)>0) {
+      //opdatere_music_oversigt_icons(); 					// load gfx icons
+      if (debugmode & 2) printf("Nusic db loaded.\n");
+    }
   } else {
     if (debugmode % 2) printf("Search for music in :%s\n",configdefaultmusicpath);
     // update music db from disk
     if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
       if (debugmode & 2) printf("No music db loaded\n");
     }
-    opdatere_music_oversigt(musicoversigt,0);
+    opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
-  if (debugmode & 2) printf("loader thread done loaded music info\n");
+  if (debugmode & 1) printf("loader thread done loaded music info\n");
   pthread_exit(NULL);
 }
 
