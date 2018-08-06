@@ -778,18 +778,14 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     clean_music_oversigt(musicoversigt);
     if (debugmode & 2) printf("Save music playlist\n");
     i=0;
-    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlists where hostname='' or playlist_name like 'default_playlist_storage'");
-
-    if (debugmode & 2) printf("Save playlists from db.\n");
-
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     if (res) {
-        while (musicoversigt[i].directory_id) {
-          sprintf(sqlselect,"insert into music_playlists values('%s',)");
+        while (i<1) {
+          sprintf(sqlselect,"insert into music_playlist values(0,'%s','%s','%s',%d,%d,'%s')",'playlistname','1','2018-01-01 00:00:00',0,0,'hostname');
           mysql_query(conn,sqlselect);
           res = mysql_store_result(conn);
           i++;

@@ -7369,7 +7369,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       vis_volume_timeout=80;
     }
 
-    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
+    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
        // gem key pressed in buffer
        if (keybufferindex<80) {
           if (key==8) {						// back space
@@ -7927,9 +7927,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_movie_options=false;			// luk option window igen
               }
               break;
-            case 's':
+              // save playlist
+            case 'S':
               if (vis_music_oversigt) {
-                
+                // save playlist
+                save_music_oversigt_playlists(musicoversigt);
               }
               break;
             case 't':
