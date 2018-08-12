@@ -5469,6 +5469,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_keys=false;
             do_show_videoplayer=false;
             do_show_tvgraber=false;
+            do_show_setup_rss=false;
             fundet=true;
           }
 
@@ -5718,6 +5719,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             vis_stream_or_movie_oversigt=false;
             vis_radio_or_music_oversigt=false;
             do_show_tvgraber=false;
+            do_show_setup_rss=false;
             fundet=true;
           }
         }

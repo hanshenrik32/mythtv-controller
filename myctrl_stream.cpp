@@ -634,7 +634,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
 }
 
 
-// get antal podcast
+// get antal podcast af type
 
 int get_podcasttype_antal(char *typedata) {
   char sqlselect[4096];
@@ -1342,7 +1342,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                             } else strcpy(tmpfilename,"");
                           }
                           strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
-
                           antal++;
                         } else {
                           // if first creat back button
