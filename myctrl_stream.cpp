@@ -298,6 +298,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
               // parse downloaded xmlfile now (create db records)
               // and get base image from funccall (baseicon (url to image))
               parsexmlrssfile(parsefilename,baseicon);
+            } else {
+              printf("XML FILE is missing/not working on %s file.\n",row[3]);
             }
           }
           // update master icon if none
@@ -981,7 +983,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Den-nye-stil-historien-om-dansk-rap',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent VALUES ('Den nye stil - historien om dansk rap',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
@@ -1235,7 +1237,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Fire forførende radiofortællinger',NULL,NULL,'Fire forførende radiofortællinger',0,0,NULL,'https://www.dr.dk/mu/feed/fire-forfoerende-radiofortaellinger.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -1246,12 +1247,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
 
-        // do not work
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Den-nye-stil-historien-om-dansk-rap',NULL,NULL,'Den-nye-stil-historien-om-dansk-rap',0,0,NULL,'https://www.dr.dk/mu/feed/den-nye-stil-historien-om-dansk-rap.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles VALUES ('Den nye stil - historien om dansk rap',NULL,NULL,'Historien-om-dansk-rap',0,0,NULL,'https://www.dr.dk/mu/feed/den-nye-stil-historien-om-dansk-rap.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-
 
       }
       if (conn) mysql_close(conn);
@@ -1271,8 +1270,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // select internetcontentarticles.feedtitle,
       sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title");
       getart=0;
-    }
-    if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
+    } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
       sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title ASC");
