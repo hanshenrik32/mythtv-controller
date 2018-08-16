@@ -739,7 +739,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         printf("SQL : %s\n",sqlselect);
       }
 
-      //if (!(dbexist)) {
+      if (!(dbexist)) {
         res = mysql_store_result(conn);
         // create default master rss feed source
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent (name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('i-seng-med-nova',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1311,7 +1311,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-      //}
+      }
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
       if (!(dbexist)) loadrssfile(1);
