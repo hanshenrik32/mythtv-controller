@@ -1606,7 +1606,7 @@ int hent_mythtv_playlist(int playlistnr) {
     res = mysql_store_result(conn);
     while(!(finish)) {
         // select sange fra myhthtv playlist
-        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
+        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
 //        printf("SQL = %s\n",sqlselect);
@@ -1726,7 +1726,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     // Connect to mythtv database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     while(!(finish)) {
-      sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
+      sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       mysql_query(conn,sqlselect);
@@ -2017,7 +2017,7 @@ unsigned int do_playlist_restore_playlist() {
             strcpy(playlistname,row[1]);				// hent playlist name
             fundet=false;
             while(!(fundet)) {
-                sprintf(sqlselect,"select * from music_playlists where playlist_name like '%s'",playlistname);
+                sprintf(sqlselect,"select * from music_playlist where playlist_name like '%s'",playlistname);
                 mysql_query(conn,"set NAMES 'utf8'");
                 res1 = mysql_store_result(conn);
                 mysql_query(conn,sqlselect);
@@ -2121,7 +2121,7 @@ unsigned int do_playlist_backup_playlist() {
         return(0);
     }
     // Hent playlistes med sange tilknyttet elementer i playlist_songs array
-    strcpy(sqlselect,"select playlist_id,playlist_name from music_playlists where playlist_songs!=''");
+    strcpy(sqlselect,"select playlist_id,playlist_name from music_playlist where playlist_songs!=''");
     mysql_query(conn,sqlselect);
     res3 = mysql_store_result(conn);
     if (res3) {
@@ -2132,7 +2132,7 @@ unsigned int do_playlist_backup_playlist() {
         printf("Save music info from playlist name:%s \n",playlistname);
         i=0;
         while(!(finish)) {
-          sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlists where playlist_id=%d",songnr,playlistnr);
+          sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
           mysql_query(conn,"set NAMES 'utf8'");
           res = mysql_store_result(conn);
           mysql_query(conn,sqlselect);
@@ -7933,6 +7933,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 'S':
               if (vis_music_oversigt) {
                 // save playlist
+                printf("Save play list\n");
                 save_music_oversigt_playlists(musicoversigt);
               }
               break;

@@ -716,7 +716,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     clean_music_oversigt(musicoversigt);
     if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
     i=0;
-    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlists where hostname='' or playlist_name like 'default_playlist_storage'");
+    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
 
     strcpy(musicoversigt[0].album_name,"   BACK");
     strcpy(musicoversigt[0].album_path,"");
@@ -764,37 +764,49 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
 }
 
 
-// update list med playlistes
+// save playlistes in db
 
 int save_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
-    char sqlselect[512];
-    unsigned int i;
-    // mysql vars
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-    char database[256];
-    if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    clean_music_oversigt(musicoversigt);
-    if (debugmode & 2) printf("Save music playlist\n");
-    i=0;
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
+  bool fault;
+  char sqlselect[8192];
+  char temptxt[2048];
+  unsigned int i;
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char database[256];
+  strcpy(database,dbname);
+  //clean_music_oversigt(musicoversigt);
+  if (debugmode & 2) printf("Save music playlist\n");
+  i=0;
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  if (conn) {
+    sprintf(sqlselect,"REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'%s','","playlistname");
+    while (i<aktiv_playlist.numbers_in_playlist()) {
+      sprintf(temptxt,"%d",aktiv_playlist.get_songid(i));
+      strcat(sqlselect,temptxt);
+      strcat(sqlselect," ");
+      i++;
+    }        	// end while
+    sprintf(temptxt,"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
+    strcat(sqlselect,temptxt);
+    mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
-    if (res) {
-        while (i<1) {
-          sprintf(sqlselect,"insert into music_playlist values(0,'%s','%s','%s',%d,%d,'%s')",'playlistname','1','2018-01-01 00:00:00',0,0,'hostname');
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          i++;
-        }        	// end while
-    }
-    mysql_close(conn);
-    return(1);
+    if (res) fault=false;
+  }
+  mysql_close(conn);
+  return(!(fault));
 }
 
+
+int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
+
+}
 
 
 //

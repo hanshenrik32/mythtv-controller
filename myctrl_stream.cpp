@@ -731,14 +731,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sqlselect);
       }
-
-      // create index
-      sprintf(sqlselect,"CREATE INDEX `internetcontentarticles_feedtitle`  ON `mythtvcontroller`.`internetcontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
-      if (mysql_query(conn,sqlselect)!=0) {
-        printf("mysql create table error.\n");
-        printf("SQL : %s\n",sqlselect);
+      if (!(dbexist)) {
+        // create index
+        sprintf(sqlselect,"CREATE INDEX `internetcontentarticles_feedtitle`  ON `mythtvcontroller`.`internetcontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql create index error.\n");
+        }
       }
-
       if (!(dbexist)) {
         res = mysql_store_result(conn);
         // create default master rss feed source
