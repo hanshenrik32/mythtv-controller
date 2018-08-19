@@ -95,6 +95,7 @@ int order_channel_list_in_tvguide_db();
 //
 int killrunninggraber();
 
+void showcoursornow(int cxpos,int cypos,int txtlength);
 
 void show_setup_interface();
 void show_setup_screen();

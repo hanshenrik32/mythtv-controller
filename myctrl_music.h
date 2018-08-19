@@ -51,7 +51,7 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
 int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *searchtxt,int search_art);
 // henter playlist oversigt
 int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]);				// mythtv playlist
-int save_music_oversigt_playlists(music_oversigt_type musicoversigt[]);
+int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *playlistname);
 int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]);
 void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected);		// new ver
 // load playliste find_dir_id
