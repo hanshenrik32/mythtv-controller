@@ -698,9 +698,11 @@ GLuint _texturetemasetup;                   //
 GLuint _texturemythtvsql;                   //
 GLuint _texturesetupfont;                   //
 GLuint _texturekeyssetup;                   //
-GLuint _texturekeysrss;                      //
+GLuint _texturekeysrss;                     //
 GLuint _texturevideoplayersetup;            //
-GLuint _texturetvgrabersetup;            //
+GLuint _texturetvgrabersetup;               //
+
+GLuint _texturesaveplaylist;                  // setup icon
 
 GLuint _texturelock;
 
@@ -3243,7 +3245,7 @@ void display() {
           }
         }
     }
-
+    // ask save playlist
     if (vis_music_oversigt) {
       if (ask_save_playlist) {
         xof=500;
@@ -3255,7 +3257,7 @@ void display() {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
+        glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS); // draw ask box
@@ -3269,15 +3271,15 @@ void display() {
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(xof+60.0f,yof+10, 0.0f);
+        glTranslatef(xof+20.0f,yof+10+5, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        //aktivfont.selectfont("Courier 10 Pitch");
+        aktivfont.selectfont("Courier 10 Pitch");
         glcRenderString("Playlist name :");
         glcRenderString(keybuffer);
         glPopMatrix();
         glPushMatrix();
-        showcoursornow(344,460,strlen(keybuffer));
+        showcoursornow(330,460+5,strlen(keybuffer));
         glPopMatrix();
       }
     }
@@ -11916,6 +11918,8 @@ void loadgfx() {
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
 
+    _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
+
 
 // ************************* screen shot *******************************
 
@@ -12092,6 +12096,7 @@ void freegfx() {
     glDeleteTextures( 1, &setupfontback);
     glDeleteTextures( 1, &setupkeysback);
     glDeleteTextures( 1, &setuprssback);
+    glDeleteTextures( 1, &_texturesaveplaylist);
     glDeleteTextures( 1, &screenshot1);		                   		// screen shots
     glDeleteTextures( 1, &screenshot2);			                  	// screen shots
     glDeleteTextures( 1, &screenshot3);			                  	// screen shots
