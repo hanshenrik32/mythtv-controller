@@ -766,7 +766,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
 
 // save playlistes in db
 
-int save_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
+int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *playlistname) {
   bool fault;
   char sqlselect[8192];
   char temptxt[2048];
@@ -786,7 +786,7 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
   mysql_query(conn,"set NAMES 'utf8'");
   res = mysql_store_result(conn);
   if (conn) {
-    sprintf(sqlselect,"REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'%s','","playlistname");
+    sprintf(sqlselect,"REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'%s','",playlistname);
     while (i<aktiv_playlist.numbers_in_playlist()) {
       sprintf(temptxt,"%d",aktiv_playlist.get_songid(i));
       strcat(sqlselect,temptxt);

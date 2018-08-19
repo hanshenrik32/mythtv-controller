@@ -32,6 +32,9 @@
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
+bool ask_save_playlist=false;
+bool save_ask_save_playlist=false;
+
 bool stream_jump=false;
 
 // Set sound system used
@@ -107,6 +110,7 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
+char playlistfilename[80];                                  // name to use thewn save playlist
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -1643,6 +1647,8 @@ int hent_mythtv_playlist(int playlistnr) {
                         strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
                         strcat(tmptxt,row1[1]);				// add filename til sang
 
+                        strcpy(tmptxt,row1[1]);				// add filename til sang
+
                         if (file_exists(tmptxt3)) {
                         // printf("Loader music cover til playlist\n");
 
@@ -2775,7 +2781,7 @@ void display() {
     }
 
 
-    if ((vis_music_oversigt) && (!(visur)))  {
+    if ((vis_music_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
         if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
            keybufferopenwin=true;					// yes open filename window
            // hent søgte sange oversigt
@@ -3099,7 +3105,7 @@ void display() {
 
 
 
-// swap ************************************************************** icon
+// swap ************************************************************** icon swap
           xof=750;
           yof=250;
           buttonsize=100;                glPushMatrix();
@@ -3238,8 +3244,54 @@ void display() {
         }
     }
 
+    if (vis_music_oversigt) {
+      if (ask_save_playlist) {
+        xof=500;
+        yof=600;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS); // draw ask box
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
 
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(xof+60.0f,yof+10, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        //aktivfont.selectfont("Courier 10 Pitch");
+        glcRenderString("Playlist name :");
+        glcRenderString(keybuffer);
+        glPopMatrix();
+        glPushMatrix();
+        showcoursornow(344,460,strlen(keybuffer));
+        glPopMatrix();
+      }
+    }
 
+    // save playlist to file
+    if (save_ask_save_playlist) {
+      save_music_oversigt_playlists(musicoversigt,playlistfilename);
+      save_ask_save_playlist=false;
+      ask_save_playlist=false;
+      // reset keyboard buffer
+      strcpy(keybuffer,"");
+      strcpy(playlistfilename,"");
+      keybufferindex=0;
+    }
 
     // start play radio station
     if (vis_radio_oversigt) {
@@ -7385,13 +7437,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                   dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
                 }
             }
-            // søg sang/artist navn
-            if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
-                if (key!=13) {
-                  keybuffer[keybufferindex]=key;
-                  keybufferindex++;
-                  keybuffer[keybufferindex]='\0';       // else input key text in buffer
-                }
+            //hvis vi ikke gør andre ting
+            if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
+              // søg sang/artist navn
+              if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
+                  if (key!=13) {
+                    keybuffer[keybufferindex]=key;
+                    keybufferindex++;
+                    keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                  }
+              }
             }
             // søg efter radio station navn
             if ((vis_radio_oversigt) && (!(show_radio_options))) {
@@ -7400,6 +7455,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
                 if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              }
+            }
+
+            // is ask for playlist file name use keybuffer to get filename
+            if (ask_save_playlist) {
+              if (key!=13) {
+                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+                strcpy(playlistfilename,keybuffer);
+                playlistfilename[keybufferindex]='\0';       // else input key text in buffer
               }
             }
 
@@ -7830,6 +7894,10 @@ void handleKeypress(unsigned char key, int x, int y) {
     } else {
         switch(key) {
             case 27:
+              if (ask_save_playlist) {
+                save_ask_save_playlist=false;
+                ask_save_playlist=false;
+              }
               // close setup windows again or close proram of not in menu
               if (do_show_setup) {
                 if (do_show_tvgraber) {
@@ -7931,10 +7999,11 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
               // save playlist
             case 'S':
+              // do save playlist
               if (vis_music_oversigt) {
                 // save playlist
-                printf("Save play list\n");
-                save_music_oversigt_playlists(musicoversigt);
+                printf("Ask save playlist\n");
+                ask_save_playlist=true;                                         // set save playlist flag
               }
               break;
             case 't':
@@ -7970,13 +8039,22 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case 13:
               if (debugmode) {
-                  if (vis_music_oversigt) fprintf(stderr,"Enter key pressed, update music list.\n");
-                  else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
+                  if (vis_music_oversigt) {
+                    if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
+                    else fprintf(stderr,"Enter key pressed, update music list.\n");
+                  } else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
                   else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
                   else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
                   else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
                   else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
               }
+
+              // set save flag of playlist
+              if (ask_save_playlist) {
+                save_ask_save_playlist=true;
+              }
+
+
               if (vis_radio_oversigt) {
                   rknapnr=0;
                   hent_radio_search=true;			  	// start radio station search
@@ -8005,7 +8083,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 music_icon_anim_icon_ofsety=0;
               }
 
-              if ((vis_music_oversigt) && (!(do_zoom_music_cover))) {
+              if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
                 mknapnr=music_key_selected;	                     	// hent valget
                 // normal dir
                 if (musicoversigt[mknapnr-1].oversigttype==0) {
@@ -8087,7 +8165,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
 
               // enter key pressed og ask open dir or play er åben så start play
-              if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
+              if ((vis_music_oversigt) && (ask_open_dir_or_play) && (ask_save_playlist==false)) {
                 ask_open_dir_or_play=false;                 // flag luk vindue igen
                 do_play_music_cover=1;                      // der er trykket på cover play det
                 do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
@@ -12185,6 +12263,7 @@ int check_radio_stations_icons() {
 int main(int argc, char** argv) {
     Display *dpy=NULL;
     Window rootxwindow;
+    strcpy(playlistfilename,"playlist");
     printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
     printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
