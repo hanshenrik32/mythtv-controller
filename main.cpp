@@ -1612,7 +1612,7 @@ int hent_mythtv_playlist(int playlistnr) {
     res = mysql_store_result(conn);
     while(!(finish)) {
         // select sange fra myhthtv playlist
-        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
+        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
 //        printf("SQL = %s\n",sqlselect);

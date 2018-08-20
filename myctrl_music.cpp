@@ -728,9 +728,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     musicoversigt[0].artist_id=0;
     musicoversigt[0].oversigttype=0;
     i++;
-
-    if (debugmode & 2) printf("Loading playlists from mythtv/internal db.\n");
-
+    if (debugmode & 2) printf("Loading playlists from internal db.\n");
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
