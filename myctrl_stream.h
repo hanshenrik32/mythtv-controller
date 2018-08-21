@@ -63,6 +63,7 @@ class stream_class : vlc_controller {
         void stopstream();
         void softstopstream();
         int playstream(int nr);
+        int pausestream();
         int playstream_url(char *path);
         unsigned long get_length_in_ms();
         float jump_position(float ofset);

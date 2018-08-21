@@ -157,6 +157,17 @@ float stream_class::jump_position(float ofset) {
 // to play streams from web
 //vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
 
+
+// pause stream
+
+int stream_class::pausestream() {
+    //stream_is_playing=true;
+    vlc_controller::pause();
+    return(1);
+}
+
+
+
 // start playing movie by vlclib
 
 int stream_class::playstream(int nr) {

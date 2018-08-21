@@ -283,6 +283,8 @@ bool do_play_stream=false;
 bool do_stop_stream=false;
 bool stopstream=false;
 
+bool do_pause_stream=false;
+
 int rknapnr=0;                                          // buttons vars
 int sknapnr=0;                                          // stream button
 int mknapnr=0;                                          // music
@@ -4057,12 +4059,13 @@ void display() {
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
 
+        // show play pause icon
         if (streamoversigt.stream_is_playing) glBindTexture(GL_TEXTURE_2D,_texturempause);
         else glBindTexture(GL_TEXTURE_2D,_texturemplay);
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // 8 = play
+        if (streamoversigt.stream_is_playing) glLoadName(8);                        // 8 = play
+        else glLoadName(8);                        // 8 = play
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 ,  320 , 0.0);
         glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50,100+320, 0.0);
@@ -4952,6 +4955,11 @@ void display() {
           //film_oversigt.softstopmovie();
         }
       }
+    }
+
+    // set play on pause rss stream
+    if (do_pause_stream) {
+
     }
 
 
