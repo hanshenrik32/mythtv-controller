@@ -45,6 +45,7 @@ class stream_class : vlc_controller {
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
     public:
         bool stream_is_playing;
+        bool stream_is_pause;
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
         int type;
         bool gfx_loaded;					                                              //
@@ -63,7 +64,7 @@ class stream_class : vlc_controller {
         void stopstream();
         void softstopstream();
         int playstream(int nr);
-        int pausestream();
+        int pausestream(int pause);
         int playstream_url(char *path);
         unsigned long get_length_in_ms();
         float jump_position(float ofset);

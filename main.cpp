@@ -283,7 +283,7 @@ bool do_play_stream=false;
 bool do_stop_stream=false;
 bool stopstream=false;
 
-bool do_pause_stream=false;
+bool do_pause_stream=false;                             // pause play
 
 int rknapnr=0;                                          // buttons vars
 int sknapnr=0;                                          // stream button
@@ -4060,12 +4060,12 @@ void display() {
         glEnable(GL_BLEND);
 
         // show play pause icon
-        if (streamoversigt.stream_is_playing) glBindTexture(GL_TEXTURE_2D,_texturempause);
-        else glBindTexture(GL_TEXTURE_2D,_texturemplay);
+        if (streamoversigt.stream_is_pause) glBindTexture(GL_TEXTURE_2D,_texturemplay);
+        else glBindTexture(GL_TEXTURE_2D,_texturempause);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if (streamoversigt.stream_is_playing) glLoadName(8);                        // 8 = play
-        else glLoadName(8);                        // 8 = play
+        if (streamoversigt.stream_is_playing) glLoadName(12);                        // 12 = pause
+        else glLoadName(8);                                                          // 8 = play
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 ,  320 , 0.0);
         glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50,100+320, 0.0);
@@ -4959,7 +4959,8 @@ void display() {
 
     // set play on pause rss stream
     if (do_pause_stream) {
-
+      streamoversigt.pausestream(1);
+      do_pause_stream=false;
     }
 
 
@@ -6045,7 +6046,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             vis_stream_oversigt=false;
           }
           // play button pressed
-          if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover)) {
+          if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover) && (fundet==false)) {
             // start play
             //do_zoom_stream_cover=!do_zoom_stream_cover;
             fundet=true;
@@ -6055,23 +6056,32 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
           // stop button
-          if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover)) {
+          if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet=true;
-            do_zoom_stream_cover=false;
-            do_stop_stream=true;                                            // flag to stop play
-            stopstream=true;                                                // flag to stop play
-            do_play_stream=false;
-            stream_jump=false;
-            if (streamoversigt.stream_is_playing) streamoversigt.stopstream();
+            if (streamoversigt.stream_is_playing) {
+              do_zoom_stream_cover=false;
+              do_stop_stream=true;                                            // flag to stop play
+              stopstream=true;                                                // flag to stop play
+              do_play_stream=false;                                           // we are not play any more
+              stream_jump=false;                                              // we can not jump in stream any more
+              streamoversigt.stopstream();
+            }
+          }
+          // pause play button pressed
+          // pause play
+          if (((GLubyte) names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
+            fundet=true;
+            if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
+            if (debugmode & 4) fprintf(stderr,"Set/reset player pause.\n");
           }
           // jump forward button stream
-          if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover)) {
+          if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet=true;
             stream_jump=true;
             if (streamoversigt.stream_is_playing) streamoversigt.jump_position(10.0f);
           }
           // jump backward button stream
-          if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover)) {
+          if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover) && (fundet==false)) {
             fundet=true;
             stream_jump=true;
             if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
@@ -6326,7 +6336,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   }
 
                   // stream stuf open stram and show rss feeds
-                  if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false)) {
+                  if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false) && (do_zoom_stream_cover==false)) {
                     if (sknapnr>0) {
                       do_play_stream=1;						// select button do open or play
                       if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);

@@ -77,8 +77,9 @@ stream_class::stream_class() : antal(0) {
     stream_oversigt_loaded=false;
     stream_oversigt_loaded_nr=0;
     antal=0;
-    gfx_loaded=false;			// gfx loaded
-    stream_is_playing=false;
+    gfx_loaded=false;			      // gfx loaded
+    stream_is_playing=false;    // is we playing any media
+    stream_is_pause=false;      // is player on pause 
 }
 
 
@@ -160,9 +161,10 @@ float stream_class::jump_position(float ofset) {
 
 // pause stream
 
-int stream_class::pausestream() {
+int stream_class::pausestream(int pause) {
     //stream_is_playing=true;
-    vlc_controller::pause();
+    vlc_controller::pause(1);
+    if (!(stream_is_pause)) stream_is_pause=true; else stream_is_pause=false;
     return(1);
 }
 

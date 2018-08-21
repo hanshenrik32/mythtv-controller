@@ -278,7 +278,7 @@ int film_oversigt_typem::playmovie(int nr) {
 // pause movie
 
 void film_oversigt_typem::pausemovie() {
-  vlc_controller::pause();
+  vlc_controller::pause(1);
 }
 
 // get position
