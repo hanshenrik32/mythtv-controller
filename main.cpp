@@ -733,6 +733,7 @@ GLuint _texturesetupmenu;
 GLuint _textureIdclose;
 GLuint _textureIdclose1;
 GLuint _texturemplay;
+GLuint _texturempause;
 GLuint _texturemstop;
 GLuint _texturemnext;
 GLuint _textureIdradiosearch;
@@ -4055,7 +4056,10 @@ void display() {
         // play button
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D,_texturemplay);
+
+        if (streamoversigt.stream_is_playing) glBindTexture(GL_TEXTURE_2D,_texturempause);
+        else glBindTexture(GL_TEXTURE_2D,_texturemplay);
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(8);                        // 8 = play
@@ -11862,6 +11866,7 @@ void loadgfx() {
     _texturemlast2      	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
     _texturemnext       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaynext");
     _texturemplay       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplay");
+    _texturempause        = loadgfxfile(temapath,(char *) "images/",(char *) "mpause");
     _textureIdpup       	= loadgfxfile(temapath,(char *) "buttons/",(char *) "pup");
     _textureIdpdown     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "pdown");
     _texturemstop       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaystop");
@@ -12048,6 +12053,7 @@ void freegfx() {
     glDeleteTextures( 1, &_texturemlast2);			        // bruges
     glDeleteTextures( 1, &_texturemnext);			          // next song
     glDeleteTextures( 1, &_texturemplay);		           	// play song
+    glDeleteTextures( 1, &_texturempause);              // pause play
     glDeleteTextures( 1, &_textureIdpup);		           	//
     glDeleteTextures( 1, &_textureIdpdown);		         	//
     glDeleteTextures( 1, &_texturemstop);			          // stop
