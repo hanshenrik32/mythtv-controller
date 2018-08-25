@@ -1504,171 +1504,171 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        res = mysql_store_result(conn);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error.\n");
-          printf("SQL %s \n",sqlselect);
-        }
-        res = mysql_store_result(conn);
-        if (res) {
-            while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-                //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
-                if (antal<maxantal) {
-                    stack[antal]=new (struct stream_oversigt_type);
-                    if (stack[antal]) {
-                        strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-                        strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
-                        strcpy(stack[antal]->feed_desc,"");                           // desc
-                        strcpy(stack[antal]->feed_path,"");                           // mythtv db path
-                        strcpy(stack[antal]->feed_gfx_url,"");
-                        strcpy(stack[antal]->feed_gfx_mythtv,"");
-                        strcpy(stack[antal]->feed_streamurl,"");
-                        stack[antal]->feed_group_antal=0;
-                        stack[antal]->feed_path_antal=0;
-                        stack[antal]->textureId=0;
-                        stack[antal]->intnr=0;
-                        stack[antal]->nyt=false;
-                        // top level
-                        if (getart==0) {
-                          strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
-                          strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                          if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
-                          if (row[0]) stack[antal]->feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
-                          else stack[antal]->feed_group_antal=0;
-                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                          if (row[7]) strncat(tmpfilename,row[7],20);                               //
-                          strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
-                          if (row[9]) strcpy(tmpfilename,row[9]);
-                          get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                          // check filename
-                          strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                          int mmm=0;
-                          while(mmm<strlen(downloadfilename)) {
-                            if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                            mmm++;
-                          }
-                          getuserhomedir(homedir);                                                  // get homedir
-                          strcpy(downloadfilenamelong,homedir);
-                          strcat(downloadfilenamelong,"/rss/images/");
-                          strcat(downloadfilenamelong,downloadfilename);
-                          if (!(file_exists(downloadfilenamelong))) {
-                            if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
-                            // download gfx file and use as icon
-                            if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
-                              printf("Download error \n");
-                            } else strcpy(tmpfilename,"");
-                          }
-                          strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
-                          antal++;
-                        } else {
-                          // if first creat back button
-                          if (antal==0) {
-                            stack[antal]->textureId=_textureIdback;			                    // back icon
-                            strcpy(stack[antal]->feed_showtxt,"BACK");
-                            if (row[0]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);
-                            if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
-                            //strcpy(stack[antal]->feed_streamurl,row[4]);
-                            if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                            if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
-                            stack[antal]->feed_group_antal=0;
-                            stack[antal]->intnr=0;	                               					// intnr=0 = back button type
-                            antal++;
-                          }
-                          // alloc new element in array
-                          if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
-                          stack[antal]->intnr=1;
-                          if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-                          if (getart==1) {
-                            // old ver used path from mysql
-                            //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                          } else {
-                            if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                          }
-                          if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                          if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                          // old ver
-                          //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                          if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
-                          switch(getart) {
-                            case 0: if (row[9]) strcpy(tmpfilename,row[9]);
-                                    break;
-                            case 1: if (row[7]) strcpy(tmpfilename,row[7]);
-                                    break;
-                            case 2: if (row[5]) strcpy(tmpfilename,row[5]);
-                                    break;
-                          }
-
-                          // test antal afspillinger this 0 set som new rss
-                          if (row[9]) {
-                            if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
-                          }
-
-                          if (strlen(tmpfilename)>7) {
-                              if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
-                                strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
-                                if (strlen(row[7])>10) {
-                                  if (getart==1) {
-                                    if (row[7]) strncat(tmpfilename,row[7]+10,100);
-                                  }
-                                  if (getart==2) {
-                                    if (row[6]) strncat(tmpfilename,row[6]+10,100);
-                                  }
-                                }
-                              } else {
-                                // rss download
-                                // downloadfilename = name on file, from tmpfilename = full web url
-                                get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                                // check filename
-                                strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                                int mmm=0;
-                                while(mmm<strlen(downloadfilename)) {
-                                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                                  mmm++;
-                                }
-                                strcpy(lasttmpfilename,tmpfilename);			              // husk file name
-                                // save file in  user homedir rss/
-                                getuserhomedir(homedir);                                  // get homedir
-                                strcpy(downloadfilenamelong,homedir);
-                                strcat(downloadfilenamelong,"/rss/images/");
-                                strcat(downloadfilenamelong,downloadfilename);
-                                if (!(file_exists(downloadfilenamelong))) {
-                                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
-                                  // download gfx file and use as icon
-                                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
-                                    printf("Download error \n");
-                                  } else strcpy(tmpfilename,"");
-                                }
-                                strcpy(tmpfilename,downloadfilenamelong);
-                              }
-                          } else strcpy(tmpfilename,"");
-                          strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
-//                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                          if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                          stack[antal]->textureId=0;
-                          // opdatere group antal
-                          if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
-                          antal++;
-                        }
-                    }
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      if (mysql_query(conn,sqlselect)!=0) {
+        printf("mysql insert error.\n");
+        printf("SQL %s \n",sqlselect);
+      }
+      res = mysql_store_result(conn);
+      if (res) {
+        while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
+          //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
+          if (antal<maxantal) {
+            stack[antal]=new (struct stream_oversigt_type);
+            if (stack[antal]) {
+              strcpy(stack[antal]->feed_showtxt,"");          	            // show name
+              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+              strcpy(stack[antal]->feed_desc,"");                           // desc
+              strcpy(stack[antal]->feed_path,"");                           // mythtv db path
+              strcpy(stack[antal]->feed_gfx_url,"");
+              strcpy(stack[antal]->feed_gfx_mythtv,"");
+              strcpy(stack[antal]->feed_streamurl,"");
+              stack[antal]->feed_group_antal=0;
+              stack[antal]->feed_path_antal=0;
+              stack[antal]->textureId=0;
+              stack[antal]->intnr=0;
+              stack[antal]->nyt=false;
+              // top level
+              if (getart==0) {
+                strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
+                strncpy(stack[antal]->feed_name,row[0],feed_namelength);
+                if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
+                if (row[0]) stack[antal]->feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
+                else stack[antal]->feed_group_antal=0;
+                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                if (row[7]) strncat(tmpfilename,row[7],20);                               //
+                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
+                if (row[9]) strcpy(tmpfilename,row[9]);
+                get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                // check filename
+                strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                int mmm=0;
+                while(mmm<strlen(downloadfilename)) {
+                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                  mmm++;
                 }
+                getuserhomedir(homedir);                                                  // get homedir
+                strcpy(downloadfilenamelong,homedir);
+                strcat(downloadfilenamelong,"/rss/images/");
+                strcat(downloadfilenamelong,downloadfilename);
+                if (!(file_exists(downloadfilenamelong))) {
+                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                  // download gfx file and use as icon
+                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                    printf("Download error \n");
+                  } else strcpy(tmpfilename,"");
+                }
+                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+                antal++;
+              } else {
+                // if first creat back button
+                if (antal==0) {
+                  stack[antal]->textureId=_textureIdback;			                    // back icon
+                  strcpy(stack[antal]->feed_showtxt,"BACK");
+                  if (row[0]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);
+                  if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);
+                  //strcpy(stack[antal]->feed_streamurl,row[4]);
+                  if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                  if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
+                  stack[antal]->feed_group_antal=0;
+                  stack[antal]->intnr=0;	                               					// intnr=0 = back button type
+                  antal++;
+                }
+                // alloc new element in array
+                if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
+                stack[antal]->intnr=1;
+                if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                if (getart==1) {
+                  // old ver used path from mysql
+                  //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                } else {
+                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
+                }
+                if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                // old ver
+                //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                switch(getart) {
+                  case 0: if (row[9]) strcpy(tmpfilename,row[9]);
+                          break;
+                  case 1: if (row[7]) strcpy(tmpfilename,row[7]);
+                          break;
+                  case 2: if (row[5]) strcpy(tmpfilename,row[5]);
+                          break;
+                }
+
+                // test antal afspillinger this 0 set som new rss
+                if (row[9]) {
+                  if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                }
+
+                if (strlen(tmpfilename)>7) {
+                  if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
+                    strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
+                    if (strlen(row[7])>10) {
+                      if (getart==1) {
+                        if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                      }
+                      if (getart==2) {
+                        if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                      }
+                    }
+                  } else {
+                    // rss download
+                    // downloadfilename = name on file, from tmpfilename = full web url
+                    get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                    // check filename
+                    strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                    int mmm=0;
+                    while(mmm<strlen(downloadfilename)) {
+                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                      mmm++;
+                    }
+                    strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                    // save file in  user homedir rss/
+                    getuserhomedir(homedir);                                  // get homedir
+                    strcpy(downloadfilenamelong,homedir);
+                    strcat(downloadfilenamelong,"/rss/images/");
+                    strcat(downloadfilenamelong,downloadfilename);
+                    if (!(file_exists(downloadfilenamelong))) {
+                      if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                      // download gfx file and use as icon
+                      if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                        printf("Download error \n");
+                      } else strcpy(tmpfilename,"");
+                    }
+                    strcpy(tmpfilename,downloadfilenamelong);
+                  }
+                } else strcpy(tmpfilename,"");
+                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+//                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
+                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                stack[antal]->textureId=0;
+                // opdatere group antal
+                if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
+                antal++;
+              }
             }
-            mysql_close(conn);
-        } else {
-          if (debugmode & 4) printf("No stream data loaded \n");
+          }
         }
-        //load_stream_gfx();
-        //
-        // load all the data in phread datainfoloader
-        // web gfx file loader in phread
-        pthread_t loaderthread;           // the load
-        int rc=pthread_create(&loaderthread,NULL,loadweb,NULL);
-        if (rc) {
-          printf("ERROR; return code from pthread_create() is %d\n", rc);
-          exit(-1);
-        }
-        return(antal-1);
+        mysql_close(conn);
+      } else {
+        if (debugmode & 4) printf("No stream data loaded \n");
+      }
+      //load_stream_gfx();
+      //
+      // load all the data in phread datainfoloader
+      // web gfx file loader in phread
+      pthread_t loaderthread;           // the load
+      int rc=pthread_create(&loaderthread,NULL,loadweb,NULL);
+      if (rc) {
+        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        exit(-1);
+      }
+      return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
     if (debugmode & 4) printf("Mythtv stream loader done... \n");
     return(0);
