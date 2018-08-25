@@ -326,7 +326,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
 
-      strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time  int, stop_time int, eq_preset   varchar(255) , relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
+      strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
 
@@ -336,6 +336,11 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
       strcpy(sqlselect,"create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
+
+      strcpy(sqlselect,"create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+
     }
     if (true) {
       //create table music_directories(directory_id int,path text, parent_id int);
@@ -389,11 +394,9 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
           res = mysql_store_result(conn);
           // loop dirs database names from root / (music dir start path)
           while ((row = mysql_fetch_row(res)) != NULL) {
-
-            if (debugmode & 2) printf("Checking dir %s%s \n",dirpath,row[1]);
-
+            if (debugmode & 2) printf("Checking dir %s/%s \n",dirpath,row[1]);
             dirid=atoi(row[0]);
-            sprintf(checkdir,"%s%s",dirpath,row[1]);
+            sprintf(checkdir,"%s/%s",dirpath,row[1]);
             dirp1=opendir(checkdir);
             // error handler
             if (dirp1==NULL) {
@@ -401,7 +404,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
               return 1;
               exit(0);
             }
-
             artistid=0;
             // hent atrist id
             conn2=mysql_init(NULL);
@@ -477,7 +479,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                     // open found dir having the songs
                     sprintf(checkdir2,"%s/%s",checkdir,de->d_name);
 
-                    if (debugmode & 2) printf("\t Checking sub dir %s \n",checkdir2);
+                    if (debugmode & 2) printf("\t Checking sub dir %s \n",de->d_name);
 
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
@@ -714,7 +716,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     clean_music_oversigt(musicoversigt);
     if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
     i=0;
-    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlists where hostname='' or playlist_name like 'default_playlist_storage'");
+    strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
 
     strcpy(musicoversigt[0].album_name,"   BACK");
     strcpy(musicoversigt[0].album_path,"");
@@ -726,9 +728,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     musicoversigt[0].artist_id=0;
     musicoversigt[0].oversigttype=0;
     i++;
-
-    if (debugmode & 2) printf("Loading playlists from mythtv.\n");
-
+    if (debugmode & 2) printf("Loading playlists from internal db.\n");
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -759,6 +759,51 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     musicoversigt_antal=i;						// antal i oversigt
     mysql_close(conn);
     return(i);
+}
+
+
+// save playlistes in db
+
+int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *playlistname) {
+  bool fault;
+  char sqlselect[8192];
+  char temptxt[2048];
+  unsigned int i;
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char database[256];
+  strcpy(database,dbname);
+  //clean_music_oversigt(musicoversigt);
+  if (debugmode & 2) printf("Save music playlist\n");
+  i=0;
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  if (conn) {
+    sprintf(sqlselect,"REPLACE INTO music_playlist (playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname) values(0,'%s','",playlistname);
+    while (i<aktiv_playlist.numbers_in_playlist()) {
+      sprintf(temptxt,"%d",aktiv_playlist.get_songid(i));
+      strcat(sqlselect,temptxt);
+      strcat(sqlselect," ");
+      i++;
+    }        	// end while
+    sprintf(temptxt,"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
+    strcat(sqlselect,temptxt);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) fault=false;
+  }
+  mysql_close(conn);
+  return(!(fault));
+}
+
+
+int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
+
 }
 
 
@@ -1183,15 +1228,6 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
         glPopMatrix();
     }
 }
-
-
-
-
-
-
-
-
-
 
 
 

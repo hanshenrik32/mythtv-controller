@@ -1,0 +1,15 @@
+Source: mythtv-controller
+Section: unknown
+Priority: optional
+Maintainer: Hans-Henrik Pedersen <hanshenrik32@gmail.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+Homepage: https://github.com/hanshenrik32/mythtv-controller
+#Vcs-Git: git://anonscm.debian.org/collab-maint/mythtv-controller.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/mythtv-controller.git
+
+Package: mythtv-controller
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},mysql,xmltv,imagemagick,libsqlite3-dev,libvlc-dev
+Description: Mediacenter for touch screen
+ <insert long description, indented with spaces>

@@ -223,7 +223,7 @@ int rss_stream_class::load_rss_data() {
   MYSQL_RES *res;
   MYSQL_ROW row;
   antal=0;
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -261,7 +261,7 @@ int rss_stream_class::save_rss_data() {
   MYSQL_RES *res,*res1;
   MYSQL_ROW row,row1;
   int n=0;
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -3078,10 +3078,11 @@ void show_setup_rss(unsigned int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==0) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset));
-        myglprint4((char *) keybuffer);   // keybuffer
+      strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset));
+      myglprint4((char *) keybuffer);   // keybuffer
     } else {
-        if (rssstreamoversigt.streamantal()+startofset>0) myglprint4((char *) rssstreamoversigt.get_stream_name(0+startofset));
+      if (rssstreamoversigt.streamantal()+startofset>0) myglprint4((char *) rssstreamoversigt.get_stream_name(0+startofset));
+        else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==0) showcoursornow(-071,500,strlen(keybuffer));
@@ -3096,6 +3097,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>1) myglprint4((char *) rssstreamoversigt.get_stream_url(0+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==1) showcoursornow(311,500,strlen(keybuffer));
@@ -3113,6 +3115,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>1) myglprint4((char *) rssstreamoversigt.get_stream_name(1+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==2) showcoursornow(011,450,strlen(keybuffer));
@@ -3128,11 +3131,11 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()>1) myglprint4((char *) rssstreamoversigt.get_stream_url(1));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==3) showcoursornow(311,450,strlen(keybuffer));
     //if (do_show_setup_select_linie==3) showcoursornow(-071,450,strlen(keybuffer));
-
 
     // line 2
     glPushMatrix();
@@ -3145,6 +3148,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()>2) myglprint4((char *) rssstreamoversigt.get_stream_name(2));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==4) showcoursornow(011,400,strlen(keybuffer));
@@ -3160,6 +3164,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>2) myglprint4((char *) rssstreamoversigt.get_stream_url(2+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==5) showcoursornow(311,400,strlen(keybuffer));
@@ -3177,6 +3182,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>3) myglprint4((char *) rssstreamoversigt.get_stream_name(3+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==6) showcoursornow(011,350,strlen(keybuffer));
@@ -3192,6 +3198,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>3) myglprint4((char *) rssstreamoversigt.get_stream_url(3+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==7) showcoursornow(311,350,strlen(keybuffer));
@@ -3209,6 +3216,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>4) myglprint4((char *) rssstreamoversigt.get_stream_name(4+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==8) showcoursornow(011,300,strlen(keybuffer));
@@ -3224,6 +3232,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>4) myglprint4((char *) rssstreamoversigt.get_stream_url(4+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==9) showcoursornow(311,300,strlen(keybuffer));
@@ -3241,6 +3250,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()>5) myglprint4((char *) rssstreamoversigt.get_stream_name(5));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==10) showcoursornow(011,250,strlen(keybuffer));
@@ -3256,6 +3266,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>5) myglprint4((char *) rssstreamoversigt.get_stream_url(5+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==11) showcoursornow(311,250,strlen(keybuffer));
@@ -3273,6 +3284,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>6) myglprint4((char *) rssstreamoversigt.get_stream_name(6+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==12) showcoursornow(011,200,strlen(keybuffer));
@@ -3288,6 +3300,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>6) myglprint4((char *) rssstreamoversigt.get_stream_url(6+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==13) showcoursornow(311,200,strlen(keybuffer));
@@ -3304,6 +3317,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_name(7+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==14) showcoursornow(011,150,strlen(keybuffer));
@@ -3319,6 +3333,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_url(7+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==15) showcoursornow(311,150,strlen(keybuffer));
@@ -3335,6 +3350,7 @@ void show_setup_rss(unsigned int startofset) {
     } else {
         glColor3f(1.0f,1.0f,1.0f);
         if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_name(8));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     //if (do_show_setup_select_linie==16) showcoursornow(011,100,strlen(keybuffer));
@@ -3350,6 +3366,7 @@ void show_setup_rss(unsigned int startofset) {
         myglprint4((char *) keybuffer);
     } else {
         if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_url(8+startofset));
+          else myglprint4((char *) "                               ");
     }
     glPopMatrix();
     if (do_show_setup_select_linie==17) showcoursornow(311,100,strlen(keybuffer));
@@ -4274,7 +4291,9 @@ void show_setup_interface() {
     int tabelofset=0;
 
     // load setings
-    if (rssstreamoversigt.streamantal()==0) rssstreamoversigt.load_rss_data();
+    if (rssstreamoversigt.streamantal()==0) {
+        rssstreamoversigt.load_rss_data();
+    }
 
     // background
 //    glLoadIdentity();

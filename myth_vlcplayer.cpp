@@ -22,6 +22,7 @@ vlc_controller::vlc_controller() {
   //vlc_inst = libvlc_new(5,opt);
   vlc_inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
   is_playing=false;
+  is_pause=false;
 }
 
 
@@ -126,6 +127,7 @@ void vlc_controller::stopmedia() {
     if (libvlc_media_player_is_playing(vlc_mp)) {
       libvlc_media_player_stop(vlc_mp);
       libvlc_media_player_release(vlc_mp);
+      is_playing=false;
     }
   } else {
     printf("Error stop movie player\n");
@@ -155,7 +157,6 @@ unsigned long vlc_controller::get_length_in_ms() {
   length=libvlc_media_player_get_length(vlc_mp);
   return((unsigned long) length);
 }
-
 
 
 // return play pos
@@ -194,6 +195,15 @@ void vlc_controller::setvolume(int volume) {
 
 // set play or pause
 
-void vlc_controller::pause() {
-  if (vlc_mp) libvlc_media_player_pause(vlc_mp);
+void vlc_controller::pause(int pause) {
+  if (vlc_mp) {
+    if (is_pause) {
+      libvlc_media_player_set_pause(vlc_mp,0);
+      is_pause=false;
+    } else {
+      libvlc_media_player_set_pause(vlc_mp,1);
+      is_pause=true;
+    }
+  }
+  //if (vlc_mp) libvlc_media_player_pause(vlc_mp);
 }

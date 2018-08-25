@@ -3,12 +3,9 @@
 #include <ctime>
 #include <string.h>
 #include <stdio.h>
-//#include <irrKlang.h>
-#include <iostream>   // one of two
+#include <iostream>
 #include <mysql.h>
 #include "myctrl_mplaylist.h"
-
-//using namespace irrklang;
 
 
 int mplaylist::m_play_playlist(char *path,int recnr) {
