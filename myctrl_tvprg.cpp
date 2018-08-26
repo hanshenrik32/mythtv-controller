@@ -182,7 +182,7 @@ char *trimwhitespace(char *str)
 
 unsigned long get_cannel_id(char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -213,7 +213,7 @@ unsigned long get_cannel_id(char *channelname) {
 
 bool do_cannel_exist(char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -245,7 +245,7 @@ bool do_cannel_exist(char *channelname) {
 
 bool do_program_exist(int pchanid,char *ptitle,char *pstarttime) {
   char sql[4096];
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -421,7 +421,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
   xmlChar *desc;
   unsigned long channelid;
   bool fundet=false;
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -2995,7 +2995,7 @@ void tv_oversigt::cleartvguide() {
   char sql[4096];
   int error=0;
   bool fundet=false;
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -3201,7 +3201,7 @@ int tv_oversigt::tvprgrecordedbefore(char *ftitle,unsigned int fchannelid) {
     MYSQL_ROW row;
     // mysql stuf
     static int recantal=0;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     bool fundet=false;
     char sqlselect[200];
     sprintf(sqlselect,"SELECT count(title) FROM recorded where chanid=%d and title=\"%s\"",fchannelid,ftitle);
@@ -3235,7 +3235,7 @@ int tv_oversigt::tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid) {
     MYSQL_ROW row;
     // mysql stuf
     static int rectype=0;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     bool fundet=false;
     char sqlselect[400];
     sprintf(sqlselect,"SELECT type FROM record where (chanid=%s and title=\"%s\" and starttime='%s') or (chanid=%s and title=\"%s\" and type=10)",fchannelid,ftitle,fstarttime,fchannelid,ftitle);
@@ -3268,7 +3268,7 @@ int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchanne
     MYSQL_ROW row;
     // mysql stuf
     static int rectype=0;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     bool fundet=false;
     char sqlselect[200];
     sprintf(sqlselect,"DELETE FROM record where chanid=%s and title=\"%s\" and starttime='%s'",fchannelid,ftitle,fstarttime);
@@ -3304,7 +3304,7 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     sqlselect=new char[40000];
     // mysql stuf
 //    static int rectype=0;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     bool doneok=false;
 
     time_t aktueltid;
@@ -3434,7 +3434,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     MYSQL_RES *res;
     MYSQL_ROW row;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     char tmptxt[100];
 
     strcpy(this->mysqllhost,mysqlhost);
@@ -4637,7 +4637,7 @@ void earlyrecorded::earlyrecordedload(char *mysqlhost,char *mysqluser,char *mysq
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythconverg";
+    char *database = (char *) "mythtvcontroller";
     // mysql stuf
     char sqlselect[200];
     strcpy(sqlselect,"SELECT title,starttime FROM recorded order by starttime limit 60");
