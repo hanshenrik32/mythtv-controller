@@ -25,14 +25,14 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so
 
 #	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10605linux/api/lowlevel/lib/x86_64/libfmod.so
 
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -45,7 +45,7 @@ ifeq ($(LBITS),64)
 else
 	STDCLIB = /usr/lib/i386-linux-gnu/libstdc++.so.6
 	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
-	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')	
+	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
 
@@ -84,7 +84,7 @@ uninstall:
 	rm -f $(DESTDIR)
 	rm -f $(BINPROG)
 
-clean: 
+clean:
 	@if test -e mythtv-controller; then rm mythtv-controller; fi
 
 installsound:
@@ -94,16 +94,16 @@ installsound:
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
-	tar -zxf fmodstudioapi10906linux.tar.gz -C /usr/share/mythtv-controller/
+	tar -zxf fmodstudioapi11008linux.tar.gz -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	#cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9.6
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so.9
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmodL.so.9.6 /usr/lib/libfmodL.so
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9.6	
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so.9
-	ln -s /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod.so.9.6 /usr/lib/libfmod.so
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so.10.8
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so.10.8
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10.8
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 

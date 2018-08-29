@@ -55,8 +55,8 @@ bool stream_jump=false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/inc/fmod_errors.h"
+#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod.hpp"
+#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -6292,7 +6292,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   // retfunc er !=0 hvis der er trykket på en knap up/down
                   // give error
                   if (debugmode & 2) {
-                    if ((show_music_oversigt) && (vis_stream_oversigt==false)) fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
+                    if ((vis_music_oversigt) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
+                      fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
+                    }
+                  }
+                  if (vis_tv_oversigt) {
+                    if (debugmode & 8) fprintf(stderr,"tvknapnr = %d \n",tvknapnr-1);
                   }
                   if (debugmode & 4) {
                     if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
@@ -6379,22 +6384,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_swing_movie_cover=1;
                   }
                 }
-
-
-                /*
-                if (state==GLUT_DOWN) {
-
-                    int retfunc1=gl_select(mousex,screeny-mousey);   // hent den som er trykket på
-                    // nu er mknapnr/fknapnr/rknapnr=den som er trykket på bliver sat i gl_select
-                    // retfunc er !=0 hvis der er trykket på en knap up/down
-                    //if (debugmode & 0) {
-                        printf("state = %d mknapnr = %d type = %d \n",state,mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
-                    //}
-                    if (mknapnr==1) {
-                    }
-                    mknapnr=-1;
-                }
-                */
 
                 break;
 
