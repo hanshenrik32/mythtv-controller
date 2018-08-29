@@ -262,23 +262,24 @@ int stream_class::loadrssfile(bool updaterssfile) {
     strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
+    // go to all record have the url in xml files to download
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
         if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
-          getuserhomedir(homedir);
+          getuserhomedir(homedir);                                          // get user homedir
           strcpy(totalurl,"wget '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,"' -o '");
-          strcat(totalurl,homedir);
-          strcat(totalurl,"/rss/wget.log'");
+          strcat(totalurl,homedir);                                         // add user homedir
+          strcat(totalurl,"/rss/wget.log'");                                // log file
           strcat(totalurl," -O '");
-          strcat(totalurl,homedir);
-          strcat(totalurl,"/rss/");
+          strcat(totalurl,homedir);                                         // add user homedir
+          strcat(totalurl,"/rss/");                                         // add output filename
           if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,".rss'");
-          strcpy(parsefilename,homedir);
+          strcpy(parsefilename,homedir);                                    // copy user homedir
           strcat(parsefilename,"/rss/");
           strcat(parsefilename,row[3]);
           strcat(parsefilename,".rss");
@@ -619,7 +620,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               subnode2=subnode2->next;
             }
             recordexist=false;
-            sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+            sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
             mysql_query(conn,sqlinsert);
             res = mysql_store_result(conn);
             if (res) {
