@@ -94,7 +94,8 @@ struct configkeytype {
 };
 
 int numCPU;                                             // have the numbers of cpu cores
-char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
+char systemcommand[2000];                               // shell command to do to play recorded program mplayer/vlc eks.
+                                                        // (vlc player buildin. DEFAULT player)
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 // koki db names (by version)
 const char *kodiver[7]={"MyMusic70.db","MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
@@ -1865,6 +1866,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
 
 
 // init lirc
+// remove controler
 
 int initlirc() {
   // LIRC SETUP
@@ -2093,12 +2095,8 @@ unsigned int do_playlist_restore_playlist() {
 //
 
 unsigned int do_playlist_backup_playlist() {
-//    char tmpfilename[200];
-//    char convert_command[256];
-//    char convert_newfilename[256];
     int playlistnr;
     char sqlselect[8192];
-//    char tmptxt[200];
     long i;
     // mysql vars
     MYSQL *conn;
@@ -5719,7 +5717,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // test for menu select music
             if ((GLubyte) names[i*4+3]==2) {
                 if (debugmode) printf("Select vis_radio_and_music \n");
-
                 vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
                 //vis_radio_oversigt=!vis_radio_oversigt;
                 //vis_music_oversigt=!vis_music_oversigt;
@@ -6153,7 +6150,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
               // er der trykket på et tv program
               if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-                tvknapnr=(GLuint) names[i*4+3]-100;					                // hent tv knap nr
+                tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
+                if (debugmode & 256) fprintf(stderr,"tvknapnr%%d.\n",tvknapnr);
                 fundet=true;
               }
             }
@@ -6509,6 +6507,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((retfunc==1) || (button==3)) {
             if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
           }
+
+
+
         }
 
         // scroll film up/down
