@@ -1749,7 +1749,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
           songintnr=atoi(row[0]);
           songantal=atoi(row[1]);
           // find cd cover samt sange info i mythtv music database
-          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name",songintnr);
           mysql_query(conn,sqlselect);
           res1 = mysql_store_result(conn);
           //              if (debugmode & 2) printf("Hentet music nummer = %i ,add song %s to liste\n",i,songname);
@@ -1801,7 +1801,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
     dirmusic.emtydirmusic();
 
     strcpy(sqlselect,"SELECT song_id,name,artist_id FROM music_songs where directory_id=");
-    sprintf(tmptxt,"%d limit %d",dirid,dirliste_size);
+    sprintf(tmptxt,"%d order by name limit %d",dirid,dirliste_size);
     strcat(sqlselect,tmptxt);
     conn=mysql_init(NULL);
     // Connect to database
@@ -3018,112 +3018,56 @@ void display() {
       glPopMatrix();
     }
 
-
-    // skal vi til at spørge ask open dir or play
+    //
+    // skal vi til at spørge ask open dir or play (ask about play)
+    //
     if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
+      do_swing_music_cover=false;
+      if (do_swing_music_cover) {
         do_swing_music_cover=false;
-        if (do_swing_music_cover) {
-            do_swing_music_cover=false;
+      }
+      if (do_swing_music_cover==false) {
+        xof=500;
+        yof=200;
+        buttonsize=200;
 
-        }
-        if (do_swing_music_cover==false) {
-          xof=500;
-          yof=200;
-          buttonsize=200;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS); // draw ask box
 
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          //glBlendFunc(GL_ONE, GL_ONE);
-          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); // draw ask box
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
 
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
-
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
 
 // ***************************************************************** play icon
-          xof=550;
-          yof=250;
-          buttonsize=100;
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
+        xof=550;
+        yof=250;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
 //            glColor4f(1.0f,1.0f,1.0f,1.0f);
 //            glBlendFunc(GL_ONE, GL_ONE);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glBindTexture(GL_TEXTURE_2D, _textureId10);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(20);                      				  // play icon nr
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          // play icon
-
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
-// ************************************************************ Open/or not open
-          xof=650;
-          yof=250;
-          buttonsize=100;
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          //            glColor4f(1.0f,1.0f,1.0f,1.0f);
-          //            glBlendFunc(GL_ONE, GL_ONE);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBlendFunc(GL_ONE, GL_ONE);
-          if (dirmusic.numbersindirlist()>0) {
-              glBindTexture(GL_TEXTURE_2D, _textureopen);
-          } else {
-              glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
-          }
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(21);                        // Overwrite the first name in the buffer
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          // play icon
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
-
-
-
-// swap ************************************************************** icon swap
-          xof=750;
-          yof=250;
-          buttonsize=100;                glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
-//            glColor4f(1.0f,1.0f,1.0f,1.0f);
-//            glBlendFunc(GL_ONE, GL_ONE);
-         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-         glBlendFunc(GL_ONE, GL_ONE);
-         glBindTexture(GL_TEXTURE_2D, _textureswap);
-         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-         glLoadName(22);                        // Overwrite the first name in the buffer
-         glBegin(GL_QUADS); //Begin quadrilateral coordinates
-         // play icon
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureId10);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(20);                      				  // play icon nr
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
 
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
@@ -3132,14 +3076,62 @@ void display() {
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
 
-// **********************************************************
-        no_open_dir=0;
+// ************************************************************ Open/or not open
+        xof=650;
+        yof=250;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        //            glColor4f(1.0f,1.0f,1.0f,1.0f);
+        //            glBlendFunc(GL_ONE, GL_ONE);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        if (dirmusic.numbersindirlist()>0) {
+            glBindTexture(GL_TEXTURE_2D, _textureopen);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(21);                        // Overwrite the first name in the buffer
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
 
+
+
+
+// swap ************************************************************** icon swap
+        xof=750;
+        yof=250;
+        buttonsize=100;                glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureswap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(22);                        // Overwrite the first name in the buffer
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
+
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
+        no_open_dir=0;
         buttonsize=300;
         if (dirmusic.numbersindirlist()==0) {						// er der nogle dirs
-
-                    // draw cd cover
-//                    glLoadIdentity();
+          // draw cd cover
           glPushMatrix();
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
@@ -3149,7 +3141,6 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS); 							//	Begin quadrilateral coordinates
           // 										draw front box
-
           glTexCoord2f(0, 0); glVertex3f(200+ xof, yof , 0.0);
           glTexCoord2f(0, 1); glVertex3f(200+ xof,yof+buttonsize, 0.0);
           glTexCoord2f(1, 1); glVertex3f(200+ xof+buttonsize, yof+buttonsize , 0.0);
@@ -3163,9 +3154,9 @@ void display() {
           //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           if (dirmusic.textureId) {
-              glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
+            glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
           } else {
-              glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
+            glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
           }
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3177,12 +3168,8 @@ void display() {
           glEnd(); //End quadrilateral coordinates
           glPopMatrix();
         }
-
-
-// ****************************************************************************************************
-
+        // ****************************************************************************************************
         glPushMatrix();
-
         glDisable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(560.0f, 950.0f , 0.0f);							// pos
@@ -3192,61 +3179,50 @@ void display() {
         if (strcmp(temptxt1,"")==0) strcpy(temptxt1,music_noartistfound[configland]);
         // check for maxlength
         if (strlen(temptxt1)>24) {
-            strcpy(temptxt1,"..");
-            strcat(temptxt1,musicoversigt[mknapnr-1].album_name+(strlen(musicoversigt[mknapnr-1].album_name)-24));
+          strcpy(temptxt1,"..");
+          strcat(temptxt1,musicoversigt[mknapnr-1].album_name+(strlen(musicoversigt[mknapnr-1].album_name)-24));
         }
         sprintf(temptxt,music_nomberofsongs[configland],dirmusic.numbersinlist(),temptxt1);
-
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        glcRenderString(temptxt);			// show numbers of songs in list
+        glScalef(20.5, 20.5, 1.0);                                                    // danish charset ttf
+        glcRenderString(temptxt);			                                                // show numbers of songs in list
         glPopMatrix();
-
-
         i=0;
         if (dirmusic.numbersindirlist()==0) dirmusiclistemax=16; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
-
+        //
         // show cd song list så man kan vælge
+        //
+
+        //aktivfont.selectfont("courier 10 Pitch");
+
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
-            ofset=18*i;
-            dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
-            pos=strrchr(temptxt,'/');
-            if (pos>0) strcpy(temptxt,pos+1);
-
-            pos=strrchr(temptxt,'.');
-            if (pos>0) temptxt[pos-temptxt]=0;
-            if (i<12) temptxt[54]=0; else temptxt[35]=0;
-            sprintf(temptxt1,"%-45s",temptxt);
-            temptxt1[45]='\0';
-
-//  	              printf("******* sang nr %d, name = %s \n",i,temptxt);
-//                    glLoadIdentity();
-
-
-
-            if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
-               else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
-
-//                    glTranslatef(560.0f, 750.0f , 0.0f);                                                    // pos
-//                    glRasterPos2f(0.0f, 0.0f);
-            glPushMatrix();
-            glTranslatef(560.0f, 850.0f -ofset, 0.0f);
-            glRasterPos2f(0.0f, 0.0f);
-            glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-            //aktivfont.selectfont("Courier 10 Pitch");
-            glcRenderString(temptxt1);
-            i++;
-            glTranslatef(5.0f, 0.0f, 0.0f);
-             if (aktiv==true) {
-              glcRenderString("[X]");
-            } else {
-              glcRenderString("[ ]");
-            }
-            //aktivfont.selectfont(configfontname);
-            glPopMatrix();
-          }
+          ofset=18*i;
+          dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
+          pos=strrchr(temptxt,'/');
+          if (pos>0) strcpy(temptxt,pos+1);
+          pos=strrchr(temptxt,'.');
+          if (pos>0) temptxt[pos-temptxt]=0;
+          if (i<12) temptxt[54]=0; else temptxt[35]=0;
+          sprintf(temptxt1,"%-45s",temptxt);
+          temptxt1[45]='\0';
+          if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
+           else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
+          glPushMatrix();
+          glTranslatef(560.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          //aktivfont.selectfont("Courier 10 Pitch");
+          glcRenderString(temptxt1);
+          i++;
+          glTranslatef(5.0f, 0.0f, 0.0f);
+          if (aktiv==true) glcRenderString("[X]");
+            else glcRenderString("[ ]");
+          glPopMatrix();
         }
+      }
     }
+    //
     // ask save playlist
+    //
     if (vis_music_oversigt) {
       if (ask_save_playlist) {
         xof=500;
@@ -3518,8 +3494,8 @@ void display() {
     #endif
 
 
-    // alt music er her under
-
+    // alt music er her under player
+    //
     if (do_play_music_cover) {
         // play list
         if (do_find_playlist) {
@@ -5865,7 +5841,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
 
+          //
           // hvis vis ask_open_dir_or_play window
+          //
           if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
             // play button
             if ((GLubyte) names[i*4+3]==20) {

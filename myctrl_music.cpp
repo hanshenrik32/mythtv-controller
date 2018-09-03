@@ -938,8 +938,9 @@ bool global_use_internal_music_loader_system_exist() {
 }
 
 
-
+//
 // loader valgte play liste
+//
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     GLuint texture; //The id of the texture
@@ -960,7 +961,7 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     sprintf(tmptxt,"%ld",find_dir_id);
     strcpy(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where directory_id=");
     strcat(sqlselect,tmptxt);
-    strcat(sqlselect," and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id");
+    strcat(sqlselect," and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name");
 //    if (debugmode) printf("SQLSELECT = %s  \n ",sqlselect);
     conn=mysql_init(NULL);
     // Connect to database
@@ -975,9 +976,9 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
             if (global_use_internal_music_loader_system) {
-              if (debugmode & 2) printf("Fundet sang song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+              if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
             } else {
-              if (debugmode & 2) printf("Fundet sang song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+              if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
             }
             if (global_use_internal_music_loader_system) {
               strcpy(tmptxt,"");
