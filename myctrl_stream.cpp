@@ -1572,13 +1572,49 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Converge with Casey Newton',NULL,NULL,'Converge with Casey Newton',0,0,NULL,'view-source:http://feeds.feedburner.com/ConvergeWithCaseyNewton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Converge with Casey Newton',NULL,NULL,'Converge with Casey Newton',0,0,NULL,'http://feeds.feedburner.com/ConvergeWithCaseyNewton',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation (Video).\n");
         res = mysql_store_result(conn);
         mysql_free_result(res);
       }
 
 
+      // TED Talk daily
+      if (check_rss_feed_exist(conn,"TED Talks Daily")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('TED Talks Daily',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('TED Talks Daily',NULL,NULL,'TED Talks Daily ',0,0,NULL,'http://feeds.feedburner.com/TEDTalks_audio',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation (Video).\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+      }
+
+
+      // RISE podcast
+      if (check_rss_feed_exist(conn,"RISE podcast")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('RISE podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('RISE podcast',NULL,NULL,'RISE podcast ',0,0,NULL,'http://feeds.soundcloud.com/users/soundcloud:users:300950004/sounds.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation (Video).\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+      }
+
+      // StarTalk Radio
+      if (check_rss_feed_exist(conn,"StarTalk Radio")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('StarTalk Radio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('StarTalk Radio',NULL,NULL,'StarTalk Radio ',0,0,NULL,'https://rss.art19.com/startalk-radio',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation (Video).\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+      }
 
 
       // close mysql
