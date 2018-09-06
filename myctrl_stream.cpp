@@ -1907,7 +1907,7 @@ int stream_class::loadweb_stream_iconoversigt() {
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          printf("File exist %s then set filename \n",downloadfilenamelong);
+            //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       } else if (strncmp(tmpfilename,"https://",8)==0) {
         //strcpy(lastfile,downloadfilename);
@@ -1923,7 +1923,7 @@ int stream_class::loadweb_stream_iconoversigt() {
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          printf("File exist %s then set filename \n",downloadfilenamelong);
+          //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -2092,9 +2092,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           // check om der findes en downloaded icon
           strcpy(downloadfilenamelong,"");
           strcat(downloadfilenamelong,gfxfilename);
-
-printf("File name %s \n",downloadfilenamelong);
-
           if (strcmp(downloadfilename_last,gfxfilename)!=0) {
             // check om filen findes i cache dir eller i mythtv netvision dir
             if (file_exists(gfxfilename)) {
