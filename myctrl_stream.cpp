@@ -746,7 +746,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // create db if not exist
       // and dump some default rss feeed in
       //
-      printf("Creating/Update database for new rss feed\n");
+      printf("Creating/Update RSS/PODCAST for new rss feed\n");
       // thumbnail   = name of an local image file
       // commandline = Program to fetch content with
       // updated     = Time of last update
@@ -1585,7 +1585,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // RISE podcast
       if (check_rss_feed_exist(conn,"RISE podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('RISE podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","RISE podcast");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('RISE podcast',NULL,NULL,'RISE podcast ',0,0,NULL,'http://feeds.soundcloud.com/users/soundcloud:users:300950004/sounds.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1596,7 +1596,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // StarTalk Radio
       if (check_rss_feed_exist(conn,"StarTalk Radio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('StarTalk Radio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","StarTalk Radio");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('StarTalk Radio',NULL,NULL,'StarTalk Radio ',0,0,NULL,'https://rss.art19.com/startalk-radio',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1607,7 +1607,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // Dr. Death
       if (check_rss_feed_exist(conn,"Dr. Death")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Dr. Death',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","Dr. Death");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Dr. Death',NULL,NULL,'Dr. Death',0,0,NULL,'https://rss.art19.com/dr-death',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1618,7 +1618,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // Stuff You Should Know
       if (check_rss_feed_exist(conn,"Stuff You Should Know")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Stuff You Should Know',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","Stuff You Should Know");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Stuff You Should Know',NULL,NULL,'Stuff You Should Know',0,0,NULL,'https://feeds.megaphone.fm/stuffyoushouldknow',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1631,7 +1631,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // GeekBeat.TV
       if (check_rss_feed_exist(conn,"GeekBeat.TV")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('GeekBeat.TV',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","GeekBeat.TV");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('GeekBeat.TV',NULL,NULL,'GeekBeat.TV',0,0,NULL,'http://feeds.feedburner.com/caliextralarge?format=xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1644,7 +1644,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // The Skeptics' Guide to the Universe
       if (check_rss_feed_exist(conn,"The Skeptics' Guide to the Universe")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Skeptics' Guide to the Universe',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","The Skeptics");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('The Skeptics' Guide to the Universe',NULL,NULL,'The Skeptics' Guide to the Universe',0,0,NULL,'https://feed.theskepticsguide.org/feed/rss.aspx?feed=SGU',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1652,8 +1652,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         res = mysql_store_result(conn);
         mysql_free_result(res);
       }
-
-
 
       // close mysql
       if (conn) mysql_close(conn);
@@ -1859,7 +1857,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) printf("Mythtv stream loader done... \n");
+    if (debugmode & 4) printf("RSS/PODCAST loader done... \n");
     return(0);
 }
 
@@ -1875,12 +1873,10 @@ void *loadweb(void *data) {
 }
 
 
+// in use
+// downloading all rss podcast icon gfx
 
-// downloading all web gfx
-
-int stream_class::loadweb_stream_iconoversigt()
-
-{
+int stream_class::loadweb_stream_iconoversigt() {
   int antal;
   int nr=0;
   int loadstatus;
@@ -1904,13 +1900,14 @@ int stream_class::loadweb_stream_iconoversigt()
         getuserhomedir(downloadfilenamelong);
         strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
-        if (!(file_exists(downloadfilenamelong))) {
+        if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
           loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
+          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          //printf("nr %3d File exist %s \n",nr,downloadfilenamelong);
+          printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       } else if (strncmp(tmpfilename,"https://",8)==0) {
         //strcpy(lastfile,downloadfilename);
@@ -1919,12 +1916,14 @@ int stream_class::loadweb_stream_iconoversigt()
         // build path
         strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
-        if (!(file_exists(downloadfilenamelong))) {
+        if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
           loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
+          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+          printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -2093,6 +2092,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           // check om der findes en downloaded icon
           strcpy(downloadfilenamelong,"");
           strcat(downloadfilenamelong,gfxfilename);
+
+printf("File name %s \n",downloadfilenamelong);
+
           if (strcmp(downloadfilename_last,gfxfilename)!=0) {
             // check om filen findes i cache dir eller i mythtv netvision dir
             if (file_exists(gfxfilename)) {
