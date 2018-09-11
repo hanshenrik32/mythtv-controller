@@ -221,7 +221,7 @@ void stream_class::update_rss_nr_of_view(char *url) {
 // updaterssfile bool is do it now (u key in overview)
 
 int stream_class::loadrssfile(bool updaterssfile) {
-  // mysql vars
+  bool haveupdated=false;
   char sqlselect[2048];
   char sqlinsert[32768];
   char totalurl[2048];
@@ -325,6 +325,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
             sprintf(sqlinsert,"UPDATE internetcontentarticles set paththumb='%s' where feedtitle like '%s' and paththumb IS NULL",baseicon,row[0]);
             mysql_query(conn,sqlinsert);
             res1 = mysql_store_result(conn);
+            haveupdated=true;
           }
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
@@ -335,6 +336,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
               sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
               mysql_query(conn,sqlinsert);
               res1 = mysql_store_result(conn);
+              haveupdated=true;
             }
           }
         }
@@ -344,7 +346,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
     }
     mysql_close(conn);
   } else return(-1);
-  return(1);
+  if (haveupdated) return(1); else return(0);
 }
 
 
