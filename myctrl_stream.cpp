@@ -470,7 +470,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 xmlFree(tmpdat);
               }
             }
-
+            // item type element
             if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
               subnode2=subnode->xmlChildrenNode;
               while(subnode2) {
@@ -544,6 +544,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                   search_and_replace2(rssprgtitle);
                   search_and_replace2(rssprgfeedtitle);
                   search_and_replace2(rssprgdesc);
+
+                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssopretdato);
+
                   sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                   if (mysql_query(conn,sqlinsert)!=0) {
                     printf("mysql REPLACE table error. %s\n",sqlinsert);
@@ -634,6 +637,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               search_and_replace2(rssprgtitle);
               search_and_replace2(rssprgfeedtitle);
               search_and_replace2(rssprgdesc);
+
+              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssopretdato);
+
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               if (mysql_query(conn,sqlinsert)!=0) {
