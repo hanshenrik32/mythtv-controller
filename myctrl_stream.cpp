@@ -319,9 +319,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
           }
           // update master icon if none
           if ((strcmp(row[0],"")!=0) && (strcmp(baseicon,"")!=0)) {
+            /*
             if (debugmode & 4) {
               printf("Create/update podcast from %s url in db\n",row[0]);
             }
+            */
             sprintf(sqlinsert,"UPDATE internetcontentarticles set paththumb='%s' where feedtitle like '%s' and paththumb IS NULL",baseicon,row[0]);
             mysql_query(conn,sqlinsert);
             res1 = mysql_store_result(conn);
@@ -330,9 +332,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
           // if podcast is not rss and title ok
           if ((strcmp(row[3],"")!=0) && (row[23])) {
             if (atoi(row[23])==1) {
+              /*
               if (debugmode & 4) {
                 printf("Create/update podcast from %s url in db\n",row[0]);
               }
+              */
               sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
               mysql_query(conn,sqlinsert);
               res1 = mysql_store_result(conn);
@@ -538,14 +542,11 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 }
                 // creoate record if not exist
                 if (!(recordexist)) {
-                  if (debugmode & 4) {
-                    printf("Create/update podcast %s in db\n",rssprgtitle);
-                  }
                   search_and_replace2(rssprgtitle);
                   search_and_replace2(rssprgfeedtitle);
                   search_and_replace2(rssprgdesc);
 
-                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssopretdato);
+                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
 
                   sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                   if (mysql_query(conn,sqlinsert)!=0) {
@@ -638,7 +639,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               search_and_replace2(rssprgfeedtitle);
               search_and_replace2(rssprgdesc);
 
-              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssopretdato);
+              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
 
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
