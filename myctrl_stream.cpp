@@ -788,6 +788,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       res = mysql_store_result(conn);
       // create default master rss feed source
       // ok Aftenshowet
+      // dr have removed the rss feed
       if (check_rss_feed_exist(conn,"Aftenshowet")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Aftenshowet.\n");
@@ -1746,7 +1747,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
-
 
       // Love + Radio
       if (check_rss_feed_exist(conn,"Love + Radio")==0) {
