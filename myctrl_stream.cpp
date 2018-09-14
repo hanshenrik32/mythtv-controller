@@ -1149,6 +1149,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+/*
       // virker ikke
       if (check_rss_feed_exist(conn,"Why'd You Push That Button?")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Why'd You Push That Button?',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1161,6 +1162,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+*/
       // ok Gametest Fan Uploads
       if (check_rss_feed_exist(conn,"Gametest Fan Uploads")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Gametest Fan Uploads',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1676,6 +1678,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+
+/*
+      // BAD need check bad images (cdn acces errors)
       // Dr. Death
       if (check_rss_feed_exist(conn,"Dr. Death")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Dr. Death',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1688,6 +1693,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+*/
       // ok Stuff You Should Know
       if (check_rss_feed_exist(conn,"Stuff You Should Know")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Stuff You Should Know',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1755,6 +1761,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
+/*
       // virker ikke
       // Når 2 bliver til 3
       if (check_rss_feed_exist(conn,"Når 2 bliver til 3")==0) {
@@ -1768,7 +1775,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
-
+*/
 
       // close mysql
       if (conn) mysql_close(conn);
@@ -1841,8 +1848,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (row[0]) stack[antal]->feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
                 else stack[antal]->feed_group_antal=0;
                 if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                if (row[7]) strncat(tmpfilename,row[7],20);                               //
-                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// mythtv icon file
+                if (row[7]) strncat(tmpfilename,row[7],20);                                     //
+                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		      // icon file
                 if (row[9]) strcpy(tmpfilename,row[9]);
                 get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
                 // check filename
@@ -1857,7 +1864,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,"/rss/images/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
-                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilenamelong);
                   // download gfx file and use as icon
                   if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
                     printf("Download error \n");
@@ -1938,7 +1945,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilename);
+                      if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilenamelong);
                       // download gfx file and use as icon
                       if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
                         printf("Download error \n");
@@ -1947,7 +1954,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     strcpy(tmpfilename,downloadfilenamelong);
                   }
                 } else strcpy(tmpfilename,"");
-                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
 //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
                 if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
                 // no texture now
