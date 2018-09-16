@@ -4544,16 +4544,24 @@ void display() {
           spec = new float[sampleSize];
           spec2 = new float[sampleSize];
           if (fft) {
+            // new ver
+            for (int i=0; i<fft->length; i++) {
+              specLeft[i]=fft->spectrum[0][i];
+              specRight[i]=fft->spectrum[1][i];
+            }
+            // old ver
+            /*
             for (chan = 0; chan < fft->numchannels; chan++) {
               float average = 0.0f;
               float power = 0.0f;
               for (int i = 0; i < fft->length; ++i) {
-                  if (fft->spectrum[chan][i]) {
-                      specLeft[i]=(float) fft->spectrum[0][i];
-                      specRight[i]=(float) fft->spectrum[1][i];
-                  }
+                if (fft->spectrum[chan][i]) {
+                  specLeft[i]=(float) fft->spectrum[0][i];
+                  specRight[i]=(float) fft->spectrum[1][i];
+                }
               }
             }
+            */
           }
           for (i = 0; i < sampleSize; i++) {
             spec[i] = specLeft[i]*2;
