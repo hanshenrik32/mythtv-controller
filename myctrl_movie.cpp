@@ -468,9 +468,9 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     struct dirent *moviefil=NULL;
     char *ext;
     char filename[256];
-    char userhomedir[200];
+    char userhomedir[2000];
     char movietitle[200];
-    char moviepath1[200];
+    char moviepath1[2000];
     bool fundet;
     // mysql vars
     MYSQL *conn;
