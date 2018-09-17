@@ -3046,6 +3046,30 @@ void show_setup_rss(unsigned int startofset) {
     }
 */
 
+    for (int n=0;n<18;n++) {
+      glPushMatrix();
+      //if (channel_list[(n-1)+startofset].changeordernr) glTranslatef(692 , 560-(n*20) , 0.0f); else
+      glTranslatef(300 , 660-(n*20) , 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      if ((do_show_setup_select_linie-1)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
+
+      strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset+n));
+      myglprint4(keybuffer);
+
+      strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset+n));
+      glRasterPos2f(392.0f, 0.0f);
+      myglprint4(keybuffer);
+      glPopMatrix();
+    }
+
+    printf("do_show_setup_select_linie = %d %d \n",do_show_setup_select_linie,(do_show_setup_select_linie % 2));
+
+    if ((do_show_setup_select_linie % 2)==0) {
+      showcoursornow(-70,510-(do_show_setup_select_linie*20),strlen(rssstreamoversigt.get_stream_name(0+startofset+do_show_setup_select_linie)));
+    } else showcoursornow(170,510-(do_show_setup_select_linie*20),strlen(rssstreamoversigt.get_stream_url(0+startofset+do_show_setup_select_linie)));
+
+
+/*
     // loop for lines
     glPushMatrix();
     xpos=320;
@@ -3069,8 +3093,8 @@ void show_setup_rss(unsigned int startofset) {
     }
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);
-
-
+    */
+/*
     // line 0
     glPushMatrix();
     //glTranslatef(680 , 650 , 0.0f);
@@ -3370,6 +3394,9 @@ void show_setup_rss(unsigned int startofset) {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==17) showcoursornow(311,100,strlen(keybuffer));
+
+    */
+
 }
 
 
