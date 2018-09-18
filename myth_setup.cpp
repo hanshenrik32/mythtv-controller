@@ -3023,7 +3023,7 @@ void show_setup_rss(unsigned int startofset) {
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(680, 680, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Rss url string.");
+    myglprint4((char *) "PODCAST url string.");
     glPopMatrix();
 
     for (int n=0;n<18;n++) {
