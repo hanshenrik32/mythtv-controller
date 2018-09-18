@@ -6985,9 +6985,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
-
-
-
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
@@ -6999,9 +6996,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     if (stream_select_iconnr>0) stream_select_iconnr+=snumbersoficonline;
                 }
-
-
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) {
@@ -7154,8 +7148,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                   }
                 }
-
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if (vis_recorded_oversigt) {
                   if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
