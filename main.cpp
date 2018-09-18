@@ -7423,9 +7423,9 @@ void handleKeypress(unsigned char key, int x, int y) {
       vis_volume_timeout=80;
     }
 
-    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
-       // gem key pressed in buffer
-       if (keybufferindex<80) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || ((do_show_setup_rss) && (key!=27))) {
+      // gem key pressed in buffer
+      if (keybufferindex<80) {
           if (key==8) {						// back space
             if (keybufferindex>0) {
               keybufferindex--;
@@ -7628,11 +7628,126 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               } else if (do_show_setup_rss) {
                 if (key!=13) {
+                  switch(do_show_setup_select_linie) {
+                    case 0: strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 1: strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 2: strcpy(keybuffer,rssstreamoversigt.get_stream_name(1+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 3: strcpy(keybuffer,rssstreamoversigt.get_stream_url(1+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 4: strcpy(keybuffer,rssstreamoversigt.get_stream_name(2+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 5: strcpy(keybuffer,rssstreamoversigt.get_stream_url(2+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 6: strcpy(keybuffer,rssstreamoversigt.get_stream_name(3+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 7: strcpy(keybuffer,rssstreamoversigt.get_stream_url(3+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 8: strcpy(keybuffer,rssstreamoversigt.get_stream_name(4+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 9: strcpy(keybuffer,rssstreamoversigt.get_stream_url(4+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 10: strcpy(keybuffer,rssstreamoversigt.get_stream_name(5+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 11: strcpy(keybuffer,rssstreamoversigt.get_stream_url(5+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 12: strcpy(keybuffer,rssstreamoversigt.get_stream_name(6+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 13: strcpy(keybuffer,rssstreamoversigt.get_stream_url(6+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 14: strcpy(keybuffer,rssstreamoversigt.get_stream_name(7+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 15: strcpy(keybuffer,rssstreamoversigt.get_stream_url(7+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 16: strcpy(keybuffer,rssstreamoversigt.get_stream_name(8+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 17: strcpy(keybuffer,rssstreamoversigt.get_stream_url(8+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 18: strcpy(keybuffer,rssstreamoversigt.get_stream_name(9+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 19: strcpy(keybuffer,rssstreamoversigt.get_stream_url(9+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 20: strcpy(keybuffer,rssstreamoversigt.get_stream_name(10+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 21: strcpy(keybuffer,rssstreamoversigt.get_stream_url(10+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 22: strcpy(keybuffer,rssstreamoversigt.get_stream_name(11+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 23: strcpy(keybuffer,rssstreamoversigt.get_stream_url(11+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 24: strcpy(keybuffer,rssstreamoversigt.get_stream_name(12+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 25: strcpy(keybuffer,rssstreamoversigt.get_stream_url(12+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 26: strcpy(keybuffer,rssstreamoversigt.get_stream_name(13+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 27: strcpy(keybuffer,rssstreamoversigt.get_stream_url(13+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 28: strcpy(keybuffer,rssstreamoversigt.get_stream_name(14+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 29: strcpy(keybuffer,rssstreamoversigt.get_stream_url(14+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 30: strcpy(keybuffer,rssstreamoversigt.get_stream_name(15+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 31: strcpy(keybuffer,rssstreamoversigt.get_stream_url(15+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 32: strcpy(keybuffer,rssstreamoversigt.get_stream_name(16+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 33: strcpy(keybuffer,rssstreamoversigt.get_stream_url(16+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 34: strcpy(keybuffer,rssstreamoversigt.get_stream_name(17+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 35: strcpy(keybuffer,rssstreamoversigt.get_stream_url(17+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 36: strcpy(keybuffer,rssstreamoversigt.get_stream_name(18+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+                    case 37: strcpy(keybuffer,rssstreamoversigt.get_stream_url(18+configrss_ofset));
+                            keybufferindex=strlen(keybuffer);
+                            break;
+
+                  }
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
-
-
 
                 }
               } else if (do_show_videoplayer) {
@@ -7780,42 +7895,83 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
            } else if (do_show_setup_rss) {
               switch(do_show_setup_select_linie) {
-                case 0: rssstreamoversigt.set_stream_name(0,keybuffer);
+                case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
                         break;
-                case 1: rssstreamoversigt.set_stream_url(0,keybuffer);
+                case 1: rssstreamoversigt.set_stream_url(0+configrss_ofset,keybuffer);
                         break;
-                case 2: rssstreamoversigt.set_stream_name(1,keybuffer);
+                case 2: rssstreamoversigt.set_stream_name(1+configrss_ofset,keybuffer);
                         break;
-                case 3: rssstreamoversigt.set_stream_url(1,keybuffer);
+                case 3: rssstreamoversigt.set_stream_url(1+configrss_ofset,keybuffer);
                         break;
-                case 4: rssstreamoversigt.set_stream_name(2,keybuffer);
+                case 4: rssstreamoversigt.set_stream_name(2+configrss_ofset,keybuffer);
                         break;
-                case 5: rssstreamoversigt.set_stream_url(2,keybuffer);
+                case 5: rssstreamoversigt.set_stream_url(2+configrss_ofset,keybuffer);
                         break;
-                case 6: rssstreamoversigt.set_stream_name(3,keybuffer);
+                case 6: rssstreamoversigt.set_stream_name(3+configrss_ofset,keybuffer);
                         break;
-                case 7: rssstreamoversigt.set_stream_url(3,keybuffer);
+                case 7: rssstreamoversigt.set_stream_url(3+configrss_ofset,keybuffer);
                         break;
-                case 8: rssstreamoversigt.set_stream_name(4,keybuffer);
+                case 8: rssstreamoversigt.set_stream_name(4+configrss_ofset,keybuffer);
                         break;
-                case 9: rssstreamoversigt.set_stream_url(4,keybuffer);
+                case 9: rssstreamoversigt.set_stream_url(4+configrss_ofset,keybuffer);
                         break;
-                case 10:rssstreamoversigt.set_stream_name(5,keybuffer);
+                case 10:rssstreamoversigt.set_stream_name(5+configrss_ofset,keybuffer);
                         break;
-                case 11:rssstreamoversigt.set_stream_url(5,keybuffer);
+                case 11:rssstreamoversigt.set_stream_url(5+configrss_ofset,keybuffer);
                         break;
-                case 12:rssstreamoversigt.set_stream_name(6,keybuffer);
+                case 12:rssstreamoversigt.set_stream_name(6+configrss_ofset,keybuffer);
                         break;
-                case 13:rssstreamoversigt.set_stream_url(6,keybuffer);
+                case 13:rssstreamoversigt.set_stream_url(6+configrss_ofset,keybuffer);
                         break;
-                case 14:rssstreamoversigt.set_stream_name(7,keybuffer);
+                case 14:rssstreamoversigt.set_stream_name(7+configrss_ofset,keybuffer);
                         break;
-                case 15:rssstreamoversigt.set_stream_url(7,keybuffer);
+                case 15:rssstreamoversigt.set_stream_url(7+configrss_ofset,keybuffer);
                         break;
-                case 16:rssstreamoversigt.set_stream_name(8,keybuffer);
+                case 16:rssstreamoversigt.set_stream_name(8+configrss_ofset,keybuffer);
                         break;
-                case 17:rssstreamoversigt.set_stream_url(8,keybuffer);
+                case 17:rssstreamoversigt.set_stream_url(8+configrss_ofset,keybuffer);
                         break;
+                case 18: rssstreamoversigt.set_stream_name(9+configrss_ofset,keybuffer);
+                        break;
+                case 19: rssstreamoversigt.set_stream_url(9+configrss_ofset,keybuffer);
+                        break;
+                case 20: rssstreamoversigt.set_stream_name(10+configrss_ofset,keybuffer);
+                        break;
+                case 21: rssstreamoversigt.set_stream_url(10+configrss_ofset,keybuffer);
+                        break;
+                case 22: rssstreamoversigt.set_stream_name(11+configrss_ofset,keybuffer);
+                        break;
+                case 23: rssstreamoversigt.set_stream_url(11+configrss_ofset,keybuffer);
+                        break;
+                case 24: rssstreamoversigt.set_stream_name(12+configrss_ofset,keybuffer);
+                        break;
+                case 25: rssstreamoversigt.set_stream_url(12+configrss_ofset,keybuffer);
+                        break;
+                case 26: rssstreamoversigt.set_stream_name(13+configrss_ofset,keybuffer);
+                        break;
+                case 27: rssstreamoversigt.set_stream_url(13+configrss_ofset,keybuffer);
+                        break;
+                case 28:rssstreamoversigt.set_stream_name(14+configrss_ofset,keybuffer);
+                        break;
+                case 29:rssstreamoversigt.set_stream_url(14+configrss_ofset,keybuffer);
+                        break;
+                case 30:rssstreamoversigt.set_stream_name(15+configrss_ofset,keybuffer);
+                        break;
+                case 31:rssstreamoversigt.set_stream_url(15+configrss_ofset,keybuffer);
+                        break;
+                case 32:rssstreamoversigt.set_stream_name(16+configrss_ofset,keybuffer);
+                        break;
+                case 33:rssstreamoversigt.set_stream_url(16+configrss_ofset,keybuffer);
+                        break;
+                case 34:rssstreamoversigt.set_stream_name(17+configrss_ofset,keybuffer);
+                        break;
+                case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,keybuffer);
+                        break;
+                case 36:rssstreamoversigt.set_stream_name(18+configrss_ofset,keybuffer);
+                        break;
+                case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
+                        break;
+
                }
            } else if (do_show_setup_keys) {
                switch(do_show_setup_select_linie) {
