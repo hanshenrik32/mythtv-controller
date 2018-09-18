@@ -3051,23 +3051,127 @@ void show_setup_rss(unsigned int startofset) {
       //if (channel_list[(n-1)+startofset].changeordernr) glTranslatef(692 , 560-(n*20) , 0.0f); else
       glTranslatef(300 , 660-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      if ((do_show_setup_select_linie-1)==n) glColor3f(1.0f,1.0f,1.0f); else glColor3f(.7f,0.7f,0.7f);
-
+      glColor3f(.7f,0.7f,0.7f);
       strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset+n));
       myglprint4(keybuffer);
-
+      glColor3f(.7f,0.7f,0.7f);
       strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset+n));
       glRasterPos2f(392.0f, 0.0f);
       myglprint4(keybuffer);
       glPopMatrix();
     }
-
     printf("do_show_setup_select_linie = %d %d \n",do_show_setup_select_linie,(do_show_setup_select_linie % 2));
+    switch(do_show_setup_select_linie) {
+        case 0: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name(0+startofset)));
+                break;
+        case 1: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(0*20),strlen(rssstreamoversigt.get_stream_url(0+startofset)));
+                break;
+        case 2: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(1*20),strlen(rssstreamoversigt.get_stream_name(1+startofset)));
+                break;
+        case 3: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(1*20),strlen(rssstreamoversigt.get_stream_url(1+startofset)));
+                break;
+        case 4: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(2*20),strlen(rssstreamoversigt.get_stream_name(2+startofset)));
+                break;
+        case 5: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(2*20),strlen(rssstreamoversigt.get_stream_url(2+startofset)));
+                break;
+        case 6: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(3*20),strlen(rssstreamoversigt.get_stream_name(3+startofset)));
+                break;
+        case 7: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(3*20),strlen(rssstreamoversigt.get_stream_url(3+startofset)));
+                break;
+        case 8: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(4*20),strlen(rssstreamoversigt.get_stream_name(4+startofset)));
+                break;
+        case 9: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(4*20),strlen(rssstreamoversigt.get_stream_url(4+startofset)));
+                break;
+        case 10:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(5*20),strlen(rssstreamoversigt.get_stream_name(5+startofset)));
+                break;
+        case 11:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(5*20),strlen(rssstreamoversigt.get_stream_url(5+startofset)));
+                break;
+        case 12:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(6*20),strlen(rssstreamoversigt.get_stream_name(6+startofset)));
+                break;
+        case 13:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(6*20),strlen(rssstreamoversigt.get_stream_url(6+startofset)));
+                break;
+        case 14:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(7*20),strlen(rssstreamoversigt.get_stream_name(7+startofset)));
+                break;
+        case 15:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(7*20),strlen(rssstreamoversigt.get_stream_url(7+startofset)));
+                break;
+        case 16:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(8*20),strlen(rssstreamoversigt.get_stream_name(8+startofset)));
+                break;
+        case 17:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(8*20),strlen(rssstreamoversigt.get_stream_url(8+startofset)));
+                break;
 
-    if ((do_show_setup_select_linie % 2)==0) {
-      showcoursornow(-70,510-(do_show_setup_select_linie*20),strlen(rssstreamoversigt.get_stream_name(0+startofset+do_show_setup_select_linie)));
-    } else showcoursornow(170,510-(do_show_setup_select_linie*20),strlen(rssstreamoversigt.get_stream_url(0+startofset+do_show_setup_select_linie)));
-
+        case 18: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(9*20),strlen(rssstreamoversigt.get_stream_name(9+startofset)));
+                break;
+        case 19: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(9*20),strlen(rssstreamoversigt.get_stream_url(9+startofset)));
+                break;
+        case 20: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(10*20),strlen(rssstreamoversigt.get_stream_name(10+startofset)));
+                break;
+        case 21: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(10*20),strlen(rssstreamoversigt.get_stream_url(10+startofset)));
+                break;
+        case 22:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(11*20),strlen(rssstreamoversigt.get_stream_name(11+startofset)));
+                break;
+        case 23:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(11*20),strlen(rssstreamoversigt.get_stream_url(11+startofset)));
+                break;
+        case 24:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(12*20),strlen(rssstreamoversigt.get_stream_name(12+startofset)));
+                break;
+        case 25:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(12*20),strlen(rssstreamoversigt.get_stream_url(12+startofset)));
+                break;
+        case 26:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(13*20),strlen(rssstreamoversigt.get_stream_name(13+startofset)));
+                break;
+        case 27:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(13*20),strlen(rssstreamoversigt.get_stream_url(13+startofset)));
+                break;
+        case 28:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(14*20),strlen(rssstreamoversigt.get_stream_name(14+startofset)));
+                break;
+        case 29:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(14*20),strlen(rssstreamoversigt.get_stream_url(14+startofset)));
+                break;
+        case 30:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(15*20),strlen(rssstreamoversigt.get_stream_name(15+startofset)));
+                break;
+        case 31:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(15*20),strlen(rssstreamoversigt.get_stream_url(15+startofset)));
+                break;
+        case 32:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(16*20),strlen(rssstreamoversigt.get_stream_name(16+startofset)));
+                break;
+        case 33:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(16*20),strlen(rssstreamoversigt.get_stream_url(16+startofset)));
+                break;
+        case 34:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(17*20),strlen(rssstreamoversigt.get_stream_name(17+startofset)));
+                break;
+        case 35:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(17*20),strlen(rssstreamoversigt.get_stream_url(17+startofset)));
+                break;
+    }
 
 /*
     // loop for lines
