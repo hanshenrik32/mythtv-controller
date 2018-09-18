@@ -6834,7 +6834,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (stream_select_iconnr>0) stream_select_iconnr--;
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
+                //printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
 
 
