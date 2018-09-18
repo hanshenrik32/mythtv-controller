@@ -6924,9 +6924,6 @@ void handlespeckeypress(int key,int x,int y) {
                   stream_key_selected++;
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-
-
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   if (tvvisvalgtnrtype==1) {
