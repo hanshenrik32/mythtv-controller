@@ -7069,9 +7069,9 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                       if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
-                    // setup videoplayer window
+                    // setup rss source window
                     if (do_show_setup_rss) {
-                      if (do_show_setup_select_linie<17) do_show_setup_select_linie++;
+                      if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
                       else configrss_ofset++;
                     }
                     // tv graber setup
