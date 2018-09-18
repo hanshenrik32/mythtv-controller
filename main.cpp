@@ -7971,7 +7971,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                         break;
                 case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
                         break;
-
                }
            } else if (do_show_setup_keys) {
                switch(do_show_setup_select_linie) {
