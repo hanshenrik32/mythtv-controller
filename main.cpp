@@ -4778,6 +4778,7 @@ void display() {
 
     // update rss db
     if (do_save_setup_rss) {
+      if (debugmode) printf("Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
       streamoversigt.loadrssfile(1);                                            // download rss files (())
       do_save_setup_rss=false;
@@ -6369,6 +6370,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
+
                 }
 
                 break;
@@ -7371,16 +7373,15 @@ void handlespeckeypress(int key,int x,int y) {
                     // select lasy line
                   }
                   if (show_setup_rss) {
-                    do_show_setup_select_linie=0;
+                    // jump to button of text
+                    if (streamoversigt.antalstreams()>17) do_show_setup_select_linie=34; else do_show_setup_select_linie=0;
                     configrss_ofset=0;
-                    configrss_ofset=streamoversigt.antalstreams()-2;
-/*
                     for(int i=configrss_ofset;i<3000-1;i++) {
-                      if (streamoversigt.get_stream_name(do_show_setup_select_linie+configrss_ofset)) {
-                        do_show_setup_select_linie++;
+                      if (streamoversigt.get_stream_name(configrss_ofset)) {
+                        configrss_ofset++;
                       }
                     }
-*/
+                    if (configrss_ofset>8) configrss_ofset-=8;
                   }
                 }
                 break;
@@ -7434,6 +7435,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     }
 
     if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || ((do_show_setup_rss) && (key!=27))) {
+      // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
           case 0: if (rssstreamoversigt.get_stream_name(0+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+configrss_ofset)); else strcpy(keybuffer,"");
@@ -8097,7 +8099,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (do_show_setup_sound) do_show_setup_sound=false; else
                 if (do_show_setup_screen) do_show_setup_screen=false; else
                 if (do_show_setup_rss) {
+                  // stop show setup of rss feeds
                   do_show_setup_rss=false;
+                  // set save flag of rss feed
                   do_save_setup_rss=true;
                 } else do_show_setup=false;
               }

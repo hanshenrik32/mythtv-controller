@@ -244,8 +244,6 @@ int rss_stream_class::load_rss_data() {
 }
 
 
-
-
 //
 // save/update rss db
 //
