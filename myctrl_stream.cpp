@@ -1348,6 +1348,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 
+
       // virker ikke
       if (check_rss_feed_exist(conn,"Linux Action Show")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Linux Action Show',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
