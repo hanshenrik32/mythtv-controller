@@ -1757,6 +1757,23 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 */
 
+// Swingercast
+if (check_rss_feed_exist(conn,"Swingercast")==0) {
+  sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Swingercast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+  if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
+  res = mysql_store_result(conn);
+  mysql_free_result(res);
+  sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Swingercast',NULL,NULL,'Swingercast',0,0,NULL,'http://feeds.feedburner.com/Swingercast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+  if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+  res = mysql_store_result(conn);
+  mysql_free_result(res);
+  rss_update=true;
+}
+
+
+http://feeds.feedburner.com/Swingercast
+
+
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
