@@ -4766,14 +4766,11 @@ void display() {
         if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
             printf("Error saving config file mythtv-controller.conf\n");
         } else printf("Saving config ok.\n");
+        rssstreamoversigt.save_rss_data();                                        // save rss data in db
         // load all new textures
         // free all loaded menu + icon gfx
-
-        freegfx();
-        // reload all menu + icon gfx
-        loadgfx();
-        // reload lande flags
-        //load_lande_flags();
+        freegfx();                                                                // free gfx loaded
+        loadgfx();                                                                // reload all menu + icon gfx
     }
 
     // update rss db
