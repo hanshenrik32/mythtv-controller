@@ -315,7 +315,7 @@ int rss_stream_class::save_rss_data() {
               //
               // no update of name of url create new
               //
-              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
               sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
@@ -325,7 +325,7 @@ int rss_stream_class::save_rss_data() {
           }
         } else {
           // create new feed totle
-          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
           sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
