@@ -7065,7 +7065,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_setup_rss) {
                       if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
                       else configrss_ofset++;
-                      realrssrecordnr++;
+                      if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) realrssrecordnr++;
                     }
                     // tv graber setup
                     if (do_show_tvgraber) {
@@ -7206,7 +7206,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_rss) {
                       if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                       else if (configrss_ofset>0) configrss_ofset--;
-                      if (realrssrecordnr>0) realrssrecordnr--;
+                      if ((((do_show_setup_select_linie+configrss_ofset) % 2)==0) && ((do_show_setup_select_linie+configrss_ofset)>0)) realrssrecordnr--;
                   }
                   // config af xmltv graber
                   if (do_show_tvgraber) {
@@ -7389,7 +7389,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
     }
-    if (show_setup_rss) printf("Antal %d recnr %d startofset %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),do_show_setup_select_linie,configrss_ofset,realrssrecordnr);
+    if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
 }
 
 

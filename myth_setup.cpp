@@ -342,14 +342,14 @@ int rss_stream_class::save_rss_data() {
 // get url
 
 int rss_stream_class::set_stream_url(int nr,char *url) {
-  strncpy(rss_source_feed[nr].stream_url,url,namemaxlength);
+  strcpy(rss_source_feed[nr].stream_url,url);
 }
 
 
 // update name
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
-  strncpy(rss_source_feed[nr].stream_name,name,urlmaxlength);
+  strcpy(rss_source_feed[nr].stream_name,name);
 }
 
 
@@ -2957,7 +2957,13 @@ void show_setup_keys() {
 
 
 
-
+void showrss_list() {
+  printf("\n");
+  for(int t=0;t<99;t++) {
+    if (strcmp(rssstreamoversigt.get_stream_name(t),"")!=0) printf("nr %d feedname %s url %s \n",t,rssstreamoversigt.get_stream_name(t),rssstreamoversigt.get_stream_url(t));
+  }
+  printf("\n");
+}
 
 
 //
