@@ -80,6 +80,9 @@ class rss_stream_class {
 };
 
 
+// test
+void showrss_list();
+
 // create xml channel config file
 int txmltvgraber_createconfig();
 //
