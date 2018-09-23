@@ -323,8 +323,8 @@ int rss_stream_class::save_rss_data() {
               res1 = mysql_store_result(conn);
             }
           }
-        } else {
-          // create new feed records
+  } else {
+          // no update of name of url create new
           sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
