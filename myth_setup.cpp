@@ -266,62 +266,71 @@ int rss_stream_class::save_rss_data() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    for(n=0;n<antal;n++) {
+    for(n=0;n<maxantal;n++) {
       // find record
       doexist=false;
       strcpy(ftitle,"");
       strcpy(ftitle2,"");
       strcpy(furl,"");
-      sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where title like '%s' limit 1",rss_source_feed[n].stream_name);
-      mysql_query(conn,sqlstring);
-      res = mysql_store_result(conn);
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        doexist=true;
-        strcpy(ftitle,row[0]);
-        strcpy(furl,row[0]);
-      }
+      if (strcmp(rss_source_feed[n].stream_name,"")!=0) {
+        sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where feedtitle like '%s' limit 1",rss_source_feed[n].stream_name);
+        mysql_query(conn,sqlstring);
+        res = mysql_store_result(conn);
+        while ((row = mysql_fetch_row(res)) != NULL) {
+            doexist=true;
+            strcpy(ftitle,row[0]);
+            strcpy(furl,row[0]);
+        }
+        if (doexist) {
+          // find record in db abd do the change and update record again
+          if (ftitle) {
+            if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
+              sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+            } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
+              //
+              // update name
+              //
 
-      if (doexist) {
-        // find record in db abd change for any change
-        if (ftitle) {
-          if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
-            sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-          } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
-            //
-            // update name
-            //
-
-            // save old name
-            sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
-              strcpy(ftitle2,row1[0]);
-            }
-            // update db record with new name
-            sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            if (res1) {
-              // if okay update
-              // chnage/update name
-              sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
+              // save old name
+              sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
+                strcpy(ftitle2,row1[0]);
+              }
+              // update db record with new name
+              sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              if (res1) {
+                // if okay update
+                // chnage/update name
+                sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
+                mysql_query(conn,sqlstring);
+                res1 = mysql_store_result(conn);
+              }
+            } else {
+              //
+              // no update of name of url create new
+              //
+              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
-          } else {
-            //
-            // no update of name of url create new
-            //
-            sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
           }
+        } else {
+          // create new feed totle
+          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+          mysql_query(conn,sqlstring);
+          res1 = mysql_store_result(conn);
+          sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
+          mysql_query(conn,sqlstring);
+          res1 = mysql_store_result(conn);
         }
       }
     } //for next
