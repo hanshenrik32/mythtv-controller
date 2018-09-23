@@ -266,7 +266,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
-        if (debugmode & 4) printf("Hent info om stream title %10s \n",row[0]);
+        if (debugmode & 4) printf("Get rss file on stream title %10s \n",row[0]);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
           getuserhomedir(homedir);                                          // get user homedir
           strcpy(totalurl,"wget -U Netscape '");
