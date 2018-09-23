@@ -7904,6 +7904,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                            break;
               }
            } else if (do_show_setup_rss) {
+              // update records
               switch(do_show_setup_select_linie) {
                 case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
                         break;
