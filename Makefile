@@ -70,6 +70,13 @@ all:
 
 
 compile: $(PROG)
+	@if ! test -d ~/.config/lirc/; then \
+	mkdir  ~/.config/lirc/; \
+		cp lirc/* ~/.config/lirc/; \
+	fi
+	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+
+
 
 $(PROG): $(SRCS)
 	$(CC) $(CFLAGS) $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
@@ -118,11 +125,11 @@ install:
 	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
 	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
 	#cp $(PROG) checkwakeup.sh startmovie.sh /usr/bin/
-	@if ! test -d ~/.config/lirc/; then \
-	  mkdir  ~/.config/lirc/; \
-	  cp lirc/* ~/.config/lirc/; \
-	fi
-	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	#@if ! test -d ~/.config/lirc/; then \
+	#  mkdir  ~/.config/lirc/; \
+	#  cp lirc/* ~/.config/lirc/; \
+	#fi
+	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	#@chmod 755 /usr/bin/startmovie.sh
 	cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
