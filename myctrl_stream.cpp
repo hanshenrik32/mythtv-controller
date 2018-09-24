@@ -799,7 +799,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
       }
 
-/*
+
 
       // ok Anders Lund Madsen
       if (check_rss_feed_exist(conn,"Anders Lund Madsen i Den Yderste By")==0) {
@@ -1628,7 +1628,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-*/
+
 
       // ok RISE podcast
       if (check_rss_feed_exist(conn,"RISE podcast")==0) {
@@ -1760,6 +1760,21 @@ if (check_rss_feed_exist(conn,"Manden, der blev stjålet")==0) {
   res = mysql_store_result(conn);
   mysql_free_result(res);
   sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Manden, der blev stjålet',NULL,NULL,'Manden, der blev stjålet',0,0,NULL,'https://www.dr.dk/mu/feed/manden-der-blev-stjalet.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+  if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+  res = mysql_store_result(conn);
+  mysql_free_result(res);
+  rss_update=true;
+}
+
+
+
+//  Ægte porno
+if (check_rss_feed_exist(conn,"Ægte porno")==0) {
+  sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Ægte porno',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+  if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
+  res = mysql_store_result(conn);
+  mysql_free_result(res);
+  sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Ægte porno',NULL,NULL,'Ægte porno',0,0,NULL,'https://www.dr.dk/mu/feed/aegte-porno.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
   if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
   res = mysql_store_result(conn);
   mysql_free_result(res);
