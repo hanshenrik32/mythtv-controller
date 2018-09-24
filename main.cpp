@@ -5631,7 +5631,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=false;
             fundet=true;
           }
-
+          // do_show_tvgraber
           if (((GLubyte) names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_setup_sound=false;
             do_show_setup_sql=false;
@@ -5646,6 +5646,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
 
           // test for close windows again icon for all other windows in setup
+          //
           if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
             do_show_setup_sound=false;
             do_show_setup_screen=false;
