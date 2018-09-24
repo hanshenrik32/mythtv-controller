@@ -2988,7 +2988,6 @@ void show_setup_rss(unsigned int startofset) {
     glBindTexture(GL_TEXTURE_2D,setuprssback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     // background
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/7),100 , 0.0);
@@ -3021,32 +3020,29 @@ void show_setup_rss(unsigned int startofset) {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
-
     glPushMatrix();
     // overskrift
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(300, 680, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Rss feed name.");
+    myglprint4((char *) "RSS Feed Name.");
     glPopMatrix();
-
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(680, 680, 0.0f);
+    glTranslatef(684, 680, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "PODCAST url string.");
+    myglprint4((char *) "Podcast URL");
     glPopMatrix();
-
     for (int n=0;n<18;n++) {
       glPushMatrix();
       glTranslatef(300 , 660-(n*20) , 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      glColor3f(.7f,0.7f,0.7f);
+      if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
       strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset+n));
       myglprint4(keybuffer);
-      glColor3f(.7f,0.7f,0.7f);
+      if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); glColor3f(.7f,0.7f,0.7f);
       strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset+n));
       glRasterPos2f(392.0f, 0.0f);
       myglprint4(keybuffer);
