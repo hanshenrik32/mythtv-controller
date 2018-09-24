@@ -4297,7 +4297,6 @@ void show_setup_interface() {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd(); //End quadrilateral coordinates
 
-
     // close button
     xpos=200;
     ypos=100;
