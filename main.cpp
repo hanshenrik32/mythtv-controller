@@ -8090,28 +8090,61 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // close tv graber windows again
                   do_show_tvgraber=false;
                   do_show_setup=false;
-                } else if (do_show_videoplayer) do_show_videoplayer=false; else
-                if (do_show_setup_sql) do_show_setup_sql=false; else
-                if (do_show_setup_font) do_show_setup_font=false; else
-                if (do_show_setup_keys) do_show_setup_keys=false; else
-                if (do_show_setup_tema) do_show_setup_tema=false; else
-                if (do_show_setup_sound) do_show_setup_sound=false; else
-                if (do_show_setup_screen) do_show_setup_screen=false; else
-                if (do_show_setup_rss) {
+                  key=0;
+                } else if (do_show_videoplayer) {
+                  do_show_videoplayer=false;
+                  key=0;
+                } else if (do_show_setup_sql) {
+                  do_show_setup_sql=false;
+                  key=0;
+                } else if (do_show_setup_font) {
+                  do_show_setup_font=false;
+                  key=0;
+                } else if (do_show_setup_keys) {
+                  do_show_setup_keys=false;
+                  key=0;
+                } else if (do_show_setup_tema) {
+                  do_show_setup_tema=false;
+                  key=0;
+                } else if (do_show_setup_sound) {
+                  do_show_setup_sound=false;
+                  key=0;
+                } else if (do_show_setup_screen) {
+                  do_show_setup_screen=false;
+                  key=0;
+                } else if (do_show_setup_rss) {
                   // stop show setup of rss feeds
                   do_show_setup_rss=false;
-                  // set save flag of rss feed
+                  key=0;
 //                  do_save_setup_rss=true;
                 } else do_show_setup=false;
                 key=0;
               }
-              if (vis_music_oversigt) vis_music_oversigt=false;
-              else if (vis_radio_oversigt) vis_radio_oversigt=false;
-              else if (vis_film_oversigt) vis_film_oversigt=false;
-              else if (vis_stream_oversigt) vis_stream_oversigt=false;
-              else if (vis_tv_oversigt) vis_tv_oversigt=false;
-              else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
-              else if ((!(do_show_setup)) && (key==27)) {
+              if (vis_music_oversigt) {
+                vis_music_oversigt=false;
+                key=0;
+              } else if (vis_radio_oversigt) {
+                vis_radio_oversigt=false;
+                key=0;
+              } else if (vis_film_oversigt) {
+                vis_film_oversigt=false;
+                key=0;
+              } else if (vis_stream_oversigt) {
+                vis_stream_oversigt=false;
+                key=0;
+              } else if (vis_tv_oversigt) {
+                vis_tv_oversigt=false;
+                key=0;
+              } else if (vis_recorded_oversigt) {
+                vis_recorded_oversigt=false;
+                key=0;
+              } else if (vis_radio_or_music_oversigt) {
+                vis_radio_or_music_oversigt=false;
+                key=0;
+              } else if (vis_stream_or_movie_oversigt) {
+                vis_stream_or_movie_oversigt=false;
+                key=0;
+              } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
                 exit(0);                                                      //  exit program
               } else key=0;
