@@ -6657,7 +6657,8 @@ void handlespeckeypress(int key,int x,int y) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
                 } else if ((!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt))) {
-                  if (do_show_setup) do_save_config=true;		// save setup
+                  if (do_show_setup) do_save_config=true;		                   // set save config file flag
+                  do_save_setup_rss=true;                                      // save rss setup
                   vis_radio_oversigt=false;
                   vis_tv_oversigt=false;
                   vis_film_oversigt=false;
@@ -8100,8 +8101,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // stop show setup of rss feeds
                   do_show_setup_rss=false;
                   // set save flag of rss feed
-                  do_save_setup_rss=true;
+//                  do_save_setup_rss=true;
                 } else do_show_setup=false;
+                key=0;
               }
               if (vis_music_oversigt) vis_music_oversigt=false;
               else if (vis_radio_oversigt) vis_radio_oversigt=false;
@@ -8109,10 +8111,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               else if (vis_stream_oversigt) vis_stream_oversigt=false;
               else if (vis_tv_oversigt) vis_tv_oversigt=false;
               else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
-              else {
+              else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
                 exit(0);
-              }
+              } else key=0;
               break;
             case '*':
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
