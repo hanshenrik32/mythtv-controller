@@ -8113,7 +8113,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
               else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
-                exit(0);
+                exit(0);                                                      //  exit program
               } else key=0;
               break;
             case '*':
