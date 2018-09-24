@@ -105,8 +105,7 @@ void get_host(char *hname,char *webpath,char *source) {
 }
 
 
-// downloader of files
-
+// downloader of file
 
 int get_webfile(char *webpath,char *outfile) {
 
@@ -209,7 +208,6 @@ int get_webfile(char *webpath,char *outfile) {
       if (strstr(message,"Moved Parmanently")) {
         webobjlength = 0;
         loaderror=true;
-
       }
     }
 
@@ -238,14 +236,24 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) return(1); else return(0);
 }
 
+
+bool check_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if ((dot) && ((strcmp(dot,".jpg")==0) || (strcmp(dot,".png")))) return(1); else return(0);
+}
+
 // used to download images from web
+// more secure now
 
 int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
-  strcpy(command,"wget ");
-  strcat(command,webpath);
-  strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
-  strcat(command,outfile);
-  strcat(command," 2>%1 ");
-  system(command);
+  // check file ext is image yes download
+  if (check_filename_ext(webpath)) {
+    strcpy(command,"wget ");
+    strcat(command,webpath);
+    strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
+    strcat(command,outfile);
+    strcat(command," 2>%1 ");
+    system(command);
+  }
 }

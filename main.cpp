@@ -55,8 +55,8 @@ bool stream_jump=false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/inc/fmod_errors.h"
+#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod.hpp"
+#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -94,7 +94,8 @@ struct configkeytype {
 };
 
 int numCPU;                                             // have the numbers of cpu cores
-char systemcommand[2000];                               // shell command to do to play recorded program mplayer eks.
+char systemcommand[2000];                               // shell command to do to play recorded program mplayer/vlc eks.
+                                                        // (vlc player buildin. DEFAULT player)
 const char *dbname="mythtvcontroller";                  // internal database name in mysql (music,movie,radio)
 // koki db names (by version)
 const char *kodiver[7]={"MyMusic70.db","MyMusic60.db","MyMusic56.db","MyMusic52.db","MyMusic48.db","MyMusic46.db","MyMusic32.db"};
@@ -377,6 +378,8 @@ int do_stream_icon_anim_icon_ofset=0;                   //
 int stream_icon_anim_icon_ofset=0;                      //
 
 unsigned int configrss_ofset=0;
+
+unsigned int realrssrecordnr=0;                         //
 
 int do_radio_icon_anim_icon_ofset=0;                    //
 int radio_icon_anim_icon_ofset=0;                       //
@@ -1748,7 +1751,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
           songintnr=atoi(row[0]);
           songantal=atoi(row[1]);
           // find cd cover samt sange info i mythtv music database
-          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id order by name",songintnr);
           mysql_query(conn,sqlselect);
           res1 = mysql_store_result(conn);
           //              if (debugmode & 2) printf("Hentet music nummer = %i ,add song %s to liste\n",i,songname);
@@ -1800,7 +1803,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
     dirmusic.emtydirmusic();
 
     strcpy(sqlselect,"SELECT song_id,name,artist_id FROM music_songs where directory_id=");
-    sprintf(tmptxt,"%d limit %d",dirid,dirliste_size);
+    sprintf(tmptxt,"%d order by name limit %d",dirid,dirliste_size);
     strcat(sqlselect,tmptxt);
     conn=mysql_init(NULL);
     // Connect to database
@@ -1865,6 +1868,7 @@ unsigned int hent_antal_dir_songs(int dirid) {
 
 
 // init lirc
+// remove controler
 
 int initlirc() {
   // LIRC SETUP
@@ -2093,12 +2097,8 @@ unsigned int do_playlist_restore_playlist() {
 //
 
 unsigned int do_playlist_backup_playlist() {
-//    char tmpfilename[200];
-//    char convert_command[256];
-//    char convert_newfilename[256];
     int playlistnr;
     char sqlselect[8192];
-//    char tmptxt[200];
     long i;
     // mysql vars
     MYSQL *conn;
@@ -3020,112 +3020,56 @@ void display() {
       glPopMatrix();
     }
 
-
-    // skal vi til at spørge ask open dir or play
+    //
+    // skal vi til at spørge ask open dir or play (ask about play)
+    //
     if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
+      do_swing_music_cover=false;
+      if (do_swing_music_cover) {
         do_swing_music_cover=false;
-        if (do_swing_music_cover) {
-            do_swing_music_cover=false;
+      }
+      if (do_swing_music_cover==false) {
+        xof=500;
+        yof=200;
+        buttonsize=200;
 
-        }
-        if (do_swing_music_cover==false) {
-          xof=500;
-          yof=200;
-          buttonsize=200;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS); // draw ask box
 
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          //glBlendFunc(GL_ONE, GL_ONE);
-          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); // draw ask box
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
 
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
-
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
 
 // ***************************************************************** play icon
-          xof=550;
-          yof=250;
-          buttonsize=100;
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
+        xof=550;
+        yof=250;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
 //            glColor4f(1.0f,1.0f,1.0f,1.0f);
 //            glBlendFunc(GL_ONE, GL_ONE);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBlendFunc(GL_ONE, GL_ONE);
-          glBindTexture(GL_TEXTURE_2D, _textureId10);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(20);                      				  // play icon nr
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          // play icon
-
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
-// ************************************************************ Open/or not open
-          xof=650;
-          yof=250;
-          buttonsize=100;
-          glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          //            glColor4f(1.0f,1.0f,1.0f,1.0f);
-          //            glBlendFunc(GL_ONE, GL_ONE);
-          glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-          glBlendFunc(GL_ONE, GL_ONE);
-          if (dirmusic.numbersindirlist()>0) {
-              glBindTexture(GL_TEXTURE_2D, _textureopen);
-          } else {
-              glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
-          }
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glLoadName(21);                        // Overwrite the first name in the buffer
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          // play icon
-          glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-          glEnd(); //End quadrilateral coordinates
-          glPopMatrix();
-
-
-
-
-// swap ************************************************************** icon swap
-          xof=750;
-          yof=250;
-          buttonsize=100;                glPushMatrix();
-          glEnable(GL_TEXTURE_2D);
-          glColor3f(1.0f, 1.0f, 1.0f);
-//            glColor4f(1.0f,1.0f,1.0f,1.0f);
-//            glBlendFunc(GL_ONE, GL_ONE);
-         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-         glBlendFunc(GL_ONE, GL_ONE);
-         glBindTexture(GL_TEXTURE_2D, _textureswap);
-         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-         glLoadName(22);                        // Overwrite the first name in the buffer
-         glBegin(GL_QUADS); //Begin quadrilateral coordinates
-         // play icon
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureId10);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(20);                      				  // play icon nr
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
 
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
@@ -3134,14 +3078,62 @@ void display() {
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
 
-// **********************************************************
-        no_open_dir=0;
+// ************************************************************ Open/or not open
+        xof=650;
+        yof=250;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        //            glColor4f(1.0f,1.0f,1.0f,1.0f);
+        //            glBlendFunc(GL_ONE, GL_ONE);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        if (dirmusic.numbersindirlist()>0) {
+            glBindTexture(GL_TEXTURE_2D, _textureopen);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
+        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(21);                        // Overwrite the first name in the buffer
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
 
+
+
+
+// swap ************************************************************** icon swap
+        xof=750;
+        yof=250;
+        buttonsize=100;                glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureswap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(22);                        // Overwrite the first name in the buffer
+        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        // play icon
+
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+        glEnd(); //End quadrilateral coordinates
+        glPopMatrix();
+        no_open_dir=0;
         buttonsize=300;
         if (dirmusic.numbersindirlist()==0) {						// er der nogle dirs
-
-                    // draw cd cover
-//                    glLoadIdentity();
+          // draw cd cover
           glPushMatrix();
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
@@ -3151,7 +3143,6 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glBegin(GL_QUADS); 							//	Begin quadrilateral coordinates
           // 										draw front box
-
           glTexCoord2f(0, 0); glVertex3f(200+ xof, yof , 0.0);
           glTexCoord2f(0, 1); glVertex3f(200+ xof,yof+buttonsize, 0.0);
           glTexCoord2f(1, 1); glVertex3f(200+ xof+buttonsize, yof+buttonsize , 0.0);
@@ -3165,9 +3156,9 @@ void display() {
           //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           if (dirmusic.textureId) {
-              glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
+            glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
           } else {
-              glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
+            glBindTexture(GL_TEXTURE_2D, _texture_nocdcover);                	// box no cd cover
           }
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3179,12 +3170,8 @@ void display() {
           glEnd(); //End quadrilateral coordinates
           glPopMatrix();
         }
-
-
-// ****************************************************************************************************
-
+        // ****************************************************************************************************
         glPushMatrix();
-
         glDisable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(560.0f, 950.0f , 0.0f);							// pos
@@ -3194,61 +3181,50 @@ void display() {
         if (strcmp(temptxt1,"")==0) strcpy(temptxt1,music_noartistfound[configland]);
         // check for maxlength
         if (strlen(temptxt1)>24) {
-            strcpy(temptxt1,"..");
-            strcat(temptxt1,musicoversigt[mknapnr-1].album_name+(strlen(musicoversigt[mknapnr-1].album_name)-24));
+          strcpy(temptxt1,"..");
+          strcat(temptxt1,musicoversigt[mknapnr-1].album_name+(strlen(musicoversigt[mknapnr-1].album_name)-24));
         }
         sprintf(temptxt,music_nomberofsongs[configland],dirmusic.numbersinlist(),temptxt1);
-
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        glcRenderString(temptxt);			// show numbers of songs in list
+        glScalef(20.5, 20.5, 1.0);                                                    // danish charset ttf
+        glcRenderString(temptxt);			                                                // show numbers of songs in list
         glPopMatrix();
-
-
         i=0;
         if (dirmusic.numbersindirlist()==0) dirmusiclistemax=16; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
-
+        //
         // show cd song list så man kan vælge
+        //
+
+        //aktivfont.selectfont("courier 10 Pitch");
+
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
-            ofset=18*i;
-            dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
-            pos=strrchr(temptxt,'/');
-            if (pos>0) strcpy(temptxt,pos+1);
-
-            pos=strrchr(temptxt,'.');
-            if (pos>0) temptxt[pos-temptxt]=0;
-            if (i<12) temptxt[54]=0; else temptxt[35]=0;
-            sprintf(temptxt1,"%-45s",temptxt);
-            temptxt1[45]='\0';
-
-//  	              printf("******* sang nr %d, name = %s \n",i,temptxt);
-//                    glLoadIdentity();
-
-
-
-            if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
-               else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
-
-//                    glTranslatef(560.0f, 750.0f , 0.0f);                                                    // pos
-//                    glRasterPos2f(0.0f, 0.0f);
-            glPushMatrix();
-            glTranslatef(560.0f, 850.0f -ofset, 0.0f);
-            glRasterPos2f(0.0f, 0.0f);
-            glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-            //aktivfont.selectfont("Courier 10 Pitch");
-            glcRenderString(temptxt1);
-            i++;
-            glTranslatef(5.0f, 0.0f, 0.0f);
-             if (aktiv==true) {
-              glcRenderString("[X]");
-            } else {
-              glcRenderString("[ ]");
-            }
-            //aktivfont.selectfont(configfontname);
-            glPopMatrix();
-          }
+          ofset=18*i;
+          dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
+          pos=strrchr(temptxt,'/');
+          if (pos>0) strcpy(temptxt,pos+1);
+          pos=strrchr(temptxt,'.');
+          if (pos>0) temptxt[pos-temptxt]=0;
+          if (i<12) temptxt[54]=0; else temptxt[35]=0;
+          sprintf(temptxt1,"%-45s",temptxt);
+          temptxt1[45]='\0';
+          if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
+           else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
+          glPushMatrix();
+          glTranslatef(560.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          //aktivfont.selectfont("Courier 10 Pitch");
+          glcRenderString(temptxt1);
+          i++;
+          glTranslatef(5.0f, 0.0f, 0.0f);
+          if (aktiv==true) glcRenderString("[X]");
+            else glcRenderString("[ ]");
+          glPopMatrix();
         }
+      }
     }
+    //
     // ask save playlist
+    //
     if (vis_music_oversigt) {
       if (ask_save_playlist) {
         xof=500;
@@ -3520,8 +3496,8 @@ void display() {
     #endif
 
 
-    // alt music er her under
-
+    // alt music er her under player
+    //
     if (do_play_music_cover) {
         // play list
         if (do_find_playlist) {
@@ -4570,16 +4546,24 @@ void display() {
           spec = new float[sampleSize];
           spec2 = new float[sampleSize];
           if (fft) {
+            // new ver
+            for (int i=0; i<fft->length; i++) {
+              specLeft[i]=fft->spectrum[0][i];
+              specRight[i]=fft->spectrum[1][i];
+            }
+            // old ver
+            /*
             for (chan = 0; chan < fft->numchannels; chan++) {
               float average = 0.0f;
               float power = 0.0f;
               for (int i = 0; i < fft->length; ++i) {
-                  if (fft->spectrum[chan][i]) {
-                      specLeft[i]=(float) fft->spectrum[0][i];
-                      specRight[i]=(float) fft->spectrum[1][i];
-                  }
+                if (fft->spectrum[chan][i]) {
+                  specLeft[i]=(float) fft->spectrum[0][i];
+                  specRight[i]=(float) fft->spectrum[1][i];
+                }
               }
             }
+            */
           }
           for (i = 0; i < sampleSize; i++) {
             spec[i] = specLeft[i]*2;
@@ -4782,18 +4766,16 @@ void display() {
         if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
             printf("Error saving config file mythtv-controller.conf\n");
         } else printf("Saving config ok.\n");
+        rssstreamoversigt.save_rss_data();                                        // save rss data in db
         // load all new textures
         // free all loaded menu + icon gfx
-
-        freegfx();
-        // reload all menu + icon gfx
-        loadgfx();
-        // reload lande flags
-        //load_lande_flags();
+        freegfx();                                                                // free gfx loaded
+        loadgfx();                                                                // reload all menu + icon gfx
     }
 
     // update rss db
     if (do_save_setup_rss) {
+      if (debugmode) printf("Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
       streamoversigt.loadrssfile(1);                                            // download rss files (())
       do_save_setup_rss=false;
@@ -5649,7 +5631,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=false;
             fundet=true;
           }
-
+          // do_show_tvgraber
           if (((GLubyte) names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
             do_show_setup_sound=false;
             do_show_setup_sql=false;
@@ -5664,6 +5646,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
 
           // test for close windows again icon for all other windows in setup
+          //
           if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
             do_show_setup_sound=false;
             do_show_setup_screen=false;
@@ -5719,7 +5702,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // test for menu select music
             if ((GLubyte) names[i*4+3]==2) {
                 if (debugmode) printf("Select vis_radio_and_music \n");
-
                 vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
                 //vis_radio_oversigt=!vis_radio_oversigt;
                 //vis_music_oversigt=!vis_music_oversigt;
@@ -5868,7 +5850,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
 
+          //
           // hvis vis ask_open_dir_or_play window
+          //
           if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
             // play button
             if ((GLubyte) names[i*4+3]==20) {
@@ -6153,7 +6137,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
               // er der trykket på et tv program
               if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-                tvknapnr=(GLuint) names[i*4+3]-100;					                // hent tv knap nr
+                tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
+                if (debugmode & 256) fprintf(stderr,"tvknapnr%%d.\n",tvknapnr);
                 fundet=true;
               }
             }
@@ -6292,7 +6277,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   // retfunc er !=0 hvis der er trykket på en knap up/down
                   // give error
                   if (debugmode & 2) {
-                    if ((show_music_oversigt) && (vis_stream_oversigt==false)) fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
+                    if ((vis_music_oversigt) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
+                      fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
+                    }
+                  }
+                  if (vis_tv_oversigt) {
+                    if (debugmode & 8) fprintf(stderr,"tvknapnr = %d \n",tvknapnr-1);
                   }
                   if (debugmode & 4) {
                     if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
@@ -6378,23 +6368,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
+
                 }
-
-
-                /*
-                if (state==GLUT_DOWN) {
-
-                    int retfunc1=gl_select(mousex,screeny-mousey);   // hent den som er trykket på
-                    // nu er mknapnr/fknapnr/rknapnr=den som er trykket på bliver sat i gl_select
-                    // retfunc er !=0 hvis der er trykket på en knap up/down
-                    //if (debugmode & 0) {
-                        printf("state = %d mknapnr = %d type = %d \n",state,mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
-                    //}
-                    if (mknapnr==1) {
-                    }
-                    mknapnr=-1;
-                }
-                */
 
                 break;
 
@@ -6520,6 +6495,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((retfunc==1) || (button==3)) {
             if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
           }
+
+
+
         }
 
         // scroll film up/down
@@ -6680,7 +6658,8 @@ void handlespeckeypress(int key,int x,int y) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
                 } else if ((!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt))) {
-                  if (do_show_setup) do_save_config=true;		// save setup
+                  if (do_show_setup) do_save_config=true;		                   // set save config file flag
+                  do_save_setup_rss=true;                                      // save rss setup
                   vis_radio_oversigt=false;
                   vis_tv_oversigt=false;
                   vis_film_oversigt=false;
@@ -6858,7 +6837,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (stream_select_iconnr>0) stream_select_iconnr--;
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
+                //printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
 
 
@@ -6948,9 +6927,6 @@ void handlespeckeypress(int key,int x,int y) {
                   stream_key_selected++;
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-
-
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   if (tvvisvalgtnrtype==1) {
@@ -7012,9 +6988,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                 }
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
-
-
-
                 // stream
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                     if (stream_key_selected>=20) {
@@ -7026,9 +6999,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     if (stream_select_iconnr>0) stream_select_iconnr+=snumbersoficonline;
                 }
-
-
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
 
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) {
@@ -7093,10 +7063,11 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_videoplayer) {
                       if (do_show_setup_select_linie<4) do_show_setup_select_linie++;
                     }
-                    // setup videoplayer window
+                    // setup rss source window
                     if (do_show_setup_rss) {
-                      if (do_show_setup_select_linie<17) do_show_setup_select_linie++;
+                      if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
                       else configrss_ofset++;
+                      if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) realrssrecordnr++;
                     }
                     // tv graber setup
                     if (do_show_tvgraber) {
@@ -7182,8 +7153,6 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 
-                printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
-
                 if (vis_recorded_oversigt) {
                   if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                     valgtrecordnr--;
@@ -7239,6 +7208,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_rss) {
                       if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                       else if (configrss_ofset>0) configrss_ofset--;
+                      if ((((do_show_setup_select_linie+configrss_ofset) % 2)==0) && ((do_show_setup_select_linie+configrss_ofset)>0)) realrssrecordnr--;
                   }
                   // config af xmltv graber
                   if (do_show_tvgraber) {
@@ -7376,6 +7346,10 @@ void handlespeckeypress(int key,int x,int y) {
                     tvchannel_startofset=0;
                     do_show_setup_select_linie=0;
                   }
+                  if (show_setup_rss) {
+                    do_show_setup_select_linie=0;
+                    configrss_ofset=0;
+                  }
                 }
 
                 break;
@@ -7397,6 +7371,17 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_tvgraber) {
                     // select lasy line
                   }
+                  if (show_setup_rss) {
+                    // jump to button of text
+                    if (streamoversigt.antalstreams()>17) do_show_setup_select_linie=34; else do_show_setup_select_linie=0;
+                    configrss_ofset=0;
+                    for(int i=configrss_ofset;i<3000-1;i++) {
+                      if (streamoversigt.get_stream_name(configrss_ofset)) {
+                        configrss_ofset++;
+                      }
+                    }
+                    if (configrss_ofset>8) configrss_ofset-=8;
+                  }
                 }
                 break;
     }
@@ -7406,6 +7391,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
     }
+    if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
 }
 
 
@@ -7447,9 +7433,128 @@ void handleKeypress(unsigned char key, int x, int y) {
       vis_volume_timeout=80;
     }
 
-    if ((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) {
-       // gem key pressed in buffer
-       if (keybufferindex<80) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || ((do_show_setup_rss) && (key!=27))) {
+      // rss setup windows is open
+      if (do_show_setup_rss) {
+        switch(do_show_setup_select_linie) {
+          case 0: if (rssstreamoversigt.get_stream_name(0+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 1: if (rssstreamoversigt.get_stream_url(0+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 2: if (rssstreamoversigt.get_stream_name(1+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(1+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 3: if (rssstreamoversigt.get_stream_url(1+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(1+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 4: if (rssstreamoversigt.get_stream_name(2+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(2+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 5: if (rssstreamoversigt.get_stream_url(2+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(2+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 6: if (rssstreamoversigt.get_stream_name(3+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(3+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 7: if (rssstreamoversigt.get_stream_url(3+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(3+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 8: if (rssstreamoversigt.get_stream_name(4+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(4+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 9: if (rssstreamoversigt.get_stream_url(4+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(4+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 10:if (rssstreamoversigt.get_stream_name(5+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(5+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 11:if (rssstreamoversigt.get_stream_url(5+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(5+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 12:if (rssstreamoversigt.get_stream_name(6+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(6+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 13:if (rssstreamoversigt.get_stream_url(6+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(6+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 14:if (rssstreamoversigt.get_stream_name(7+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(7+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 15:if (rssstreamoversigt.get_stream_url(7+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(7+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 16:if (rssstreamoversigt.get_stream_name(8+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(8+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 17:if (rssstreamoversigt.get_stream_url(8+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(8+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 18:if (rssstreamoversigt.get_stream_name(9+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(9+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 19:if (rssstreamoversigt.get_stream_url(9+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(9+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 20:if (rssstreamoversigt.get_stream_name(10+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(10+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 21:if (rssstreamoversigt.get_stream_url(10+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(10+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 22:if (rssstreamoversigt.get_stream_name(11+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(11+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 23:if (rssstreamoversigt.get_stream_url(11+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(11+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 24:if (rssstreamoversigt.get_stream_name(12+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(12+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 25:if (rssstreamoversigt.get_stream_url(12+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(12+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 26:if (rssstreamoversigt.get_stream_name(13+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(13+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 27:if (rssstreamoversigt.get_stream_url(13+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(13+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 28:if (rssstreamoversigt.get_stream_name(14+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(14+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 29:if (rssstreamoversigt.get_stream_url(14+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(14+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 30:if (rssstreamoversigt.get_stream_name(15+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(15+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 31:if (rssstreamoversigt.get_stream_url(15+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(15+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 32:if (rssstreamoversigt.get_stream_name(16+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(16+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 33:if (rssstreamoversigt.get_stream_url(16+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(16+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 34:if (rssstreamoversigt.get_stream_name(17+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(17+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 35:if (rssstreamoversigt.get_stream_url(17+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(17+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 36:if (rssstreamoversigt.get_stream_name(18+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_name(18+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 37:if (rssstreamoversigt.get_stream_url(18+configrss_ofset)) strcpy(keybuffer,rssstreamoversigt.get_stream_url(18+configrss_ofset)); else strcpy(keybuffer,"");
+                  keybufferindex=strlen(keybuffer);
+                  break;
+        }
+      }
+      // gem key pressed in buffer
+      if (keybufferindex<80) {
           if (key==8) {						// back space
             if (keybufferindex>0) {
               keybufferindex--;
@@ -7656,8 +7761,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
 
-
-
                 }
               } else if (do_show_videoplayer) {
                 // video player setting
@@ -7803,42 +7906,83 @@ void handleKeypress(unsigned char key, int x, int y) {
                            break;
               }
            } else if (do_show_setup_rss) {
+              // update records
               switch(do_show_setup_select_linie) {
-                case 0: rssstreamoversigt.set_stream_name(0,keybuffer);
+                case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
                         break;
-                case 1: rssstreamoversigt.set_stream_url(0,keybuffer);
+                case 1: rssstreamoversigt.set_stream_url(0+configrss_ofset,keybuffer);
                         break;
-                case 2: rssstreamoversigt.set_stream_name(1,keybuffer);
+                case 2: rssstreamoversigt.set_stream_name(1+configrss_ofset,keybuffer);
                         break;
-                case 3: rssstreamoversigt.set_stream_url(1,keybuffer);
+                case 3: rssstreamoversigt.set_stream_url(1+configrss_ofset,keybuffer);
                         break;
-                case 4: rssstreamoversigt.set_stream_name(2,keybuffer);
+                case 4: rssstreamoversigt.set_stream_name(2+configrss_ofset,keybuffer);
                         break;
-                case 5: rssstreamoversigt.set_stream_url(2,keybuffer);
+                case 5: rssstreamoversigt.set_stream_url(2+configrss_ofset,keybuffer);
                         break;
-                case 6: rssstreamoversigt.set_stream_name(3,keybuffer);
+                case 6: rssstreamoversigt.set_stream_name(3+configrss_ofset,keybuffer);
                         break;
-                case 7: rssstreamoversigt.set_stream_url(3,keybuffer);
+                case 7: rssstreamoversigt.set_stream_url(3+configrss_ofset,keybuffer);
                         break;
-                case 8: rssstreamoversigt.set_stream_name(4,keybuffer);
+                case 8: rssstreamoversigt.set_stream_name(4+configrss_ofset,keybuffer);
                         break;
-                case 9: rssstreamoversigt.set_stream_url(4,keybuffer);
+                case 9: rssstreamoversigt.set_stream_url(4+configrss_ofset,keybuffer);
                         break;
-                case 10:rssstreamoversigt.set_stream_name(5,keybuffer);
+                case 10:rssstreamoversigt.set_stream_name(5+configrss_ofset,keybuffer);
                         break;
-                case 11:rssstreamoversigt.set_stream_url(5,keybuffer);
+                case 11:rssstreamoversigt.set_stream_url(5+configrss_ofset,keybuffer);
                         break;
-                case 12:rssstreamoversigt.set_stream_name(6,keybuffer);
+                case 12:rssstreamoversigt.set_stream_name(6+configrss_ofset,keybuffer);
                         break;
-                case 13:rssstreamoversigt.set_stream_url(6,keybuffer);
+                case 13:rssstreamoversigt.set_stream_url(6+configrss_ofset,keybuffer);
                         break;
-                case 14:rssstreamoversigt.set_stream_name(7,keybuffer);
+                case 14:rssstreamoversigt.set_stream_name(7+configrss_ofset,keybuffer);
                         break;
-                case 15:rssstreamoversigt.set_stream_url(7,keybuffer);
+                case 15:rssstreamoversigt.set_stream_url(7+configrss_ofset,keybuffer);
                         break;
-                case 16:rssstreamoversigt.set_stream_name(8,keybuffer);
+                case 16:rssstreamoversigt.set_stream_name(8+configrss_ofset,keybuffer);
                         break;
-                case 17:rssstreamoversigt.set_stream_url(8,keybuffer);
+                case 17:rssstreamoversigt.set_stream_url(8+configrss_ofset,keybuffer);
+                        break;
+                case 18: rssstreamoversigt.set_stream_name(9+configrss_ofset,keybuffer);
+                        break;
+                case 19: rssstreamoversigt.set_stream_url(9+configrss_ofset,keybuffer);
+                        break;
+                case 20: rssstreamoversigt.set_stream_name(10+configrss_ofset,keybuffer);
+                        break;
+                case 21: rssstreamoversigt.set_stream_url(10+configrss_ofset,keybuffer);
+                        break;
+                case 22: rssstreamoversigt.set_stream_name(11+configrss_ofset,keybuffer);
+                        break;
+                case 23: rssstreamoversigt.set_stream_url(11+configrss_ofset,keybuffer);
+                        break;
+                case 24: rssstreamoversigt.set_stream_name(12+configrss_ofset,keybuffer);
+                        break;
+                case 25: rssstreamoversigt.set_stream_url(12+configrss_ofset,keybuffer);
+                        break;
+                case 26: rssstreamoversigt.set_stream_name(13+configrss_ofset,keybuffer);
+                        break;
+                case 27: rssstreamoversigt.set_stream_url(13+configrss_ofset,keybuffer);
+                        break;
+                case 28:rssstreamoversigt.set_stream_name(14+configrss_ofset,keybuffer);
+                        break;
+                case 29:rssstreamoversigt.set_stream_url(14+configrss_ofset,keybuffer);
+                        break;
+                case 30:rssstreamoversigt.set_stream_name(15+configrss_ofset,keybuffer);
+                        break;
+                case 31:rssstreamoversigt.set_stream_url(15+configrss_ofset,keybuffer);
+                        break;
+                case 32:rssstreamoversigt.set_stream_name(16+configrss_ofset,keybuffer);
+                        break;
+                case 33:rssstreamoversigt.set_stream_url(16+configrss_ofset,keybuffer);
+                        break;
+                case 34:rssstreamoversigt.set_stream_name(17+configrss_ofset,keybuffer);
+                        break;
+                case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,keybuffer);
+                        break;
+                case 36:rssstreamoversigt.set_stream_name(18+configrss_ofset,keybuffer);
+                        break;
+                case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
                         break;
                }
            } else if (do_show_setup_keys) {
@@ -7914,7 +8058,7 @@ void handleKeypress(unsigned char key, int x, int y) {
              }
            }
        }
-    // end if ******************************************
+    // end if **( start if) ****************************************
     } else {
         switch(key) {
             case 27:
@@ -7947,28 +8091,64 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // close tv graber windows again
                   do_show_tvgraber=false;
                   do_show_setup=false;
-                } else if (do_show_videoplayer) do_show_videoplayer=false; else
-                if (do_show_setup_sql) do_show_setup_sql=false; else
-                if (do_show_setup_font) do_show_setup_font=false; else
-                if (do_show_setup_keys) do_show_setup_keys=false; else
-                if (do_show_setup_tema) do_show_setup_tema=false; else
-                if (do_show_setup_sound) do_show_setup_sound=false; else
-                if (do_show_setup_screen) do_show_setup_screen=false; else
-                if (do_show_setup_rss) {
+                  key=0;
+                } else if (do_show_videoplayer) {
+                  do_show_videoplayer=false;
+                  key=0;
+                } else if (do_show_setup_sql) {
+                  do_show_setup_sql=false;
+                  key=0;
+                } else if (do_show_setup_font) {
+                  do_show_setup_font=false;
+                  key=0;
+                } else if (do_show_setup_keys) {
+                  do_show_setup_keys=false;
+                  key=0;
+                } else if (do_show_setup_tema) {
+                  do_show_setup_tema=false;
+                  key=0;
+                } else if (do_show_setup_sound) {
+                  do_show_setup_sound=false;
+                  key=0;
+                } else if (do_show_setup_screen) {
+                  do_show_setup_screen=false;
+                  key=0;
+                } else if (do_show_setup_rss) {
+                  // stop show setup of rss feeds
                   do_show_setup_rss=false;
-                  do_save_setup_rss=true;
+                  key=0;
+//                  do_save_setup_rss=true;
                 } else do_show_setup=false;
+                key=0;
               }
-              if (vis_music_oversigt) vis_music_oversigt=false;
-              else if (vis_radio_oversigt) vis_radio_oversigt=false;
-              else if (vis_film_oversigt) vis_film_oversigt=false;
-              else if (vis_stream_oversigt) vis_stream_oversigt=false;
-              else if (vis_tv_oversigt) vis_tv_oversigt=false;
-              else if (vis_recorded_oversigt) vis_recorded_oversigt=false;
-              else {
+              if (vis_music_oversigt) {
+                vis_music_oversigt=false;
+                key=0;
+              } else if (vis_radio_oversigt) {
+                vis_radio_oversigt=false;
+                key=0;
+              } else if (vis_film_oversigt) {
+                vis_film_oversigt=false;
+                key=0;
+              } else if (vis_stream_oversigt) {
+                vis_stream_oversigt=false;
+                key=0;
+              } else if (vis_tv_oversigt) {
+                vis_tv_oversigt=false;
+                key=0;
+              } else if (vis_recorded_oversigt) {
+                vis_recorded_oversigt=false;
+                key=0;
+              } else if (vis_radio_or_music_oversigt) {
+                vis_radio_or_music_oversigt=false;
+                key=0;
+              } else if (vis_stream_or_movie_oversigt) {
+                vis_stream_or_movie_oversigt=false;
+                key=0;
+              } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
-                exit(0);
-              }
+                exit(0);                                                      //  exit program
+              } else key=0;
               break;
             case '*':
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info

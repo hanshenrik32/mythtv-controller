@@ -244,8 +244,6 @@ int rss_stream_class::load_rss_data() {
 }
 
 
-
-
 //
 // save/update rss db
 //
@@ -268,62 +266,71 @@ int rss_stream_class::save_rss_data() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
-    for(n=0;n<antal;n++) {
+    for(n=0;n<maxantal;n++) {
       // find record
       doexist=false;
       strcpy(ftitle,"");
       strcpy(ftitle2,"");
       strcpy(furl,"");
-      sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where title like '%s' limit 1",rss_source_feed[n].stream_name);
-      mysql_query(conn,sqlstring);
-      res = mysql_store_result(conn);
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        doexist=true;
-        strcpy(ftitle,row[0]);
-        strcpy(furl,row[0]);
-      }
+      if (strcmp(rss_source_feed[n].stream_name,"")!=0) {
+        sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where feedtitle like '%s' limit 1",rss_source_feed[n].stream_name);
+        mysql_query(conn,sqlstring);
+        res = mysql_store_result(conn);
+        while ((row = mysql_fetch_row(res)) != NULL) {
+            doexist=true;
+            strcpy(ftitle,row[0]);
+            strcpy(furl,row[0]);
+        }
+        if (doexist) {
+          // find record in db abd do the change and update record again
+          if (ftitle) {
+            if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
+              sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+            } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
+              //
+              // update name
+              //
 
-      if (doexist) {
-        // find record in db abd change for any change
-        if (ftitle) {
-          if (strcmp(ftitle,rss_source_feed[n].stream_name)==0) {
-            sprintf(sqlstring,"update internetcontentarticles set url='%s' where title like '%s' limit 1",rss_source_feed[n].stream_url,rss_source_feed[n].stream_name);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-          } else if (strcmp(furl,rss_source_feed[n].stream_url)==0) {
-            //
-            // update name
-            //
-
-            // save old name
-            sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
-              strcpy(ftitle2,row1[0]);
-            }
-            // update db record with new name
-            sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            if (res1) {
-              // if okay update
-              // chnage/update name
-              sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
+              // save old name
+              sprintf(sqlstring,"select title from internetcontentarticles where url like '%s' limit 1",rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              while (((row1 = mysql_fetch_row(res1)) != NULL) && (antal<100)) {
+                strcpy(ftitle2,row1[0]);
+              }
+              // update db record with new name
+              sprintf(sqlstring,"update internetcontentarticles set name='%s' where url like '%s' limit 1",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              if (res1) {
+                // if okay update
+                // chnage/update name
+                sprintf(sqlstring,"update internetcontent set name='%s' where name like '%s'",rss_source_feed[n].stream_name,ftitle2);
+                mysql_query(conn,sqlstring);
+                res1 = mysql_store_result(conn);
+              }
+            } else {
+              //
+              // no update of name of url create new
+              //
+              sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+              mysql_query(conn,sqlstring);
+              res1 = mysql_store_result(conn);
+              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
-          } else {
-            //
-            // no update of name of url create new
-            //
-            sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,url) values('%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
-            sprintf(sqlstring,"insert into internetcontent (title) values('%s')",rss_source_feed[n].stream_name);
-            mysql_query(conn,sqlstring);
-            res1 = mysql_store_result(conn);
           }
+  } else {
+          // no update of name of url create new
+          sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
+          mysql_query(conn,sqlstring);
+          res1 = mysql_store_result(conn);
+          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
+          mysql_query(conn,sqlstring);
+          res1 = mysql_store_result(conn);
         }
       }
     } //for next
@@ -335,14 +342,14 @@ int rss_stream_class::save_rss_data() {
 // get url
 
 int rss_stream_class::set_stream_url(int nr,char *url) {
-  strncpy(rss_source_feed[nr].stream_url,url,namemaxlength);
+  strcpy(rss_source_feed[nr].stream_url,url);
 }
 
 
 // update name
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
-  strncpy(rss_source_feed[nr].stream_name,name,urlmaxlength);
+  strcpy(rss_source_feed[nr].stream_name,name);
 }
 
 
@@ -2950,7 +2957,13 @@ void show_setup_keys() {
 
 
 
-
+void showrss_list() {
+  printf("\n");
+  for(int t=0;t<99;t++) {
+    if (strcmp(rssstreamoversigt.get_stream_name(t),"")!=0) printf("nr %d feedname %s url %s \n",t,rssstreamoversigt.get_stream_name(t),rssstreamoversigt.get_stream_url(t));
+  }
+  printf("\n");
+}
 
 
 //
@@ -2975,7 +2988,6 @@ void show_setup_rss(unsigned int startofset) {
     glBindTexture(GL_TEXTURE_2D,setuprssback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     // background
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/7),100 , 0.0);
@@ -3008,368 +3020,144 @@ void show_setup_rss(unsigned int startofset) {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
-
     glPushMatrix();
     // overskrift
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(300, 680, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Rss feed name.");
+    myglprint4((char *) "RSS Feed Name.");
     glPopMatrix();
-
     glPushMatrix();
-    // overskrift
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(680, 680, 0.0f);
+    glTranslatef(684, 680, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Rss url string.");
+    myglprint4((char *) "Podcast URL");
     glPopMatrix();
-
-/*
-    xpos=310;
-    ypos=650;
-    for(n=0;n<rssstreamoversigt.streamantal();n++) {
-      if (rssstreamoversigt.get_stream_name(0)) {
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(xpos, ypos, 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        strcpy(temptxt,rssstreamoversigt.get_stream_name(n));
-        //myglprint4((char *) "F4");
-        myglprint4((char *) temptxt);
-        glPopMatrix();
-      }
-      ypos-=50;
+    for (int n=0;n<18;n++) {
+      glPushMatrix();
+      glTranslatef(300 , 660-(n*20) , 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); else glColor3f(.7f,0.7f,0.7f);
+      strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset+n));
+      myglprint4(keybuffer);
+      if (n==do_show_setup_select_linie) glColor3f(1.0f,1.0f,0.0f); glColor3f(.7f,0.7f,0.7f);
+      strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset+n));
+      glRasterPos2f(392.0f, 0.0f);
+      myglprint4(keybuffer);
+      glPopMatrix();
     }
-*/
-
-    // loop for lines
-    glPushMatrix();
-    xpos=320;
-    ypos=100;
-    winsizx=850;
-    winsizy=30;
-    for(int i=0;i<9;i++) {
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
-        glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-        glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
-        glEnd(); //End quadrilateral coordinates
+    switch(do_show_setup_select_linie) {
+        case 0: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(0*20),strlen(rssstreamoversigt.get_stream_name(0+startofset)));
+                break;
+        case 1: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(0*20),strlen(rssstreamoversigt.get_stream_url(0+startofset)));
+                break;
+        case 2: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(1*20),strlen(rssstreamoversigt.get_stream_name(1+startofset)));
+                break;
+        case 3: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(1*20),strlen(rssstreamoversigt.get_stream_url(1+startofset)));
+                break;
+        case 4: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(2*20),strlen(rssstreamoversigt.get_stream_name(2+startofset)));
+                break;
+        case 5: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(2*20),strlen(rssstreamoversigt.get_stream_url(2+startofset)));
+                break;
+        case 6: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(3*20),strlen(rssstreamoversigt.get_stream_name(3+startofset)));
+                break;
+        case 7: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(3*20),strlen(rssstreamoversigt.get_stream_url(3+startofset)));
+                break;
+        case 8: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(4*20),strlen(rssstreamoversigt.get_stream_name(4+startofset)));
+                break;
+        case 9: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(4*20),strlen(rssstreamoversigt.get_stream_url(4+startofset)));
+                break;
+        case 10:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(5*20),strlen(rssstreamoversigt.get_stream_name(5+startofset)));
+                break;
+        case 11:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(5*20),strlen(rssstreamoversigt.get_stream_url(5+startofset)));
+                break;
+        case 12:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(6*20),strlen(rssstreamoversigt.get_stream_name(6+startofset)));
+                break;
+        case 13:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(6*20),strlen(rssstreamoversigt.get_stream_url(6+startofset)));
+                break;
+        case 14:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(7*20),strlen(rssstreamoversigt.get_stream_name(7+startofset)));
+                break;
+        case 15:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(7*20),strlen(rssstreamoversigt.get_stream_url(7+startofset)));
+                break;
+        case 16:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(8*20),strlen(rssstreamoversigt.get_stream_name(8+startofset)));
+                break;
+        case 17:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(8*20),strlen(rssstreamoversigt.get_stream_url(8+startofset)));
+                break;
+        case 18: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(9*20),strlen(rssstreamoversigt.get_stream_name(9+startofset)));
+                break;
+        case 19: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(9*20),strlen(rssstreamoversigt.get_stream_url(9+startofset)));
+                break;
+        case 20: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(10*20),strlen(rssstreamoversigt.get_stream_name(10+startofset)));
+                break;
+        case 21: glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(10*20),strlen(rssstreamoversigt.get_stream_url(10+startofset)));
+                break;
+        case 22:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(11*20),strlen(rssstreamoversigt.get_stream_name(11+startofset)));
+                break;
+        case 23:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(11*20),strlen(rssstreamoversigt.get_stream_url(11+startofset)));
+                break;
+        case 24:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(12*20),strlen(rssstreamoversigt.get_stream_name(12+startofset)));
+                break;
+        case 25:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(12*20),strlen(rssstreamoversigt.get_stream_url(12+startofset)));
+                break;
+        case 26:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(13*20),strlen(rssstreamoversigt.get_stream_name(13+startofset)));
+                break;
+        case 27:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(13*20),strlen(rssstreamoversigt.get_stream_url(13+startofset)));
+                break;
+        case 28:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(14*20),strlen(rssstreamoversigt.get_stream_name(14+startofset)));
+                break;
+        case 29:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(14*20),strlen(rssstreamoversigt.get_stream_url(14+startofset)));
+                break;
+        case 30:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(15*20),strlen(rssstreamoversigt.get_stream_name(15+startofset)));
+                break;
+        case 31:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(15*20),strlen(rssstreamoversigt.get_stream_url(15+startofset)));
+                break;
+        case 32:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(16*20),strlen(rssstreamoversigt.get_stream_name(16+startofset)));
+                break;
+        case 33:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(16*20),strlen(rssstreamoversigt.get_stream_url(16+startofset)));
+                break;
+        case 34:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(-70,510-(17*20),strlen(rssstreamoversigt.get_stream_name(17+startofset)));
+                break;
+        case 35:glColor3f(1.0f,1.0f,1.0f);
+                showcoursornow(320,510-(17*20),strlen(rssstreamoversigt.get_stream_url(17+startofset)));
+                break;
     }
-    glPopMatrix();
-    glDisable(GL_TEXTURE_2D);
-
-
-    // line 0
-    glPushMatrix();
-    //glTranslatef(680 , 650 , 0.0f);
-    glTranslatef(310 , 650 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==0) {
-      strcpy(keybuffer,rssstreamoversigt.get_stream_name(0+startofset));
-      myglprint4((char *) keybuffer);   // keybuffer
-    } else {
-      if (rssstreamoversigt.streamantal()+startofset>0) myglprint4((char *) rssstreamoversigt.get_stream_name(0+startofset));
-        else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==0) showcoursornow(-071,500,strlen(keybuffer));
-
-    // line 0
-    glPushMatrix();
-    glTranslatef(680 , 650 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==1) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(0+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>1) myglprint4((char *) rssstreamoversigt.get_stream_url(0+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==1) showcoursornow(311,500,strlen(keybuffer));
-    //if (do_show_setup_select_linie==1) showcoursornow(-071,500,strlen(keybuffer));
-
-
-    // line 1
-    glPushMatrix();
-    glTranslatef(310 , 600 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==2) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(1+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>1) myglprint4((char *) rssstreamoversigt.get_stream_name(1+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==2) showcoursornow(011,450,strlen(keybuffer));
-    if (do_show_setup_select_linie==2) showcoursornow(-071,450,strlen(keybuffer));
-
-    // line 1
-    glPushMatrix();
-    glTranslatef(680 , 600 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==3) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(1));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()>1) myglprint4((char *) rssstreamoversigt.get_stream_url(1));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==3) showcoursornow(311,450,strlen(keybuffer));
-    //if (do_show_setup_select_linie==3) showcoursornow(-071,450,strlen(keybuffer));
-
-    // line 2
-    glPushMatrix();
-    glTranslatef(310 , 550 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==4) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(2));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()>2) myglprint4((char *) rssstreamoversigt.get_stream_name(2));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==4) showcoursornow(011,400,strlen(keybuffer));
-    if (do_show_setup_select_linie==4) showcoursornow(-071,400,strlen(keybuffer));
-
-    // line 2
-    glPushMatrix();
-    glTranslatef(680 , 550 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==5) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(2+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>2) myglprint4((char *) rssstreamoversigt.get_stream_url(2+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==5) showcoursornow(311,400,strlen(keybuffer));
-    //if (do_show_setup_select_linie==5) showcoursornow(-071,400,strlen(keybuffer));
-
-
-    // line 3
-    glPushMatrix();
-    glTranslatef(310 , 500 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==6) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(3+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>3) myglprint4((char *) rssstreamoversigt.get_stream_name(3+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==6) showcoursornow(011,350,strlen(keybuffer));
-    if (do_show_setup_select_linie==6) showcoursornow(-071,350,strlen(keybuffer));
-
-    // line 3
-    glPushMatrix();
-    glTranslatef(680 , 500 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==7) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(3+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>3) myglprint4((char *) rssstreamoversigt.get_stream_url(3+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==7) showcoursornow(311,350,strlen(keybuffer));
-    //if (do_show_setup_select_linie==7) showcoursornow(-071,350,strlen(keybuffer));
-
-
-    // line 4
-    glPushMatrix();
-    glTranslatef(310 , 450 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==8) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(4+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>4) myglprint4((char *) rssstreamoversigt.get_stream_name(4+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==8) showcoursornow(011,300,strlen(keybuffer));
-    if (do_show_setup_select_linie==8) showcoursornow(-071,300,strlen(keybuffer));
-
-    // line 4
-    glPushMatrix();
-    glTranslatef(680 , 450 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==9) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(4+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>4) myglprint4((char *) rssstreamoversigt.get_stream_url(4+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==9) showcoursornow(311,300,strlen(keybuffer));
-    //if (do_show_setup_select_linie==9) showcoursornow(-071,300,strlen(keybuffer));
-
-
-    // line 5
-    glPushMatrix();
-    glTranslatef(310 , 400 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==10) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(5));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()>5) myglprint4((char *) rssstreamoversigt.get_stream_name(5));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==10) showcoursornow(011,250,strlen(keybuffer));
-    if (do_show_setup_select_linie==10) showcoursornow(-071,250,strlen(keybuffer));
-
-    // line 5
-    glPushMatrix();
-    glTranslatef(680 , 400 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==11) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(5+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>5) myglprint4((char *) rssstreamoversigt.get_stream_url(5+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==11) showcoursornow(311,250,strlen(keybuffer));
-    //if (do_show_setup_select_linie==11) showcoursornow(-071,250,strlen(keybuffer));
-
-
-    // line 6
-    glPushMatrix();
-    glTranslatef(310 , 350 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==12) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(6+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>6) myglprint4((char *) rssstreamoversigt.get_stream_name(6+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==12) showcoursornow(011,200,strlen(keybuffer));
-    if (do_show_setup_select_linie==12) showcoursornow(-071,200,strlen(keybuffer));
-
-    // line 6
-    glPushMatrix();
-    glTranslatef(680 , 350 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==13) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(6+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>6) myglprint4((char *) rssstreamoversigt.get_stream_url(6+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==13) showcoursornow(311,200,strlen(keybuffer));
-
-
-    // line 7
-    glPushMatrix();
-    glTranslatef(310 , 300 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==14) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(7+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_name(7+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==14) showcoursornow(011,150,strlen(keybuffer));
-    if (do_show_setup_select_linie==14) showcoursornow(-071,150,strlen(keybuffer));
-
-    // line 7
-    glPushMatrix();
-    glTranslatef(680 , 300 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==15) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(7+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_url(7+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==15) showcoursornow(311,150,strlen(keybuffer));
-
-
-    // line 8
-    glPushMatrix();
-    glTranslatef(310 , 250 , 0.0f);
-    glRasterPos2f(0.8f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==16) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_name(8));
-        myglprint4((char *) keybuffer);
-    } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_name(8));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    //if (do_show_setup_select_linie==16) showcoursornow(011,100,strlen(keybuffer));
-    if (do_show_setup_select_linie==16) showcoursornow(-071,100,strlen(keybuffer));
-
-    // line 8
-    glPushMatrix();
-    glTranslatef(680 , 250 , 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor3f(1.0f,1.0f,1.0f);
-    if (do_show_setup_select_linie==17) {
-        strcpy(keybuffer,rssstreamoversigt.get_stream_url(8+startofset));
-        myglprint4((char *) keybuffer);
-    } else {
-        if (rssstreamoversigt.streamantal()+startofset>7) myglprint4((char *) rssstreamoversigt.get_stream_url(8+startofset));
-          else myglprint4((char *) "                               ");
-    }
-    glPopMatrix();
-    if (do_show_setup_select_linie==17) showcoursornow(311,100,strlen(keybuffer));
 }
 
 

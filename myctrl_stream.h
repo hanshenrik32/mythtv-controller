@@ -1,14 +1,11 @@
 #ifndef MYCTRL_STREAM
 #define MYCTRL_STREAM
 
-
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "myth_vlcplayer.h"
 
-
-//const char *radioiconpath="/usr/share/mythtv-controller/images/radiostations/";
 const int feed_namelength=80;
 const int feed_desclength=200;
 const int feed_pathlength=200;
@@ -20,7 +17,7 @@ struct stream_oversigt_type {
     char feed_desc[feed_desclength+1];				// desc
     char feed_path[feed_pathlength+1];				// mythtv db path
     char feed_gfx_url[feed_url+1];
-    char feed_gfx_mythtv[feed_url+1];				// mythtv icon gfx path in mythtv system
+    char feed_gfx_mythtv[feed_url+1];				  // icon gfx path in mythtv system
     char feed_streamurl[feed_url+1];
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
@@ -51,8 +48,8 @@ class stream_class : vlc_controller {
         bool gfx_loaded;					                                              //
         void update_rss_nr_of_view(char *url);                                  // save rss to db file (struct)
         void set_rss_new(int nr,bool ny) { if (nr<antal) stack[nr]->nyt=ny; }                 // set new flag
-        char *get_stream_name(int nr);        // get name
-        char *get_stream_desc(int nr);        // get desc
+        char *get_stream_name(int nr);                                          // get name
+        char *get_stream_desc(int nr);                                          // get desc
         char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
         char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); }
         char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
@@ -61,6 +58,7 @@ class stream_class : vlc_controller {
         unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_path_antal); }
         long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr]->intnr); }
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
+        int antalstreams() { return antal; };
         void stopstream();
         void softstopstream();
         int playstream(int nr);
@@ -81,7 +79,6 @@ class stream_class : vlc_controller {
 };
 
 void *loadweb(void *data);
-
 void *load_all_stream_gfx(void *data);
 
 #endif
