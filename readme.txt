@@ -10,6 +10,8 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 
 Version.
 
+mythtv-controller ver 0.36.7
+
 mythtv-controller ver 0.36.4
 
 new rss feed default installed
