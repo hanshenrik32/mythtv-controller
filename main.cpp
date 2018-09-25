@@ -6401,7 +6401,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 // close vis stream play
                 if ((vis_stream_oversigt) && (state==GLUT_UP)) {
-                  if (sknapnr>0) do_zoom_stream_cover=!do_zoom_stream_cover;
+                  if (debugmode & 4) printf("sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
+                  if ((sknapnr>0) && (stream_playnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
                 }
                 //
                 if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
