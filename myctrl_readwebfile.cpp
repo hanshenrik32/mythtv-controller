@@ -40,9 +40,13 @@ int get_webfilenamelong(char *fname,char *webpath) {
       tmp[firstslashpointer-1]='\0';
       npointer=strrchr(tmp,'/');
       if (npointer) {
+        //strcpy(fname,filename);
+        /* old have errors
         strcpy(fname,npointer+1);
-        fname[11]='\0';
+        //fname[11]='\0';
         strcat(fname,filename);
+        */
+        strcpy(fname,filename);
       }
       delete [] filename;
     }
@@ -253,7 +257,8 @@ int get_webfile2(char *webpath,char *outfile) {
     strcat(command,webpath);
     strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
     strcat(command,outfile);
-    strcat(command," 2>%1 ");
+    //strcat(command," 2>%1 ");
+    strcat(command," 2>> wget.log ");
     system(command);
   }
 }

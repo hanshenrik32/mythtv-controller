@@ -1951,7 +1951,7 @@ if (check_rss_feed_exist(conn,"Swingercast")==0) {
                     // rss download
                     // downloadfilename = name on file, from tmpfilename = full web url
                     get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                    // check filename
+                    // check filename fro ? or = and replace to _
                     strcpy(downloadfilename1,downloadfilename);                 // back name before change
                     int mmm=0;
                     while(mmm<strlen(downloadfilename)) {
