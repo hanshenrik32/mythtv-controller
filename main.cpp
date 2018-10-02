@@ -9763,7 +9763,7 @@ void update2(int value) {
 
 
 
-// old ver
+// in use
 
 void update(int value) {
     float MOVIE_CS;		// movie dvd cover side
