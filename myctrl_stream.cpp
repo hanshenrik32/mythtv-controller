@@ -1841,7 +1841,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
       getart=0;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle),ANY_VALUE(path),ANY_VALUE(title),ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,ANY_VALUE(path) as path,ANY_VALUE(title) as title,ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' GROUP BY title ORDER BY length(title),title DESC");
       getart=1;
@@ -1907,7 +1907,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,"/rss/images/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
-                  if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilenamelong);
+                  if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   // download gfx file and use as icon
                   if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
                     printf("Download error \n");
@@ -1988,7 +1988,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Downloadloading web file %s realname %s \n",tmpfilename,downloadfilenamelong);
+                      if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                       // download gfx file and use as icon
                       if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
                         printf("Download error \n");
