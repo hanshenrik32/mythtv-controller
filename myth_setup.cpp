@@ -3860,7 +3860,9 @@ void show_setup_tv_graber(int startofset) {
         // it is a first time program thing
         hent_tv_channels=true;
         // crete mew config file
-        if (txmltvgraber_createconfig()==0) printf("error xmltv graber confg \n");
+        if (txmltvgraber_createconfig()==0) {
+          printf("Error xmltv graber confg. Set to %s \n",configbackend_tvgraber);
+        }
         // load mew chanel config data from file
         load_channel_list_from_graber();
         // save config

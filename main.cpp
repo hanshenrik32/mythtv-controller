@@ -7434,7 +7434,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       vis_volume_timeout=80;
     }
 
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || ((do_show_setup_rss) && (key!=27))) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss)) && (key!=27))) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -7800,6 +7800,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               } else if (do_show_tvgraber) {
                 // in setup menu
+                // show_setup_tv_graber = true
                 if ((key==32) && (do_show_setup_select_linie==0)) {
                   if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal+1) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
                   // husk last selected
@@ -7827,7 +7828,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
        }
        // ved setup window
-       if (do_show_setup) {
+        if (do_show_setup) {
            if (do_show_setup_sound) {
                switch(do_show_setup_select_linie) {
                    case 0:
