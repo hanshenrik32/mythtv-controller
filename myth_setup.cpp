@@ -3287,6 +3287,8 @@ int txmltvgraber_createconfig() {
               break;
       default: sprintf(exebuffer,"'\nall\n' |");
     }
+    // get grabercmd command
+    // add configure paramters to tv_grab_*
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     switch(aktiv_tv_graber.graberaktivnr) {
@@ -3297,7 +3299,8 @@ int txmltvgraber_createconfig() {
               break;
 
     }
-    return(1);
+    // sysresult = -1 if error else command return value
+    return(sysresult);
   } else return(0);
 }
 
@@ -3573,12 +3576,13 @@ int load_channel_list_from_graber() {
   bool errors=false;
   char userhomedir[1024];
   char filename[1024];
-  if (debugmode) printf("Get channel list file from web.\n");
+  if (debugmode) printf("Get channel list file from tv graber sub system.\n");
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/tvguide_channels.txt");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
+    // get config tv graber
     strcpy(exestring,configbackend_tvgraber);
     //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
     switch (aktiv_tv_graber.graberaktivnr) {
@@ -3700,7 +3704,7 @@ int load_channel_list_from_graber() {
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
   } else errors=true;
-  if (errors==false) return(1); return(0);
+  if (errors) return(-1); else return(sysresult);
 }
 
 //
@@ -3847,6 +3851,7 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
