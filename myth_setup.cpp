@@ -3746,9 +3746,9 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
-  strcat(filename,tvguide_dat_filename);
+  strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-    channel_list[n].selected=false;                                             // is program channel active
+    channel_list[n].selected=true;                                              // is program channel active
     channel_list[n].ordernr=0;                                                  // show ordernr
     channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
     strcpy(channel_list[n].name,"");                                            // channel name
@@ -3860,6 +3860,7 @@ void show_setup_tv_graber(int startofset) {
     char text[200];
     // update channel list before show it
     if (hent_tv_channels==false) {
+      // try to load struct channel info
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
@@ -3869,8 +3870,9 @@ void show_setup_tv_graber(int startofset) {
           printf("Error xmltv graber confg. Set to %s \n",configbackend_tvgraber);
         }
         // load mew chanel config data from file
+        // in to struct
         load_channel_list_from_graber();
-        // save config
+        // save struct data
         save_channel_list();
         //firsttime_xmltvupdate=true;
       }
