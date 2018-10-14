@@ -3857,6 +3857,9 @@ void show_setup_tv_graber(int startofset) {
     // update channel list before show it
     if (hent_tv_channels==false) {
       // try to load struct channel info
+
+      //tvguide_channels.dat
+
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
@@ -3871,6 +3874,9 @@ void show_setup_tv_graber(int startofset) {
         // save struct data
         save_channel_list();
         //firsttime_xmltvupdate=true;
+      } else {
+//        hent_tv_channels=true;
+//        load_channel_list_from_graber();
       }
     }
     // background
