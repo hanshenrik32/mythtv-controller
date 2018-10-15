@@ -3253,7 +3253,7 @@ void display() {
         glTranslatef(xof+20.0f,yof+10+5, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        aktivfont.selectfont("Courier 10 Pitch");
+        aktivfont.selectfont((char *) "Courier 10 Pitch");
         glcRenderString("Playlist name :");
         glcRenderString(keybuffer);
         glPopMatrix();
@@ -6138,7 +6138,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               // er der trykket på et tv program
               if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
                 tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
-                if (debugmode & 256) fprintf(stderr,"tvknapnr%%d.\n",tvknapnr);
+                if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
                 fundet=true;
               }
             }
