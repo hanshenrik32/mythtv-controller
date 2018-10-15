@@ -762,7 +762,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // commandline = Program to fetch content with
       // updated     = Time of last update
       if ((!(dbexist)) && (mysql_query(conn,"CREATE database if not exist mythtvcontroller")!=0)) {
-        printf("mysql db create error. %s \n");
+        printf("mysql db create error.\n");
       }
       res = mysql_store_result(conn);
       // create db
@@ -788,7 +788,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       res = mysql_store_result(conn);
       // ok Aftenshowet
       // dr have removed the rss feed
-      if (check_rss_feed_exist(conn,"Aftenshowet")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Aftenshowet")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Aftenshowet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Aftenshowet.\n");
         res = mysql_store_result(conn);
@@ -802,7 +802,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       // ok Anders Lund Madsen
-      if (check_rss_feed_exist(conn,"Anders Lund Madsen i Den Yderste By")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Anders Lund Madsen i Den Yderste By")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Anders Lund Madsen i Den Yderste By',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Anders Lund Madsen.\n");
         res = mysql_store_result(conn);
@@ -814,7 +814,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
       // ok AK 24syv
-      if (check_rss_feed_exist(conn,"AK 24syv")==0) {
+      if (check_rss_feed_exist(conn,(char *) "AK 24syv")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('AK 24syv',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error AK 24syv.\n");
         res = mysql_store_result(conn);
@@ -826,7 +826,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Best of YouTube
-      if (check_rss_feed_exist(conn,"Best of YouTube (video)")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Best of YouTube (video)")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Best of YouTube (video)',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Best of YouTube.\n");
         res = mysql_store_result(conn);
@@ -838,7 +838,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Bonderøven
-      if (check_rss_feed_exist(conn,"Bonderøven")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Bonderøven")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Bonderøven',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Bonderøven.\n");
         res = mysql_store_result(conn);
@@ -850,7 +850,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke
-      if (check_rss_feed_exist(conn,"CNET")==0) {
+      if (check_rss_feed_exist(conn,(char *) "CNET")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('CNET',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error CNET.\n");
         res = mysql_store_result(conn);
@@ -862,7 +862,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Droner og kanoner
-      if (check_rss_feed_exist(conn,"Droner og kanoner")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Droner og kanoner")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Droner og kanoner',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Droner og kanoner\n");
         res = mysql_store_result(conn);
@@ -874,7 +874,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok icon wrong
-      if (check_rss_feed_exist(conn,"Dynamo")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Dynamo")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Dynamo',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Dynamo.\n");
         res = mysql_store_result(conn);
@@ -886,7 +886,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok So ein Ding
-      if (check_rss_feed_exist(conn,"So ein Ding")==0) {
+      if (check_rss_feed_exist(conn,(char *) "So ein Ding")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('So ein Ding',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error So ein Ding.\n");
         res = mysql_store_result(conn);
@@ -898,7 +898,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Verdens Bedste Filmklub
-      if (check_rss_feed_exist(conn,"Verdens Bedste Filmklub")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Verdens Bedste Filmklub")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Verdens Bedste Filmklub',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Verdens Bedste Filmklub.\n");
         res = mysql_store_result(conn);
@@ -910,7 +910,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok I seng med NOVA
-      if (check_rss_feed_exist(conn,"I seng med NOVA")==0) {
+      if (check_rss_feed_exist(conn,(char *) "I seng med NOVA")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('I seng med NOVA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error I seng med NOVA.\n");
         res = mysql_store_result(conn);
@@ -922,7 +922,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Krager og Drager - Dansk Game of Thrones Podcast
-      if (check_rss_feed_exist(conn,"Krager og Drager - Dansk Game of Thrones Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Krager og Drager - Dansk Game of Thrones Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Krager og Drager - Dansk Game of Thrones Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Krager og Drager.\n");
         res = mysql_store_result(conn);
@@ -934,7 +934,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok The Verge
-      if (check_rss_feed_exist(conn,"The Verge")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The Verge")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Verge',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Verge.\n");
         res = mysql_store_result(conn);
@@ -946,7 +946,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Tech Talk Today
-      if (check_rss_feed_exist(conn,"Tech Talk Today")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Tech Talk Today")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Tech Talk Today',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tech Talk Today.\n");
         res = mysql_store_result(conn);
@@ -958,7 +958,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Kontant
-      if (check_rss_feed_exist(conn,"Kontant")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Kontant")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Kontant',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Kontant.\n");
         res = mysql_store_result(conn);
@@ -970,7 +970,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Movieclips Coming Soon
-      if (check_rss_feed_exist(conn,"Movieclips Coming Soon")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Movieclips Coming Soon")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Movieclips Coming Soon',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Movieclips Coming Soon.\n");
         res = mysql_store_result(conn);
@@ -982,7 +982,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok The Rocket Ranch
-      if (check_rss_feed_exist(conn,"The Rocket Ranch")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The Rocket Ranch")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Rocket Ranch',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Rocket Ranch.\n");
         res = mysql_store_result(conn);
@@ -994,7 +994,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Troldspejlet Podcast
-      if (check_rss_feed_exist(conn,"Troldspejlet Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Troldspejlet Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Troldspejlet Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Troldspejlet Podcast.\n");
         res = mysql_store_result(conn);
@@ -1006,7 +1006,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke (youtube)
-      if (check_rss_feed_exist(conn,"GameSpot")==0) {
+      if (check_rss_feed_exist(conn,(char *) "GameSpot")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('GameSpot',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error GameSpot.\n");
         res = mysql_store_result(conn);
@@ -1018,7 +1018,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok The Story from The Guardian
-      if (check_rss_feed_exist(conn,"The Story from The Guardian")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The Story from The Guardian")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Story from The Guardian',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Story from The Guardian.\n");
         res = mysql_store_result(conn);
@@ -1030,7 +1030,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok DEN GRÅ SIDE
-      if (check_rss_feed_exist(conn,"DEN GRÅ SIDE")==0) {
+      if (check_rss_feed_exist(conn,(char *) "DEN GRÅ SIDE")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('DEN GRÅ SIDE',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -1042,7 +1042,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok TechSNAP
-      if (check_rss_feed_exist(conn,"TechSNAP")==0) {
+      if (check_rss_feed_exist(conn,(char *) "TechSNAP")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('TechSNAP',NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error TechSNAP.\n");
         res = mysql_store_result(conn);
@@ -1055,7 +1055,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
       // ok Bitch Sesh: A Real Housewives Breakdown
-      if (check_rss_feed_exist(conn,"Bitch Sesh: A Real Housewives Breakdown")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Bitch Sesh: A Real Housewives Breakdown")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Bitch Sesh: A Real Housewives Breakdown',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Bitch Sesh.\n");
         res = mysql_store_result(conn);
@@ -1067,7 +1067,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok 2 Dope Queens
-      if (check_rss_feed_exist(conn,"2 Dope Queens")==0) {
+      if (check_rss_feed_exist(conn,(char *) "2 Dope Queens")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('2 Dope Queens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error 2 Dope Queens.\n");
         res = mysql_store_result(conn);
@@ -1079,7 +1079,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Ramajetterne
-      if (check_rss_feed_exist(conn,"Ramajetterne")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Ramajetterne")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Ramajetterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Ramajetterne.\n");
         res = mysql_store_result(conn);
@@ -1091,7 +1091,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok De Sorte Spejdere - podcast
-      if (check_rss_feed_exist(conn,"De Sorte Spejdere - podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "De Sorte Spejdere - podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('De Sorte Spejdere - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error De Sorte Spejdere.\n");
         res = mysql_store_result(conn);
@@ -1103,7 +1103,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Nak & æd
-      if (check_rss_feed_exist(conn,"Nak & æd")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Nak & æd")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Nak & æd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Nak & æd.\n");
         res = mysql_store_result(conn);
@@ -1115,7 +1115,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Ubådssagen
-      if (check_rss_feed_exist(conn,"Ubådssagen")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Ubådssagen")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Ubådssagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Ubådssagen.\n");
         res = mysql_store_result(conn);
@@ -1127,7 +1127,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Videnskabens Verden
-      if (check_rss_feed_exist(conn,"Videnskabens Verden")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Videnskabens Verden")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Videnskabens Verden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Videnskabens Verden.\n");
         res = mysql_store_result(conn);
@@ -1142,7 +1142,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       // ok Gametest Fan Uploads
-      if (check_rss_feed_exist(conn,"Gametest Fan Uploads")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Gametest Fan Uploads")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Gametest Fan Uploads',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Gametest Fan Uploads.\n");
         res = mysql_store_result(conn);
@@ -1154,7 +1154,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Gravity Assist
-      if (check_rss_feed_exist(conn,"Gravity Assist")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Gravity Assist")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Gravity Assist',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Gravity Assist.\n");
         res = mysql_store_result(conn);
@@ -1166,7 +1166,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok TED
-      if (check_rss_feed_exist(conn,"TED")==0) {
+      if (check_rss_feed_exist(conn,(char *) "TED")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('TED',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error TED.\n");
         res = mysql_store_result(conn);
@@ -1178,7 +1178,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Hva så?! med Christian Fuhlendorff
-      if (check_rss_feed_exist(conn,"Hva så?! med Christian Fuhlendorff")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Hva så?! med Christian Fuhlendorff")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Hva så?! med Christian Fuhlendorff',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hva så?! med Christian Fuhlendorff.\n");
         res = mysql_store_result(conn);
@@ -1190,7 +1190,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Mads & Monopolet
-      if (check_rss_feed_exist(conn,"Mads & Monopolet - podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Mads & Monopolet - podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Mads & Monopolet - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Mads & Monopolet.\n");
         res = mysql_store_result(conn);
@@ -1202,7 +1202,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Det røde rum
-      if (check_rss_feed_exist(conn,"Det røde rum")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Det røde rum")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Det røde rum',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Det røde rum.\n");
         res = mysql_store_result(conn);
@@ -1214,7 +1214,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Den Korte Weekendavis
-      if (check_rss_feed_exist(conn,"Den Korte Weekendavis")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Den Korte Weekendavis")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den Korte Weekendavis',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den Korte Weekendavis.\n");
         res = mysql_store_result(conn);
@@ -1227,7 +1227,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       // virker ikke
       // title skifter i rss file
-      if (check_rss_feed_exist(conn,"Radio24syv Nyheder")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Radio24syv Nyheder")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Radio24syv Nyheder',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Radio24syv Nyheder.\n");
         res = mysql_store_result(conn);
@@ -1239,7 +1239,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Selvsving
-      if (check_rss_feed_exist(conn,"Selvsving")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Selvsving")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Selvsving',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Selvsving.\n");
         res = mysql_store_result(conn);
@@ -1251,7 +1251,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Lille Nørd
-      if (check_rss_feed_exist(conn,"Lille Nørd")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Lille Nørd")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Lille Nørd',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Lille Nørd.\n");
         res = mysql_store_result(conn);
@@ -1263,7 +1263,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Sofus
-      if (check_rss_feed_exist(conn,"Sofus")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Sofus")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Sofus',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Sofus.\n");
         res = mysql_store_result(conn);
@@ -1275,7 +1275,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok CBS This Morning
-      if (check_rss_feed_exist(conn,"CBS This Morning")==0) {
+      if (check_rss_feed_exist(conn,(char *) "CBS This Morning")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('CBS This Morning',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error CBS This Morning.\n");
         res = mysql_store_result(conn);
@@ -1290,7 +1290,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       // ok CBS Evening News
-      if (check_rss_feed_exist(conn,"CBS Evening News -- Full Audio")==0) {
+      if (check_rss_feed_exist(conn,(char *) "CBS Evening News -- Full Audio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('CBS Evening News -- Full Audio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error CBS Evening News.\n");
         res = mysql_store_result(conn);
@@ -1302,7 +1302,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke
-      if (check_rss_feed_exist(conn,"Vergecast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Vergecast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Vergecast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Vergecast.\n");
         res = mysql_store_result(conn);
@@ -1314,7 +1314,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Elektronista
-      if (check_rss_feed_exist(conn,"Elektronista")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Elektronista")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Elektronista',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Elektronista.\n");
         res = mysql_store_result(conn);
@@ -1326,7 +1326,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Linux Action News
-      if (check_rss_feed_exist(conn,"Linux Action News")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Linux Action News")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Linux Action News',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Linux Action News.\n");
         res = mysql_store_result(conn);
@@ -1342,7 +1342,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       // virker ikke
-      if (check_rss_feed_exist(conn,"Linux Action Show")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Linux Action Show")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Linux Action Show',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Linux Action Show.\n");
         res = mysql_store_result(conn);
@@ -1354,7 +1354,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke
-      if (check_rss_feed_exist(conn,"GNU World Order")==0) {
+      if (check_rss_feed_exist(conn,(char *) "GNU World Order")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('GNU World Order',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error GNU World Order.\n");
         res = mysql_store_result(conn);
@@ -1366,7 +1366,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok The Command Line Podcast
-      if (check_rss_feed_exist(conn,"The Command Line Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The Command Line Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Command Line Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -1378,7 +1378,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Her går det godt
-      if (check_rss_feed_exist(conn,"Her går det godt")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Her går det godt")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Her går det godt',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Her går det godt.\n");
         res = mysql_store_result(conn);
@@ -1390,7 +1390,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke The RC Newb Podcast
-      if (check_rss_feed_exist(conn,"The RC Newb Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The RC Newb Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('he RC Newb Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The RC Newb Podcast.\n");
         res = mysql_store_result(conn);
@@ -1402,7 +1402,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok P7 MIX Maraton - podcast
-      if (check_rss_feed_exist(conn,"P7 MIX Maraton - podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "P7 MIX Maraton - podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('P7 MIX Maraton - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error P7 MIX Maraton.\n");
         res = mysql_store_result(conn);
@@ -1414,7 +1414,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok going linux
-      if (check_rss_feed_exist(conn,"going linux")==0) {
+      if (check_rss_feed_exist(conn,(char *) "going linux")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('going linux',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error going linux.\n");
         res = mysql_store_result(conn);
@@ -1426,7 +1426,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Fire forførende radiofortællinger
-      if (check_rss_feed_exist(conn,"Fire forførende radiofortællinger")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Fire forførende radiofortællinger")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Fire forførende radiofortællinger',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Fire forførende radiofortællinger.\n");
         res = mysql_store_result(conn);
@@ -1438,7 +1438,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Videnskab.dk Podcast
-      if (check_rss_feed_exist(conn,"Videnskab.dk Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Videnskab.dk Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Videnskab.dk Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Videnskab.dk Podcast.\n");
         res = mysql_store_result(conn);
@@ -1450,7 +1450,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Den nye stil
-      if (check_rss_feed_exist(conn,"Den nye stil - historien om dansk rap")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Den nye stil - historien om dansk rap")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den nye stil - historien om dansk rap',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den nye stil.\n");
         res = mysql_store_result(conn);
@@ -1462,7 +1462,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // virker ikke
-      if (check_rss_feed_exist(conn,"Giant Gnome Productions")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Giant Gnome Productions")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Giant Gnome Productions',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Giant Gnome Productions.\n");
         res = mysql_store_result(conn);
@@ -1474,7 +1474,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok META
-      if (check_rss_feed_exist(conn,"META")==0) {
+      if (check_rss_feed_exist(conn,(char *) "META")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('META',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error META.\n");
         res = mysql_store_result(conn);
@@ -1486,7 +1486,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Voksen ABC podcast
-      if (check_rss_feed_exist(conn,"Voksen ABC podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Voksen ABC podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Voksen ABC podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Voksen ABC podcast.\n");
         res = mysql_store_result(conn);
@@ -1498,7 +1498,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Third Ear
-      if (check_rss_feed_exist(conn,"Third Ear")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Third Ear")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Third Ear',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Third Ear.\n");
         res = mysql_store_result(conn);
@@ -1509,7 +1509,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
       }
       // ok Sex Nerd Sandra
-      if (check_rss_feed_exist(conn,"Sex Nerd Sandra")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Sex Nerd Sandra")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Sex Nerd Sandra',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Sex Nerd Sandra.\n");
         res = mysql_store_result(conn);
@@ -1521,7 +1521,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Skru op for sex
-      if (check_rss_feed_exist(conn,"Skru op for sex")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Skru op for sex")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Skru op for sex',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Skru op for sex.\n");
         res = mysql_store_result(conn);
@@ -1533,7 +1533,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok Techsistens
-      if (check_rss_feed_exist(conn,"Techsistens")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Techsistens")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Techsistens',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Techsistens.\n");
         res = mysql_store_result(conn);
@@ -1545,7 +1545,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // beginner audiophile
-      if (check_rss_feed_exist(conn,"beginner audiophile | hifi | gear reviews | stereo | hi-end audio")==0) {
+      if (check_rss_feed_exist(conn,(char *) "beginner audiophile | hifi | gear reviews | stereo | hi-end audio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('beginner audiophile | hifi | gear reviews | stereo | hi-end audio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error beginner audiophile.\n");
         res = mysql_store_result(conn);
@@ -1557,7 +1557,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // What Hi-Fi
-      if (check_rss_feed_exist(conn,"What Hi-Fi? Podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "What Hi-Fi? Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('What Hi-Fi? Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error What Hi-Fi.\n");
         res = mysql_store_result(conn);
@@ -1569,7 +1569,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // NASACast Video
-      if (check_rss_feed_exist(conn,"NASACast Video")==0) {
+      if (check_rss_feed_exist(conn,(char *) "NASACast Video")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('NASACast Video',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error NASACast.\n");
         res = mysql_store_result(conn);
@@ -1580,7 +1580,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
       }
       // Inside Dynaudio
-      if (check_rss_feed_exist(conn,"Inside Dynaudio")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Inside Dynaudio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Inside Dynaudio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Inside Dynaudio.\n");
         res = mysql_store_result(conn);
@@ -1592,7 +1592,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // Hacker New Nation
-      if (check_rss_feed_exist(conn,"Hacker News Nation (Video)")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Hacker News Nation (Video)")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Hacker News Nation (Video)',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation.\n");
         res = mysql_store_result(conn);
@@ -1604,7 +1604,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // need check
-      if (check_rss_feed_exist(conn,"Converge with Casey Newton")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Converge with Casey Newton")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Converge with Casey Newton',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Hacker News Nation.\n");
         res = mysql_store_result(conn);
@@ -1616,7 +1616,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok TED Talk daily
-      if (check_rss_feed_exist(conn,"TED Talks Daily")==0) {
+      if (check_rss_feed_exist(conn,(char *) "TED Talks Daily")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('TED Talks Daily',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error.\n");
         res = mysql_store_result(conn);
@@ -1631,7 +1631,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       // ok RISE podcast
-      if (check_rss_feed_exist(conn,"RISE podcast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "RISE podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('RISE podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","RISE podcast");
         res = mysql_store_result(conn);
@@ -1643,7 +1643,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // ok StarTalk Radio
-      if (check_rss_feed_exist(conn,"StarTalk Radio")==0) {
+      if (check_rss_feed_exist(conn,(char *) "StarTalk Radio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('StarTalk Radio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","StarTalk Radio");
         res = mysql_store_result(conn);
@@ -1658,7 +1658,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 /*
       // BAD need check bad images (cdn acces errors)
       // Dr. Death
-      if (check_rss_feed_exist(conn,"Dr. Death")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Dr. Death")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Dr. Death',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","Dr. Death");
         res = mysql_store_result(conn);
@@ -1671,7 +1671,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 */
       // ok Stuff You Should Know
-      if (check_rss_feed_exist(conn,"Stuff You Should Know")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Stuff You Should Know")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Stuff You Should Know',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","Stuff You Should Know");
         res = mysql_store_result(conn);
@@ -1685,7 +1685,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
       // do not work
       // GeekBeat.TV
-      if (check_rss_feed_exist(conn,"GeekBeat.TV")==0) {
+      if (check_rss_feed_exist(conn,(char *) "GeekBeat.TV")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('GeekBeat.TV',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","GeekBeat.TV");
         res = mysql_store_result(conn);
@@ -1699,7 +1699,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
       // do not work
       // The Skeptics' Guide to the Universe
-      if (check_rss_feed_exist(conn,"The Skeptics' Guide to the Universe")==0) {
+      if (check_rss_feed_exist(conn,(char *) "The Skeptics' Guide to the Universe")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Skeptics\' Guide to the Universe',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Skeptics.");
         res = mysql_store_result(conn);
@@ -1711,7 +1711,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
       // tilbage til mars dr1 podcast
-      if (check_rss_feed_exist(conn,"Tilbage til Mars")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Tilbage til Mars")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Tilbage til Mars',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1724,7 +1724,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
       // Love + Radio
-      if (check_rss_feed_exist(conn,"Love + Radio")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Love + Radio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Love + Radio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1739,7 +1739,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 /*
       // virker ikke
       // Når 2 bliver til 3
-      if (check_rss_feed_exist(conn,"Når 2 bliver til 3")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Når 2 bliver til 3")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Når 2 bliver til 3',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1754,7 +1754,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
       //  Manden, der blev stjålet
-      if (check_rss_feed_exist(conn,"Manden, der blev stjålet")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Manden, der blev stjålet")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Manden, der blev stjålet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1767,7 +1767,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
       //  Barometeret
-      if (check_rss_feed_exist(conn,"Barometeret")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Barometeret")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Barometeret',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1780,7 +1780,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
       //  Et langsomt mord
-      if (check_rss_feed_exist(conn,"Et langsomt mord")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Et langsomt mord")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Et langsomt mord',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1794,7 +1794,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 /*
       //  Ægte porno
-      if (check_rss_feed_exist(conn,"Ægte porno")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Ægte porno")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Ægte porno',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
@@ -1808,7 +1808,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 */
 
       // Swingercast
-      if (check_rss_feed_exist(conn,"Swingercast")==0) {
+      if (check_rss_feed_exist(conn,(char *) "Swingercast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Swingercast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
         res = mysql_store_result(conn);
