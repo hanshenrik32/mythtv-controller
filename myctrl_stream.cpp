@@ -1699,6 +1699,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
       // do not work
       // The Skeptics' Guide to the Universe
+      /* <Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>16BE8739B10171E0</RequestId><HostId>d9k2jl6XXJZQHxln+0e7stchHMpi8Ns7EwLj2bOjsrr/O2OYKY1UtbFEQK16lYB9uS/jvaTODM4=</HostId></Error>*/
+/*
       if (check_rss_feed_exist(conn,(char *) "The Skeptics' Guide to the Universe")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Skeptics\' Guide to the Universe',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Skeptics.");
@@ -1710,6 +1712,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+*/
       // tilbage til mars dr1 podcast
       if (check_rss_feed_exist(conn,(char *) "Tilbage til Mars")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Tilbage til Mars',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
