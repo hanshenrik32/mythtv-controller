@@ -240,6 +240,7 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) return(1); else return(0);
 }
 
+// check if file is a image file of type jpg,png
 
 bool check_filename_ext(const char *filename) {
     const char *dot = strrchr(filename, '.');
