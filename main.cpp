@@ -2505,7 +2505,7 @@ void display() {
         if (sfile) {
             fputs("Lockfile",sfile);
             fclose(sfile);
-            remove_log_file=true;
+            remove_log_file=true;                                               // set flag to delete log file
         }
     }
     if ((visur==0) && (sleep_ok==0) && (remove_log_file)) {

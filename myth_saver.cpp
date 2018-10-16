@@ -13,7 +13,7 @@
 extern char configpicturepath[256];
 extern GLuint screensaverbox;
 extern GLuint screensaverbox_mask;
-
+extern GLuint onlineradio;                       //
 
 float sinofsetz[]={
 
@@ -2507,13 +2507,16 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
     int i=0;
     int rotate=1;
 
-    float sizx=80.0f;
-    float sizy=40.0f;
+    float sizx=200.0f;
+    float sizy=150.0f;
+    float sizz=150.0f;
 
 
     //glTranslatef(2.0f, 0.0f, -10.0f);			// default afstand ved af start screen saver
-    glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
+    //glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
+    glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
 //    set_new_textures(1);
+
     if (rotate) {
         glRotatef(rangle, 0.0f, 0.0f, 1.0f);
         glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
@@ -2526,30 +2529,70 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
     if (rangle>360*10) rangle=0;
 
     n=0;
-    for(y=0;y<11;y++) {
+    for(y=0;y<2;y++) {                                           // 11
         if ((y==0) || (y==4) || (y==8)) rool_sinus();
-        for(x=0;x<11;x++) {
+        for(x=0;x<2;x++) {                                         // 11
             glPushMatrix();
 
-            zof=sinofsetz[i]/4;			// GET FROM TABLE
+            zof=sinofsetz[i];			// GET FROM TABLE
+            //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, (matrix[x][y].zpos)+zof);        // -27
 
-            glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
-            glRotatef(angle, 0.0f, -1.0f, 0.0f);
+            glTranslatef(matrix[x][y].xpos*8,matrix[x][y].ypos*8,0.0f);        //
+
+            //glRotatef(angle, 0.0f, -1.0f, 0.0f);
+            glRotatef(1.0f, 0.0f, 0.0f, 0.0f);
             glColor4f(1.0f,1.0f,1.0f,1.0f);
             if (matrix[x][y].texture) {
                 glEnable(GL_TEXTURE_2D);
                 glBindTexture(GL_TEXTURE_2D,matrix[x][y].texture);
+                //glBindTexture(GL_TEXTURE_2D,onlineradio);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
             } else {
-                glDisable(GL_TEXTURE_2D);
+//                glDisable(GL_TEXTURE_2D);
                 random_r_color=rand() % 1000;
                 random_g_color=rand() % 1000;
                 random_b_color=rand() % 1000;
                 glColor4f(random_r_color,random_g_color,random_b_color,1.0f);
             }
 
+            glRectf(25.0, 25.0, 50.0, 50.0);
+/*
+            // front
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(200, 75 , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, 0.0);
+            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75+sizy , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , 0.0);
+            glEnd();
+
+
+            // back
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(200, 75 , sizz);
+            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, sizz);
+            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75+sizy , sizz);
+            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , sizz);
+            glEnd();
+
+            // left
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(200, 75+sizy , sizz);
+            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, 0);
+            glTexCoord2f(1, 1); glVertex3f(200, 75 , 0);
+            glTexCoord2f(1, 0); glVertex3f(200, 75 , sizz);
+            glEnd();
+
+            // right
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(200+sizx, 75+sizy , sizz);
+            glTexCoord2f(0, 1); glVertex3f(200+sizx, 75+sizy, 0);
+            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75 , 0);
+            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , sizz);
+            glEnd();
+*/
+            // top
+/*
             glBegin(GL_QUADS); //Begin quadrilateral coordinates
             // front
             glNormal3f(-0.0f, 0.0f, 1.0f);
@@ -2561,7 +2604,8 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glNormal3f(-1.0f, 0.0f, 1.0f);
             glTexCoord2f(1.0, 0.0); glVertex3f(sizx, -sizy, 1.0);
             glEnd();
-
+*/
+/*
             // back
             glBegin(GL_QUADS);
             glNormal3f(-1.0f, 0.0f, -1.0f);
@@ -2599,6 +2643,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glTexCoord2f(0.0, -1.0); glVertex3f(sizx, -sizy, 1.0);
             glEnd();
 
+
             glBegin(GL_QUADS);
             // left
             glNormal3f(-1.0f, 0.0f, 1.0f);
@@ -2610,6 +2655,8 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glNormal3f(1.0f, 0.0f, 1.0f);
             glTexCoord2f(0.0, -1.0); glVertex3f(-sizx, -sizy, 1.0);
             glEnd(); //End quadrilateral coordinates
+*/
+
             angle+=9;
             i+=180*2;
 
