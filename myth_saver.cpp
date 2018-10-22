@@ -2376,12 +2376,10 @@ void boxarray::settexture(struct music_oversigt_type *musicoversigt)
 
 
 int n=0;
-float rangle=0.0f;
-
-
 void boxarray::show_music_3d_new(int aangle,GLuint textureId)
 
 {
+    static float rangle=0.0f;
     float random_r_color,random_g_color,random_b_color;
     int x,y;
     float angle=aangle;
@@ -2500,6 +2498,7 @@ void boxarray::show_music_3d_new(int aangle,GLuint textureId)
 void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GLuint textureIdmask1)
 
 {
+    static float rangle=0.0f;
     float random_r_color,random_g_color,random_b_color;
     int x,y;
     float angle=aangle;
@@ -2507,14 +2506,17 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
     int i=0;
     int rotate=1;
 
-    float sizx=200.0f;
-    float sizy=150.0f;
-    float sizz=150.0f;
+    float sizx=140.0f;
+    float sizy=140.0f;
+    float sizz=140.0f;
 
 
     //glTranslatef(2.0f, 0.0f, -10.0f);			// default afstand ved af start screen saver
     //glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
-    glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
+    //glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
+
+/*
+
 //    set_new_textures(1);
 
     if (rotate) {
@@ -2524,7 +2526,6 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
         glRotatef(0, 0.0f, 0.0f, 1.0f);
         glRotatef(0, 0.0f, 1.0f, 0.0f);
     }
-
     rangle+=.1;
     if (rangle>360*10) rangle=0;
 
@@ -2540,7 +2541,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glTranslatef(matrix[x][y].xpos*8,matrix[x][y].ypos*8,0.0f);        //
 
             //glRotatef(angle, 0.0f, -1.0f, 0.0f);
-            glRotatef(1.0f, 0.0f, 0.0f, 0.0f);
+            //glRotatef(angle, 0.0f, 1.0f, 0.0f);
             glColor4f(1.0f,1.0f,1.0f,1.0f);
             if (matrix[x][y].texture) {
                 glEnable(GL_TEXTURE_2D);
@@ -2556,8 +2557,8 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
                 glColor4f(random_r_color,random_g_color,random_b_color,1.0f);
             }
 
-            glRectf(25.0, 25.0, 50.0, 50.0);
-/*
+            //glRectf(25.0, 25.0, 25.0, 25.0);
+
             // front
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(200, 75 , 0.0);
@@ -2590,9 +2591,9 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glTexCoord2f(1, 1); glVertex3f(200+sizx, 75 , 0);
             glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , sizz);
             glEnd();
-*/
+
             // top
-/*
+
             glBegin(GL_QUADS); //Begin quadrilateral coordinates
             // front
             glNormal3f(-0.0f, 0.0f, 1.0f);
@@ -2655,7 +2656,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
             glNormal3f(1.0f, 0.0f, 1.0f);
             glTexCoord2f(0.0, -1.0); glVertex3f(-sizx, -sizy, 1.0);
             glEnd(); //End quadrilateral coordinates
-*/
+
 
             angle+=9;
             i+=180*2;
@@ -2666,12 +2667,93 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
 //        angle+=9;
     }
 
+*/
+//  glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
+  // front
+  printf("grader %f \n ",rangle);
+  rotate=0;
+  //glTranslatef(0.0f, 0.0f, 0.0f);
+  if (rotate) {
+//      glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+//      glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
+  } else {
+//      glRotatef(0, 0.0f, 0.0f, 1.0f);
+//      glRotatef(0, 0.0f, 1.0f, 0.0f);
+  }
+  //rangle+=0.1f;
+  if (rangle>90.0f) rangle=0.0f;
+  glEnable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBindTexture(GL_TEXTURE_2D,textureId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glEnable(GL_DEPTH_TEST);
+
+  //glDisable(GL_BLEND);
+  n=0;
+  i=0;
+  //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+  for(y=0;y<4;y++) {                                           // 11
+    //if ((y==0) || (y==4) || (y==8)) rool_sinus();
+    for(x=0;x<4;x++) {                                         // 11
+
+      glPushMatrix();
+      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2),0.0f);
+      glRotatef(rangle, -1.0f, 0.0f, 0.0f);
+      i++;
+      rool_sinus();
+
+
+
+      //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
+
+
+      //glRotatef(rangle, 1.0f, 0.0f, 1.0f);
+      //glRotatef(rangle, 0.0f, 1.0f, 0.0f);
+      rangle+=0.1f;
+      // front
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0.0);
+      glEnd();
+
+      // back
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, sizz);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      glEnd();
+
+      // left
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy , sizz);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , 0);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
+      glEnd();
+
+      // right
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy, 0);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      glEnd();
+
+      glPopMatrix();
+    }
+  }
 }
 
 
 void boxarray::show_music_3d1(float aangle,GLuint textureId)
 
 {
+    static float rangle=0.0f;
     //float random_r_color,random_g_color,random_b_color;
     int x,y;
     float angle=aangle;
