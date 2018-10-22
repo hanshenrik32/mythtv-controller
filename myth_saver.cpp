@@ -2683,6 +2683,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
   //rangle+=0.1f;
   if (rangle>90.0f) rangle=0.0f;
   glEnable(GL_TEXTURE_2D);
+  //glMatrixMode(GL_MODELVIEW);
   glColor3f(1.0f, 1.0f, 1.0f);
   glBindTexture(GL_TEXTURE_2D,textureId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2693,56 +2694,70 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
   //glDisable(GL_BLEND);
   n=0;
   i=0;
+  rangle=25.0f;
+  static float rangle1=0.0f;
   //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-  for(y=0;y<4;y++) {                                           // 11
+  rool_sinus();
+  for(y=0;y<5;y++) {                                           // 11
     //if ((y==0) || (y==4) || (y==8)) rool_sinus();
-    for(x=0;x<4;x++) {                                         // 11
-
+    for(x=0;x<8;x++) {                                         // 11
       glPushMatrix();
-      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2),0.0f);
-      glRotatef(rangle, -1.0f, 0.0f, 0.0f);
+      //glDisable(GL_CULL_FACE);
+      glDisable(GL_DEPTH_TEST);
+      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*50]*7),0);
+
+      //glRotatef(rangle, -1.0f, 0.0f, 0.0f);
+      glRotatef(10.0f, 0.0f, -1.0f, 0.0f);
+      glRotatef(rangle1, 0.0f, 0.0f, 1.0f);
+      rangle1+=0.001f;
       i++;
-      rool_sinus();
-
-
 
       //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
-
-
       //glRotatef(rangle, 1.0f, 0.0f, 1.0f);
       //glRotatef(rangle, 0.0f, 1.0f, 0.0f);
-      rangle+=0.1f;
+      //rangle+=0.1f;
+
       // front
       glBegin(GL_QUADS);
+      glNormal3f(0.0, 1.0f, 0.0f);
       glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , 0.0);
       glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0.0);
       glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , 0.0);
       glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0.0);
-      glEnd();
-
       // back
-      glBegin(GL_QUADS);
+      glNormal3f(0.0, 1.0f, 0.0f);
       glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
       glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, sizz);
       glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
       glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
-      glEnd();
-
       // left
-      glBegin(GL_QUADS);
+      glNormal3f(-1.0, 0.0f, 0.0f);
       glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy , sizz);
       glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0);
       glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , 0);
       glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
-      glEnd();
-
       // right
-      glBegin(GL_QUADS);
+      glNormal3f(1.0, 0.0f, 0.0f);
       glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
       glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy, 0);
       glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0);
       glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      // top
+      glNormal3f(0.0, 1.0f, 0.0f);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy , sizz);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0.0);
+      // bund
+      glNormal3f(0.0, -1.0f, 0.0f);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)), 0.0);
       glEnd();
+
+
+      //
 
       glPopMatrix();
     }
@@ -2829,7 +2844,7 @@ void boxarray::show_music_3d1(float aangle,GLuint textureId)
             glTexCoord2f(0.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
 
             //Right face
-                glNormal3f(1.0, 0.0f, 0.0f);
+            glNormal3f(1.0, 0.0f, 0.0f);
             glTexCoord2f(0.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
             glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
             glTexCoord2f(1.0, -1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
