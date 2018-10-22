@@ -2379,7 +2379,7 @@ void display() {
       firsttime_rssupdate=false;                         // only used first time
     }
 
-
+    visur=true;
 
     glPushMatrix();
     // background picture
@@ -2457,6 +2457,7 @@ void display() {
             break;
         case SAVER3D:
             //reset pos
+/*
             glLoadIdentity();
             glTranslatef(0.0f, 0.0f, -7.0f);
             glEnable(GL_DEPTH_TEST);
@@ -2470,8 +2471,13 @@ void display() {
                 load_music_covergfx(musicoversigt);
                 mybox.settexture(musicoversigt);
             }
-
-            mybox.show_music_3d(_angle,_texture_nocdcover,_texture_nocdcover,0);
+*/
+            _angle++;
+            glPushMatrix();
+            //glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
+            //mybox.show_music_3d(_angle,screensaverbox,_texture_nocdcover,0);
+            mybox.show_music_3d(_angle,screensaverbox,screensaverbox,0);
+            glPopMatrix();
             break;
         case SAVER3D2:
             // reset pos
@@ -11259,7 +11265,7 @@ bool init(void) {
     // initialize viewing values
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, orgwinsizex, 0.0, orgwinsizey, -0.0,10.0);
+    glOrtho(0.0f, orgwinsizex, 0.0f, orgwinsizey, -1000.0f,1000.0f);
 }
 
 
