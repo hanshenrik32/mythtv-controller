@@ -16,6 +16,11 @@ const char *SHOWVER={"0.36.7"};
 // 512 = media importer
 // 1024 = flag loader
 
+// Keys
+//
+// music overview 'S' Save playlist
+//
+//
 
 //
 // xmltv update interval in sec
@@ -99,5 +104,8 @@ void *update_xmltv_phread_loader();
 
 void *datainfoloader_stream(void *data);
 void *update_rss_phread_loader();
+
+void *datainfoloader_movie(void *data);
+void *xbmcdatainfoloader_movie(void *data);
 
 #endif

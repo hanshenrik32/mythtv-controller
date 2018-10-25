@@ -7406,8 +7406,9 @@ void handlespeckeypress(int key,int x,int y) {
 
 
 
-
+//
 // keyboard handler *******************************************************************************************************
+//
 
 void handleKeypress(unsigned char key, int x, int y) {
     const char optionmenukey='O';
@@ -8067,6 +8068,7 @@ void handleKeypress(unsigned char key, int x, int y) {
            }
        }
     // end if **( start if) ****************************************
+    // All other keys that + - * S U ESC
     } else {
         switch(key) {
             case 27:
@@ -8248,6 +8250,28 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_update_music=true;                                               // show update
                 do_update_music_now=true;                                           // and do the update flag
               }
+              if (vis_film_oversigt) {
+                pthread_t loaderthread1;           // the load
+                // start multi thread and update movie overview
+                // movie loader
+                if (debugmode) printf("Update movie db.\n");
+                if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
+                  int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
+                  if (rc1) {
+                    printf("ERROR; return code from pthread_create() is %d\n", rc1);
+                    exit(-1);
+                  }
+                } else {
+                  if (configmythtvver>=0) {
+                    int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
+                    if (rc1) {
+                      printf("ERROR; return code from pthread_create() is %d\n", rc1);
+                      exit(-1);
+                    }
+                  }
+                }
+              }
+
               break;
             case 13:
               if (debugmode) {
@@ -12564,6 +12588,7 @@ int main(int argc, char** argv) {
     create_radio_oversigt();										                          // Create radio mysql database if not exist
     radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
     strcpy(configbackend_tvgraber_old,"");
+    // if kodi
     if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
       // music loader
       pthread_t loaderthread;           // the load
