@@ -597,7 +597,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
                                                         (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
                                                         movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
               recnr++;
-              fprintf(stderr, "Movie db update %d \n",recnr);
+              fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
               mysql_query(conn,sqlselect);
               res = mysql_store_result(conn);
               if ((mysql_error(conn)) && (debugmode & 512)) {
