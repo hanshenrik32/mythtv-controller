@@ -2379,7 +2379,7 @@ void display() {
       firsttime_rssupdate=false;                         // only used first time
     }
 
-    visur=true;
+    //visur=true;
 
     glPushMatrix();
     // background picture
