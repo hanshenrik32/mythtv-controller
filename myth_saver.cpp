@@ -2698,18 +2698,19 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
   static float rangle1=0.0f;
   //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
   rool_sinus();
-  for(y=0;y<5;y++) {                                           // 11
+  for(y=0;y<6;y++) {                                           // 11
     //if ((y==0) || (y==4) || (y==8)) rool_sinus();
-    for(x=0;x<8;x++) {                                         // 11
+    for(x=0;x<10;x++) {                                         // 11
       glPushMatrix();
       //glDisable(GL_CULL_FACE);
-      glDisable(GL_DEPTH_TEST);
-      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*50]*7),0);
+      //glDisable(GL_DEPTH_TEST);
+      glEnable(GL_DEPTH_TEST);
+      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*57]*7),0);
 
       //glRotatef(rangle, -1.0f, 0.0f, 0.0f);
-      glRotatef(10.0f, 0.0f, -1.0f, 0.0f);
-      glRotatef(rangle1, 0.0f, 0.0f, 1.0f);
-      rangle1+=0.001f;
+      glRotatef(16.0f, 0.0f, -1.0f, 0.0f);
+      glRotatef(sinofsetz[i*2]*24, 0.0f, 0.0f, 1.0f);
+      rangle1+=0.005f;
       i++;
 
       //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
@@ -2755,7 +2756,6 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
       glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
       glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)), 0.0);
       glEnd();
-
 
       //
 
