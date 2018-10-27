@@ -485,7 +485,6 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
 //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
-
     if (conn) {
       allokay=true;
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -495,9 +494,11 @@ int film_oversigt_typem::opdatere_film_oversigt() {
       sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        dbexist=true;
-      }
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dbexist=true;
+        }
+      } else dbexist=false;
       // create databases/tables if not exist
       // needed by movie loader
       if (!(dbexist)) {
