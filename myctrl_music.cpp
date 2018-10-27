@@ -309,8 +309,10 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
     // test fpom musik table exist
     mysql_query(conn,"SHOW TABLES LIKE 'music_albums'");
     res = mysql_store_result(conn);
-    while ((row = mysql_fetch_row(res)) != NULL) {
-      dbexist=1;
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dbexist=1;
+      }
     }
     //
     // if database not exist do dir scan and create tables for music
