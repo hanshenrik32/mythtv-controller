@@ -11,28 +11,28 @@
 //used in music oversigt
 
 struct music_oversigt_type {
-    unsigned int album_id;
-    unsigned int artist_id;
-    char album_name[256];			      // music name
-    int album_year;
-    unsigned int directory_id;			// dir id fra myth mysql database
-    unsigned int parent_id;         //
-    char album_coverfile[256];			// coverfilename
-    char album_path[256];	      		// path to cover
-    GLuint textureId;			        	// texture id hvis der findes en cover til musiken
-    char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
+  unsigned int album_id;
+  unsigned int artist_id;
+  char album_name[256];			      // music name
+  int album_year;
+  unsigned int directory_id;			// dir id fra myth mysql database
+  unsigned int parent_id;         //
+  char album_coverfile[256];			// coverfilename
+  char album_path[256];	      		// path to cover
+  GLuint textureId;			        	// texture id hvis der findes en cover til musiken
+  char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
 
 // class tempplate to music oversigt;
 
 template <class T> class list {
-    public:
-        list *insert(T val);
-    private:
-        list (T Linkalue,list * next);
-        T value;
-        list *ptrtonext;
+  public:
+    list *insert(T val);
+  private:
+    list (T Linkalue,list * next);
+    T value;
+    list *ptrtonext;
 };
 
 
@@ -57,10 +57,8 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
 // load playliste find_dir_id
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
 void zoom_music_info();
-
 // load music covers
 int load_music_covergfx(music_oversigt_type musicoversigt[]);
-
 // check music exist internal db return true if exist
 bool global_use_internal_music_loader_system_exist();
 

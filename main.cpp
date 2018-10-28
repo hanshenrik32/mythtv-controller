@@ -2477,7 +2477,7 @@ void display() {
             glPushMatrix();
             //glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
             //mybox.show_music_3d(_angle,screensaverbox,_texture_nocdcover,0);
-            mybox.show_music_3d(_angle,screensaverbox,screensaverbox,0);
+            mybox.show_music_3d(_angle,screensaverbox,onlinestream,onlineradio);
             glPopMatrix();
             break;
         case SAVER3D2:
@@ -9510,159 +9510,152 @@ void update2(int value) {
           }
           // start play radio
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
-              // play radio station
-              rknapnr=radio_key_selected;		// hent button
-              if (rknapnr>0) do_play_radio=1;
+            // play radio station
+            rknapnr=radio_key_selected;		// hent button
+            if (rknapnr>0) do_play_radio=1;
           }
           // opdatere radio oversigt efter pressed on the remorte control from lirc
           if ((vis_radio_oversigt) && (show_radio_options)) {
-              radiooversigt.clean_radio_oversigt();			                        // clean old liste
-              radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
-              radiooversigt.load_radio_stations_gfx();
-              show_radio_options=false;
+            radiooversigt.clean_radio_oversigt();			                        // clean old liste
+            radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
+            radiooversigt.load_radio_stations_gfx();
+            show_radio_options=false;
           }
           if (vis_tv_oversigt) {
-              tvknapnr=tvsubvalgtrecordnr;
-              do_zoom_tvprg_aktiv_nr=tvknapnr;
-              ask_tv_record=!ask_tv_record;
-              if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
+            tvknapnr=tvsubvalgtrecordnr;
+            do_zoom_tvprg_aktiv_nr=tvknapnr;
+            ask_tv_record=!ask_tv_record;
+            if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
           }
           if (vis_stream_oversigt) {
-              //do_zoom_stream_cover=!do_zoom_stream_cover;
-              hent_stream_search=true;				                                  // start stream station search
-              sknapnr=stream_select_iconnr;                                   // selected
-              stream_key_selected=1;
-              stream_select_iconnr=0;         // tmp
-              _sangley=0.0f;
-              do_play_stream=0;
+            //do_zoom_stream_cover=!do_zoom_stream_cover;
+            hent_stream_search=true;				                                  // start stream station search
+            sknapnr=stream_select_iconnr;                                   // selected
+            stream_key_selected=1;
+            stream_select_iconnr=0;         // tmp
+            _sangley=0.0f;
+            do_play_stream=0;
           }
 
           // stream oversigt do it
           if ((vis_stream_oversigt) && (sknapnr>=0)) {
-              //if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr,streamoversigt.get_stream_groupantal(sknapnr),streamoversigt.type,streamoversigt.streamantal());
-              if (streamoversigt.type==0) {
-                strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
+            //if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr,streamoversigt.get_stream_groupantal(sknapnr),streamoversigt.type,streamoversigt.streamantal());
+            if (streamoversigt.type==0) {
+              strncpy(temptxt,streamoversigt.get_stream_name(sknapnr),200);
+              streamoversigt.clean_stream_oversigt();
+              if (debugmode & 4) fprintf(stderr,"stream nr %d name %s \n ",sknapnr,temptxt);
+              streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+              do_play_stream=false;
+            } else if (streamoversigt.type==1) {
+              if (sknapnr>0) do_play_stream=1;						// select button do play
+              // do back
+              if (sknapnr==0) {
                 streamoversigt.clean_stream_oversigt();
-                if (debugmode & 4) fprintf(stderr,"stream nr %d name %s \n ",sknapnr,temptxt);
-                streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+                streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                //streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),streamoversigt.get_stream_path(sknapnr));
                 do_play_stream=false;
-              } else if (streamoversigt.type==1) {
-                if (sknapnr>0) do_play_stream=1;						// select button do play
-                // do back
-                if (sknapnr==0) {
+                stream_key_selected=1;
+                stream_select_iconnr=0;
+                _sangley=0.0f;
+              }
+            } else {
+              // back button
+              fprintf(stderr,"stream nr %d \n ",sknapnr-1);
+              if ((sknapnr)==0) {
+                if (streamoversigt.type==2) {
+                  // one level up
+                  streamoversigt.clean_stream_oversigt();
+                  streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *)"");
+                  do_play_stream=false;
+                  do_play_stream=false;
+                  stream_key_selected=1;
+                  stream_select_iconnr=0;
+                  _sangley=0.0f;
+                } else {
+                  // jump to top
                   streamoversigt.clean_stream_oversigt();
                   streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
-                  //streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),streamoversigt.get_stream_path(sknapnr));
+                  do_play_stream=false;
                   do_play_stream=false;
                   stream_key_selected=1;
                   stream_select_iconnr=0;
                   _sangley=0.0f;
                 }
+              }
+            }
+            // play stream
+            if ((sknapnr>=0) && (do_play_stream)) {
+              if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
+                startstream=true;
+                sknapnr+=1;
               } else {
-                // back button
-                fprintf(stderr,"stream nr %d \n ",sknapnr-1);
-                if ((sknapnr)==0) {
-                  if (streamoversigt.type==2) {
-                    // one level up
-                    streamoversigt.clean_stream_oversigt();
-                    streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr),(char *)"");
-                    do_play_stream=false;
-                    do_play_stream=false;
-                    stream_key_selected=1;
-                    stream_select_iconnr=0;
-                    _sangley=0.0f;
-                  } else {
-                    // jump to top
-                    streamoversigt.clean_stream_oversigt();
-                    streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
-                    do_play_stream=false;
-                    do_play_stream=false;
-                    stream_key_selected=1;
-                    stream_select_iconnr=0;
-                    _sangley=0.0f;
-                  }
-                }
+                startstream=true;
+                sknapnr+=1;
               }
-              // play stream
-              if ((sknapnr>=0) && (do_play_stream)) {
-                if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
-                  startstream=true;
-                  sknapnr+=1;
-                } else {
-                  startstream=true;
-                  sknapnr+=1;
-                }
-              }
+            }
           }
-
         }
         // end start play
-
         if (strcmp("KEY_VOLUMEUP",cmd)==0) {
-            if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
-            #if defined USE_FMOD_MIXER
-            if (sndsystem) channel->setVolume(configsoundvolume);
-            #endif
-            if (vis_film_oversigt) {
-              film_oversigt.volumeup();
-              configsoundvolume+=0.1f;
-            }
-
-            show_volume_info=true;					// show volume info window
-            vis_volume_timeout=80;
+          if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+          #if defined USE_FMOD_MIXER
+          if (sndsystem) channel->setVolume(configsoundvolume);
+          #endif
+          if (vis_film_oversigt) {
+            film_oversigt.volumeup();
+            configsoundvolume+=0.1f;
+          }
+          show_volume_info=true;					// show volume info window
+          vis_volume_timeout=80;
         }
 
         if (strcmp("KEY_VOLUMEDOWN",cmd)==0) {
-            if (configsoundvolume>0) configsoundvolume-=0.1f;
-            #if defined USE_FMOD_MIXER
-            if (sndsystem) channel->setVolume(configsoundvolume);
-            #endif
-
-            if (vis_film_oversigt) {
-              film_oversigt.volumedown();
-              configsoundvolume-=0.1f;
-            }
-
-            show_volume_info=true;					// show volume info window
-            vis_volume_timeout=80;
+          if (configsoundvolume>0) configsoundvolume-=0.1f;
+          #if defined USE_FMOD_MIXER
+          if (sndsystem) channel->setVolume(configsoundvolume);
+          #endif
+          if (vis_film_oversigt) {
+            film_oversigt.volumedown();
+            configsoundvolume-=0.1f;
+          }
+          show_volume_info=true;					// show volume info window
+          vis_volume_timeout=80;
         }
 
         if (strcmp("KEY_NEXT",cmd)==0) {
-             // next song
-             if ((vis_music_oversigt) && (!(do_shift_song))) {
-               if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
-                 do_play_music_aktiv_table_nr++;
-                 do_shift_song=true;
-                 do_zoom_music_cover=true;
-               }
+           // next song
+           if ((vis_music_oversigt) && (!(do_shift_song))) {
+             if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
+               do_play_music_aktiv_table_nr++;
+               do_shift_song=true;
+               do_zoom_music_cover=true;
              }
-             if (vis_tv_oversigt) {
-               aktiv_tv_oversigt.changetime(60*60*24);
-               aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
-
-             }
-             if (vis_film_oversigt) {
-               film_oversigt.next_movie_chapther();
-             }
+           }
+           if (vis_tv_oversigt) {
+             aktiv_tv_oversigt.changetime(60*60*24);
+             aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+           }
+           if (vis_film_oversigt) {
+             film_oversigt.next_movie_chapther();
+           }
         }
 
         if (strcmp("KEY_PREVIOUS",cmd)==0) {
-             // last song
-              if ((vis_music_oversigt) && (!(do_shift_song))) {
-               if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
-                 do_play_music_aktiv_table_nr--;						// skift aktiv sang
-                 do_shift_song=true;							// sæt flag til skift
-                 do_zoom_music_cover=true;
-               }
-              }
-              if (vis_tv_oversigt) {
-                aktiv_tv_oversigt.changetime(-(60*60*24));
-                aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
-              }
-              if (vis_film_oversigt) {
-                film_oversigt.prevous_movie_chapther();
-              }
-
+         // last song
+          if ((vis_music_oversigt) && (!(do_shift_song))) {
+           if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
+             do_play_music_aktiv_table_nr--;						// skift aktiv sang
+             do_shift_song=true;							// sæt flag til skift
+             do_zoom_music_cover=true;
+           }
+          }
+          if (vis_tv_oversigt) {
+            aktiv_tv_oversigt.changetime(-(60*60*24));
+            aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+          }
+          if (vis_film_oversigt) {
+            film_oversigt.prevous_movie_chapther();
+          }
         }
         if (strcmp(cmd,"KEY_STOP")==0) {
           // stop all music
@@ -9703,8 +9696,6 @@ void update2(int value) {
 
 
 
-
-
 // in use
 
 void update(int value) {
@@ -9716,26 +9707,20 @@ void update(int value) {
     int numbers_cd_covers_on_line;
     int numbers_radio_covers_on_line;
     int numbers_stream_covers_on_line;
-
     _angle+=0.5;				// for 3D screen saver and rotate movie cover
     if (_angle > 360) {
-        _angle = 0;
+      _angle = 0;
     }
-
     char *code=0;
     char *c=0;
     int ret;
-
     if ((sock!=0) && (sock!=-1)) {
         while ((ret=lirc_nextcode(&code))==0 && code!=NULL) {
             if (code==NULL) continue;
             if (lircconfig) {
                 while((ret=lirc_code2char(lircconfig,code,&c))==0 && c!=NULL) {
                     if (debugmode) fprintf(stderr,"Lirc Command %s \n ",c);
-
                     saver_irq=true;				// RESET (sluk hvis aktiv) screen saver
-
-
                     if (strcmp(c,"Music")==0) {							// show music directoy
                       vis_tv_oversigt=false;
                       vis_film_oversigt=false;
@@ -9743,9 +9728,7 @@ void update(int value) {
                       vis_music_oversigt=true;
                       vis_recorded_oversigt=false;
                       vis_radio_oversigt=false;
-
                     }
-
                     if (strcmp(c,"Radio")==0) {							// show music directoy
                       vis_tv_oversigt=false;
                       vis_film_oversigt=false;
@@ -9792,8 +9775,6 @@ void update(int value) {
                       vis_recorded_oversigt=false;							// sluk recorded program oversigt
                       vis_radio_oversigt=false;							// sluk radio oversigt
                     }
-
-
                     if (strcmp(c,"KEY_BACK")==0) {
                       if (vis_music_oversigt) vis_music_oversigt=false;
                       if (do_zoom_film_cover) do_zoom_film_cover=false;
@@ -9802,8 +9783,6 @@ void update(int value) {
                       if (vis_recorded_oversigt) vis_recorded_oversigt=false;
                       if (vis_radio_oversigt) vis_radio_oversigt=false;
                     }
-
-
                     // Pause music player
                     if (strcmp(c,"P")==0) {
                         #if defined USE_FMOD_MIXER
@@ -9814,18 +9793,13 @@ void update(int value) {
                         }
                         #endif
                     }
-
-
                     // lirc move down
                     if (strcmp(c,"Key-nav-down")==0) {
-
                         if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-
                             if ((unsigned int) do_show_play_open_select_line+do_show_play_open_select_line_ofset<(unsigned int) dirmusic.numbersinlist()-1) {
                                 if ((int) do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
                             }
                         }
-
                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
                             if (((int) music_key_selected<(int) musicoversigt_antal-4) && (music_icon_anim_icon_ofset==0)) {
                                 switch (screen_size) {
@@ -10110,61 +10084,58 @@ void update(int value) {
 
                     // lirc move up
                     if (strcmp(c,"Key-nav-up")==0) {
-
                         if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-                            if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
-                                if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
+                          if (do_show_play_open_select_line>0) do_show_play_open_select_line--; else
+                            if (do_show_play_open_select_line_ofset>0) do_show_play_open_select_line_ofset--;
                         }
                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
                             switch (screen_size) {
                                 case 1:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1)) ) {
-                                            if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
-                                                 _mangley-=41;
-                                                 music_select_iconnr-=numbers_cd_covers_on_line;
-                                                 do_music_icon_anim_icon_ofset=-1;
-
-                                            } else music_select_iconnr-=numbers_cd_covers_on_line;
-                                            if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
-                                                music_key_selected-=numbers_cd_covers_on_line;
-                                            }
+                                          if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
+                                             _mangley-=41;
+                                             music_select_iconnr-=numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset=-1;
+                                          } else music_select_iconnr-=numbers_cd_covers_on_line;
+                                          if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
+                                            music_key_selected-=numbers_cd_covers_on_line;
+                                          }
                                         }
                                         break;
                                 case 2:
-
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1)) ) {
-                                            if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
-                                                 _mangley-=41;
-                                                 music_select_iconnr-=numbers_cd_covers_on_line;
-                                                 do_music_icon_anim_icon_ofset=-1;
-                                            } else music_select_iconnr-=numbers_cd_covers_on_line;
-                                            if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
-                                                music_key_selected-=numbers_cd_covers_on_line;
-                                            }
+                                          if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
+                                             _mangley-=41;
+                                             music_select_iconnr-=numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset=-1;
+                                          } else music_select_iconnr-=numbers_cd_covers_on_line;
+                                          if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
+                                            music_key_selected-=numbers_cd_covers_on_line;
+                                          }
                                         }
                                         break;
                                 case 3:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1)) ) {
-                                            if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
-                                                 _mangley-=41;
-                                                 music_select_iconnr-=numbers_cd_covers_on_line;
-                                                 do_music_icon_anim_icon_ofset=-1;
-                                            } else music_select_iconnr-=numbers_cd_covers_on_line;
-                                            if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
-                                                music_key_selected-=numbers_cd_covers_on_line;
-                                            }
+                                          if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
+                                           _mangley-=41;
+                                           music_select_iconnr-=numbers_cd_covers_on_line;
+                                           do_music_icon_anim_icon_ofset=-1;
+                                          } else music_select_iconnr-=numbers_cd_covers_on_line;
+                                          if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
+                                            music_key_selected-=numbers_cd_covers_on_line;
+                                          }
                                         }
                                         break;
                                 case 4:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1)) ) {
-                                            if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
-                                                 _mangley-=41;
-                                                 music_select_iconnr-=numbers_cd_covers_on_line;
-                                                 do_music_icon_anim_icon_ofset=-1;
-                                            } else music_select_iconnr-=numbers_cd_covers_on_line;
-                                            if (music_key_selected>numbers_cd_covers_on_line) {
-                                                music_key_selected-=numbers_cd_covers_on_line;
-                                            }
+                                          if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
+                                             _mangley-=41;
+                                             music_select_iconnr-=numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset=-1;
+                                          } else music_select_iconnr-=numbers_cd_covers_on_line;
+                                          if (music_key_selected>numbers_cd_covers_on_line) {
+                                            music_key_selected-=numbers_cd_covers_on_line;
+                                          }
                                         }
                                         break;
                             }
@@ -10174,40 +10145,38 @@ void update(int value) {
                             switch(screen_size) {
                                 case 1:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
-                                            if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                                 _fangley-=MOVIE_CS;
-                                                 film_select_iconnr-=numbers_film_covers_on_line;
-                                            } else film_select_iconnr-=numbers_film_covers_on_line;
-                                            if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
+                                          if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
+                                             _fangley-=MOVIE_CS;
+                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                          if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
-
                                         break;
                                 case 2:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
-                                            if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                                 _fangley-=MOVIE_CS;
-                                                 film_select_iconnr-=numbers_film_covers_on_line;
-                                            } else film_select_iconnr-=numbers_film_covers_on_line;
-                                            if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
+                                          if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
+                                             _fangley-=MOVIE_CS;
+                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                          if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
                                         break;
                                 case 3:
-
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
-                                            if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                                 _fangley-=MOVIE_CS;
-                                                 film_select_iconnr-=numbers_film_covers_on_line;
-                                            } else film_select_iconnr-=numbers_film_covers_on_line;
-                                            if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
+                                          if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
+                                             _fangley-=MOVIE_CS;
+                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                          if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
                                         break;
                                 case 4:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
-                                            if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                                 _fangley-=MOVIE_CS;
-                                                 film_select_iconnr-=numbers_film_covers_on_line;
-                                            } else film_select_iconnr-=numbers_film_covers_on_line;
-                                            if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
+                                          if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
+                                             _fangley-=MOVIE_CS;
+                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                          if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
                                         break;
                             }
@@ -10278,40 +10247,39 @@ void update(int value) {
                             switch(screen_size) {
                                 case 1:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
-                                            if (((int) stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                                 _rangley-=MOVIE_CS;
-                                                 stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            } else stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
+                                          if (((int) stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
+                                             _rangley-=MOVIE_CS;
+                                             stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
 
                                         break;
                                 case 2:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
-                                            if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                                 _rangley-=MOVIE_CS;
-                                                 stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            } else stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
+                                          if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
+                                             _rangley-=MOVIE_CS;
+                                             stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
                                 case 3:
-
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
-                                            if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                                 _rangley-=MOVIE_CS;
-                                                 stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            } else stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
+                                          if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
+                                             _rangley-=MOVIE_CS;
+                                             stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
                                 case 4:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
-                                            if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                                 _rangley-=MOVIE_CS;
-                                                 stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            } else stream_select_iconnr-=numbers_stream_covers_on_line;
-                                            if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
+                                          if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
+                                             _rangley-=MOVIE_CS;
+                                             stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                          if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
                             }
@@ -10320,141 +10288,132 @@ void update(int value) {
 
 
                         if (vis_recorded_oversigt) {
-                            if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
-                                valgtrecordnr--;
-                                subvalgtrecordnr=0;
-                            } else if ((visvalgtnrtype==2) && (subvalgtrecordnr>0)) subvalgtrecordnr--;	// bruges til visning af optaget programmer
-                            reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
+                          if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
+                            valgtrecordnr--;
+                            subvalgtrecordnr=0;
+                          } else if ((visvalgtnrtype==2) && (subvalgtrecordnr>0)) subvalgtrecordnr--;	// bruges til visning af optaget programmer
+                          reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
                         }
-
-
-
                         if (vis_tv_oversigt) {
-                            if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
-                                tvvalgtrecordnr--;
-                                tvsubvalgtrecordnr=0;
-                            } else if ((tvvisvalgtnrtype==2) && (tvsubvalgtrecordnr>0)) tvsubvalgtrecordnr--;	// bruges til visning af optaget programmer
-
-// old ver                           _anglex-=1.0*5;
+                          if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
+                            tvvalgtrecordnr--;
+                            tvsubvalgtrecordnr=0;
+                          } else if ((tvvisvalgtnrtype==2) && (tvsubvalgtrecordnr>0)) tvsubvalgtrecordnr--;	// bruges til visning af optaget programmer
                         }
-
-
                         if (do_show_setup) {
-                           if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                         if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                         }
                     }
-
-
                     // lirc move left
                     if (strcmp(c,"Key-nav-left")==0) {
                         if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-                            dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+                          dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
                         }
                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
-                            if (music_key_selected>1) {
-                                if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
-                                    if (music_key_selected>1) {
-                                        music_key_selected--;
-                                        music_select_iconnr--;
-                                    } else {
-                                        if (music_select_iconnr>0) {
-                                             _mangley-=41;
-                                             music_key_selected+=numbers_cd_covers_on_line-1;  // den viste på skærm af 1 til 20
-                                             music_select_iconnr--;                  	// den rigtige valgte af 1 til cd antal
-                                        }
-                                    }
+                          if (music_key_selected>1) {
+                            if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
+                              if (music_key_selected>1) {
+                                music_key_selected--;
+                                music_select_iconnr--;
+                              } else {
+                                if (music_select_iconnr>0) {
+                                   _mangley-=41;
+                                   music_key_selected+=numbers_cd_covers_on_line-1;  // den viste på skærm af 1 til 20
+                                   music_select_iconnr--;                  	// den rigtige valgte af 1 til cd antal
                                 }
+                              }
                             }
+                          }
                         }
                         if (vis_film_oversigt) {							// ved film oversigt
                             if (film_key_selected>1) {
                                 switch (screen_size) {
                                     case 1: if (film_key_selected % 12==0) {
                                                 if (film_select_iconnr>0) {
-                                                    film_key_selected--;			// den som er ramme om
-                                                    film_select_iconnr--;
+                                                  film_key_selected--;			// den som er ramme om
+                                                  film_select_iconnr--;
                                                 } else {
-                                                    if ((_fangley-MOVIE_CS)<0) {
-                                                        _fangley-=MOVIE_CS;
-                                                        film_key_selected--;
-                                                        film_select_iconnr=-3;
-                                                        do_movie_icon_anim_icon_ofset=-1;
-                                                    }
+                                                  if ((_fangley-MOVIE_CS)<0) {
+                                                    _fangley-=MOVIE_CS;
+                                                    film_key_selected--;
+                                                    film_select_iconnr=-3;
+                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                  }
                                                 }
                                             } else {
-                                                if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                    _fangley-=MOVIE_CS;
-                                                    film_select_iconnr+=4;
-                                                    do_movie_icon_anim_icon_ofset=-1;
-                                                }
-                                                film_key_selected--;
-                                                film_select_iconnr--;
+                                              if ((film_select_iconnr==1) && (_fangley>0)) {
+                                                _fangley-=MOVIE_CS;
+                                                film_select_iconnr+=4;
+                                                do_movie_icon_anim_icon_ofset=-1;
+                                              }
+                                              film_key_selected--;
+                                              film_select_iconnr--;
                                             }
                                             break;
                                     case 2: if (film_key_selected % 24==0) {
                                                 if (film_select_iconnr>0) {
-                                                    film_key_selected--;
-                                                    film_select_iconnr--;
+                                                  film_key_selected--;
+                                                  film_select_iconnr--;
                                                 } else {
-                                                    if (_fangley-MOVIE_CS<0) {
-                                                         _fangley-=MOVIE_CS;
-                                                        film_key_selected--;
-                                                        film_select_iconnr=-5;
-                                                        do_movie_icon_anim_icon_ofset=-1;
-                                                    }
+                                                  if (_fangley-MOVIE_CS<0) {
+                                                     _fangley-=MOVIE_CS;
+                                                    film_key_selected--;
+                                                    film_select_iconnr=-5;
+                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                  }
                                                 }
                                             } else {
-                                                if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                    _fangley-=MOVIE_CS;
-                                                    film_select_iconnr+=6;
-                                                    do_movie_icon_anim_icon_ofset=-1;
-                                                }
-                                                film_key_selected--;
-                                                film_select_iconnr--;
+                                              if ((film_select_iconnr==1) && (_fangley>0)) {
+                                                _fangley-=MOVIE_CS;
+                                                film_select_iconnr+=6;
+                                                do_movie_icon_anim_icon_ofset=-1;
+                                              }
+                                              film_key_selected--;
+                                              film_select_iconnr--;
                                             }
                                             break;
                                     case 3: if (film_key_selected % 36==0) {
-                                                if (film_select_iconnr>0) {
-                                                    film_key_selected--;
-                                                    film_select_iconnr--;
-                                                } else {
-                                                    if (_fangley-MOVIE_CS<0) {
-                                                        _fangley-=MOVIE_CS;
-                                                        film_key_selected--;
-                                                        film_select_iconnr=-8;
-                                                        do_movie_icon_anim_icon_ofset=-1;
-                                                    }
-                                                }
-                                            } else {
-                                                if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                    _fangley-=MOVIE_CS;
-                                                    film_select_iconnr+=9;
-                                                    do_movie_icon_anim_icon_ofset=-1;
-                                                }
+                                              if (film_select_iconnr>0) {
                                                 film_key_selected--;
                                                 film_select_iconnr--;
+                                              } else {
+                                                if (_fangley-MOVIE_CS<0) {
+                                                  _fangley-=MOVIE_CS;
+                                                  film_key_selected--;
+                                                  film_select_iconnr=-8;
+                                                  do_movie_icon_anim_icon_ofset=-1;
+                                                }
+                                              }
+                                            } else {
+                                              if ((film_select_iconnr==1) && (_fangley>0)) {
+                                                _fangley-=MOVIE_CS;
+                                                film_select_iconnr+=9;
+                                                do_movie_icon_anim_icon_ofset=-1;
+                                              }
+                                              film_key_selected--;
+                                              film_select_iconnr--;
                                             }
                                             break;
                                     case 4: if (film_key_selected % 36==0) {
                                                 if (film_select_iconnr>0) {
-                                                    film_key_selected--;
-                                                    film_select_iconnr--;
+                                                  film_key_selected--;
+                                                  film_select_iconnr--;
                                                 } else {
-                                                    if (_fangley-MOVIE_CS<0) {
-                                                        _fangley-=MOVIE_CS;
-                                                        film_key_selected--;
-                                                        film_select_iconnr=-8;
-                                                        do_movie_icon_anim_icon_ofset=-1;
-                                                    }
+                                                  if (_fangley-MOVIE_CS<0) {
+                                                    _fangley-=MOVIE_CS;
+                                                    film_key_selected--;
+                                                    film_select_iconnr=-8;
+                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                  }
                                                 }
                                             } else {
-                                                if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                    _fangley-=MOVIE_CS;
-                                                    film_select_iconnr+=9;
-                                                    do_movie_icon_anim_icon_ofset=-1;
-                                                }
-                                                film_key_selected--;
-                                                film_select_iconnr--;
+                                              if ((film_select_iconnr==1) && (_fangley>0)) {
+                                                _fangley-=MOVIE_CS;
+                                                film_select_iconnr+=9;
+                                                do_movie_icon_anim_icon_ofset=-1;
+                                              }
+                                              film_key_selected--;
+                                              film_select_iconnr--;
                                             }
                                             break;
                                 }
@@ -10465,21 +10424,21 @@ void update(int value) {
                                 switch (screen_size) {
                                     case 1: if (radio_key_selected % 12==0) {
                                                 if (radio_select_iconnr>0) {
-                                                    radio_key_selected--;			// den som er ramme om
-                                                    radio_select_iconnr--;
+                                                  radio_key_selected--;			// den som er ramme om
+                                                  radio_select_iconnr--;
                                                 } else {
                                                     if ((_rangley-MOVIE_CS)<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        radio_key_selected--;
-                                                        radio_select_iconnr=-3;
-                                                        do_radio_icon_anim_icon_ofset=-1;
+                                                      _rangley-=MOVIE_CS;
+                                                      radio_key_selected--;
+                                                      radio_select_iconnr=-3;
+                                                      do_radio_icon_anim_icon_ofset=-1;
                                                     }
                                                 }
                                             } else {
                                                 if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    radio_select_iconnr+=4;
-                                                    do_radio_icon_anim_icon_ofset=-1;
+                                                  _rangley-=MOVIE_CS;
+                                                  radio_select_iconnr+=4;
+                                                  do_radio_icon_anim_icon_ofset=-1;
                                                 }
                                                 radio_key_selected--;
                                                 radio_select_iconnr--;
@@ -10487,43 +10446,43 @@ void update(int value) {
                                             break;
                                     case 2: if (radio_key_selected % 24==0) {
                                                 if (radio_select_iconnr>0) {
-                                                    radio_key_selected--;
-                                                    radio_select_iconnr--;
+                                                  radio_key_selected--;
+                                                  radio_select_iconnr--;
                                                 } else {
-                                                    if (_rangley-MOVIE_CS<0) {
-                                                         _rangley-=MOVIE_CS;
-                                                        radio_key_selected--;
-                                                        radio_select_iconnr=-5;
-                                                        do_radio_icon_anim_icon_ofset=-1;
-                                                    }
+                                                  if (_rangley-MOVIE_CS<0) {
+                                                     _rangley-=MOVIE_CS;
+                                                    radio_key_selected--;
+                                                    radio_select_iconnr=-5;
+                                                    do_radio_icon_anim_icon_ofset=-1;
+                                                  }
                                                 }
                                             } else {
-                                                if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    radio_select_iconnr+=6;
-                                                    do_radio_icon_anim_icon_ofset=-1;
-                                                }
-                                                radio_key_selected--;
-                                                radio_select_iconnr--;
+                                              if ((radio_select_iconnr==1) && (_rangley>0)) {
+                                                _rangley-=MOVIE_CS;
+                                                radio_select_iconnr+=6;
+                                                do_radio_icon_anim_icon_ofset=-1;
+                                              }
+                                              radio_key_selected--;
+                                              radio_select_iconnr--;
                                             }
                                             break;
                                     case 3: if (radio_key_selected % 36==0) {
                                                 if (radio_select_iconnr>0) {
-                                                    radio_key_selected--;
-                                                    radio_select_iconnr--;
+                                                  radio_key_selected--;
+                                                  radio_select_iconnr--;
                                                 } else {
                                                     if (_rangley-MOVIE_CS<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        radio_key_selected--;
-                                                        radio_select_iconnr=-8;
-                                                        do_radio_icon_anim_icon_ofset=-1;
+                                                      _rangley-=MOVIE_CS;
+                                                      radio_key_selected--;
+                                                      radio_select_iconnr=-8;
+                                                      do_radio_icon_anim_icon_ofset=-1;
                                                     }
                                                 }
                                             } else {
                                                 if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    radio_select_iconnr+=9;
-                                                    do_radio_icon_anim_icon_ofset=-1;
+                                                  _rangley-=MOVIE_CS;
+                                                  radio_select_iconnr+=9;
+                                                  do_radio_icon_anim_icon_ofset=-1;
                                                 }
                                                 radio_key_selected--;
                                                 radio_select_iconnr--;
@@ -10531,21 +10490,21 @@ void update(int value) {
                                             break;
                                     case 4: if (radio_key_selected % 36==0) {
                                                 if (radio_select_iconnr>0) {
-                                                    radio_key_selected--;
-                                                    radio_select_iconnr--;
+                                                  radio_key_selected--;
+                                                  radio_select_iconnr--;
                                                 } else {
                                                     if (_rangley-MOVIE_CS<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        radio_key_selected--;
-                                                        radio_select_iconnr=-8;
-                                                        do_radio_icon_anim_icon_ofset=-1;
+                                                      _rangley-=MOVIE_CS;
+                                                      radio_key_selected--;
+                                                      radio_select_iconnr=-8;
+                                                      do_radio_icon_anim_icon_ofset=-1;
                                                     }
                                                 }
                                             } else {
                                                 if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    radio_select_iconnr+=9;
-                                                    do_radio_icon_anim_icon_ofset=-1;
+                                                  _rangley-=MOVIE_CS;
+                                                  radio_select_iconnr+=9;
+                                                  do_radio_icon_anim_icon_ofset=-1;
                                                 }
                                                 radio_key_selected--;
                                                 radio_select_iconnr--;
@@ -10561,14 +10520,14 @@ void update(int value) {
                                 switch (screen_size) {
                                     case 1: if (stream_key_selected % 12==0) {
                                                 if (stream_select_iconnr>0) {
-                                                    stream_key_selected--;			// den som er ramme om
-                                                    stream_select_iconnr--;
+                                                  stream_key_selected--;			// den som er ramme om
+                                                  stream_select_iconnr--;
                                                 } else {
                                                     if ((_rangley-MOVIE_CS)<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        stream_key_selected--;
-                                                        stream_select_iconnr=-3;
-                                                        do_stream_icon_anim_icon_ofset=-1;
+                                                      _rangley-=MOVIE_CS;
+                                                      stream_key_selected--;
+                                                      stream_select_iconnr=-3;
+                                                      do_stream_icon_anim_icon_ofset=-1;
                                                     }
                                                 }
                                             } else {
@@ -10583,226 +10542,157 @@ void update(int value) {
                                             break;
                                     case 2: if (stream_key_selected % 24==0) {
                                                 if (stream_select_iconnr>0) {
-                                                    stream_key_selected--;
-                                                    stream_select_iconnr--;
+                                                  stream_key_selected--;
+                                                  stream_select_iconnr--;
                                                 } else {
                                                     if (_rangley-MOVIE_CS<0) {
-                                                         _rangley-=MOVIE_CS;
-                                                        stream_key_selected--;
-                                                        stream_select_iconnr=-5;
-                                                        do_stream_icon_anim_icon_ofset=-1;
+                                                       _rangley-=MOVIE_CS;
+                                                      stream_key_selected--;
+                                                      stream_select_iconnr=-5;
+                                                      do_stream_icon_anim_icon_ofset=-1;
                                                     }
                                                 }
                                             } else {
                                                 if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    stream_select_iconnr+=6;
-                                                    do_stream_icon_anim_icon_ofset=-1;
+                                                  _rangley-=MOVIE_CS;
+                                                  stream_select_iconnr+=6;
+                                                  do_stream_icon_anim_icon_ofset=-1;
                                                 }
                                                 stream_key_selected--;
                                                 stream_select_iconnr--;
                                             }
                                             break;
                                     case 3: if (stream_key_selected % 36==0) {
-                                                if (stream_select_iconnr>0) {
-                                                    stream_key_selected--;
-                                                    stream_select_iconnr--;
-                                                } else {
-                                                    if (_rangley-MOVIE_CS<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        stream_key_selected--;
-                                                        stream_select_iconnr=-8;
-                                                        do_stream_icon_anim_icon_ofset=-1;
-                                                    }
-                                                }
-                                            } else {
-                                                if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    stream_select_iconnr+=9;
-                                                    do_stream_icon_anim_icon_ofset=-1;
-                                                }
+                                              if (stream_select_iconnr>0) {
                                                 stream_key_selected--;
                                                 stream_select_iconnr--;
+                                              } else {
+                                                  if (_rangley-MOVIE_CS<0) {
+                                                    _rangley-=MOVIE_CS;
+                                                    stream_key_selected--;
+                                                    stream_select_iconnr=-8;
+                                                    do_stream_icon_anim_icon_ofset=-1;
+                                                  }
+                                              }
+                                            } else {
+                                              if ((stream_select_iconnr==1) && (_rangley>0)) {
+                                                _rangley-=MOVIE_CS;
+                                                stream_select_iconnr+=9;
+                                                do_stream_icon_anim_icon_ofset=-1;
+                                              }
+                                              stream_key_selected--;
+                                              stream_select_iconnr--;
                                             }
                                             break;
                                     case 4: if (stream_key_selected % 36==0) {
-                                                if (stream_select_iconnr>0) {
-                                                    stream_key_selected--;
-                                                    stream_select_iconnr--;
-                                                } else {
-                                                    if (_rangley-MOVIE_CS<0) {
-                                                        _rangley-=MOVIE_CS;
-                                                        stream_key_selected--;
-                                                        stream_select_iconnr=-8;
-                                                        do_stream_icon_anim_icon_ofset=-1;
-                                                    }
-                                                }
-                                            } else {
-                                                if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                    _rangley-=MOVIE_CS;
-                                                    stream_select_iconnr+=9;
-                                                    do_stream_icon_anim_icon_ofset=-1;
-                                                }
+                                              if (stream_select_iconnr>0) {
                                                 stream_key_selected--;
                                                 stream_select_iconnr--;
+                                              } else {
+                                                  if (_rangley-MOVIE_CS<0) {
+                                                    _rangley-=MOVIE_CS;
+                                                    stream_key_selected--;
+                                                    stream_select_iconnr=-8;
+                                                    do_stream_icon_anim_icon_ofset=-1;
+                                                  }
+                                              }
+                                            } else {
+                                              if ((stream_select_iconnr==1) && (_rangley>0)) {
+                                                _rangley-=MOVIE_CS;
+                                                stream_select_iconnr+=9;
+                                                do_stream_icon_anim_icon_ofset=-1;
+                                              }
+                                              stream_key_selected--;
+                                              stream_select_iconnr--;
                                             }
                                             break;
                                 }
                             }
                         }
                         if (vis_recorded_oversigt) {
-                            visvalgtnrtype=1;
+                          visvalgtnrtype=1;
                         }
                         if (vis_tv_oversigt) {
-                            tvvisvalgtnrtype=1;
-                        /*
-                            if (tvstartxofset<2300) {
-                                tvstartxofset+=tvprgsstep;
-                                glDeleteLists(tvoversigt, 1);				// delete old list
-                                tvoversigt=glGenLists(1);				// make new
-                                glNewList(tvoversigt,GL_COMPILE);
-                                aktiv_tv_oversigt.build_tv_oversigt(tvstartxofset,0);
-                                glEndList();
-
-                            }
-                         */
+                          tvvisvalgtnrtype=1;
                         }
                     }
-
-
-
                     // lirc move right
                     if (strcmp(c,"Key-nav-right")==0) {
                         if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-                            dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+                          dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
                         }
-
                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
                             if (((int) music_key_selected<(int) musicoversigt_antal) && (music_icon_anim_icon_ofset==0)) {
-                                if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal)) {
-                                    if (((int) music_key_selected % (numbers_cd_covers_on_line*4)==0) || (((int) music_select_iconnr==((numbers_cd_covers_on_line*4)-1)) && ((int) music_key_selected % numbers_cd_covers_on_line==0))) {
-                                        _mangley+=41;
-                                        music_key_selected-=numbers_cd_covers_on_line;			// den viste på skærm af 1 til 20
-                                        music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                    } else {
-                                        music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                    }
-                                    music_key_selected++;
+                              if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal)) {
+                                if (((int) music_key_selected % (numbers_cd_covers_on_line*4)==0) || (((int) music_select_iconnr==((numbers_cd_covers_on_line*4)-1)) && ((int) music_key_selected % numbers_cd_covers_on_line==0))) {
+                                  _mangley+=41;
+                                  music_key_selected-=numbers_cd_covers_on_line;			// den viste på skærm af 1 til 20
+                                  music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                } else {
+                                  music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                 }
-
-/*
-                                switch (screen_size) {
-                                    case 1:
-
-                                        printf("music_select_iconnr =%d  music_select_iconnr mod 33= %d  music_key_selected mod 7=%d  \n",music_select_iconnr, music_select_iconnr % 33,music_key_selected % 7);
-                                        if ((music_key_selected % 12==0) || ((music_select_iconnr==11) && (music_key_selected % 4==0))) {
-                                            do_music_icon_anim_icon_ofset=1;
-                                            _mangley+=(6.5f)/2;
-                                            music_select_iconnr-=3;
-                                        } else {
-                                            music_select_iconnr++;
-                                        }
-                                        music_key_selected++;
-                                        break;
-                                    case 2:
-                                        //
-//                                printf("music_select_iconnr =%d  music_select_iconnr mod 33= %d  music_key_selected mod 7=%d  \n",music_select_iconnr, music_select_iconnr % 33,music_key_selected % 7);
-                                        if ((music_key_selected % 7==0) && (music_select_iconnr==34)) {
-                                            do_music_icon_anim_icon_ofset=1;
-                                            _mangley+=(6.5f)/2;
-                                            music_select_iconnr-=6;
-                                        } else {
-                                            music_select_iconnr++;
-                                        }
-                                        music_key_selected++;
-                                        break;
-                                    case 3:
-//      		                          printf("music_select_iconnr =%d  music_select_iconnr mod 54= %d  music_key_selected mod 11=%d  \n",music_select_iconnr, music_select_iconnr % 54,music_key_selected % 11);
-                                        if ((music_key_selected % 11==0) && (music_select_iconnr==54))  {
-                                            do_music_icon_anim_icon_ofset=1;
-                                            _mangley+=(6.5f)/2;
-                                            music_select_iconnr-=10;
-                                        } else {
-                                            music_select_iconnr++;
-                                        }
-                                        music_key_selected++;
-                                        break;
-                                    case 4:
-//      		                          printf("music_select_iconnr =%d  music_select_iconnr mod 54= %d  music_key_selected mod 11=%d  \n",music_select_iconnr, music_select_iconnr % 54,music_key_selected % 11);
-                                        if ((music_key_selected % 11==0) && (music_select_iconnr==54))  {
-                                            do_music_icon_anim_icon_ofset=1;
-                                            _mangley+=(6.5f)/2;
-                                            music_select_iconnr-=10;
-                                        } else {
-                                            music_select_iconnr++;
-                                        }
-                                        music_key_selected++;
-                                        break;
-                                }
-
-*/
-
+                                music_key_selected++;
+                              }
                             }
                         }
                         if (vis_film_oversigt) {
                             switch (screen_size) {
                                 case 1:
                                         if ((vis_film_oversigt) && ((int unsigned) film_select_iconnr<film_oversigt.film_antal()-1)) {
-                                            if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
-                                                if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                                    _fangley+=MOVIE_CS;
-                                                    film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                film_key_selected++;
+                                          if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
+                                            if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
+                                              _fangley+=MOVIE_CS;
+                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                            } else {
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             }
+                                            film_key_selected++;
+                                          }
                                         }
                                         break;
-
                                 case 2:
                                         if ((vis_film_oversigt) && (film_select_iconnr<(int) film_oversigt.film_antal()-1)) {
-                                            if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
-                                                if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                                    _fangley+=MOVIE_CS;
-                                                    film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                film_key_selected++;
+                                          if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
+                                            if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
+                                              _fangley+=MOVIE_CS;
+                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                            } else {
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             }
+                                            film_key_selected++;
+                                          }
                                         }
                                         break;
 
                                 case 3:
                                         if ((vis_film_oversigt) && (film_select_iconnr<(int) film_oversigt.film_antal()-1)) {
-                                            if (film_select_iconnr<(int) film_oversigt.film_antal()) {
-                                                if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                                    _fangley+=MOVIE_CS;
-                                                    film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                film_key_selected++;
+                                          if (film_select_iconnr<(int) film_oversigt.film_antal()) {
+                                            if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
+                                              _fangley+=MOVIE_CS;
+                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                            } else {
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             }
+                                            film_key_selected++;
+                                          }
                                         }
 
                                         break;
                                 case 4:
                                         if ((vis_film_oversigt) && (film_select_iconnr<(int) film_oversigt.film_antal()-1)) {
-                                            if (film_select_iconnr<(int ) film_oversigt.film_antal()) {
-                                                if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                                    _fangley+=MOVIE_CS;
-                                                    film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                film_key_selected++;
+                                          if (film_select_iconnr<(int ) film_oversigt.film_antal()) {
+                                            if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
+                                              _fangley+=MOVIE_CS;
+                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                            } else {
+                                              film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             }
+                                            film_key_selected++;
+                                          }
                                         }
                                         break;
                             }
@@ -10810,68 +10700,20 @@ void update(int value) {
 
                         if (vis_radio_oversigt) {
                             switch (screen_size) {
-/*
-                                case 1:
+                                default:
                                         if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
-                                            if (radio_select_iconnr<(int) radiooversigt_antal) {
-                                                if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
-                                                    _rangley+=MOVIE_CS;
-                                                    radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                radio_key_selected++;
+                                          if (radio_select_iconnr<(int) radiooversigt_antal) {
+                                            if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
+                                              _rangley+=MOVIE_CS;
+                                              radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
+                                              radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                            } else {
+                                              radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             }
+                                            radio_key_selected++;
+                                          }
                                         }
                                         break;
-
-                                case 2:
-                                        if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
-                                            if (radio_select_iconnr<(int) radiooversigt_antal) {
-                                                if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
-                                                    _rangley+=MOVIE_CS;
-                                                    radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                radio_key_selected++;
-                                            }
-                                        }
-                                        break;
-*/
-                                case 3:
-                                        if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
-                                            if (radio_select_iconnr<(int) radiooversigt_antal) {
-                                                if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
-                                                    _rangley+=MOVIE_CS;
-                                                    radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                radio_key_selected++;
-                                            }
-                                        }
-
-                                        break;
-/*
-                                case 4:
-                                        if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
-                                            if (radio_select_iconnr<(int) radiooversigt_antal) {
-                                                if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
-                                                    _rangley+=MOVIE_CS;
-                                                    radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                } else {
-                                                    radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                                }
-                                                radio_key_selected++;
-                                            }
-                                        }
-                                        break;
-*/
                             }
                         }
 
@@ -10894,81 +10736,69 @@ void update(int value) {
                               break;
                             case 2:
                               if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
-                                      if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
-                                          _rangley+=MOVIE_CS;
-                                          stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      } else {
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      }
-                                      stream_key_selected++;
+                                if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
+                                  if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
+                                    _rangley+=MOVIE_CS;
+                                    stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                  } else {
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                   }
+                                  stream_key_selected++;
+                                }
                               }
                               break;
                             case 3:
                               if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
-                                      if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
-                                          _rangley+=MOVIE_CS;
-                                          stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      } else {
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      }
-                                      stream_key_selected++;
+                                if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
+                                  if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
+                                    _rangley+=MOVIE_CS;
+                                    stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                  } else {
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                   }
+                                  stream_key_selected++;
+                                }
                               }
                               break;
                             case 4:
                               if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
-                                  if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
-                                      if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
-                                          _rangley+=MOVIE_CS;
-                                          stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      } else {
-                                          stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
-                                      }
-                                      stream_key_selected++;
+                                if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
+                                  if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
+                                    _rangley+=MOVIE_CS;
+                                    stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
+                                  } else {
+                                    stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                   }
+                                  stream_key_selected++;
+                                }
                               }
                               break;
                             }
                         }
-
                         if (vis_recorded_oversigt) {
-                            visvalgtnrtype=2;
+                          visvalgtnrtype=2;
                         }
-
                         if (vis_tv_oversigt) {
-                            tvvisvalgtnrtype=2;
-                            /*
-                            tvstartxofset-=tvprgsstep;
-                            glDeleteLists(tvoversigt, 1);				// delete old list
-                            tvoversigt=glGenLists(1);				// make new
-                            glNewList(tvoversigt,GL_COMPILE);
-                            aktiv_tv_oversigt.build_tv_oversigt(tvstartxofset,0);
-                            glEndList();
-                            */
-//                           _anglez-=1.0*5;
+                          tvvisvalgtnrtype=2;
                         }
                     }
 
                     // lirc back button
                     if (strcmp(c,"Back")==0) {
-                        if (vis_music_oversigt) {
-
-                           if (ask_open_dir_or_play) {
-                               ask_open_dir_or_play=false;
-                               do_zoom_film_cover=false;
-                           } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
-                        }
-                        if (do_zoom_film_cover) {
-                            do_zoom_film_cover=false;
-                            fknapnr=0;
-                            mknapnr=0;					// reset knapnr i alt
-                        }
+                      if (vis_music_oversigt) {
+                       if (ask_open_dir_or_play) {
+                         ask_open_dir_or_play=false;
+                         do_zoom_film_cover=false;
+                       } else do_zoom_music_cover=!do_zoom_music_cover;		// show/hide music info
+                      }
+                      if (do_zoom_film_cover) {
+                        do_zoom_film_cover=false;
+                        fknapnr=0;
+                        mknapnr=0;					// reset knapnr i alt
+                      }
                     }
                     if (strcmp("Next",c)==0) {
                       // lirc
@@ -10981,44 +10811,43 @@ void update(int value) {
                         }
                       }
                       if (vis_tv_oversigt) {
-                          aktiv_tv_oversigt.changetime(60*60*24);
-                          aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                        aktiv_tv_oversigt.changetime(60*60*24);
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                       }
                     }
                     // lirc
                     if (strcmp("Prev",c)==0) {
-                        // lirc
-                        // last song
-                         if ((vis_music_oversigt) && (!(do_shift_song))) {
-                            if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
-                                do_play_music_aktiv_table_nr--;						// skift aktiv sang
-                                do_shift_song=true;							// sæt flag til skift
-                                do_zoom_music_cover=true;
-                            }
-                         }
-                         if (vis_tv_oversigt) {
-                            aktiv_tv_oversigt.changetime(-(60*60*24));
-                            aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
-
-                         }
+                      // lirc
+                      // last song
+                       if ((vis_music_oversigt) && (!(do_shift_song))) {
+                          if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
+                            do_play_music_aktiv_table_nr--;						// skift aktiv sang
+                            do_shift_song=true;							// sæt flag til skift
+                            do_zoom_music_cover=true;
+                          }
+                       }
+                       if (vis_tv_oversigt) {
+                        aktiv_tv_oversigt.changetime(-(60*60*24));
+                        aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                      }
                     }
                     // lirc
                     if (strcmp("Key-vol-up",c)==0) {
-                        if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
-                        #if defined USE_FMOD_MIXER
-                        if (sndsystem) channel->setVolume(configsoundvolume);
-                        #endif
-                        show_volume_info=true;					// show volume info window
-                        vis_volume_timeout=80;
+                      if (configsoundvolume<1.0f) configsoundvolume+=0.1f;
+                      #if defined USE_FMOD_MIXER
+                      if (sndsystem) channel->setVolume(configsoundvolume);
+                      #endif
+                      show_volume_info=true;					// show volume info window
+                      vis_volume_timeout=80;
                     }
                     // lirc
                     if (strcmp("Key-vol-down",c)==0) {
-                        if (configsoundvolume>0) configsoundvolume-=0.1f;
-                        #if defined USE_FMOD_MIXER
-                        if (sndsystem) channel->setVolume(configsoundvolume);
-                        #endif
-                        show_volume_info=true;					// show volume info window
-                        vis_volume_timeout=80;
+                      if (configsoundvolume>0) configsoundvolume-=0.1f;
+                      #if defined USE_FMOD_MIXER
+                      if (sndsystem) channel->setVolume(configsoundvolume);
+                      #endif
+                      show_volume_info=true;					// show volume info window
+                      vis_volume_timeout=80;
                     }
                     // lirc
                     // start some func
@@ -11057,7 +10886,6 @@ void update(int value) {
                           if (do_play_music_aktiv_nr>0) {
                             antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
                           } else antal_songs=0;
-
                           if (antal_songs==0) {							// er der ingen sange i dir lav en auto open
                             ask_open_dir_or_play_aopen=1; 						// flag auto open
                           } else {
@@ -11083,8 +10911,6 @@ void update(int value) {
                           // hent liste over mythtv playlist
                           opdatere_music_oversigt_playlists(musicoversigt);			// vis alle playlister
                         }
-
-
                         if ((antal_songs>0) && (do_play_music_aktiv_nr)) {
                           do_swing_music_cover=1;
                           ask_open_dir_or_play=1;
@@ -11098,49 +10924,42 @@ void update(int value) {
                           music_icon_anim_icon_ofsety=0;
                           _mangley=0.0f;
                         }
-//                                if (debugmode & 2) printf("music_key_selected %d musik knap nr = %d  music_select_iconnr= %d \n ",music_key_selected,mknapnr,music_select_iconnr);
                       }
                       do_zoom_music_cover_remove_timeout=showtimeout;		// show music info timeout
                       if (debugmode & 2) fprintf(stderr,"lirc Set Play it flag \n");
                     }
-
                     if ((vis_film_oversigt) && (do_zoom_film_cover)) {
                       fprintf(stderr,"lirc Start movie player.\n");
                       startmovie=true;
                     }
-
                     if (vis_film_oversigt) {				// select movie to show info for
                       do_zoom_film_cover=true;
                       do_swing_movie_cover=0;
                       do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
                       fknapnr=film_select_iconnr+1;				// OLD film_key_selected;
                     }
-
                     if (vis_recorded_oversigt) {
                       // play record/rss fil
                       do_play_recorded_aktiv_nr=1;
                     }
                     if (vis_tv_oversigt) {
-                        tvknapnr=tvsubvalgtrecordnr;
-                        do_zoom_tvprg_aktiv_nr=tvknapnr;
-                        ask_tv_record=!ask_tv_record;
-                        if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else printf("lirc Hide tvprogram info.\n");
+                      tvknapnr=tvsubvalgtrecordnr;
+                      do_zoom_tvprg_aktiv_nr=tvknapnr;
+                      ask_tv_record=!ask_tv_record;
+                      if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else printf("lirc Hide tvprogram info.\n");
                     }
-
-
                     // start play radio
                     if ((vis_radio_oversigt) && (!(show_radio_options))) {
-                        // play radio station
-                        rknapnr=radio_key_selected;		// hent button
-                        if (rknapnr>0) do_play_radio=1;
+                      // play radio station
+                      rknapnr=radio_key_selected;		// hent button
+                      if (rknapnr>0) do_play_radio=1;
                     }
-
                     // opdatere radio oversigt efter efter pressed on the remorte control from lirc
                     if ((vis_radio_oversigt) && (show_radio_options)) {
-                        radiooversigt.clean_radio_oversigt();			// clean old liste
-                        radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
-                        radiooversigt.load_radio_stations_gfx();
-                        show_radio_options=false;
+                      radiooversigt.clean_radio_oversigt();			// clean old liste
+                      radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
+                      radiooversigt.load_radio_stations_gfx();
+                      show_radio_options=false;
                     }
                   }
                   // lirc
@@ -11155,7 +10974,6 @@ void update(int value) {
                     }
                     system("/sbin/shutdown -P");
                     exit(2);				// QUIT program
-
                   }
                 }
             }
@@ -11188,10 +11006,10 @@ void update(int value) {
 // init screen setup
 
 bool init(void) {
-   #ifndef ALLOW_RUN_AS_ROOT
+    #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0) {
-        fprintf (stderr, "MYTHTV-CONTROLLER is not supposed to be run as root. Sorry.\n"
-        "If you need to use real-time priorities and/or privileged TCP ports\n");
+        fprintf(stderr,"MYTHTV-CONTROLLER is not supposed to be run as root. Sorry.\n");
+        fprintf(stderr,"If you need to use real-time priorities and/or privileged TCP ports\n");
         return 1;
     }
     #endif
@@ -11214,7 +11032,7 @@ int init_sound_system(int devicenr) {
     int count;
     unsigned int handle=0;
     char name[256];
-#if defined USE_FMOD_MIXER
+    #if defined USE_FMOD_MIXER
     printf("Setup FMOD soundsystem\n");
     result = FMOD::System_Create(&sndsystem);
     ERRCHECK(result,0);
@@ -11234,11 +11052,11 @@ int init_sound_system(int devicenr) {
     ERRCHECK(result,0);
     numbersofsoundsystems=numdrivers;				// numbers of devices
     for (count=0; count < numdrivers; count++) {
-         char name[256];
-         result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
-         ERRCHECK(result,0);
-         strcpy(avalible_device[count],name);			// save device name to list
-         printf(" %d - %s\n", count , name);
+       char name[256];
+       result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
+       ERRCHECK(result,0);
+       strcpy(avalible_device[count],name);			// save device name to list
+       printf(" %d - %s\n", count , name);
     }
     if (devicenr>numdrivers) devicenr=0;			// hvis der er valgt et soundcard i config filen som ikke findes vælg default
     // setlect default soundcard=0
@@ -11248,10 +11066,10 @@ int init_sound_system(int devicenr) {
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_CODEC, &num);
     ERRCHECK(result,0);
     for (count = 0; count < num; count++) {
-        result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_CODEC, count, &handle);
-        ERRCHECK(result,0);
-        result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
-        ERRCHECK(result,0);
+      result = sndsystem->getPluginHandle(FMOD_PLUGINTYPE_CODEC, count, &handle);
+      ERRCHECK(result,0);
+      result = sndsystem->getPluginInfo(handle, 0, name, 256, 0);
+      ERRCHECK(result,0);
     }
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_OUTPUT, &num);
     ERRCHECK(result,0);
@@ -11275,9 +11093,9 @@ int init_sound_system(int devicenr) {
     result = sndsystem->setStreamBufferSize(64*1024, FMOD_TIMEUNIT_RAWBYTES);
     ERRCHECK(result,0);
     strcpy(configmythsoundsystem,avalible_device[0]);
-#endif
+    #endif
 
-#if defined USE_SDL_MIXER
+    #if defined USE_SDL_MIXER
     printf("Setup SDL_MIXER soundsystem\n");
     // load support for the OGG and MOD sample/music formats
     int flags=MIX_INIT_OGG|MIX_INIT_MP3|MIX_INIT_FLAC;
@@ -11298,7 +11116,7 @@ int init_sound_system(int devicenr) {
         printf("Mix_Init: %s\n", Mix_GetError());
         // handle error
     }
-#endif
+    #endif
     return(2);
 }
 
@@ -11316,17 +11134,15 @@ void *radio_check_statusloader(void *data) {
   printf("loader thread starting - Start checkling radio status's thread\n");
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
-      do {
-          notdone=radiooversigt.check_radio_online(0);
-      } while (notdone);
+    do {
+      notdone=radiooversigt.check_radio_online(0);
+    } while (notdone);
   }
   if (strcmp(configbackend,"xbmc")==0) {
-      do {
-          notdone=radiooversigt.check_radio_online(0);
-      } while (notdone);
+    do {
+      notdone=radiooversigt.check_radio_online(0);
+    } while (notdone);
   }
-
-
   printf("radio thread done\n");
   pthread_exit(NULL);
 }
@@ -11715,7 +11531,6 @@ void *xbmcdatainfoloader_movie(void *data) {
   MYSQL_ROW row;
   bool dbexist=false;
   char sqlselect[1024];
-
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -11735,27 +11550,21 @@ void *xbmcdatainfoloader_movie(void *data) {
       strcpy(sqlselect,"create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videogenre(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(128))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videocountry(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, country varchar(128))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videocollection(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(256), contenttype int, plot text,network varchar(128), collectionref varchar(128), certification varchar(128), genre varchar(128),releasedate date, language varchar(10),status varchar(64), rating float, ratingcount int, runtime int, banner text,fanart text,coverart text)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videopathinfo(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, path text, contenttype int, collectionref int,recurse  int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS videotypes(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, extension varchar(128),playcommand varchar(255), f_ignore int,  use_default int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
@@ -11795,8 +11604,8 @@ void *xbmcdatainfoloader_movie(void *data) {
     strcat(userhomedir,"/.kodi/userdata/Database");
     dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
-        printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
-        exit(0);
+      printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
+      exit(0);
     }
     // loop dir and update music songs db
     // and find kodi db version
@@ -11871,34 +11680,12 @@ void *xbmcdatainfoloader_movie(void *data) {
       // load movies in from db
       xbmcSQL->getxmlfilepath();                   // get path info from xml file
       film_oversigt.opdatere_film_oversigt();     // gen covers 3d hvis de ikke findes.
-  //xbmcclient->SendNOTIFICATION("test", "message", 0);
-
-  //pthread_mutex_lock(&count_mutex);
-  //pthread_mutex_unlock(&count_mutex);
-  //  printf("loader thread starting - Loading movie info from xbmc/kodi.\n");
-  // Opdatere tv oversigt fra mythtv db
-  //    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
-                                                                // load record file list
-/*
-      recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
-      // load old recorded list not some recorded any more
-      oldrecorded.earlyrecordedload(configmysqlhost,configmysqluser,configmysqlpass);
-      // load new tv schecule program
-      newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
-*/
-      //create_radio_oversigt();										                          // Create radio mysql database if not exist
-      //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-      // stream
-      //streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");       // load all stream from mythtv
     }
   }
   if (debugmode & 16) printf("loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
   do_update_moviedb=false;
   pthread_exit(NULL);
 }
-
-
 
 
 
@@ -11953,11 +11740,10 @@ void loadgfx() {
     if (tema==8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
     if (tema==9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
     if (tema==10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
-        // default tema
-        strcpy(temapath,"tema1/");
-        tema=1;
+      // default tema
+      strcpy(temapath,"tema1/");
+      tema=1;
     }
-
     _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
     _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
     _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
@@ -12017,7 +11803,6 @@ void loadgfx() {
     _textureIdfilm_aktiv  = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie1");
     _textureIdmusicsearch = loadgfxfile(temapath,(char *) "images/",(char *) "music_search");
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
-
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
     _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
@@ -12054,8 +11839,8 @@ void loadgfx() {
     _tvnewprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "newrecordedbutton");
     _tvmaskprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbutton_mask");
 
-
     // ****************** backgrounds **************************************
+
     setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
     setuptemaback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptemaback");
@@ -12123,23 +11908,6 @@ void loadgfx() {
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
 
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
-
-// *********************************************************************
-/*
-    i=0;
-    while(i<11) {
-        strcpy(tmpfilename,temapath);
-        strcat(tmpfilename,(char *) "buttons/");
-        strcat(tmpfilename,music_zoom_anim_files[i]);
-        if (file_exists(tmpfilename)) {
-           _textureIdmusic_mask_anim[i]=loadTexture ((char *) tmpfilename);
-        } else {
-            printf("Load error %s\n",music_zoom_anim_files[i]);
-        }
-        i++;
-    }
-*/
-
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -12276,28 +12044,15 @@ void freegfx() {
     glDeleteTextures( 1, &_textureuv1);                         // uv img
     glDeleteTextures( 1, &_textureuv1_top);                         // uv img
     glDeleteTextures( 1, &_errorbox);                           // error box
-
     // delete radio lande flags
     i=0;
     while(i<69) {
-        if (gfxlande[i]) glDeleteTextures( 1, &gfxlande[i]);
-        i++;
+      if (gfxlande[i]) glDeleteTextures( 1, &gfxlande[i]);
+      i++;
     }
-    /*
-    i=0;
-    while(i<11) {
-        if (_textureIdmusic_mask_anim[i]) glDeleteTextures( 1,&_textureIdmusic_mask_anim[i]);
-        i++;
-    }
-    */
     glDeleteTextures( 1,&_textureIdmusic_aktiv);
     glDeleteTextures( 1,&screensaverbox);
     glDeleteTextures( 1,&newstuf_icon);
-
-    //_textureIdmusic_anim[i].textureId;
-    //film_oversigt.filmoversigt[i]
-    //musicoversigt[i].				// clear selv
-
 }
 
 
@@ -12324,15 +12079,15 @@ void load_lande_flags() {
     i=0;
     strcpy(path2,"");
     while(i<69) {
-        printf("load flag %d %s \n",i,lande[i]);
-        strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
-        strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
-        strcpy(path,"/usr/share/mythtv-controller/images/");
-        if (strcmp(lande[i],"")!=0) {
-          gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
-          //gfxlande[i]=loadTexture ((char *) tmpfilename);
-        }
-        i++;
+      printf("load flag %d %s \n",i,lande[i]);
+      strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
+      strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
+      strcpy(path,"/usr/share/mythtv-controller/images/");
+      if (strcmp(lande[i],"")!=0) {
+        gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
+        //gfxlande[i]=loadTexture ((char *) tmpfilename);
+      }
+      i++;
     }
 }
 
@@ -12344,7 +12099,6 @@ void InitGL()              // We call this right after our OpenGL window is crea
     char tmpfilename[256];
     char fileload[256];
     char temapath[256];
-
     strcpy(temapath,"");
     if (tema==1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
     if (tema==2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
@@ -12366,8 +12120,8 @@ void InitGL()              // We call this right after our OpenGL window is crea
     if (tema==18) strcpy(temapath,"/usr/share/mythtv-controller/tema18/"); else
     if (tema==19) strcpy(temapath,"/usr/share/mythtv-controller/tema19/"); else
     if (tema==20) strcpy(temapath,"/usr/share/mythtv-controller/tema20/"); else {
-        strcpy(temapath,"tema1/");
-        tema=1;
+      strcpy(temapath,"tema1/");
+      tema=1;
     }
     //load_lande_flags();
 // Load radio stations gfx **********************************************
@@ -12638,27 +12392,22 @@ int main(int argc, char** argv) {
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
     glutTimerFunc(25, update2, 0);                     // set start loop
-    // init fonts
-    init_ttf_fonts();
+    init_ttf_fonts();                                   // init fonts
     // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
     if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt=true;
     if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt=true;
     if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt=true;
     if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt=true;
-
     //aktivfont.updatefontlist();
     //aktivfont.selectfont((char *) "Tlwg Mono");
-
     // select font from configfile (/etc/mythtv-controller.conf)
     aktivfont.selectfont(configfontname);
-
     printf("\nHardware           %s\n",(char *)glGetString(GL_RENDERER));                         // Display Renderer
     printf("OpenGL Render      %s\n",(char *)glGetString(GL_VENDOR));                           // Display Vendor Name
     printf("Version            %s\n",(char *)glGetString(GL_VERSION));
     // start main loop now
     glutMainLoop();
-
     #if defined USE_FMOD_MIXER
     result=sound->release();
     ERRCHECK(result,0);
@@ -12667,12 +12416,9 @@ int main(int argc, char** argv) {
     result=sndsystem->release();                                // release sound system
     ERRCHECK(result,0);
     #endif
-
-
     #if defined USE_SDL_MIXER
     Mix_Quit();
     #endif
-
     freegfx();                                                  // free gfx
     return(EXIT_SUCCESS);
 }
