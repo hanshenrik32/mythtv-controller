@@ -57,7 +57,9 @@ int get_webfilenamelong(char *fname,char *webpath) {
 
 
 
-// return string for filename
+//
+// return string for filename or null
+//
 
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
