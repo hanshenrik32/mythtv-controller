@@ -309,43 +309,38 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
     // test fpom musik table exist
     mysql_query(conn,"SHOW TABLES LIKE 'music_albums'");
     res = mysql_store_result(conn);
-    while ((row = mysql_fetch_row(res)) != NULL) {
-      dbexist=1;
-    }
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dbexist=true;
+      }
+    } else dbexist=false;
     //
     // if database not exist do dir scan and create tables for music
     //
     if (!(dbexist)) {
-
       if (debugmode & 2) printf("Creating database for music\n");
-
       strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       strcpy(sqlselect,"create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       strcpy(sqlselect,"create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
     }
     if (true) {
       //create table music_directories(directory_id int,path text, parent_id int);
       //create table music_albums(album_id  int, artist_id int, album_name   varchar(255) ,year int, compilation int);
-
       strcpy(musicoversigt[0].album_name,"PLAYLIST");
       strcpy(musicoversigt[0].album_path,"");
       strcpy(musicoversigt[0].album_coverfile,"");
@@ -377,7 +372,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
               musicoversigt[i].artist_id=0;
               musicoversigt[i].oversigttype=0;
               parent_dir_id=0;
-
               // update artist db
               sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,de->d_name);
               mysql_query(conn,sqlselect2);
@@ -386,7 +380,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
             }
           }
         }
-
         // fill database music_albums from dir on music_directories
         strcpy(sqlselect,"select directory_id ,path ,parent_id from music_directories");
         if (conn) {
@@ -428,26 +421,18 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                   // if dir
                   // opret i album db
                   if (de->d_type==DT_DIR) {
-
-                    //if (debugmode & 2) printf("Foundet dir %s in dir %10s  ",de->d_name,checkdir);
-
                     conn2=mysql_init(NULL);
                     if (conn2) {
                       mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                      // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
                       sprintf(sqlselect1,"insert into music_albums(album_id,artist_id,album_name,year,compilation) values(%d,%d,'%s',%d,%d)",0,artistid,de->d_name,0,0);
                       mysql_query(conn2,sqlselect1);
                       res2 = mysql_store_result(conn2);
-//                      mysql_close(conn2);
-
                       // husk last dir vi kommer fra
                       parent_dir_id=atoi(row[0]);
-
                       // create dir id for subdir
                       sprintf(sqlselect1,"insert into music_directories(directory_id,path,parent_id) values(%d,'%s',%d)",0,de->d_name,parent_dir_id);
                       mysql_query(conn2,sqlselect1);
                       res2 = mysql_store_result(conn2);
-
                       // hent dirid der lige er oprettet
                       sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",de->d_name);
                       mysql_query(conn2,sqlselect1);
@@ -458,7 +443,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                         }
                       }
                       mysql_close(conn2);
-
                       albumid=0;
                       // hent albumid til song db
                       conn2=mysql_init(NULL);
@@ -475,12 +459,9 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                         mysql_close(conn2);
                       }
                     }
-
                     // open found dir having the songs
                     sprintf(checkdir2,"%s/%s",checkdir,de->d_name);
-
                     if (debugmode & 2) printf("\t Checking sub dir %s \n",de->d_name);
-
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
                         printf("Open dir error ->%s<-\n",checkdir2);
@@ -498,10 +479,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                           strcpy(songname,checkdir2);
                           strcat(songname,"/");
                           strcat(songname,de2->d_name);
-//                          printf("Filename created in db %s\n",songname);
-
                           if (song_exist_in_db(songname,songname)) printf("SONG EXIST **********************************");
-
                           sprintf(sqlselect1,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                                         (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                                         0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
@@ -509,7 +487,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
 
                           // show in music overview loader
                           strcpy(music_db_update_loader,de->d_name);
-
                           conn1=mysql_init(NULL);
                           if (conn1) {
                             mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -524,25 +501,14 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                   } else {
                     // it is a file
                     // get albumid
-                    //printf("Found file name %s\n",de->d_name);
-
                     // find file extition
                     ext = strrchr(de->d_name, '.');
                     if (ext) strcpy(filetype,ext+1); else strcpy(filetype,"");
-
                     if ((strcmp(filetype,"mp3")==0) || (strcmp(filetype,"flac")==0) || (strcmp(filetype,"ogg")==0) || (strcmp(filetype,"wav")==0)) {
-
-                      //sprintf(sqlselect1,"insert into music_albums(album_id,artist_id,album_name,year,compilation) values(%d,%d,'%s',%d,%d)",0,artistid,de->d_name,0,0);
-
-
                       strcpy(songname,checkdir);
                       strcat(songname,"/");
                       strcat(songname,de->d_name);
-
-  //                    printf("Filename2 created in db %s artist_id %d album_id %d \n",songname,artistid,albumid);
-
                       if (song_exist_in_db(songname,songname)) printf("SONG EXIST **********************************");
-
                       sprintf(sqlselect1,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                                                                   (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                                                                    0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "1970-01-01 00:00:00",   "1970-01-01 00:00:00","1970-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,dirid);
@@ -597,14 +563,10 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     // select the right db to update from
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);				// clear music oversigt
-    //gotoxy(10,13);
-
     if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
-
     i=0;
     if (directory_id==0) {			// hent fra starten top music directory
         strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
-
         strcpy(musicoversigt[0].album_name,"PLAYLIST");
         strcpy(musicoversigt[0].album_path,"");
         strcpy(musicoversigt[0].album_coverfile,"");
@@ -615,7 +577,6 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
         musicoversigt[0].artist_id=0;
         musicoversigt[0].oversigttype=-1;			// type -1 = playlist
         i++;
-
     } else {
         sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
         strcpy(musicoversigt[0].album_name,"   BACK");
@@ -652,13 +613,8 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
             if (file_exists(fundetpath)) {
                 strcpy(convert_command,"/usr/bin/convert -scale 128 ");
                 strcat(convert_command,"\"");
-
-//                strcat(convert_command,configmusicpath);
-//                strcat(convert_command,row[1]);
-
                 strcat(convert_command,fundetpath);
                 strcat(convert_command,"\"");
-
                 strcat(convert_command," \"");
                 strcat(convert_command,configmusicpath);
                 strcat(convert_command,row[1]);
@@ -717,7 +673,6 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
     i=0;
     strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
-
     strcpy(musicoversigt[0].album_name,"   BACK");
     strcpy(musicoversigt[0].album_path,"");
     strcpy(musicoversigt[0].album_coverfile,"");
@@ -737,24 +692,20 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-
-//        printf("Load playlist nr %s songs info from database om record %d \n",row[0],i);
-
-            strcpy(musicoversigt[i].album_name,row[1]);
-            strcpy(musicoversigt[i].album_path,"");
-            musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
-            musicoversigt[i].parent_id=0;
-            musicoversigt[i].album_id=0;
-            musicoversigt[i].artist_id=0;
-            musicoversigt[i].oversigttype=-1;
-            i++;
-        }        	// end while
+      while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
+        strcpy(musicoversigt[i].album_name,row[1]);
+        strcpy(musicoversigt[i].album_path,"");
+        musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
+        musicoversigt[i].parent_id=0;
+        musicoversigt[i].album_id=0;
+        musicoversigt[i].artist_id=0;
+        musicoversigt[i].oversigttype=-1;
+        i++;
+      }        	// end while
     } else {
-        printf("SQL DATBASE ERROR\n");
-        i=0;
+      printf("SQL DATBASE ERROR\n");
+      i=0;
     }
-
     if (debugmode & 2) printf("Fundet antal %d playlists. \n",i);
     musicoversigt_antal=i;						// antal i oversigt
     mysql_close(conn);
@@ -859,57 +810,52 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-//            printf("fundet directory_id = %s path = %s parent id = %s  \n ",row[0],row[1],row[2]);
-            strcpy(dirname,row[1]);
-            strcpy(tmptxt,configmusicpath);
-            strcat(tmptxt,row[1]);
-            strcat(tmptxt,"/Front.jpg");
-            if (file_exists(tmptxt)) {
-                strcpy(convert_command,"/usr/bin/convert -scale 128 ");
-                strcat(convert_command,"\"");
-                strcat(convert_command,configmusicpath);
-                strcat(convert_command,row[1]);
-                strcat(convert_command,"/Front.jpg\"");
-                strcat(convert_command," \"");
-                strcat(convert_command,configmusicpath);
-                strcat(convert_command,row[1]);
-                strcat(convert_command,"/");
-                strcat(convert_command,"mythcFront.jpg\"");
-//        printf("convert command =%s \n",convert_command);
-                strcpy(tmptxt,configmusicpath);
-                strcat(tmptxt,row[1]);
-                strcat(tmptxt,"/mythcFront.jpg");
-                if (!(file_exists(tmptxt))) {
-                    system(convert_command);
-                    printf("Do Convert scale image %s to 128*128 \n",row[1]);
-                }
-                strcpy(icon_file,tmptxt);		// gem icon file name
-            } else {
-                strcpy(icon_file,"");			// no icon
-                //printf("No file exist in %s \n",tmptxt);
-            }
-            strcpy(musicoversigt[i].album_name,dirname);
-            strcpy(musicoversigt[i].album_path,"");
-            //printf("gem icon file path = %s \n",icon_file);
-            strcpy(musicoversigt[i].album_coverfile,icon_file);
-            musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
-            musicoversigt[i].parent_id=atoi(row[2]);
-            musicoversigt[i].album_id=0;
-            musicoversigt[i].artist_id=0;
-            musicoversigt[i].oversigttype=0;
-            i++;
-        }        	// end while
+      while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
+        strcpy(dirname,row[1]);
+        strcpy(tmptxt,configmusicpath);
+        strcat(tmptxt,row[1]);
+        strcat(tmptxt,"/Front.jpg");
+        if (file_exists(tmptxt)) {
+          strcpy(convert_command,"/usr/bin/convert -scale 128 ");
+          strcat(convert_command,"\"");
+          strcat(convert_command,configmusicpath);
+          strcat(convert_command,row[1]);
+          strcat(convert_command,"/Front.jpg\"");
+          strcat(convert_command," \"");
+          strcat(convert_command,configmusicpath);
+          strcat(convert_command,row[1]);
+          strcat(convert_command,"/");
+          strcat(convert_command,"mythcFront.jpg\"");
+          strcpy(tmptxt,configmusicpath);
+          strcat(tmptxt,row[1]);
+          strcat(tmptxt,"/mythcFront.jpg");
+          if (!(file_exists(tmptxt))) {
+            system(convert_command);
+            printf("Do Convert scale image %s to 128*128 \n",row[1]);
+          }
+          strcpy(icon_file,tmptxt);		// gem icon file name
+        } else {
+          strcpy(icon_file,"");			// no icon
+        }
+        strcpy(musicoversigt[i].album_name,dirname);
+        strcpy(musicoversigt[i].album_path,"");
+        strcpy(musicoversigt[i].album_coverfile,icon_file);
+        musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
+        musicoversigt[i].parent_id=atoi(row[2]);
+        musicoversigt[i].album_id=0;
+        musicoversigt[i].artist_id=0;
+        musicoversigt[i].oversigttype=0;
+        i++;
+      }        	// end while
     } else {
-        printf("SQL DATBASE ERROR\n");
-        i=0;
+      printf("SQL DATBASE ERROR\n");
+      i=0;
     }
     if (debugmode & 2) printf("Fundet antal %d CD Covers. \n",i);
     musicoversigt_antal=i;						// antal i oversigt
     mysql_close(conn);
     return(i);
 }
-
 
 
 //
@@ -974,31 +920,28 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     strcpy(husk_tmptxt3,"");
     strcpy(tmptxt3,"");
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
-            if (global_use_internal_music_loader_system) {
-              if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
-            } else {
-              if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
-            }
-            if (global_use_internal_music_loader_system) {
-              strcpy(tmptxt,"");
-            } else strcpy(tmptxt,configmusicpath);		// set defult start path from internal or mythtv if exist
-            sprintf(tmptxt2,"%s",row[2]);		         	// hent dir id
-            hent_dir_id(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
-            strcpy(tmptxt3,tmptxt);		                // temptxt3 er = path
-            strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
-            strcat(tmptxt,row[1]);				// add filename til sang
-            if ((strcmp(tmptxt3,husk_tmptxt3)!=0) && (file_exists(tmptxt3))) {
-//                printf("Loader music cover til playlist\n");
-                texture=loadTexture(tmptxt3);				// load texture
-            } else {
-                //printf(" No texture file found: %s \n",tmptxt3);
-                texture=0;
-            }
-//            if (debugmode) printf("playlist name is %s aktiv %d \n",row[4], music_list_select_array[i]);
-            if ((music_list_select_array[i]==true)) aktiv_playlist.m_add_playlist(tmptxt,row[0],row[5],row[3],row[4],row[6],row[7],0,texture);	// add (gem) info i playlist
-            i++;
+      while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
+        if (global_use_internal_music_loader_system) {
+          if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+        } else {
+          if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
         }
+        if (global_use_internal_music_loader_system) {
+          strcpy(tmptxt,"");
+        } else strcpy(tmptxt,configmusicpath);		// set defult start path from internal or mythtv if exist
+        sprintf(tmptxt2,"%s",row[2]);		         	// hent dir id
+        hent_dir_id(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
+        strcpy(tmptxt3,tmptxt);		                // temptxt3 er = path
+        strcat(tmptxt3,"mythcFront.jpg");		      // add filename til cover
+        strcat(tmptxt,row[1]);				            // add filename til sang
+        if ((strcmp(tmptxt3,husk_tmptxt3)!=0) && (file_exists(tmptxt3))) {
+          texture=loadTexture(tmptxt3);				// load texture
+        } else {
+          texture=0;
+        }
+        if ((music_list_select_array[i]==true)) aktiv_playlist.m_add_playlist(tmptxt,row[0],row[5],row[3],row[4],row[6],row[7],0,texture);	// add (gem) info i playlist
+        i++;
+      }
     }
     if (debugmode & 2) printf("Numbers in playlist=%d \n",aktiv_playlist.numbers_in_playlist());
     mysql_close(conn);
@@ -1011,13 +954,13 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
     unsigned int i=0; // hent alle music convers
     char tmpfilename[200];
     while (i<MUSIC_OVERSIGT_TYPE_SIZE-1) {
-        strcpy(tmpfilename,"");
-        if (strcmp(tmpfilename,musicoversigt[i].album_coverfile)==0) strcpy(tmpfilename,"images/");
-        strcat(tmpfilename,musicoversigt[i].album_coverfile);
-        if ((strcmp(tmpfilename,"images/")!=0) && (file_exists(tmpfilename))) {
-            if (musicoversigt[i].textureId==0) musicoversigt[i].textureId = loadTexture(tmpfilename);
-        }
-        i++;
+      strcpy(tmpfilename,"");
+      if (strcmp(tmpfilename,musicoversigt[i].album_coverfile)==0) strcpy(tmpfilename,"images/");
+      strcat(tmpfilename,musicoversigt[i].album_coverfile);
+      if ((strcmp(tmpfilename,"images/")!=0) && (file_exists(tmpfilename))) {
+        if (musicoversigt[i].textureId==0) musicoversigt[i].textureId = loadTexture(tmpfilename);
+      }
+      i++;
     }
     return(i);
 }
@@ -1045,513 +988,180 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
     int ofs;
     sofset=(_mangley/40)*8;
     while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
-        // do new line (if not first line)
-        if (((i % bonline)==0) && (i>0)) {
-            xof=0;
-            yof=yof-(buttonsizey+44);
-        }
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        // show back or opem playlist list
-        if (i==0) {
-            if (musicoversigt[i+sofset].oversigttype!=-1) {
-                if (i+sofset==0) {
-                    glBindTexture(GL_TEXTURE_2D,back_icon);
-                } else {
-                    if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
-                    else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
-                }
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            } else {
-                glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            }
+      // do new line (if not first line)
+      if (((i % bonline)==0) && (i>0)) {
+        xof=0;
+        yof=yof-(buttonsizey+44);
+      }
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      // show back or opem playlist list
+      if (i==0) {
+        if (musicoversigt[i+sofset].oversigttype!=-1) {
+          if (i+sofset==0) {
+              glBindTexture(GL_TEXTURE_2D,back_icon);
+          } else {
+              if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+              else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+          }
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         } else {
-            // else normal icon loader if exist else load default icon (normal_icon) or playlist icon (dirplaylist_icon)
-            if (musicoversigt[i+sofset].textureId!=0) {
-                glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            } else {
-                if (musicoversigt[i+sofset].oversigttype==-1) {
-                    glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                } else {
-                    glBindTexture(GL_TEXTURE_2D,normal_icon);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                }
-            }
+          glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
-
-        // if selected icon
-        if (i+1==music_key_selected) buttonsize=190.0f;
-        else buttonsize=180.0f;
-
-        glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glLoadName(100+i);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd();
-        glPopMatrix();
-
-        glPushMatrix();
-
-        glTranslatef(xof, yof ,0.0f);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);				//
-        glRasterPos2f(	0.0f, 0.0f);
-        strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
-        lastslash=strrchr(temptxt,'/');
-        if (lastslash) strcpy(temptxt,lastslash+1);
-        glScalef(20.0, 20.0, 1.0);
-        glDisable(GL_TEXTURE_2D);
-        if (strlen(temptxt)<17) {
-            ofs=(strlen(temptxt)/2)*9;
-            glRasterPos2f(0.0f, 10.0f);
-            glcRenderString(temptxt);
+      } else {
+        // else normal icon loader if exist else load default icon (normal_icon) or playlist icon (dirplaylist_icon)
+        if (musicoversigt[i+sofset].textureId!=0) {
+          glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         } else {
-            glRasterPos2f(0.0f, 10.0f);
-            temptxt[18]=0;
-            glcRenderString(temptxt);
+          if (musicoversigt[i+sofset].oversigttype==-1) {
+            glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          } else {
+            glBindTexture(GL_TEXTURE_2D,normal_icon);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          }
+        }
+      }
+      // if selected icon
+      if (i+1==music_key_selected) buttonsize=190.0f;
+      else buttonsize=180.0f;
+      glEnable(GL_TEXTURE_2D);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(100+i);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsize,yof+buttonsize , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+      glEnd();
+      glPopMatrix();
+      glPushMatrix();
+      glTranslatef(xof, yof ,0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);				//
+      glRasterPos2f(	0.0f, 0.0f);
+      strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
+      lastslash=strrchr(temptxt,'/');
+      if (lastslash) strcpy(temptxt,lastslash+1);
+      glScalef(20.0, 20.0, 1.0);
+      glDisable(GL_TEXTURE_2D);
+      if (strlen(temptxt)<17) {
+          ofs=(strlen(temptxt)/2)*9;
+          glRasterPos2f(0.0f, 10.0f);
+          glcRenderString(temptxt);
+      } else {
+          glRasterPos2f(0.0f, 10.0f);
+          temptxt[18]=0;
+          glcRenderString(temptxt);
 /*
-            while(ytextofset<=10) {
-                j=0;
-                while(!isspace(temptxt[ii])) {
-                    if (temptxt[ii]=='\0') break;
-                    word[j]=temptxt[ii];
-                    ii++;
-                    j++;
-                }
-                word[j]='\0';		// j = word length
-                if (j>13) {		// print char by char
-                    k=0;
-                    while(word[k]!='\0') {
-                        if (pos>=13) {
-                            if ( k != 0 ) glcRenderChar('-');
-                            pos=0;
-                            ytextofset+=10.0f;
+          while(ytextofset<=10) {
+              j=0;
+              while(!isspace(temptxt[ii])) {
+                  if (temptxt[ii]=='\0') break;
+                  word[j]=temptxt[ii];
+                  ii++;
+                  j++;
+              }
+              word[j]='\0';		// j = word length
+              if (j>13) {		// print char by char
+                  k=0;
+                  while(word[k]!='\0') {
+                      if (pos>=13) {
+                          if ( k != 0 ) glcRenderChar('-');
+                          pos=0;
+                          ytextofset+=10.0f;
 //                            glLoadIdentity();
 //                            glRasterPos2f(0.0f, 0.0f);
 //                            glScalef(1.0, 1.0, 1.0);
-                        }
-                        glTranslatef(xof,yof,0.0f);
-                        glRasterPos2f(0.0f, 0.0f);
-                        glcRenderChar(word[k]);
-                        pos++;
-                        k++;
-                    }
-                } else {
-                    if (pos+j>13) {	// word doesn't fit line
-                        ytextofset+=15.0f;
-                        pos=0;
+                      }
+                      glTranslatef(xof,yof,0.0f);
+                      glRasterPos2f(0.0f, 0.0f);
+                      glcRenderChar(word[k]);
+                      pos++;
+                      k++;
+                  }
+              } else {
+                  if (pos+j>13) {	// word doesn't fit line
+                      ytextofset+=15.0f;
+                      pos=0;
 //                     glLoadIdentity();
 //                        glRasterPos2f(0.0f, 0.0f);
 //                        glScalef(1.0, 1.0, 1.0);
-                    glTranslatef(xof,yof,0.0f);
-                    glRasterPos2f(0.0f, 0.0f);
-                    }
-                    ofs=(int) (strlen(word)/2)*9;
-                    glcRenderString(word);
-                    pos+=j;
-                }
-                if (pos<12) {
-                    glcRenderChar(' ');
-                    pos++;
-                }
-                if (temptxt[ii]=='\0') break;
-                ii++;	// skip space
-            }
+                  glTranslatef(xof,yof,0.0f);
+                  glRasterPos2f(0.0f, 0.0f);
+                  }
+                  ofs=(int) (strlen(word)/2)*9;
+                  glcRenderString(word);
+                  pos+=j;
+              }
+              if (pos<12) {
+                  glcRenderChar(' ');
+                  pos++;
+              }
+              if (temptxt[ii]=='\0') break;
+              ii++;	// skip space
+          }
 */
-        }
-        glEnable(GL_TEXTURE_2D);
-        glPopMatrix();
+      }
+      glEnable(GL_TEXTURE_2D);
+      glPopMatrix();
 
-        xof+=210;
-        i++;
+      xof+=210;
+      i++;
     }
-
-
+    // update to show
     if (strcmp(music_db_update_loader,"")>0) {
-        // show music loader status
-        glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
-        glEnd();
-
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef(1680+20,95,0);
-        glScalef(24.0, 24.0, 1.0);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glcRenderString(music_db_update_loader);
-        glPopMatrix();
+      // show music loader status
+      glEnable(GL_TEXTURE_2D);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
+      glEnd();
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+20,95,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      glcRenderString(music_db_update_loader);
+      glPopMatrix();
     }
-
     if (i==0) {
-        // show error message
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
-        glEnd();
-        glPushMatrix();
-        glTranslatef((orgwinsizex/3)+30, 275.0f , 0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(24.0, 24.0, 1.0);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        sprintf(temptxt,"Error no music loaded in db");
-        glcRenderString(temptxt);
-        glPopMatrix();
+      // show error message
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
+      glEnd();
+      glPushMatrix();
+      glTranslatef((orgwinsizex/3)+30, 275.0f , 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      sprintf(temptxt,"Error no music loaded in db");
+      glcRenderString(temptxt);
+      glPopMatrix();
     }
 }
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-
-
-
-
-void show_newmusic_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley) {
-
-    int lmusicoversigt_antal;
-    int i=0;
-//    int txtbrede;
-    unsigned int ofs;		// used to calc the text length
-    float yof=0.0f;
-    float xof=0.0f;
-//  float yofset=10.0f;
-//  float xofset=22.0f;
-    char *lastslash;
-    float xvgaz=0.0f;
-    char temptxt[200];
-    int sofset;
-    int bonline;
-    float buttonsize=68.0f;
-    float buttonzoom=0.0f;
-//  float scale=1.0f;
-    float boffset=buttonsize*2;
-    int akiconnr;
-    switch(screen_size) {
-        case 1: xof=-380.0f;
-                yof= 250.0f;
-                sofset=(_mangley/41)*5;
-                bonline=5;
-                xvgaz=-800.0f;
-                lmusicoversigt_antal=6*4;			// 5*4
-                buttonsize=88.0f;				// 68
-                break;
-        case 2: xof=-380.0f;
-                yof= 250.0f;
-                sofset=(_mangley/41)*5;
-                bonline=5;
-                xvgaz=-850.0f;
-                lmusicoversigt_antal=7*4;
-                buttonsize=88.0f;
-                break;
-        case 3: xof=-660.0f;
-                yof= 336.0f;
-                sofset=(_mangley/41)*9;
-                bonline=9;
-                xvgaz=-1000.0f;
-                lmusicoversigt_antal=10*5;
-                buttonsize=84.0f;
-                break;
-        case 4: xof=-660.0f;
-                yof= 336.0f;
-                sofset=(_mangley/41)*8;
-                bonline=8;
-                xvgaz=-1000.0f;
-                lmusicoversigt_antal=9*5;
-                buttonsize=96.0f;
-                break;
-        default:
-                xof=-380.0;
-                yof= 250.0f;
-                sofset=(_mangley/41)*5;
-                bonline=5;
-                xvgaz=-800.0f;
-                lmusicoversigt_antal=6*4;
-                buttonsize=68.0f;
-                break;
-    }
-    yof=yof+(buttonsize*2)*2;
-    i=i-bonline;
-    //  printf("*Show music oversigt * antal = %d \n",musicoversigt_antal);
-    // viser det antal cder/mapper som kan være på skærmen på en gang
-    // ellers er der et start ofset (sofset) som beskriver start ofset fra array (bliver rettet andet sted) pilup/pildown osv osv
-    while((i<(int) lmusicoversigt_antal) && (i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
-        switch(screen_size) {
-            case 1:
-                if ((i % bonline)==0) xof=-380;		// reset x to next line
-                if (((i % bonline)==0) && (i>0)) {
-                    yof=yof-(boffset+30);		// add y ofset to next line
-                }
-                break;
-            case 2:
-                if ((i % bonline)==0) xof=-380;		// next line
-                if (((i % bonline)==0) && (i>0)) {
-                    yof=yof-(boffset+30);
-                }
-                break;
-            case 3:
-                if ((i % bonline)==0) xof=-660;		// next line
-                if ((i % bonline)==0) {
-                    yof=yof-(boffset+30);
-                }
-                break;
-            case 4:
-                if ((i % bonline)==0) xof=-660;		// next line
-                if (((i % bonline)==0) && (i>0)) {
-                    yof=yof-(boffset+30);
-                }
-                break;
-        }
-        glLoadIdentity();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-
-        if (i+sofset>=0) {
-
-            if (do_music_icon_anim_icon_ofset==-1) akiconnr=i+sofset+bonline;
-            else if (do_music_icon_anim_icon_ofset==1) akiconnr=i+sofset-bonline;
-            else akiconnr=i+sofset;
-
-            if (i==0) {
-                if (musicoversigt[akiconnr].oversigttype!=-1) {
-                    if (i+sofset==0) {
-                        if (musicoversigt[akiconnr].oversigttype==-1) glBindTexture(GL_TEXTURE_2D,dirplaylist_icon); else glBindTexture(GL_TEXTURE_2D,back_icon);
-                    } else {
-                        if (musicoversigt[akiconnr].textureId!=0) glBindTexture(GL_TEXTURE_2D,musicoversigt[akiconnr].textureId); else glBindTexture(GL_TEXTURE_2D,normal_icon);
-                    }
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                } else {
-                    glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                }
-            } else {
-                if (musicoversigt[akiconnr].textureId!=0) {
-                    if (sinusofset==0) glBindTexture(GL_TEXTURE_2D,musicoversigt[akiconnr].textureId);
-                    else {
-                        if (musicoversigt[akiconnr].textureId!=0) glBindTexture(GL_TEXTURE_2D,musicoversigt[akiconnr].textureId);
-                        else glBindTexture(GL_TEXTURE_2D,normal_icon);
-                    }
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                } else {
-                    if (musicoversigt[akiconnr].oversigttype==-1) {
-                        glBindTexture(GL_TEXTURE_2D,dirplaylist_icon);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    } else {
-                        glBindTexture(GL_TEXTURE_2D,normal_icon);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    }
-                }
-            }
-            if (i+1==music_key_selected) buttonzoom=10.0f;
-            else buttonzoom=0.0f;
-
-            if (do_music_icon_anim_icon_ofset==1) glTranslatef(xof,yof-((sinus[sinusofset]-176)),xvgaz);
-            else if (do_music_icon_anim_icon_ofset==-1) glTranslatef(xof,yof-((costabel[sinusofset])),xvgaz);
-            else glTranslatef(xof,yof,xvgaz);
-
-            glRotatef(45.0f, 0.0f, 0.0f, 0.0f);
-
-            if (strcmp(musicoversigt[i+sofset].album_name,"")!=0) {
-                glLoadName(100+i);
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f(-(buttonsize+buttonzoom), -(buttonsize+buttonzoom), 0.0);
-                glTexCoord2f(0, 1); glVertex3f(-(buttonsize+buttonzoom),  buttonsize+buttonzoom, 0.0);
-                glTexCoord2f(1, 1); glVertex3f( buttonsize+buttonzoom,  buttonsize+buttonzoom, 0.0);
-                glTexCoord2f(1, 0); glVertex3f( buttonsize+buttonzoom, -(buttonsize+buttonzoom), 0.0);
-                glEnd(); //End quadrilateral coordinates
-
-                if (do_music_icon_anim_icon_ofset==-1) strcpy(temptxt,musicoversigt[i+sofset+bonline].album_name);        // album navn
-                else if (do_music_icon_anim_icon_ofset==1)  strcpy(temptxt,musicoversigt[i+sofset-bonline].album_name);
-                else strcpy(temptxt,musicoversigt[i+sofset].album_name);
-                lastslash=strrchr(temptxt,'/');
-                if (lastslash) strcpy(temptxt,lastslash+1);
-                temptxt[13]=0;
-                //    txtbrede=t3dDrawWidth(musicoversigt[i+sofset].album_name);
-
-                glPushMatrix();
-                glLoadIdentity();
-
-                ofs=120-strlen(temptxt);
-                //    ofs=0;
-                if (do_music_icon_anim_icon_ofset==1) glTranslatef(xof-ofs+60,  yof-90-((sinus[sinusofset]-176)) ,xvgaz);
-                else if (do_music_icon_anim_icon_ofset==-1) glTranslatef(xof-ofs+60,  yof-90-((costabel[sinusofset])) ,xvgaz);
-                else glTranslatef(xof-ofs+60,  yof-90 ,xvgaz);
-
-                glRasterPos2f(0.0f, 0.0f);
-                glDisable(GL_TEXTURE_2D);
-
-                glScalef(14.0, 14.0, 1.0);
-
-                float ytextofset=0.0f;
-                int ii,j,k,pos;
-                ii=pos=0;
-                char word[16000];
-
-                // small text line
-                if (strlen(temptxt)<=14) {
-                    glLoadIdentity();
-                    ofs=(strlen(temptxt)/2)*9;
-                    if (do_music_icon_anim_icon_ofset==1) glTranslatef(xof-50-ofs+60,  yof-90-((sinus[sinusofset]-176)) ,xvgaz);
-                    else if (do_music_icon_anim_icon_ofset==-1) glTranslatef(xof-50-ofs+60,  yof-90-((costabel[sinusofset])) ,xvgaz);
-                    else glTranslatef(xof-50-ofs+60,  yof-90 ,xvgaz);
-                    glRasterPos2f(0.0f, 0.0f);
-                    glDisable(GL_TEXTURE_2D);
-                    glScalef(14.0, 14.0, 1.0);
-                    glcRenderString(temptxt);
-                } else {
-                    while((1)  && (ytextofset<=10)) {
-                        j=0;
-                        while(!isspace(temptxt[ii])) {
-                            if (temptxt[ii]=='\0') break;
-                            word[j]=temptxt[ii];
-                            ii++;
-                            j++;
-                        }
-                        word[j]='\0';		// j = word length
-                        if (j>13) {		// print char by char
-                            k=0;
-                            while(word[k]!='\0') {
-                                if (pos>=13) {
-                                    if ( k != 0 ) glcRenderChar('-');
-                                    pos=0;
-                                    ytextofset+=10.0f;
-                                    glLoadIdentity();
-                                    if (do_music_icon_anim_icon_ofset==1) glTranslatef(xof-50-ofs+60,  yof-90-((sinus[sinusofset]-176)) ,xvgaz);
-                                    else if (do_music_icon_anim_icon_ofset==-1) glTranslatef(xof-50-ofs+60,  yof-90-((costabel[sinusofset])) ,xvgaz);
-                                    else glTranslatef(xof-ofs+60,  yof-90 ,xvgaz);
-                                    glRasterPos2f(0.0f, 0.0f);
-                                    glScalef(14.0, 14.0, 1.0);
-
-                                }
-                                glcRenderChar(word[k]);
-                                pos++;
-                                k++;
-                            }
-                        } else {
-                            if (pos+j>13) {	// word doesn't fit line
-                                ytextofset+=15.0f;
-                                pos=0;
-                                glLoadIdentity();
-                                if (do_music_icon_anim_icon_ofset==1) glTranslatef(xof-50-ofs+60,  yof-90-((sinus[sinusofset]-176)) ,xvgaz);
-                                else if (do_music_icon_anim_icon_ofset==-1) glTranslatef(xof-50-ofs+60,  yof-90-((costabel[sinusofset])) ,xvgaz);
-                                else glTranslatef(xof-ofs+60,  yof-90 ,xvgaz);
-                                glRasterPos2f(0.0f, 0.0f);
-                                glScalef(14.0, 14.0, 1.0);
-                        }
-                        ofs=(int) (strlen(word)/2)*9;
-                        glcRenderString(word);
-                        pos+=j;
-                    }
-                    if (pos<12) {
-                        glcRenderChar(' ');
-                        pos++;
-                    }
-                    if (temptxt[ii]=='\0') break;
-                    ii++;	// skip space
-                }
-            }
-//                glcRenderString(temptxt);
-        }
-            // lav ramme om valgte music icon
-            if (i+1==music_key_selected) {
-                 // lav valgte border
-                glLoadIdentity();
-                glTranslatef((xof), (yof), xvgaz);
-                //            glRotatef(45.0f, 0.0f, 0.0f, 0.0f); 		// 45.0f,0.0f,0.0f,0.0f
-
-                glColor3f(1.0f,1.0f,1.0f);
-                glBindTexture(GL_TEXTURE_2D,0);
-
-                //            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                //            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-                // left
-                glTexCoord2f(0.0, 0.0); glVertex3f(-72, -75, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(-75, -75, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(-75, 75, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(-72, 75, 0.0);
-                // right
-                glTexCoord2f(0.0, 0.0); glVertex3f(72, -75, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(75, -75, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(75, 75, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(72, 75, 0.0);
-
-                // button
-                glVertex3f(-75, -72, 0.0);
-                glVertex3f(-75, -75, 0.0);
-                glVertex3f(75, -75, 0.0);
-                glVertex3f(75, -72, 0.0);
-
-                // top
-                glVertex3f(-75, 72, 0.0);
-                glVertex3f(-75, 75, 0.0);
-                glVertex3f(75, 75, 0.0);
-                glVertex3f(75, 72, 0.0);
-                glEnd();
-            } // end box
-            glPopMatrix();
-        } // end if i>0
-        i++;
-        switch(screen_size) {
-            case 1: xof+=(buttonsize*1.6);
-                    break;
-            case 2: xof+=(buttonsize*1.6);
-                    break;
-            case 3: xof+=(buttonsize*1.7);
-                    break;
-            case 4: xof+=(buttonsize*1.65);
-                    break;
-            default:xof+=(buttonsize*2)+8;
-                    break;
-        }
-    } // end while
-}
-*/

@@ -15,6 +15,8 @@ extern GLuint screensaverbox;
 extern GLuint screensaverbox_mask;
 extern GLuint onlineradio;                       //
 
+extern GLuint newstuf_icon;
+
 float sinofsetz[]={
 
 4.00,4.00,4.00,4.00,4.00,4.00,4.00,4.00,3.99,3.99,3.99,3.99,3.99,3.98,3.98,3.98,3.97,3.97,3.97,3.96,
@@ -1818,27 +1820,46 @@ float sinofsetz[]={
 2.15,2.13,2.11,2.09,2.07,2.05,2.03,2.01,1.99,1.97,1.95,1.93,1.91,1.89,1.87,1.85,1.83,1.81,1.79,1.77,
 1.75,1.73,1.71,1.69,1.67,1.65,1.63,1.61,1.59,1.57,1.55,1.53,1.51,1.49,1.47,1.45};
 
+// define layout
+// default layout
+
+void boxarray::build_default_array() {
+  int x,y;
+  int i=0;
+  float sizx=120.0f;            // space
+  float sizy=120.0f;            // space
+  float sizz=120.0f;            // space
+  float bsizex=120.0f;          // box size
+  float bsizey=100.0f;          // box size
+  float bsizez=100.0f;          // box size
+  for(y=0;y<11;y++) {
+    for(x=0;x<11;x++) {
+      matrix[x][y].xpos=(x*180.0f)+(sizx/2);
+      matrix[x][y].ypos=(y*140.0f)+(sizy/2)+(sinofsetz[i*57]*7);
+      matrix[x][y].zpos=0.0f;
+      matrix[x][y].sizex=bsizex;
+      matrix[x][y].sizey=bsizey;
+      matrix[x][y].sizez=bsizez;
+      i++;
+    }
+  }
+}
 
 // constructor init array
 
-boxarray::boxarray()
-{
-    float xofset=20.5f;
-    float yofset=20.5f;
-    float xpos=15.0;
-    float ypos=11.5;
+boxarray::boxarray() {
     int x,y;
-    tilt=0;
     for(y=0;y<11;y++) {
-        for(x=0;x<11;x++) {
-            matrix[x][y].xpos=xpos+(xofset*x);
-            matrix[x][y].ypos=ypos+(yofset*y);
-            matrix[x][y].zpos=0;
-            matrix[x][y].texture=0;			// den aktive texture
-            matrix[x][y].pictexture=0;			// texture fra pictures
-            matrix[x][y].musictexture=0;		// texture fra music cd samling i mythtv
-        }
+      for(x=0;x<11;x++) {
+        matrix[x][y].xpos=0;
+        matrix[x][y].ypos=0;
+        matrix[x][y].zpos=0;
+        matrix[x][y].texture=0;			              // use default aktive texture
+        matrix[x][y].pictexture=onlineradio;		// texture fra pictures
+        matrix[x][y].musictexture=newstuf_icon;		// texture fra music cd samling i mythtv
+      }
     }
+    build_default_array();
 }
 
 
@@ -1848,11 +1869,8 @@ boxarray::boxarray()
 // type 3 =
 // type 4 = set texture to music texture
 
-void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
-
-{
+void boxarray::set_new_textures(int mode,int type,GLuint newtexture) {
     int x,y;
-
     if (type==0) {								// scroll med newtexture and restore old
         switch (mode) {
             case 1:
@@ -1862,7 +1880,7 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
                 for(y=4;y<7;y++) {
                     for(x=4;x<7;x++) {
                         if ((x==5) && (y==5)) {
-                            matrix[x][y].texture=matrix[x][y].musictexture;		// restore texture igen
+                          matrix[x][y].texture=matrix[x][y].musictexture;		// restore texture igen
                         } else matrix[x][y].texture=newtexture;
                     }
                 }
@@ -1871,7 +1889,7 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
                 for(y=3;y<8;y++) {
                     for(x=3;x<8;x++) {
                         if (((x==4) || (x==5) || (x==6)) && ((y==4) || (y==5) || (y==6))) {
-                            matrix[x][y].texture=matrix[x][y].musictexture;
+                          matrix[x][y].texture=matrix[x][y].musictexture;
                         } else matrix[x][y].texture=newtexture;
                     }
                 }
@@ -1880,7 +1898,7 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
                 for(y=2;y<9;y++) {
                     for(x=2;x<9;x++) {
                         if (((x==3) || (x==4) || (x==5) || (x==6) || (x==7)) && ((y==3)|| (y==4) || (y==5) || (y==6) || (y==7))) {
-                            matrix[x][y].texture=matrix[x][y].musictexture;
+                          matrix[x][y].texture=matrix[x][y].musictexture;
                         } else matrix[x][y].texture=newtexture;
                     }
                 }
@@ -1889,7 +1907,7 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
                 for(y=1;y<10;y++) {
                     for(x=1;x<10;x++) {
                         if (((x==2) || (x==3) || (x==4) || (x==5) || (x==6) || (x==7) || (x==8)) && ((y==2) || (y==3) || (y==4) || (y==5) || (y==6) || (y==7) || (y==8))) {
-                            matrix[x][y].texture=matrix[x][y].musictexture;
+                          matrix[x][y].texture=matrix[x][y].musictexture;
                         } else matrix[x][y].texture=newtexture;
                     }
                 }
@@ -1906,7 +1924,7 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
             default:
                 for(y=0;y<11;y++) {
                     for(x=0;x<11;x++) {
-                        matrix[x][y].texture=matrix[x][y].musictexture;
+                      matrix[x][y].texture=matrix[x][y].musictexture;
                     }
                 }
                 break;
@@ -1978,74 +1996,74 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
             case 1:
                 y=0;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 2:
                 y=1;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 3:
                 y=2;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 4:
                 y=3;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 5:
                 y=4;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 6:
                 y=5;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 7:
                 y=6;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 8:
                 y=7;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 9:
                 y=8;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 10:
                 y=9;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 11:
                 y=10;
                 for(x=0;x<11;x++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             default:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        matrix[x][y].texture=newtexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
         }
@@ -2055,74 +2073,74 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
             case 1:
                 x=0;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 2:
                 x=1;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 3:
                 x=2;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 4:
                 x=3;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 5:
                 x=4;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 6:
                 x=5;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 7:
                 x=6;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 8:
                 x=7;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 9:
                 x=8;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 10:
                 x=9;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             case 11:
                 x=10;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=newtexture;
+                  matrix[x][y].texture=newtexture;
                 }
                 break;
             default:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        matrix[x][y].texture=newtexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    matrix[x][y].texture=newtexture;
+                  }
                 }
                 break;
         }
@@ -2132,74 +2150,74 @@ void boxarray::set_new_textures(int mode,int type,GLuint newtexture)
             case 1:
                 x=11;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 2:
                 x=10;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 3:
                 x=9;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 4:
                 x=8;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 5:
                 x=7;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 6:
                 x=6;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 7:
                 x=5;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 8:
                 x=4;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 9:
                 x=3;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 10:
                 x=2;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             case 11:
                 x=1;
                 for(y=0;y<11;y++) {
-                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  matrix[x][y].texture=matrix[x][y].musictexture;
                 }
                 break;
             default:
                 for(y=0;y<11;y++) {
-                    for(x=0;x<11;x++) {
-                        matrix[x][y].texture=matrix[x][y].musictexture;
-                    }
+                  for(x=0;x<11;x++) {
+                    matrix[x][y].texture=matrix[x][y].musictexture;
+                  }
                 }
                 break;
         }
@@ -2213,11 +2231,8 @@ void rool_sinus()
     float husk;
     husk=sinofsetz[0];
     while (n<35996) {
-        sinofsetz[n]=sinofsetz[n+1];
-        n++;
-
-//printf("%d = %f \n",n,sinofsetz[n]);
-
+      sinofsetz[n]=sinofsetz[n+1];
+      n++;
     }
     sinofsetz[n]=husk;
 }
@@ -2226,8 +2241,8 @@ void rool_sinus()
 bool fileexists(const char * filename)
 {
     if (FILE * file = fopen(filename, "r")) {
-        fclose(file);
-        return true;
+      fclose(file);
+      return true;
     }
     return false;
 }
@@ -2254,37 +2269,34 @@ void boxarray::createboxpictures()
     strcat(destpath,"mythc_gallery/");
     dp  = opendir(startpath);
     if (dp==NULL) {
-        printf("Dir error, can not open dir. %s ",startpath);
-
+      printf("Dir error, can not open dir. %s ",startpath);
     } else {
-        printf("Directory to scan : %s \n\n",startpath);
+      printf("Directory to scan : %s \n\n",startpath);
     }
     if (dp) {
-        while((dirp = readdir(dp))!=NULL) {
-            if ((strcmp(dirp->d_name,".")!=0) && ((strcmp(dirp->d_name,"..")!=0))) {
-                strcpy(temptxt,destpath);
-                strcat(temptxt,dirp->d_name);
+      while((dirp = readdir(dp))!=NULL) {
+        if ((strcmp(dirp->d_name,".")!=0) && ((strcmp(dirp->d_name,"..")!=0))) {
+          strcpy(temptxt,destpath);
+          strcat(temptxt,dirp->d_name);
 
-                fundet=fileexists(temptxt);
-                if (!(fundet)) {
-                    antal++;
-
-                    printf("filnavn to create in gallery is %s \n",dirp->d_name);
-
-                    strcpy(convert_command,"convert -resize 128x128! '");                // first convert and resize dvd cover
-                    strcat(convert_command,startpath);
-                    strcat(convert_command,dirp->d_name);
-                    strcat(convert_command,"' '");
-                    strcat(convert_command,destpath);
-                    strcat(convert_command,dirp->d_name);
-                    strcat(convert_command,"'");
-                    system(convert_command);
-//                    printf("Conver command is %s \n",convert_command);
-                }
-            }
+          fundet=fileexists(temptxt);
+          if (!(fundet)) {
+            antal++;
+            printf("filnavn to create in gallery is %s \n",dirp->d_name);
+            strcpy(convert_command,"convert -resize 128x128! '");                // first convert and resize dvd cover
+            strcat(convert_command,startpath);
+            strcat(convert_command,dirp->d_name);
+            strcat(convert_command,"' '");
+            strcat(convert_command,destpath);
+            strcat(convert_command,dirp->d_name);
+            strcat(convert_command,"'");
+            system(convert_command);
+            // printf("Conver command is %s \n",convert_command);
+          }
         }
-        if (antal==0) printf("Done none to convert. \n"); else printf("Numbers of converted pictures :%d \n",antal);
-        closedir(dp);
+      }
+      if (antal==0) printf("Done none to convert. \n"); else printf("Numbers of converted pictures :%d \n",antal);
+      closedir(dp);
     }
 }
 
@@ -2307,36 +2319,36 @@ void boxarray::loadboxpictures()
     int y=0;
     dp  = opendir(startpath);
     if (dp==NULL) {
-        printf("Dir error\n");
+      printf("Dir error\n");
     }
     if (dp) {
-        if (loadboxpic) {
-            loadboxpic=0;
-            while (y<11) {
-                x=0;
-                while (x<11) {
-                    if (matrix[x][y].pictexture==0) {
-                        dirp = readdir(dp);
-                        if (dirp) {
-                            if ((strcmp(dirp->d_name,".")!=0) && ((strcmp(dirp->d_name,"..")!=0))) {
-                                printf("filnavn to load is %s x=%d Y=%d \n ",dirp->d_name,x,y);
-                                strcpy(temptxt,startpath);
-                                strcat(temptxt,dirp->d_name);
-                                textureid=loadTexture(temptxt);
-                                if (textureid) {
-                                    matrix[x][y].texture=textureid;		// gem texture hvis den ikke har
-                                    matrix[x][y].pictexture=textureid;	// gem texture hvis den ikke har
-                                }
-                            }
-                        }
-                    } else {
-                        matrix[x][y].texture=matrix[x][y].pictexture;
-                    }
-                    x++;
+      if (loadboxpic) {
+        loadboxpic=0;
+        while (y<11) {
+          x=0;
+          while (x<11) {
+            if (matrix[x][y].pictexture==0) {
+              dirp = readdir(dp);
+              if (dirp) {
+                if ((strcmp(dirp->d_name,".")!=0) && ((strcmp(dirp->d_name,"..")!=0))) {
+                  printf("filnavn to load is %s x=%d Y=%d \n ",dirp->d_name,x,y);
+                  strcpy(temptxt,startpath);
+                  strcat(temptxt,dirp->d_name);
+                  textureid=loadTexture(temptxt);
+                  if (textureid) {
+                    matrix[x][y].texture=textureid;		// gem texture hvis den ikke har
+                    matrix[x][y].pictexture=textureid;	// gem texture hvis den ikke har
+                  }
                 }
-                y++;
+              }
+            } else {
+              matrix[x][y].texture=matrix[x][y].pictexture;
             }
+            x++;
+          }
+          y++;
         }
+      }
     }
     if (dp) closedir(dp);
 }
@@ -2344,41 +2356,38 @@ void boxarray::loadboxpictures()
 
 // setter textures fra cd samling i mythtv
 
-void boxarray::settexture(struct music_oversigt_type *musicoversigt)
-
-{
+void boxarray::settexture(struct music_oversigt_type *musicoversigt) {
     int x,y;
     int n=0;
     GLuint textureid;
     for(y=0;y<11;y++) {
-        for(x=0;x<11;x++) {
-            bool fundettexture=false;
-            while ((n<200) && (fundettexture==false)) {
-                if (musicoversigt[n].textureId!=0) {
-                    fundettexture=true;
-                    textureid=musicoversigt[n].textureId;
-                } else textureid=0;
-                n++;
-                if (n==200) {
-                    fundettexture=true;
-                    textureid=0;
-                    n=0;
-                }
-            }
-            if (fundettexture) {
-                matrix[x][y].texture=textureid;			// gem texture hvis den ikke har en
-                matrix[x][y].musictexture=textureid;		// gem texture hvis den ikke har en
-            }
+      for(x=0;x<11;x++) {
+        bool fundettexture=false;
+        while ((n<200) && (fundettexture==false)) {
+          if (musicoversigt[n].textureId!=0) {
+            fundettexture=true;
+            textureid=musicoversigt[n].textureId;
+          } else textureid=0;
+          n++;
+          if (n==200) {
+            fundettexture=true;
+            textureid=0;
+            n=0;
+          }
         }
+        if (fundettexture) {
+          matrix[x][y].texture=textureid;			// gem texture hvis den ikke har en
+          matrix[x][y].musictexture=textureid;		// gem texture hvis den ikke har en
+        }
+      }
     }
 }
 
 
 
 int n=0;
-void boxarray::show_music_3d_new(int aangle,GLuint textureId)
 
-{
+void boxarray::show_music_3d_new(int aangle,GLuint textureId) {
     static float rangle=0.0f;
     float random_r_color,random_g_color,random_b_color;
     int x,y;
@@ -2392,11 +2401,11 @@ void boxarray::show_music_3d_new(int aangle,GLuint textureId)
     glTranslatef(200.0f, 200.0f, 1.0f);			// default afstand ved af start screen saver
 //    set_new_textures(1);
     if (rotate) {
-        glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-        glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
+      glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+      glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
     } else {
-        glRotatef(0, 0.0f, 0.0f, 1.0f);
-        glRotatef(0, 0.0f, 1.0f, 0.0f);
+      glRotatef(0, 0.0f, 0.0f, 1.0f);
+      glRotatef(0, 0.0f, 1.0f, 0.0f);
     }
 
     rangle+=.1;
@@ -2495,229 +2504,96 @@ void boxarray::show_music_3d_new(int aangle,GLuint textureId)
 }
 
 
-void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GLuint textureIdmask1)
+void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3)
 
 {
-    static float rangle=0.0f;
-    float random_r_color,random_g_color,random_b_color;
-    int x,y;
-    float angle=aangle;
-    float zof;
-    int i=0;
-    int rotate=1;
-
-    float sizx=140.0f;
-    float sizy=140.0f;
-    float sizz=140.0f;
-
-
-    //glTranslatef(2.0f, 0.0f, -10.0f);			// default afstand ved af start screen saver
-    //glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
-    //glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
-
-/*
-
-//    set_new_textures(1);
-
-    if (rotate) {
-        glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-        glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
-    } else {
-        glRotatef(0, 0.0f, 0.0f, 1.0f);
-        glRotatef(0, 0.0f, 1.0f, 0.0f);
-    }
-    rangle+=.1;
-    if (rangle>360*10) rangle=0;
-
-    n=0;
-    for(y=0;y<2;y++) {                                           // 11
-        if ((y==0) || (y==4) || (y==8)) rool_sinus();
-        for(x=0;x<2;x++) {                                         // 11
-            glPushMatrix();
-
-            zof=sinofsetz[i];			// GET FROM TABLE
-            //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, (matrix[x][y].zpos)+zof);        // -27
-
-            glTranslatef(matrix[x][y].xpos*8,matrix[x][y].ypos*8,0.0f);        //
-
-            //glRotatef(angle, 0.0f, -1.0f, 0.0f);
-            //glRotatef(angle, 0.0f, 1.0f, 0.0f);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            if (matrix[x][y].texture) {
-                glEnable(GL_TEXTURE_2D);
-                glBindTexture(GL_TEXTURE_2D,matrix[x][y].texture);
-                //glBindTexture(GL_TEXTURE_2D,onlineradio);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            } else {
-//                glDisable(GL_TEXTURE_2D);
-                random_r_color=rand() % 1000;
-                random_g_color=rand() % 1000;
-                random_b_color=rand() % 1000;
-                glColor4f(random_r_color,random_g_color,random_b_color,1.0f);
-            }
-
-            //glRectf(25.0, 25.0, 25.0, 25.0);
-
-            // front
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(200, 75 , 0.0);
-            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, 0.0);
-            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75+sizy , 0.0);
-            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , 0.0);
-            glEnd();
-
-
-            // back
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(200, 75 , sizz);
-            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, sizz);
-            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75+sizy , sizz);
-            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , sizz);
-            glEnd();
-
-            // left
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(200, 75+sizy , sizz);
-            glTexCoord2f(0, 1); glVertex3f(200, 75+sizy, 0);
-            glTexCoord2f(1, 1); glVertex3f(200, 75 , 0);
-            glTexCoord2f(1, 0); glVertex3f(200, 75 , sizz);
-            glEnd();
-
-            // right
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(200+sizx, 75+sizy , sizz);
-            glTexCoord2f(0, 1); glVertex3f(200+sizx, 75+sizy, 0);
-            glTexCoord2f(1, 1); glVertex3f(200+sizx, 75 , 0);
-            glTexCoord2f(1, 0); glVertex3f(200+sizx, 75 , sizz);
-            glEnd();
-
-            // top
-
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            // front
-            glNormal3f(-0.0f, 0.0f, 1.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-sizx, -sizy, 1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(0.0, 1.0); glVertex3f(-sizx, sizy, 1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(1.0, 1.0); glVertex3f(sizx, sizy, 1.0);
-            glNormal3f(-1.0f, 0.0f, 1.0f);
-            glTexCoord2f(1.0, 0.0); glVertex3f(sizx, -sizy, 1.0);
-            glEnd();
-*/
-/*
-            // back
-            glBegin(GL_QUADS);
-            glNormal3f(-1.0f, 0.0f, -1.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-sizx, -sizy, -1.0);
-            glNormal3f(-1.0f, 0.0f, -1.0f);
-            glTexCoord2f(0.0, 1.0); glVertex3f(-sizx, sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, -1.0f);
-            glTexCoord2f(1.0, 1.0); glVertex3f(sizx, sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, -1.0f);
-            glTexCoord2f(1.0, 0.0); glVertex3f(sizx, -sizy, -1.0);
-            glEnd();
-            // bund
-            glBegin(GL_QUADS);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-sizx,-sizy,1.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(sizx,-sizy,1.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(sizx,-sizy,-1.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(-sizx,-sizy,-1.0);
-            glEnd();
-            // top
-            glBegin(GL_QUADS);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-sizx,sizy,1.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(sizx,sizy,1.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(sizx,sizy,-1.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(-sizx,sizy,-1.0);
-            glEnd();
-            // right
-            glBegin(GL_QUADS);
-            glNormal3f(1.0f, 0.0f, -1.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(sizx, sizy, 1.0);
-            glNormal3f(1.0f, 0.0f, -1.0f);
-            glTexCoord2f(1.0, 0.0); glVertex3f(sizx, sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(1.0, -1.0); glVertex3f(sizx, -sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(0.0, -1.0); glVertex3f(sizx, -sizy, 1.0);
-            glEnd();
-
-
-            glBegin(GL_QUADS);
-            // left
-            glNormal3f(-1.0f, 0.0f, 1.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-sizx, sizy, 1.0);
-            glNormal3f(1.0f, 0.0f, -1.0f);
-            glTexCoord2f(1.0, 0.0); glVertex3f(-sizx, sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(1.0, -1.0); glVertex3f(-sizx, -sizy, -1.0);
-            glNormal3f(1.0f, 0.0f, 1.0f);
-            glTexCoord2f(0.0, -1.0); glVertex3f(-sizx, -sizy, 1.0);
-            glEnd(); //End quadrilateral coordinates
-
-
-            angle+=9;
-            i+=180*2;
-
-            glPopMatrix();
-
-        }
-//        angle+=9;
-    }
-
-*/
-//  glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
-  // front
-  printf("grader %f \n ",rangle);
+  static float rangle=0.0f;
+  static int mod=0;
+  static int mod1=0;
+  static int typ=0;
+  float random_r_color,random_g_color,random_b_color;
+  int x,y;
+  float angle=aangle;
+  float zof;
+  int i=0;
+  int rotate=1;
+  float sizx=120.0f;
+  float sizy=70.0f;
+  float sizz=120.0f;
+  //glTranslatef(2.0f, 0.0f, -10.0f);			// default afstand ved af start screen saver
+  //glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
+  //glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
+//  printf("grader %f \n ",rangle);
   rotate=0;
-  //glTranslatef(0.0f, 0.0f, 0.0f);
-  if (rotate) {
-//      glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-//      glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
-  } else {
-//      glRotatef(0, 0.0f, 0.0f, 1.0f);
-//      glRotatef(0, 0.0f, 1.0f, 0.0f);
-  }
-  //rangle+=0.1f;
   if (rangle>90.0f) rangle=0.0f;
   glEnable(GL_TEXTURE_2D);
   //glMatrixMode(GL_MODELVIEW);
   glColor3f(1.0f, 1.0f, 1.0f);
-  glBindTexture(GL_TEXTURE_2D,textureId);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
   glEnable(GL_DEPTH_TEST);
-
-  //glDisable(GL_BLEND);
+  // type 0 = set to music texture
+  // type 1 = set new texture NOT center cross from param newtexture
+  // type 2 = set new texture from param newtexture
+  // type 3 =
+  // type 4 = set texture to music texture
+  // mode 1,2,3,4
+  // set_new_textures(mode,type,textureId);
+  //set_new_textures(mod,typ,textureId);
+  set_new_textures(2,mod,textureId);
+  printf("mod1=%d mod=%d type=%d\n",mod1,mod,typ);
+  if (mod1>4) {
+    mod++;
+    if (mod>11) {
+      mod=0;
+      typ++;
+      if (typ>11) {
+        typ=0;
+        mod=0;
+        mod1=0;
+      }
+    }
+    mod1=0;
+  }
+  mod1++;
   n=0;
   i=0;
   rangle=25.0f;
   static float rangle1=0.0f;
   //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
   rool_sinus();
-  for(y=0;y<6;y++) {                                           // 11
+  for(y=0;y<8;y++) {                                           // 11
     //if ((y==0) || (y==4) || (y==8)) rool_sinus();
-    for(x=0;x<10;x++) {                                         // 11
+    for(x=0;x<11;x++) {                                         // 11
       glPushMatrix();
       //glDisable(GL_CULL_FACE);
       //glDisable(GL_DEPTH_TEST);
       glEnable(GL_DEPTH_TEST);
-      glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*57]*7),0);
-
+      //glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*57]*7),0);
+      glTranslatef(matrix[x][y].xpos,matrix[x][y].ypos,matrix[x][y].zpos);
       //glRotatef(rangle, -1.0f, 0.0f, 0.0f);
       glRotatef(16.0f, 0.0f, -1.0f, 0.0f);
       glRotatef(sinofsetz[i*2]*24, 0.0f, 0.0f, 1.0f);
       rangle1+=0.005f;
       i++;
-
-      //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
-      //glRotatef(rangle, 1.0f, 0.0f, 1.0f);
-      //glRotatef(rangle, 0.0f, 1.0f, 0.0f);
-      //rangle+=0.1f;
-
+      if (matrix[x][y].texture) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,matrix[x][y].texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      } else {
+        //glDisable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,textureId2);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+/*
+        random_r_color=rand() % 1000;
+        random_g_color=rand() % 1000;
+        random_b_color=rand() % 1000;
+        glColor4f(random_r_color,random_g_color,random_b_color,1.0f);
+*/
+      }
+      sizx=matrix[x][y].sizex;
+      sizy=matrix[x][y].sizey;
+      sizz=matrix[x][y].sizez;
       // front
       glBegin(GL_QUADS);
       glNormal3f(0.0, 1.0f, 0.0f);
@@ -2756,18 +2632,14 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureIdmask,GL
       glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
       glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)), 0.0);
       glEnd();
-
       //
-
       glPopMatrix();
     }
   }
 }
 
 
-void boxarray::show_music_3d1(float aangle,GLuint textureId)
-
-{
+void boxarray::show_music_3d1(float aangle,GLuint textureId) {
     static float rangle=0.0f;
     //float random_r_color,random_g_color,random_b_color;
     int x,y;
@@ -2781,87 +2653,73 @@ void boxarray::show_music_3d1(float aangle,GLuint textureId)
     glDisable(GL_BLEND);
     glTranslatef(0.0f, 0.0f, -4.0f);
     if (rotate) {
-        glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-        glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
+      glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+      glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
     } else {
-        glRotatef(0, 0.0f, 0.0f, 1.0f);
-        glRotatef(0, 0.0f, 1.0f, 0.0f);
+      glRotatef(0, 0.0f, 0.0f, 1.0f);
+      glRotatef(0, 0.0f, 1.0f, 0.0f);
     }
     rangle+=.1;
     if (rangle>360*10) rangle=0;
     n=0;
     for(y=0;y<11;y++) {
-        if ((y==0) || (y==4) || (y==8)) rool_sinus();
-        for(x=0;x<11;x++) {
-            glPushMatrix();
-            zof=-20+(sinofsetz[i]/4);			// GET FROM TABLE
-            i+=180*2;
-
-            glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
-            glRotatef(angle, 0.0f, -1.0f, 0.0f);
-
-            angle+=9;
-
-            glEnable(GL_TEXTURE_2D);
-            glDisable(GL_BLEND);
-
-//    glEnable(GL_CULL_FACE);
-
-            float BOX_SIZE=2.0f;
-
-            glBindTexture(GL_TEXTURE_2D,textureId);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            glBegin(GL_QUADS);
-            //Back face
-                //    glColor3f(1.0f, 1.0f, 0.0f);
-            glNormal3f(0.0, 1.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-
-
-            //Top face
-            glNormal3f(0.0, 1.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-
-            //Bottom face
-            glNormal3f(0.0, -1.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(0.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);                                                                    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
-
-            //Left face
-            glNormal3f(-1.0, 0.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(1.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(0.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-
-            //Right face
-            glNormal3f(1.0, 0.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
-            glTexCoord2f(1.0, -1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(0.0, -1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
-
-
-            //Front face
-            glNormal3f(0.0, 1.0f, 0.0f);
-            glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
-            glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
-            glEnd();
-            angle+=9.0f;
-            i+=180*2;
-            glPopMatrix();
-        }
+      if ((y==0) || (y==4) || (y==8)) rool_sinus();
+      for(x=0;x<11;x++) {
+        glPushMatrix();
+        zof=-20+(sinofsetz[i]/4);			// GET FROM TABLE
+        i+=180*2;
+        glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
+        glRotatef(angle, 0.0f, -1.0f, 0.0f);
+        angle+=9;
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+        //    glEnable(GL_CULL_FACE);
+        float BOX_SIZE=2.0f;
+        glBindTexture(GL_TEXTURE_2D,textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        //Back face
+            //    glColor3f(1.0f, 1.0f, 0.0f);
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Top face
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Bottom face
+        glNormal3f(0.0, -1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);                                                                    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        //Left face
+        glNormal3f(-1.0, 0.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Right face
+        glNormal3f(1.0, 0.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, -1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, -1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        //Front face
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glEnd();
+        angle+=9.0f;
+        i+=180*2;
+        glPopMatrix();
+      }
     }
     glPopMatrix();
 }

@@ -485,7 +485,6 @@ int film_oversigt_typem::opdatere_film_oversigt() {
     sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
 //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
-
     if (conn) {
       allokay=true;
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -495,9 +494,11 @@ int film_oversigt_typem::opdatere_film_oversigt() {
       sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        dbexist=true;
-      }
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dbexist=true;
+        }
+      } else dbexist=false;
       // create databases/tables if not exist
       // needed by movie loader
       if (!(dbexist)) {
@@ -597,7 +598,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
                                                         (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
                                                         movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
               recnr++;
-              fprintf(stderr, "Movie db update %d \n",recnr);
+              fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
               mysql_query(conn,sqlselect);
               res = mysql_store_result(conn);
               if ((mysql_error(conn)) && (debugmode & 512)) {
