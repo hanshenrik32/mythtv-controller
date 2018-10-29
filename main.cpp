@@ -719,6 +719,7 @@ GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,s
 GLuint _textureIdback_main=0,_textureIdback_music=0;            // main background
 GLuint _textureIdback_setup;
 GLuint  screensaverbox;
+GLuint  screensaverbox1;
 GLuint _textureIdmusic_aktiv;
 GLuint _tvmaskprgrecordedbutton;
 GLuint _tvbar1,_tvbar3;
@@ -2475,9 +2476,10 @@ void display() {
 */
             _angle++;
             glPushMatrix();
-            //glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-            //mybox.show_music_3d(_angle,screensaverbox,_texture_nocdcover,0);
-            mybox.show_music_3d(_angle,screensaverbox,onlinestream,onlineradio);
+            std::clock_t start;
+            start = std::clock();
+            mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
+            std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             glPopMatrix();
             break;
         case SAVER3D2:
@@ -2486,8 +2488,10 @@ void display() {
             glTranslatef(0.0f, 0.0f, -2.0f);
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
+            start = std::clock();
             //mybox.show_music_3d1(_angle,screensaverbox);	//_textureId19
             mybox.show_music_3d_new(_angle,screensaverbox);	//_textureId19
+            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             break;
         case PICTURE3D:
             // picture screen saver
@@ -11904,6 +11908,7 @@ void loadgfx() {
     gfxlandemask=loadTexture (fileload);
     // screen saver boxes
     screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
+    screensaverbox1=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
 
@@ -12052,6 +12057,7 @@ void freegfx() {
     }
     glDeleteTextures( 1,&_textureIdmusic_aktiv);
     glDeleteTextures( 1,&screensaverbox);
+    glDeleteTextures( 1,&screensaverbox1);
     glDeleteTextures( 1,&newstuf_icon);
 }
 

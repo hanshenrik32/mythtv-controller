@@ -12,9 +12,6 @@
 
 extern char configpicturepath[256];
 extern GLuint screensaverbox;
-extern GLuint screensaverbox_mask;
-extern GLuint onlineradio;                       //
-
 extern GLuint newstuf_icon;
 
 float sinofsetz[]={
@@ -1830,8 +1827,8 @@ void boxarray::build_default_array() {
   float sizy=120.0f;            // space
   float sizz=120.0f;            // space
   float bsizex=120.0f;          // box size
-  float bsizey=100.0f;          // box size
-  float bsizez=100.0f;          // box size
+  float bsizey=120.0f;          // box size
+  float bsizez=120.0f;          // box size
   for(y=0;y<11;y++) {
     for(x=0;x<11;x++) {
       matrix[x][y].xpos=(x*180.0f)+(sizx/2);
@@ -1854,9 +1851,9 @@ boxarray::boxarray() {
         matrix[x][y].xpos=0;
         matrix[x][y].ypos=0;
         matrix[x][y].zpos=0;
-        matrix[x][y].texture=0;			              // use default aktive texture
-        matrix[x][y].pictexture=onlineradio;		// texture fra pictures
-        matrix[x][y].musictexture=newstuf_icon;		// texture fra music cd samling i mythtv
+        matrix[x][y].texture=0;                     // use default aktive texture
+        matrix[x][y].pictexture=screensaverbox;  		// texture fra pictures
+        matrix[x][y].musictexture=newstuf_icon;		  // texture fra music cd samling i mythtv
       }
     }
     build_default_array();
@@ -2504,6 +2501,10 @@ void boxarray::show_music_3d_new(int aangle,GLuint textureId) {
 }
 
 
+
+//
+// working in use
+//
 void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3)
 
 {
@@ -2520,9 +2521,6 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   float sizx=120.0f;
   float sizy=70.0f;
   float sizz=120.0f;
-  //glTranslatef(2.0f, 0.0f, -10.0f);			// default afstand ved af start screen saver
-  //glTranslatef(200.0f, 200.0f, -5.0f);			// default afstand ved af start screen saver
-  //glTranslatef(200.0f, 200.0f, 0.0f);			// default afstand ved af start screen saver
 //  printf("grader %f \n ",rangle);
   rotate=0;
   if (rangle>90.0f) rangle=0.0f;
@@ -2538,8 +2536,9 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   // mode 1,2,3,4
   // set_new_textures(mode,type,textureId);
   //set_new_textures(mod,typ,textureId);
-  set_new_textures(2,mod,textureId);
-  printf("mod1=%d mod=%d type=%d\n",mod1,mod,typ);
+  //set_new_textures(typ,mod,textureId);
+  set_new_textures(1,mod,textureId3);
+  //printf("mod1=%d mod=%d type=%d\n",mod1,mod,typ);
   if (mod1>4) {
     mod++;
     if (mod>11) {
@@ -2580,16 +2579,11 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       } else {
-        //glDisable(GL_TEXTURE_2D);
+        // use default texture
         glBindTexture(GL_TEXTURE_2D,textureId2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-/*
-        random_r_color=rand() % 1000;
-        random_g_color=rand() % 1000;
-        random_b_color=rand() % 1000;
-        glColor4f(random_r_color,random_g_color,random_b_color,1.0f);
-*/
+        //glColor4f(1.0f,1.0f,1.0f,1.0f);
       }
       sizx=matrix[x][y].sizex;
       sizy=matrix[x][y].sizey;
