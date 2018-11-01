@@ -13,6 +13,7 @@
 extern char configpicturepath[256];
 extern GLuint screensaverbox;
 extern GLuint newstuf_icon;
+extern int orgwinsizex,orgwinsizey;
 
 float sinofsetz[]={
 
@@ -1832,7 +1833,7 @@ void boxarray::build_default_array() {
   for(y=0;y<11;y++) {
     for(x=0;x<11;x++) {
       matrix[x][y].xpos=(x*180.0f)+(sizx/2);
-      matrix[x][y].ypos=(y*140.0f)+(sizy/2)+(sinofsetz[i*57]*7);
+      matrix[x][y].ypos=(y*140.0f)+(sizy/2)+(sinofsetz[i*40]*7);
       matrix[x][y].zpos=0.0f;
       matrix[x][y].sizex=bsizex;
       matrix[x][y].sizey=bsizey;
@@ -2505,9 +2506,8 @@ void boxarray::show_music_3d_new(int aangle,GLuint textureId) {
 //
 // working in use
 //
-void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3)
 
-{
+void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3) {
   static float rangle=0.0f;
   static int mod=0;
   static int mod1=0;
@@ -2515,19 +2515,21 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   float random_r_color,random_g_color,random_b_color;
   int x,y;
   float angle=aangle;
-  float zof;
+  float zof=0.0f;
+  float yof=0.0f;
   int i=0;
   int rotate=1;
   float sizx=120.0f;
   float sizy=70.0f;
   float sizz=120.0f;
-//  printf("grader %f \n ",rangle);
+  //  printf("grader %f \n ",rangle);
   rotate=0;
   if (rangle>90.0f) rangle=0.0f;
   glEnable(GL_TEXTURE_2D);
   //glMatrixMode(GL_MODELVIEW);
   glColor3f(1.0f, 1.0f, 1.0f);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_DEPTH_TEST);
+  //glDisable(GL_DEPTH_TEST);
   // type 0 = set to music texture
   // type 1 = set new texture NOT center cross from param newtexture
   // type 2 = set new texture from param newtexture
@@ -2537,7 +2539,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   // set_new_textures(mode,type,textureId);
   //set_new_textures(mod,typ,textureId);
   //set_new_textures(typ,mod,textureId);
-  set_new_textures(1,mod,textureId3);
+  //set_new_textures(1,mod,textureId3);
   //printf("mod1=%d mod=%d type=%d\n",mod1,mod,typ);
   if (mod1>4) {
     mod++;
@@ -2558,15 +2560,21 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   rangle=25.0f;
   static float rangle1=0.0f;
   //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
-  rool_sinus();
+  //rool_sinus();
   for(y=0;y<8;y++) {                                           // 11
-    //if ((y==0) || (y==4) || (y==8)) rool_sinus();
+    if ((y==0) || (y==4) || (y==8)) rool_sinus();
     for(x=0;x<11;x++) {                                         // 11
       glPushMatrix();
       //glDisable(GL_CULL_FACE);
       //glDisable(GL_DEPTH_TEST);
       glEnable(GL_DEPTH_TEST);
-      //glTranslatef((x*200.0f)+(sizx/2), (y*200.0f)+(sizy/2)+(sinofsetz[i*57]*7),0);
+
+      //glRotatef(16.0f, 0.0f, -1.0f, 0.0f);
+
+      //glRotatef(sinofsetz[i*2]*24, 0.0f, 1.0f, 0.0f);
+
+      glRotatef(sinofsetz[i*2]*18, 1.0f, 0.0f, 0.0f);
+
       glTranslatef(matrix[x][y].xpos,matrix[x][y].ypos,matrix[x][y].zpos);
       //glRotatef(rangle, -1.0f, 0.0f, 0.0f);
       glRotatef(16.0f, 0.0f, -1.0f, 0.0f);
@@ -2588,49 +2596,55 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
       sizx=matrix[x][y].sizex;
       sizy=matrix[x][y].sizey;
       sizz=matrix[x][y].sizez;
+
+      yof=sinofsetz[i*2]*100;
+
+      //zof=sinofsetz[i*50]*40;                                                    // depth offset
       // front
       glBegin(GL_QUADS);
       glNormal3f(0.0, 1.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0.0);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+yof , 0.0+zof);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof, 0.0+zof);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof , 0.0+zof);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , 0.0+zof);
       // back
       glNormal3f(0.0, 1.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
-      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, sizz);
-      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
-      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+yof , sizz+zof);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof, sizz+zof);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof , sizz+zof);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , sizz+zof);
       // left
       glNormal3f(-1.0, 0.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy , sizz);
-      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0);
-      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , 0);
-      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
+      glTexCoord2f(0, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof , sizz+zof);
+      glTexCoord2f(0, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof, 0+zof);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2))+yof , 0+zof);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2))+yof , sizz+zof);
       // right
       glNormal3f(1.0, 0.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
-      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy, 0);
-      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0);
-      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof , sizz+zof);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof, 0+zof);
+      glTexCoord2f(1, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , 0+zof);
+      glTexCoord2f(1, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , sizz+zof);
       // top
       glNormal3f(0.0, 1.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy , sizz);
-      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy , sizz);
-      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof , 0.0+zof);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+sizy+yof , sizz+zof);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof , sizz+zof);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2))+sizy+yof, 0.0+zof);
       // bund
       glNormal3f(0.0, -1.0f, 0.0f);
-      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2)) , sizz);
-      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2)) , sizz);
-      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2)), 0.0);
+      glTexCoord2f(0, 0); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , 0.0+zof);
+      glTexCoord2f(0, 1); glVertex3f((-(sizx/2))+sizx, (-(sizy/2))+yof , sizz+zof);
+      glTexCoord2f(1, 1); glVertex3f(-(sizx/2), (-(sizy/2))+yof , sizz+zof);
+      glTexCoord2f(1, 0); glVertex3f(-(sizx/2), (-(sizy/2))+yof, 0.0+zof);
       glEnd();
       //
       glPopMatrix();
     }
   }
 }
+
+
 
 
 void boxarray::show_music_3d1(float aangle,GLuint textureId) {

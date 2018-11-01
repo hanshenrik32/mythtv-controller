@@ -6138,8 +6138,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 }
 
 
-
-
 // get selected icon
 
 int gl_select(int x,int y) {
@@ -6156,7 +6154,8 @@ int gl_select(int x,int y) {
     glLoadIdentity();
     gluPickMatrix(x, y, 1.0, 1.0, view);	                                      // restrict the draw to an area around the cursor
     //gluPerspective(45.0, (double)screenx / (double) screeny, 0.0001, 10000.0);
-    glOrtho(0.0f, (float) orgwinsizex, 0.0f,(float) orgwinsizey, -0.0f,10.0f);
+    //glOrtho(0.0f, (float) orgwinsizex, 0.0f,(float) orgwinsizey, -0.0f,10.0f);
+    glOrtho(0.0f, (float) orgwinsizex, 0.0f, (float) orgwinsizey, -0.0f,100.0f);
     glMatrixMode(GL_MODELVIEW);		// Draw the objects onto the screen
     glutSwapBuffers();			// draw only the names in the stack, and fill the array
     display();
@@ -12139,12 +12138,7 @@ void InitGL()              // We call this right after our OpenGL window is crea
 //    mybox.settexture(musicoversigt);
 }
 
-
-
-
-
 // bruges til at checke_copy radio icons som virker til nyt dir
-
 
 int check_radio_stations_icons() {
   MYSQL *conn;
@@ -12170,7 +12164,6 @@ int check_radio_stations_icons() {
     }
   }
 }
-
 
 
 
