@@ -2490,7 +2490,7 @@ void display() {
             glDisable(GL_BLEND);
             start = std::clock();
             //mybox.show_music_3d1(_angle,screensaverbox);	//_textureId19
-            mybox.show_music_3d_new(_angle,screensaverbox);	//_textureId19
+            //mybox.show_music_3d_new(_angle,screensaverbox);	//_textureId19
             if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             break;
         case PICTURE3D:
