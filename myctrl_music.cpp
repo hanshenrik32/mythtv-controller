@@ -291,9 +291,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
   char songname[1024];
   int dbexist=0;                              // use to check db exist
   clean_music_oversigt(musicoversigt);				// clear music oversigt
-
-  debugmode=2;
-
   dirp=opendir(dirpath);
   if (dirp==NULL) {
       printf("Open dir error ->%s<-\n",dirpath);
