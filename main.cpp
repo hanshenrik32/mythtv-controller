@@ -2373,13 +2373,6 @@ void display() {
     //visur=1;
     static int xrand=0;
     static int yrand=0;
-    if (tmpcounter>200) {
-      tmpcounter=0;
-      xrand=(rand()/10240)/400;
-      yrand=(rand()/10240)/500;
-    }
-    tmpcounter++;
-
     if (visur) {
       glPushMatrix();
       switch (urtype) {
@@ -2387,11 +2380,14 @@ void display() {
             // time
             glPushMatrix();
             glDisable(GL_TEXTURE_2D);
-
-            printf("x=%d\n",tmpcounter);
-
+            if (tmpcounter>200) {
+              tmpcounter=0;
+              xrand=(rand()/10240)/300;
+              yrand=(rand()/10240)/480;
+            }
+            tmpcounter++;
             strftime(temptxt, 20, "%H:%M", timeinfo);
-            glTranslatef((orgwinsizex/2)-(strlen(temptxt)*8)-xrand, (orgwinsizey/2)-yrand, 0.0f);
+            glTranslatef(xrand+70, yrand, 0.0f);
             glRasterPos2f(0.0f, 0.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -2402,7 +2398,8 @@ void display() {
             glPushMatrix();
             glDisable(GL_TEXTURE_2D);
             strftime(temptxt, 80, "%d %B %Y", timeinfo);
-            glTranslatef(((orgwinsizex/2)-(strlen(temptxt)*8))-xrand, ((orgwinsizey/2)-80)-yrand, 0.0f);
+            //glTranslatef(((orgwinsizex/2)-(strlen(temptxt)*8))-xrand, ((orgwinsizey/2)-80)-yrand, 0.0f);
+            glTranslatef(xrand, yrand-(strlen(temptxt)*5), 0.0f);
             glRasterPos2f(0.0f, 0.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
