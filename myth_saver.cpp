@@ -2459,13 +2459,9 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
       //glDisable(GL_CULL_FACE);
       //glDisable(GL_DEPTH_TEST);
       glEnable(GL_DEPTH_TEST);
-
       //glRotatef(16.0f, 0.0f, -1.0f, 0.0f);
-
       //glRotatef(sinofsetz[i*2]*24, 0.0f, 1.0f, 0.0f);
-
       //glRotatef(sinofsetz[i*1]*18, 1.0f, 0.0f, 0.0f);
-
       glTranslatef(matrix[x][y].xpos,matrix[x][y].ypos,matrix[x][y].zpos);
       //glRotatef(rangle, -1.0f, 0.0f, 0.0f);
       glRotatef(16.0f, 0.0f, -1.0f, 0.0f);

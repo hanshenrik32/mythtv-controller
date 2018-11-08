@@ -2282,6 +2282,7 @@ void display() {
     float *specLeft, *specRight;
     bool startup=true;
     // uv color table
+    static int tmpcounter=0;
     float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
@@ -2370,6 +2371,15 @@ void display() {
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
     //visur=1;
+    static int xrand=0;
+    static int yrand=0;
+    if (tmpcounter>200) {
+      tmpcounter=0;
+      xrand=(rand()/10240)/400;
+      yrand=(rand()/10240)/500;
+    }
+    tmpcounter++;
+
     if (visur) {
       glPushMatrix();
       switch (urtype) {
@@ -2377,8 +2387,11 @@ void display() {
             // time
             glPushMatrix();
             glDisable(GL_TEXTURE_2D);
+
+            printf("x=%d\n",tmpcounter);
+
             strftime(temptxt, 20, "%H:%M", timeinfo);
-            glTranslatef((orgwinsizex/2)-(strlen(temptxt)*8), orgwinsizey/2, 0.0f);
+            glTranslatef((orgwinsizex/2)-(strlen(temptxt)*8)-xrand, (orgwinsizey/2)-yrand, 0.0f);
             glRasterPos2f(0.0f, 0.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -2389,7 +2402,7 @@ void display() {
             glPushMatrix();
             glDisable(GL_TEXTURE_2D);
             strftime(temptxt, 80, "%d %B %Y", timeinfo);
-            glTranslatef((orgwinsizex/2)-(strlen(temptxt)*8), (orgwinsizey/2)-80, 0.0f);
+            glTranslatef(((orgwinsizex/2)-(strlen(temptxt)*8))-xrand, ((orgwinsizey/2)-80)-yrand, 0.0f);
             glRasterPos2f(0.0f, 0.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -10719,7 +10732,7 @@ void update(int value) {
     #if defined USE_FMOD_MIXER
     sndsystem->update();				// run update on fmod sound system
     #endif
-    glutTimerFunc(25, update, 0);
+    glutTimerFunc(25, update2, 0);
     glutPostRedisplay();
 }
 
