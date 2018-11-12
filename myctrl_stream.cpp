@@ -1920,6 +1920,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+      // P1 podcaster
+      if (check_rss_feed_exist(conn,"P1 podcaster")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('P1 podcaster',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('P1 podcaster',NULL,NULL,'P1 podcaster',0,0,NULL,'https://www.dr.dk/mu/feed/p1-podcaster.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
 
 
       // close mysql
