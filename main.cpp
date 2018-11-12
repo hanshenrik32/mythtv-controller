@@ -7242,6 +7242,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                   break;
         }
       }
+      if (do_show_setup_screen) {
+        switch (do_show_setup_select_linie) {
+          case 0: break;
+          case 1: break;
+          case 2: strcpy(keybuffer,configscreensavertimeout);
+                  break;
+          default:
+                  break;
+        }
+      }
       // gem key pressed in buffer
       if (keybufferindex<80) {
           if (key==8) {						// back space
