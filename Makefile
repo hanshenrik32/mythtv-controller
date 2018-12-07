@@ -11,6 +11,7 @@ DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
+FMODFILE   = fmodstudioapi11008linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -96,15 +97,15 @@ clean:
 
 installsound:
 	@echo "Install fmod sound system ver 4.44.41"
+	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
-	cp fmodstudioapi10906linux.tar.gz $(DESTDIR)
+	cp $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
-	tar -zxf fmodstudioapi11008linux.tar.gz -C /usr/share/mythtv-controller/
+	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	#cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
 	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
 	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
 	@echo "Done installing fmod32/64 version 4.44.41"
@@ -116,11 +117,10 @@ install:
 	mkdir -p /usr/share/mythtv-controller/images/radiostations
 	mkdir -p /usr/share/mythtv-controller/convert/hires
 	cp charset $(DESTDIR)
-	@if test -e /etc/mythtv-controller.conf; then echo "config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
+	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
 	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
-	#cp $(PROG) checkwakeup.sh startmovie.sh /usr/bin/
 	#@if ! test -d ~/.config/lirc/; then \
 	#  mkdir  ~/.config/lirc/; \
 	#  cp lirc/* ~/.config/lirc/; \
