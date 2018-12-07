@@ -5985,13 +5985,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     if (visur==false) {
         switch(button) {
             case GLUT_LEFT_BUTTON:
+
+              printf("ask_open_dir_or_play = %d \n ",ask_open_dir_or_play);
+
                 if (state==GLUT_UP) {
                   retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
                   // nu er mknapnr/fknapnr/rknapnr=den som er trykket på bliver sat i gl_select
                   // retfunc er !=0 hvis der er trykket på en knap up/down
                   // give error
                   if (debugmode & 2) {
-                    if ((vis_music_oversigt) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
+                    if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
                       fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
                     }
                   }
@@ -6019,6 +6022,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                           ask_open_dir_or_play_aopen=false;
                         }
                       } else {
+                        // here
+
                         if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
                         // playlist loader
                         do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
@@ -6082,12 +6087,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
-
                 }
-
                 break;
-
             case GLUT_RIGHT_BUTTON:
+
+              printf("ask_open_dir_or_play = %d \n ",ask_open_dir_or_play);
+
                 if (vis_music_oversigt) {
                   if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
                     ask_open_dir_or_play=false;
@@ -6158,12 +6163,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               _mangley=0.0f;
             } else {
                 //if (debugmode & 2) printf("der scrolles _mangley =%d \n",(_mangley/41)*5);
-
                 //do_find_playlist=true;
                 //do_play_music_cover=true;
-
                 // playlist oversigt fil loader
-
                 /*
                 if ((musicoversigt[mknapnr-1].oversigttype==-1) && (musicoversigt[mknapnr-1].directory_id!=0)) {	// der er et playlistid til mysql database
                     // user open button pressed in ask_open_dir_or_play window
@@ -6172,7 +6174,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id);               // ************************
                     opdatere_music_oversigt_icons();                                                            // opdatere icons visning
                     printf("Loaded numbers of covers: %d \n",musicoversigt_antal);
-
                     mknapnr=0;
                     music_key_selected=1;
                     music_icon_anim_icon_ofset=0;
@@ -6181,7 +6182,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 */
             }
-
             // do scroll up/down view mouse or screen button
             if  (!(ask_open_dir_or_play)) {
               // scroll down
@@ -6210,26 +6210,23 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((retfunc==1) || (button==3)) {
             if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
           }
-
-
-
         }
 
         // scroll film up/down
         if (vis_film_oversigt) {
-            if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+8<film_oversigt.film_antal()-1)) {
-              do_movie_icon_anim_icon_ofset=1;
-              switch(screen_size) {
-                  case 1: _fangley+=(41.0f);					// 51 scroll 1 line
-                          break;
-                  case 2: _fangley+=(41.0f);
-                          break;
-                  case 3: _fangley+=(41.0f);					// scroll 2 lines
-                          break;
-                  case 4: _fangley+=(41.0f);
-                          break;
-              }
-              film_select_iconnr+=numbers_film_covers_on_line;			// move to next line
+          if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+8<film_oversigt.film_antal()-1)) {
+            do_movie_icon_anim_icon_ofset=1;
+            switch(screen_size) {
+                case 1: _fangley+=(41.0f);					// 51 scroll 1 line
+                        break;
+                case 2: _fangley+=(41.0f);
+                        break;
+                case 3: _fangley+=(41.0f);					// scroll 2 lines
+                        break;
+                case 4: _fangley+=(41.0f);
+                        break;
+            }
+            film_select_iconnr+=numbers_film_covers_on_line;			// move to next line
           }
             if (((button==3) || (retfunc==1)) && (film_select_iconnr-4>0)) {
               do_movie_icon_anim_icon_ofset=-1;
