@@ -97,7 +97,7 @@ clean:
 
 installsound:
 	@echo "Install fmod sound system ver 4.44.41"
-	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
+	#@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
 	cp $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
@@ -106,8 +106,8 @@ installsound:
 	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
