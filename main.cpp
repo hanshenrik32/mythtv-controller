@@ -3025,15 +3025,15 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(20);                      				  // play icon nr
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glBegin(GL_QUADS);
         // play icon
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
-        // ************************************************************ Open/or not open
+        // ************************************************************ Open/or close window again
         xof=650;
         yof=250;
         buttonsize=100;
@@ -3045,23 +3045,25 @@ void display() {
         if (dirmusic.numbersindirlist()>0) {
           glBindTexture(GL_TEXTURE_2D, _textureopen);
         } else {
-          glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
+          //glBindTexture(GL_TEXTURE_2D, _textureopen);                // _textureclose);
+          glBindTexture(GL_TEXTURE_2D, _textureclose);
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(21);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glBegin(GL_QUADS);
         // play icon
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // swap ************************************************************** icon swap
         xof=750;
         yof=250;
-        buttonsize=100;                glPushMatrix();
+        buttonsize=100;
+        glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
@@ -3069,20 +3071,42 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _textureswap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(22);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
-        // play icon
-
+        glLoadName(22);
+        glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
+/*
+        // close ************************************************************** icon close
+        xof=850;
+        yof=250;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D, _textureclose);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(23);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
+        glEnd();
+        glPopMatrix();
+*/
+        // draw cd cover
+        xof=750;
+        yof=250;
         no_open_dir=0;
         buttonsize=300;
         if (dirmusic.numbersindirlist()==0) {						// er der nogle dirs
-          // draw cd cover
           glPushMatrix();
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
@@ -5142,12 +5166,12 @@ void display() {
               Mix_PlayMusic(sdlmusicplayer, 0);
               if (!(sdlmusicplayer)) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
               #endif
-              do_zoom_music_cover_remove_timeout=showtimeout;			// set close info window timeout
-              do_zoom_music_cover=true;					// show music cover info til timeout showtimeout
-            } else {						// else slet playliste (reset player)
+              do_zoom_music_cover_remove_timeout=showtimeout;			              // set close info window timeout
+              do_zoom_music_cover=true;				                                  // show music cover info til timeout showtimeout
+            } else {				                                    		// else slet playliste (reset player)
               do_play_music_aktiv_table_nr=1;
               #if defined USE_FMOD_MIXER
-              result=sound->release();          		// stop last played sound on soundsystem fmod
+              result=sound->release();          		                            // stop last played sound on soundsystem fmod
               ERRCHECK(result,do_play_music_aktiv_table_nr);
               #endif
               #if defined USE_SDL_MIXER
@@ -5574,6 +5598,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((GLubyte) names[i*4+3]==27) {
               if (debugmode & 2) fprintf(stderr,"Show music info\n");
               do_zoom_music_cover=!do_zoom_music_cover;
+              ask_open_dir_or_play=false;
               fundet=true;
             }
           }
@@ -5602,11 +5627,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
               fundet=true;
             }
-            // no drop
+            // open music dir or close window
             if ((GLubyte) names[i*4+3]==21) {
               // pressed close
               if (debugmode) fprintf(stderr,"Close window again\n");
               ask_open_dir_or_play=false;				// flag luk vindue igen
+              do_zoom_music_cover=false;
               mknapnr=0;
               fundet=true;
             }
@@ -5626,6 +5652,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((GLubyte) names[i*4+3]==5) {
               // if touch/mouse click on window then close windows again
               do_zoom_music_cover=false;
+              ask_open_dir_or_play=false;				// flag luk vindue igen
               fundet=true;
             }
             // last song
@@ -6098,11 +6125,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     ask_open_dir_or_play=false;
                     mknapnr=0;
                   } else if ((ask_open_dir_or_play==false) && (do_play_music_aktiv_table_nr>0) && (state==0) && (button==2)) {
-                    if (do_zoom_music_cover) {
-                      do_zoom_music_cover=false;
-                    } else {
-                      do_zoom_music_cover=true;
-                    }
+                    do_zoom_music_cover=!do_zoom_music_cover;
+                    if (ask_open_dir_or_play) ask_open_dir_or_play=false;
                   }
                 }
                 // close/show net radio play status window flag
