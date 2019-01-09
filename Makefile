@@ -132,7 +132,7 @@ install:
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
-	  cp lirc/mythtv-controller ~/.lirc/; fi
+	  cp lirc/mythtv-controller* ~/.lirc/; fi
 
 
 include buildnumber.mak

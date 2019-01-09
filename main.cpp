@@ -205,7 +205,7 @@ bool full_screen=true;
 int do_play_music_aktiv_table_nr=0;                     // aktiv sang nr
 int do_play_music_aktiv_nr_select_array=0;
 bool show_uv=true;                                      // default show uv under menu
-bool vis_uv_meter=false;                                 // uv meter er igang med at blive vist
+bool vis_uv_meter=false;                                // uv meter er igang med at blive vist
 bool hent_music_search=false;                           // skal vi søge efter music
 bool keybufferopenwin=false;                            // er vindue open
 bool do_play_music_cover=false;                         // start play music
@@ -5986,7 +5986,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         switch(button) {
             case GLUT_LEFT_BUTTON:
 
-              printf("ask_open_dir_or_play = %d \n ",ask_open_dir_or_play);
+              printf("ask_open_dir_or_play = %d do_zoom_music_cover = %d \n ",ask_open_dir_or_play,do_zoom_music_cover);
 
                 if (state==GLUT_UP) {
                   retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
