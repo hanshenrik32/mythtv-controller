@@ -857,7 +857,7 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
 
 //
 // check music internal db exist if yes use it.
-//
+// return true if exist
 
 bool global_use_internal_music_loader_system_exist() {
   MYSQL *conn;
