@@ -6013,7 +6013,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         switch(button) {
             case GLUT_LEFT_BUTTON:
 
-              printf("ask_open_dir_or_play = %d do_zoom_music_cover = %d \n ",ask_open_dir_or_play,do_zoom_music_cover);
+              //printf("ask_open_dir_or_play = %d do_zoom_music_cover = %d \n ",ask_open_dir_or_play,do_zoom_music_cover);
 
                 if (state==GLUT_UP) {
                   retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
@@ -6117,9 +6117,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 break;
             case GLUT_RIGHT_BUTTON:
-
-              printf("ask_open_dir_or_play = %d \n ",ask_open_dir_or_play);
-
                 if (vis_music_oversigt) {
                   if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
                     ask_open_dir_or_play=false;
