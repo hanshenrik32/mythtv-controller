@@ -659,6 +659,8 @@ GLuint _textureuv1;                       // uv img
 GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
 
+GLuint _textureexit;                      // exit button
+
 // radio view icons
 GLuint onlineradio;                       //
 GLuint onlineradio_empty;                 //
@@ -2650,6 +2652,23 @@ void display() {
             glEnd();
           }
         }
+
+        // exit button
+        if (vis_uv_meter==false) {
+          glBindTexture(GL_TEXTURE_2D, _textureexit);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(6);                                                        // exit button nr 6
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( 0 ,  orgwinsizey-(iconspacey/3) , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( 0,   orgwinsizey-(iconspacey/3)+(iconsizex/3) , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( 0+(iconsizex/3),orgwinsizey-(iconspacey/3)+(iconsizex/3) , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( 0+(iconsizex/3),orgwinsizey-(iconspacey/3) , 0.0);
+          glEnd();
+        }
+
+
+
         glPopMatrix();
     }
     // radio stuf
@@ -5551,6 +5570,18 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_rss=false;
             fundet=true;
           }
+          if ((GLubyte) names[i*4+3]==6) {
+            vis_music_oversigt=false;
+            vis_film_oversigt=false;
+            vis_tv_oversigt=!vis_tv_oversigt;
+            vis_recorded_oversigt=false;
+            vis_radio_or_music_oversigt=false;
+            vis_stream_oversigt=false;
+            vis_stream_or_movie_oversigt=false;
+            do_show_tvgraber=false;
+            fundet=true;
+            exit(0);                                                           // exit
+          }
         }
         if (vis_stream_oversigt) {
           if (!(fundet)) {
@@ -6117,7 +6148,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 break;
             case GLUT_RIGHT_BUTTON:
-                if (vis_music_oversigt) {
+                  if (vis_music_oversigt) {
                   if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
                     ask_open_dir_or_play=false;
                     mknapnr=0;
@@ -11667,8 +11698,8 @@ void loadgfx() {
     screensaverbox1=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
-
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
+    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");;
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -11805,6 +11836,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureuv1);                         // uv img
     glDeleteTextures( 1, &_textureuv1_top);                         // uv img
     glDeleteTextures( 1, &_errorbox);                           // error box
+    glDeleteTextures( 1, &_textureexit);
     // delete radio lande flags
     i=0;
     while(i<69) {
