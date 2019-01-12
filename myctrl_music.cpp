@@ -42,32 +42,22 @@ extern int debugmode;
 extern unsigned int musicoversigt_antal;
 extern int music_select_iconnr;
 extern int do_music_icon_anim_icon_ofset;
-
 extern GLuint _textureIdback1;
 extern GLuint _textureId28_1;
 extern GLuint _textureId29_1;
-
 extern GLuint _textureIdloading;
 extern GLuint _textureIdloading1;
 
-//extern GLuint _textureIdloading_mask;
 
 // Screen saver box ********************************************************************************
 extern boxarray mybox;                         // 3D screen saver
-
 extern int fonttype;
 extern fontctrl aktivfont;
-
 mplaylist aktiv_playlist;
-
 extern int sinusofset;
-
-
 extern GLint cur_avail_mem_kb;
-
 extern int orgwinsizey;
 extern int orgwinsizex;
-
 
 // parameret til mysql er dirid = directory_id i database
 // retunere path og parent_id som bliver udfyldt fra mysql databasen
@@ -91,10 +81,10 @@ void hent_dir_id(char *path,char *parent_id,char *dirid) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(parent_id,row[0]);
-            strcpy(path,row[1]);
-        }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(parent_id,row[0]);
+        strcpy(path,row[1]);
+      }
     }
     mysql_close(conn);
 }
@@ -124,13 +114,12 @@ unsigned int hent_parent_dir_id(int dirid) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            returid=atol(row[0]);
-        }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        returid=atol(row[0]);
+      }
     }
     mysql_close(conn);
     return(returid);
-
 }
 
 
@@ -140,16 +129,16 @@ void clean_music_oversigt(music_oversigt_type musicoversigt[])
 {
     unsigned int i=0;
     while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
-        strcpy(musicoversigt[i].album_name,"");
-        strcpy(musicoversigt[i].album_path,"");
-        strcpy(musicoversigt[i].album_coverfile,"");
-        musicoversigt[i].textureId=0;
-        musicoversigt[i].directory_id=0;                        // husk directory id
-        musicoversigt[i].parent_id=0;
-        musicoversigt[i].album_id=0;
-        musicoversigt[i].artist_id=0;
-        musicoversigt[i].oversigttype=0;
-        i++;
+      strcpy(musicoversigt[i].album_name,"");
+      strcpy(musicoversigt[i].album_path,"");
+      strcpy(musicoversigt[i].album_coverfile,"");
+      musicoversigt[i].textureId=0;
+      musicoversigt[i].directory_id=0;                        // husk directory id
+      musicoversigt[i].parent_id=0;
+      musicoversigt[i].album_id=0;
+      musicoversigt[i].artist_id=0;
+      musicoversigt[i].oversigttype=0;
+      i++;
     }
 }
 
@@ -173,19 +162,19 @@ int findcoverfile(char *path,char *fundetnavn) {
     strcpy(filename[6],"thumbnail.jpg");
     strcpy(filename[7],"Thumbnail.jpg");
     while(!(fundet) && (n<=ANTAL)) {
-        strcpy(filepath,path);			// load org path again
-        strcat(filepath,"/");			// add next filetype to test for
-        strcat(filepath,filename[n]);		//
-        if (file_exists(filepath)) fundet=true;
-        n++;
+      strcpy(filepath,path);			// load org path again
+      strcat(filepath,"/");			// add next filetype to test for
+      strcat(filepath,filename[n]);		//
+      if (file_exists(filepath)) fundet=true;
+      n++;
     }
     // return file exist tested path
     if (fundet) {
-        strcpy(fundetnavn,filepath);
-        return(1);
+      strcpy(fundetnavn,filepath);
+      return(1);
     } else {
-        strcpy(fundetnavn,"");
-        return(0);
+      strcpy(fundetnavn,"");
+      return(0);
     }
 }
 
@@ -293,9 +282,9 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
   clean_music_oversigt(musicoversigt);				// clear music oversigt
   dirp=opendir(dirpath);
   if (dirp==NULL) {
-      printf("Open dir error ->%s<-\n",dirpath);
-      return 1;
-      exit(0);
+    printf("Open dir error ->%s<-\n",dirpath);
+    return 1;
+    exit(0);
   }
   conn=mysql_init(NULL);
   // Connect to database
@@ -410,7 +399,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
               }
               mysql_close(conn2);
             }
-
             if (dirp1) {
               // loop the dir and create the music records and music_dir if mount in loop dir
               while(de = readdir(dirp1)) {
@@ -461,9 +449,9 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                     if (debugmode & 2) printf("\t Checking sub dir %s \n",de->d_name);
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
-                        printf("Open dir error ->%s<-\n",checkdir2);
-                        return 1;
-                        exit(0);
+                      printf("Open dir error ->%s<-\n",checkdir2);
+                      return 1;
+                      exit(0);
                     }
                     // loop dir and update music songs db
                     while(de2 = readdir(dirp2)) {
@@ -480,8 +468,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                           sprintf(sqlselect1,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                                         (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                                         0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
-
-
                           // show in music overview loader
                           strcpy(music_db_update_loader,de->d_name);
                           conn1=mysql_init(NULL);
@@ -536,8 +522,6 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
 }
 
 
-
-
 //
 // update_music_oversigt
 // update list pr dir id from mythtv-backend or internal loader
@@ -563,29 +547,29 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
     i=0;
     if (directory_id==0) {			// hent fra starten top music directory
-        strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
-        strcpy(musicoversigt[0].album_name,"PLAYLIST");
-        strcpy(musicoversigt[0].album_path,"");
-        strcpy(musicoversigt[0].album_coverfile,"");
-        musicoversigt[0].textureId=0;
-        musicoversigt[0].directory_id=0;			// husk directory id
-        musicoversigt[0].parent_id=0;
-        musicoversigt[0].album_id=0;
-        musicoversigt[0].artist_id=0;
-        musicoversigt[0].oversigttype=-1;			// type -1 = playlist
-        i++;
+      strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
+      strcpy(musicoversigt[0].album_name,"PLAYLIST");
+      strcpy(musicoversigt[0].album_path,"");
+      strcpy(musicoversigt[0].album_coverfile,"");
+      musicoversigt[0].textureId=0;
+      musicoversigt[0].directory_id=0;			// husk directory id
+      musicoversigt[0].parent_id=0;
+      musicoversigt[0].album_id=0;
+      musicoversigt[0].artist_id=0;
+      musicoversigt[0].oversigttype=-1;			// type -1 = playlist
+      i++;
     } else {
-        sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
-        strcpy(musicoversigt[0].album_name,"   BACK");
-        strcpy(musicoversigt[0].album_path,"");
-        strcpy(musicoversigt[0].album_coverfile,"");
-        musicoversigt[0].textureId=0;
-        musicoversigt[0].directory_id=hent_parent_dir_id(directory_id); // husk directory id
-        musicoversigt[0].parent_id=0;
-        musicoversigt[0].album_id=0;
-        musicoversigt[0].artist_id=0;
-        musicoversigt[0].oversigttype=0;			// type 0 = dirid
-        i++;
+      sprintf(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=%d",directory_id);		 // dir id in mythtv mysql
+      strcpy(musicoversigt[0].album_name,"   BACK");
+      strcpy(musicoversigt[0].album_path,"");
+      strcpy(musicoversigt[0].album_coverfile,"");
+      musicoversigt[0].textureId=0;
+      musicoversigt[0].directory_id=hent_parent_dir_id(directory_id); // husk directory id
+      musicoversigt[0].parent_id=0;
+      musicoversigt[0].album_id=0;
+      musicoversigt[0].artist_id=0;
+      musicoversigt[0].oversigttype=0;			// type 0 = dirid
+      i++;
     }
     conn=mysql_init(NULL);
     // Connect to database
@@ -595,57 +579,53 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-            strcpy(dirname,row[1]);
-            strcpy(tmptxt,configmusicpath);			// config dir fra mythtv setup table
-            strcat(tmptxt,row[1]);
-            //strcat(tmptxt,"/Front.jpg");
-            strcpy(tmptxt1,configmusicpath);			// config dir fra mythtv setup table
-            strcat(tmptxt1,row[1]);
-            strcat(tmptxt1,"/front.jpg");
-
-            // check for some file types to convert to cover
-            findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found
-
-            if (file_exists(fundetpath)) {
-                strcpy(convert_command,"/usr/bin/convert -scale 128 ");
-                strcat(convert_command,"\"");
-                strcat(convert_command,fundetpath);
-                strcat(convert_command,"\"");
-                strcat(convert_command," \"");
-                strcat(convert_command,configmusicpath);
-                strcat(convert_command,row[1]);
-                strcat(convert_command,"/");
-                strcat(convert_command,"mythcFront.jpg\"");
-                strcpy(tmptxt,configmusicpath);
-                strcat(tmptxt,row[1]);
-                strcat(tmptxt,"/mythcFront.jpg");
-                if (!(file_exists(tmptxt))) {
-                    system(convert_command);
-                    if (debugmode) printf("Do Convert scale image %s to 128*128 \n",row[1]);
-                }
-                strcpy(icon_file,tmptxt);		// gem icon file name
-            } else {
-                strcpy(icon_file,"");			// no icon
-            }
-            strcpy(musicoversigt[i].album_name,dirname);
-            strcpy(musicoversigt[i].album_path,"");
-            strcpy(musicoversigt[i].album_coverfile,icon_file);
-            musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
-            musicoversigt[i].parent_id=atoi(row[2]);
-            musicoversigt[i].album_id=0;
-            musicoversigt[i].artist_id=0;
-            musicoversigt[i].oversigttype=0;
-            i++;
-        }        	// end while
+      while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
+        strcpy(dirname,row[1]);
+        strcpy(tmptxt,configmusicpath);			// config dir fra mythtv setup table
+        strcat(tmptxt,row[1]);
+        //strcat(tmptxt,"/Front.jpg");
+        strcpy(tmptxt1,configmusicpath);			// config dir fra mythtv setup table
+        strcat(tmptxt1,row[1]);
+        strcat(tmptxt1,"/front.jpg");
+        // check for some file types to convert to cover
+        findcoverfile(tmptxt,fundetpath);			// return fundetpath = picture found
+        if (file_exists(fundetpath)) {
+          strcpy(convert_command,"/usr/bin/convert -scale 128 ");
+          strcat(convert_command,"\"");
+          strcat(convert_command,fundetpath);
+          strcat(convert_command,"\"");
+          strcat(convert_command," \"");
+          strcat(convert_command,configmusicpath);
+          strcat(convert_command,row[1]);
+          strcat(convert_command,"/");
+          strcat(convert_command,"mythcFront.jpg\"");
+          strcpy(tmptxt,configmusicpath);
+          strcat(tmptxt,row[1]);
+          strcat(tmptxt,"/mythcFront.jpg");
+          if (!(file_exists(tmptxt))) {
+            system(convert_command);
+            if (debugmode) printf("Do Convert scale image %s to 128*128 \n",row[1]);
+          }
+          strcpy(icon_file,tmptxt);		// gem icon file name
+        } else {
+          strcpy(icon_file,"");			// no icon
+        }
+        strcpy(musicoversigt[i].album_name,dirname);
+        strcpy(musicoversigt[i].album_path,"");
+        strcpy(musicoversigt[i].album_coverfile,icon_file);
+        musicoversigt[i].directory_id=atoi(row[0]);			// husk directory id
+        musicoversigt[i].parent_id=atoi(row[2]);
+        musicoversigt[i].album_id=0;
+        musicoversigt[i].artist_id=0;
+        musicoversigt[i].oversigttype=0;
+        i++;
+      }        	// end while
     } else {
-        //gotoxy(10,14);
-        if (debugmode & 2) printf("MYTHTV - sql database err.\n");
-        i=0;
+      if (debugmode & 2) printf("MYTHTV - sql database err.\n");
+      i=0;
     }
     if (i>0) {
-        //gotoxy(10,14);
-        if (debugmode & 2) printf(" %d CD Covers loaded.\n",i);
+      if (debugmode & 2) printf(" %d CD Covers loaded.\n",i);
     }
     musicoversigt_antal=i;						// antal i oversigt
     mysql_close(conn);
@@ -773,30 +753,28 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
     char tmptxt[512];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);
-
     if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
     i=0;
     if (strcmp(searchtxt,"")==0) {			// hent fra starten top music directory
-        strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
+      strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
     } else {
-        if (search_art==0) {
-            strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_artists.artist_name like '%");
-        } else {
-            strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_songs.name like '%");
-        }
-        strcat(sqlselect,searchtxt);
-        strcat(sqlselect,"%' group by directory_id");
-
-        strcpy(musicoversigt[0].album_name,(char *) "   BACK");
-        strcpy(musicoversigt[0].album_path,(char *) "");
-        strcpy(musicoversigt[0].album_coverfile,(char *) "");
-        musicoversigt[0].textureId=0;
-        musicoversigt[0].directory_id=0;			// husk directory id
-        musicoversigt[0].parent_id=0;
-        musicoversigt[0].album_id=0;
-        musicoversigt[0].artist_id=0;
-        musicoversigt[0].oversigttype=0;
-        i++;
+      if (search_art==0) {
+        strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_artists.artist_name like '%");
+      } else {
+        strcpy(sqlselect,"select music_directories.directory_id,path,parent_id from music_directories left join music_songs on (music_directories.directory_id=music_songs.directory_id) left join music_artists on (music_songs.artist_id=music_artists.artist_id)  where music_songs.name like '%");
+      }
+      strcat(sqlselect,searchtxt);
+      strcat(sqlselect,"%' group by directory_id");
+      strcpy(musicoversigt[0].album_name,(char *) "   BACK");
+      strcpy(musicoversigt[0].album_path,(char *) "");
+      strcpy(musicoversigt[0].album_coverfile,(char *) "");
+      musicoversigt[0].textureId=0;
+      musicoversigt[0].directory_id=0;			// husk directory id
+      musicoversigt[0].parent_id=0;
+      musicoversigt[0].album_id=0;
+      musicoversigt[0].artist_id=0;
+      musicoversigt[0].oversigttype=0;
+      i++;
     }
     //printf("SQL SELECT = %s \n",sqlselect);
     conn=mysql_init(NULL);
@@ -945,7 +923,7 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
 }
 
 
-
+// load music conver gfx
 
 int load_music_covergfx(music_oversigt_type musicoversigt[]) {
     unsigned int i=0; // hent alle music convers
@@ -961,8 +939,6 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
     }
     return(i);
 }
-
-
 
 
 // show music oversigt
@@ -997,10 +973,10 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       if (i==0) {
         if (musicoversigt[i+sofset].oversigttype!=-1) {
           if (i+sofset==0) {
-              glBindTexture(GL_TEXTURE_2D,back_icon);
+            glBindTexture(GL_TEXTURE_2D,back_icon);
           } else {
-              if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
-              else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
+            if (musicoversigt[i+sofset].textureId==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+            else glBindTexture(GL_TEXTURE_2D,musicoversigt[i+sofset].textureId);
           }
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1051,13 +1027,13 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       glScalef(20.0, 20.0, 1.0);
       glDisable(GL_TEXTURE_2D);
       if (strlen(temptxt)<17) {
-          ofs=(strlen(temptxt)/2)*9;
-          glRasterPos2f(0.0f, 10.0f);
-          glcRenderString(temptxt);
+        ofs=(strlen(temptxt)/2)*9;
+        glRasterPos2f(0.0f, 10.0f);
+        glcRenderString(temptxt);
       } else {
-          glRasterPos2f(0.0f, 10.0f);
-          temptxt[18]=0;
-          glcRenderString(temptxt);
+        glRasterPos2f(0.0f, 10.0f);
+        temptxt[18]=0;
+        glcRenderString(temptxt);
 /*
           while(ytextofset<=10) {
               j=0;
@@ -1072,9 +1048,9 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
                   k=0;
                   while(word[k]!='\0') {
                       if (pos>=13) {
-                          if ( k != 0 ) glcRenderChar('-');
-                          pos=0;
-                          ytextofset+=10.0f;
+                        if ( k != 0 ) glcRenderChar('-');
+                        pos=0;
+                        ytextofset+=10.0f;
 //                            glLoadIdentity();
 //                            glRasterPos2f(0.0f, 0.0f);
 //                            glScalef(1.0, 1.0, 1.0);
@@ -1110,11 +1086,11 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       }
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
-
       xof+=210;
       i++;
     }
-    // update to show
+    // show loader on screen
+    // show music_db_update_loader string
     if (strcmp(music_db_update_loader,"")>0) {
       // show music loader status
       glEnable(GL_TEXTURE_2D);
