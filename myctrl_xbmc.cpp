@@ -27,13 +27,10 @@ int xbmcsqlite::getxmlfilepath() {
   if (document) {
     root = xmlDocGetRootElement(document);
     //fprintf(stdout, "Root is <%s> \n", root->name);
-
     first_child = root->children;
     for (node = first_child; node; node = node->next) {
       //fprintf(stdout, "\t Child is <%s> (%i) \n", node->name,node->type);
       if (strcmp((char *) node->name,"<video>")==0) {
-
-
       }
     }
     fprintf(stdout, "...\n");
@@ -202,48 +199,36 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
         }
       }
     }
-
     if (azColName[i]) {
-
       // movie name
       if (strncmp("c00",azColName[i],3)==0) {
         strcpy(movietitle,argv[i]);
       }
-
       // plot in db
       if (strncmp("c01",azColName[i],3)==0) {
         strcpy(movieplot,argv[i]);
       }
-
       // userrating in db
       if (strncmp("c05",azColName[i],3)==0) {
         movieuserrating=atof(argv[i]);
       }
-
       // year
       if ((azColName[i]) && (strncmp("c07",azColName[i],3)==0)) {
         if (argv[i]) movieyear=atoi(argv[i]);
       }
-
       // movie cover
       if ((azColName[i]) && (strncmp("c08",azColName[i],3)==0)) {
         if (argv[i]) strcpy(fullcovertxt,argv[i]);
       }
-
-
       // imdb nr
       if (strncmp("c09",azColName[i],3)==0) {
         strcpy(movieimdb,argv[i]);
       }
-
-
       // length of movie
       if (strncmp("c11",azColName[i],3)==0) {
         movielength=atoi(argv[i]);
         movielength=movielength/60; // calc to min
       }
-
-
       // category
       // create if not exist
       if (strncmp("c14",azColName[i],3)==0) {
@@ -272,32 +257,26 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
           }
         }
       }
-
       // sub title
       if (strncmp("c16",azColName[i],3)==0) {
         strcpy(moviesubtitle,argv[i]);
       }
-
       // youtube trailer link
       if (strncmp("c19",azColName[i],3)==0) {
         strcpy(movietrailerlink,argv[i]);
       }
-
       // cover/screenshot file
       if (strncmp("c20",azColName[i],3)==0) {
         strcpy(moviescoverfile,argv[i]);
       }
-
       // contry (name)
       if (strncmp("c21",azColName[i],3)==0) {
         strcpy(moviescontry,argv[i]);
       }
-
       // link to file to play (path+filername)
       if (strncmp("c22",azColName[i],3)==0) {
         strcpy(moviepath1,argv[i]);
       }
-
       if (strncmp("dateAdded",azColName[i],9)==0) {
         strcpy(moviedateadded,argv[i]);
       }
@@ -431,9 +410,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   musicoversigt[0].artist_id=0;
   musicoversigt[0].oversigttype=0;
   for(int i=0; i<argc; i++) {
-
-    //printf("i=%d     %s = %s\n",i, azColName[i], argv[i] ? argv[i] : "NULL");
-
     cr=false;
     if (i==0) {
       musicoversigt[i].textureId=0;
@@ -467,12 +443,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           }
           n++;
         };
-
         strncpy(temp,artistname+1,nn);
         temp[nn-1]=0;
-
         //if (debugmode & 2) printf("nn=%d artistname=%s \n ",nn,temp);
-
         strcpy(temp1,configdefaultmusicpath);
         //
         if (strcmp(husklastdir,"")!=0) {
@@ -480,7 +453,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           strcat(temp1,"/");
         }
         strcat(temp1,temp);
-
         if (file_exists(temp1)) {
           // husk sidste dirid
           last_directoryid=directoryid;
@@ -504,11 +476,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           if (!(exist)) {
             conn=mysql_init(NULL);
             mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-            //      printf("create directoryid %d on artist *%s* on db music_directories \n ",directoryid,temp);
             sprintf(sqlselect2,"insert into music_directories values (%d,'%s',%d)",0,temp,last_directoryid);
             mysql_query(conn,sqlselect2);
             res = mysql_store_result(conn);
-
             // hent dir id
             sprintf(sqlselect2,"select directory_id from music_directories where path like '%s'",temp);
             mysql_query(conn,sqlselect2);
@@ -546,22 +516,17 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         argomgang++;                                          // next round
       } while (nn<strlen(artistname));
     }
-
     if (strncmp("strTitle",azColName[i],8)==0) {
       strcpy(filename,argv[i]);
     }
-
     if (strncmp("strFileName",azColName[i],8)==0) {
       strcpy(filename1,argv[i]);
     }
-
     if (strncmp("strArtists",azColName[i],10)==0) {
       strcpy(artistname,argv[i]);
-
       conn2=mysql_init(NULL);
       if (conn2) {
         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-
         sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
         mysql_query(conn2,sqlselect1);
         res2 = mysql_store_result(conn2);
@@ -571,15 +536,12 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
         mysql_close(conn2);
         if (artistid==0) {
           cr=true;
-
           conn=mysql_init(NULL);
           mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,artistname);
           mysql_query(conn,sqlselect2);
           res = mysql_store_result(conn);
           mysql_close(conn);
-
-
           conn2=mysql_init(NULL);
           mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
           sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
@@ -591,9 +553,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           mysql_close(conn2);
         }
       }
-
     }
-
     if (strncmp("iDuration",azColName[i],9)==0) {
       length=atoi(argv[i]);
     }
@@ -603,11 +563,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     if (strncmp("strPath",azColName[i],7)==0) {
       strcpy(filepath,argv[i]);
     }
-
     if (strncmp("strAlbum",azColName[i],8)==0) {
-
-      //strcpy(albumname,argv[i]);
-
       conn2=mysql_init(NULL);
       if (conn2) {
         mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -623,7 +579,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
       // create album if not exist
       if (albumid==0) {
         cr=true;
-//        printf("create album %20s  ",albumname);
         sprintf(sqlselect1,"insert into music_albums values(%d,%d,'%s',%d,%d)",0,artistid,albumname,0,0);
         conn=mysql_init(NULL);
         if (conn) {
@@ -632,7 +587,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           res = mysql_store_result(conn);
           mysql_close(conn);
         }
-
         // get albumid
         conn2=mysql_init(NULL);
         if (conn2) {
@@ -647,11 +601,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
           mysql_close(conn2);
         }
       }
-
     }
   }
   strcpy(temp,filepath);
-
   char *lastpath;
   char sted[255];
   int aaa=strlen(filepath);
@@ -662,31 +614,8 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   strcpy(sted,filepath+(aaa+1));
   aaa=strlen(sted);
   sted[aaa-1]=0;
-  /*
-  conn2=mysql_init(NULL);
-  if (conn2) {
-    mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-
-    sprintf(sqlselect1,"select directory_id from music_directories where path like '%s'",sted);
-    mysql_query(conn2,sqlselect1);
-    res2 = mysql_store_result(conn2);
-    if (res2) {
-      while ((row2 = mysql_fetch_row(res2)) != NULL) {
-        directoryid=atol(row2[0]);
-        exist=true;
-      }
-    }
-    mysql_close(conn2);
-  }
-*/
   strcat(temp,filename1);
-
-  //strcat(temp,songname);
-
   if (debugmode & 512) printf("Import kodi song %40s \n",songname);
-  // if (debugmode & 2) printf("dirid %d artistid=%4d albumid=%4d path %s songname=%10s \n",directoryid,artistid,albumid,sted,songname);
-
-  //printf("Song name %s \n",songname);
   sprintf(sqlselect,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                 (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                 0,      temp,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,directoryid);
@@ -697,6 +626,5 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
     res = mysql_store_result(conn);
     mysql_close(conn);
   }
-  //printf("XBMC - Antal xbmc music loaded %d \n",argc);
   return(0);
 }
