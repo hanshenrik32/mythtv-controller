@@ -59,6 +59,7 @@ class stream_class : vlc_controller {
         long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr]->intnr); }
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
         int antalstreams() { return antal; };
+        int streams_loaded() { return stream_oversigt_loaded_nr; };
         void stopstream();
         void softstopstream();
         int playstream(int nr);

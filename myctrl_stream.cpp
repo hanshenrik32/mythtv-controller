@@ -2588,8 +2588,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2599,17 +2597,14 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
       glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
       glEnd();
-
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-
       glTranslatef(1680+20,140,0);
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
       sprintf(temptxt,"Loading icons");
       glcRenderString(temptxt);
       glPopMatrix();
-
       glPushMatrix();
       glTranslatef(1680+20,95,0);
       glScalef(24.0, 24.0, 1.0);

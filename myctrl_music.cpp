@@ -24,6 +24,7 @@
 #include "myth_saver.h"
 
 extern char music_db_update_loader[256];                       //
+extern int music_oversigt_loaded_nr;
 
 extern char *dbname;                                          // internal database name in mysql (music,movie,radio)
 extern int debug;
@@ -470,6 +471,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
                                         0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
                           // show in music overview loader
                           strcpy(music_db_update_loader,de->d_name);
+                          music_oversigt_loaded_nr++;
                           conn1=mysql_init(NULL);
                           if (conn1) {
                             mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -1091,6 +1093,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
     }
     // show loader on screen
     // show music_db_update_loader string
+/*
     if (strcmp(music_db_update_loader,"")>0) {
       // show music loader status
       glEnable(GL_TEXTURE_2D);
@@ -1114,6 +1117,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       glcRenderString(music_db_update_loader);
       glPopMatrix();
     }
+*/
     if (i==0) {
       // show error message
       glEnable(GL_TEXTURE_2D);

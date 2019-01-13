@@ -59,6 +59,17 @@ bool stream_jump=false;
 #include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
+
+
+
+int radio_oversigt_loaded_nr=0;                                                  //
+bool radio_oversigt_loaded_begin=false;                                         // true first time radio is loaded
+int radio_oversigt_antal=0;                                                      //
+int music_oversigt_loaded_nr=0;                                                  //
+int movie_oversigt_loaded_nr=0;                                                  //
+
+
+
 FMOD::DSP* dsp = 0;                   // fmod Sound device
 
 // from compiler (debuger)
@@ -4989,6 +5000,75 @@ void display() {
       }
       glPopMatrix();
     }
+
+    // show status of all the thread loaders
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false))) {
+      // show loader status
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
+      glEnd();
+      float y=0;
+      int xx=0;
+      int valgtnr=0;
+      if ((radio_oversigt_loaded_nr<radiooversigt.radioantal()) && (radio_oversigt_loaded_done==false)) {
+        y=(float) radio_oversigt_loaded_nr/radiooversigt.radioantal();
+        xx=(float) y*17;
+        if (y>0.0f) valgtnr=1;
+      }
+      if (valgtnr==0) {
+        y=(float) music_oversigt_loaded_nr/7344;
+        xx=(float) y*17;
+        if (y>0.0f) valgtnr=2;
+        //printf("music_oversigt_loaded_nr = %d val = %d Y=%f \n",music_oversigt_loaded_nr,xx,y);
+      } else if (valgtnr==0) {
+        y=(float) streamoversigt.streams_loaded()/streamoversigt.streamantal();
+        xx=(float) y*17;
+        if (y>0.0f) valgtnr=3;
+        //printf("stream_oversigt_loaded_nr = %d val = %d Y=%f \n",streamoversigt.streams_loaded(),xx,y);
+      } else if (valgtnr==0) {
+        y=(float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
+        xx=(float) y*17;
+        if (y>0.0f) valgtnr=4;
+      } else y=0;
+      for(int x=0;x<xx;x++) {
+        glDisable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(1470+222+(x*12), 125 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(1470+222+(x*12), 125+(25), 0.0);
+        glTexCoord2f(1, 1); glVertex3f(1470+222+(10)+(x*12), 125+(25) , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(1470+222+(10)+(x*12), 125 , 0.0);
+        glEnd();
+      }
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(1680+20,95,0);
+      glScalef(24.0, 24.0, 1.0);
+      glColor3f(0.6f, 0.6f, 0.6f);
+      switch(valgtnr) {
+        case 1: glcRenderString("Updating Radio");
+                break;
+        case 2: glcRenderString(" Updating Music");
+                break;
+        case 3: glcRenderString("Updating Stream");
+                break;
+        case 4: glcRenderString(" Updating Movie");
+                break;
+        case 5: glcRenderString("     Other");
+                break;
+      }
+      glPopMatrix();
+    }
+
     // show pfs
     // debug mode 1
     if ((showfps) && (debugmode & 1)) {
