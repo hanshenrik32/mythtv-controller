@@ -51,7 +51,10 @@ extern radiostation_class radiooversigt;
 extern GLint cur_avail_mem_kb;
 extern bool radio_oversigt_loaded;
 extern bool radio_oversigt_loaded_done;
+extern bool radio_oversigt_loaded_begin;
 
+extern int radio_oversigt_loaded_nr;
+extern int radio_oversigt_antal;
 
 // constructor
 radiostation_class::radiostation_class() : antal(0) {
@@ -415,8 +418,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     int length,width;
     int pline=0;
     sofset=(_mangley/40)*8;
-    //static bool radio_oversigt_loaded=false;
-    static int radio_oversigt_loaded_nr=0;
     GLuint texture;
     if (screen_size==2) {
       bonline=6;
@@ -430,6 +431,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     // if no load 1 at eatch run
     // loader
     if ((radio_oversigt_loaded==false) && (radio_oversigt_loaded_nr<radiooversigt.radioantal())) {
+        radio_oversigt_loaded_begin=true;
         radio_pictureloaded=false;
         strcpy(tmpfilename,radiostation_iconsgfx);      		                                    // hent path
         strcpy(gfxfilename,radiooversigt.get_station_gfxfile(radio_oversigt_loaded_nr));        // hent radio icon gfx filename
@@ -462,7 +464,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             }
           }
         }
-        if (radio_oversigt_loaded_nr>=radiooversigt.radioantal()) {
+        if (radio_oversigt_loaded_nr>=radiooversigt.radioantal()-1) {
           radio_oversigt_loaded=true;
           radio_oversigt_loaded_done=true;
         } else radio_oversigt_loaded_nr++;
@@ -624,6 +626,8 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         xof=xof+buttonsize+6;
         i++;
     }
+    radio_oversigt_antal=radiooversigt.radioantal();
+/*
     if (radio_oversigt_loaded_nr<radiooversigt.radioantal()) {
       // show radio icon loader status
       glEnable(GL_TEXTURE_2D);
@@ -648,6 +652,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
       glcRenderString(temptxt);
       glPopMatrix();
     }
+*/
     if (i==0) {
       // show error message
       glEnable(GL_TEXTURE_2D);

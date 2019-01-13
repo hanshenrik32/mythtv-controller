@@ -7,16 +7,14 @@
 
 #include <mysql.h>                      // mysql stuf
 #include <dirent.h>                     // dir functions
-
 #include <linux/limits.h>
 
 #include "utility.h"
 #include "myctrl_movie.h"
 #include "readjpg.h"
-
 #include "myth_vlcplayer.h"
-
 #include "myctrl_music.h"
+
 extern char configmoviepath[256];                              //
 extern char configdefaultmoviepath[256];
 extern char configbackend[];
@@ -39,6 +37,7 @@ extern GLint cur_avail_mem_kb;
 extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
+extern int movie_oversigt_loaded_nr;
 
 // window info
 extern int orgwinsizey;
@@ -581,7 +580,7 @@ int film_oversigt_typem::opdatere_film_oversigt() {
               *(ext)='\0';
             }
             strcpy(moviepath1,filename);
-            if (debugmode & 16) printf("Checking/Update %s db :%s \n",movietitle);
+            if (debugmode & 16) printf("Checking/Update %s \n",movietitle);
             int movieyear=2000;
             float movieuserrating=1.0f;
             int movielength=120;
@@ -905,7 +904,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   static bool movie_oversigt_loaded=false;
   static int movie_oversigt_loaded_done=0;
   char tmpfilename[200];
-  static int movie_oversigt_loaded_nr=0; // hent alle music convers
   int loader_xpos,loader_ypos;
   int winsizx,winsizy;
   int xpos,ypos;
@@ -1092,30 +1090,20 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int bonline=8;
   float boffset;
   int ofs;
-
   static bool movie_oversigt_loaded=false;
   static int movie_oversigt_loaded_done=0;
   char tmpfilename[200];
-  static int movie_oversigt_loaded_nr=0; // hent alle music convers
   int loader_xpos,loader_ypos;
-
   int winsizx,winsizy;
   int xpos,ypos;
-
-
-
   char *base,*right_margin;
   int length,width;
   int pline=0;
   bool stop=false;
-
   int buttonsize=200;
   int buttonsizey=180;
   int xof=5;
   int yof=orgwinsizey-(buttonsizey);
-
-
-
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
