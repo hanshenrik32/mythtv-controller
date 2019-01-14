@@ -2664,7 +2664,7 @@ void display() {
           }
         }
         // exit button
-        if (vis_uv_meter==false) {
+        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_radio_oversigt))) {
           glBindTexture(GL_TEXTURE_2D, _textureexit);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
