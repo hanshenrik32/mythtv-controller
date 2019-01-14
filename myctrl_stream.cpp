@@ -653,6 +653,36 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
 }
 
 
+
+
+
+//
+// get nr of rss feed
+//
+
+int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
+  char sqlselect[4096];
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+
+  printf("*************************************************************************************\n");
+
+  if (conn) {
+    sprintf(sqlselect,"SELECT count(name) from mythtvcontroller.internetcontent");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        antalrss_feeds=atoi(row[0]);
+      }
+    }
+  }
+  return(1);
+}
+
+
+
+
 // get antal podcast af type
 
 int get_podcasttype_antal(char *typedata) {
@@ -680,6 +710,10 @@ int get_podcasttype_antal(char *typedata) {
   }
   return(nrofrec);
 }
+
+
+
+
 
 
 // check if exist
@@ -1943,6 +1977,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+      get_antal_rss_feeds_sources(conn);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
@@ -2300,7 +2335,7 @@ void stream_class::playstream(char *url) {
 }
 
 
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected,bool do_update_rss_show)
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
 
 {
     int j,ii,k,pos;
@@ -2548,6 +2583,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       i++;
       xof+=(buttonsize+10);
     }
+/*
     // show rss file loading status
     if (do_update_rss_show) {
       glEnable(GL_TEXTURE_2D);
@@ -2613,8 +2649,9 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glcRenderString(temptxt);
       glPopMatrix();
     }
+*/
     // no records loaded error
-    if ((i==0) && (do_update_rss_show==false)) {
+    if ((i==0) && (antal_rss_streams()==0)) {
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
       glPushMatrix();
