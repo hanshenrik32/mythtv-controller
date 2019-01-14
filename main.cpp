@@ -2831,7 +2831,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
-        streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected,do_update_rss_show);
+        streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
         if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
@@ -5002,8 +5002,10 @@ void display() {
     }
 
     // show status of all the thread loaders
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false))) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show)) {
       // show loader status
+      int statuswxpos=1470;
+      int statuswypos=75;
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       //glBlendFunc(GL_ONE, GL_ONE);
@@ -5027,20 +5029,29 @@ void display() {
         if (y>0.0f) valgtnr=1;
       }
       if (valgtnr==0) {
-        y=(float) music_oversigt_loaded_nr/7344;
-        xx=(float) y*17;
-        if (y>0.0f) valgtnr=2;
-        //printf("music_oversigt_loaded_nr = %d val = %d Y=%f \n",music_oversigt_loaded_nr,xx,y);
-      } else if (valgtnr==0) {
-        y=(float) streamoversigt.streams_loaded()/streamoversigt.streamantal();
-        xx=(float) y*17;
-        if (y>0.0f) valgtnr=3;
-        //printf("stream_oversigt_loaded_nr = %d val = %d Y=%f \n",streamoversigt.streams_loaded(),xx,y);
-      } else if (valgtnr==0) {
+        if (music_oversigt_loaded_nr<7344) {
+          y=(float) music_oversigt_loaded_nr/7344;
+          xx=(float) y*17;
+          if (y>0.0f) valgtnr=2;
+        }
+        printf("music_oversigt_loaded_nr = %d val = %d Y=%f \n",music_oversigt_loaded_nr,xx,y);
+      }
+      if (valgtnr==0) {
+        if (streamoversigt.streams_rss_loaded()) {
+          y=(float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
+          y=(float) streamoversigt.streams_rss_loaded()/88;
+          xx=(float) y*17;
+          if (y>0.0f) valgtnr=3;
+        }
+        printf("valgtnr=%d   stream loaded =%d antal streams = %d \n",valgtnr,streamoversigt.streams_rss_loaded(),streamoversigt.antal_rss_streams());
+      }
+      if (valgtnr==0) {
         y=(float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
         xx=(float) y*17;
         if (y>0.0f) valgtnr=4;
+        printf("update movie \n");
       } else y=0;
+
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
