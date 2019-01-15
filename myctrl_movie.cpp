@@ -38,6 +38,7 @@ extern unsigned int filmoversigt_antal;
 extern GLuint _textureIdloading,_textureIdloading1;
 extern bool vis_uv_meter;                                 // uv meter er igang med at blive vist
 extern int movie_oversigt_loaded_nr;
+extern bool movie_oversigt_gfx_loading;
 
 // window info
 extern int orgwinsizey;
@@ -1106,6 +1107,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int yof=orgwinsizey-(buttonsizey);
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
+    movie_oversigt_gfx_loading=true;
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
     if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
         this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
@@ -1113,6 +1115,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
         movie_oversigt_loaded=true;
         movie_oversigt_loaded_done=1;
+        movie_oversigt_gfx_loading=false;
     } else movie_oversigt_loaded_nr++;
   }
   glTranslatef(0.0f, 0.0f ,0.0f);
