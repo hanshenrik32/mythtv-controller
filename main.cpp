@@ -67,7 +67,8 @@ bool radio_oversigt_loaded_begin=false;                                         
 int radio_oversigt_antal=0;                                                      //
 int music_oversigt_loaded_nr=0;                                                  //
 int movie_oversigt_loaded_nr=0;                                                  //
-
+bool movie_oversigt_gfx_loading=false;
+bool show_status_update=false;
 
 
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -2648,7 +2649,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
         if (vis_uv_meter==false) {
-          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt))) {
+          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
             //glBlendFunc(GL_ONE, GL_ONE);
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
@@ -5000,9 +5001,11 @@ void display() {
       }
       glPopMatrix();
     }
-
+    //
     // show status of all the thread loaders
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show) || (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    //
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+      show_status_update=true;
       // show loader status
       int statuswxpos=1470;
       int statuswypos=75;
@@ -5015,57 +5018,54 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f(statuswxpos+200, statuswypos , 0.0);
+      glTexCoord2f(0, 1); glVertex3f(statuswxpos+200, statuswypos+130, 0.0);
+      glTexCoord2f(1, 1); glVertex3f(statuswxpos+200+250, statuswypos+130 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f(statuswxpos+200+250, statuswypos , 0.0);
       glEnd();
       float y=0;
       int xx=0;
       int valgtnr=0;
       if ((radio_oversigt_loaded_nr<radiooversigt.radioantal()) && (radio_oversigt_loaded_done==false)) {
         y=(float) radio_oversigt_loaded_nr/radiooversigt.radioantal();
-        xx=(float) y*17;
+        xx=(float) y*18;
         if (y>0.0f) valgtnr=1;
       }
+      // show music loader status
       if (valgtnr==0) {
         if (music_oversigt_loaded_nr<7344) {
           y=(float) music_oversigt_loaded_nr/7344;
-          xx=(float) y*17;
+          xx=(float) y*18;
           if (y>0.0f) valgtnr=2;
         }
-        printf("music_oversigt_loaded_nr = %d val = %d Y=%f \n",music_oversigt_loaded_nr,xx,y);
       }
+      // show stream loader status
       if (valgtnr==0) {
         if (streamoversigt.streams_rss_loaded()) {
           y=(float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
           y=(float) streamoversigt.streams_rss_loaded()/88;
-          xx=(float) y*17;
+          xx=(float) y*18;
           if (y>0.0f) valgtnr=3;
         }
-        printf("valgtnr=%d   stream loaded =%d antal streams = %d \n",valgtnr,streamoversigt.streams_rss_loaded(),streamoversigt.antal_rss_streams());
       }
-
-      printf("valgt nr = %d movie loaded_nr = %d antal = %d \n",valgtnr,movie_oversigt_loaded_nr,film_oversigt.get_film_antal());
-
+      // show movie loader status
       if (valgtnr==0) {
         y=(float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
-        xx=(float) y*17;
+        xx=(float) y*18;
         if (y>0.0f) valgtnr=4;
-        printf("update movie \n");
       } else y=0;
 
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(1470+222+(x*12), 125 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(1470+222+(x*12), 125+(25), 0.0);
-        glTexCoord2f(1, 1); glVertex3f(1470+222+(10)+(x*12), 125+(25) , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(1470+222+(10)+(x*12), 125 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), 125 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), 125+(25), 0.0);
+        glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), 125+(25) , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), 125 , 0.0);
         glEnd();
       }
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+20,95,0);
+      glTranslatef(statuswxpos+220+20,95,0);
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
       switch(valgtnr) {
@@ -5081,7 +5081,7 @@ void display() {
                 break;
       }
       glPopMatrix();
-    }
+    } else show_status_update=false;
 
     // show pfs
     // debug mode 1
