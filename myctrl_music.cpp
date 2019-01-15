@@ -1091,33 +1091,6 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       xof+=210;
       i++;
     }
-    // show loader on screen
-    // show music_db_update_loader string
-/*
-    if (strcmp(music_db_update_loader,"")>0) {
-      // show music loader status
-      glEnable(GL_TEXTURE_2D);
-      //glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
-      glEnd();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+20,95,0);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      glcRenderString(music_db_update_loader);
-      glPopMatrix();
-    }
-*/
     if (i==0) {
       // show error message
       glEnable(GL_TEXTURE_2D);
