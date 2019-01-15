@@ -2583,75 +2583,20 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       i++;
       xof+=(buttonsize+10);
     }
-/*
-    // show rss file loading status
-    if (do_update_rss_show) {
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
-      glEnd();
-
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+6,140,0);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"FEED IS LOADING");
-      glcRenderString(temptxt);
-      glPopMatrix();
-
-
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+60,95,0);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"%4d",streamoversigt.stream_rssparse_nowloading);
-      glcRenderString(temptxt);
-      glPopMatrix();
-    }
-
-    // show icon gfx loader status
-    // do not show while loading new rss
-    if ((do_update_rss_show==false) && (stream_oversigt_loaded_nr<streamoversigt.streamantal())) {
-      // show radio icon loader status
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(1470+200, 75 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(1470+200, 75+130, 0.0);
-      glTexCoord2f(1, 1); glVertex3f(1470+200+250, 75+130 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(1470+200+250, 75 , 0.0);
-      glEnd();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(1680+20,140,0);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"Loading icons");
-      glcRenderString(temptxt);
-      glPopMatrix();
-      glPushMatrix();
-      glTranslatef(1680+20,95,0);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"%4d of %4d ",stream_oversigt_loaded_nr,streamoversigt.streamantal());
-      glcRenderString(temptxt);
-      glPopMatrix();
-    }
-*/
     // no records loaded error
     if ((i==0) && (antal_rss_streams()==0)) {
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
+      glEnd();
       strcpy(temptxt,"No backend ip/hostname ");
       strcat(temptxt,configmysqlhost);
       glPushMatrix();

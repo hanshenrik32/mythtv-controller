@@ -5002,7 +5002,7 @@ void display() {
     }
 
     // show status of all the thread loaders
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show)) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show) || (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       // show loader status
       int statuswxpos=1470;
       int statuswypos=75;
@@ -5045,6 +5045,9 @@ void display() {
         }
         printf("valgtnr=%d   stream loaded =%d antal streams = %d \n",valgtnr,streamoversigt.streams_rss_loaded(),streamoversigt.antal_rss_streams());
       }
+
+      printf("valgt nr = %d movie loaded_nr = %d antal = %d \n",valgtnr,movie_oversigt_loaded_nr,film_oversigt.get_film_antal());
+
       if (valgtnr==0) {
         y=(float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
         xx=(float) y*17;

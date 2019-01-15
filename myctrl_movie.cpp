@@ -1313,36 +1313,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     film_nr++;
     //glPopMatrix();
   }
-
-  // show dvd cover loading status
-  if ((movie_oversigt_loaded_nr<this->filmoversigt_antal) && (!(vis_uv_meter))) {
-    winsizx=200;
-    winsizy=150;
-    xpos=orgwinsizex-200;
-    ypos=10;
-    glBindTexture(GL_TEXTURE_2D,_textureIdloading);	//  _textureIdloading1);
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glTexCoord2f(0, 0); glVertex3f(xpos,ypos , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(xpos,ypos+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos , 0.0);
-    glEnd(); //End quadrilateral coordinates
-
-    sprintf(temptxt,"%4d of %4d ",movie_oversigt_loaded_nr,filmoversigt_antal-1);
-
-    glPushMatrix();
-    glTranslatef(xpos+10, ypos+40 ,0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(20.0, 20.0, 1.0);
-    glcRenderString(temptxt);
-    glEnable(GL_TEXTURE_2D);
-    glPopMatrix();
-  }
   if ((film_nr==0) || (this->filmoversigt_antal==0)) {
     sprintf(temptxt,"No info from %s backend.",configbackend);
     strcat(temptxt,configmysqlhost);
