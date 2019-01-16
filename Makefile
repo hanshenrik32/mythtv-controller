@@ -7,10 +7,12 @@ PROG     = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
+DESTDIRBIN = /usr/local/bin
 DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
+FMODFILE   = fmodstudioapi11008linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -96,21 +98,17 @@ clean:
 
 installsound:
 	@echo "Install fmod sound system ver 4.44.41"
+	#@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
-	cp fmodstudioapi10906linux.tar.gz $(DESTDIR)
+	cp $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
-	tar -zxf fmodstudioapi11008linux.tar.gz -C /usr/share/mythtv-controller/
+	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	#cp /usr/share/mythtv-controller/fmodstudioapi10906linux/api/lowlevel/lib/x86_64/libfmod* /usr/lib/
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so.10.8
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so.10.8
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmodL.so.10.8 /usr/lib/libfmodL.so
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10.8
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
@@ -120,11 +118,10 @@ install:
 	mkdir -p /usr/share/mythtv-controller/images/radiostations
 	mkdir -p /usr/share/mythtv-controller/convert/hires
 	cp charset $(DESTDIR)
-	@if test -e /etc/mythtv-controller.conf; then echo "config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
+	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
 	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
-	#cp $(PROG) checkwakeup.sh startmovie.sh /usr/bin/
 	#@if ! test -d ~/.config/lirc/; then \
 	#  mkdir  ~/.config/lirc/; \
 	#  cp lirc/* ~/.config/lirc/; \
@@ -132,11 +129,14 @@ install:
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	#@chmod 755 /usr/bin/startmovie.sh
 	cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
+	cp mythtv-controller $(DESTDIRBIN)
+	cp mythtv-controller.desktop /usr/share/applications/
+	cp mythtv-controller.desktop  ~/.local/share/applications
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
-	  cp lirc/mythtv-controller ~/.lirc/; fi
+	  cp lirc/mythtv-controller* ~/.lirc/; fi
 
 
 include buildnumber.mak

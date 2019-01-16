@@ -3162,10 +3162,6 @@ void show_setup_rss(unsigned int startofset) {
 
 
 
-
-
-
-
 //
 // call tv_graber config and do auto config if posible
 // will try to make list of all channels from tv_graber
@@ -3227,66 +3223,68 @@ int txmltvgraber_createconfig() {
               15: All TV Channels
               */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"'2\n\n\all\n' |");
+      case 8: sprintf(exebuffer,"echo -e '2\n\n\all\n' |");
               break;
               // create new config for tv_grab_se_swedb
-      case 9: sprintf(exebuffer,"'\n\nall\n' |");
+      case 9: sprintf(exebuffer,"echo -e '\n\nall\n' |");
               break;
               // create new config for tv_grab_fr
               // take some time to finish
-      case 10: sprintf(exebuffer,"'all\n' |");
+      case 10: sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_uk_bleb
-      case 11:sprintf(exebuffer,"'all\n' |");
+      case 11:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_huro
-      case 12:sprintf(exebuffer,"'1\nall\n' |");
+      case 12:sprintf(exebuffer,"echo -e '1\nall\n' |");
               break;
               // create new config for tv_grab_ch_search
-      case 13:sprintf(exebuffer,"'all\n' |");
+      case 13:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_it
-      case 14:sprintf(exebuffer,"'all\n' |");
+      case 14:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_is
-      case 15:sprintf(exebuffer,"'all\n' |");
+      case 15:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_fi_sv
-      case 16:sprintf(exebuffer,"'all\n' |");
+      case 16:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_na_dtv
               // do not work for now
               // need more work on time zones
-      case 17:sprintf(exebuffer,"'all\n' |");
+      case 17:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_tr
-      case 18:sprintf(exebuffer,"'\nall\n' |");
+      case 18:sprintf(exebuffer,"echo -e '\nall\n' |");
               break;
               // create new config for tv_grab_eu_egon
-      case 19:sprintf(exebuffer,"'\n\nall\n' |");
+      case 19:sprintf(exebuffer,"echo -e '\n\nall\n' |");
               break;
               // create new config for tv_grab_dk_dr
-      case 20:sprintf(exebuffer,"'1\n0\n\nyes\nall\n' |");
+      case 20:sprintf(exebuffer,"echo -e '1\n0\n\nyes\nall\n' |");
               break;
               // create new config for tv_grab_se_tvzon
-      case 21:sprintf(exebuffer,"'\n\nall\n' |");
+      case 21:sprintf(exebuffer,"echo -e '\n\nall\n' |");
               break;
               // create new config for tv_grab_ar
               //
-      case 22:sprintf(exebuffer,"'all\n' |");
+      case 22:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_fr_kazer
               // do not work
-      case 23:sprintf(exebuffer,"'all\n' |");
+      case 23:sprintf(exebuffer,"echo -e 'all\n' |");
               break;
               // create new config for tv_grab_uk_tvguide
-      case 24:sprintf(exebuffer,"'\nall\n' |");
+      case 24:sprintf(exebuffer,"echo -e '\nall\n' |");
               break;
       case 25:// tv_grab_zz_sdjson
               exebuffer[0]='\0';
               break;
-      default: sprintf(exebuffer,"'\nall\n' |");
+      default: sprintf(exebuffer,"echo -e '\nall\n' |");
     }
+    // get grabercmd command
+    // add configure paramters to tv_grab_*
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     switch(aktiv_tv_graber.graberaktivnr) {
@@ -3297,7 +3295,8 @@ int txmltvgraber_createconfig() {
               break;
 
     }
-    return(1);
+    // sysresult = -1 if error else command return value
+    return(sysresult);
   } else return(0);
 }
 
@@ -3573,12 +3572,13 @@ int load_channel_list_from_graber() {
   bool errors=false;
   char userhomedir[1024];
   char filename[1024];
-  if (debugmode) printf("Get channel list file from web.\n");
+  if (debugmode) printf("Get channel list file from tv graber sub system.\n");
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/tvguide_channels.txt");
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
+    // get config tv graber
     strcpy(exestring,configbackend_tvgraber);
     //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
     switch (aktiv_tv_graber.graberaktivnr) {
@@ -3700,7 +3700,7 @@ int load_channel_list_from_graber() {
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
   } else errors=true;
-  if (errors==false) return(1); return(0);
+  if (errors) return(-1); else return(sysresult);
 }
 
 //
@@ -3742,9 +3742,9 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
-  strcat(filename,tvguide_dat_filename);
+  strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-    channel_list[n].selected=false;                                             // is program channel active
+    channel_list[n].selected=true;                                              // is program channel active
     channel_list[n].ordernr=0;                                                  // show ordernr
     channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
     strcpy(channel_list[n].name,"");                                            // channel name
@@ -3847,6 +3847,7 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
@@ -3855,17 +3856,27 @@ void show_setup_tv_graber(int startofset) {
     char text[200];
     // update channel list before show it
     if (hent_tv_channels==false) {
+      // try to load struct channel info
+
+      //tvguide_channels.dat
+
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
         hent_tv_channels=true;
         // crete mew config file
-        if (txmltvgraber_createconfig()==0) printf("error xmltv graber confg \n");
+        if (txmltvgraber_createconfig()==0) {
+          printf("Error xmltv graber confg. Set to %s \n",configbackend_tvgraber);
+        }
         // load mew chanel config data from file
+        // in to struct
         load_channel_list_from_graber();
-        // save config
+        // save struct data
         save_channel_list();
         //firsttime_xmltvupdate=true;
+      } else {
+//        hent_tv_channels=true;
+//        load_channel_list_from_graber();
       }
     }
     // background

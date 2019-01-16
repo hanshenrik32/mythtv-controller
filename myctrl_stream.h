@@ -30,7 +30,8 @@ class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         stream_oversigt_type *stack[maxantal];			                            // radio stack
-        int antal;					                       	                            // Antal
+        int antal;					                       	                            // Antal streams
+        int antalrss_feeds;                                                     // antal feeds
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      //
@@ -40,6 +41,7 @@ class stream_class : vlc_controller {
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
         int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
+        int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
         bool stream_is_playing;
         bool stream_is_pause;
@@ -58,7 +60,11 @@ class stream_class : vlc_controller {
         unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_path_antal); }
         long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr]->intnr); }
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
+        //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         int antalstreams() { return antal; };
+        int antal_rss_streams() { return antalrss_feeds; };
+        int streams_loaded() { return stream_oversigt_loaded_nr; };
+        int streams_rss_loaded() { return stream_rssparse_nowloading; };
         void stopstream();
         void softstopstream();
         int playstream(int nr);
@@ -75,7 +81,7 @@ class stream_class : vlc_controller {
 //        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
         float getstream_pos();
-        void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected,bool do_update_rss_show);
+        void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 
 void *loadweb(void *data);

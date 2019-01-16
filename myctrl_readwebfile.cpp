@@ -40,9 +40,13 @@ int get_webfilenamelong(char *fname,char *webpath) {
       tmp[firstslashpointer-1]='\0';
       npointer=strrchr(tmp,'/');
       if (npointer) {
+        //strcpy(fname,filename);
+        /* old have errors
         strcpy(fname,npointer+1);
-        fname[11]='\0';
+        //fname[11]='\0';
         strcat(fname,filename);
+        */
+        strcpy(fname,filename);
       }
       delete [] filename;
     }
@@ -53,7 +57,9 @@ int get_webfilenamelong(char *fname,char *webpath) {
 
 
 
-// return string for filename
+//
+// return string for filename or null
+//
 
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
@@ -108,7 +114,6 @@ void get_host(char *hname,char *webpath,char *source) {
 // downloader of file
 
 int get_webfile(char *webpath,char *outfile) {
-
     struct sockaddr_in servaddr;
     struct hostent *hp;
     int sock_id;
@@ -126,34 +131,23 @@ int get_webfile(char *webpath,char *outfile) {
     FILE *fil;
     int error=0;
     strcpy(hostname,"");
-
     // return hostname
     //  wpath = text after hostbname (path to file - domainname)
     get_host(hostname,wpath,webpath);	// sample webpage http://www.dr.dk/image
-
-    // http 1.0
-//    strcpy(request,"GET ");
-//    strcat(request,wpath);
-//    strcat(request," HTTP/1.0\r\nFrom: wget!!!\r\nUser-Agent: HTTPTool/1.0\r\n\r\n");
     // http 1.1
     sprintf(request,"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n",wpath,hostname);
     //Get a socket
     if((sock_id = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
       fprintf(stderr,"Couldn't get a socket.\n");
       exit(EXIT_FAILURE);
-    } else {
-      //fprintf(stderr,"Got a socket.  ");
     }
     //book uses bzero which my man pages say is deprecated
     //the man page said to use memset instead. :-)
     memset(&servaddr,0,sizeof(servaddr));
     //get address for google.com
     if((hp = gethostbyname(hostname)) == NULL) {
-        fprintf(stderr,"Couldn't get an address.\n");
-        return(0);
-    }
-    else {
-        //fprintf(stderr,"Got an address.  ");
+      fprintf(stderr,"Couldn't get an address.\n");
+      return(0);
     }
     //bcopy is deprecated also, using memcpy instead
     memcpy((char *)&servaddr.sin_addr.s_addr, (char *)hp->h_addr, hp->h_length);
@@ -162,19 +156,15 @@ int get_webfile(char *webpath,char *outfile) {
     servaddr.sin_family = AF_INET;
     //make the connection
     if(connect(sock_id, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
-        fprintf(stderr, "Couldn't connect.\n");
-        error=1;
-        loaderror=1;
-    }
-    else {
-        //fprintf(stderr,"Got a connection!!!  ");
+      fprintf(stderr, "Couldn't connect.\n");
+      error=1;
+      loaderror=1;
     }
     if (!(error)) {
       //send the request
       send(sock_id,request,strlen(request),0);
       //write(sock_id,request,strlen(request));
     }
-
     while((strcmp(message,"\r\n")) && (!(loaderror))) {
       for(i = 0;strcmp(message + i - 2, "\r\n"); i++) {
         read(sock_id,message+i,1);
@@ -184,27 +174,22 @@ int get_webfile(char *webpath,char *outfile) {
       if (strstr(message, "Content-Length:")==message) {
         webobjlength = atoi(strchr(lpos, ' ') + 1);
       }
-
       if (strstr(message, "Invalid URL")) {
         webobjlength = 0;
         loaderror=true;
       }
-
       if (strstr(message,"HTTP/1.0 400 Bad Request")) {
         webobjlength = 0;
         loaderror=true;
       }
-
       if (strstr(message,"302 Found")) {
         webobjlength = 0;
         loaderror=true;
       }
-
       if (strstr(message,"404 Not Found")) {
         webobjlength = 0;
         loaderror=true;
       }
-
       if (strstr(message,"Moved Parmanently")) {
         webobjlength = 0;
         loaderror=true;
@@ -236,6 +221,7 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) return(1); else return(0);
 }
 
+// check if file is a image file of type jpg,png
 
 bool check_filename_ext(const char *filename) {
     const char *dot = strrchr(filename, '.');
@@ -253,7 +239,8 @@ int get_webfile2(char *webpath,char *outfile) {
     strcat(command,webpath);
     strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
     strcat(command,outfile);
-    strcat(command," 2>%1 ");
+    //strcat(command," 2>%1 ");
+    strcat(command," 2>> wget.log ");
     system(command);
   }
 }
