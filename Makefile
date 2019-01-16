@@ -7,6 +7,7 @@ PROG     = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
+DESTDIRBIN = /usr/local/bin
 DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
@@ -128,7 +129,7 @@ install:
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	#@chmod 755 /usr/bin/startmovie.sh
 	cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
-	cp mythtv-controller $(DESTDIR)
+	cp mythtv-controller $(DESTDIRBIN)
 	cp mythtv-controller.desktop /usr/share/applications/
 	cp mythtv-controller.desktop  ~/.local/share/applications
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
