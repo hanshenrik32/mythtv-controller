@@ -1953,9 +1953,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-
-
-
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
@@ -1972,15 +1969,16 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     // find records after type to find
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
-      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
+//      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
+      sprintf(sqlselect,"select (internetcontentarticles.feedtitle) as feedtitle,(internetcontentarticles.path) as path,(internetcontentarticles.title) as title,(internetcontentarticles.description) as description,(internetcontentarticles.url) as url,(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,(internetcontent.thumbnail) as thumbnail,(internetcontentarticles.time) as nroftimes,(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
       getart=0;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,ANY_VALUE(path) as path,ANY_VALUE(title) as title,ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),count(path),ANY_VALUE(paththumb),ANY_VALUE(mediaURL),ANY_VALUE(time) as nroftimes,ANY_VALUE(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sprintf(sqlselect,"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' GROUP BY title ORDER BY id");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,ANY_VALUE(path) as path,ANY_VALUE(title) as title,ANY_VALUE(description),ANY_VALUE(url),ANY_VALUE(thumbnail),ANY_VALUE(paththumb),ANY_VALUE(time) as nroftimes,ANY_VALUE(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
@@ -2362,7 +2360,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     float yof=orgwinsizey-(buttonsizey);                                        // start ypos
     float xof=0.0f;
     int lstreamoversigt_antal=9*6;
-    int i=0;
+    int i=0;                                                                    // data ofset in stack array
     unsigned int sofset=0;
     int bonline=8;                                                              // antal pr linie
     float boffset;
@@ -2605,7 +2603,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     if ((i==0) && (antal_rss_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2619,11 +2617,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       strcat(temptxt,configmysqlhost);
       glPushMatrix();
       xof=700;
-      yof=400;
-      glTranslatef(xof+10, yof+40 ,0.0f);
+      yof=260;
+      glTranslatef(xof, yof ,0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
-      glScalef(20.0, 20.0, 1.0);
+      glScalef(22.0, 22.0, 1.0);
       glcRenderString(temptxt);
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();

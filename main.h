@@ -91,14 +91,6 @@ const char *movie_cast[]={"Cast","Cast","Case","Case","Case"};
 const char *movie_description[]={"Description","Beskrivelse","Description","Description","Description"};
 const char *movie_year[]={"Year","År","Year","Year","Year"};
 
-// other anim stuf
-
-const char *music_icon_anim_files[]={"music","music1"};
-const char *movie_icon_anim_files[]={"video","video1"};
-const char *radio_icon_anim_files[]={"radio","radio1"};
-const char *other_icon_anim_files[]={"recorded","lille_knap1_1"};
-const char *tv_icon_anim_files[]={"tv","tv1"};
-
 void *radio_check_statusloader(void *data);
 void *update_xmltv_phread_loader();
 
