@@ -2599,6 +2599,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       i++;
       xof+=(buttonsize+10);
     }
+/*
     // no records loaded error
     if ((i==0) && (antal_rss_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
@@ -2626,4 +2627,5 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+*/    
 }
