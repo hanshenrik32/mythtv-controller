@@ -135,8 +135,10 @@ install:
 	#@chmod 755 /usr/bin/startmovie.sh
 	cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	cp mythtv-controller $(DESTDIRBIN)
+	cp mythtv-controller.png  /usr/share/mythtv-controller/mythtv-controller.png
 	cp mythtv-controller.desktop /usr/share/applications/
 	cp mythtv-controller.desktop  ~/.local/share/applications
+	cp mythtv-controller.desktop ~/Desktop
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \

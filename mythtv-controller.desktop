@@ -3,8 +3,7 @@ Type=Application
 Terminal=false
 Version=0.37.1
 Name=Myhthtv-controller
-Comment=Mediacenter
+Comment=Touch screen Mediacenter
 Icon=/usr/share/mythtv-controller/mythtv-controller.png
-Path=/usr/share/mythtv-controller
-Exec=/usr/share/mythtv-controller/mythtv-controller
+Exec=/usr/local/bin/mythtv-controller
 
