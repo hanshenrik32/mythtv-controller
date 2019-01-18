@@ -1411,6 +1411,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+
       // virker ikke The RC Newb Podcast
       if (check_rss_feed_exist(conn,(char *) "The RC Newb Podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('he RC Newb Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -2622,8 +2623,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
       glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
       glEnd();
       glPushMatrix();
       xof=700;
