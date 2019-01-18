@@ -21,7 +21,6 @@
 #include "myctrl_readwebfile.h"
 
 extern int tema;
-
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -51,9 +50,7 @@ extern GLuint newstuf_icon;                                     //
 extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
-
 extern int _sangley;
-
 extern GLuint _textureIdloading,_textureIdloading1;
 //extern GLuint _textureIdloading_mask;
 
@@ -63,7 +60,6 @@ extern GLuint onlinestreammask;
 extern GLuint onlinestreammaskicon;		// icon mask on web icon
 extern stream_class streamoversigt;
 extern GLint cur_avail_mem_kb;
-
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
@@ -1940,6 +1936,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+
+      // Guys We F****d
+      if (check_rss_feed_exist(conn,"Attack")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Guys We F****d',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Guys We F****d',NULL,NULL,'Guys We F****d',0,0,NULL,'https://feeds.megaphone.fm/LM9233046886',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+
       // bollemusik
       if (check_rss_feed_exist(conn,"bollemusik")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('bollemusik',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -2599,7 +2610,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       i++;
       xof+=(buttonsize+10);
     }
-/*
+
     // no records loaded error
     if ((i==0) && (antal_rss_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
@@ -2614,8 +2625,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
       glEnd();
-      strcpy(temptxt,"No backend ip/hostname ");
-      strcat(temptxt,configmysqlhost);
       glPushMatrix();
       xof=700;
       yof=260;
@@ -2623,9 +2632,8 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString(temptxt);
+      glcRenderString("Please wait Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
-*/    
 }
