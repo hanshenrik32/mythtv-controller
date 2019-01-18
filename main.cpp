@@ -6819,8 +6819,12 @@ void handlespeckeypress(int key,int x,int y) {
                   // setup rss source window
                   if (do_show_setup_rss) {
                     if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
-                    else configrss_ofset++;
-                    if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) realrssrecordnr++;
+                    else {
+                      if (configrss_ofset<streamoversigt.antalstreams()) configrss_ofset++;
+                    }
+                    if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
+                      if ((realrssrecordnr)<43) realrssrecordnr++;
+                    }
                   }
                   // tv graber setup
                   if (do_show_tvgraber) {
