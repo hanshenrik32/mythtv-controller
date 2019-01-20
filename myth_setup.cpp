@@ -3567,6 +3567,10 @@ int load_channel_list_from_graber() {
   bool errors=false;
   char userhomedir[1024];
   char filename[1024];
+  const char *grabercmd[35]={"","tv_grab_na_dd","tv_grab_nl","tv_grab_es_laguiatv","tv_grab_il","tv_grab_na_tvmedia","tv_grab_dtv_la","tv_grab_fi","tv_grab_eu_dotmedia","tv_grab_se_swedb",
+                            "tv_grab_pt_meo","tv_grab_fr","tv_grab_uk_bleb","tv_grab_huro","tv_grab_ch_search","tv_grab_it","tv_grab_is","tv_grab_fi_sv","tv_grab_na_dtv","tv_grab_tr",
+                            "tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide","tv_grab_zz_sdjson"};
+
   if (debugmode) printf("Get channel list file from tv graber sub system.\n");
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
@@ -3574,7 +3578,7 @@ int load_channel_list_from_graber() {
   // Er der en aktiv tv graber
   if (aktiv_tv_graber.graberaktivnr>0) {
     // get config tv graber
-    strcpy(exestring,configbackend_tvgraber);
+    strcpy(exestring,grabercmd[aktiv_tv_graber.graberaktivnr]);
     //strcat(exestring," --list-channels | grep '<display-name lang=' | cut -c29-300 | cut -f1 -d'<' > ~/tvguide_channels.txt");
     switch (aktiv_tv_graber.graberaktivnr) {
               // none
@@ -3675,8 +3679,7 @@ int load_channel_list_from_graber() {
     printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
     sysresult=system(exestring);
     if (sysresult) {
-      printf("Error Create channel list from tv grabber doing %s  \n ",exestring);
-      exit(0);
+      printf("Error Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
     }
     fil=fopen(filename,"r");
     if (fil) {
