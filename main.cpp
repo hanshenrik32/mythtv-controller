@@ -18,7 +18,6 @@
 #include <mysql.h>                      // mysql stuf
 #include <sys/socket.h>
 #include <unistd.h>                     // get hostname
-#include <time.h>                       // have strftime
 #include <sqlite3.h>                    // sqlite interface to xbmc(kodi)
 // vlc plugin
 #include <vlc/vlc.h>
@@ -133,7 +132,7 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
-bool hent_tv_channels=false;
+bool hent_tv_channels=false;                            //
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
@@ -696,7 +695,9 @@ GLuint _textureIdloading;                 // loading window
 GLuint _textureIdloading1;                // empty window
 
 // setup menu textures
+GLuint setupupdatebutton;
 GLuint setuptexture;
+
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
@@ -2368,17 +2369,17 @@ void display() {
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
-      lasttoday=today;                                      // rember last update
-      do_update_xmltv=true;                                 // do update tvguide
-      do_update_xmltv_show=true;                            // show we are updating
-      firsttime_xmltvupdate=false;                          // only used first time
+      lasttoday=today;                                                          // rember last update
+      do_update_xmltv=true;                                                     // do update tvguide
+      do_update_xmltv_show=true;                                                // show we are updating
+      firsttime_xmltvupdate=false;                                              // only used first time
     }
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
       if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
-      lasttoday=today;                                      // rember last update
-      do_update_rss=true;                                  // do update rss
-      do_update_rss_show=true;                            // show we are updating rss
-      firsttime_rssupdate=false;                         // only used first time
+      lasttoday=today;                                                          // rember last update
+      do_update_rss=true;                                                       // do update rss
+      do_update_rss_show=true;                                                  // show we are updating rss
+      firsttime_rssupdate=false;                                                // only used first time
     }
     //visur=true;
     glPushMatrix();
@@ -2492,7 +2493,7 @@ void display() {
             std::clock_t start;
             start = std::clock();
             mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
-            std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             glPopMatrix();
             break;
         case SAVER3D2:
@@ -2648,7 +2649,8 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
-        if (vis_uv_meter==false) {          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
+        if (vis_uv_meter==false) {
+          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
             //glBlendFunc(GL_ONE, GL_ONE);
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
@@ -3105,28 +3107,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
         glEnd();
         glPopMatrix();
-/*
-        // close ************************************************************** icon close
-        xof=850;
-        yof=250;
-        buttonsize=100;
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _textureclose);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(23);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd();
-        glPopMatrix();
-*/
         // draw cd cover
         xof=750;
         yof=250;
@@ -5506,6 +5486,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_rss=true;
             fundet=true;
           }
+          if ((GLubyte) names[i*4+3]==45) {
+            fundet=true;
+            printf("45 Button pressed \n");
+          }
         }
         // main menu
         if ((fundet==false) && (do_show_setup==false)) {
@@ -6153,6 +6137,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
+
+                  // set flag to update
+                  if ((do_show_tvgraber) && (retfunc==0)) {
+                    unlink("~/tvguide_channels.dat");
+//                    hent_tv_channels=false;
+                  }
+
+
                 }
                 break;
             case GLUT_RIGHT_BUTTON:
@@ -6369,14 +6361,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
-            //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
-            _sangley+=(41.0f);						// scroll window down one icon
+            //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
+            _sangley+=(41.0f);						                            // scroll window down one icon
             stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
           }
           // scroll up
           if (((retfunc==1) || (button==3)) && (_sangley>0)) {
-            //do_music_icon_anim_icon_ofset=-1;				// direction -1 = up 1 = down
-            _sangley-=(41.0f);						// scroll window up
+            //do_music_icon_anim_icon_ofset=-1;				                // direction -1 = up 1 = down
+            _sangley-=(41.0f);						                            // scroll window up
             stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
           }
         }
@@ -6386,15 +6378,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
 
 
-unsigned int hourtounixtime(int hour) {
-  time_t nutid;
-  struct tm *tid;
-  time(&nutid);                                                            // get time
-  tid=localtime(&nutid);                                                   // fillout struct
-  tid->tm_min=0;
-  tid->tm_hour=hour;
-  return(mktime(tid));
-}
 
 
 //
@@ -6407,6 +6390,7 @@ void handlespeckeypress(int key,int x,int y) {
     float MUSIC_CS;
     float RADIO_CS;
     unsigned int mnumbersoficonline;
+    int numbers_cd_covers_on_line=8;
     int fnumbersoficonline;
     int rnumbersoficonline;
     int snumbersoficonline;
@@ -6932,12 +6916,15 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_sql) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // sound setup
                   if (do_show_setup_sound) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // screen setup
                   if (do_show_setup_screen) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // network setup
                   if (do_show_setup_network) {
                     // hvis vi ikke viser select wlan window hop med coursor i networksetup
                     if (!(show_wlan_select)) {
@@ -6946,15 +6933,19 @@ void handlespeckeypress(int key,int x,int y) {
                       if (setupwlanselectofset>0) setupwlanselectofset--;
                     }
                   }
+                  // setup fonts
                   if (do_show_setup_font) {
                     if (setupfontselectofset>0) setupfontselectofset--;
                   }
+                  // setup keys
                   if (do_show_setup_keys) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // setup video player
                   if (do_show_videoplayer) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // setup rss
                   if (do_show_setup_rss) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                     else if (configrss_ofset>0) configrss_ofset--;
@@ -6975,7 +6966,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                     if (tvchannel_startofset<0) tvchannel_startofset=0;
                   }
-
+                  // move to other order
                   if (channel_list[(do_show_setup_select_linie)+tvchannel_startofset].changeordernr) {
                     if (do_show_setup_select_linie+tvchannel_startofset>0) {
                       //swap channels
@@ -7004,7 +6995,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_PAGE_UP:
-                if (vis_music_oversigt) {
+                if ((vis_music_oversigt) && (music_select_iconnr>numbers_cd_covers_on_line)) {
+                  do_music_icon_anim_icon_ofset=-1;			              // direction -1 = up 1 = down
+                  _mangley-=(41.0f);			                       			// scroll window up
+                  music_select_iconnr-=numbers_cd_covers_on_line;			// add to next line
                 }
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -7036,6 +7030,9 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_music_oversigt) {
+                  do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
+                  _mangley+=(41.0f);				                      		// scroll window down one icon
+                  music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
                 }
                 // if indside tv overoview
                 if ((vis_tv_oversigt) && ((aktiv_tv_oversigt.vistvguidekl>1) || (aktiv_tv_oversigt.vistvguidekl==0))) {
@@ -7078,8 +7075,8 @@ void handlespeckeypress(int key,int x,int y) {
                       tvknapnr=0;
                       do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
                     }
-
                 }
+                // radio
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                     if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                        _rangley-=0;
@@ -7096,21 +7093,21 @@ void handlespeckeypress(int key,int x,int y) {
                     tvchannel_startofset=0;
                     do_show_setup_select_linie=0;
                   }
+                  // rss setup
                   if (show_setup_rss) {
                     do_show_setup_select_linie=0;
                     configrss_ofset=0;
                   }
                 }
-
                 break;
         case GLUT_KEY_END:
+                // music oversigt
                 if (vis_music_oversigt) {
                   _mangley=0;     	                      							  // scroll start ofset reset to start
                   music_select_iconnr=1;                                  // first icon in view left top conner
                   do_music_icon_anim_icon_ofset=1;                        // set scroll
                   music_key_selected=1;
                 }
-
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   aktiv_tv_oversigt.changetime((60*60*24));
@@ -7137,7 +7134,7 @@ void handlespeckeypress(int key,int x,int y) {
     }
     if (debugmode) {
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
-      if (vis_film_oversigt) fprintf(stderr,"ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
+      if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
     }
@@ -7510,6 +7507,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
+                // rss editor
               } else if (do_show_setup_rss) {
                 if (key!=13) {
                   keybuffer[keybufferindex]=key;
@@ -8078,7 +8076,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
                   //do_zoom_music_cover=true;
                 } else {
-                  // do playlist
+                  // playlist dir
                   if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
                   // playlist loader
                   do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
@@ -11574,6 +11572,7 @@ void loadgfx() {
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
+    setupupdatebutton     = loadgfxfile(temapath,(char *) "images/",(char *) "updatebutton");
     setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
     _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "music");
@@ -11744,6 +11743,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
+    glDeleteTextures( 1, &setupupdatebutton);			      // global update button
     glDeleteTextures( 1, &setuptvgraberback);           // bryges af setup tv graber
     glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
     glDeleteTextures( 1, &_textureIdmusic);			        // music

@@ -107,6 +107,7 @@ extern GLuint _texturevideoplayersetup;             // setup
 extern GLuint _texturemythtvsql;
 extern GLuint _textureclose;
 extern GLuint _texturetvgrabersetup;                //
+extern GLuint setupupdatebutton;
 extern GLuint screenshot1,screenshot2,screenshot3,screenshot4,screenshot5,screenshot6,screenshot7,screenshot8,screenshot9,screenshot10;
 extern unsigned int do_show_setup_select_linie;
 extern int tema;
@@ -177,12 +178,12 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
   if (showcursor) {
     lasttimer=timer.tv_nsec;
     glDisable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(cxpos+((orgwinsizex/2)-(1200/2))+6,cypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(cxpos+((orgwinsizex/2)-(1200/2))+6,cypos+((orgwinsizey/2)-(800/2))+20, 0.0);
     glTexCoord2f(1, 1); glVertex3f(cxpos+((orgwinsizex/2)-(1200/2))+14,cypos+((orgwinsizey/2)-(800/2))+20 , 0.0);
     glTexCoord2f(1, 0); glVertex3f(cxpos+((orgwinsizex/2)-(1200/2))+14,cypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
   }
   glPopMatrix();
 
@@ -395,12 +396,12 @@ void show_setup_screen() {
     xpos=550;
     ypos=50;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -419,12 +420,12 @@ void show_setup_screen() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -470,12 +471,12 @@ void show_setup_screen() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     // use 3d
@@ -495,12 +496,12 @@ void show_setup_screen() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -519,12 +520,12 @@ void show_setup_screen() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -545,12 +546,12 @@ void show_setup_screen() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -780,12 +781,12 @@ void show_setup_video() {
     xpos=550;
     ypos=150;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -806,12 +807,12 @@ void show_setup_video() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -831,12 +832,12 @@ void show_setup_video() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -901,12 +902,12 @@ void show_setup_video() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -955,12 +956,12 @@ void show_setup_video() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1086,12 +1087,12 @@ void show_setup_tema() {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
     glLoadName(41);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1124,12 +1125,12 @@ void show_setup_tema() {
     xpos=450;
     ypos=100;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1182,12 +1183,12 @@ void show_setup_font(int startofset) {
           //glBindTexture(GL_TEXTURE_2D,setupfontback);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
+          glBegin(GL_QUADS);
           glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
           glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
           glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
           glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-          glEnd(); //End quadrilateral coordinates
+          glEnd();
       }
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
@@ -1254,12 +1255,12 @@ void show_setup_font(int startofset) {
     xpos=490;
     ypos=70;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 }
@@ -1307,12 +1308,12 @@ void show_wlan_networks(int valgtnr) {
             glTranslatef(600.0f, 400.0f, 0.0f);
             glRasterPos2f(0.0f, 0.0f+(i*20.0f));
             glColor3f(0.0f, 0.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
+            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
             glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
             glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
             glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-            glEnd(); //End quadrilateral coordinates
+            glEnd();
             glPopMatrix();
         }
 
@@ -1348,12 +1349,12 @@ void show_wlan_networks(int valgtnr) {
             //glTranslatef(1.2f, 2.4f-(i*0.4f),-14.8f);
             glTranslatef(550.0f, 260.0f+(i*20), 0.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
+            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
             glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
             glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
             glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-            glEnd(); //End quadrilateral coordinates
+            glEnd();
             glPopMatrix();
         }
         i++;
@@ -1379,12 +1380,12 @@ void show_wlan_networks(int valgtnr) {
     xpos=450;
     ypos=80;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 }
@@ -1440,12 +1441,12 @@ void show_setup_network() {
     xpos=450;
     ypos=80;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1464,12 +1465,12 @@ void show_setup_network() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1487,12 +1488,12 @@ void show_setup_network() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -1511,12 +1512,12 @@ void show_setup_network() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1533,12 +1534,12 @@ void show_setup_network() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1558,12 +1559,12 @@ void show_setup_network() {
 
     //glLoadName(41);
 
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-0.6, -0.2f, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-0.6,  0.2f, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f( 0.8,  0.2f, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f( 0.8, -0.2f, 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1722,12 +1723,12 @@ void show_setup_sound() {
     xpos=450;
     ypos=150;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1746,12 +1747,12 @@ void show_setup_sound() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1769,12 +1770,12 @@ void show_setup_sound() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1792,12 +1793,12 @@ void show_setup_sound() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1911,12 +1912,12 @@ void show_setup_sql() {
     xpos=450;
     ypos=0;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -1952,12 +1953,12 @@ void show_setup_sql() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // text input background
     glEnable(GL_TEXTURE_2D);
@@ -1971,12 +1972,12 @@ void show_setup_sql() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 
@@ -2010,12 +2011,13 @@ void show_setup_sql() {
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // text input background
     glEnable(GL_TEXTURE_2D);
@@ -2028,12 +2030,13 @@ void show_setup_sql() {
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // text input background
 //    glLoadIdentity();
@@ -2302,12 +2305,12 @@ void show_setup_keys() {
     xpos=475;
     ypos=-10;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -2417,12 +2420,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     winsizx=500;
@@ -2438,12 +2441,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     // text input background F5
@@ -2459,13 +2462,13 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
 
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 
@@ -2481,13 +2484,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 
@@ -2503,13 +2505,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     winsizx=500;
     winsizy=30;
@@ -2523,13 +2524,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // text input background F9
     winsizx=500;
@@ -2543,13 +2543,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     // text input background F10
@@ -2564,14 +2563,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
-
+    glEnd();
 
     // text input background F11
     winsizx=500;
@@ -2585,13 +2582,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     // text input background F12
@@ -2606,13 +2602,12 @@ void show_setup_keys() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
 
@@ -2627,15 +2622,15 @@ void show_setup_keys() {
         glColor3f(1.0f, 1.0f, 1.0f);
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,setupkeysbar2);			// setupkeysbar1
+        glBindTexture(GL_TEXTURE_2D,setupkeysbar2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
         glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
         glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+(i*50)+((orgwinsizey/2)-(800/2)) , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
     }
     glPopMatrix();
 
@@ -3012,12 +3007,12 @@ void show_setup_rss(unsigned int startofset) {
     xpos=475;
     ypos=-10;
     glLoadName(40);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     glPushMatrix();
@@ -3288,7 +3283,7 @@ int txmltvgraber_createconfig() {
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     switch(aktiv_tv_graber.graberaktivnr) {
-      case 8: sysresult=system("cp xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+      case 8: sysresult=system("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
       default:
               sysresult=system(exebuffer);
@@ -3553,7 +3548,7 @@ int channel_configfile::graber_configbuild() {
 
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
-//
+// load in to channel_list array
 
 int load_channel_list_from_graber() {
   FILE *fil;
@@ -3677,13 +3672,17 @@ int load_channel_list_from_graber() {
               strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
               break;
     }
-
+    printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
     sysresult=system(exestring);
+    if (sysresult) {
+      printf("Error Create channel list from tv grabber doing %s  \n ",exestring);
+      exit(0);
+    }
     fil=fopen(filename,"r");
     if (fil) {
       while(!(feof(fil))) {
-        fgets(buffer,512,fil);
-        fgets(buffer1,512,fil);
+        fgets(buffer,512,fil);                                                  // get id
+        fgets(buffer1,512,fil);                                                 // get name
         if (cnr<MAXPRGLIST_ANTAL) {
           strcpy(channel_list[cnr].id,buffer);
           strcpy(channel_list[cnr].name,buffer1);
@@ -3697,6 +3696,9 @@ int load_channel_list_from_graber() {
       fclose(fil);
       // remove temp file again
       sysresult=system("rm ~/tvguide_channels.txt");
+      if (sysresult) {
+        printf("error remove file ~/tvguide_channels.txt \n ");
+      }
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     }
   } else errors=true;
@@ -3713,17 +3715,19 @@ bool save_channel_list() {
   char filename[1024];
   unsigned int cnr=0;
   bool errors=false;
-  getuserhomedir(userhomedir);
+  getuserhomedir(userhomedir);                                                // get user homedir
   strcpy(filename,userhomedir);
-  strcat(filename,tvguide_dat_filename);
-  fil=fopen(filename,"w");
-  if (fil) {
-    while(cnr<PRGLIST_ANTAL) {
-      fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-      cnr++;
-    }
-    fclose(fil);
-  } else errors=true;
+  strcat(filename,tvguide_dat_filename);                                     // add the filename
+  if (PRGLIST_ANTAL>0) {
+    fil=fopen(filename,"w");                                                  // open file for write
+    if (fil) {
+      while(cnr<PRGLIST_ANTAL) {
+        fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+        cnr++;
+      }
+      fclose(fil);
+    } else errors=true;
+  }
   if (cnr>0) return(true); else return(false);
 }
 
@@ -3755,7 +3759,7 @@ int load_channel_list() {
     while(!(feof(fil))) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
       cnr++;
-      PRGLIST_ANTAL++;
+      PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
     fclose(fil);
   } else errors=true;
@@ -3840,7 +3844,6 @@ int order_channel_list_in_tvguide_db() {
 // ********************* show setup tv graber ************************************************************************
 //
 
-
 void show_setup_tv_graber(int startofset) {
     const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","l\\ørdag","s\\øndag"};
     const char *weekdaysuk[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
@@ -3854,17 +3857,18 @@ void show_setup_tv_graber(int startofset) {
     int xpos=0;
     int ypos=0;
     char text[200];
+    //
     // update channel list before show it
+    // channel list editor
     if (hent_tv_channels==false) {
       // try to load struct channel info
-
       //tvguide_channels.dat
-
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
         hent_tv_channels=true;
         // crete mew config file
+        printf("Create config file for xmltv \n");
         if (txmltvgraber_createconfig()==0) {
           printf("Error xmltv graber confg. Set to %s \n",configbackend_tvgraber);
         }
@@ -3875,14 +3879,17 @@ void show_setup_tv_graber(int startofset) {
         save_channel_list();
         //firsttime_xmltvupdate=true;
       } else {
-//        hent_tv_channels=true;
-//        load_channel_list_from_graber();
+        // set flag to load channel list
+        hent_tv_channels=true;
+        // do it
+        load_channel_list_from_graber();
       }
     }
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(0.6f, 0.6f, 0.6f);
     glBindTexture(GL_TEXTURE_2D,setuptvgraberback);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3916,16 +3923,6 @@ void show_setup_tv_graber(int startofset) {
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
 
-/*
-    glPushMatrix();
-    // overskrift
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(780, 740, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "TV Graber config");
-    glPopMatrix();
-*/
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -3934,6 +3931,30 @@ void show_setup_tv_graber(int startofset) {
     myglprint4((char *) "Use TV graber ");
     glPopMatrix();
 
+    // update button
+    glPushMatrix();
+    winsizx=100;
+    winsizy=50;
+    xpos=820;
+    ypos=490;
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,setupupdatebutton);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(45);                                                             // update button name
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+
+
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -3941,15 +3962,12 @@ void show_setup_tv_graber(int startofset) {
     glRasterPos2f(0.0f, 0.0f);
     myglprint4((char *) "Last update    ");
     glPopMatrix();
-
     // start af input felter
-
     glPushMatrix();
     winsizx=500;
     winsizy=30;
     xpos=300;
     ypos=500;
-
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glDisable(GL_BLEND);
@@ -3957,12 +3975,12 @@ void show_setup_tv_graber(int startofset) {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // line 0 input
     glDisable(GL_TEXTURE_2D);
@@ -3994,12 +4012,12 @@ void show_setup_tv_graber(int startofset) {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     glDisable(GL_TEXTURE_2D);
@@ -4045,12 +4063,12 @@ void show_setup_tv_graber(int startofset) {
     glBindTexture(GL_TEXTURE_2D,0);			// setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
     glPopMatrix();
 
     for (int n=0;n<14;n++) {
@@ -4093,19 +4111,13 @@ void show_setup_interface() {
     if (rssstreamoversigt.streamantal()==0) {
         rssstreamoversigt.load_rss_data();
     }
-
     // background
-//    glLoadIdentity();
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);
-    //glBlendFunc(GL_ONE, GL_ONE);
-
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setuptexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
@@ -4115,7 +4127,6 @@ void show_setup_interface() {
     glPopMatrix();
 
 
-
 //***********************************************************************************************
 // sound setup
     // buttons
@@ -4123,62 +4134,52 @@ void show_setup_interface() {
     winsizy=200;
     xpos=200;
     ypos=500;
-    // glTranslatef(-1.0f+sintable[tabelofset-ii]*3, 0.0f+costable[tabelofset-ii]*3,-15.0f);
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D,_texturesoundsetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     glLoadName(30);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 //***********************************************************************************************
 
     // buttons
-    //glTranslatef(-1.0f+sintable[tabelofset+(ii+14)]*3, 0.0f+costable[tabelofset+(ii+14)]*3,-15.0f);
     xpos=400;
     ypos=500;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturesourcesetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(31);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 //***********************************************************************************************
 
-
-
     // buttons
-//    glTranslatef(-1.0f+sintable[tabelofset+(ii+28)]*3, 0.0f+costable[tabelofset+(ii+28)]*3,-15.0f);
     xpos=600;
     ypos=500;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_textureimagesetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(32);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 //***********************************************************************************************
 
@@ -4186,18 +4187,17 @@ void show_setup_interface() {
 //    glTranslatef(-1.0f+sintable[tabelofset+(ii+42)]*3, 0.0f+costable[tabelofset+(ii+42)]*3,-15.0f);
     xpos=800;
     ypos=500;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturetemasetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(33);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 //***********************************************************************************************
 
@@ -4205,18 +4205,17 @@ void show_setup_interface() {
 //    glTranslatef(-1.0f+sintable[tabelofset+(ii+56)]*3, 0.0f+costable[tabelofset+(ii+56)]*3,-15.0f);
     xpos=200;
     ypos=300;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturemythtvsql);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(34);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 //***********************************************************************************************
@@ -4226,18 +4225,17 @@ void show_setup_interface() {
 //    glTranslatef(-1.0f+sintable[tabelofset+(ii+70)]*3, 0.0f+costable[tabelofset+(ii+70)]*3,-15.0f);
     xpos=400;
     ypos=300;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturesetupfont);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(35);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
 // *************************************************************************************************
@@ -4245,83 +4243,78 @@ void show_setup_interface() {
 //    glTranslatef(-1.0f+sintable[tabelofset+(ii+84)]*3, 0.0f+costable[tabelofset+(ii+84)]*3,-15.0f);
     xpos=600;
     ypos=300;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturekeyssetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(36);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     // setup video player button
     xpos=800;
     ypos=300;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturevideoplayersetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(38);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 
     // setup tv graber to use
     xpos=400;
     ypos=100;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturetvgrabersetup);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(39);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // setup rss
     xpos=600;
     ypos=100;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturekeysrss);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(42);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
     // close button
     xpos=200;
     ypos=100;
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,_texturesetupclose);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(37);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
+    glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-    glEnd(); //End quadrilateral coordinates
+    glEnd();
 
 }
