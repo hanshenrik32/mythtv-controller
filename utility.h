@@ -6,5 +6,6 @@ int gotoxy(int x, int y);
 int clearscreen();
 int getuserhomedir(char *homedir);
 int check_zerro_bytes_file(char *filename);
+unsigned int hourtounixtime(int hour);
 
 #endif

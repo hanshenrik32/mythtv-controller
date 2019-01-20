@@ -6,6 +6,18 @@
 #include <pwd.h>
 #include <unistd.h>
 #include "utility.h"
+#include <time.h>                       // have strftime
+
+unsigned int hourtounixtime(int hour) {
+  time_t nutid;
+  struct tm *tid;
+  time(&nutid);                                                            // get time
+  tid=localtime(&nutid);                                                   // fillout struct
+  tid->tm_min=0;
+  tid->tm_hour=hour;
+  return(mktime(tid));
+}
+
 
 
 // get user homedir
