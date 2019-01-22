@@ -58,7 +58,7 @@ class film_oversigt_type {
     bool getcover3d() { return(cover3d); }
     void setcover3d(bool value) { cover3d=value; }
 
-    GLuint gettextureid() { if (textureId) return (textureId); else return(0); }
+    GLuint gettextureid() { return (textureId); }
     void settextureid(GLuint value) { textureId=value; }
     void settextureidfile(char *filename);
 

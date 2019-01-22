@@ -3857,8 +3857,6 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
 
-    vis_nyefilm_oversigt=false;
-
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
