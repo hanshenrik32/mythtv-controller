@@ -3284,6 +3284,7 @@ int txmltvgraber_createconfig() {
     strcat(exebuffer, " --configure");
     switch(aktiv_tv_graber.graberaktivnr) {
       case 8: sysresult=system("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              printf("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
       default:
               sysresult=system(exebuffer);
@@ -3876,7 +3877,7 @@ void show_setup_tv_graber(int startofset) {
         // crete mew config file
         printf("Create config file for xmltv \n");
         if (txmltvgraber_createconfig()==0) {
-          printf("Error xmltv graber confg. Set to %s \n",configbackend_tvgraber);
+          printf("Error xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
         }
         // load mew chanel config data from file
         // in to struct
