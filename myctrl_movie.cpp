@@ -935,7 +935,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         ypos=ypos-(winsizy+60);
       }
       if (i+1==(int) film_key_selected) boffset+=10; else boffset=0;
-      if (filmoversigt[i+sofset].gettextureid()) {
+      if (((i+sofset)<filmoversigt_antal) && (filmoversigt[i+sofset].gettextureid())) {
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);

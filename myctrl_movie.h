@@ -58,7 +58,7 @@ class film_oversigt_type {
     bool getcover3d() { return(cover3d); }
     void setcover3d(bool value) { cover3d=value; }
 
-    GLuint gettextureid() { return (textureId); }
+    GLuint gettextureid() { if (textureId) return (textureId); else return(0); }
     void settextureid(GLuint value) { textureId=value; }
     void settextureidfile(char *filename);
 
@@ -159,7 +159,7 @@ class film_oversigt_typem : vlc_controller {
       void prevous_movie_chapther();
       void volumeup();
       void volumedown();
-      void setcolume(int volume);                                         // do not store volume in volume member int vaule 
+      void setcolume(int volume);                                         // do not store volume in volume member int vaule
       void softstopmovie();
       void pausemovie();
       film_oversigt_typem(unsigned int antal);
