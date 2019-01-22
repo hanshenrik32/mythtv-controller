@@ -1294,7 +1294,7 @@ void load_config(char * filename) {
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
-    strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
+    strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");      // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
@@ -1336,7 +1336,7 @@ void load_config(char * filename) {
           fputs("configdefaultmusicpath=Music\n",file);
           fputs("configdefaultmovie=Movies\n",file);
           fputs("uvmetertype=1\n",file);
-          fputs("tvgraber=tv_grab_uk_tvguide\n",file);
+          fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
           fputs("tvgraberupdate=0\n",file);
           fputs("tvgrabercolor=yes\n",file);
           fclose(file);
@@ -4503,7 +4503,8 @@ void display() {
       if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
         printf("Error saving config file mythtv-controller.conf\n");
       } else printf("Saving config ok.\n");
-      rssstreamoversigt.save_rss_data();                                        // save rss data in db
+      // crash crash
+      //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
       freegfx();                                                                // free gfx loaded
@@ -5249,6 +5250,8 @@ void display() {
 
 
 // used by mouse stuf
+// to check mouse buttons
+// names is the array of gfx on screen as buttons
 
 int list_hits(GLint hits, GLuint *names,int x,int y) {
     int i=hits;			// numbers of hits

@@ -28,7 +28,7 @@
 
 extern int configuvmeter;
 extern int debugmode;
-
+extern int vis_nyefilm_oversigt;
 
 // controll rss
 //
@@ -273,7 +273,7 @@ int rss_stream_class::save_rss_data() {
       strcpy(ftitle,"");
       strcpy(ftitle2,"");
       strcpy(furl,"");
-      if (strcmp(rss_source_feed[n].stream_name,"")!=0) {
+      if ((rss_source_feed[n].stream_name) && (strcmp(rss_source_feed[n].stream_name,"")!=0)) {
         sprintf(sqlstring,"select feedtitle,url from internetcontentarticles where feedtitle like '%s' limit 1",rss_source_feed[n].stream_name);
         mysql_query(conn,sqlstring);
         res = mysql_store_result(conn);
@@ -3536,6 +3536,7 @@ int channel_configfile::graber_configbuild() {
 
         }
         fputs(buffer,fil);
+        if (debugmode) printf("%s",buffer);
       }
       cnr++;
     }
@@ -3681,29 +3682,31 @@ int load_channel_list_from_graber() {
     if (sysresult) {
       printf("Error Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
     }
-    fil=fopen(filename,"r");
-    if (fil) {
-      while(!(feof(fil))) {
-        fgets(buffer,512,fil);                                                  // get id
-        fgets(buffer1,512,fil);                                                 // get name
-        if (cnr<MAXPRGLIST_ANTAL) {
-          strcpy(channel_list[cnr].id,buffer);
-          strcpy(channel_list[cnr].name,buffer1);
-          // set default new channel is not active
-          channel_list[cnr].selected=false;                                     // default
-          channel_list[cnr].ordernr=0;                                          // default
-          cnr++;
-          PRGLIST_ANTAL++;
+    if (check_zerro_bytes_file(filename)!=0) {
+      fil=fopen(filename,"r");
+      if (fil) {
+        while(!(feof(fil))) {
+          fgets(buffer,512,fil);                                                  // get id
+          fgets(buffer1,512,fil);                                                 // get name
+          if (cnr<MAXPRGLIST_ANTAL) {
+            strcpy(channel_list[cnr].id,buffer);
+            strcpy(channel_list[cnr].name,buffer1);
+            // set default new channel is not active
+            channel_list[cnr].selected=false;                                     // default
+            channel_list[cnr].ordernr=0;                                          // default
+            cnr++;
+            PRGLIST_ANTAL++;
+          }
         }
+        fclose(fil);
       }
-      fclose(fil);
       // remove temp file again
       sysresult=system("rm ~/tvguide_channels.txt");
       if (sysresult) {
         printf("error remove file ~/tvguide_channels.txt \n ");
       }
       if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
-    }
+    } else errors=true;
   } else errors=true;
   if (errors) return(-1); else return(sysresult);
 }
@@ -3853,6 +3856,8 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+
+    vis_nyefilm_oversigt=false;
 
     int winsizx=100;
     struct tm *xmlupdatelasttime;
