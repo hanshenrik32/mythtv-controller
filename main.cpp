@@ -4507,8 +4507,9 @@ void display() {
       //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
-      freegfx();                                                                // free gfx loaded
-      loadgfx();                                                                // reload all menu + icon gfx
+
+      //freegfx();                                                                // free gfx loaded
+      //loadgfx();                                                                // reload all menu + icon gfx
     }
     // update rss db
     if (do_save_setup_rss) {
@@ -5520,6 +5521,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=false;
             fundet=true;
             remove("mythtv-controller.lock");
+            save_channel_list();
             exit(0);                                                           // exit
           }
         }
@@ -7849,6 +7851,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
+                save_channel_list();
                 exit(0);                                                      //  exit program
               } else key=0;
               break;

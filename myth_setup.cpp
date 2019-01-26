@@ -3679,13 +3679,19 @@ int load_channel_list_from_graber() {
               break;
     }
     printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
-    sysresult=system(exestring);
-    if (sysresult) {
-      printf("Error Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
+    switch (aktiv_tv_graber.graberaktivnr) {
+        case 13:sysresult=system(exestring);
+                break;
+      default:
+                sysresult=system(exestring);
+                if (sysresult) {
+                  printf("Error Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
+                }
     }
     if (check_zerro_bytes_file(filename)!=0) {
       fil=fopen(filename,"r");
       if (fil) {
+        PRGLIST_ANTAL=0;
         while(!(feof(fil))) {
           fgets(buffer,512,fil);                                                  // get id
           fgets(buffer1,512,fil);                                                 // get name
@@ -3728,11 +3734,14 @@ bool save_channel_list() {
   if (PRGLIST_ANTAL>0) {
     fil=fopen(filename,"w");                                                  // open file for write
     if (fil) {
+      printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
       while(cnr<PRGLIST_ANTAL) {
         fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+        printf("S # %d active %d name %s ",cnr,channel_list[cnr].selected,channel_list[cnr].name);
         cnr++;
       }
       fclose(fil);
+      if (debugmode) printf("Saving tvguidedb ok.\n");
     } else errors=true;
   }
   if (cnr>0) return(true); else return(false);
@@ -3755,7 +3764,8 @@ int load_channel_list() {
   strcpy(filename,userhomedir);
   strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-    channel_list[n].selected=true;                                              // is program channel active
+    if (n==0) channel_list[n].selected=true;
+      else channel_list[n].selected=false;                                      // is program channel active (default only the first one)
     channel_list[n].ordernr=0;                                                  // show ordernr
     channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
     strcpy(channel_list[n].name,"");                                            // channel name
@@ -3763,8 +3773,9 @@ int load_channel_list() {
   }
   fil=fopen(filename,"r");
   if (fil) {
-    while(!(feof(fil))) {
+    while((!(feof(fil))) && (cnr<MAXCHANNEL_ANTAL-1)) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
+      printf("L # %d active %d name %s ",cnr,channel_list[cnr].selected,channel_list[cnr].name);
       cnr++;
       PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
@@ -3852,7 +3863,7 @@ int order_channel_list_in_tvguide_db() {
 //
 
 void show_setup_tv_graber(int startofset) {
-    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","l\\ørdag","s\\øndag"};
+    const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
     const char *weekdaysuk[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
@@ -3886,10 +3897,11 @@ void show_setup_tv_graber(int startofset) {
         save_channel_list();
         //firsttime_xmltvupdate=true;
       } else {
+        // the channel list is loaded from db file.
         // set flag to load channel list
+        //load_channel_list_from_graber();
         hent_tv_channels=true;
-        // do it
-        load_channel_list_from_graber();
+        save_channel_list();
       }
     }
     // background
