@@ -3365,7 +3365,6 @@ int txmltvgraber_updateconfigfile() {
 
 
 
-
 //
 // read xmltv config file
 //
