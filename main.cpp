@@ -7782,7 +7782,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   order_channel_list();
                   save_channel_list();
                   // buid new config file for xmltv from saved db
-                  xmltv_configcontrol.graber_configbuild();
+                  //xmltv_configcontrol.graber_configbuild();
                   // hent ny tv guide
                   //if (get_tvguide_fromweb()!=-1)
                   // update db med tvguide

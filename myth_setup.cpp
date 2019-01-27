@@ -3310,40 +3310,42 @@ int txmltvgraber_updateconfigfile() {
   FILE *filin;
   FILE *filout;
   int sysresult;
-  int line=0;
   int cnr;
-  bool fundet=false;
-  getuserhomedir(path);                                                         // get user homedir
-  strcat(path,"/.xmltv/");
-  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(path,".conf");
-  strcpy(filename,path);
+  getuserhomedir(filename);                                                 // get user homedir
+  strcat(filename,"/.xmltv/");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
+  strcat(filename,".conf");
+  // create new config file
   getuserhomedir(outfilename);                                                 // get user homedir
   strcat(outfilename,"/tmp_");
   strcat(outfilename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
   strcat(outfilename,".conf");
   filin=fopen(filename,"r");
   filout=fopen(outfilename,"w");
-  if ((filin) && (filout)) {
-    while(!(feof(filin))) {
-      fgets(buffer,512,filin);
-      cnr=0;
-      fundet=false;
-      while((cnr<MAXPRGLIST_ANTAL) && (!(fundet))) {
-        // if channel fundet
-        if (strcmp(buffer+8,channel_list[cnr].id)==0) {
-          fundet=true;
-          if (channel_list[cnr].selected) {
-            strcpy(buffer,"channel=");
-          } else {
-            strcpy(buffer,"channel!");
-          }
-          strcat(buffer,channel_list[cnr].id);
-          fputs(buffer,filout);
-        }
-        cnr++;
+  if ((filout) && (filin)) {
+    switch (aktiv_tv_graber.graberaktivnr) {
+      case 8: fgets(buffer,512,filin);
+              fputs(buffer,filout);
+              fgets(buffer,512,filin);
+              fputs(buffer,filout);
+              break;
+      default:
+              break;
+    }
+    cnr=0;
+    while(cnr<PRGLIST_ANTAL) {
+      switch (aktiv_tv_graber.graberaktivnr) {
+        case 8: if (channel_list[cnr].selected) {
+                  strcpy(buffer,"channel=");
+                } else {
+                  strcpy(buffer,"channel!");
+                }
+                strcat(buffer,channel_list[cnr].id);
+                fputs(buffer,filout);
+                fputs("\n",filout);
+                break;
       }
-      if (!(fundet)) fputs(buffer,filout);
+      cnr++;
     }
   }
   fclose(filin);
@@ -3619,6 +3621,7 @@ int channel_configfile::graber_configbuild() {
 
 int load_channel_list_from_graber() {
   FILE *fil;
+  int x;
   char buffer[1024];
   char buffer1[1024];
   unsigned int cnr=0;
@@ -3627,6 +3630,7 @@ int load_channel_list_from_graber() {
   xmlNode *root, *first_child, *node, *node1 ,*subnode;
   xmlChar *xmltvid;
   xmlChar *content;
+  char *pointer;
   int sysresult;
   int channelnr=0;
   char result[1024];
@@ -3761,8 +3765,14 @@ int load_channel_list_from_graber() {
           fgets(buffer,512,fil);                                                  // get id
           fgets(buffer1,512,fil);                                                 // get name
           if (cnr<MAXPRGLIST_ANTAL) {
-            strcpy(channel_list[cnr].id,buffer);
-            strcpy(channel_list[cnr].name,buffer1);
+            for(x=0;x<strlen(buffer);x++) {
+              if ((buffer[x]!='\r') && (buffer[x]!='\n')) channel_list[cnr].id[x]=buffer[x];
+            }
+            channel_list[cnr].id[x]='\0';
+            for(x=0;x<strlen(buffer1);x++) {
+              if ((buffer1[x]!='\r') && (buffer1[x]!='\n')) channel_list[cnr].name[x]=buffer1[x];
+            }
+            channel_list[cnr].name[x]='\0';
             // set default new channel is not active
             channel_list[cnr].selected=false;                                     // default
             channel_list[cnr].ordernr=0;                                          // default
@@ -3802,7 +3812,7 @@ bool save_channel_list() {
       printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
       while(cnr<PRGLIST_ANTAL) {
         fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-        printf("S # %d active %d name %s ",cnr,channel_list[cnr].selected,channel_list[cnr].name);
+        printf("S # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
         cnr++;
       }
       fclose(fil);
@@ -3839,7 +3849,7 @@ int load_channel_list() {
   if (fil) {
     while((!(feof(fil))) && (cnr<MAXCHANNEL_ANTAL-1)) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-      printf("L # %d active %d name %s ",cnr,channel_list[cnr].selected,channel_list[cnr].name);
+      printf("L # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
       cnr++;
       PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
@@ -3965,7 +3975,10 @@ void show_setup_tv_graber(int startofset) {
         // the channel list is loaded from db file.
         // set flag to load channel list
         save_channel_list();
+        // update conf file to xmltv grabber
         txmltvgraber_updateconfigfile();
+        // set order in db
+        order_channel_list_in_tvguide_db();
         //
         // this func create new config and make all channel's active
         // txmltvgraber_createconfig();
