@@ -5522,6 +5522,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet=true;
             remove("mythtv-controller.lock");
             save_channel_list();
+            txmltvgraber_createconfig();
             exit(0);                                                           // exit
           }
         }

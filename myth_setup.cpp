@@ -3157,6 +3157,9 @@ void show_setup_rss(unsigned int startofset) {
 
 
 
+
+
+
 //
 // call tv_graber config and do auto config if posible
 // will try to make list of all channels from tv_graber
@@ -3171,8 +3174,10 @@ int txmltvgraber_createconfig() {
   strcat(path,"/.xmltv/");
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(exebuffer,path);
+  strcat(exebuffer,".conf");
   // delete old config from dir
   if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
+    // delete old file
     sysresult=system(exebuffer);
     // create new config
     switch (aktiv_tv_graber.graberaktivnr) {
@@ -3292,8 +3297,68 @@ int txmltvgraber_createconfig() {
 
     }
     // sysresult = -1 if error else command return value
-    return(sysresult);
+    return(1);
   } else return(0);
+}
+
+
+int txmltvgraber_updateconfigfile() {
+  char path[1024];
+  char buffer[1024];
+  char filename[1024];
+  char outfilename[1024];
+  FILE *filin;
+  FILE *filout;
+  int sysresult;
+  int line=0;
+  int cnr;
+  bool fundet=false;
+  getuserhomedir(path);                                                         // get user homedir
+  strcat(path,"/.xmltv/");
+  strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(path,".conf");
+  strcpy(filename,path);
+  getuserhomedir(outfilename);                                                 // get user homedir
+  strcat(outfilename,"/tmp_");
+  strcat(outfilename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
+  strcat(outfilename,".conf");
+  filin=fopen(filename,"r");
+  filout=fopen(outfilename,"w");
+  if ((filin) && (filout)) {
+    while(!(feof(filin))) {
+      fgets(buffer,512,filin);
+      cnr=0;
+      fundet=false;
+      while((cnr<MAXPRGLIST_ANTAL) && (!(fundet))) {
+        // if channel fundet
+        if (strcmp(buffer+8,channel_list[cnr].id)==0) {
+          fundet=true;
+          if (channel_list[cnr].selected) {
+            strcpy(buffer,"channel=");
+          } else {
+            strcpy(buffer,"channel!");
+          }
+          strcat(buffer,channel_list[cnr].id);
+          fputs(buffer,filout);
+        }
+        cnr++;
+      }
+      if (!(fundet)) fputs(buffer,filout);
+    }
+  }
+  fclose(filin);
+  fclose(filout);
+  // copy new config file to xmltv homedir ~/.xmltv
+  getuserhomedir(path);                                                     // get user homedir
+  strcpy(filename,"cp ");
+  strcat(filename,path);
+  strcat(filename,"/tmp_");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(filename,".conf");
+  strcat(filename," ~/.xmltv/");
+  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+  strcat(filename,".conf");
+  sysresult=system(filename);
 }
 
 
@@ -3685,7 +3750,7 @@ int load_channel_list_from_graber() {
       default:
                 sysresult=system(exestring);
                 if (sysresult) {
-                  printf("Error Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
+                  printf("\nError Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
                 }
     }
     if (check_zerro_bytes_file(filename)!=0) {
@@ -3764,8 +3829,7 @@ int load_channel_list() {
   strcpy(filename,userhomedir);
   strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-    if (n==0) channel_list[n].selected=true;
-      else channel_list[n].selected=false;                                      // is program channel active (default only the first one)
+    channel_list[n].selected=false;                                             // is program channel active (default)
     channel_list[n].ordernr=0;                                                  // show ordernr
     channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
     strcpy(channel_list[n].name,"");                                            // channel name
@@ -3884,25 +3948,30 @@ void show_setup_tv_graber(int startofset) {
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
-        hent_tv_channels=true;
         // crete mew config file
-        printf("Create config file for xmltv \n");
+        printf("Create config file for xmltv first time.\n");
         if (txmltvgraber_createconfig()==0) {
-          printf("Error xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
+          printf("\nError xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
+          exit(0);
         }
-        // load mew chanel config data from file
-        // in to struct
+        //
+        // load all channels name from tv_graber
         load_channel_list_from_graber();
-        // save struct data
+        // save channel list to struct db file
+        // struct channel_list
         save_channel_list();
         //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.
         // set flag to load channel list
-        //load_channel_list_from_graber();
-        hent_tv_channels=true;
         save_channel_list();
+        txmltvgraber_updateconfigfile();
+        //
+        // this func create new config and make all channel's active
+        // txmltvgraber_createconfig();
+        //
       }
+      hent_tv_channels=true;
     }
     // background
     glPushMatrix();
