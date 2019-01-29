@@ -5521,9 +5521,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=false;
             fundet=true;
             remove("mythtv-controller.lock");
-            save_channel_list();
-            txmltvgraber_createconfig();
-            exit(0);                                                           // exit
+            order_channel_list();                                               // order tv channel list
+            save_channel_list();                                                //
+            txmltvgraber_createconfig();                                        //
+            exit(0);                                                            // exit
           }
         }
         //
@@ -7854,6 +7855,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
+                order_channel_list();
                 save_channel_list();
                 exit(0);                                                      //  exit program
               } else key=0;
