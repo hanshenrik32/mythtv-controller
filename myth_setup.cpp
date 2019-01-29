@@ -3333,7 +3333,7 @@ int txmltvgraber_updateconfigfile() {
               break;
     }
     cnr=0;
-    while(cnr<PRGLIST_ANTAL) {
+    while((cnr<PRGLIST_ANTAL) && (strcmp(channel_list[cnr].id,"")!=0)) {
       switch (aktiv_tv_graber.graberaktivnr) {
         case 8: if (channel_list[cnr].selected) {
                   strcpy(buffer,"channel=");
@@ -3403,7 +3403,7 @@ int channel_configfile::readgraber_configfile() {
 //
 // write xmltv config file and save it
 //
-
+/*
 int channel_configfile::writegraber_configfile() {
   char path[1024];
   char buffer[1024];
@@ -3427,7 +3427,7 @@ int channel_configfile::writegraber_configfile() {
   if (errors==false) return(1); else return(0);
 }
 
-
+*/
 
 // kill running graber
 //
@@ -3446,6 +3446,7 @@ int killrunninggraber() {
 // write xmltv config file and save it
 // build xmltv config file
 
+/*
 int channel_configfile::graber_configbuild() {
   char buffer[1024];
   char filename[1024];
@@ -3611,7 +3612,7 @@ int channel_configfile::graber_configbuild() {
   } else errors=true;
   if (errors==false) return(1); else return(0);
 }
-
+*/
 
 
 //

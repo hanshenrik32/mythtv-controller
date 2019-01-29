@@ -7787,12 +7787,14 @@ void handleKeypress(unsigned char key, int x, int y) {
                   //if (get_tvguide_fromweb()!=-1)
                   // update db med tvguide
                   aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+/*
                   // order channels in db (mysqldb)
                   order_channel_list_in_tvguide_db();
+*/
                   // hent/update tv guide from db
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                   // set update flag in display() func
-                  firsttime_xmltvupdate=true;
+                  firsttime_xmltvupdate=true;                                 // if true reset xml config file
                   // close tv graber windows again
                   do_show_tvgraber=false;
                   do_show_setup=false;

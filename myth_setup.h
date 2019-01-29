@@ -32,10 +32,11 @@ struct channel_list_struct {
   bool changeordernr;                                                           // do change ordre nr (used in setup)
 };
 
+
+
 //
 // used for tv channel db config
 //
-
 
 class channel_configfile {
   private:
@@ -44,8 +45,8 @@ class channel_configfile {
     char configtext[400][80];                                                   // config settings
   public:
     int readgraber_configfile();                                                // read graber file
-    int writegraber_configfile();                                               // read graber file
-    int graber_configbuild();                                                   // build xmltv config file
+    //int writegraber_configfile();                                               // read graber file
+    //int graber_configbuild();                                                   // build xmltv config file
 };
 
 
