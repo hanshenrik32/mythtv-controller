@@ -44,6 +44,8 @@ class channel_configfile {
     int configfilesize=0;                                                       // real size
     char configtext[400][80];                                                   // config settings
   public:
+    channel_configfile();
+    ~channel_configfile();
     int readgraber_configfile();                                                // read graber file
     //int writegraber_configfile();                                               // read graber file
     //int graber_configbuild();                                                   // build xmltv config file

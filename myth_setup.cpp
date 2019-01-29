@@ -3161,7 +3161,7 @@ void show_setup_rss(unsigned int startofset) {
 
 
 //
-// call tv_graber config and do auto config if posible
+// call tv_graber create defaut config and do auto config if posible
 // will try to make list of all channels from tv_graber
 // by pipe the command in shell
 
@@ -3302,6 +3302,10 @@ int txmltvgraber_createconfig() {
 }
 
 
+//
+// create/update from old config file to new xmltv grabber config file. from tvgude config in array channel_list
+//
+
 int txmltvgraber_updateconfigfile() {
   char path[1024];
   char buffer[1024];
@@ -3329,11 +3333,17 @@ int txmltvgraber_updateconfigfile() {
               fgets(buffer,512,filin);
               fputs(buffer,filout);
               break;
+      case 9: fgets(buffer,512,filin);
+              fputs(buffer,filout);
+              fgets(buffer,512,filin);
+              fputs(buffer,filout);
+              break;
       default:
               break;
     }
     cnr=0;
     while((cnr<PRGLIST_ANTAL) && (strcmp(channel_list[cnr].id,"")!=0)) {
+      strcpy(buffer,"");
       switch (aktiv_tv_graber.graberaktivnr) {
         case 8: if (channel_list[cnr].selected) {
                   strcpy(buffer,"channel=");
@@ -3363,6 +3373,27 @@ int txmltvgraber_updateconfigfile() {
   sysresult=system(filename);
 }
 
+
+
+
+//
+// constructor for channel_list array
+//
+
+channel_configfile::channel_configfile() {
+  for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
+    channel_list[n].selected=false;                                             // is program channel active (default)
+    channel_list[n].ordernr=0;                                                  // show ordernr
+    channel_list[n].changeordernr=false;                                        // used change ordernr in cobfig setup screen
+    strcpy(channel_list[n].name,"");                                            // channel name
+    strcpy(channel_list[n].id,"");                                              // internal dbid
+  }
+}
+
+
+channel_configfile::~channel_configfile() {
+
+}
 
 
 //
@@ -3812,10 +3843,11 @@ bool save_channel_list() {
       printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
       while(cnr<PRGLIST_ANTAL) {
         fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-        printf("S # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
+        //printf("S # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
         cnr++;
       }
       fclose(fil);
+      order_channel_list_in_tvguide_db();                                       // ret db liste til som i channel_list
       if (debugmode) printf("Saving tvguidedb ok.\n");
     } else errors=true;
   }
@@ -3849,7 +3881,7 @@ int load_channel_list() {
   if (fil) {
     while((!(feof(fil))) && (cnr<MAXCHANNEL_ANTAL-1)) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-      printf("L # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
+      //printf("L # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
       cnr++;
       PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
@@ -3909,17 +3941,23 @@ int order_channel_list_in_tvguide_db() {
   MYSQL_ROW row;
   char sqlselect[1024];
   // mysql stuf
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // Connect to database
   if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-      if (channel_list[n].ordernr>0) {
-        // update order to show in tvguide
-        sprintf(sqlselect,"update channel set channel.orderid=%d where channel.name like '%s' limit 1",n,channel_list[n].name);
-        if (debugmode) printf("sql channel update %s \n",sqlselect);
+      if (channel_list[n].selected) {
+        sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
+        if (debugmode) printf("sql %s \n",sqlselect);
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        done=true;
+      } else {
+        // if not active update to not active
+        sprintf(sqlselect,"update channel set channel.visible=0 where channel.name like '%s' limit 1",channel_list[n].name);
+        if (debugmode) printf("sql %s \n",sqlselect);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         done=true;
@@ -3927,7 +3965,7 @@ int order_channel_list_in_tvguide_db() {
     }
     mysql_close(conn);
   }
-  if (done) return(1); else return(0);
+  return(done);
 }
 
 
@@ -3969,16 +4007,16 @@ void show_setup_tv_graber(int startofset) {
         load_channel_list_from_graber();
         // save channel list to struct db file
         // struct channel_list
+        order_channel_list();
         save_channel_list();
         //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.
         // set flag to load channel list
+        order_channel_list();
         save_channel_list();
         // update conf file to xmltv grabber
         txmltvgraber_updateconfigfile();
-        // set order in db
-        order_channel_list_in_tvguide_db();
         //
         // this func create new config and make all channel's active
         // txmltvgraber_createconfig();
