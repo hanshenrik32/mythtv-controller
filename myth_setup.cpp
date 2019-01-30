@@ -28,6 +28,7 @@
 
 extern int configuvmeter;
 extern int debugmode;
+extern bool firsttime_xmltvupdate;
 extern int vis_nyefilm_oversigt;
 
 // controll rss
@@ -3947,16 +3948,13 @@ int order_channel_list_in_tvguide_db() {
   if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
+    sprintf(sqlselect,"update channel set channel.visible=0 where chanid>=0");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    // make channel active from config
     for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
       if (channel_list[n].selected) {
         sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
-        if (debugmode) printf("sql %s \n",sqlselect);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        done=true;
-      } else {
-        // if not active update to not active
-        sprintf(sqlselect,"update channel set channel.visible=0 where channel.name like '%s' limit 1",channel_list[n].name);
         if (debugmode) printf("sql %s \n",sqlselect);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -4009,6 +4007,7 @@ void show_setup_tv_graber(int startofset) {
         // struct channel_list
         order_channel_list();
         save_channel_list();
+        //firsttime_xmltvupdate=true;                                               // if true reset xml config fi
         //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.

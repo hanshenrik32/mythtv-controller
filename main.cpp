@@ -4492,7 +4492,9 @@ void display() {
           }
           if (do_show_setup_font) show_setup_font(setupfontselectofset);      //
           if (do_show_setup_keys) show_setup_keys();                          // Function keys
-          if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   //
+          if (do_show_tvgraber) {
+            show_setup_tv_graber(tvchannel_startofset);   //
+          }
           if (do_show_setup_rss) show_setup_rss(configrss_ofset);             //
         }
         glPopMatrix();
@@ -5397,9 +5399,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=true;
             fundet=true;
           }
-          // test for close windows again icon for all other windows in setup
+          // test for close windows again icon for all other windows in setup glLoadName(40)
           //
-          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
+          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
             do_show_setup_sound=false;
             do_show_setup_screen=false;
             do_show_setup_sql=false;
@@ -5409,6 +5411,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_keys=false;
             do_show_videoplayer=false;
             do_show_setup_rss=false;
+            if (do_show_tvgraber) {
+              // hent/update tv guide from db
+              // efter den er saved i db fra setup tvguide function som saver data.
+              aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+            }
             do_show_tvgraber=false;
             fundet=true;
           }
