@@ -25,6 +25,7 @@
 #include <X11/extensions/Xrandr.h>
 // time
 #include <ctime>
+#include <sys/timeb.h>
 // file io
 #include <iostream>
 
@@ -2191,6 +2192,16 @@ void show_background() {
 // *********************** MAIN LOOP *********************************************************************************
 //
 
+const float clockR=80.0f;
+
+void newLine(float rStart, float rEnd, float angle) {
+  float c = cos(angle), s = sin(angle);
+  glVertex2f((clockR*rStart*c)+(screenx/2),(clockR*rStart*s)+(screeny/2));
+  glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
+}
+
+
+
 static bool do_update_xmltv_show=false;
 static bool do_update_rss_show=true;
 static bool do_update_rss=false;
@@ -2296,6 +2307,10 @@ void display() {
                           0.3,0.3,0.3, \
                           0.8,0.1,0.1, \
                           0.8,0.1,0.1};
+    struct timeb tb;
+    struct tm* t;
+    float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
+    float angleHour = 0,angleMin  = 0,angleSec  = 0;
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
@@ -2317,6 +2332,15 @@ void display() {
     }
     // make xmltv update
     today=time(NULL);
+    t=localtime(&today);                                                        // local time
+    ftime(&tb);
+
+    // used by analog clock
+    angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec/60.0f;
+    angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
+    //
+
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
@@ -2375,53 +2399,32 @@ void display() {
             glPopMatrix();
             break;
         case ANALOG:
+            //glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
+            //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
             glDisable(GL_TEXTURE_2D);
-            glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-            // draw analog watch/ur
-            for(i=0;i<360;i+=45) {
-              //glTranslatef(100.0f, 100.0f, 0.0f);
-              glColor3f(0.4f, 0.4f, 0.4f);
-              glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-              glBegin(GL_QUADS); //Begin quadrilateral coordinates
-              if ((i==0) || (i==90) || (i==180) || (i==270)) {
-                glTexCoord2f(0.0, 0.0); glVertex3f(300.0, 0.0, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(300.0, 10.0, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(320.0, 10.0, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(320.0, 0.0, 0.0);
+            glLineWidth(3.0f);
+            glBegin(GL_LINES);
+            //glBegin(GL_QUADS);
+            for(i=0; i<60; i++) {
+              if(i%5) {                                                         // normal minute
+                if(i%5 == 1) glColor3f(1.0f, 1.0f, 1.0f);
+                newLine(minStart, minEnd, i*angle1min);
               } else {
-                glTexCoord2f(0.0, 0.0); glVertex3f(300.0, 0.0, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(300.0, 20.0, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(400.0, 20.0, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(400.0, 0.0, 0.0);
+                glColor3f(1.0f, 0.0f, 0.0f);
+                newLine(stepStart, stepEnd, i*angle1min);
               }
-              glEnd(); //End quadrilateral coordinates
             }
-            mgrader=min*(360/60);
-            tgrader=tim*(360/12);
-            glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            glColor3f(0.8f, 0.8f, 0.8f);
-            // tgrader
-            glRotatef(-(tgrader-90), 0.0f, 0.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(180.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(180.0, 0.0, 0.0);
-            glEnd(); //End quadrilateral coordinates
-            glPopMatrix();
-            // mgrader
-            glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-            glRotatef(-(mgrader-90), 0.0f, 0.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(240.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(240.0, 0.0, 0.0);
-            glEnd(); //End quadrilateral coordinates
-            glPopMatrix();
+            glEnd();
+            glLineWidth(5.0f);
+            glBegin(GL_LINES);
+            newLine(-0.2f, 3.5f, -angleHour+M_PI/2);                       // timer
+            newLine(-0.2f, 4.5f, -angleMin+M_PI/2);                        // min
+            glEnd();
+            glLineWidth(3.0f);
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBegin(GL_LINES);
+            newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
+            glEnd();
             break;
         case SAVER3D:
             //reset pos
