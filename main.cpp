@@ -778,6 +778,7 @@ GLuint radiomusicbuttonmask;
 GLuint streammoviebuttonmask;
 
 GLuint newstuf_icon;                        // icon for new stuf in stream view
+GLuint analog_clock_background;             // background for analog clock
 
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
@@ -2309,8 +2310,14 @@ void display() {
                           0.8,0.1,0.1};
     struct timeb tb;
     struct tm* t;
+
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
     float angleHour = 0,angleMin  = 0,angleSec  = 0;
+    float last_angleSec=0.0f;
+    float angleSec2=0.0f;
+
+    int winsizx=1920;
+    int winsizy=1080;
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
@@ -2336,8 +2343,16 @@ void display() {
     ftime(&tb);
 
     // used by analog clock
-    angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec/60.0f;
+    if (last_angleSec==0.0f) {
+      last_angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+      angleSec=last_angleSec;
+    } else if (angleSec+10.0f>=last_angleSec) {
+      last_angleSec=angleSec;
+      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    }
+    angleSec2=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    //angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec2/60.0f;
     angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
     //
 
@@ -2399,10 +2414,24 @@ void display() {
             glPopMatrix();
             break;
         case ANALOG:
-            //glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
             //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+            // background
+            glPushMatrix();
+            glEnable(GL_TEXTURE_2D);
+            glTranslatef(0.0f, 0.0f, 0.0f);
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+            glBindTexture(GL_TEXTURE_2D,analog_clock_background);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
+            glEnd();
+            glPopMatrix();
             glDisable(GL_TEXTURE_2D);
-            glLineWidth(3.0f);
+            glLineWidth(5.0f);
             glBegin(GL_LINES);
             //glBegin(GL_QUADS);
             for(i=0; i<60; i++) {
@@ -2422,6 +2451,7 @@ void display() {
             glEnd();
             glLineWidth(3.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
+            //glColor3f(0.0f, 0.0f, 1.0f);
             glBegin(GL_LINES);
             newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
             glEnd();
@@ -11661,7 +11691,8 @@ void loadgfx() {
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
-    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");;
+    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
+    analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -11810,6 +11841,7 @@ void freegfx() {
     glDeleteTextures( 1,&screensaverbox);
     glDeleteTextures( 1,&screensaverbox1);
     glDeleteTextures( 1,&newstuf_icon);
+    glDeleteTextures( 1,&analog_clock_background);
 }
 
 
