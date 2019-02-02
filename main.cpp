@@ -18,7 +18,6 @@
 #include <mysql.h>                      // mysql stuf
 #include <sys/socket.h>
 #include <unistd.h>                     // get hostname
-#include <time.h>                       // have strftime
 #include <sqlite3.h>                    // sqlite interface to xbmc(kodi)
 // vlc plugin
 #include <vlc/vlc.h>
@@ -26,6 +25,7 @@
 #include <X11/extensions/Xrandr.h>
 // time
 #include <ctime>
+#include <sys/timeb.h>
 // file io
 #include <iostream>
 
@@ -133,7 +133,7 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
-bool hent_tv_channels=false;
+bool hent_tv_channels=false;                            // if false update tv guide
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
@@ -696,7 +696,9 @@ GLuint _textureIdloading;                 // loading window
 GLuint _textureIdloading1;                // empty window
 
 // setup menu textures
+GLuint setupupdatebutton;
 GLuint setuptexture;
+
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
@@ -776,6 +778,7 @@ GLuint radiomusicbuttonmask;
 GLuint streammoviebuttonmask;
 
 GLuint newstuf_icon;                        // icon for new stuf in stream view
+GLuint analog_clock_background;             // background for analog clock
 
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
@@ -1274,7 +1277,6 @@ void load_config(char * filename) {
     FILE *file;
     struct hostent *remoteHost;
     struct in_addr **addr_list;
-
     gethostname(hostname,128);				                		// get this hosts name
     strcpy(confighostname,hostname);
     char *database = (char *) "mythconverg";			            // mythtv database name
@@ -1294,7 +1296,7 @@ void load_config(char * filename) {
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
-    strcpy(configbackend_tvgraber,"tv_grab_uk_tvguide");      // default tv guide tv_grab_uk_tvguide
+    strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");      // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
@@ -1336,7 +1338,7 @@ void load_config(char * filename) {
           fputs("configdefaultmusicpath=Music\n",file);
           fputs("configdefaultmovie=Movies\n",file);
           fputs("uvmetertype=1\n",file);
-          fputs("tvgraber=tv_grab_uk_tvguide\n",file);
+          fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
           fputs("tvgraberupdate=0\n",file);
           fputs("tvgrabercolor=yes\n",file);
           fclose(file);
@@ -1347,38 +1349,33 @@ void load_config(char * filename) {
           exit(0);
         }
     }
-
     remoteHost = gethostbyname(configmythhost);
     if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
         printf("mediacenter server name is : %s\n", remoteHost->h_name);
         for(i = 0; addr_list[i] != NULL; i++) {
-            printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+          printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
         strcpy(confighostname,hostname);
         strcpy(configmysqlhost,remoteHost->h_name);
         strcpy(configmythhost,remoteHost->h_name);
         strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
-
         remoteHost = gethostbyname(confighostname);
         if (remoteHost) {
-            addr_list = (struct in_addr **) remoteHost->h_addr_list;
-            printf("Hostname : %s\n", remoteHost->h_name);
-            for(i = 0; addr_list[i] != NULL; i++) {
-                printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
-            }
-            strcpy(confighostip,inet_ntoa(*addr_list[0]));
+          addr_list = (struct in_addr **) remoteHost->h_addr_list;
+          printf("Hostname : %s\n", remoteHost->h_name);
+          for(i = 0; addr_list[i] != NULL; i++) {
+            printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
+          }
+          strcpy(confighostip,inet_ntoa(*addr_list[0]));
         } else strcpy(confighostip,"127.0.0.1");
     } else {
-        printf("Error recolving hostname.\n");
+      printf("Error recolving hostname.\n");
     }
-
     strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation' and hostname like '");
     strcat(sqlselect,configmysqlhost);
     strcat(sqlselect,"' ");
-
     printf("start reading database setup.....\n");
-
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -1386,26 +1383,25 @@ void load_config(char * filename) {
     res = mysql_store_result(conn);
     if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(configmusicpath,row[0]);
-            if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
+          strcpy(configmusicpath,row[0]);
+          if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
         }
         //
         // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
         // load default
         //
         if (strcmp(configmusicpath,"")==0) {
-            strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
-            mysql_query(conn,sqlselect);
-            res = mysql_store_result(conn);
-            if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                    strcpy(configmusicpath,row[0]);
-                    if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
-                }
+          strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              strcpy(configmusicpath,row[0]);
+              if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
             }
+          }
         }
         if ((strlen(configmusicpath)>0) && (configmusicpath[strlen(configmusicpath)-1]!='/')) strcat(configmusicpath,"/");             // add last '/' if not exist
-
         strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir' and hostname like '");
         strcat(sqlselect,configmysqlhost);
         strcat(sqlselect,"' ");
@@ -1419,7 +1415,6 @@ void load_config(char * filename) {
           fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
           exit(-1);
         }
-
         //
         // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
         // load default
@@ -1439,7 +1434,6 @@ void load_config(char * filename) {
         strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
         strcat(sqlselect,configmysqlhost);
         strcat(sqlselect,"' ");
-
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
@@ -1451,7 +1445,6 @@ void load_config(char * filename) {
           exit(-1);
         }
         if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
-
         // find storagegroup dirs and load them
         strcpy(sqlselect,"SELECT dirname,groupname from storagegroup where hostname like '");
         strcat(sqlselect,configmysqlhost);
@@ -1459,15 +1452,15 @@ void load_config(char * filename) {
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
-            i=0;
-            while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
-                if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
-                strcpy(configstoragerecord[i].path,row[0]);
-                strcpy(configstoragerecord[i].name,row[1]);
-                if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
-                i++;
-            }
-            if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
+          i=0;
+          while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
+            if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
+            strcpy(configstoragerecord[i].path,row[0]);
+            strcpy(configstoragerecord[i].name,row[1]);
+            if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
+            i++;
+          }
+          if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
         } else {
             printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
         }
@@ -1491,9 +1484,8 @@ void load_config(char * filename) {
           if (conn) mysql_close(conn);
         }
     } else {
-        strcpy(configmusicpath,"");
-        printf("No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
-//        exit(-1);                        // stop program
+      strcpy(configmusicpath,"");
+      printf("No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
     }
     // read key file setup
     if ((file = fopen("mythtv-controller.keys", "r"))) {
@@ -1510,10 +1502,6 @@ void load_config(char * filename) {
     }
     if (conn) mysql_close(conn);
 }
-
-
-
-
 
 
 
@@ -1587,9 +1575,6 @@ void hent_dir_id1(char *path,char *parent_id,char *dirid) {
 
 
 
-
-
-
 // ************************************************************ music play list loader fra mythtv
 // load playlist til oversigt ask_open_dir_play
 
@@ -1618,16 +1603,13 @@ int hent_mythtv_playlist(int playlistnr) {
     bool finish=0;
     // mysql stuf
     char database[255];
-
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-
     if (debugmode & 2) fprintf(stderr,"Hent info om playlist nr: %d \n",playlistnr);
     songnr=1;
     aktiv_playlist.clean_playlist();		// clear old playlist
     conn=mysql_init(NULL);
     int songintnr;				// sang nr som skal i playliste
     long songantal=0;				// antal sange i array i database
-
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -1636,59 +1618,47 @@ int hent_mythtv_playlist(int playlistnr) {
         sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-//        printf("SQL = %s\n",sqlselect);
         if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-//                printf("Fundet recnr %d datanr %s \n",songnr,row[0]);
-                songintnr=atoi(row[0]);
-                songantal=atol(row[1]);
-
-                printf("Song antal fundet = %ld \n",songantal);
-
-                // find cd cover samt sange info i mythtv music database
-                sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
-                mysql_query(conn,sqlselect);
-                res1 = mysql_store_result(conn);
-//                printf("SQL = %s\n",sqlselect);
-                if ((res1) && (songantal>0)) {
-                    while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                        strcpy(songid,row1[0]);
-                        strcpy(artistid,row1[5]);
-                        strcpy(albumname,row1[3]);
-                        strcpy(songname,row1[4]);
-                        strcpy(artistname,row1[6]);
-                        strcpy(songlength,row1[7]);
-
-                        if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
-
-                        strcpy(tmptxt,configmusicpath);		// start path
-                        sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
-                        hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
-                        strcat(tmptxt,tmptxt1);				// add path
-                        strcat(tmptxt,"/");
-                        strcpy(tmptxt3,tmptxt);			// er = path
-                        strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
-                        strcat(tmptxt,row1[1]);				// add filename til sang
-
-                        strcpy(tmptxt,row1[1]);				// add filename til sang
-
-                        if (file_exists(tmptxt3)) {
-                        // printf("Loader music cover til playlist\n");
-
-                            texture=loadTexture(tmptxt3);				// load texture
-
-                        } else {
-                            printf(" Error loading texture file : %s \n",tmptxt3);
-                            texture=0;
-                        }
-                    }
-                    aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            songintnr=atoi(row[0]);
+            songantal=atol(row[1]);
+            printf("Song antal fundet = %ld \n",songantal);
+            // find cd cover samt sange info i mythtv music database
+            sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+            mysql_query(conn,sqlselect);
+            res1 = mysql_store_result(conn);
+            if ((res1) && (songantal>0)) {
+              while ((row1 = mysql_fetch_row(res1)) != NULL) {
+                strcpy(songid,row1[0]);
+                strcpy(artistid,row1[5]);
+                strcpy(albumname,row1[3]);
+                strcpy(songname,row1[4]);
+                strcpy(artistname,row1[6]);
+                strcpy(songlength,row1[7]);
+                if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
+                strcpy(tmptxt,configmusicpath);		// start path
+                sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
+                hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
+                strcat(tmptxt,tmptxt1);				// add path
+                strcat(tmptxt,"/");
+                strcpy(tmptxt3,tmptxt);			// er = path
+                strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
+                strcat(tmptxt,row1[1]);				// add filename til sang
+                strcpy(tmptxt,row1[1]);				// add filename til sang
+                if (file_exists(tmptxt3)) {
+                  texture=loadTexture(tmptxt3);				// load texture
                 } else {
-                    finish=true;
-                    error=1;
+                  printf(" Error loading texture file : %s \n",tmptxt3);
+                  texture=0;
                 }
+              }
+              aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
+            } else {
+              finish=true;
+              error=1;
             }
-            songnr++;
+          }
+          songnr++;
         }
         if ((res==0) || (songnr==songantal)) finish=true;
         if (songantal==1) finish=true;
@@ -1798,12 +1768,9 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
 
 unsigned int hent_antal_dir_songs(int dirid) {
     char tmpfilename[200];
-//    char convert_command[256];
-//    char convert_newfilename[256];
     char sqlselect[512];
     char tmptxt[200];
     unsigned int i,ii;
-//    float xofset=0.0f;
     GLuint textureId;
     // mysql vars
     MYSQL *conn;
@@ -1811,12 +1778,9 @@ unsigned int hent_antal_dir_songs(int dirid) {
     MYSQL_ROW row;
     // mysql stuf
     char database[256];
-
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     if (debugmode & 2) fprintf(stderr,"Hent info om directory_id = %d \n",dirid);
-
     dirmusic.emtydirmusic();
-
     strcpy(sqlselect,"SELECT song_id,name,artist_id FROM music_songs where directory_id=");
     sprintf(tmptxt,"%d order by name limit %d",dirid,dirliste_size);
     strcat(sqlselect,tmptxt);
@@ -1927,9 +1891,7 @@ int init_ttf_fonts() {
     //GLint  master,master_count,ii;
     //GLint face_count;
     //int i,j;
-
     // Get the number of entries in the catalog list
-
     /* Get a unique font ID. */
     glc_font_id = glcGenFontID();
     glcAppendCatalog("/usr/share/fonts/truetype");
@@ -1937,9 +1899,7 @@ int init_ttf_fonts() {
     glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
     if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Open ttf font select error.\n");  // Regular
     glcFont(myFont);
-
     aktivfont.updatefontlist();                                                          // update font list
-
     /* Draw letters as filled polygons. */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 /*
@@ -1951,7 +1911,6 @@ int init_ttf_fonts() {
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
-
     glcDisable(GLC_GL_OBJECTS);
 //    glcRenderStyle(GLC_LINE);                 // lines
 //    glcRenderStyle(GLC_TEXTURE);
@@ -2053,41 +2012,41 @@ unsigned int do_playlist_restore_playlist() {
                 mysql_query(conn,sqlselect);
                 res1 = mysql_store_result(conn);
                 if (res1) {
-                    while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                        if (fundet==false) {
-                            printf("Found playlist %s updating ",playlistname);
-                            sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
-                            mysql_query(conn,"set NAMES 'utf8'");
-                            res2 = mysql_store_result(conn);
-                            mysql_query(conn,sqlselect);
-                            res2 = mysql_store_result(conn);
-                            // missing Check done
-                        }
-                        fundet=true;
-                        // find song in music database
-                        songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
-                        songlength=atol(row[8]);							// get song length
-                        // if song exist update playlist
-                        if (songplacering>0) {
-                            printf(".");
-                            sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
-                            mysql_query(conn,"set NAMES 'utf8'");
-                            res2 = mysql_store_result(conn);
-                            mysql_query(conn,sqlselect);
-                            res2 = mysql_store_result(conn);
-                        } // endif
-                    } // endwhile
+                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
+                    if (fundet==false) {
+                      printf("Found playlist %s updating ",playlistname);
+                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
+                      mysql_query(conn,"set NAMES 'utf8'");
+                      res2 = mysql_store_result(conn);
+                      mysql_query(conn,sqlselect);
+                      res2 = mysql_store_result(conn);
+                      // missing Check done
+                    }
+                    fundet=true;
+                    // find song in music database
+                    songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
+                    songlength=atol(row[8]);							// get song length
+                    // if song exist update playlist
+                    if (songplacering>0) {
+                      printf(".");
+                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
+                      mysql_query(conn,"set NAMES 'utf8'");
+                      res2 = mysql_store_result(conn);
+                      mysql_query(conn,sqlselect);
+                      res2 = mysql_store_result(conn);
+                    } // endif
+                  } // endwhile
                 } // endif
                 printf("\n");
                 if (!(fundet)) {
-                    // else create new playlist
-                    printf("Create new playlist %s......\n",playlistname);
-                    songplacering=find_music_song_placering(row[1],row[2]);
-                    sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
-                    mysql_query(conn,"set NAMES 'utf8'");
-                    res2 = mysql_store_result(conn);
-                    mysql_query(conn,sqlselect);
-                    res2 = mysql_store_result(conn);
+                  // else create new playlist
+                  printf("Create new playlist %s......\n",playlistname);
+                  songplacering=find_music_song_placering(row[1],row[2]);
+                  sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
+                  mysql_query(conn,"set NAMES 'utf8'");
+                  res2 = mysql_store_result(conn);
+                  mysql_query(conn,sqlselect);
+                  res2 = mysql_store_result(conn);
                 }
             } // endwhile
         } // endwhile
@@ -2127,17 +2086,14 @@ unsigned int do_playlist_backup_playlist() {
     int songintnr;				// sang nr som skal i playliste
     long songantal=0;				// antal sange i array i database
     int songnr=1;
-
     if (debugmode & 2) fprintf(stderr,"Gemmer sange fra playlister \n");
     i=0;
     conn=mysql_init(NULL);
     // Connect to mythtv database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-
     // drop old table
     mysql_query(conn,"drop table music_songs_tmp");
     res2 = mysql_store_result(conn);
-
     // Create temp table to backup of songs in playlist
     strcpy(sqlselect,"create table music_songs_tmp(playlist_id int not null AUTO_INCREMENT,PRIMARY KEY(playlist_id), playlist_name varchar(255), filename text, song_name varchar(255), artist_name varchar(255), album_name varchar(255), genre_name varchar(255), year int, length int,numplays int, rating int, lastplayed datetime,date_entered datetime, date_modified datetime, format varchar(4), size int, descrition varchar(255), comment varchar(255), disc_count int, disc_number int, track_count int, start_time int, stop_stime int,eq_preset varchar(255), relative_volume int, sample_rate int, bitrate int, bpm int,  directory_name varchar(255))");
     mysql_query(conn,sqlselect);
@@ -2219,7 +2175,6 @@ void show_background() {
     else if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _textureIdback_setup);
     else if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);
     else glBindTexture(GL_TEXTURE_2D, _textureIdback_other);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -2237,6 +2192,16 @@ void show_background() {
 //
 // *********************** MAIN LOOP *********************************************************************************
 //
+
+const float clockR=80.0f;
+
+void newLine(float rStart, float rEnd, float angle) {
+  float c = cos(angle), s = sin(angle);
+  glVertex2f((clockR*rStart*c)+(screenx/2),(clockR*rStart*s)+(screeny/2));
+  glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
+}
+
+
 
 static bool do_update_xmltv_show=false;
 static bool do_update_rss_show=true;
@@ -2343,6 +2308,16 @@ void display() {
                           0.3,0.3,0.3, \
                           0.8,0.1,0.1, \
                           0.8,0.1,0.1};
+    struct timeb tb;
+    struct tm* t;
+
+    float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
+    float angleHour = 0,angleMin  = 0,angleSec  = 0;
+    float last_angleSec=0.0f;
+    float angleSec2=0.0f;
+
+    int winsizx=1920;
+    int winsizy=1080;
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
@@ -2364,21 +2339,38 @@ void display() {
     }
     // make xmltv update
     today=time(NULL);
+    t=localtime(&today);                                                        // local time
+    ftime(&tb);
+
+    // used by analog clock
+    if (last_angleSec==0.0f) {
+      last_angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+      angleSec=last_angleSec;
+    } else if (angleSec+10.0f>=last_angleSec) {
+      last_angleSec=angleSec;
+      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    }
+    angleSec2=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    //angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec2/60.0f;
+    angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
+    //
+
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
-      lasttoday=today;                                      // rember last update
-      do_update_xmltv=true;                                 // do update tvguide
-      do_update_xmltv_show=true;                            // show we are updating
-      firsttime_xmltvupdate=false;                          // only used first time
+      lasttoday=today;                                                          // rember last update
+      do_update_xmltv=true;                                                     // do update tvguide
+      do_update_xmltv_show=true;                                                // show we are updating
+      firsttime_xmltvupdate=false;                                              // only used first time
     }
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
       if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
-      lasttoday=today;                                      // rember last update
-      do_update_rss=true;                                  // do update rss
-      do_update_rss_show=true;                            // show we are updating rss
-      firsttime_rssupdate=false;                         // only used first time
+      lasttoday=today;                                                          // rember last update
+      do_update_rss=true;                                                       // do update rss
+      do_update_rss_show=true;                                                  // show we are updating rss
+      firsttime_rssupdate=false;                                                // only used first time
     }
     //visur=true;
     glPushMatrix();
@@ -2422,53 +2414,47 @@ void display() {
             glPopMatrix();
             break;
         case ANALOG:
+            //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+            // background
+            glPushMatrix();
+            glEnable(GL_TEXTURE_2D);
+            glTranslatef(0.0f, 0.0f, 0.0f);
+            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+            glBindTexture(GL_TEXTURE_2D,analog_clock_background);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
+            glEnd();
+            glPopMatrix();
             glDisable(GL_TEXTURE_2D);
-            glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-            // draw analog watch/ur
-            for(i=0;i<360;i+=45) {
-              //glTranslatef(100.0f, 100.0f, 0.0f);
-              glColor3f(0.4f, 0.4f, 0.4f);
-              glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-              glBegin(GL_QUADS); //Begin quadrilateral coordinates
-              if ((i==0) || (i==90) || (i==180) || (i==270)) {
-                glTexCoord2f(0.0, 0.0); glVertex3f(300.0, 0.0, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(300.0, 10.0, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(320.0, 10.0, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(320.0, 0.0, 0.0);
+            glLineWidth(5.0f);
+            glBegin(GL_LINES);
+            //glBegin(GL_QUADS);
+            for(i=0; i<60; i++) {
+              if(i%5) {                                                         // normal minute
+                if(i%5 == 1) glColor3f(1.0f, 1.0f, 1.0f);
+                newLine(minStart, minEnd, i*angle1min);
               } else {
-                glTexCoord2f(0.0, 0.0); glVertex3f(300.0, 0.0, 0.0);
-                glTexCoord2f(0.0, 1.0); glVertex3f(300.0, 20.0, 0.0);
-                glTexCoord2f(1.0, 1.0); glVertex3f(400.0, 20.0, 0.0);
-                glTexCoord2f(1.0, 0.0); glVertex3f(400.0, 0.0, 0.0);
+                glColor3f(1.0f, 0.0f, 0.0f);
+                newLine(stepStart, stepEnd, i*angle1min);
               }
-              glEnd(); //End quadrilateral coordinates
             }
-            mgrader=min*(360/60);
-            tgrader=tim*(360/12);
-            glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            glColor3f(0.8f, 0.8f, 0.8f);
-            // tgrader
-            glRotatef(-(tgrader-90), 0.0f, 0.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(180.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(180.0, 0.0, 0.0);
-            glEnd(); //End quadrilateral coordinates
-            glPopMatrix();
-            // mgrader
-            glPushMatrix();
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            glTranslatef(orgwinsizex/2, orgwinsizey/2, 0.0f);
-            glRotatef(-(mgrader-90), 0.0f, 0.0f, 1.0f);
-            glBegin(GL_QUADS); //Begin quadrilateral coordinates
-            glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-            glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 1.0); glVertex3f(240.0, 10.0, 0.0);
-            glTexCoord2f(1.0, 0.0); glVertex3f(240.0, 0.0, 0.0);
-            glEnd(); //End quadrilateral coordinates
-            glPopMatrix();
+            glEnd();
+            glLineWidth(5.0f);
+            glBegin(GL_LINES);
+            newLine(-0.2f, 3.5f, -angleHour+M_PI/2);                       // timer
+            newLine(-0.2f, 4.5f, -angleMin+M_PI/2);                        // min
+            glEnd();
+            glLineWidth(3.0f);
+            glColor3f(1.0f, 1.0f, 1.0f);
+            //glColor3f(0.0f, 0.0f, 1.0f);
+            glBegin(GL_LINES);
+            newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
+            glEnd();
             break;
         case SAVER3D:
             //reset pos
@@ -2492,7 +2478,7 @@ void display() {
             std::clock_t start;
             start = std::clock();
             mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
-            std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             glPopMatrix();
             break;
         case SAVER3D2:
@@ -2648,7 +2634,8 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
-        if (vis_uv_meter==false) {          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
+        if (vis_uv_meter==false) {
+          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
             //glBlendFunc(GL_ONE, GL_ONE);
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
@@ -2810,7 +2797,6 @@ void display() {
         }
       }
     }
-
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
@@ -2900,7 +2886,6 @@ void display() {
         glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
-
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
         glTranslatef(80, 70, 0.0f);
@@ -3105,28 +3090,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
         glEnd();
         glPopMatrix();
-/*
-        // close ************************************************************** icon close
-        xof=850;
-        yof=250;
-        buttonsize=100;
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _textureclose);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(23);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+buttonsize, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize, yof+buttonsize , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize,yof , 0.0);
-        glEnd();
-        glPopMatrix();
-*/
         // draw cd cover
         xof=750;
         yof=250;
@@ -3460,7 +3423,6 @@ void display() {
     strcpy(aktivsongstatus,"Playing");
     #endif
     // alt music er her under player
-    //
     if (do_play_music_cover) {
       // play list
       if (do_find_playlist) {
@@ -3870,9 +3832,7 @@ void display() {
             strcpy(temptxt,temptxt1);
           }
           pos=strrchr(temptxt,'.');
-          if (pos>0) {
-            temptxt[pos-temptxt]='\0';
-          }
+          if (pos>0) temptxt[pos-temptxt]='\0';
           temptxt[40]=0;
           glRasterPos2f(0.0f, 0.0f);
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
@@ -4351,7 +4311,6 @@ void display() {
             }
           }
         }
-
         // create uv meter
         if ((snd) && (show_uv)) vis_uv_meter=true;
         if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
@@ -4448,12 +4407,9 @@ void display() {
                 uvypos+=16;
               }
             }
-
             glPopMatrix();
-
           } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
-
             //glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
             //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
@@ -4569,7 +4525,9 @@ void display() {
           }
           if (do_show_setup_font) show_setup_font(setupfontselectofset);      //
           if (do_show_setup_keys) show_setup_keys();                          // Function keys
-          if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   //
+          if (do_show_tvgraber) {
+            show_setup_tv_graber(tvchannel_startofset);   //
+          }
           if (do_show_setup_rss) show_setup_rss(configrss_ofset);             //
         }
         glPopMatrix();
@@ -4580,11 +4538,13 @@ void display() {
       if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
         printf("Error saving config file mythtv-controller.conf\n");
       } else printf("Saving config ok.\n");
-      rssstreamoversigt.save_rss_data();                                        // save rss data in db
+      // crash crash
+      //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
-      freegfx();                                                                // free gfx loaded
-      loadgfx();                                                                // reload all menu + icon gfx
+
+      //freegfx();                                                                // free gfx loaded
+      //loadgfx();                                                                // reload all menu + icon gfx
     }
     // update rss db
     if (do_save_setup_rss) {
@@ -5326,6 +5286,8 @@ void display() {
 
 
 // used by mouse stuf
+// to check mouse buttons
+// names is the array of gfx on screen as buttons
 
 int list_hits(GLint hits, GLuint *names,int x,int y) {
     int i=hits;			// numbers of hits
@@ -5470,9 +5432,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=true;
             fundet=true;
           }
-          // test for close windows again icon for all other windows in setup
+          // test for close windows again icon for all other windows in setup glLoadName(40)
           //
-          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer))) {
+          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
             do_show_setup_sound=false;
             do_show_setup_screen=false;
             do_show_setup_sql=false;
@@ -5482,6 +5444,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_setup_keys=false;
             do_show_videoplayer=false;
             do_show_setup_rss=false;
+            if (do_show_tvgraber) {
+              // hent/update tv guide from db
+              // efter den er saved i db fra setup tvguide function som saver data.
+              aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+            }
             do_show_tvgraber=false;
             fundet=true;
           }
@@ -5505,6 +5472,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_rss=false;
             do_show_setup_rss=true;
             fundet=true;
+          }
+          if ((GLubyte) names[i*4+3]==45) {
+            fundet=true;
+            printf("45 Button pressed \n");
           }
         }
         // main menu
@@ -5590,7 +5561,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_tvgraber=false;
             fundet=true;
             remove("mythtv-controller.lock");
-            exit(0);                                                           // exit
+            order_channel_list();                                               // order tv channel list
+            save_channel_list();                                                //
+            txmltvgraber_createconfig();                                        //
+            exit(0);                                                            // exit
           }
         }
         //
@@ -6153,6 +6127,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
+
+                  // set flag to update
+                  if ((do_show_tvgraber) && (retfunc==0)) {
+                    printf("* Delete old tvguide *\n");
+                    unlink("~/tvguide_channels.dat");
+                    printf("* Update new tvguide *\n");
+                    hent_tv_channels=false;
+                  }
+
+
                 }
                 break;
             case GLUT_RIGHT_BUTTON:
@@ -6369,14 +6353,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
 
           if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
-            //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
-            _sangley+=(41.0f);						// scroll window down one icon
+            //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
+            _sangley+=(41.0f);						                            // scroll window down one icon
             stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
           }
           // scroll up
           if (((retfunc==1) || (button==3)) && (_sangley>0)) {
-            //do_music_icon_anim_icon_ofset=-1;				// direction -1 = up 1 = down
-            _sangley-=(41.0f);						// scroll window up
+            //do_music_icon_anim_icon_ofset=-1;				                // direction -1 = up 1 = down
+            _sangley-=(41.0f);						                            // scroll window up
             stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
           }
         }
@@ -6386,15 +6370,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
 
 
-unsigned int hourtounixtime(int hour) {
-  time_t nutid;
-  struct tm *tid;
-  time(&nutid);                                                            // get time
-  tid=localtime(&nutid);                                                   // fillout struct
-  tid->tm_min=0;
-  tid->tm_hour=hour;
-  return(mktime(tid));
-}
 
 
 //
@@ -6407,6 +6382,7 @@ void handlespeckeypress(int key,int x,int y) {
     float MUSIC_CS;
     float RADIO_CS;
     unsigned int mnumbersoficonline;
+    int numbers_cd_covers_on_line=8;
     int fnumbersoficonline;
     int rnumbersoficonline;
     int snumbersoficonline;
@@ -6819,8 +6795,12 @@ void handlespeckeypress(int key,int x,int y) {
                   // setup rss source window
                   if (do_show_setup_rss) {
                     if (do_show_setup_select_linie<35) do_show_setup_select_linie++;
-                    else configrss_ofset++;
-                    if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) realrssrecordnr++;
+                    else {
+                      if (configrss_ofset<streamoversigt.antalstreams()) configrss_ofset++;
+                    }
+                    if (((do_show_setup_select_linie+configrss_ofset) % 2)==0) {
+                      if ((realrssrecordnr)<43) realrssrecordnr++;
+                    }
                   }
                   // tv graber setup
                   if (do_show_tvgraber) {
@@ -6928,12 +6908,15 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_setup_sql) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // sound setup
                   if (do_show_setup_sound) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // screen setup
                   if (do_show_setup_screen) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // network setup
                   if (do_show_setup_network) {
                     // hvis vi ikke viser select wlan window hop med coursor i networksetup
                     if (!(show_wlan_select)) {
@@ -6942,15 +6925,19 @@ void handlespeckeypress(int key,int x,int y) {
                       if (setupwlanselectofset>0) setupwlanselectofset--;
                     }
                   }
+                  // setup fonts
                   if (do_show_setup_font) {
                     if (setupfontselectofset>0) setupfontselectofset--;
                   }
+                  // setup keys
                   if (do_show_setup_keys) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // setup video player
                   if (do_show_videoplayer) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                   }
+                  // setup rss
                   if (do_show_setup_rss) {
                     if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
                     else if (configrss_ofset>0) configrss_ofset--;
@@ -6971,7 +6958,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (do_show_setup_select_linie<0) do_show_setup_select_linie=0;
                     if (tvchannel_startofset<0) tvchannel_startofset=0;
                   }
-
+                  // move to other order
                   if (channel_list[(do_show_setup_select_linie)+tvchannel_startofset].changeordernr) {
                     if (do_show_setup_select_linie+tvchannel_startofset>0) {
                       //swap channels
@@ -7000,7 +6987,10 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 break;
         case GLUT_KEY_PAGE_UP:
-                if (vis_music_oversigt) {
+                if ((vis_music_oversigt) && (music_select_iconnr>numbers_cd_covers_on_line)) {
+                  do_music_icon_anim_icon_ofset=-1;			              // direction -1 = up 1 = down
+                  _mangley-=(41.0f);			                       			// scroll window up
+                  music_select_iconnr-=numbers_cd_covers_on_line;			// add to next line
                 }
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -7032,6 +7022,9 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case GLUT_KEY_PAGE_DOWN:
                 if (vis_music_oversigt) {
+                  do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
+                  _mangley+=(41.0f);				                      		// scroll window down one icon
+                  music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
                 }
                 // if indside tv overoview
                 if ((vis_tv_oversigt) && ((aktiv_tv_oversigt.vistvguidekl>1) || (aktiv_tv_oversigt.vistvguidekl==0))) {
@@ -7074,8 +7067,8 @@ void handlespeckeypress(int key,int x,int y) {
                       tvknapnr=0;
                       do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
                     }
-
                 }
+                // radio
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                     if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                        _rangley-=0;
@@ -7092,21 +7085,21 @@ void handlespeckeypress(int key,int x,int y) {
                     tvchannel_startofset=0;
                     do_show_setup_select_linie=0;
                   }
+                  // rss setup
                   if (show_setup_rss) {
                     do_show_setup_select_linie=0;
                     configrss_ofset=0;
                   }
                 }
-
                 break;
         case GLUT_KEY_END:
+                // music oversigt
                 if (vis_music_oversigt) {
                   _mangley=0;     	                      							  // scroll start ofset reset to start
                   music_select_iconnr=1;                                  // first icon in view left top conner
                   do_music_icon_anim_icon_ofset=1;                        // set scroll
                   music_key_selected=1;
                 }
-
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   aktiv_tv_oversigt.changetime((60*60*24));
@@ -7133,7 +7126,7 @@ void handlespeckeypress(int key,int x,int y) {
     }
     if (debugmode) {
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
-      if (vis_film_oversigt) fprintf(stderr,"ang = %4f film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",_fangley,film_key_selected,film_select_iconnr,film_oversigt.film_antal());
+      if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
     }
@@ -7506,6 +7499,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
+                // rss editor
               } else if (do_show_setup_rss) {
                 if (key!=13) {
                   keybuffer[keybufferindex]=key;
@@ -7829,17 +7823,19 @@ void handleKeypress(unsigned char key, int x, int y) {
                   order_channel_list();
                   save_channel_list();
                   // buid new config file for xmltv from saved db
-                  xmltv_configcontrol.graber_configbuild();
+                  //xmltv_configcontrol.graber_configbuild();
                   // hent ny tv guide
                   //if (get_tvguide_fromweb()!=-1)
                   // update db med tvguide
                   aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+/*
                   // order channels in db (mysqldb)
                   order_channel_list_in_tvguide_db();
+*/
                   // hent/update tv guide from db
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                   // set update flag in display() func
-                  firsttime_xmltvupdate=true;
+                  firsttime_xmltvupdate=true;                                 // if true reset xml config file
                   // close tv graber windows again
                   do_show_tvgraber=false;
                   do_show_setup=false;
@@ -7899,6 +7895,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
+                order_channel_list();
+                save_channel_list();
                 exit(0);                                                      //  exit program
               } else key=0;
               break;
@@ -8074,7 +8072,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
                   //do_zoom_music_cover=true;
                 } else {
-                  // do playlist
+                  // playlist dir
                   if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
                   // playlist loader
                   do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
@@ -11570,6 +11568,7 @@ void loadgfx() {
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
     _textureIdback       	= loadgfxfile(temapath,(char *) "images/",(char *) "back-icon");
     setuptexture         	= loadgfxfile(temapath,(char *) "images/",(char *) "setup");
+    setupupdatebutton     = loadgfxfile(temapath,(char *) "images/",(char *) "updatebutton");
     setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
     _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "music");
@@ -11692,7 +11691,8 @@ void loadgfx() {
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
-    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");;
+    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
+    analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -11740,6 +11740,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
     glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
     glDeleteTextures( 1, &setuptexture);			          // bruges af setup
+    glDeleteTextures( 1, &setupupdatebutton);			      // global update button
     glDeleteTextures( 1, &setuptvgraberback);           // bryges af setup tv graber
     glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
     glDeleteTextures( 1, &_textureIdmusic);			        // music
@@ -11840,6 +11841,7 @@ void freegfx() {
     glDeleteTextures( 1,&screensaverbox);
     glDeleteTextures( 1,&screensaverbox1);
     glDeleteTextures( 1,&newstuf_icon);
+    glDeleteTextures( 1,&analog_clock_background);
 }
 
 

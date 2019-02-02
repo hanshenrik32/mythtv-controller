@@ -159,7 +159,7 @@ class film_oversigt_typem : vlc_controller {
       void prevous_movie_chapther();
       void volumeup();
       void volumedown();
-      void setcolume(int volume);                                         // do not store volume in volume member int vaule 
+      void setcolume(int volume);                                         // do not store volume in volume member int vaule
       void softstopmovie();
       void pausemovie();
       film_oversigt_typem(unsigned int antal);

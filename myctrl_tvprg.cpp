@@ -3409,6 +3409,7 @@ void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
   }
 }
 
+
 //
 // henter aktiv tv overigt fra mythtv or internal localdb created like mythtv in use
 //
@@ -3436,22 +3437,18 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     // mysql stuf
     char *database = (char *) "mythtvcontroller";
     char tmptxt[100];
-
     strcpy(this->mysqllhost,mysqlhost);
     strcpy(this->mysqlluser,mysqluser);
     strcpy(this->mysqllpass,mysqlpass);
-
     loading_tv_guide=true;
-
     // is startid as args ? 0
     if (nystarttid==0) {
-        rawtime=rawtime2=time(NULL);				     			// hent nu tid
+      rawtime=rawtime2=time(NULL);				     			// hent nu tid
     } else {
-        // hent ny starttid
-        rawtime=this->starttid;             // start tid type (time_t unix time)
-        rawtime2=this->starttid+(60*60*24); // end   tid type (time_t unix time)
+      // hent ny starttid
+      rawtime=this->starttid;             // start tid type (time_t unix time)
+      rawtime2=this->starttid+(60*60*24); // end   tid type (time_t unix time)
     }
-
     timeinfo=localtime(&rawtime);			                        		// lav om til local time
     timeinfo2=localtime(&rawtime2);	            		          		  // lav om til local time
     // copy struct
@@ -3630,7 +3627,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                         else if (strcmp("Reality Show",row[9])==0) prgtype=8;
                         else prgtype=0;
                       }
-
                     default:
                       prgtype=0;
                   }
@@ -3640,12 +3636,12 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                 prgnr++;
                 totalantalprogrammer++;
                 if ((strcmp(tmptxt,row[0])!=0) || (prgnr>=maxprogram_antal-1)) {
-                    if (debugmode & 256) printf(" Programs in channel : %3d \n",prgnr);
-                    // if new channel id
-                    tvkanaler[kanalnr].set_program_antal(prgnr-1);
-                    huskprgantal=prgnr-1;
-                    prgnr=0;
-                    kanalnr++;								// next tv channel
+                  if (debugmode & 256) printf(" Programs in channel : %3d \n",prgnr);
+                  // if new channel id
+                  tvkanaler[kanalnr].set_program_antal(prgnr-1);
+                  huskprgantal=prgnr-1;
+                  prgnr=0;
+                  kanalnr++;								// next tv channel
                 }
             }
             // set last channel # of programs in array
@@ -3665,58 +3661,51 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
 
 
-
+//
 // Outputs a string wrapped to N columns
-void WordWrap( char *str, int N ) {
-    int i,j,k,pos;
-    i = pos = 0;
-    char word[16000];
+//
 
-    while( 1 ) {
-        j = 0;
-        while( !isspace( str[i]) ) // Find next word
-        {
-            if( str[i] == '\0' )
-                break;
-            word[j] = str[i];
-            i++;
-            j++;
+void WordWrap(char *str, int N) {
+  int i,j,k,pos;
+  i = pos = 0;
+  char word[16000];
+  while(1) {
+    j = 0;
+    while(!isspace(str[i])) {                                                  // Find next word
+      if( str[i] == '\0' )
+        break;
+      word[j] = str[i];
+      i++;
+      j++;
+    }
+    word[j] = '\0'; // The value of j is the word length
+    if( j > N ) { // Word length is greater than column length // print char-by-char
+      k = 0;
+      while( word[k] != '\0' ) {
+        if( pos >= N-1 ) {
+          if( k != 0 ) putchar('-'); // print '-' if last-but-one column
+          pos = 0;
+          putchar('\n');
         }
-
-        word[j] = '\0'; // The value of j is the word length
-
-        if( j > N ) // Word length is greater than column length
-        { // print char-by-char
-            k = 0;
-            while( word[k] != '\0' ) {
-                if( pos >= N-1 ) {
-                    if( k != 0 ) putchar('-'); // print '-' if last-but-one column
-                    pos = 0;
-                    putchar('\n');
-                }
-                putchar( word[k] );
-                pos++;
-                k++;
-            }
-        } else {
-            if( pos + j > N ) // Word doesn't fit in line
-            {
-                putchar('\n');
-                pos = 0;
-            }
-
-            printf("%s", word );
-            pos += j;
-        }
-        if( pos < N-1 ) // print space if not last column
-        {
-            putchar(' ');
-            pos++;
-        }
-        if( str[i] == '\0' ) break;
-
-        i++; // Skip space
-    } // end of while(1)
+        putchar( word[k] );
+        pos++;
+        k++;
+      }
+    } else {
+      if(pos + j > N) { // Word doesn't fit in line
+        putchar('\n');
+        pos = 0;
+      }
+      printf("%s", word );
+      pos += j;
+    }
+    if(pos < N-1) {// print space if not last column
+      putchar(' ');
+      pos++;
+    }
+    if( str[i] == '\0' ) break;
+    i++; // Skip space
+  } // end of while(1)
 }
 
 
