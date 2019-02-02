@@ -119,7 +119,7 @@ installsound:
 
 
 install:
-	@echo "Installing mythtv-controller ver 0.32.x in /usr/share/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.37.x in /usr/share/mythtv-controller."
 	@mkdir -p /usr/share/mythtv-controller/images/radiostations
 	@mkdir -p /usr/share/mythtv-controller/convert/hires
 	@cp charset $(DESTDIR)
