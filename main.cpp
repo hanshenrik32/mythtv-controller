@@ -2312,12 +2312,14 @@ void display() {
     struct tm* t;
 
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
-    float angleHour = 0,angleMin  = 0,angleSec  = 0;
-    float last_angleSec=0.0f;
-    float angleSec2=0.0f;
+    static float angleHour = 0,angleMin  = 0,angleSec  = 0;
+    static float last_angleSec=0.0f;
+    bool clock_udpate;
+    static int lastsec=0;
 
     int winsizx=1920;
     int winsizy=1080;
+
 
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
@@ -2341,21 +2343,20 @@ void display() {
     today=time(NULL);
     t=localtime(&today);                                                        // local time
     ftime(&tb);
-
+    clock_udpate=false;
     // used by analog clock
-    if (last_angleSec==0.0f) {
-      last_angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-      angleSec=last_angleSec;
-    } else if (angleSec+10.0f>=last_angleSec) {
-      last_angleSec=angleSec;
-      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    if (lastsec>=20) {
+      clock_udpate=true;
+      lastsec=0;
     }
-    angleSec2=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-    //angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec2/60.0f;
-    angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
-    //
-
+    lastsec++;
+    if (clock_udpate) {
+      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+      angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec/60.0f;
+      angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
+    }
+    clock_udpate=false;
+    // gvguide update
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
@@ -2365,6 +2366,9 @@ void display() {
       do_update_xmltv_show=true;                                                // show we are updating
       firsttime_xmltvupdate=false;                                              // only used first time
     }
+    // rss update
+    // update interval
+    // set in main.h
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
       if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
       lasttoday=today;                                                          // rember last update
@@ -2372,7 +2376,6 @@ void display() {
       do_update_rss_show=true;                                                  // show we are updating rss
       firsttime_rssupdate=false;                                                // only used first time
     }
-    //visur=true;
     glPushMatrix();
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
@@ -2433,7 +2436,6 @@ void display() {
             glDisable(GL_TEXTURE_2D);
             glLineWidth(5.0f);
             glBegin(GL_LINES);
-            //glBegin(GL_QUADS);
             for(i=0; i<60; i++) {
               if(i%5) {                                                         // normal minute
                 if(i%5 == 1) glColor3f(1.0f, 1.0f, 1.0f);
@@ -2525,7 +2527,7 @@ void display() {
     int iconsizex=200;
     int iconspacey=210;
     if ((screen_size==3) || (screen_size==4)) {
-      iconsizex=192;                            // 200
+      iconsizex=192;                            // icon size
       iconspacey=192;
     }
     // vis menu **********************************************************************
@@ -2536,7 +2538,6 @@ void display() {
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
         // tv icon
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         if ((vis_music_oversigt) || (vis_radio_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show musicplay info
@@ -2558,14 +2559,13 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
         glEnd();
         // movie stuf
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_film_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
           // glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// film icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(3); 			// load film icon name
+          glLoadName(3); 			                                                  // film icon name 3
         } else {
           if ((vis_music_oversigt) || (vis_radio_oversigt)) {
             glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);
@@ -2584,7 +2584,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
         //film icon
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2609,7 +2608,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
         // recorded icon
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2636,7 +2634,6 @@ void display() {
         glEnd();
         if (vis_uv_meter==false) {
           if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
-            //glBlendFunc(GL_ONE, GL_ONE);
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2673,7 +2670,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
@@ -2689,7 +2685,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
@@ -2708,7 +2703,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
@@ -2724,7 +2718,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
@@ -2938,12 +2931,12 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTranslatef(550, 19, 0.0f);                                          // orgwinsizey
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 10.0, 0.0, 0.0);
       glTexCoord2f(0, 1); glVertex3f( 10.0, 50.0, 0.0);
       glTexCoord2f(1, 1); glVertex3f( 640.0, 50.0, 0.0);
       glTexCoord2f(1, 0); glVertex3f( 640.0, 0.0, 0.0);
-      glEnd(); //End quadrilateral coordinates
+      glEnd();
       glPopMatrix();
       if (film_oversigt.film_is_playing) {
         strcpy(temptxt1,"Error playing movie.");
@@ -3021,7 +3014,7 @@ void display() {
         glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
         glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ***************************************************************** play icon
         xof=550;
@@ -3115,7 +3108,6 @@ void display() {
           no_open_dir=1;
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
-          //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           if (dirmusic.textureId) {
             glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
@@ -3193,7 +3185,6 @@ void display() {
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         glColor3f(1.0f, 1.0f, 1.0f);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
@@ -3276,7 +3267,6 @@ void display() {
               /* If we actually care about what we got, we can ask here.
               In this program we don't, but I'm showing the function call here anyway in case we'd want to know later. */
               Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-
               sdlmusic=Mix_Init(flags);
               if(sdlmusic&flags != flags) {
                   printf("Mix_Init: Failed to init required ogg,mp3,flac support!\n");
@@ -3375,7 +3365,6 @@ void display() {
           }
         }
       }
-      //        printf("rknapnr = %d online = %d \n",rknapnr-1,radiooversigt.get_radio_online(2));
       // create radio station online check tread
       #endif
       #if defined USE_SDL_MIXER
@@ -3518,7 +3507,6 @@ void display() {
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
-        //glDisable(GL_DEPTH_TEST);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         if (do_stop_music_all) {						// SKAL checkes om gfx er ok
             glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
@@ -3528,7 +3516,6 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.00f);					// lav alpha blending. 80%
-        //glLoadName(5);				                        // Overwrite the first name in the buffer
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4), yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),yof+buttonsizey, 0.0);
@@ -3545,14 +3532,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemplay);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(8);                        // play button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(20+ (orgwinsizex/4), 20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(20+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(20+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(20+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************ last
         glPushMatrix();
@@ -3563,14 +3550,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemlast2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(6);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(6);                                              // last button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(120+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(120+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(120+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(120+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************ next
         glPushMatrix();
@@ -3581,14 +3568,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemnext);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(7);                     						   // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(7);                     						   // next button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(220+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(220+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(220+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(220+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************stop
         glPushMatrix();
@@ -3599,14 +3586,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemstop);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(9);                                                          // Stop button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(320+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(320+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(320+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(320+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************* draw cover
         // Draw music cover
@@ -3627,7 +3614,7 @@ void display() {
         glTexCoord2f(0, 1); glVertex3f(560+ (orgwinsizex/4),40+yof+200, 0.0);
         glTexCoord2f(1, 1); glVertex3f(560+ (orgwinsizex/4)+200, 40+yof+200 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(560+ (orgwinsizex/4)+200,40+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // show artist
         glDisable(GL_TEXTURE_2D);
@@ -3982,7 +3969,6 @@ void display() {
             // window texture
             glEnable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
-            //glBlendFunc(GL_ONE, GL_ONE);
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
@@ -4013,7 +3999,7 @@ void display() {
             glBindTexture(GL_TEXTURE_2D,_texturemstop);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glLoadName(9	);                        // 9 = stop
+            glLoadName(9);                        // 9 = stop
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
             glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
@@ -4139,7 +4125,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // show station name
               switch (screen_size) {
@@ -4159,7 +4144,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // show station name
               switch (screen_size) {
@@ -4179,7 +4163,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // play time
               radio_playtime_hour=(radio_playtime/60)/60;
@@ -4205,7 +4188,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);                // write text
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
@@ -4224,7 +4206,6 @@ void display() {
               sprintf(temptxt,": %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // speed info
               frequency=192;
@@ -4245,7 +4226,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // speed info
               frequency=192;
@@ -4266,7 +4246,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
@@ -4287,7 +4266,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
@@ -4352,8 +4330,8 @@ void display() {
           if ((configuvmeter==1) && (screen_size!=4)) {
             glPushMatrix();
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-            glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
+            glBindTexture(GL_TEXTURE_2D,_textureuv1);
+            glBindTexture(GL_TEXTURE_2D,texturedot);
             //glColor4f(1.0f,1.0f,1.0f,1.0f);
             int uvypos=0;
             int high;
@@ -4411,8 +4389,7 @@ void display() {
           } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
             //glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-            //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
+            glBindTexture(GL_TEXTURE_2D,_textureuv1);
             glColor4f(1.0f,1.0f,1.0f,1.0f);
             int uvypos=0;
             int uvyypos=0;
@@ -4426,7 +4403,6 @@ void display() {
               if (high>7) high=6;
               // draw 1 bar
               for(i=0;i<high;i+=1) {
-                //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
                 switch(i) {
                     case 1:
                     case 2:
@@ -4542,7 +4518,6 @@ void display() {
       //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
-
       //freegfx();                                                                // free gfx loaded
       //loadgfx();                                                                // reload all menu + icon gfx
     }
@@ -4970,8 +4945,6 @@ void display() {
       int statuswypos=75;
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      //glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -5052,7 +5025,6 @@ void display() {
       GLfloat fps;
       GLfloat seconds = (t - T0) / 1000.0;
       fps = Frames / seconds;
-      //printf("%0.0f FPS\n", fps);
       T0 = t;
       Frames = 0;
       sprintf(temptxt,"FPS: %-4.0f", fps);
@@ -5145,7 +5117,6 @@ void display() {
                 }
               }
               #endif
-
               #if defined USE_SDL_MIXER
               // aktivplay_music_path = next song to play
               if (debugmode & 2) fprintf(stderr,"Auto1 Next song %s \n",aktivplay_music_path);
@@ -6091,7 +6062,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
                     }
                   }
-
                   // radio stuf
                   if ((vis_radio_oversigt) && (retfunc==0)) {
                     if (rknapnr>0) {
@@ -6099,7 +6069,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                     }
                   }
-
                   // ved vis film oversigt
                   if ((vis_film_oversigt) & (retfunc==0)) {
                     do_zoom_film_cover=true;
@@ -6120,14 +6089,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (debugmode & 256) fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
                     if (debugmode & 256) fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
                   }
-
                   // fra start film nyt fast show
                   if ((vis_nyefilm_oversigt) && (retfunc==0)) {
                     do_zoom_film_cover=true;
                     do_zoom_film_aktiv_nr=fknapnr;
                     do_swing_movie_cover=1;
                   }
-
                   // set flag to update
                   if ((do_show_tvgraber) && (retfunc==0)) {
                     printf("* Delete old tvguide *\n");
@@ -6135,8 +6102,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     printf("* Update new tvguide *\n");
                     hent_tv_channels=false;
                   }
-
-
                 }
                 break;
             case GLUT_RIGHT_BUTTON:
@@ -6284,8 +6249,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               film_select_iconnr-=numbers_film_covers_on_line;			// move to last line
             }
         }
-
-
         // scroll radio up/down
         if (vis_radio_oversigt) {
           // scroll down
@@ -6302,7 +6265,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             radio_select_iconnr-=numbers_radio_covers_on_line;			// add to next line
           }
         }
-
         // update or scroll stream up/down/play
         if ((vis_stream_oversigt) && (stream_jump==false)) {
           if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
@@ -6365,7 +6327,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
     }
-//    printf("button = %d \n",button);
 }
 
 
@@ -6544,13 +6505,10 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
-
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) visvalgtnrtype=2;
                   else if (visvalgtnrtype==2) visvalgtnrtype=1;
                 }
-
-
                 if (vis_radio_oversigt) {
                   if (radio_key_selected>1) {
                     radio_key_selected--;
@@ -6563,8 +6521,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
-
-
                 if (vis_stream_oversigt) {
                   if (stream_key_selected>1) {
                     stream_key_selected--;
@@ -7865,7 +7821,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // stop show setup of rss feeds
                   do_show_setup_rss=false;
                   key=0;
-//                  do_save_setup_rss=true;
+                  // do_save_setup_rss=true;
                 } else do_show_setup=false;
                 key=0;
               }
@@ -7992,7 +7948,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
                 do_update_moviedb=true;                                           // set update flag
-                pthread_t loaderthread1;           // the load
+                pthread_t loaderthread1;                                          // loader thread
                 // start multi thread and update movie overview
                 // movie loader
                 if (debugmode) printf("Update movie db.\n");
@@ -8046,10 +8002,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((vis_music_oversigt) && (keybufferopenwin)) {
                 mknapnr=0;				                            	// reset mouse/key pos in vis_music_overs
                 _mangley=0.0f;
-                hent_music_search=true;                         // start music search  (set flag)
-                music_key_selected=1;
-                music_select_iconnr=0;
-                music_icon_anim_icon_ofset=0;
+                hent_music_search=true;                         // start music search (set flag)
+                music_key_selected=1;                           // reset to first icon
+                music_select_iconnr=0;                          // reset to first icon
+                music_icon_anim_icon_ofset=0;                   // reset to first icon
                 music_icon_anim_icon_ofsety=0;
               }
               if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
@@ -10876,13 +10832,11 @@ int init_sound_system(int devicenr) {
     ERRCHECK(result,0);
     strcpy(configmythsoundsystem,avalible_device[0]);
     #endif
-
     #if defined USE_SDL_MIXER
     printf("Setup SDL_MIXER soundsystem\n");
     // load support for the OGG and MOD sample/music formats
     int flags=MIX_INIT_OGG|MIX_INIT_MP3|MIX_INIT_FLAC;
     SDL_Init(SDL_INIT_AUDIO);
-
     /* This is where we open up our audio device.  Mix_OpenAudio takes
     as its parameters the audio format we'd /like/ to have. */
     if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
@@ -11594,10 +11548,7 @@ void loadgfx() {
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
     _textureIdclosemask 	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close_mask");
     _texturelock        	= loadgfxfile(temapath,(char *) "images/",(char *) "lock");
-
-
-// ************************ icons ******************************************
-
+    // ************************ icons ******************************************
     _texturesetupmenu   	= loadgfxfile(temapath,(char *) "buttons/",(char *) "setupmenu");				// setup menu
     _texturesetupmenu_select	= loadgfxfile(temapath,(char *) "buttons/",(char *) "setupmenu1");		// setup menu selected
     _texturesoundsetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsound");
@@ -11621,9 +11572,7 @@ void loadgfx() {
     _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
     _tvnewprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "newrecordedbutton");
     _tvmaskprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbutton_mask");
-
     // ****************** backgrounds **************************************
-
     setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
     setuptemaback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptemaback");
@@ -11633,12 +11582,8 @@ void loadgfx() {
     setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
-
     _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
-
-
 // ************************* screen shot *******************************
-
     screenshot1=loadTexture ((char *) "images/screenshot1.png");
     screenshot2=loadTexture ((char *) "images/screenshot2.png");
     screenshot3=loadTexture ((char *) "images/screenshot3.png");
@@ -11649,12 +11594,10 @@ void loadgfx() {
     screenshot8=loadTexture ((char *) "images/screenshot8.png");
     screenshot9=loadTexture ((char *) "images/screenshot9.png");
     screenshot10=loadTexture ((char *) "images/screenshot10.png");
-
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
-
     // icons buttons
     // radio buttons
     onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
@@ -11669,11 +11612,9 @@ void loadgfx() {
     radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
     radiooptionsmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptionsmask");
-
     onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
     onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
     onlinestream_empty1  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
-
     // stream stuf
     // stream/movie button mask
     streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
@@ -11810,7 +11751,6 @@ void freegfx() {
     glDeleteTextures( 1, &screenshot8);                         // screen shots
     glDeleteTextures( 1, &screenshot9);                         // screen shots
     glDeleteTextures( 1, &screenshot10);                        // screen shots
-
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar3);
     glDeleteTextures( 1, &onlineradio_empty);
@@ -11912,11 +11852,10 @@ void InitGL()              // We call this right after our OpenGL window is crea
       strcpy(temapath,"tema1/");
       tema=1;
     }
-    //load_lande_flags();
+
 // Load radio stations gfx **********************************************
 // virker vis aktiveres
 // bliver loaded første gang de bruges
-
 //    radiooversigt.load_radio_stations_gfx();
 // *********************************************************************
 //    mybox.settexture(musicoversigt);
@@ -11930,7 +11869,6 @@ int check_radio_stations_icons() {
   MYSQL_ROW row;
   bool dbexist=false;
   char resl[1024];
-
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -11975,10 +11913,8 @@ int main(int argc, char** argv) {
         exit(0);
       }
     }
-
     numCPU = sysconf( _SC_NPROCESSORS_ONLN );
     printf("Numbers of cores :%d found.\n",numCPU);
-
     // Load config
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
@@ -11986,7 +11922,6 @@ int main(int argc, char** argv) {
       printf("mythtv - Backend\n");
       printf("Mythtv database version %d\n",configmythtvver);
       printf("configmysqluser   =%s \n",configmysqluser);
-      //printf("configmysqlpass   =%s \n",configmysqlpass);
       printf("configmysqlhost   =%s \n",configmysqlhost);
       printf("config movie path =%s \n",configmoviepath);
       printf("config music path =%s \n",configmusicpath);
@@ -12082,10 +12017,8 @@ int main(int argc, char** argv) {
       printf("ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
-
     // Load the VLC engine
 //    vlc_inst = libvlc_new(5,opt);
-
 /*
     vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
     // Create a media player playing environement
@@ -12097,7 +12030,6 @@ int main(int argc, char** argv) {
     //sleep(10); // play
     //libvlc_media_player_stop(vlc_mp);
     //libvlc_media_player_release(vlc_mp);
-
     sock=initlirc();
     // bruges til at checke_copy radio icons som virker til nyt dir
     //check_radio_stations_icons();
@@ -12137,19 +12069,13 @@ int main(int argc, char** argv) {
     //GC gc=XCreateGC(dpy, w, 0,0);
     // set title
     //XStoreName(dpy, w, "Mythtv-controller status window");
-
     //XDrawString(dpy,w,gc,1,1, "test", 4);
-
     //XFlush(dpy);
-
     //XDrawString(dpy, w,  gc ,	0,	0,	"abc",	3);
     //XDrawString(dpy, w, gc, 10, 10, "TEST", strlen("TEST"));
     //XFlush(dpy);
-
     //sleep(10);
-
      // Sleep long enough to see the window.
-
     InitGL();
     glutInitDisplayMode (GLUT_RGBA | GLUT_DOUBLE); // (GLUT_SINGLE | GLUT_RGB);
     // set screen size
