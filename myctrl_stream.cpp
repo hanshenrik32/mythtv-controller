@@ -609,9 +609,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               search_and_replace2(rssprgtitle);
               search_and_replace2(rssprgfeedtitle);
               search_and_replace2(rssprgdesc);
-
               if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               if (mysql_query(conn,sqlinsert)!=0) {
@@ -1989,7 +1987,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (!(file_exists(downloadfilenamelong))) {
                   if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   // download gfx file and use as icon
-                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                  if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
                 }
@@ -2068,7 +2066,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     if (!(file_exists(downloadfilenamelong))) {
                       if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                       // download gfx file and use as icon
-                      if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                      if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                         printf("Download error \n");
                       } else strcpy(tmpfilename,"");
                     }
@@ -2132,6 +2130,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
+  if (debugmode & 4) printf("rss stream gfx download start \n");
   while(nr<antal) {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
@@ -2169,7 +2168,6 @@ int stream_class::loadweb_stream_iconoversigt() {
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -2177,7 +2175,11 @@ int stream_class::loadweb_stream_iconoversigt() {
     }
     nr++;
   }
-  this->gfx_loaded=true;
+  if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
+  if (debugmode & 4) {
+    if (gfx_loaded) printf("rss stream gfx download end ok. \n");
+    else printf("rss stream gfx download error. \n");
+  }
   return(1);
 }
 

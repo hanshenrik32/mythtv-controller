@@ -234,13 +234,14 @@ bool check_filename_ext(const char *filename) {
 int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
   // check file ext is image yes download
-  if (check_filename_ext(webpath)) {
+  if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
     strcpy(command,"wget ");
     strcat(command,webpath);
     strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
     strcat(command,outfile);
     //strcat(command," 2>%1 ");
     strcat(command," 2>> wget.log ");
-    system(command);
+    //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
+    return (system(command));
   }
 }
