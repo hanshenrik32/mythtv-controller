@@ -57,7 +57,6 @@ extern GLuint _tvmaskprgrecordedbutton;
 extern GLuint _tvoverskrift;
 extern fontctrl aktivfont;
 extern int orgwinsizex,orgwinsizey;
-
 extern GLuint _textureutvbgmask;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -66,25 +65,20 @@ extern char configmusicpath[256];                              //
 extern char configmusicmypath[];                               //
 extern char configbackend_tvgraber[256];                       // internal tv graber to use
 extern long configtvguidelastupdate;                           //
-
 extern bool loading_tv_guide;
 
-//extern earlyrecorded oldrecorded;
-//extern earlyrecorded newtcrecordlist;
-
-const float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
-                              0.6f,0.6f,1.0f,               // 1 - children
-                              0.0f,0.8f,0.0f,               // 2 - sport
-                              0.6f,0.6f,0.8f,               // 3 - cartoons
-                              0.5f,0.9f,0.0f,               // 4 - news
-                              1.0f,0.4f,1.0f,               // 5 - movies
-                              0.5f,0.9f,0.0f,               // 6 - natur
-                              0.5f,0.8f,0.6f,               // 7 - Documentary
-                              0.7f,0.1f,0.1f,               // 8 - Entertainment
-                              1.0f,0.6f,0.0f,               // 9 - Sci-Fi
-                              0.1f,0.2f,0.1f,               // 10 - Series
-                              0.8f,0.2f,0.8f};              // 11 - Adult
-
+float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
+                        0.6f,0.6f,1.0f,               // 1 - children
+                        0.0f,0.8f,0.0f,               // 2 - sport
+                        0.6f,0.6f,0.8f,               // 3 - cartoons
+                        0.5f,0.9f,0.0f,               // 4 - news
+                        1.0f,0.4f,1.0f,               // 5 - movies
+                        0.5f,0.9f,0.0f,               // 6 - natur
+                        0.5f,0.8f,0.6f,               // 7 - Documentary
+                        0.7f,0.1f,0.1f,               // 8 - Entertainment
+                        1.0f,0.6f,0.0f,               // 9 - Sci-Fi
+                        0.1f,0.2f,0.1f,               // 10 - Series
+                        0.8f,0.2f,0.8f};              // 11 - Adult
 
 
 // bruges af show_tvoversigt
@@ -4245,13 +4239,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_clock_color[0],now_text_clock_color[1], now_text_clock_color[2]); else glColor3f(catalog_text_clock_color[0],catalog_text_clock_color[1], catalog_text_clock_color[2]);    // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           glcRenderString(tmptxt);
-
           if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
             glColor3f(1.0f,0.0f,0.0f);
             glcRenderString(" R");
             ask_tv_record=false;
           }
-
           glPopMatrix();
         } else {
           glPushMatrix();
@@ -4263,13 +4255,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(0.5f,0.5f, 0.5f);	else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);   // active program color
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           glcRenderString(tmptxt);
-
           if (tvkanaler[kanalnr].tv_prog_guide[prg_nr].settorecord) {
             glColor3f(1.0f,0.0f,0.0f);
             glcRenderString(" R");
             ask_tv_record=false;
           }
-
           glPopMatrix();
         }
         barsize=barsize+(prglength*5);
@@ -4277,13 +4267,11 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       }
       prg_nr++;                                                                 // next program
     }
-
     kanalomgang+=kanalomgangofset;                                                         // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
   }
-
   // show clock line over tvguide banner gfx
   //
   if (!(loading_tv_guide)) {
