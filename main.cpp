@@ -135,6 +135,7 @@ char configxbmchost[256];                               //
 // ************************************************************************************************
 bool hent_tv_channels=false;                            // if false update tv guide
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
+float configdefaulttvguidefontsize=18;                  // default font size tv tvguide
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -887,7 +888,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize};
     int commandlength;
     char value[200];
     bool command=false;
@@ -1012,7 +1013,12 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=tvguidercolor;
                       commandlength=12;
-                    } else command=false;
+                    } else if (strncmp(buffer+n,"tvguidefontsize",14)==0) {
+                      command=true;
+                      command_nr=tvguidefontsize;
+                      commandlength=14;
+                    }
+                    else command=false;
                 }
                 strcpy(value,"");
                 if (command) {
@@ -1148,7 +1154,6 @@ int parse_config(char *filename) {
                       strcpy(configdefaultmoviepath,value);
                       strcpy(configmoviepath,value);
                     }
-
                     // use 3d effect
                     else if (command_nr==setuse3d) {
                         if (strcmp(value,"yes")) {
@@ -1164,6 +1169,8 @@ int parse_config(char *filename) {
                       configuvmeter=atoi(value);
                     } else if (command_nr==setvolume) {
                       configsoundvolume=atof(value);                         // set default volume under play
+                    } else if (command_nr==tvguidefontsize) {
+                      configdefaulttvguidefontsize=atof(value);                                 // set tvguide font size
                     }
                 }
             }
@@ -1245,6 +1252,8 @@ int save_config(char * filename) {
       sprintf(temp,"tvgraber=%s\n",configbackend_tvgraber);                         // tv graber to use
       fputs(temp,file);
       sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
+      fputs(temp,file);
+      sprintf(temp,"tvguidefontsize=%0.0f\n",configdefaulttvguidefontsize);
       fputs(temp,file);
       //aktiv_tv_oversigt.vistvguidecolors=true;
       if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
@@ -1341,6 +1350,7 @@ void load_config(char * filename) {
           fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
           fputs("tvgraberupdate=0\n",file);
           fputs("tvgrabercolor=yes\n",file);
+          fputs("tvguidefontsize=18\n",file);
           fclose(file);
         } else {
           fprintf(stderr,"Config file not writeble ");
@@ -2422,6 +2432,13 @@ void display() {
             glPushMatrix();
             glEnable(GL_TEXTURE_2D);
             glTranslatef(0.0f, 0.0f, 0.0f);
+            if (t->tm_hour>22) {
+              glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
+            } else if (t->tm_hour>20) {
+              glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+            } else {
+              glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            }
             glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             glBindTexture(GL_TEXTURE_2D,analog_clock_background);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
