@@ -3,22 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
 #include <GL/glut.h>    // Header File For The GLUT Library
 #include <GL/gl.h>      // Header File For The OpenGL32 Library
 #include <GL/glu.h>     // Header File For The GLu32 Library
 #include <GL/glx.h>     // Header file fot the glx libraries.
 #include <GL/glc.h>     // danish ttf support
-
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
-
 #include <math.h>
 #include <ctype.h>
 #include <ical.h>
 #include <libxml/parser.h>
-
 //#include "text3d.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
@@ -27,16 +23,14 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
+extern float configdefaulttvguidefontsize;                                     // font size in tvguide
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
 extern tv_graber_config aktiv_tv_graber;                                       // xmltv graber config
-
 extern int screen_size;
 extern int debugmode;
 extern int fonttype;
-
 extern int configland;
-
 extern GLuint _tvbar1;
 extern GLuint _tvbar3;
 extern GLuint _textureIdclose;
@@ -50,7 +44,6 @@ extern GLuint _tvrecordbutton;
 GLuint _textureId13;
 extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
-
 extern GLuint _tvoldprgrecordedbutton;
 extern GLuint _tvnewprgrecordedbutton;
 extern GLuint _tvmaskprgrecordedbutton;
@@ -81,14 +74,15 @@ float prgtypeRGB[]={    0.7f,0.7f,0.7f,               // 0 - none
                         0.8f,0.2f,0.8f};              // 11 - Adult
 
 
-// bruges af show_tvoversigt
+// bruges ikke af show_tvoversigt
 
 void myglprinttv(char *string) {
-    int len,i;
-    len = (int) strlen(string);
-    for (i = 0; i < len; i++) {
-       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
-    }
+  int len,i;
+  len = (int) strlen(string);
+  for (i = 0; i < len; i++) {
+    //glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
+     glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+  }
 }
 
 
@@ -251,7 +245,6 @@ bool do_program_exist(int pchanid,char *ptitle,char *pstarttime) {
     res = mysql_store_result(conn);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-
     sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
@@ -333,7 +326,6 @@ void expand_escapes(char* dest, const char* src) {
         *(dest++) = c;
      }
   }
-
   *dest = '\0'; /* Ensure nul terminator */
 }
 
@@ -419,12 +411,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-
   struct stat t_stat;           // file info struct
   struct tm* lastmod;           //
-
   loading_tv_guide=true;        // set loadtv guide flag to show in show_tv_guide then xml files is passed
-
   // mysql stuf
   // Connect to database
   conn=mysql_init(NULL);
@@ -434,19 +423,15 @@ int tv_oversigt::parsexmltv(const char *filename) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     mysql_free_result(res);
-
     strcpy(description,"");
-
     sprintf(sql,"CREATE DATABASE IF NOT EXISTS %s",database);
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     if (res) mysql_free_result(res);
-
     sprintf(sql,"use %s",database);
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     mysql_free_result(res);
-
     // check if db exist
     sprintf(sql,"select chanid from channel limit 1");
     mysql_query(conn,sql);
@@ -496,7 +481,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
       mysql_query(conn,sql);
       res = mysql_store_result(conn);
       mysql_free_result(res);
-
       // crete index
       // strcpy(sql,"create index chanid on program (chanid)");
       // mysql_query(conn,sql);
@@ -512,11 +496,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
     strcpy(path,userhomedir);
     strcat(path,"/");
     strcat(path,filename);                                                      // add filename to xmlfile name
-
     // get file date
     stat(path, &t_stat);                                                        // get file info like create date
     lastmod=localtime(&(t_stat.st_mtime));                                      // convert to unix time
-
     // if file change from last run. update tv guide again
     if ((configtvguidelastupdate!=mktime(lastmod)) || (configtvguidelastupdate==0)) {
       // save last updated
@@ -538,7 +520,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 s=trimwhitespace(result);
                 if (debugmode & 256) printf("TV chanel found : %s \n",s);
               }
-
               subnode=node->xmlChildrenNode;
               while(subnode) {
                 xmltvid=xmlGetProp(node,( xmlChar *) "id");
@@ -569,10 +550,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 res = mysql_store_result(conn);
               }
             }
-
-//            printf("aktiv_tv_graber.graberaktivnr %d graber %s \n ",aktiv_tv_graber.graberaktivnr,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-
-
             // create tv programs in guide from xmltag programme
             if (strcmp((char *) node->name,"programme")==0) {
               content = xmlNodeGetContent(node);
@@ -838,8 +815,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
+                    //
                     // tv_grab_il Grab TV listings for Israel
                     //
                     // DO NOT WORK
@@ -1005,11 +981,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     // tv_grab_dtv_la Grab TV listings for Direct TV Latin America
                     // can not test from denmark Access Denied
                     case 6:
-
                     // tv_grab_fi Grab TV listings for Finland
                     //
                     case 7:
@@ -1090,7 +1064,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     // tv_grab_eu_dotmedia Europe ver OK
                     // need config by --gui
                     // country's avable in xmlgraber is this list
@@ -1185,8 +1158,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     //
                     // tv_grab_se_swedb sweden
                     //
@@ -1271,8 +1242,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     //
                     //  tv_grab_pt_meo for Portugal
                     //
@@ -1357,8 +1326,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     //
                     // tv_grab_fr for france
                     //
@@ -1443,8 +1410,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     //
                     // tv_grab_uk_bleb uk
                     //
@@ -1529,7 +1494,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_huro Hungary or Romania ok
                     //
@@ -1620,7 +1584,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_ch_search ok
                     //
@@ -1720,8 +1683,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     //
                     // tv_grab_it ok
                     //
@@ -1818,7 +1779,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_is OK
                     //
@@ -1903,7 +1863,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_fi_sv
                     //
@@ -1988,8 +1947,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
+                    //
                     // tv_grab_na_dtv
+                    //
                     case 18:
                     if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
                       strcpy(category,"Series");
@@ -2155,8 +2115,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
+                    //
                     // tv_grab_eu_egon TV listings for German
+                    //
                     case 20:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
                         strcpy(category,"Series");
@@ -2238,8 +2199,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
+                    //
                     // tv_grab_dk_dr TV listings for DK
+                    //
                     case 22:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
                         strcpy(category,"Series");
@@ -2318,7 +2280,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_se_tvzon TV listings for Sweden OK
                     //
@@ -2415,7 +2376,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     //
                     // tv_grab_ar TV listings for Argentina OK
                     //
@@ -2503,8 +2463,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     // 25 tv_grab_fr_kazer
                     case 25:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
@@ -2587,8 +2545,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
-
                     // 26 tv_grab_uk_tvguide
                     case 26:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
@@ -2671,7 +2627,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     // 27 tv_grab_zz_sdjson
                     case 27:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
@@ -2754,7 +2709,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                         prgtype=true;
                       }
                       break;
-
                     // > 27
                     default:
                       if ((prgtype==false) && (strcmp("series",(char *) token)==0)) {
@@ -2848,7 +2802,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 getend=false;
                 gettchannel=false;
                 node1=node;
-
                 tmpdat=xmlGetProp(node1,( xmlChar *) "start");
                 //if (tmpdat) printf("tmpdat : %s \n", tmpdat);
                 if (tmpdat) {
@@ -2870,13 +2823,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
 //                  if (debugmode & 256) printf("From: %20s", starttime);
                   xmlFree(tmpdat);
                 }
-
                 tmpdat=xmlGetProp(node,( xmlChar *) "desc");
                 if (tmpdat) {
                   strncpy(description,(char *) tmpdat,4095);                             // get desc
                 }
-
-
                 //xmlFree(tmpdat);
                 tmpdat=xmlGetProp(node,( xmlChar *) "category");
                 if (tmpdat) {
@@ -2891,7 +2841,6 @@ int tv_oversigt::parsexmltv(const char *filename) {
                   else if (strcmp("Film",(char *) tmpdat)==0) strcpy(category,"Film");
                   else strcpy(category,"None");
                 }
-
                 tmpdat=xmlGetProp(node1,( xmlChar *) "stop");
                 if (tmpdat) {
                   getend=true;
@@ -2912,31 +2861,23 @@ int tv_oversigt::parsexmltv(const char *filename) {
 //                if (debugmode & 256) printf(" ->%20s", endtime);
                 }
                 //xmlFree(tmpdat);
-
                 xmltvid=xmlGetProp(node1,( xmlChar *) "channel");
                 if ((xmltvid) && (gettchannel==false)) {
                   gettchannel=true;
                   strcpy(channelname,(char *) xmltvid);
-  //                if (debugmode & 256) printf(" %s",channelname);
                 }
                 // save channelname to show in update
                 strcpy(this->loadinginfotxt,channelname);
-
                 //xmlFree(tmpdat);
 //                if (debugmode & 256) printf("\n");
                 subnode=subnode->next;
               }
-
-
               //title=xmlGetProp(node1,( xmlChar *) "title");
               //if (title) printf("title : %s\n", title);
-
               //desc=xmlGetProp(node1,( xmlChar *) "desc");
               //if (desc) printf("desc: %s\n", desc);
-
               //            tmpdat=xmlGetProp(subnode,( xmlChar *) "category");
               //            if (tmpdat) printf("category: %s\n", tmpdat);
-
               // get changel id to db
               channelid=get_cannel_id(channelname);
               // convert spec chars to esc string in string
@@ -2945,15 +2886,12 @@ int tv_oversigt::parsexmltv(const char *filename) {
               if (!(do_program_exist(channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
-
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,prgtitle);
                 strncpy(prgtitle,temptxt,1024-1);
-
                 // convert spec chars to esc string in string
                 expand_escapes(temptxt,description);
                 strncpy(description,temptxt,4096-1);
-
                 sprintf(sql,"REPLACE into program (chanid,starttime,endtime,title,subtitle,description,category) values(%ld,'%s','%s','%s','%s','%s','%s')",channelid,starttime,endtime,prgtitle,"","",category);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
@@ -3102,17 +3040,17 @@ void tv_oversigt_pr_kanal::putkanalname(char *kname) {
 
 void tv_oversigt_pr_kanal::cleanprogram_kanal() {
   for(int ii=0;ii<maxprogram_antal-1;ii++) {
-      strcpy(tv_prog_guide[ii].program_navn,"");
-      strcpy(tv_prog_guide[ii].starttime,"");
-      strcpy(tv_prog_guide[ii].endtime,"");
-      strcpy(tv_prog_guide[ii].sub_title,"");
-      strcpy(tv_prog_guide[ii].description,"");
-      tv_prog_guide[ii].program_length_minuter=0;
-      tv_prog_guide[ii].starttime_unix=0;
-      tv_prog_guide[ii].prg_type=0;
-      tv_prog_guide[ii].aktiv=false;
-      tv_prog_guide[ii].brugt=true;
-      tv_prog_guide[ii].recorded=0;
+    strcpy(tv_prog_guide[ii].program_navn,"");
+    strcpy(tv_prog_guide[ii].starttime,"");
+    strcpy(tv_prog_guide[ii].endtime,"");
+    strcpy(tv_prog_guide[ii].sub_title,"");
+    strcpy(tv_prog_guide[ii].description,"");
+    tv_prog_guide[ii].program_length_minuter=0;
+    tv_prog_guide[ii].starttime_unix=0;
+    tv_prog_guide[ii].prg_type=0;
+    tv_prog_guide[ii].aktiv=false;
+    tv_prog_guide[ii].brugt=true;
+    tv_prog_guide[ii].recorded=0;
   }
   strcpy(chanel_name,"");
 }
@@ -3207,10 +3145,10 @@ int tv_oversigt::tvprgrecordedbefore(char *ftitle,unsigned int fchannelid) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
-            fundet=true;
-            recantal=atoi(row[0]);
-        }
+      while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
+        fundet=true;
+        recantal=atoi(row[0]);
+      }
     }
     mysql_close(conn);
     if (fundet) return(recantal); else return(0);
@@ -3274,9 +3212,9 @@ int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchanne
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
-            fundet=true;
-        }
+      while (((row = mysql_fetch_row(res)) != NULL) && (fundet==false)) {
+        fundet=true;
+      }
     }
     mysql_close(conn);
     if (fundet) return(rectype); else return(0);
@@ -3300,20 +3238,17 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 //    static int rectype=0;
     char *database = (char *) "mythtvcontroller";
     bool doneok=false;
-
     time_t aktueltid;
     time_t prgtid;
     time(&aktueltid);					// hent hvad klokken er
     struct tm *timeinfo;
     struct tm prgtidinfo;
     timeinfo=localtime(&aktueltid);				// convert to localtime
-
     if (strptime(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,"%Y-%m-%d %H:%M:%S",&prgtidinfo)==NULL) {
       printf("DO INSERT RECORDED PROGRAM DATE FORMAT ERROR can't convert. by strptime\n");
     }
     // lav tv proram starttid om til time_t format
     prgtid=mktime(&prgtidinfo);
-
     if ((difftime(aktueltid,prgtid)<=0) && (sqlselect)) {
       sprintf(sqlselect,"SELECT channel.name as channelname, TIME(starttime) as starttime,DATE(starttime) as startdate,TIME(endtime) as endtime,DATE(endtime) as enddate,NOW() as datenu, program.chanid, program.category from program left join channel on program.chanid=channel.chanid where program.title='%s' and program.starttime='%s' and program.endtime='%s'",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].endtime);
       conn=mysql_init(NULL);
@@ -3323,21 +3258,16 @@ int tv_oversigt::tvprgrecord_addrec(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
       mysql_real_connect(conn1, mysqllhost,mysqlluser, mysqllpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-
       mysql_query(conn1,"set NAMES 'utf8'");
       res1 = mysql_store_result(conn1);
-
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (doneok==false)) {
           //tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn
           // sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
-
           sprintf(sqlselect,"INSERT INTO record values (0,1,%s,'12:00:00','2018-01-02','12:00:00','2018-01-02',\"%s\",\"%s\",\"%s\",11,12,\"%s\",'pro',15,16,17,18,19,20,'Default',22,23,'station','serid','prgid','intref',28,29,30,31,32,33,34,35,36,'12:00:12',38,39,40,41,'playgroup',43,'2017-01-02 12:00:00','2017-01-02 12:00:00','2017-01-02 12:00:00','storegrp',48,49)",row[6],tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn, tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].sub_title,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].description,row[8]);
-
           if (debugmode & 256) printf("sql record is %s\n",sqlselect);
-
           mysql_query(conn1,sqlselect);
           res1 = mysql_store_result(conn1);
           doneok=true;
@@ -3456,9 +3386,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     timeinfo3.tm_isdst=timeinfo->tm_isdst;
     timeinfo3.tm_mday+=1;
     mktime(&timeinfo3);
-
-    //printf("raw start time %d  \nraw end time %d ",timeinfo->tm_mday,timeinfo2->tm_mday);
-
     sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
     sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
     //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
@@ -3476,7 +3403,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         res = mysql_store_result(conn);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-
         // do select from db count nr of records
         strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
@@ -3490,16 +3416,12 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
           }
         }
-
         // do select from db
         strcpy(sqlselect,"SELECT channel.name,channel.iconfile,program.starttime,program.endtime,title,subtitle,TIMESTAMPDIFF(MINUTE,starttime,endtime),UNIX_TIMESTAMP(program.starttime),UNIX_TIMESTAMP(program.endtime),category,category_type,description,program.chanid FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
-
-  //      if (debugmode & 256) printf("Tv guide sql = %s \n",sqlselect);
-
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         kanalnr=0;
@@ -3595,7 +3517,6 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
                         else prgtype=0;
                       }
                       break;
-
                     case 24:
                       // graber_ar Grab TV listings for Argentina
                       // Province avable in config mode is
@@ -3786,8 +3707,8 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   int xsiz,ysiz;
   int prglength=0;
   int barsize=0;
-  float textsize1=18.0f;
-  float textsize2=16.0f;
+  //float textsize1=20.0f;                                                        // default text size
+  float textsize2=16.0f;                                                        // default text size (NOT IN USE)
   int starttimeinmin,starttimeintim;
   int yypos=0;
   int prg_nr=0;
@@ -3830,7 +3751,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   glScalef(40.0, 40.0, 1.0);
   //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
-
   // big top overskrift (tvguide .......)
   glPushMatrix();
   glColor3f(1.0f, 1.0f, 1.0f);
@@ -3842,7 +3762,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   }
   glScalef(40.0, 40.0,1);
   glDisable(GL_TEXTURE_2D);
-
   //
   // show time bar in left side
   //
@@ -3863,7 +3782,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   //show do_update_xmltv_show
-
   // check if we get tvguide and show it
   //if ((check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false)) do_update_xmltv_show=false;
   switch (configland) {
@@ -3894,10 +3812,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   };
   glcRenderString(tmptxt);
   glPopMatrix();
-
   // show time line
   n=0;
-  while (n<8) {
+  while (n<6) {
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     switch (screen_size) {
@@ -3907,7 +3824,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
               glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
               break;
     }
-    //glTranslatef(xpos+10,(orgwinsizey-230)-(n*150), 0.0f);                      // glTranslatef(xpos+10,(orgwinsizey-230)-(n*300), 0.0f);
+    // show clock
     glScalef(20.0, 20.0,1);
     glDisable(GL_TEXTURE_2D);
     sprintf(tmptxt,"%02d:%02d",mytimelist.tm_hour,mytimelist.tm_min);
@@ -3921,7 +3838,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     }
     mktime(&mytimelist);
   }
-
   // reset to today after show time line
   //if (viskl==0) mytimelist.tm_hour=timelist->tm_hour; else mytimelist.tm_hour=viskl;
   mytimelist.tm_hour=vistvguidekl;
@@ -3933,17 +3849,13 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   mytimelist.tm_yday=timelist->tm_yday;
   mytimelist.tm_isdst=timelist->tm_isdst;
   mktime(&mytimelist);
-
   mytimelist.tm_hour=timelist->tm_hour;
   //if (viskl>0) mytimelist.tm_hour=viskl;                                      // timelist->tm_hour;
   mytimelist.tm_hour=vistvguidekl;                                              // timelist->tm_hour;
   mktime(&mytimelist);
-
   kanalnr=0+cstartofset;
-
   // hent tidspunk nu
   nutid=mktime(&nowtime_h);
-
   xpos=50+40;
   int do_kanal_nr=0;
   switch (screen_size) {
@@ -3958,9 +3870,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   //
   // loop for channel
   //
-
   int xx=xpos-50;
-
   while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -3970,7 +3880,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       default:glTranslatef(xpos+11,860, 0.0f);
               break;
     }
-
     // box show the icon for the tv channel loaded from xmltv file if exist in file
     // loaded other place
     if (tvkanaler[kanalnr].get_kanal_icon()) {
@@ -3998,38 +3907,28 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       glcRenderString(tmptxt);
     }
     glPopMatrix();
-
     int xsiz=210;
     int ysiz=110;
-
     prg_nr=0;
     barsize=0;
     yypos=0;
-
     //if (debugmode) printf("Omgang %d \n",do_kanal_nr);
-
     //printf("kanal nr %10d navn %40s \n",kanalnr,tvkanaler[kanalnr].chanel_name);
-
     // make time frame to show in sec
     time_t tt=mktime(&mytimelist)+(60*60*3);
     //
     // loop for program
     // mytime = overskrift tid
     // tt = tid som går fra maxtid nederst på skærmen starttid + 2 timer
-
     while((tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix<tt) && (prg_nr<=tvkanaler[kanalnr].program_antal())) {
-
       // start pos orgwinsizey-245
       //ypos=orgwinsizey-245-barsize;
-
       ypos=orgwinsizey-245;
       // hent prg length in min
       prgstarttid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].starttime_unix;              // get time in unixtime
       prgendtid=tvkanaler[kanalnr].tv_prog_guide[prg_nr].endtime_unix;                  // get time in unixtime
       prglength=tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_length_minuter;        // get time in unixtime
-
       //printf("tt=%d %s progrm start tid %d \n",tt,ctime(&tt),prgstarttid);
-
       // show program start before over view time start and end tine after view time start
       if ((prgstarttid<=mktime(&mytimelist)) && prgendtid>mktime(&mytimelist)) {
         // hent i minuter og lav det om til pixel (min * 5)
@@ -4106,7 +4005,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
-
         // show program stat + end tid hvis plads
         if (prglength>13) {
           // show start time
@@ -4131,9 +4029,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
         *(tmptxt+21)='\0';
         if (prglength>13) glTranslatef(xpos+20,ypos-22, 0.0f); else glTranslatef(xpos+20,ypos-7, 0.0f);
-        glScalef(textsize1, textsize1, 1.0f);
+        glScalef(configdefaulttvguidefontsize, configdefaulttvguidefontsize, 1.0);
+        //glScalef(textsize1, textsize1, 1.0f);
         glColor3f(0.7f,0.7f, 0.7f);		                                          // active program color
+        // default color
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);    // active program color
+        // select color
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
         glcRenderString(tmptxt);                                              // print program name
         glPopMatrix();
@@ -4214,17 +4115,16 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
-
         if (prglength>10) {
           glPushMatrix();
           glDisable(GL_TEXTURE_2D);
-          //glTranslatef(xpos,820-(yypos+18), 0.0f);
           glTranslatef(xpos+20,ypos-28, 0.0f);
-          glScalef(textsize1, textsize1, 1.0);
+          glScalef(configdefaulttvguidefontsize, configdefaulttvguidefontsize, 1.0);
           if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
           strcpy(tmptxt,tvkanaler[kanalnr].tv_prog_guide[prg_nr].program_navn);
           *(tmptxt+21)='\0';
           if ((prgstarttid<=time(0)) && (prgendtid>=time(0))) glColor3f(now_text_color[0],now_text_color[1], now_text_color[2]); else glColor3f(catalog_text_color[0],catalog_text_color[1], catalog_text_color[2]);	    // active program color
+          glcRenderStyle(GLC_TRIANGLE);
           glcRenderString(tmptxt);
           glPopMatrix();
           glPushMatrix();
@@ -4285,20 +4185,14 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       ysiz=2;
       float timelineofset=(timelist->tm_min*4.5);
       ypos-=timelineofset;
-
       glPushMatrix();
       glTranslatef(10,50, 0.0f);
       // top
-      //glEnable(GL_TEXTURE_2D);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(0.8f, 0.8f, 0.8f);
-      //  glScalef(70.0, 70.0, 1.0);
-      //  glcRenderString("TEST");
-      //glBegin(GL_QUADS); //Begin quadrilateral coordinates
       glBegin(GL_LINE_LOOP);                // line
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
       glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
@@ -4306,7 +4200,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
       glEnd(); //End quadrilateral coordinates
       glScalef(40.0, 40.0, 1.0);
-      //glcRenderString(tvkanaler[1].chanel_name);
       glPopMatrix();
     }
   }
