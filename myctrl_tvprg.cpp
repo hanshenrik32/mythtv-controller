@@ -4172,12 +4172,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     kanalnr++;
     do_kanal_nr++;
   }
-  // show clock line over tvguide banner gfx
+  // show clock line over tvguide gfx
   //
   if (!(loading_tv_guide)) {
     time(&rawtime);
     timelist=localtime(&rawtime);
-    if (timelist->tm_hour==mytimelist.tm_hour) {
+    if ((timelist->tm_hour==mytimelist.tm_hour) || (timelist->tm_hour==mytimelist.tm_hour+1)) {
       xpos=35;
       ypos=orgwinsizey-298;
       xsiz=(orgwinsizex-280);
@@ -4187,18 +4187,17 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       ypos-=timelineofset;
       glPushMatrix();
       glTranslatef(10,50, 0.0f);
-      // top
       glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(0.8f, 0.8f, 0.8f);
-      glBegin(GL_LINE_LOOP);                // line
+      glBegin(GL_LINE_LOOP);
       glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
       glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos+ysiz, 0.0);
       glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
       glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-      glEnd(); //End quadrilateral coordinates
+      glEnd();
       glScalef(40.0, 40.0, 1.0);
       glPopMatrix();
     }
