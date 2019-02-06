@@ -9,9 +9,7 @@ const int maxprogram_antal=400;
 // antal kanaler max
 const int MAXKANAL_ANTAL=200;
 const int description_length=2048;
-
 const char tvguidedbfilename[]={"tvguidedb.dat"};
-
 
 
 // tv oversigt
@@ -29,12 +27,11 @@ class tv_oversigt_prgtype {					// char type fra mythtv ver 0.22/24
         unsigned long starttime_unix;		                             	// unix time start time
         unsigned long endtime_unix;				                            // unix time end time
         int prg_type;					                                       	// prg type
-        bool aktiv;
-        bool brugt;           						// findes der et prg
-        bool updated;                     // er den updated
+        bool aktiv;                                                   // aktiv
+        bool brugt;           						                            // findes der et prg
+        bool updated;                                                 // er den updated
         int recorded;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
-        bool settorecord;				             	// er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
-
+        bool settorecord;				          // er tv program optaget med mythtv (0 > yes) Se http://www.mythtv.org/wiki/Record_table, recorded=type from mysql table record can be 0/1/2/3/4/5/6/7/8/9/10
         bool getprogramupdated() { return (updated); }
         tv_oversigt_prgtype();
         ~tv_oversigt_prgtype();

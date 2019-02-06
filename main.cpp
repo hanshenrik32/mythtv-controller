@@ -2272,6 +2272,19 @@ void display() {
     bool startup=true;
     // uv color table
     static int tmpcounter=0;
+
+    float analogclock_color_table[]={1.0,1.0,1.0, \
+                                     0.8,0.8,0.8, \
+                                     0.6,0.6,0.6, \
+                                     0.4,0.4,0.4, \
+                                     0.2,0.2,0.2, \
+                                     0.2,0.2,0.2, \
+                                     0.4,0.4,0.4, \
+                                     0.6,0.6,0.6, \
+                                     0.8,0.8,0.8, \
+                                     0.9,0.9,0.9, \
+                                     1.0,1.0,1.0};
+
     float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
@@ -2432,12 +2445,33 @@ void display() {
             glPushMatrix();
             glEnable(GL_TEXTURE_2D);
             glTranslatef(0.0f, 0.0f, 0.0f);
-            if (t->tm_hour>22) {
-              glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
-            } else if (t->tm_hour>20) {
-              glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
-            } else {
-              glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            // switch color over night
+            switch(t->tm_hour) {
+              case 20:glColor4f(analogclock_color_table[0],analogclock_color_table[1],analogclock_color_table[2],1.0f);
+                      break;
+              case 21:glColor4f(analogclock_color_table[3],analogclock_color_table[4],analogclock_color_table[5],1.0f);
+                      break;
+              case 22:glColor4f(analogclock_color_table[6],analogclock_color_table[7],analogclock_color_table[8],1.0f);
+                      break;
+              case 23:glColor4f(analogclock_color_table[9],analogclock_color_table[10],analogclock_color_table[11],1.0f);
+                      break;
+              case 24:glColor4f(analogclock_color_table[12],analogclock_color_table[13],analogclock_color_table[14],1.0f);
+                      break;
+              case 01:glColor4f(analogclock_color_table[15],analogclock_color_table[16],analogclock_color_table[17],1.0f);
+                      break;
+              case 02:glColor4f(analogclock_color_table[18],analogclock_color_table[19],analogclock_color_table[20],1.0f);
+                      break;
+              case 03:glColor4f(analogclock_color_table[21],analogclock_color_table[22],analogclock_color_table[23],1.0f);
+                      break;
+              case 04:glColor4f(analogclock_color_table[24],analogclock_color_table[25],analogclock_color_table[26],1.0f);
+                      break;
+              case 05:glColor4f(analogclock_color_table[27],analogclock_color_table[28],analogclock_color_table[29],1.0f);
+                      break;
+              case 06:glColor4f(analogclock_color_table[30],analogclock_color_table[31],analogclock_color_table[32],1.0f);
+                      break;
+              default:
+                      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                      break;
             }
             glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             glBindTexture(GL_TEXTURE_2D,analog_clock_background);

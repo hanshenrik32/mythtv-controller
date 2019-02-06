@@ -449,7 +449,6 @@ void show_setup_screen() {
     // here start input
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    //
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -493,7 +492,6 @@ void show_setup_screen() {
     // here start input
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    //
     glEnable(GL_TEXTURE_2D);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -507,8 +505,6 @@ void show_setup_screen() {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
     glPopMatrix();
-
-
     // full screen box
     glPushMatrix();
     winsizx=40;
@@ -590,9 +586,7 @@ void show_setup_screen() {
         myglprint4((char *) configscreensavertimeout);
     }
     glPopMatrix();
-
     if (do_show_setup_select_linie==2) showcoursornow(250,500,strlen(configscreensavertimeout));
-
     glPushMatrix();
     // show close on exit type
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -1037,9 +1031,6 @@ void show_setup_tema() {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
     glPopMatrix();
-
-
-
 }
 
 
@@ -1101,41 +1092,32 @@ void show_setup_font(int startofset) {
       glPopMatrix();
     }
 /*
-
     // select selected font
     if ((startofset>0) && (fontselected==false)) {
         fontselected=true;
         printf("Select font %s \n",aktivfont.typeinfo[startofset].fontname);
         fontnr=startofset;
         aktivfont.selectfont(aktivfont.typeinfo[startofset].fontname);
-
 //        glLoadIdentity();
         glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(400.0f, 200.f, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
-
         glScalef(25.0f, 25.0f, 1.00f);
         glcRenderString("Sample");
         //myglprint4((char *) "This is a demo of the font");
          // restore select font
         //    aktivfont.selectfont(configfontname);
-
     } else {
-
 //        glLoadIdentity();
         glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(200.0f, 200.0f, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(25.0f, 25.0f, 1.00f);
         glcRenderString("Sample");
-
     }
-
     if ((strcmp(aktivfont.typeinfo[startofset].fontname,configfontname)!=0) && (fontnr!=startofset)) {
         fontselected=false;
     }
-
-
 */
     glPushMatrix();
     // close buttons
@@ -1159,7 +1141,6 @@ void show_setup_font(int startofset) {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
     glPopMatrix();
-
 }
 
 
@@ -1275,14 +1256,11 @@ void show_wlan_networks(int valgtnr) {
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
     glPopMatrix();
-
 }
 
-
-
-
-
+//
 // ************** network setup window *****************************************************
+//
 
 void show_setup_network() {
     char tmptxt[1024];
@@ -1502,16 +1480,12 @@ void show_setup_network() {
     glRasterPos2f(60.0f, 0.0f);
     myglprint4((char *) tmptxt);
     glPopMatrix();
-
-
-
     glPushMatrix();
     //  show wlan network password
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(700,500, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     myglprint4((char *) "Password");
-
     wifinets.get_wifipass(setupwlanselectofset,tmptxt);			// get password for aktive wlan
     if (wifinets.antal()>0) strcpy(tmptxt,""); else {
       // no wifi network avable
@@ -1622,7 +1596,6 @@ void show_setup_sound() {
     // text input background
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    //    glTranslatef(-2.0f, 2.1f-0.5f,-14.8f);
     winsizx=200;
     winsizy=30;
     xpos=300;
@@ -1696,7 +1669,6 @@ void show_setup_sound() {
       myglprint4((char *) "FMOD");
     }
     glPopMatrix();
-
 }
 
 
@@ -1869,13 +1841,11 @@ void show_setup_sql() {
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd(); //End quadrilateral coordinates
-
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     if (strcmp(configbackend,"mythtv")==0) {
@@ -2019,7 +1989,6 @@ void show_setup_sql() {
     }
     glPopMatrix();
     if (do_show_setup_select_linie==5) showcoursornow(-200,-450,strlen(configpicturepath));
-
     // show config movie path
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -2057,9 +2026,6 @@ void show_setup_sql() {
     glPopMatrix();
     if (do_show_setup_select_linie==7) showcoursornow(-200,-550,strlen(configrecordpath));
 }
-
-
-
 
 
 //
@@ -2227,8 +2193,6 @@ void show_setup_keys() {
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
-
-
     // text input background F5
     winsizx=500;
     winsizy=30;
@@ -2457,11 +2421,11 @@ void show_setup_keys() {
     glRasterPos2f(0.8f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==4) {
-        strcpy(keybuffer,configkeyslayout[2].cmdname);
-        myglprint4((char *) keybuffer);
+      strcpy(keybuffer,configkeyslayout[2].cmdname);
+      myglprint4((char *) keybuffer);
     } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        myglprint4((char *) configkeyslayout[2].cmdname);
+      glColor3f(1.0f,1.0f,1.0f);
+      myglprint4((char *) configkeyslayout[2].cmdname);
     }
     glPopMatrix();
     if (do_show_setup_select_linie==4) showcoursornow(311,400,strlen(keybuffer));
@@ -2485,11 +2449,11 @@ void show_setup_keys() {
     glRasterPos2f(0.8f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==6) {
-        strcpy(keybuffer,configkeyslayout[3].cmdname);
-        myglprint4((char *) keybuffer);
+      strcpy(keybuffer,configkeyslayout[3].cmdname);
+      myglprint4((char *) keybuffer);
     } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        myglprint4((char *) configkeyslayout[3].cmdname);
+      glColor3f(1.0f,1.0f,1.0f);
+      myglprint4((char *) configkeyslayout[3].cmdname);
     }
     glPopMatrix();
     if (do_show_setup_select_linie==6) showcoursornow(311,350,strlen(keybuffer));
@@ -2516,8 +2480,8 @@ void show_setup_keys() {
       strcpy(keybuffer,configkeyslayout[4].cmdname);
       myglprint4((char *) keybuffer);
     } else {
-        glColor3f(1.0f,1.0f,1.0f);
-        myglprint4((char *) configkeyslayout[4].cmdname);
+      glColor3f(1.0f,1.0f,1.0f);
+      myglprint4((char *) configkeyslayout[4].cmdname);
     }
     glPopMatrix();
     if (do_show_setup_select_linie==8) showcoursornow(311,300,strlen(keybuffer));
@@ -3671,14 +3635,12 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
-
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
     int xpos=0;
     int ypos=0;
     char text[200];
-    //
     // update channel list before show it
     // channel list editor
     if (hent_tv_channels==false) {
@@ -3922,7 +3884,7 @@ void show_setup_interface() {
     int tabelofset=0;
     // load setings
     if (rssstreamoversigt.streamantal()==0) {
-        rssstreamoversigt.load_rss_data();
+      rssstreamoversigt.load_rss_data();
     }
     // background
     glPushMatrix();
