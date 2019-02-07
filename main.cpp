@@ -2206,7 +2206,8 @@ void show_background() {
 const float clockR=80.0f;
 
 void newLine(float rStart, float rEnd, float angle) {
-  float c = cos(angle), s = sin(angle);
+  float c = cos(angle);
+  s = sin(angle);
   glVertex2f((clockR*rStart*c)+(screenx/2),(clockR*rStart*s)+(screeny/2));
   glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
 }
@@ -2344,6 +2345,12 @@ void display() {
     int winsizy=1080;
 
 
+    static bool firsttime=true;
+    static bool clock_gluptimetime=false;
+    static GLuint index;
+    static int lastohur;
+
+
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
     rawtime=time(NULL);                                 // hent now time
@@ -2440,50 +2447,75 @@ void display() {
             glPopMatrix();
             break;
         case ANALOG:
-            //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-            // background
-            glPushMatrix();
-            glEnable(GL_TEXTURE_2D);
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            // switch color over night
-            switch(t->tm_hour) {
-              case 20:glColor4f(analogclock_color_table[0],analogclock_color_table[1],analogclock_color_table[2],1.0f);
-                      break;
-              case 21:glColor4f(analogclock_color_table[3],analogclock_color_table[4],analogclock_color_table[5],1.0f);
-                      break;
-              case 22:glColor4f(analogclock_color_table[6],analogclock_color_table[7],analogclock_color_table[8],1.0f);
-                      break;
-              case 23:glColor4f(analogclock_color_table[9],analogclock_color_table[10],analogclock_color_table[11],1.0f);
-                      break;
-              case 24:glColor4f(analogclock_color_table[12],analogclock_color_table[13],analogclock_color_table[14],1.0f);
-                      break;
-              case 01:glColor4f(analogclock_color_table[15],analogclock_color_table[16],analogclock_color_table[17],1.0f);
-                      break;
-              case 02:glColor4f(analogclock_color_table[18],analogclock_color_table[19],analogclock_color_table[20],1.0f);
-                      break;
-              case 03:glColor4f(analogclock_color_table[21],analogclock_color_table[22],analogclock_color_table[23],1.0f);
-                      break;
-              case 04:glColor4f(analogclock_color_table[24],analogclock_color_table[25],analogclock_color_table[26],1.0f);
-                      break;
-              case 05:glColor4f(analogclock_color_table[27],analogclock_color_table[28],analogclock_color_table[29],1.0f);
-                      break;
-              case 06:glColor4f(analogclock_color_table[30],analogclock_color_table[31],analogclock_color_table[32],1.0f);
-                      break;
-              default:
-                      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                      break;
+            // create one display list
+            if (firsttime) {
+              index = glGenLists(1);
+              lastohur=t->tm_hour;
             }
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-            glBindTexture(GL_TEXTURE_2D,analog_clock_background);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-            glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-            glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-            glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-            glEnd();
-            glPopMatrix();
+            if (t->tm_hour>lastohur) {
+              clock_gluptimetime=true;
+              lastohur=t->tm_hour;
+              // delete old display list and create new
+              glDeleteLists(index,1);
+              index = glGenLists(1);
+            }
+            //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+            // create display list index
+            if ((firsttime) || (clock_gluptimetime)) {
+              firsttime=false;
+              clock_gluptimetime=false;
+              // compile the display list, store a triangle in it
+              glNewList(index, GL_COMPILE);
+              // background
+              glPushMatrix();
+              glEnable(GL_TEXTURE_2D);
+              glTranslatef(0.0f, 0.0f, 0.0f);
+              // switch color over night
+              switch(t->tm_hour) {
+                case 20:glColor4f(analogclock_color_table[0],analogclock_color_table[1],analogclock_color_table[2],1.0f);
+                        break;
+                case 21:glColor4f(analogclock_color_table[3],analogclock_color_table[4],analogclock_color_table[5],1.0f);
+                        break;
+                case 22:glColor4f(analogclock_color_table[6],analogclock_color_table[7],analogclock_color_table[8],1.0f);
+                        break;
+                case 23:glColor4f(analogclock_color_table[9],analogclock_color_table[10],analogclock_color_table[11],1.0f);
+                        break;
+                case 24:glColor4f(analogclock_color_table[12],analogclock_color_table[13],analogclock_color_table[14],1.0f);
+                        break;
+                case 01:glColor4f(analogclock_color_table[15],analogclock_color_table[16],analogclock_color_table[17],1.0f);
+                        break;
+                case 02:glColor4f(analogclock_color_table[18],analogclock_color_table[19],analogclock_color_table[20],1.0f);
+                        break;
+                case 03:glColor4f(analogclock_color_table[21],analogclock_color_table[22],analogclock_color_table[23],1.0f);
+                        break;
+                case 04:glColor4f(analogclock_color_table[24],analogclock_color_table[25],analogclock_color_table[26],1.0f);
+                        break;
+                case 05:glColor4f(analogclock_color_table[27],analogclock_color_table[28],analogclock_color_table[29],1.0f);
+                        break;
+                case 06:glColor4f(analogclock_color_table[30],analogclock_color_table[31],analogclock_color_table[32],1.0f);
+                        break;
+                default:
+                        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                        break;
+              }
+              glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+              glBindTexture(GL_TEXTURE_2D,analog_clock_background);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+              glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+              glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+              glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
+              glEnd();
+              glPopMatrix();
+              // end display list
+              glEndList();
+            } else {
+              // Call display list to show object
+              glCallList(index);
+            }
+            // make the analog clock
             glDisable(GL_TEXTURE_2D);
             glLineWidth(5.0f);
             glBegin(GL_LINES);
