@@ -2207,7 +2207,7 @@ const float clockR=80.0f;
 
 void newLine(float rStart, float rEnd, float angle) {
   float c = cos(angle);
-  s = sin(angle);
+  float s = sin(angle);
   glVertex2f((clockR*rStart*c)+(screenx/2),(clockR*rStart*s)+(screeny/2));
   glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
 }
