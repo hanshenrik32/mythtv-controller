@@ -60,7 +60,7 @@ bool stream_jump=false;
 #endif
 
 
-
+bool tv_guide_firsttime_update=false;
 
 int radio_oversigt_loaded_nr=0;                                                  //
 bool radio_oversigt_loaded_begin=false;                                         // true first time radio is loaded
@@ -8010,6 +8010,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // u key
                 // Update tv guide
                 printf("Update tv guide\n");
+                tv_guide_firsttime_update=true;
                 // set flag for show update
                 do_update_xmltv_show=true;
                 loading_tv_guide=true;
@@ -8018,6 +8019,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 } else if (strcmp(configbackend,"xbmc")==0) {
                   update_xmltv_phread_loader();
                 }
+                tv_guide_firsttime_update=true;                                 // set update flag
               }
               if (vis_stream_oversigt) {
                 do_update_rss_show=true;
