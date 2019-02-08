@@ -23,6 +23,7 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
+extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
 extern GLuint setupnetworkwlanback;
 extern bool ask_tv_record;
@@ -3718,7 +3719,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   char tmpmin[1024];
   char tmptxt1[1024];
   bool grayaktivprg=false;                                                      // show aktiv program in gray color
+  static GLuint index;
+  static bool firsttime=true;                                                   // first time update flag
   time_t prgstarttid,prgendtid;
+  static int last_sec=0;
   starttid=time(NULL);
   nutid=starttid;
   timeinfo=localtime(&starttid);
@@ -3732,7 +3736,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   glTranslatef(10,50, 0.0f);
   // top bar
   glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE, GL_ONE);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_tvoverskrift);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3749,7 +3752,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
   glEnd(); //End quadrilateral coordinates
   glScalef(40.0, 40.0, 1.0);
-  //glcRenderString(tvkanaler[1].chanel_name);
   glPopMatrix();
   // big top overskrift (tvguide .......)
   glPushMatrix();
@@ -3883,10 +3885,10 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     // box show the icon for the tv channel loaded from xmltv file if exist in file
     // loaded other place
     if (tvkanaler[kanalnr].get_kanal_icon()) {
+      // show channel icon
       // icon size
       ysiz=72;
       xsiz=98;
-      //
       glColor3f(1.0f, 1.0f, 1.0f);		                                      // default
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D,tvkanaler[kanalnr].get_kanal_icon());
@@ -3898,6 +3900,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       glEnd();
       glDisable(GL_TEXTURE_2D);
     } else {
+      // show channel name
       glScalef(24.0, 24.0, 1.0);
       if (selectchanel==kanalnr) glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]); else glColor3f(0.6f, 0.6f, 0.6f);
       chanid=tvkanaler[0].chanid;
@@ -3942,7 +3945,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
         glPushMatrix();
         //glTranslatef(xpos,820-yypos, 0.0f);
         glTranslatef(10,10, 0.0f);
-//        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
+  //        glColor3f(0.5f,0.5f, 0.5f);		                                          // active program color
         if ((prgstarttid<=time(0)) && (prgendtid>=time(0)) && (grayaktivprg)) {
           glColor3f(timenow_color[0],timenow_color[1], timenow_color[2]);		    // active program color
         } else {
@@ -3986,7 +3989,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
                 glColor3f(1.0f, 1.0f, 1.0f);		    // default
                 break;
             }
-          } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide in colors no use default
+          } else glColor3f(0.5f, 0.5f, 0.5f);		    // show tvguide no colors no use default
         }
         if ((selectchanel==kanalnr) && (selectprg==prg_nr)) glColor3f(selectcolor[0],selectcolor[1],selectcolor[0]);
         //_textureutvbgmask
@@ -4103,17 +4106,16 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
           glEnable(GL_TEXTURE_2D);
           glBindTexture(GL_TEXTURE_2D,_textureutvbgmask);
           glLoadName(kanalomgang+prg_nr);
-          glBegin(GL_QUADS);                                                   // box
+          glBegin(GL_QUADS);                                              // box
         } else {
           glLoadName(kanalomgang+prg_nr);
           glBegin(GL_LINE_LOOP);                                          // line
         }
-        //glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); glVertex3f(xpos, ypos, 0.0);
         glTexCoord2f(0.0, 1.0); glVertex3f(xpos, ypos-ysiz, 0.0);
         glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos-ysiz, 0.0);
         glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         if (prglength>10) {
           glPushMatrix();
@@ -4167,11 +4169,12 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       }
       prg_nr++;                                                                 // next program
     }
-    kanalomgang+=kanalomgangofset;                                                         // next channel
+    kanalomgang+=kanalomgangofset;                                              // next channel
     xpos+=220;
     kanalnr++;
     do_kanal_nr++;
   }
+  //
   // show clock line over tvguide gfx
   //
   if (!(loading_tv_guide)) {
@@ -4198,7 +4201,6 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
       glTexCoord2f(1.0, 1.0); glVertex3f(xpos+xsiz, ypos+ysiz, 0.0);
       glTexCoord2f(1.0, 0.0); glVertex3f(xpos+xsiz, ypos, 0.0);
       glEnd();
-      glScalef(40.0, 40.0, 1.0);
       glPopMatrix();
     }
   }
