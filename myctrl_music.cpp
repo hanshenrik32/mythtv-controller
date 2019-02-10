@@ -6,10 +6,7 @@
 #include <string.h>
 #include <mysql.h>
 #include <GL/glc.h>
-
-
-// listdir.c
-#include <sys/types.h>
+#include <sys/types.h>                                    // listdir.c
 #include <dirent.h>
 #include <stdio.h>
 
@@ -23,6 +20,7 @@
 
 #include "myth_saver.h"
 
+extern float configdefaultmusicfontsize;                        // default font
 extern char music_db_update_loader[256];                       //
 extern int music_oversigt_loaded_nr;
 
@@ -1026,7 +1024,8 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-      glScalef(20.0, 20.0, 1.0);
+      //glScalef(20.0, 20.0, 1.0);
+      glScalef(configdefaultmusicfontsize, configdefaultmusicfontsize, 1.0);
       glDisable(GL_TEXTURE_2D);
       if (strlen(temptxt)<17) {
         ofs=(strlen(temptxt)/2)*9;

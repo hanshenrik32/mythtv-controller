@@ -3,7 +3,7 @@
 #include <string.h>
 // opengl
 #include <GL/gl.h>
-#include <GL/glut.h>
+#include <GL/glut.h>                     // print
 #include <IL/il.h>
 #include <math.h>
 #include <errno.h>
@@ -59,6 +59,16 @@ bool stream_jump=false;
 #include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
+
+// glut fonts list
+
+// GLUT_BITMAP_8_BY_13 - A variable-width font with every character fitting in a rectangle of 13 pixels high by at most 8 pixels wide.
+// GLUT_BITMAP_9_BY_15 - A variable-width font with every character fitting in a rectangle of 15 pixels high by at most 9 pixels wide.
+// GLUT_BITMAP_TIMES_ROMAN_10 - A 10-point variable-width Times Roman font.
+// GLUT_BITMAP_TIMES_ROMAN_24 - A 24-point variable-width Times Roman font.
+// GLUT_BITMAP_HELVETICA_10 - A 10-point variable-width Helvetica font.
+// GLUT_BITMAP_HELVETICA_12 - A 12-point variable-width Helvetica font.
+// GLUT_BITMAP_HELVETICA_18 - A 18-point variable-width Helvetica font.
 
 bool tv_guide_firsttime_update=false;
 
@@ -136,6 +146,10 @@ char configxbmchost[256];                               //
 bool hent_tv_channels=false;                            // if false update tv guide
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
 float configdefaulttvguidefontsize=18;                  // default font size tv tvguide
+float configdefaultradiofontsize=18;                    // default font size
+float configdefaultmusicfontsize=18;                    // default font size
+float configdefaultstreamfontsize=18;                   // default font size
+float configdefaultmoviefontsize=18;                    // default font size
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -888,7 +902,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize};
     int commandlength;
     char value[200];
     bool command=false;
@@ -1017,8 +1031,23 @@ int parse_config(char *filename) {
                       command=true;
                       command_nr=tvguidefontsize;
                       commandlength=14;
-                    }
-                    else command=false;
+                    } else if (strncmp(buffer+n,"radiofontsize",12)==0) {
+                      command=true;
+                      command_nr=radiofontsize;
+                      commandlength=12;
+                    } else if (strncmp(buffer+n,"musicfontsize",12)==0) {
+                      command=true;
+                      command_nr=musicfontsize;
+                      commandlength=12;
+                    } else if (strncmp(buffer+n,"streamfontsize",13)==0) {
+                      command=true;
+                      command_nr=streamfontsize;
+                      commandlength=13;
+                    } else if (strncmp(buffer+n,"moviefontsize",12)==0) {
+                      command=true;
+                      command_nr=moviefontsize;
+                      commandlength=12;
+                    } else command=false;
                 }
                 strcpy(value,"");
                 if (command) {
@@ -1168,9 +1197,17 @@ int parse_config(char *filename) {
                     } else if (command_nr==setuvmetertype) {
                       configuvmeter=atoi(value);
                     } else if (command_nr==setvolume) {
-                      configsoundvolume=atof(value);                         // set default volume under play
+                      configsoundvolume=atof(value);                            // set default volume under play
                     } else if (command_nr==tvguidefontsize) {
-                      configdefaulttvguidefontsize=atof(value);                                 // set tvguide font size
+                      configdefaulttvguidefontsize=atof(value);                 // set tvguide font size
+                    } else if (command_nr==radiofontsize) {
+                       configdefaultradiofontsize=atof(value);                  // set radio font size
+                    } else if (command_nr==musicfontsize) {
+                        configdefaultmusicfontsize=atof(value);                 // set music font size
+                    } else if (command_nr==streamfontsize) {
+                      configdefaultstreamfontsize=atof(value);                  // set stream font size
+                    } else if (command_nr==moviefontsize) {
+                      configdefaultmoviefontsize=atof(value);                   // set movie font size
                     }
                 }
             }
@@ -1180,9 +1217,6 @@ int parse_config(char *filename) {
     } else return(0);
     if (check_zerro_bytes_file(filename)>0) return(1); else return(0);
 }
-
-
-
 
 // save config to file
 
@@ -1254,6 +1288,14 @@ int save_config(char * filename) {
       sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
       fputs(temp,file);
       sprintf(temp,"tvguidefontsize=%0.0f\n",configdefaulttvguidefontsize);
+      fputs(temp,file);
+      sprintf(temp,"radiofontsize=%0.0f\n",configdefaultradiofontsize);
+      fputs(temp,file);
+      sprintf(temp,"musicfontsize=%0.0f\n",configdefaultmusicfontsize);
+      fputs(temp,file);
+      sprintf(temp,"streamfontsize=%0.0f\n",configdefaultstreamfontsize);
+      fputs(temp,file);
+      sprintf(temp,"moviefontsize=%0.0f\n",configdefaultmoviefontsize);
       fputs(temp,file);
       //aktiv_tv_oversigt.vistvguidecolors=true;
       if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
@@ -1351,6 +1393,10 @@ void load_config(char * filename) {
           fputs("tvgraberupdate=0\n",file);
           fputs("tvgrabercolor=yes\n",file);
           fputs("tvguidefontsize=18\n",file);
+          fputs("radiofontsize=18\n",file);
+          fputs("musicfontsize=18\n",file);
+          fputs("streamfontsize=18\n",file);
+          fputs("moviefontsize=18\n",file);
           fclose(file);
         } else {
           fprintf(stderr,"Config file not writeble ");
@@ -1898,26 +1944,28 @@ int init_ttf_fonts() {
     glcContext(ctx);
     // *********************************************************************************************************
     static GLint glc_font_id;
-    //GLint  master,master_count,ii;
-    //GLint face_count;
-    //int i,j;
+    GLint count,ii;
     // Get the number of entries in the catalog list
     /* Get a unique font ID. */
     glc_font_id = glcGenFontID();
+    // add dir for fonts
     glcAppendCatalog("/usr/share/fonts/truetype");
     myFont = glcGenFontID();
-    glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
-    if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Open ttf font select error.\n");  // Regular
+    //glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
+    glcNewFontFromFamily(myFont, "Uroob");                                       // Droid Serif,UbuntumFreeMono
+    glcFontFace(myFont, "Bold");
     glcFont(myFont);
     aktivfont.updatefontlist();                                                          // update font list
     /* Draw letters as filled polygons. */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-/*
+
     // Get the number of entries in the catalog list
     count = glcGeti(GLC_CATALOG_COUNT);
-    // Print the path to the catalogs
-    for (ii = 0; ii < count; ii++) printf("%s\n", glcGetListc(GLC_CATALOG_LIST, ii));
-*/
+    // Print the path to the catalog
+    for (ii = 0; ii < count; ii++) {
+        printf("Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
+    }
+
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
@@ -12170,14 +12218,14 @@ int main(int argc, char** argv) {
     glutCreateWindow ("mythtv-controller");
     init();
     loadgfx();
-    if (full_screen) glutFullScreen();                  // set full screen mode
-    glutDisplayFunc(display);
-    glutIdleFunc(NULL);                            // idle func
+    if (full_screen) glutFullScreen();                // set full screen mode
+    glutDisplayFunc(display);                         // main loop func
+    glutIdleFunc(NULL);                               // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
-    glutTimerFunc(25, update2, 0);                     // set start loop
-    init_ttf_fonts();                                   // init fonts
+    glutTimerFunc(25, update2, 0);                    // set start loop
+    init_ttf_fonts();                                 // init fonts
     // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
     if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt=true;

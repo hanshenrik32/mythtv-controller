@@ -21,6 +21,7 @@
 #include "readjpg.h"
 #include "loadpng.h"
 
+extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
 extern char configmysqluser[256];                             //
 extern char configmysqlpass[256];                             //
@@ -552,11 +553,10 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         }
         // print radios station name
         glPushMatrix();
-        float fontsiz=15.0f;
         pline=0;
         glTranslatef(xof,yof-18,0);
         glDisable(GL_TEXTURE_2D);
-        glScalef(fontsiz, fontsiz, 1.0);
+        glScalef(configdefaultradiofontsize, configdefaultradiofontsize, 1.0);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glRasterPos2f(0.0f, 0.0f);
         glDisable(GL_TEXTURE_2D);

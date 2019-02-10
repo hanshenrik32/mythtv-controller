@@ -14,7 +14,7 @@
 #include "readjpg.h"
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
-
+extern float configdefaultmoviefontsize;                                      // font size
 extern char configmoviepath[256];                              //
 extern char configdefaultmoviepath[256];
 extern char configbackend[];
@@ -1069,12 +1069,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 }
 
 
-
-
-
-
-
-
 //
 // normal oversigt
 // ny udgave
@@ -1183,35 +1177,28 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
-
       }
-
       strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-
-
       glPushMatrix();
-
       if (strlen(temptxt)<=14) {
         ofs=(strlen(temptxt)/2)*12;
         glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glDisable(GL_TEXTURE_2D);
-        glScalef(20.0, 20.0, 1.0);
+        glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
         glcRenderString(temptxt);
       } else {
         glTranslatef(xpos+(60-ofs), ypos+120 ,0.0f);
-        glScalef(20.0, 20.0, 1.0);
+        glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
         glDisable(GL_TEXTURE_2D);
         ofs=(strlen(temptxt)/2)*9;
-
         float ytextofset=0.0f;
         int ii,j,k,pos;
         int xof,yof;
         ii=pos=0;
         char word[16000];
-
         while((1) && (ytextofset<=10.0)) {		// max 2 linier
           j=0;
           while(!isspace(temptxt[ii])) {
@@ -1220,7 +1207,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
             ii++;
             j++;
           }
-
           word[j]='\0';	// j = word length
           if (j>13) {		// print char by char
             k=0;
@@ -1230,11 +1216,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
                 pos=0;
                 ytextofset+=15.0f;
                 ofs=0;
-
-              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-
+                glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
                 glRasterPos2f(0.0f, 0.0f);
-                glScalef(14.0, 14.0, 1.0);
+                glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
               }
               glcRenderChar(word[k]);
               pos++;
@@ -1247,7 +1231,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
               ofs=(int) (strlen(word)/2)*9;
               glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
               glRasterPos2f(0.0f, 0.0f);
-              glScalef(14.0, 14.0, 1.0);
+              glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
             }
             glcRenderString(word);
             pos+=j;

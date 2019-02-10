@@ -20,6 +20,11 @@
 // web file loader
 #include "myctrl_readwebfile.h"
 
+//
+// text render is glcRenderString for freetype font support
+//
+
+extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
@@ -2484,19 +2489,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef(xof+22,yof+14,0);
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(14.0, 14.0, 1.0);
+        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
         glcRenderString(temptxt);
         glPopMatrix();
       }
       // show text of element
-      float fontsiz=15.0f;
       glPushMatrix();
       pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(fontsiz, fontsiz, 1.0);
+      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);

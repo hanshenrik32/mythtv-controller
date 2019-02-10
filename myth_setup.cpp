@@ -22,6 +22,11 @@
 #include "checknet.h"
 #include "utility.h"
 
+extern float configdefaultradiofontsize;                                        // font size in overviews
+extern float configdefaulttvguidefontsize;
+extern float configdefaultmusicfontsize;
+extern float configdefaultstreamfontsize;
+extern float configdefaultmoviefontsize;
 
 extern int configuvmeter;
 extern int debugmode;
