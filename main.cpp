@@ -2668,20 +2668,20 @@ void display() {
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
-        // tv icon
+        // tv icon or info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if ((vis_music_oversigt) || (vis_radio_oversigt)) {
+        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show musicplay info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(27);                  // Overwrite the first name in the buffer
-        } else {
-          glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// default tv
+          glLoadName(27);                                           // Info icon nr 27
+        } else {                                                                    // else default tv
+          glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// Tv texture icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(1);                  // Overwrite the first name in the buffer
+          glLoadName(1);                                            // Tv guide icon nr 1
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
@@ -5685,6 +5685,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc=2;
               fundet=true;
             }
+            if ((GLubyte) names[i*4+3]==27) {
+              printf("Close stream info\n");
+              returnfunc=2;
+              do_zoom_stream_cover=false;
+
+
+              do_stop_stream=true;                                            // flag to stop play
+              stopstream=true;                                                // flag to stop play
+              do_play_stream=false;                                           // we are not play a
+
+
+              fundet=true;
+            }
           }
         }
         if (vis_film_oversigt) {
@@ -5698,6 +5711,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((GLubyte) names[i*4+3]==24) {
               printf("scroll up\n");
               returnfunc=2;
+              fundet=true;
+            }
+            if ((GLubyte) names[i*4+3]==27) {
+              printf("Close movie info\n");
+              returnfunc=2;
+              do_zoom_film_cover=false;
               fundet=true;
             }
           }

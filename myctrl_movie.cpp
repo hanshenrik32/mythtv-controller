@@ -1190,7 +1190,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
         glcRenderString(temptxt);
       } else {
-        glTranslatef(xpos+(60-ofs), ypos+120 ,0.0f);
+        glTranslatef(xpos+(50-ofs), ypos+120 ,0.0f);
         glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
         glDisable(GL_TEXTURE_2D);
         ofs=(strlen(temptxt)/2)*9;
@@ -1218,7 +1218,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
                 ofs=0;
                 glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
                 glRasterPos2f(0.0f, 0.0f);
-                glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
+                //glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
               }
               glcRenderChar(word[k]);
               pos++;
@@ -1231,7 +1231,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
               ofs=(int) (strlen(word)/2)*9;
               glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
               glRasterPos2f(0.0f, 0.0f);
-              glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
+              //glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
             }
             glcRenderString(word);
             pos+=j;
@@ -1240,58 +1240,15 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
             glcRenderChar(' ');
             pos++;
           }
-
           if (temptxt[ii]=='\0') break;
           ii++;	// skip space
         }
       }
-/*
-      base=temptxt;
-      length=strlen(temptxt);
-      width = 22;
-      stop=false;
-      glTranslatef(xpos+(100-ofs), ypos+120 ,0.0f);
-      glScalef(20.0, 20.0, 1.0);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glDisable(GL_TEXTURE_2D);
-      while(*base) {
-        if(length <= width) {
-          pline++;
-          ofs=(strlen(temptxt)/2)*12;
-          glDisable(GL_TEXTURE_2D);
-          glcRenderString(base);
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(xpos+(100-ofs), ypos+120-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
-      }
-*/
-        //glTranslatef(xpos+ofs, ypos+120 ,0.0f);
+//        glTranslatef(xpos+ofs, ypos+120 ,0.0f);
 //        glRasterPos2f(0.0f, 0.0f);
 //        glDisable(GL_TEXTURE_2D);
 //        glScalef(20.0, 20.0, 1.0);
 //        glcRenderString(temptxt);
-
-
-
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
