@@ -470,8 +470,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
           radio_oversigt_loaded_done=true;
         } else radio_oversigt_loaded_nr++;
     }
-//    printf("sofset =  %d  _mangley = %d \n ",sofset,_mangley);
-//    glBindTexture(GL_TEXTURE_2D, onlineradiomask);
     glPushMatrix();
     while((i<lradiooversigt_antal) && ((int) i+(int) sofset<(int) antal) && (stack[i+sofset]!=NULL)) {
         if (((i % bonline)==0) && (i>0)) {
@@ -564,7 +562,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
         base=temptxt;
         length=strlen(temptxt);
-        width = 22;
+        width = 22;                                                             // normal 22 18 point font
         while(*base) {
           if(length <= width) {
             glcRenderString(base);
@@ -620,9 +618,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 
         }
 */
-
         glPopMatrix();
-
         xof=xof+buttonsize+6;
         i++;
     }
