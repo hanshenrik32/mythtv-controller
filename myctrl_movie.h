@@ -151,6 +151,7 @@ class film_oversigt_typem : vlc_controller {
       // show startup new added movies
       void show_minifilm_oversigt(float _mangley,int filmnr);
       int opdatere_film_oversigt();
+      int opdatere_search_film_oversigt(char *movietitle);
       void resetallefilm();
       int load_film_dvcovers();
       int playmovie(int nr);

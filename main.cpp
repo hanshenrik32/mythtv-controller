@@ -133,7 +133,8 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
-char playlistfilename[80];                                  // name to use thewn save playlist
+char playlistfilename[80];                              // name to use thewn save playlist
+char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -244,6 +245,7 @@ bool do_stop_music_all=false;
 char aktivplay_music_path[1024];
 
 bool hent_radio_search=false;                           // skal vi søge efter music
+bool hent_film_search=false;                            // skal vi søge efter film title
 bool hent_stream_search=false;                          // skal vi søge efter stream
 
 int do_music_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast music
@@ -777,6 +779,7 @@ GLuint _textureIdradiosearch;
 GLuint _textureIdplayinfo;
 GLuint _textureIdmusicsearch1;
 GLuint _textureIdmusicsearch;
+GLuint _textureIdmoviesearch;
 GLuint _textureIdrecorded_aktiv;
 GLuint _textureIdpup;
 GLuint _textureIdpdown;
@@ -2875,6 +2878,25 @@ void display() {
       if (fknapnr==0) show_newmovietimeout--;
       film_oversigt.show_minifilm_oversigt(0,0);
     }
+
+    // search movies
+    if (vis_film_oversigt) {
+      if (keybufferindex>0) {
+        keybufferopenwin=true;					// yes open filename window
+        if ((keybufferopenwin) && (hent_film_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
+          hent_film_search=false;
+          if (debugmode & 8) fprintf(stderr,"Search movie string: %s \n ",keybuffer);
+          //
+          // start search for movie title
+          film_oversigt.opdatere_search_film_oversigt(keybuffer);
+          // function call here
+          //
+          keybuffer[0]=0;
+          keybufferindex=0;
+        }
+      }
+    }
+
     // search radio station buffer search
     if ((vis_radio_oversigt) && (!(visur)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
@@ -2882,7 +2904,7 @@ void display() {
         // hent søgte sange oversigt
         if ((keybufferopenwin) && (hent_radio_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_radio_search=false;
-          if (debugmode & 8) fprintf(stderr,"Search string: %s \n ",keybuffer);
+          if (debugmode & 8) fprintf(stderr,"Search radio string: %s \n ",keybuffer);
           radiooversigt.clean_radio_oversigt();			// clean old liste
           radiooversigt.opdatere_radio_oversigt(keybuffer);	// load new
           radiooversigt.load_radio_stations_gfx();
@@ -2928,7 +2950,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
         std::clock_t start;
         start = std::clock();
@@ -2936,19 +2958,23 @@ void display() {
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_stream_oversigt) {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
         std::clock_t start;
         start = std::clock();
         radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        // show radio options menu
+        if ((show_radio_options) && (!(visur))) {
+          radiooversigt.show_radio_options();
+        }
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -2975,14 +3001,10 @@ void display() {
         std::clock_t start;
         start = std::clock();
         recordoversigt.show_recorded_oversigt1(0,0);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
-      // show radio options menu
-      if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
-        radiooversigt.show_radio_options();
-      }
-      // show tv record list
       if (vis_tvrec_list) {
+        // show tv record list
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
@@ -2991,14 +3013,15 @@ void display() {
         if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
-    // show search box and text for radio and music
-    if ((vis_radio_oversigt) || (vis_music_oversigt)) {
+    // show search box and text for radio and music and movie
+    if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt)) {
       if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch); // mask _textureId5_!
         else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1); // mask _textureId5_!
+        else if (vis_film_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmoviesearch); // mask _textureId5_!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -3049,7 +3072,7 @@ void display() {
     // vis_error=true;
     // vis_error_timeout=10;
     // show music loader/player (sdl_mixer/fmod) error in program
-    if ((vis_error) && (!(visur)) && (vis_error_timeout)) {
+    if ((vis_error) && (vis_error_timeout)) {
       vis_error_timeout--;
       // background
       glPushMatrix();
@@ -6728,18 +6751,17 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   music_key_selected++;
                 }
-                //
-                if ((vis_film_oversigt) && ((int unsigned) film_select_iconnr<film_oversigt.film_antal()-1)) {
+                //film_select_iconnr+film_key_selected
+                if ((vis_film_oversigt) && ((int unsigned) (film_select_iconnr)<film_oversigt.film_antal()-1)) {
                   if ((film_key_selected % (mnumbersoficonline*3)==0) || ((film_select_iconnr==14) && (film_key_selected % mnumbersoficonline==0))) {
                     _fangley+=MOVIE_CS;
                     film_key_selected-=mnumbersoficonline;	// den viste på skærm af 1 til 20
-                    film_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
                   } else {
-                    film_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
                   }
                   film_key_selected++;
                 }
-
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) visvalgtnrtype=2;
                   else if (visvalgtnrtype==2) visvalgtnrtype=1;
@@ -7235,8 +7257,8 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
+      if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
     }
-    if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
 }
 
 
@@ -7274,7 +7296,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       show_volume_info=true;					// show volume info window
       vis_volume_timeout=80;
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup)) && (key!=27))) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || (vis_film_oversigt)) && (key!=27)) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -7443,6 +7465,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
                 strcpy(playlistfilename,keybuffer);
                 playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+              }
+            }
+            if (vis_film_oversigt) {
+              if (key!=13) {
+                if ((key>31) && (key<127)) {
+                  keybuffer[keybufferindex]=key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                }
+                fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               }
             }
             //
@@ -7675,8 +7707,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
           }
-       }
-       // ved setup window
+        }
+        // ved setup window
         if (do_show_setup) {
            if (do_show_setup_sound) {
                switch(do_show_setup_select_linie) {
@@ -8141,6 +8173,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 hent_radio_search=true;			  	// start radio station search
                 radio_key_selected=1;
                 _rangley=0.0f;
+              }
+              if (vis_film_oversigt) {
+                hent_film_search=true;			  	// start movie title search
+                fknapnr=0;
               }
               if (vis_stream_oversigt) {
                 hent_stream_search=true;				// start stream station search
@@ -11693,6 +11729,7 @@ void loadgfx() {
     _textureIdmusicsearch = loadgfxfile(temapath,(char *) "images/",(char *) "music_search");
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
+    _textureIdmoviesearch = loadgfxfile(temapath,(char *) "images/",(char *) "movie_search");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
     _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
@@ -11852,6 +11889,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdmusicsearch);	     	// search felt til music
     glDeleteTextures( 1, &_textureIdradiosearch);		    // sang search
     glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
+    glDeleteTextures( 1, &_textureIdmoviesearch);	   	// artist search
     glDeleteTextures( 1, &_textureIdloading);
     glDeleteTextures( 1, &_textureIdloading1);
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
@@ -12045,6 +12083,7 @@ int main(int argc, char** argv) {
     Display *dpy=NULL;
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
+    strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
     printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
