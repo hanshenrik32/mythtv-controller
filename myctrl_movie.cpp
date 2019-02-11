@@ -886,6 +886,82 @@ int film_oversigt_typem::opdatere_film_oversigt() {
 
 
 
+// hent film oversigt
+// create if not exist (mythtv/internal)
+
+int film_oversigt_typem::opdatere_search_film_oversigt(char *movietitle) {
+    char sqlselect[4000];
+    char mainsqlselect[2000];
+    unsigned int i;
+    int filmantal=0;
+    char database[200];
+    bool dbexist=false;
+    // mysql vars
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    // mysql stuf
+    strcpy(database,dbname);
+    sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%s%' order by category,title limit %d",movietitle,FILM_OVERSIGT_TYPE_SIZE-1);
+    conn=mysql_init(NULL);
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      // test fpom musik table exist
+      sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          dbexist=true;
+        }
+      } else dbexist=false;
+    }
+    conn=mysql_init(NULL);
+    // Connect to database
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,mainsqlselect);
+      res = mysql_store_result(conn);
+      i=0;
+      if (res) {
+        while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+            filmantal++;
+            filmoversigt[i].setfilmid(atoi(row[0]));
+            filmoversigt[i].setfilmtitle(row[1]);
+            hentcast(&filmoversigt[i],filmoversigt[i].getfilmid());
+            hentgenre(&filmoversigt[i],filmoversigt[i].getfilmid());
+            if (row[8]) {							// hent film beskrivelse
+                filmoversigt[i].setfilmsubtitle(row[8]);
+            } else filmoversigt[i].setfilmsubtitle((char *) "");
+            filmoversigt[i].setfilmfilename(row[2]);	                 // fil navn på film
+            filmoversigt[i].setfilmcoverfile(row[3]);				           // fil navn på cover fil
+            filmoversigt[i].setfilmlength(atoi(row[4]));			         // film længde i unsigned int
+            filmoversigt[i].setfilmaar(atoi(row[5]));
+            filmoversigt[i].setimdbfilmrating(row[6]);	               // rating hmm imdb ?
+            filmoversigt[i].setfilmrating(atoi(row[7]));          		 // user rating
+            filmoversigt[i].setfilmimdbnummer(row[9]);
+            if (row[10]) {							                              // category (type text)
+              strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
+            } else strcpy(filmoversigt[i].category_name,"");
+  	        i++;
+          }
+      }
+    }
+    if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
+    //gotoxy(10,18);
+    if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
+    mysql_close(conn);
+    return(filmantal);
+}
+
+
+
+
+
 //
 // mini oversigt
 // i start menu
@@ -928,7 +1004,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   ypos=700;
   while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
-
     if ((i+sofset)<filmoversigt_antal) {
       if (((i % bonline)==0) && (i>0)) {
         xpos=220;
@@ -963,7 +1038,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset-5 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx-3,ypos+((orgwinsizey/2)-(800/2))-boffset+5 , 0.0);
         glEnd(); //End quadrilateral coordinates
-
       } else {
 
         // print cover dvd
@@ -982,14 +1056,10 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
-
       }
-
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-
-
       glPushMatrix();
       if (strlen(temptxt)<=14) {
         ofs=(strlen(temptxt)/2)*12;
@@ -1003,13 +1073,12 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glScalef(20.0, 20.0, 1.0);
         glDisable(GL_TEXTURE_2D);
         ofs=(strlen(temptxt)/2)*9;
-
+        // show movie title
         float ytextofset=0.0f;
         int ii,j,k,pos;
         int xof,yof;
         ii=pos=0;
         char word[16000];
-
         while((1) && (ytextofset<=10.0)) {		// max 2 linier
           j=0;
           while(!isspace(temptxt[ii])) {
@@ -1018,7 +1087,6 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
             ii++;
             j++;
           }
-
           word[j]='\0';	// j = word length
           if (j>13) {		// print char by char
             k=0;
@@ -1028,9 +1096,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
                 pos=0;
                 ytextofset+=15.0f;
                 ofs=0;
-
-              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-
+                glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
                 glRasterPos2f(0.0f, 0.0f);
                 glScalef(14.0, 14.0, 1.0);
               }
@@ -1043,9 +1109,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
               ytextofset+=15.0f;
               pos=0;
               ofs=(int) (strlen(word)/2)*9;
-
-            glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
-
+              glTranslatef(xof-50,  yof-60-20-ytextofset ,xvgaz);
               glRasterPos2f(0.0f, 0.0f);
               glScalef(14.0, 14.0, 1.0);
             }
