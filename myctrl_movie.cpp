@@ -902,14 +902,16 @@ int film_oversigt_typem::opdatere_search_film_oversigt(char *movietitle) {
     MYSQL_ROW row;
     // mysql stuf
     strcpy(database,dbname);
-    sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%s%' order by category,title limit %d",movietitle,FILM_OVERSIGT_TYPE_SIZE-1);
+    strcpy(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref from videometadata where title like '%");
+    strcat(mainsqlselect,movietitle);
+    strcat(mainsqlselect,"%' order by category,title limit 100"); // ,FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
     if (conn) {
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test fpom musik table exist
-      sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
+      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'",database);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if (res) {
@@ -951,7 +953,7 @@ int film_oversigt_typem::opdatere_search_film_oversigt(char *movietitle) {
           }
       }
     }
-    if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
+    if (filmantal>0) this->filmoversigt_antal=filmantal; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
     if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
     mysql_close(conn);
