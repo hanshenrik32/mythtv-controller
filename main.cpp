@@ -2886,13 +2886,12 @@ void display() {
         if ((keybufferopenwin) && (hent_film_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_film_search=false;
           if (debugmode & 8) fprintf(stderr,"Search movie string: %s \n ",keybuffer);
-          //
-          // start search for movie title
-          film_oversigt.opdatere_search_film_oversigt(keybuffer);
-          // function call here
-          //
+          // start search for movie title. And fill movie view from db
+          if (strcmp(keybuffer,"")!=0) film_oversigt.opdatere_search_film_oversigt(keybuffer);
           keybuffer[0]=0;
           keybufferindex=0;
+          film_select_iconnr=0;
+          film_key_selected=0;
         }
       }
     }
@@ -7296,7 +7295,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       show_volume_info=true;					// show volume info window
       vis_volume_timeout=80;
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || (vis_film_oversigt)) && (key!=27)) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
