@@ -164,13 +164,10 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   char c00[256];
   char movieplot[4096];
   bool fundet;
-
   char fullcovertxt[1024];
   char *coverpointer;
   char filetodownload[2048];
-
   for(int i=0; i<argc; i++) {
-
     // file path
     fundet=false;
     if (strncmp("strPath",azColName[i],7)==0) {
@@ -304,7 +301,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
             strcat(filetodownload,ext);
       }
       // download file and save it same path as movile file
-
       if (!(file_exists(filetodownload))) {
         if (get_webfile(moviecover,filetodownload)) {
           if (debugmode & 512) printf("Downloading cover %s\n",movietitle);
@@ -314,9 +310,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       }
     }
   }
-
-  //film_oversigt.filmoversigt[0].setfilmfilename(moviepath);				// fil navn på film
-  //film_oversigt.filmoversigt[0].setfilmtitle(movietitle);				// fil navn på film
   fundet=false;
   // create record if not exist
   // do check if exist
@@ -334,13 +327,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   // create if not exist
   if (!(fundet)) {
     if (debugmode & 512) printf("Import kodi title %40s\n",movietitle);
-/*
-    char tmp[2048];
-    strcpy(tmp,"Dett'e er en test");
-    search_and_replace(tmp);
-    printf("%s\n\n",tmp);
-*/
-
     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                               (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
                                               movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1,filetodownload);
@@ -398,11 +384,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   bool dbexist=false;
   bool exist=false;
   bool cr=false;
-
   int n=0;
   int nn;
   char *tt;
-
   musicoversigt[0].textureId=0;
   musicoversigt[0].directory_id=0;			// husk directory id
   musicoversigt[0].parent_id=0;
@@ -489,22 +473,6 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
               }
             }
             strcpy(albumname,temp);
-/*
-            sprintf(sqlselect1,"insert into music_albums values(%d,%d,'%s',%d,%d)",0,artistid,temp,0,0);
-            //sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,temp);
-            mysql_query(conn,sqlselect2);
-            res2 = mysql_store_result(conn);
-*/
-/*
-            sprintf(sqlselect2,"select artist_id from music_artists where artist_name like '%s'",temp);
-            mysql_query(conn,sqlselect1);
-            res2 = mysql_store_result(conn);
-            if (res2) {
-              while ((row2 = mysql_fetch_row(res2)) != NULL) artistid=atol(row2[0]);
-            }
-*/
-
-
             mysql_close(conn);
           }
         }
