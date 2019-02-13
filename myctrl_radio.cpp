@@ -646,7 +646,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
       glcRenderString(temptxt);
       glPopMatrix();
     }
-
     glPopMatrix();
     return(radio_pictureloaded);
 }
@@ -812,7 +811,7 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     MYSQL_RES *res;
     MYSQL_ROW row;
     if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
-        else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
+      else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
@@ -849,8 +848,7 @@ int radiostation_class::get_radio_online(int stationid) {
 // set radio station online flag internal use
 
 int radiostation_class::set_radio_intonline(int arraynr) {
-    if (((unsigned int) arraynr<(unsigned int) antal) && (stack[arraynr]))
-       stack[arraynr]->online=true; else return(0);
+    if (((unsigned int) arraynr<(unsigned int) antal) && (stack[arraynr])) stack[arraynr]->online=true; else return(0);
     return(1);
 }
 
@@ -957,7 +955,6 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     char hostname[1024];
     char ipadresse[1024];
     char st_name[1024];
-
     int error=0;
     unsigned long radiostation=0;
     char sqlselect[512];
@@ -975,65 +972,64 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
       if (mysql_real_connect(conn, configmysqlhost, configmysqluser, configmysqlpass, dbname, 0, NULL, 0)) {
-          mysql_query(conn,"set NAMES 'utf8'");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              // port=80;
-              strncpy(hostname,row[3],1000);
-              strncpy(st_name,row[0],1000);
-              if (strcmp(hostname,"")!=0) {
-                // get port and ip
-                port=get_url_data(hostname,ipadresse);
-                if (debugmode & 1) fprintf(stderr,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
-                sock=socket(PF_INET, SOCK_STREAM, 0);
-                if (sock) {
-                  //fcntl(sock, F_SETFL, O_NONBLOCK);
-                  tv.tv_sec = 5;
-                  tv.tv_usec = 0;
-                  FD_ZERO(&myset);
-                  FD_SET(sock, &myset);
-                  error=(init_sockaddr(&servername,ipadresse,port));
-                  if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
-                    if (cerror==0) {
-                      if (debugmode & 1) fprintf(stderr," Station OK. \n ");
-                      radiook=true;
-                    } else radiook=false;
-                  } else {
-                    if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
-                    radiook=false;
-                  }
-                  close (sock);
+        mysql_query(conn,"set NAMES 'utf8'");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            // port=80;
+            strncpy(hostname,row[3],1000);
+            strncpy(st_name,row[0],1000);
+            if (strcmp(hostname,"")!=0) {
+              // get port and ip
+              port=get_url_data(hostname,ipadresse);
+              if (debugmode & 1) fprintf(stderr,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
+              sock=socket(PF_INET, SOCK_STREAM, 0);
+              if (sock) {
+                //fcntl(sock, F_SETFL, O_NONBLOCK);
+                tv.tv_sec = 5;
+                tv.tv_usec = 0;
+                FD_ZERO(&myset);
+                FD_SET(sock, &myset);
+                error=(init_sockaddr(&servername,ipadresse,port));
+                if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
+                  if (cerror==0) {
+                    if (debugmode & 1) fprintf(stderr," Station OK. \n ");
+                    radiook=true;
+                  } else radiook=false;
+                } else {
+                  if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
+                  radiook=false;
                 }
-                radiostation=atol(row[2]);
+                close (sock);
               }
-            }
-            nn=0;
-            // find radio station
-            nfundet=false;
-            while ((nn<antal) && (nfundet==false)) {
-              if  (stack[nn]->station_name) {
-                // if found set active again
-                if (strcmp(stack[nn]->station_name,st_name)==0) {
-                  stack[nn]->online=1;
-                  nfundet=true;
-                } else nn++;
-              } else nn++;
+              radiostation=atol(row[2]);
             }
           }
-          if ((conn) && (radiostation)) {
-            if ((radiook) && (nfundet)) {
-              sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
-            } else {
-              sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
-            }
-            mysql_query(conn,sqlselect);
-            res = mysql_store_result(conn);
+          nn=0;
+          // find radio station
+          nfundet=false;
+          while ((nn<antal) && (nfundet==false)) {
+            if  (stack[nn]->station_name) {
+              // if found set active again
+              if (strcmp(stack[nn]->station_name,st_name)==0) {
+                stack[nn]->online=1;
+                nfundet=true;
+              } else nn++;
+            } else nn++;
           }
         }
-        if (conn) mysql_close(conn);
+        if ((conn) && (radiostation)) {
+          if ((radiook) && (nfundet)) {
+            sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
+          } else {
+            sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
+          }
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+        }
+      }
+      if (conn) mysql_close(conn);
     }
     return(radiostation);		// we are done check all radio stations in database
-//	    return(1);			// enable to task to check 4 ever
 }

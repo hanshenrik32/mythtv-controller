@@ -195,18 +195,11 @@ int get_webfile(char *webpath,char *outfile) {
         loaderror=true;
       }
     }
-
-    //lpos=strstr(message, "Content-Length:");
-    //if (lpos) j = atoi(strchr(lpos, ' ') + 1);
-
-//    printf("get %s length=%d \n",webpath, webobjlength);
-
     if (!(loaderror)) {
       fil=fopen(outfile,"w");
       if (!(fil)) {
         if (debugmode) fprintf(stderr," Open file for write error %s \n",outfile);
         loaderror=true;							// not posible to save file
-//        exit(0);
       }
       if (fil) {
         for (i = 0;i < webobjlength; i++) {
