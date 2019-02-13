@@ -1170,12 +1170,12 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     movie_oversigt_gfx_loading=true;
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
     if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
-        this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
+      this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
     }
     if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
-        movie_oversigt_loaded=true;
-        movie_oversigt_loaded_done=1;
-        movie_oversigt_gfx_loading=false;
+      movie_oversigt_loaded=true;
+      movie_oversigt_loaded_done=1;
+      movie_oversigt_gfx_loading=false;
     } else movie_oversigt_loaded_nr++;
   }
   glTranslatef(0.0f, 0.0f ,0.0f);
@@ -1187,13 +1187,11 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   ypos=700;
   while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {
     sofset=(_mangley/40)*8;
-
     if ((film_nr+sofset)<filmoversigt_antal) {
       if (((film_nr % bonline)==0) && (film_nr>0)) {
         xpos=20;
         ypos=ypos-(winsizy+60);
       }
-
       if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
       if (filmoversigt[film_nr+sofset].gettextureid()) {
         // print cover dvd
@@ -1318,7 +1316,6 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
-
     xpos+=205;
     film_nr++;
     //glPopMatrix();

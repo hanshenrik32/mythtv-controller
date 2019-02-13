@@ -284,9 +284,9 @@ int rss_stream_class::save_rss_data() {
         mysql_query(conn,sqlstring);
         res = mysql_store_result(conn);
         while ((row = mysql_fetch_row(res)) != NULL) {
-            doexist=true;
-            strcpy(ftitle,row[0]);
-            strcpy(furl,row[0]);
+          doexist=true;
+          strcpy(ftitle,row[0]);
+          strcpy(furl,row[0]);
         }
         if (doexist) {
           // find record in db abd do the change and update record again
@@ -601,7 +601,6 @@ void show_setup_screen() {
     myglprint4((char *) " ");
     if (do_show_setup_select_linie==3) {
       glColor3f(selectcolor[0],selectcolor[1],selectcolor[2]);
-//        glRasterPos2f(2.2f, 0.0f);
       if (strcmp(configuse3deffect,"yes")==0) myglprint4((char *) "yes"); else  myglprint4((char *) "no ");
     } else {
       if (strcmp(configuse3deffect,"yes")==0) myglprint4((char *) "yes"); else  myglprint4((char *) "no ");
@@ -670,7 +669,6 @@ void show_setup_screen() {
     glPopMatrix();
     if (do_show_setup_select_linie==5) showcoursornow(250,350,strlen(keybuffer));
     glPushMatrix();
-//    glScalef(25.0f, 25.0f, 1.00f);
     sprintf(resl,"Hardware %s",glGetString(GL_RENDERER));
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -684,8 +682,6 @@ void show_setup_screen() {
     sprintf(resl," Version  %s",glGetString(GL_VERSION));
     myglprint5((char *) resl);
     glPopMatrix();
-
-
 }
 
 
@@ -771,7 +767,6 @@ void show_setup_video() {
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -881,7 +876,6 @@ void show_setup_video() {
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1073,7 +1067,6 @@ void show_setup_font(int startofset) {
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
-        //glBindTexture(GL_TEXTURE_2D,setupfontback);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -1399,10 +1392,8 @@ void show_setup_network() {
     glPopMatrix();
     glPushMatrix();
     // Buttons
-//    glLoadIdentity();
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f,1.0f, 1.0f);
-//    glTranslatef(-3.6f+3.0f, 2.1f-1.5f,-14.8f);
     glTranslatef(0.0f, 0.0f, 0.0f);
     glDisable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -2384,11 +2375,11 @@ void show_setup_keys() {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==1) {
-        sprintf(keybuffer,"%d",configkeyslayout[0].scrnr);
-        myglprint4((char *) keybuffer);   // keybuffer
+      sprintf(keybuffer,"%d",configkeyslayout[0].scrnr);
+      myglprint4((char *) keybuffer);   // keybuffer
     } else {
-        sprintf(text,"%d",configkeyslayout[0].scrnr);
-        myglprint4((char *) text);
+      sprintf(text,"%d",configkeyslayout[0].scrnr);
+      myglprint4((char *) text);
     }
     glPopMatrix();
     if (do_show_setup_select_linie==1) showcoursornow(812,500,strlen(keybuffer));
@@ -2398,11 +2389,11 @@ void show_setup_keys() {
     glRasterPos2f(0.0f, 0.0f);
     glColor3f(1.0f,1.0f,1.0f);
     if (do_show_setup_select_linie==2) {
-        strcpy(keybuffer,configkeyslayout[1].cmdname);
-        myglprint4((char *) keybuffer);
+      strcpy(keybuffer,configkeyslayout[1].cmdname);
+      myglprint4((char *) keybuffer);
     } else {
-        sprintf(text,"%s",configkeyslayout[1].cmdname);
-        myglprint4((char *) text);
+      sprintf(text,"%s",configkeyslayout[1].cmdname);
+      myglprint4((char *) text);
     }
     glPopMatrix();
     if (do_show_setup_select_linie==2) showcoursornow(311,450,strlen(keybuffer));
@@ -3142,179 +3133,6 @@ int killrunninggraber() {
 
 
 //
-// write xmltv config file and save it
-// build xmltv config file
-
-/*
-int channel_configfile::graber_configbuild() {
-  char buffer[1024];
-  char filename[1024];
-  char userhomedir[1024];
-  char sql[4096];
-  FILE *fil;
-  char *database = (char *) "mythconverg";
-  int error=0;
-  int line=0;
-  int cnr=0;                                                                    // channum to create in config file
-  bool errors=false;
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  // mysql stuf
-  getuserhomedir(userhomedir);
-  strcpy(filename,userhomedir);
-  strcat(filename,"/.xmltv/");
-  strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-  strcat(filename,".conf");
-  fil=fopen(filename,"w");
-  if (fil) {
-    // write file header for tvgraber config file
-    switch (aktiv_tv_graber.graberaktivnr) {
-      case 0: fputs("Tv-graber disabled.",fil);
-              break;
-      // tv_grab_na_dd
-      case 1: fputs("Not posible to config graber use tv_grab_na_dd --configure to setup the xmltv graber.",fil);
-              break;
-      // tv_grab_nl
-      case 2: fputs("# Channel ID                              Channel name\n",fil);
-              break;
-      // tv_grab_es_laguiatv
-      case 3: fputs("configversion 3\nusecache yes\ncachedir ~/.xmltv/cache\ngetdescriptions yes\n",fil);
-              break;
-      // tv_grab_il
-      case 4: fputs("Do not work graber error.",fil);
-              break;
-      // tv_grab_na_tvmedia
-      // API Key found on your account dashboard page (https://www.xmltvlistings.com/account/)
-      // API Key:
-      case 5: fputs("Not posible to config graber use tv_grab_na_tvmedia --configure to setup the xmltv graber.",fil);
-              break;
-      // tv_grab_dtv_la
-      case 6: fputs("Do not work graber error. Homepage fault",fil);
-              break;
-      // tv_grab_fi
-      case 7: fputs("# -*- coding: utf-8 -*-\n",fil);                                 //  tv_grab_fi
-              break;
-      // tv_grab_eu_dotmedia
-      case 8: fputs("country=Denmark\ncachedir=~/.xmltv/cache\n",fil);       // tv_grab_eu_dotmedia
-              break;
-      // tv_grab_se_swedb
-      case 9:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);     // tv_grab_se_swedb
-              break;
-      // tv_grab_pt_meo
-      case 10:fputs("maxchannels=5\n",fil);                                  // tv_grab_pt_meo
-              break;
-      // tv_grab_fr
-      case 11:fputs("Do not work graber error",fil);          // tv_grab_fr
-              break;
-      // tv_grab_uk_bleb
-      case 12:fputs("",fil);
-              break;
-      // tv_grab_huro
-      case 13:fputs("country hu      # Hungary\n",fil);    // tv_grab_huro
-              break;
-      // tv_grab_ch_search
-      case 14:fputs("",fil);
-              break;
-      // tv_grab_it
-      case 15:fputs("",fil);    // tv_grab_it
-              break;
-      // tv_grab_is
-      case 16:fputs("",fil);    // tv_grab_is
-              break;
-      // tv_grab_fi_sv
-      case 17:fputs("# -*- coding: utf-8 -*-\n",fil);
-              break;
-      // tv_grab_na_dtv
-      case 18:fputs("No tv graber config exist for this land. Use --configure\n",fil);
-              break;
-      // tv_grab_tr
-      case 19:fputs("cachedir=~/.xmltv/cache\n",fil);
-              break;
-      // tv_grab_eu_egon
-      case 20:fputs("root-url=http://xmltv.spaetfruehstuecken.org/xmltv/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);
-              break;
-      // tv_grab_dk_dr
-      case 21:fputs("accept-copyright-disclaimer=accept\ninclude-radio=0\nroot-url=http://www.dr.dk/tjenester/program-guide/json/guide/\nepisode-in-subtitle=no\n",fil);
-              break;
-      // tv_grab_se_tvzon
-      case 22:fputs("root-url=http://xmltv.tvsajten.com/channels.xml.gz\ncachedir=~/.xmltv/cache\n",fil);
-              break;
-      // tv_grab_ar
-      case 23:fputs("location 683 CAPITAL FEDERAL\n",fil);
-              break;
-      // tv_grab_fr_kazer
-      case 24:fputs("",fil);
-              break;
-      // tv_grab_uk_tvguide
-      case 25:fputs("cachedir=~/.xmltv/cache\n",fil);
-              break;
-      default:fputs("No tv graber exist for this land\n",fil);
-    }
-    //
-    // write channel config in config file
-    //
-    while(cnr<MAXCHANNEL_ANTAL) {
-      if (channel_list[cnr].selected) {
-        switch (aktiv_tv_graber.graberaktivnr) {
-          case 1: sprintf(buffer,"channel=%s",channel_list[cnr].id);
-                  break;
-          case 2: sprintf(buffer,"channel %s",channel_list[cnr].id);
-                  break;
-          case 3: sprintf(buffer,"channel %s",channel_list[cnr].id);
-                  break;
-          case 6: sprintf(buffer,"channel=%s",channel_list[cnr].id);                                        // tv_graber now working
-                  break;
-          case 7: sprintf(buffer,"channel %s %s",channel_list[cnr].id,channel_list[cnr].name);
-                  break;
-          case 8: sprintf(buffer,"channel=%s",channel_list[cnr].id);
-                  break;
-          case 13:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
-                  break;
-          case 15:sprintf(buffer,"channel %s # %s",channel_list[cnr].id,channel_list[cnr].name);
-                  break;
-          case 16:sprintf(buffer,"channel %s # %s\n",channel_list[cnr].id,channel_list[cnr].name);
-                  break;
-          case 17:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // sweeden
-                  break;
-          case 18:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                    // tv_grab_na_dtv
-                  break;
-          case 19:sprintf(buffer,"channel=%s",channel_list[cnr].id);
-                  break;
-          case 20:sprintf(buffer,"channel=%s",channel_list[cnr].id);
-                  break;
-          case 21:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
-                  break;
-          case 22:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
-                  break;
-          case 23:sprintf(buffer,"channel %s %s\n",channel_list[cnr].id,channel_list[cnr].name);
-                  break;
-          case 25:sprintf(buffer,"channel=%s",channel_list[cnr].id);                                      // tv_grab_dk_dr
-                  break;
-          default:sprintf(buffer,"channel=%s",channel_list[cnr].id);
-        }
-        fputs(buffer,fil);
-      } else {
-        switch (aktiv_tv_graber.graberaktivnr) {
-          case 8: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
-                  break;
-          case 25: sprintf(buffer,"channel!%s\n",channel_list[cnr].id);
-                  break;
-
-        }
-        fputs(buffer,fil);
-        if (debugmode) printf("%s",buffer);
-      }
-      cnr++;
-    }
-    fclose(fil);
-  } else errors=true;
-  if (errors==false) return(1); else return(0);
-}
-*/
-
-
-//
 // parse channel info from xmltvguide reader channel overview xmlfile
 // load in to channel_list array
 
@@ -3449,12 +3267,12 @@ int load_channel_list_from_graber() {
     printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
     switch (aktiv_tv_graber.graberaktivnr) {
         case 13:sysresult=system(exestring);
-                break;
-      default:
-                sysresult=system(exestring);
-                if (sysresult) {
-                  printf("\nError Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
-                }
+              break;
+        default:
+              sysresult=system(exestring);
+              if (sysresult) {
+                printf("\nError Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
+              }
     }
     if (check_zerro_bytes_file(filename)!=0) {
       fil=fopen(filename,"r");
