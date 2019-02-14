@@ -5738,21 +5738,29 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if (vis_film_oversigt) {
         if (!(fundet)) {
           // we have a select mouse/touch element dirid
+          // scroll down
           if ((GLubyte) names[i*4+3]==23) {
             if (debugmode & 8) printf("scroll down\n");
             returnfunc=1;
             fundet=true;
           }
+          // scroll up
           if ((GLubyte) names[i*4+3]==24) {
             printf("scroll up\n");
             returnfunc=2;
             fundet=true;
           }
+          // close window
           if ((GLubyte) names[i*4+3]==27) {
             printf("Close movie info\n");
             returnfunc=2;
             do_zoom_film_cover=false;
             fundet=true;
+          }
+          // reset movie search view
+          // show all movies again
+          if ((GLubyte) names[i*4+3]==28) {
+            film_oversigt.opdatere_search_film_oversigt("%");
           }
         }
       }
