@@ -687,7 +687,7 @@ GLuint _textureIdback; 	                  //
 GLuint _textureuv1;                       // uv img
 GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
-
+GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
 
 // radio view icons
@@ -2702,9 +2702,9 @@ void display() {
           glLoadName(3); 			                                                  // film icon name 3
         } else {
           if ((vis_music_oversigt) || (vis_radio_oversigt)) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);
+            glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                 //
           } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                              // music icon
+            glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                      // music icon
           }
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2747,7 +2747,7 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(24); 			                                                 // load film icon name
+          glLoadName(24); 			                                                // load film icon name
         } else {
           if (vis_recorded_oversigt) {
             glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
@@ -2758,14 +2758,31 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(4); 			// Overwrite the first name in the buffer
-        }                                                                                    // _textureId13			// default button mask
+          glLoadName(4);                                                        //
+        }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*4) , 0.0);
         glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
+
+        // show reset movie oversigt
+        if (vis_film_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, _textureIdreset_search);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(5);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
+        }
+
+
+
         if (vis_uv_meter==false) {
           if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
             // setup icon
@@ -11814,6 +11831,7 @@ void loadgfx() {
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
     _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
+    _textureIdreset_search=loadgfxfile(temapath,(char *) "images/",(char *) "reset_search");
     analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
@@ -11953,6 +11971,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureuv1_top);                         // uv img
     glDeleteTextures( 1, &_errorbox);                           // error box
     glDeleteTextures( 1, &_textureexit);
+    glDeleteTextures( 1, &_textureIdreset_search);
     // delete radio lande flags
     i=0;
     while(i<69) {
