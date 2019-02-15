@@ -5767,11 +5767,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if (vis_music_oversigt) {
         if (!(fundet)) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
           // we have a select mouse/touch element dirid
+          // scroll down
           if ((GLubyte) names[i*4+3]==23) {
             if (debugmode & 2) fprintf(stderr,"scroll down\n");
             returnfunc=1;
             fundet=true;
           }
+          // scroll up
           if ((GLubyte) names[i*4+3]==24) {
             if (debugmode & 2) fprintf(stderr,"scroll up\n");
             returnfunc=2;
@@ -5793,7 +5795,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet=true;
           }
           // husk last
-          if (mknapnr!=0) swknapnr=mknapnr;
+          if (mknapnr!=0) swknapnr=mknapnr;                                     // swknapnr
           // mknapnr=mknapnr+(music_icon_anim_icon_ofsety*4);
           mknapnr=mknapnr+(_mangley/41)*8;
         }
@@ -5803,10 +5805,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
           // play button
           if ((GLubyte) names[i*4+3]==20) {
-            ask_open_dir_or_play=false;                 // flag luk vindue igen
-            do_play_music_cover=1;                      // der er trykket på cover play det
-            do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
-            do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
+            ask_open_dir_or_play=false;                                         // flag luk vindue igen
+            do_play_music_cover=1;                                              // der er trykket på cover play det
+            do_zoom_music_cover=false;                                          // ja den skal spilles lav zoom cover info window
+            do_find_playlist=true;                                              // find de sange som skal indsættes til playlist (og load playlist andet sted)
             fundet=true;
           }
           // open music dir or close window
@@ -5892,17 +5894,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       }
       // kun til mus/touch skærm (radio stationer)
       // luk show play radio
+      // scroll down
       if ((vis_radio_oversigt)  && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
           returnfunc=1;
           fundet=true;
         }
+        // scroll up
         if ((GLubyte) names[i*4+3]==24) {
           if (debugmode & 8) fprintf(stderr,"scroll up\n");
           returnfunc=2;
           fundet=true;
         }
+        // show close radio info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
           do_zoom_radio=!do_zoom_radio;
@@ -5949,6 +5954,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_stream_or_movie_oversigt=false;
         }
       }
+      //
       if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==3) {
           fundet=true;
@@ -6018,6 +6024,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet=true;
           startmovie=true;
         }
+        // stop play movie
         if ((GLubyte) names[i*4+3]==26) {
           if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
           fundet=true;
@@ -6026,8 +6033,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // we have a select mouse/touch
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-          fknapnr=(GLuint) names[i*4+3]-99;			// hent filmknap nr
-          printf("Film selected=%d\n",fknapnr);
+          fknapnr=(GLuint) names[i*4+3]-99;			                                // get movie id
+          printf("Film selected=%d\n",fknapnr);                                 //
           fundet=true;
         }
       }
@@ -6050,16 +6057,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       if ((vis_tv_oversigt) && (!(fundet))) {
+        // close view
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
           vis_tv_oversigt=false;
           fundet=true;
         }
+        // show recorded programs
         if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
           if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
           vis_tv_oversigt=false;
           fundet=true;
         }
+        // close record
         if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
           if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
           ask_tv_record=true;
@@ -11839,7 +11849,7 @@ void loadgfx() {
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
     _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
-    _textureIdreset_search=loadgfxfile(temapath,(char *) "images/",(char *) "reset_search");
+    _textureIdreset_search=loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
     analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
