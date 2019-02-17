@@ -2767,8 +2767,10 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
 
-        // show reset movie oversigt
-        if (vis_film_oversigt) {
+        //
+        // show reset movie search oversigt
+        //
+        if ((vis_film_oversigt) && (film_oversigt.get_search_view())) {
           glBindTexture(GL_TEXTURE_2D, _textureIdreset_search);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2904,7 +2906,10 @@ void display() {
           hent_film_search=false;
           if (debugmode & 8) fprintf(stderr,"Search movie string: %s \n ",keybuffer);
           // start search for movie title. And fill movie view from db
-          if (strcmp(keybuffer,"")!=0) film_oversigt.opdatere_search_film_oversigt(keybuffer);
+          if (strcmp(keybuffer,"")!=0) {
+            film_oversigt.opdatere_search_film_oversigt(keybuffer);
+            film_oversigt.set_search_view(true);
+          }
           keybuffer[0]=0;
           keybufferindex=0;
           film_select_iconnr=0;
@@ -5761,6 +5766,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // show all movies again
           if ((GLubyte) names[i*4+3]==28) {
             film_oversigt.opdatere_search_film_oversigt("%");
+            //  remove search flag again and show all movies
+            film_oversigt.set_search_view(false);
           }
         }
       }
@@ -11854,7 +11861,7 @@ void loadgfx() {
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
-        _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
+      _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
     } else _textureIdmusic_aktiv=0;
     printf ("Done loading init graphic.\n");
 }

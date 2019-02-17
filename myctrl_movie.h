@@ -112,7 +112,10 @@ class film_oversigt_typem : vlc_controller {
 //      libvlc_instance_t *vlc_inst;              //
 //      libvlc_media_player_t *vlc_mp;            //
       float getmovieposition();
-    public:
+      bool show_search_view;
+  public:
+      bool get_search_view() { return (show_search_view); }
+      void set_search_view(bool val) { show_search_view=val; }
       bool film_is_playing;                       // playing ?
       film_oversigt_type *filmoversigt;           // all movie array to show in movie overview
       void sortfilm(int type);
