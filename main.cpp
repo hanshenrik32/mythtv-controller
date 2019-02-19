@@ -55,8 +55,8 @@ bool stream_jump=false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
+#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod.hpp"
+#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 
@@ -385,7 +385,6 @@ bool show_stream_options=false;
 
 bool startmovie=false;                  		// start play movie
 
-
 int sleep_ok=0;
 int sleeper=1;
 
@@ -441,7 +440,7 @@ char aktivsongstatus[40];
 // fmod stuf
 #if defined USE_FMOD_MIXER
 FMOD_OPENSTATE openstate;
-int fmodbuffersize=32*1024;
+int fmodbuffersize=16*1024;
 #endif
 
 #if defined USE_SDL_MIXER
@@ -466,7 +465,7 @@ int tvstartxofset=0;
 
 // ************************************************************************************************
 
-extern mplaylist aktiv_playlist;
+extern mplaylist aktiv_playlist;                                                // music play list
 
 struct dirmusic_list_type {
     char name[200];
@@ -500,11 +499,11 @@ class dirmusictype {
         GLuint textureId;		             			// directorys texture
         int emtydirmusic() {
             for(unsigned int i=0;i<listesize;i++) {			// reset all music info
-                strcpy(songliste[i].name,"");
-                songliste[i].songlength=0;
-                strcpy(dirliste[i].dirname,"");
-                dirliste[i].dirid=0;
-                dirliste[i]._textureId=0;			// reset Opengl cover id
+              strcpy(songliste[i].name,"");
+              songliste[i].songlength=0;
+              strcpy(dirliste[i].dirname,"");
+              dirliste[i].dirid=0;
+              dirliste[i]._textureId=0;			// reset Opengl cover id
             }
             numbersofsongs=0;
             numbersofdirs=0;
@@ -800,13 +799,12 @@ GLuint analog_clock_background;             // background for analog clock
 
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
-fontctrl aktivfont;                     // font control
+fontctrl aktivfont;                                                             // font control (default aktiv font all over (if opencl))
 
-unsigned int setupfontselectofset=0;            // valgte font i oversigt
-unsigned int setupwlanselectofset=0;            // valgte wlan nr i oversigt
+unsigned int setupfontselectofset=0;                                            // valgte font i oversigt
+unsigned int setupwlanselectofset=0;                                            // valgte wlan nr i oversigt
 
-const int TEMA_ANTAL=10;                                        // numbers of tema
-
+const int TEMA_ANTAL=10;                                                        // numbers of tema
 
 // define for use before function is created
 void *update_music_phread_loader();
@@ -915,311 +913,311 @@ int parse_config(char *filename) {
     strcpy(configbackend,"mythtv");
     fil=fopen(filename,"r");
     if (fil) {
-        while(!(feof(fil))) {
-            fgets(buffer,512,fil);
-            n=0;
-            nn=0;
-            command=false;
-            valueok=false;
-            // remove all spaces
-            while((n<strlen(buffer)) && (*(buffer+n)==32)) n++;
-
-            if (n!=strlen(buffer)) {
-                // test for command
-                if (buffer[n]!='#') {
-                    if (strncmp(buffer+n,"backend",6)==0) {
-                      command=true;
-                      command_nr=setbackend;
-                      commandlength=6;
-                    } else if (strncmp(buffer+n,"mythhost",7)==0)  {
-                      command=true;
-                      command_nr=sethostname;
-                      commandlength=7;
-                    } else if (strncmp(buffer+n,"mysqlhost",8)==0) {
-                      command=true;
-                      command_nr=setmysqlhost;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"mysqluser",8)==0) {
-                      command=true;
-                      command_nr=setmysqluser;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"mysqlpass",8)==0) {
-                      command=true;
-                      command_nr=setmysqlpass;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"soundsystem",10)==0) {
-                      command=true;
-                      command_nr=setsoundsystem;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"soundoutport",11)==0) {
-                      command=true;
-                      command_nr=setsoundoutport;
-                      commandlength=11;
-                    } else if (strncmp(buffer+n,"screensaver=",12)==0) {
-                      command=true;
-                      command_nr=setscreensaver;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"screensavername",14)==0) {
-                      command=true;
-                      command_nr=setscreensavername;
-                      commandlength=14;
-                    } else if (strncmp(buffer+n,"screensize",9)==0) {
-                      command=true;
-                      command_nr=setscreensize;
-                      commandlength=9;
-                    } else if (strncmp(buffer+n,"tema",3)==0) {
-                      command=true;
-                      command_nr=settema;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"font",3)==0) {
-                      command=true;
-                      command_nr=setfont;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"mouse",4)==0) {
-                      command=true;
-                      command_nr=setmouse;
-                      commandlength=4;
-                    } else if (strncmp(buffer+n,"use3d",4)==0) {
-                      command=true;
-                      command_nr=setuse3d;
-                      commandlength=4;
-                    } else if (strncmp(buffer+n,"land",3)==0) {
-                      command=true;
-                      command_nr=setland;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"fullscreen",9)==0) {
-                      command=true;
-                      command_nr=setscreenmode;
-                      commandlength=9;
-                    } else if (strncmp(buffer+n,"configdefaultmusicpath",21)==0) {
-                      command=true;
-                      command_nr=setconfigdefaultmusicpath;
-                      commandlength=21;
-                    } else if (strncmp(buffer+n,"configdefaultmoviepath",21)==0) {
-                      command=true;
-                      command_nr=setconfigdefaultmoviepath;
-                      commandlength=21;
-                    } else if (strncmp(buffer+n,"videoplayer",10)==0) {
-                      command=true;
-                      command_nr=setvideoplayer;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"debug",4)==0) {
-                      command_nr=setdebugmode;
-                      command=true;
-                      commandlength=4;
-                      debugmode=atoi(value);		// set debug mode from config file
-                      showfps=true;
-                    } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
-                      command=true;
-                      command_nr=setuvmetertype;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
-                      command=true;
-                      command_nr=setvolume;
-                      commandlength=12;
-                    } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
-                      command=true;
-                      command_nr=tvgraberupdate;
-                      commandlength=13;
-                      // vi do not have tvgraberpath in config file
-                    } else if ((strncmp(buffer+n,"tvgraber",7)==0) && (strncmp(buffer+n,"tvgraberpath",11)!=0)) {
-                      command=true;
-                      command_nr=settvgraber;
-                      commandlength=7;
-                    } else if (strncmp(buffer+n,"tvguidercolor",12)==0) {
-                      command=true;
-                      command_nr=tvguidercolor;
-                      commandlength=12;
-                    } else if (strncmp(buffer+n,"tvguidefontsize",14)==0) {
-                      command=true;
-                      command_nr=tvguidefontsize;
-                      commandlength=14;
-                    } else if (strncmp(buffer+n,"radiofontsize",12)==0) {
-                      command=true;
-                      command_nr=radiofontsize;
-                      commandlength=12;
-                    } else if (strncmp(buffer+n,"musicfontsize",12)==0) {
-                      command=true;
-                      command_nr=musicfontsize;
-                      commandlength=12;
-                    } else if (strncmp(buffer+n,"streamfontsize",13)==0) {
-                      command=true;
-                      command_nr=streamfontsize;
-                      commandlength=13;
-                    } else if (strncmp(buffer+n,"moviefontsize",12)==0) {
-                      command=true;
-                      command_nr=moviefontsize;
-                      commandlength=12;
-                    } else command=false;
-                }
-                strcpy(value,"");
-                if (command) {
-                  while((n<strlen(buffer)) && (!(valueok))) {
-                    if ((buffer[n]!=10) && (buffer[n]!='=')) {
-                      if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
-                        valueok=true;
-                        strcpy(value,buffer+n+commandlength+2);
-                        nn=strlen(value);
-                        if (nn>0) {
-                            if (value[nn-1]=='\n') value[nn-1]=0;
-                            else value[nn]=0;
-                        }
-                      }
-                    }
-                    n++;
+      while(!(feof(fil))) {
+        fgets(buffer,512,fil);
+        n=0;
+        nn=0;
+        command=false;
+        valueok=false;
+        // remove all spaces
+        while((n<strlen(buffer)) && (*(buffer+n)==32)) n++;
+        if (n!=strlen(buffer)) {
+          // test for command
+          if (buffer[n]!='#') {
+            if (strncmp(buffer+n,"backend",6)==0) {
+              command=true;
+              command_nr=setbackend;
+              commandlength=6;
+            } else if (strncmp(buffer+n,"mythhost",7)==0)  {
+              command=true;
+              command_nr=sethostname;
+              commandlength=7;
+            } else if (strncmp(buffer+n,"mysqlhost",8)==0) {
+              command=true;
+              command_nr=setmysqlhost;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"mysqluser",8)==0) {
+              command=true;
+              command_nr=setmysqluser;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"mysqlpass",8)==0) {
+              command=true;
+              command_nr=setmysqlpass;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"soundsystem",10)==0) {
+              command=true;
+              command_nr=setsoundsystem;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"soundoutport",11)==0) {
+              command=true;
+              command_nr=setsoundoutport;
+              commandlength=11;
+            } else if (strncmp(buffer+n,"screensaver=",12)==0) {
+              command=true;
+              command_nr=setscreensaver;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"screensavername",14)==0) {
+              command=true;
+              command_nr=setscreensavername;
+              commandlength=14;
+            } else if (strncmp(buffer+n,"screensize",9)==0) {
+              command=true;
+              command_nr=setscreensize;
+              commandlength=9;
+            } else if (strncmp(buffer+n,"tema",3)==0) {
+              command=true;
+              command_nr=settema;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"font",3)==0) {
+              command=true;
+              command_nr=setfont;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"mouse",4)==0) {
+              command=true;
+              command_nr=setmouse;
+              commandlength=4;
+            } else if (strncmp(buffer+n,"use3d",4)==0) {
+              command=true;
+              command_nr=setuse3d;
+              commandlength=4;
+            } else if (strncmp(buffer+n,"land",3)==0) {
+              command=true;
+              command_nr=setland;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"fullscreen",9)==0) {
+              command=true;
+              command_nr=setscreenmode;
+              commandlength=9;
+            } else if (strncmp(buffer+n,"configdefaultmusicpath",21)==0) {
+              command=true;
+              command_nr=setconfigdefaultmusicpath;
+              commandlength=21;
+            } else if (strncmp(buffer+n,"configdefaultmoviepath",21)==0) {
+              command=true;
+              command_nr=setconfigdefaultmoviepath;
+              commandlength=21;
+            } else if (strncmp(buffer+n,"videoplayer",10)==0) {
+              command=true;
+              command_nr=setvideoplayer;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"debug",4)==0) {
+              command_nr=setdebugmode;
+              command=true;
+              commandlength=4;
+              debugmode=atoi(value);		// set debug mode from config file
+              showfps=true;
+            } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
+              command=true;
+              command_nr=setuvmetertype;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
+              command=true;
+              command_nr=setvolume;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
+              command=true;
+              command_nr=tvgraberupdate;
+              commandlength=13;
+              // vi do not have tvgraberpath in config file
+            } else if ((strncmp(buffer+n,"tvgraber",7)==0) && (strncmp(buffer+n,"tvgraberpath",11)!=0)) {
+              command=true;
+              command_nr=settvgraber;
+              commandlength=7;
+            } else if (strncmp(buffer+n,"tvguidercolor",12)==0) {
+              command=true;
+              command_nr=tvguidercolor;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"tvguidefontsize",14)==0) {
+              command=true;
+              command_nr=tvguidefontsize;
+              commandlength=14;
+            } else if (strncmp(buffer+n,"radiofontsize",12)==0) {
+              command=true;
+              command_nr=radiofontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"musicfontsize",12)==0) {
+              command=true;
+              command_nr=musicfontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"streamfontsize",13)==0) {
+              command=true;
+              command_nr=streamfontsize;
+              commandlength=13;
+            } else if (strncmp(buffer+n,"moviefontsize",12)==0) {
+              command=true;
+              command_nr=moviefontsize;
+              commandlength=12;
+            } else command=false;
+          }
+          strcpy(value,"");
+          if (command) {
+            while((n<strlen(buffer)) && (!(valueok))) {
+              if ((buffer[n]!=10) && (buffer[n]!='=')) {
+                if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
+                  valueok=true;
+                  strcpy(value,buffer+n+commandlength+2);
+                  nn=strlen(value);
+                  if (nn>0) {
+                      if (value[nn-1]=='\n') value[nn-1]=0;
+                      else value[nn]=0;
                   }
                 }
-                if ((command) && (valueok)) {
-                    // set backupend system to XBMC or mythtv
-                    if (command_nr==setbackend) {
-                      strcpy(configbackend,value);
-                      printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
-                      printf("Mode selected : %s\n",configbackend);
-                      printf("*********************************************************\n");
-                    }
-                    // set tv graber
-                    else if (command_nr==settvgraber) {
-                      strcpy(configbackend_tvgraber,value);
-                      if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")==0) aktiv_tv_graber.graberaktivnr=1;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) aktiv_tv_graber.graberaktivnr=2;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")==0) aktiv_tv_graber.graberaktivnr=3;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) aktiv_tv_graber.graberaktivnr=4;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")==0) aktiv_tv_graber.graberaktivnr=5;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) aktiv_tv_graber.graberaktivnr=6;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) aktiv_tv_graber.graberaktivnr=7;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) aktiv_tv_graber.graberaktivnr=8;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")==0) aktiv_tv_graber.graberaktivnr=9;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")==0) aktiv_tv_graber.graberaktivnr=10;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) aktiv_tv_graber.graberaktivnr=11;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")==0) aktiv_tv_graber.graberaktivnr=12;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_huro")==0) aktiv_tv_graber.graberaktivnr=13;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")==0) aktiv_tv_graber.graberaktivnr=14;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) aktiv_tv_graber.graberaktivnr=15;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) aktiv_tv_graber.graberaktivnr=16;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) aktiv_tv_graber.graberaktivnr=17;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")==0) aktiv_tv_graber.graberaktivnr=18;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) aktiv_tv_graber.graberaktivnr=19;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")==0) aktiv_tv_graber.graberaktivnr=20;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) aktiv_tv_graber.graberaktivnr=21;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")==0) aktiv_tv_graber.graberaktivnr=22;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) aktiv_tv_graber.graberaktivnr=23;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")==0) aktiv_tv_graber.graberaktivnr=24;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
-                      else aktiv_tv_graber.graberaktivnr=0;
-
-                      printf("**************** Set config xmltv graber ****************\n");
-                      printf("Tv graber ....: %s\n",configbackend_tvgraber);
-                      printf("*********************************************************\n");
-                    } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
-                    // set tvguide color or no color
-                    else if (command_nr==tvguidercolor) {
-                     if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors=true;
-                     else aktiv_tv_oversigt.vistvguidecolors=false;
-                    // set hostname
-                    } else if (command_nr==sethostname) strcpy(configmythhost,value);
-                    // mysql host
-                    else if (command_nr==setmysqlhost) strcpy(configmysqlhost,value);
-                    // mysql user
-                    else if (command_nr==setmysqluser) strcpy(configmysqluser,value);
-                    // mysql pass
-                    else if (command_nr==setmysqlpass) strcpy(configmysqlpass,value);
-                    // set sound system
-                    else if (command_nr==setsoundsystem) {
-                      strcpy(configmythsoundsystem,value);
-                      soundsystem=atoi(configmythsoundsystem);
-                    } else if (command_nr==setdebugmode) {
-                      if (strcmp(value,"0")!=0) {
-                        debugmode=atoi(value);
-                        fprintf(stderr,"Set debug mode %d  \n",debugmode);
-                      } else {
-                        debugmode=0;
-                        showfps=false;
-                      }
-                    }
-                    else if (command_nr==setvideoplayer) {
-                      if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
-                      strcpy(configvideoplayer,value);
-                    }
-                    // sound port
-                    else if (command_nr==setsoundoutport) strcpy(configsoundoutport,value);
-                    // screen saver timeout
-                    else if (command_nr==setscreensaver) {
-                      strcpy(configscreensavertimeout,value);
-                      if (atoi(configscreensavertimeout)==0) strcpy(configscreensavertimeout,"30");
-                    }
-                    // screen saver
-                    else if (command_nr==setscreensavername) {
-                      strcpy(configaktivescreensavername,value);
-                      if (strncmp(configaktivescreensavername,"analog",6)==0) {
-                          urtype=ANALOG;
-                      } else if (strncmp(configaktivescreensavername,"digital",6)==0) {
-                          urtype=DIGITAL;
-                      } else if (strncmp(configaktivescreensavername,"3D2",3)==0) {
-                          urtype=SAVER3D2;
-                      } else if (strncmp(configaktivescreensavername,"3D",2)==0) {
-                          urtype=SAVER3D;
-                      } else if (strncmp(configaktivescreensavername,"PICTURE3D",9)==0) {
-                          urtype=PICTURE3D;
-                      } else urtype=ANALOG;
-                    }
-                    // screen size
-                    else if (command_nr==setscreensize) {
-                      screen_size=atoi(value);
-                      if (screen_size==0) screen_size=1;		// set min default screen size mode 1 = 1024/768
-                    }
-                    // select tema
-                    else if (command_nr==settema) {
-                      tema=atoi(value);
-                      if (tema==0) tema=6;
-                    }
-                    // set font name
-                    else if (command_nr==setfont) strcpy(configfontname,value);
-                    // show mouse (visible)
-                    else if (command_nr==setmouse) strcpy(configmouse,value);
-                    // set full screen off
-                    else if (command_nr==setscreenmode) {
-                      if (strcmp(value,"true")==0) full_screen=true; else full_screen=false;
-                    } else if (command_nr==setconfigdefaultmusicpath) {
-                      strcpy(configdefaultmusicpath,value);
-                      strcpy(configmusicpath,value);
-                    } else if (command_nr==setconfigdefaultmoviepath) {
-                      strcpy(configdefaultmoviepath,value);
-                      strcpy(configmoviepath,value);
-                    }
-                    // use 3d effect
-                    else if (command_nr==setuse3d) {
-                        if (strcmp(value,"yes")) {
-                            use3deffect=true;
-                            strcpy(configuse3deffect,"yes");
-                        } else {
-                            use3deffect=false;
-                            strcpy(configuse3deffect,"no");
-                        }
-                    } else if (command_nr==setland) {
-                      configland=1; // set default land code
-                    } else if (command_nr==setuvmetertype) {
-                      configuvmeter=atoi(value);
-                    } else if (command_nr==setvolume) {
-                      configsoundvolume=atof(value);                            // set default volume under play
-                    } else if (command_nr==tvguidefontsize) {
-                      configdefaulttvguidefontsize=atof(value);                 // set tvguide font size
-                    } else if (command_nr==radiofontsize) {
-                       configdefaultradiofontsize=atof(value);                  // set radio font size
-                    } else if (command_nr==musicfontsize) {
-                        configdefaultmusicfontsize=atof(value);                 // set music font size
-                    } else if (command_nr==streamfontsize) {
-                      configdefaultstreamfontsize=atof(value);                  // set stream font size
-                    } else if (command_nr==moviefontsize) {
-                      configdefaultmoviefontsize=atof(value);                   // set movie font size
-                    }
-                }
+              }
+              n++;
             }
-            strcpy(buffer,"");
+          }
+          if ((command) && (valueok)) {
+            // set backupend system to XBMC or mythtv
+            if (command_nr==setbackend) {
+              strcpy(configbackend,value);
+              printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
+              printf("Mode selected : %s\n",configbackend);
+              printf("*********************************************************\n");
+            }
+            // set tv graber
+            else if (command_nr==settvgraber) {
+              strcpy(configbackend_tvgraber,value);
+              if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")==0) aktiv_tv_graber.graberaktivnr=1;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) aktiv_tv_graber.graberaktivnr=2;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")==0) aktiv_tv_graber.graberaktivnr=3;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) aktiv_tv_graber.graberaktivnr=4;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")==0) aktiv_tv_graber.graberaktivnr=5;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) aktiv_tv_graber.graberaktivnr=6;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) aktiv_tv_graber.graberaktivnr=7;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) aktiv_tv_graber.graberaktivnr=8;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")==0) aktiv_tv_graber.graberaktivnr=9;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")==0) aktiv_tv_graber.graberaktivnr=10;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) aktiv_tv_graber.graberaktivnr=11;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")==0) aktiv_tv_graber.graberaktivnr=12;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_huro")==0) aktiv_tv_graber.graberaktivnr=13;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")==0) aktiv_tv_graber.graberaktivnr=14;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) aktiv_tv_graber.graberaktivnr=15;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) aktiv_tv_graber.graberaktivnr=16;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) aktiv_tv_graber.graberaktivnr=17;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")==0) aktiv_tv_graber.graberaktivnr=18;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) aktiv_tv_graber.graberaktivnr=19;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")==0) aktiv_tv_graber.graberaktivnr=20;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) aktiv_tv_graber.graberaktivnr=21;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")==0) aktiv_tv_graber.graberaktivnr=22;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) aktiv_tv_graber.graberaktivnr=23;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")==0) aktiv_tv_graber.graberaktivnr=24;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
+              else aktiv_tv_graber.graberaktivnr=0;
+
+              printf("**************** Set config xmltv graber ****************\n");
+              printf("Tv graber ....: %s\n",configbackend_tvgraber);
+              printf("*********************************************************\n");
+            } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
+            // set tvguide color or no color
+            else if (command_nr==tvguidercolor) {
+             if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors=true;
+             else aktiv_tv_oversigt.vistvguidecolors=false;
+            // set hostname
+            } else if (command_nr==sethostname) strcpy(configmythhost,value);
+            // mysql host
+            else if (command_nr==setmysqlhost) strcpy(configmysqlhost,value);
+            // mysql user
+            else if (command_nr==setmysqluser) strcpy(configmysqluser,value);
+            // mysql pass
+            else if (command_nr==setmysqlpass) strcpy(configmysqlpass,value);
+            // set sound system
+            else if (command_nr==setsoundsystem) {
+              strcpy(configmythsoundsystem,value);
+              soundsystem=atoi(configmythsoundsystem);
+            } else if (command_nr==setdebugmode) {
+              if (strcmp(value,"0")!=0) {
+                debugmode=atoi(value);
+                fprintf(stderr,"Set debug mode %d  \n",debugmode);
+              } else {
+                debugmode=0;
+                showfps=false;
+              }
+            }
+            else if (command_nr==setvideoplayer) {
+              if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
+              strcpy(configvideoplayer,value);
+            }
+            // sound port
+            else if (command_nr==setsoundoutport) strcpy(configsoundoutport,value);
+            // screen saver timeout
+            else if (command_nr==setscreensaver) {
+              strcpy(configscreensavertimeout,value);
+              if (atoi(configscreensavertimeout)==0) strcpy(configscreensavertimeout,"30");
+            }
+            // screen saver
+            else if (command_nr==setscreensavername) {
+              strcpy(configaktivescreensavername,value);
+              if (strncmp(configaktivescreensavername,"analog",6)==0) {
+                  urtype=ANALOG;
+              } else if (strncmp(configaktivescreensavername,"digital",6)==0) {
+                  urtype=DIGITAL;
+              } else if (strncmp(configaktivescreensavername,"3D2",3)==0) {
+                  urtype=SAVER3D2;
+              } else if (strncmp(configaktivescreensavername,"3D",2)==0) {
+                  urtype=SAVER3D;
+              } else if (strncmp(configaktivescreensavername,"PICTURE3D",9)==0) {
+                  urtype=PICTURE3D;
+              } else urtype=ANALOG;
+            }
+            // screen size
+            else if (command_nr==setscreensize) {
+              screen_size=atoi(value);
+              if (screen_size==0) screen_size=1;		// set min default screen size mode 1 = 1024/768
+            }
+            // select tema
+            else if (command_nr==settema) {
+              tema=atoi(value);
+              if (tema==0) tema=6;
+            }
+            // set font name
+            else if (command_nr==setfont) strcpy(configfontname,value);
+            // show mouse (visible)
+            else if (command_nr==setmouse) strcpy(configmouse,value);
+            // set full screen off
+            else if (command_nr==setscreenmode) {
+              if (strcmp(value,"true")==0) full_screen=true; else full_screen=false;
+            } else if (command_nr==setconfigdefaultmusicpath) {
+              strcpy(configdefaultmusicpath,value);
+              strcpy(configmusicpath,value);
+            } else if (command_nr==setconfigdefaultmoviepath) {
+              strcpy(configdefaultmoviepath,value);
+              strcpy(configmoviepath,value);
+            }
+            // use 3d effect
+            else if (command_nr==setuse3d) {
+                if (strcmp(value,"yes")) {
+                    use3deffect=true;
+                    strcpy(configuse3deffect,"yes");
+                } else {
+                    use3deffect=false;
+                    strcpy(configuse3deffect,"no");
+                }
+            } else if (command_nr==setland) {
+              configland=1; // set default land code
+            } else if (command_nr==setuvmetertype) {
+              configuvmeter=atoi(value);
+            } else if (command_nr==setvolume) {
+              configsoundvolume=atof(value);                            // set default volume under play
+            } else if (command_nr==tvguidefontsize) {
+              configdefaulttvguidefontsize=atof(value);                 // set tvguide font size
+            } else if (command_nr==radiofontsize) {
+               configdefaultradiofontsize=atof(value);                  // set radio font size
+            } else if (command_nr==musicfontsize) {
+                configdefaultmusicfontsize=atof(value);                 // set music font size
+            } else if (command_nr==streamfontsize) {
+              configdefaultstreamfontsize=atof(value);                  // set stream font size
+            } else if (command_nr==moviefontsize) {
+              configdefaultmoviefontsize=atof(value);                   // set movie font size
+            }
+          }
         }
-        fclose(fil);
+        strcpy(buffer,"");
+      }
+      fclose(fil);
     } else return(0);
     if (check_zerro_bytes_file(filename)>0) return(1); else return(0);
 }
+
 
 // save config to file
 
@@ -1357,77 +1355,77 @@ void load_config(char * filename) {
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
-        strcpy(configaktivescreensavername,"analog");				  // default analog clock
-        urtype=2;								                              // default screen saver
-        strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
-        strcpy(configmysqlpass,"password");				         	  // default password
-        strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
-        strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
-        strcpy(configmythsoundsystem,"");			          		  //
-        strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
-        strcpy(configclosemythtvfrontend,"no");				     	  //
-        strcpy(configfontname,"FreeMono");			           		//
-        strcpy(configmouse,"1");						                  // enable mouse default
-        FILE * file = fopen(filename, "w");                   // open file for write
-        if (file) {
-          fputs("mysqluser=mythtv\n",file);                  // write config info to config file
-          fputs("mysqlpass=password\n",file);
-          fputs("mysqlhost=localhost\n",file);
-          fputs("mythhost=localhost\n",file);
-          fputs("soundsystem=0\n",file);
-          fputs("soundoutport=int\n",file);
-          fputs("screensaver=60\n",file);
-          strcpy(temptxt,"screensavername=");
-          strcat(temptxt,configaktivescreensavername);
-          strcat(temptxt,"\n");
-          fputs(temptxt,file);
-          fputs("screensize=3\n",file);
-          fputs("tema=3\n",file);
-          fputs("font=FreeMono\n",file);
-          fputs("mouse=1\n",file);
-          fputs("use3d=yes\n",file);
-          fputs("land=1\n",file);
-          fputs("debug=0\n",file);
-          fputs("videoplayer=default\n",file);
-          fputs("configdefaultmusicpath=Music\n",file);
-          fputs("configdefaultmovie=Movies\n",file);
-          fputs("uvmetertype=1\n",file);
-          fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
-          fputs("tvgraberupdate=0\n",file);
-          fputs("tvgrabercolor=yes\n",file);
-          fputs("tvguidefontsize=18\n",file);
-          fputs("radiofontsize=18\n",file);
-          fputs("musicfontsize=18\n",file);
-          fputs("streamfontsize=18\n",file);
-          fputs("moviefontsize=18\n",file);
-          fclose(file);
-        } else {
-          fprintf(stderr,"Config file not writeble ");
-          fprintf(stderr,"%s \n",filename);
-          fprintf(stderr,"check /etc/mythtv-controller.conf is writeble by user.");
-          exit(0);
-        }
+      strcpy(configaktivescreensavername,"analog");				  // default analog clock
+      urtype=2;								                              // default screen saver
+      strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
+      strcpy(configmysqlpass,"password");				         	  // default password
+      strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
+      strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
+      strcpy(configmythsoundsystem,"");			          		  //
+      strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
+      strcpy(configclosemythtvfrontend,"no");				     	  //
+      strcpy(configfontname,"FreeMono");			           		//
+      strcpy(configmouse,"1");						                  // enable mouse default
+      FILE * file = fopen(filename, "w");                   // open file for write
+      if (file) {
+        fputs("mysqluser=mythtv\n",file);                  // write config info to config file
+        fputs("mysqlpass=password\n",file);
+        fputs("mysqlhost=localhost\n",file);
+        fputs("mythhost=localhost\n",file);
+        fputs("soundsystem=0\n",file);
+        fputs("soundoutport=int\n",file);
+        fputs("screensaver=60\n",file);
+        strcpy(temptxt,"screensavername=");
+        strcat(temptxt,configaktivescreensavername);
+        strcat(temptxt,"\n");
+        fputs(temptxt,file);
+        fputs("screensize=3\n",file);
+        fputs("tema=3\n",file);
+        fputs("font=FreeMono\n",file);
+        fputs("mouse=1\n",file);
+        fputs("use3d=yes\n",file);
+        fputs("land=1\n",file);
+        fputs("debug=0\n",file);
+        fputs("videoplayer=default\n",file);
+        fputs("configdefaultmusicpath=Music\n",file);
+        fputs("configdefaultmovie=Movies\n",file);
+        fputs("uvmetertype=1\n",file);
+        fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
+        fputs("tvgraberupdate=0\n",file);
+        fputs("tvgrabercolor=yes\n",file);
+        fputs("tvguidefontsize=18\n",file);
+        fputs("radiofontsize=18\n",file);
+        fputs("musicfontsize=18\n",file);
+        fputs("streamfontsize=18\n",file);
+        fputs("moviefontsize=18\n",file);
+        fclose(file);
+      } else {
+        fprintf(stderr,"Config file not writeble ");
+        fprintf(stderr,"%s \n",filename);
+        fprintf(stderr,"check /etc/mythtv-controller.conf is writeble by user.");
+        exit(0);
+      }
     }
     remoteHost = gethostbyname(configmythhost);
     if (remoteHost) {
+      addr_list = (struct in_addr **) remoteHost->h_addr_list;
+      printf("mediacenter server name is : %s\n", remoteHost->h_name);
+      for(i = 0; addr_list[i] != NULL; i++) {
+        printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+      }
+      strcpy(confighostname,hostname);
+      strcpy(configmysqlhost,remoteHost->h_name);
+      strcpy(configmythhost,remoteHost->h_name);
+      strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
+      remoteHost = gethostbyname(confighostname);
+      if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
-        printf("mediacenter server name is : %s\n", remoteHost->h_name);
+        printf("Hostname : %s\n", remoteHost->h_name);
         for(i = 0; addr_list[i] != NULL; i++) {
-          printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+          printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
-        strcpy(confighostname,hostname);
-        strcpy(configmysqlhost,remoteHost->h_name);
-        strcpy(configmythhost,remoteHost->h_name);
-        strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
-        remoteHost = gethostbyname(confighostname);
-        if (remoteHost) {
-          addr_list = (struct in_addr **) remoteHost->h_addr_list;
-          printf("Hostname : %s\n", remoteHost->h_name);
-          for(i = 0; addr_list[i] != NULL; i++) {
-            printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
-          }
-          strcpy(confighostip,inet_ntoa(*addr_list[0]));
-        } else strcpy(confighostip,"127.0.0.1");
+        strcpy(confighostip,inet_ntoa(*addr_list[0]));
+      } else strcpy(confighostip,"127.0.0.1");
     } else {
       printf("Error recolving hostname.\n");
     }
@@ -1441,107 +1439,107 @@ void load_config(char * filename) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          strcpy(configmusicpath,row[0]);
-          if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
-        }
-        //
-        // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
-        // load default
-        //
-        if (strcmp(configmusicpath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configmusicpath,row[0]);
-              if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
-            }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(configmusicpath,row[0]);
+        if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
+      }
+      //
+      // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
+      // load default
+      //
+      if (strcmp(configmusicpath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            strcpy(configmusicpath,row[0]);
+            if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
           }
         }
-        if ((strlen(configmusicpath)>0) && (configmusicpath[strlen(configmusicpath)-1]!='/')) strcat(configmusicpath,"/");             // add last '/' if not exist
-        strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir' and hostname like '");
-        strcat(sqlselect,configmysqlhost);
-        strcat(sqlselect,"' ");
+      }
+      if ((strlen(configmusicpath)>0) && (configmusicpath[strlen(configmusicpath)-1]!='/')) strcat(configmusicpath,"/");             // add last '/' if not exist
+      strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir' and hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' ");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          strcpy(configmoviepath,row[0]);
+        }
+      } else {
+        fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
+        exit(-1);
+      }
+      //
+      // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
+      // load default
+      //
+      if (strcmp(configmoviepath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
             strcpy(configmoviepath,row[0]);
-          }
-        } else {
-          fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
-          exit(-1);
-        }
-        //
-        // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
-        // load default
-        //
-        if (strcmp(configmoviepath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configmoviepath,row[0]);
-              if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
-            }
+            if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
           }
         }
-        if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
-        strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
+      }
+      if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
+      strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' ");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          strcpy(configpicturepath,row[0]);
+        }
+      } else {
+        printf("No access to mysql database... Can not read GalleryDir table.\n");
+        exit(-1);
+      }
+      if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
+      // find storagegroup dirs and load them
+      strcpy(sqlselect,"SELECT dirname,groupname from storagegroup where hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' and groupname like 'Default' order by id");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        i=0;
+        while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
+          if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
+          strcpy(configstoragerecord[i].path,row[0]);
+          strcpy(configstoragerecord[i].name,row[1]);
+          if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
+          i++;
+        }
+        if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
+      } else {
+          printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
+      }
+
+      // er der ingen storagegroup defined. Load old type from settings table
+      if (strcmp(configrecordpath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
         strcat(sqlselect,configmysqlhost);
         strcat(sqlselect,"' ");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(configpicturepath,row[0]);
+            strcpy(configrecordpath,row[0]);
+            if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
           }
         } else {
-          printf("No access to mysql database... Can not read GalleryDir table.\n");
+          printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
           exit(-1);
         }
-        if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
-        // find storagegroup dirs and load them
-        strcpy(sqlselect,"SELECT dirname,groupname from storagegroup where hostname like '");
-        strcat(sqlselect,configmysqlhost);
-        strcat(sqlselect,"' and groupname like 'Default' order by id");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-          i=0;
-          while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
-            if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
-            strcpy(configstoragerecord[i].path,row[0]);
-            strcpy(configstoragerecord[i].name,row[1]);
-            if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
-            i++;
-          }
-          if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
-        } else {
-            printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
-        }
-
-        // er der ingen storagegroup defined. Load old type from settings table
-        if (strcmp(configrecordpath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
-          strcat(sqlselect,configmysqlhost);
-          strcat(sqlselect,"' ");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configrecordpath,row[0]);
-              if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
-            }
-          } else {
-            printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
-            exit(-1);
-          }
-          if (conn) mysql_close(conn);
-        }
+        if (conn) mysql_close(conn);
+      }
     } else {
       strcpy(configmusicpath,"");
       printf("No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
@@ -1673,54 +1671,54 @@ int hent_mythtv_playlist(int playlistnr) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     while(!(finish)) {
-        // select sange fra myhthtv playlist
-        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-          while ((row = mysql_fetch_row(res)) != NULL) {
-            songintnr=atoi(row[0]);
-            songantal=atol(row[1]);
-            printf("Song antal fundet = %ld \n",songantal);
-            // find cd cover samt sange info i mythtv music database
-            sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
-            mysql_query(conn,sqlselect);
-            res1 = mysql_store_result(conn);
-            if ((res1) && (songantal>0)) {
-              while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                strcpy(songid,row1[0]);
-                strcpy(artistid,row1[5]);
-                strcpy(albumname,row1[3]);
-                strcpy(songname,row1[4]);
-                strcpy(artistname,row1[6]);
-                strcpy(songlength,row1[7]);
-                if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
-                strcpy(tmptxt,configmusicpath);		// start path
-                sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
-                hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
-                strcat(tmptxt,tmptxt1);				// add path
-                strcat(tmptxt,"/");
-                strcpy(tmptxt3,tmptxt);			// er = path
-                strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
-                strcat(tmptxt,row1[1]);				// add filename til sang
-                strcpy(tmptxt,row1[1]);				// add filename til sang
-                if (file_exists(tmptxt3)) {
-                  texture=loadTexture(tmptxt3);				// load texture
-                } else {
-                  printf(" Error loading texture file : %s \n",tmptxt3);
-                  texture=0;
-                }
+      // select sange fra myhthtv playlist
+      sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          songintnr=atoi(row[0]);
+          songantal=atol(row[1]);
+          printf("Song antal fundet = %ld \n",songantal);
+          // find cd cover samt sange info i mythtv music database
+          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+          mysql_query(conn,sqlselect);
+          res1 = mysql_store_result(conn);
+          if ((res1) && (songantal>0)) {
+            while ((row1 = mysql_fetch_row(res1)) != NULL) {
+              strcpy(songid,row1[0]);
+              strcpy(artistid,row1[5]);
+              strcpy(albumname,row1[3]);
+              strcpy(songname,row1[4]);
+              strcpy(artistname,row1[6]);
+              strcpy(songlength,row1[7]);
+              if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
+              strcpy(tmptxt,configmusicpath);		// start path
+              sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
+              hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
+              strcat(tmptxt,tmptxt1);				// add path
+              strcat(tmptxt,"/");
+              strcpy(tmptxt3,tmptxt);			// er = path
+              strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
+              strcat(tmptxt,row1[1]);				// add filename til sang
+              strcpy(tmptxt,row1[1]);				// add filename til sang
+              if (file_exists(tmptxt3)) {
+                texture=loadTexture(tmptxt3);				// load texture
+              } else {
+                printf(" Error loading texture file : %s \n",tmptxt3);
+                texture=0;
               }
-              aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
-            } else {
-              finish=true;
-              error=1;
             }
+            aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
+          } else {
+            finish=true;
+            error=1;
           }
-          songnr++;
         }
-        if ((res==0) || (songnr==songantal)) finish=true;
-        if (songantal==1) finish=true;
+        songnr++;
+      }
+      if ((res==0) || (songnr==songantal)) finish=true;
+      if (songantal==1) finish=true;
     }
     mysql_close(conn);
     if ((finish) && (error==0)) return(songantal); else return(0);
@@ -1961,14 +1959,12 @@ int init_ttf_fonts() {
     aktivfont.updatefontlist();                                                          // update font list
     /* Draw letters as filled polygons. */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
     // Get the number of entries in the catalog list
     count = glcGeti(GLC_CATALOG_COUNT);
     // Print the path to the catalog
     for (ii = 0; ii < count; ii++) {
-        printf("Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
+      printf("Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
     }
-
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
@@ -2063,59 +2059,59 @@ unsigned int do_playlist_restore_playlist() {
     mysql_query(conn,"select * from music_songs_tmp");
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(playlistname,row[1]);				// hent playlist name
-            fundet=false;
-            while(!(fundet)) {
-                sprintf(sqlselect,"select * from music_playlist where playlist_name like '%s'",playlistname);
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(playlistname,row[1]);				// hent playlist name
+        fundet=false;
+        while(!(fundet)) {
+          sprintf(sqlselect,"select * from music_playlist where playlist_name like '%s'",playlistname);
+          mysql_query(conn,"set NAMES 'utf8'");
+          res1 = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res1 = mysql_store_result(conn);
+          if (res1) {
+            while ((row1 = mysql_fetch_row(res1)) != NULL) {
+              if (fundet==false) {
+                printf("Found playlist %s updating ",playlistname);
+                sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
                 mysql_query(conn,"set NAMES 'utf8'");
-                res1 = mysql_store_result(conn);
+                res2 = mysql_store_result(conn);
                 mysql_query(conn,sqlselect);
-                res1 = mysql_store_result(conn);
-                if (res1) {
-                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                    if (fundet==false) {
-                      printf("Found playlist %s updating ",playlistname);
-                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
-                      mysql_query(conn,"set NAMES 'utf8'");
-                      res2 = mysql_store_result(conn);
-                      mysql_query(conn,sqlselect);
-                      res2 = mysql_store_result(conn);
-                      // missing Check done
-                    }
-                    fundet=true;
-                    // find song in music database
-                    songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
-                    songlength=atol(row[8]);							// get song length
-                    // if song exist update playlist
-                    if (songplacering>0) {
-                      printf(".");
-                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
-                      mysql_query(conn,"set NAMES 'utf8'");
-                      res2 = mysql_store_result(conn);
-                      mysql_query(conn,sqlselect);
-                      res2 = mysql_store_result(conn);
-                    } // endif
-                  } // endwhile
-                } // endif
-                printf("\n");
-                if (!(fundet)) {
-                  // else create new playlist
-                  printf("Create new playlist %s......\n",playlistname);
-                  songplacering=find_music_song_placering(row[1],row[2]);
-                  sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
-                  mysql_query(conn,"set NAMES 'utf8'");
-                  res2 = mysql_store_result(conn);
-                  mysql_query(conn,sqlselect);
-                  res2 = mysql_store_result(conn);
-                }
+                res2 = mysql_store_result(conn);
+                // missing Check done
+              }
+              fundet=true;
+              // find song in music database
+              songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
+              songlength=atol(row[8]);							// get song length
+              // if song exist update playlist
+              if (songplacering>0) {
+                printf(".");
+                sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
+                mysql_query(conn,"set NAMES 'utf8'");
+                res2 = mysql_store_result(conn);
+                mysql_query(conn,sqlselect);
+                res2 = mysql_store_result(conn);
+              } // endif
             } // endwhile
+          } // endif
+          printf("\n");
+          if (!(fundet)) {
+            // else create new playlist
+            printf("Create new playlist %s......\n",playlistname);
+            songplacering=find_music_song_placering(row[1],row[2]);
+            sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
+            mysql_query(conn,"set NAMES 'utf8'");
+            res2 = mysql_store_result(conn);
+            mysql_query(conn,sqlselect);
+            res2 = mysql_store_result(conn);
+          }
         } // endwhile
-        // delete tmp tabel again
-        mysql_query(conn,"set NAMES 'utf8'");
-        res2 = mysql_store_result(conn);
-        mysql_query(conn,"drop table music_songs_tmp");
-        res2 = mysql_store_result(conn);
+      } // endwhile
+      // delete tmp tabel again
+      mysql_query(conn,"set NAMES 'utf8'");
+      res2 = mysql_store_result(conn);
+      mysql_query(conn,"drop table music_songs_tmp");
+      res2 = mysql_store_result(conn);
     } // endif
     printf("Finish\n");
     mysql_close(conn);
@@ -2907,7 +2903,8 @@ void display() {
           if (debugmode & 8) fprintf(stderr,"Search movie string: %s \n ",keybuffer);
           // start search for movie title. And fill movie view from db
           if (strcmp(keybuffer,"")!=0) {
-            film_oversigt.opdatere_search_film_oversigt(keybuffer);
+            //film_oversigt.opdatere_search_film_oversigt(keybuffer);
+            film_oversigt.opdatere_film_oversigt(keybuffer);
             film_oversigt.set_search_view(true);
           }
           keybuffer[0]=0;
@@ -5765,7 +5762,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // reset movie search view
           // show all movies again
           if ((GLubyte) names[i*4+3]==28) {
-            film_oversigt.opdatere_search_film_oversigt("%");
+            film_oversigt.opdatere_film_oversigt("%");
             //  remove search flag again and show all movies
             film_oversigt.set_search_view(false);
           }
