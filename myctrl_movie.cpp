@@ -7,6 +7,7 @@
 #include <mysql.h>                      // mysql stuf
 #include <dirent.h>                     // dir functions
 #include <linux/limits.h>
+#include <sys/stat.h>                   // stats func for file/dir info struct
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -461,17 +462,28 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     bool allokay=false;
     bool dbexist=false;
     DIR *dirp=NULL;
+    DIR *subdirp=NULL;
     struct dirent *moviefil=NULL;
+    struct dirent *submoviefil=NULL;
     char *ext;
     char filename[256];
     char userhomedir[2000];
     char movietitle[200];
     char moviepath1[2000];
+    char statfilename[2000];
     bool fundet;
     // mysql vars
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    struct stat statbuffer;
+    bool film_ok=false;
+
+    int movieyear=2000;
+    float movieuserrating=1.0f;
+    int movielength=120;
+
+
     // mysql stuf
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     strcpy(database,dbname);
@@ -563,37 +575,104 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         while (moviefil = readdir(dirp)) {
           if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
             ext = strrchr(moviefil->d_name, '.');
-            if (ext) strcpy(filename,moviefil->d_name);
-            strcpy(movietitle,filename);
-            //make real title from filename
-            ext=strrchr(movietitle,'.');
             if (ext) {
-              *(ext)='\0';
+              strcpy(filename,moviefil->d_name);
             }
-            strcpy(moviepath1,filename);
-            if (debugmode & 16) printf("Checking/Update %s \n",movietitle);
-            int movieyear=2000;
-            float movieuserrating=1.0f;
-            int movielength=120;
-            fundet=false;
-            sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
-            mysql_query(conn,sqlselect);
-            res = mysql_store_result(conn);
-            if (res) {
-              while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+            // get title from dir/file name
+            strcpy(movietitle,filename);
+            strcpy(statfilename,configmoviepath);
+            strcat(statfilename,"/");
+            strcat(statfilename,moviefil->d_name);
+            if (stat(statfilename,&statbuffer)==-1) {
+              perror("stat");
+              exit(EXIT_FAILURE);
             }
-            // create record if not exist
-            if (!(fundet)) {
-              sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                                        (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                        movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
-              recnr++;
-              fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
-              mysql_query(conn,sqlselect);
-              res = mysql_store_result(conn);
-              if ((mysql_error(conn)) && (debugmode & 512)) {
-                printf("%s\n",mysql_error(conn));
-                exit(0);
+            if ((statbuffer.st_mode & S_IFMT)==S_IFDIR) {
+              // it a dir
+              subdirp=opendir(statfilename);
+              film_ok=false;
+              while (submoviefil = readdir(subdirp)) {
+                ext = strrchr(submoviefil->d_name, '.');
+                if (ext) {
+                  film_ok=false;
+                  if (strcmp(ext,".avi")==0) film_ok=true;
+                  if (strcmp(ext,".mp4")==0) film_ok=true;
+                  if (strcmp(ext,".mkv")==0) film_ok=true;
+                  if (strcmp(ext,".iso")==0) film_ok=true;
+                  if (strcmp(ext,".ISO")==0) film_ok=true;
+                  if (film_ok) {
+                    strcpy(movietitle,submoviefil->d_name);
+                    // name title
+                    ext = strrchr(movietitle, '.');
+                    if (ext) {
+                      *ext='\0';
+                    }
+                    strcpy(moviepath1,moviefil->d_name);                         // a
+                    strcat(moviepath1,"/");
+                    strcat(moviepath1,submoviefil->d_name);                     // get full filename
+                    fundet=false;
+                    if (debugmode & 16) printf("checking movietitle %s \n",movietitle);
+                    sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
+                    mysql_query(conn,sqlselect);
+                    res = mysql_store_result(conn);
+                    if (res) {
+                      while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+                    }
+                    if (!(fundet)) {
+                      sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                                                (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                      recnr++;
+                      fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
+                      mysql_query(conn,sqlselect);
+                      res = mysql_store_result(conn);
+                      if ((mysql_error(conn)) && (debugmode & 512)) {
+                        printf("%s\n",mysql_error(conn));
+                        exit(0);
+                      }
+                    }
+                  }
+                }
+              }
+            } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {
+              ext = strrchr(moviefil->d_name, '.');
+              if (ext) {
+                film_ok=false;
+                if (strcmp(ext,".avi")==0) film_ok=true;
+                if (strcmp(ext,".mp4")==0) film_ok=true;
+                if (strcmp(ext,".mkv")==0) film_ok=true;
+                if (strcmp(ext,".iso")==0) film_ok=true;
+                if (strcmp(ext,".ISO")==0) film_ok=true;
+                if (film_ok) {
+                  strcpy(movietitle,moviefil->d_name);
+                  // name title
+                  ext = strrchr(movietitle, '.');
+                  if (ext) {
+                    *ext='\0';
+                  }
+                  strcpy(moviepath1,moviefil->d_name);                         // get full filename
+                  fundet=false;
+                  if (debugmode & 16) printf("checking movietitle %s \n",movietitle);
+                  sprintf(sqlselect,"select title from videometadata where title like '%s' and filename like '%s' limit 1",movietitle,moviepath1);
+                  mysql_query(conn,sqlselect);
+                  res = mysql_store_result(conn);
+                  if (res) {
+                    while ((row = mysql_fetch_row(res)) != NULL) fundet=true;
+                  }
+                  if (!(fundet)) {
+                    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+                                                              (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                    recnr++;
+                    fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
+                    mysql_query(conn,sqlselect);
+                    res = mysql_store_result(conn);
+                    if ((mysql_error(conn)) && (debugmode & 512)) {
+                      printf("%s\n",mysql_error(conn));
+                      exit(0);
+                    }
+                  }
+                }
               }
             }
           }
