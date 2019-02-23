@@ -12268,7 +12268,7 @@ int main(int argc, char** argv) {
     printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
     printf("Screen mode %d\n",screen_size);
     // get first monitor screen size (pixel)
-    dpy = XOpenDisplay(":0");
+    dpy = XOpenDisplay(":1");
     if (dpy) {
       rootxwindow = RootWindow(dpy, 0);
       XRRScreenResources *xscreen_conf = XRRGetScreenResources(dpy, rootxwindow);
