@@ -452,7 +452,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     char convert_command1[2000];
     char sqlselect[4000];
     char mainsqlselect[2000];
-    char temptxt[1000];
+    char temptxt[2000];
     unsigned int recnr=0;
     unsigned int i;
     int filmantal=0;
@@ -969,6 +969,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       fclose(filhandle);							// close log file again
     }
     // check if movied is deleted in dir
+    /*
     if (is_db_updated_then_do_clean_up) {
       sprintf(mainsqlselect,"SELECT videometadata.intid,filename from videometadata");
       conn=mysql_init(NULL);
@@ -1002,6 +1003,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         if (filhandle) fclose(filhandle);
       }
     }
+    */
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
     if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
