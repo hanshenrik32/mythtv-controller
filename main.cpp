@@ -4485,17 +4485,23 @@ void display() {
           int qq=1;
           int uvypos=0;
           if ((configuvmeter==1) && (screen_size!=4)) {
-            printf("Draw UV\n");
+            printf("Draw  22 = %f * ",(int) specLeft[24*3]);
+            for(int xx=0;xx<90;xx+=3) {
+              printf("%0.2f ",specLeft[xx]);
+            }
+            printf("\n");
             glPushMatrix();
             winsizx=16;
             winsizy=16;
             int xpos=1350;
             int ypos=10;
-            for(qq=0;qq<10;qq++) {
+            for(qq=0;qq<16;qq++) {
               high=3;
-              //high=sqrt(spec[(qq*1)+1])*10.0f;
               ypos=10;
-              //high=sqrt(spec[(qq*2)+1])*30.0f;
+              //high=(int) spec[(qq*2)+1]*30.0f;
+              high=(int) fabsf(specLeft[(21*3)+(qq*3)]);
+              high+=1;
+              if (high>14) high=14;
               for(i=0;i<high;i++) {
                 // uv
                 glEnable(GL_TEXTURE_2D);
@@ -4548,7 +4554,7 @@ void display() {
                 glEnd(); //End quadrilateral coordinates
                 ypos=ypos+(i*18);
               }
-              uvypos+=18;
+              uvypos+=14;
             }
             glPopMatrix();
 
