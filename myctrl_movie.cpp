@@ -485,6 +485,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     unsigned int del_rec_nr;
     bool is_db_updated_then_do_clean_up=false;
     long delrecid;
+    unsigned int filepathsize;
+    char *file_to_check_path;
     // mysql stuf
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     strcpy(database,dbname);
@@ -969,41 +971,47 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       fclose(filhandle);							// close log file again
     }
     // check if movied is deleted in dir
-    /*
+
     if (is_db_updated_then_do_clean_up) {
       sprintf(mainsqlselect,"SELECT videometadata.intid,filename from videometadata");
       conn=mysql_init(NULL);
       if (conn) {
         filhandle=0;
-        filhandle=fopen("movie_cleanup_info.log","w");
+        filhandle=fopen("movie_cleanup_info.log","r+");
+        // if file not exist crete first time
+        if (filhandle==NULL) filhandle=fopen("movie_cleanup_info.log","w+");
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         mysql_query(conn,mainsqlselect);
         res = mysql_store_result(conn);
         if (res) {
-          while ((row = mysql_fetch_row(res)) != NULL)  {
-            strcpy(temptxt,configmoviepath);                                        // make path to file
-            strcat(temptxt,"/");
-            strcat(temptxt,row[1]);
-            if (strcmp(temptxt,"")!=0) {
-              if (!(file_exists(temptxt))) {
-                fputs("Movie deleted filename ",filhandle);
-                fputs(row[1],filhandle);                                        // write to log file
-                fputs("\n",filhandle);
-                delrecid=atol(row[0]);
-                sprintf(sqlselect,"delete from videometadata where intid=%d limit 1",delrecid);
-                mysql_query(conn,sqlselect);
-                res = mysql_store_result(conn);
-                // delete from db
+          while ((res) && ((row = mysql_fetch_row(res)) != NULL))  {
+            filepathsize=strlen(configmoviepath)+strlen(row[1])+1+1;            // + NULL + /
+            file_to_check_path=new char[filepathsize];
+            if (file_to_check_path) {
+              strcpy(file_to_check_path,configmoviepath);                                        // make path to file
+              strcat(file_to_check_path,"/");
+              strcat(file_to_check_path,row[1]);
+              if (strlen(file_to_check_path)>1) {
+                if (!(file_exists(file_to_check_path))) {
+                  fputs("Movie deleted filename ",filhandle);
+                  fputs(row[1],filhandle);                                        // write to log file
+                  fputs("\n",filhandle);
+                  delrecid=atol(row[0]);
+                  // delete from db
+                  sprintf(sqlselect,"delete from videometadata where intid=%d limit 1",delrecid);
+                  mysql_query(conn,sqlselect);
+                  res = mysql_store_result(conn);
+                }
               }
             }
+            delete [] file_to_check_path;
           }
         }
         if (filhandle) fclose(filhandle);
       }
     }
-    */
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
     if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);

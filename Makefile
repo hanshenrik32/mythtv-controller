@@ -3,7 +3,7 @@ C = gcc
 # -Wall
 CFLAGS = -Wformat-truncation -pthread -m32 -Wformat-overflow -std=c++11
 
-PROG     = mythtv-controller
+PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
@@ -77,8 +77,6 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-
-
 
 $(PROG): $(SRCS)
 	$(CC) $(CFLAGS) $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)

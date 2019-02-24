@@ -1120,11 +1120,11 @@ void show_setup_font(int startofset) {
     glPushMatrix();
     // close buttons
     glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(0.0f, 0.0f, 0.0f);
-    glBindTexture(GL_TEXTURE_2D,_textureclose);
+    glBindTexture(GL_TEXTURE_2D,_textureclose);                            // _texturesetupclose
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     winsizx=100;
@@ -1708,7 +1708,7 @@ void show_setup_sql() {
     winsizx=100;
     winsizy=100;
     xpos=450;
-    ypos=0;
+    ypos=-10;
     glLoadName(40);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -3519,6 +3519,7 @@ void show_setup_tv_graber(int startofset) {
     glPushMatrix();
     // close buttons
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(0.0f, 0.0f, 0.0f);
