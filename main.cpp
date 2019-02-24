@@ -2320,7 +2320,6 @@ void display() {
     bool startup=true;
     // uv color table
     static int tmpcounter=0;
-
     float analogclock_color_table[]={1.0,1.0,1.0, \
                                      0.8,0.8,0.8, \
                                      0.6,0.6,0.6, \
@@ -2381,23 +2380,17 @@ void display() {
                           0.8,0.1,0.1};
     struct timeb tb;
     struct tm* t;
-
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
     static float angleHour = 0,angleMin  = 0,angleSec  = 0;
     static float last_angleSec=0.0f;
     bool clock_udpate;
     static int lastsec=0;
-
     int winsizx=1920;
     int winsizy=1080;
-
-
-    static bool firsttime=true;
+    static bool firsttime=true;                                                 // gen first time clock
     static bool clock_gluptimetime=false;
     static GLuint index;
     static int lastohur;
-
-
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glLoadIdentity();
     rawtime=time(NULL);                                 // hent now time
@@ -2595,7 +2588,6 @@ void display() {
             glTranslatef(0.0f, 0.0f, -7.0f);
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
-
 
             // music gfx loaded
             // if not load before screen saver
@@ -2873,6 +2865,7 @@ void display() {
       glEnd();
       glPopMatrix();
     }
+    //
     if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
       show_newmovietimeout=0;
       vis_nyefilm_oversigt=false;
@@ -2889,7 +2882,6 @@ void display() {
       if (fknapnr==0) show_newmovietimeout--;
       film_oversigt.show_minifilm_oversigt(0,0);
     }
-
     // search movies
     if (vis_film_oversigt) {
       if (keybufferindex>0) {
@@ -2910,7 +2902,6 @@ void display() {
         }
       }
     }
-
     // search radio station buffer search
     if ((vis_radio_oversigt) && (!(visur)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
@@ -2931,7 +2922,7 @@ void display() {
         }
       }
     }
-    //
+    // search func for music
     if ((vis_music_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
         keybufferopenwin=true;					// yes open filename window
@@ -3154,7 +3145,6 @@ void display() {
       glcRenderString(temptxt1);
       glPopMatrix();
     }
-
     //
     // skal vi til at spørge ask open dir or play (ask about play)
     //
@@ -3858,6 +3848,7 @@ void display() {
           // play position
           unsigned int ms = 0;
           float frequency;
+          vis_error=false;
           if (vis_error==false)  {
             #if defined USE_FMOD_MIXER
             result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
@@ -3869,14 +3860,13 @@ void display() {
             if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
               ERRCHECK(result,do_play_music_aktiv_table_nr);
             }
-
             result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
             if (result!=FMOD_OK) {
               ERRCHECK(result,do_play_music_aktiv_table_nr);
             }
             #endif
             #if defined USE_SDL_MIXER
-            ms=2000;
+            ms=0;
             playtime_songlength=20000;
             lenbytes=200;
             frequency=audio_rate;		// show rate
@@ -3884,7 +3874,6 @@ void display() {
             #endif
             // do the calc
             #if defined USE_FMOD_MIXER
-            ms=2000;
             if ((playtime_songlength>0) && (result==FMOD_OK)) {
               kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
             } else {
@@ -3895,12 +3884,14 @@ void display() {
               playtime=ms/1000;
             } else {
               playtime_songlength=0;
-              playtime=0;
+              playtime=ms/1000;
             }
             #endif
           } else if (vis_error) {
             kbps=0;
             ms=0;
+            playtime_songlength=0;
+            playtime=ms/1000;
           }
           glPushMatrix();
           glColor3f(0.6f, 0.6f, 0.6f);
@@ -4222,36 +4213,31 @@ void display() {
               // play position
               unsigned int ms = 0;
               float frequency;
-              if (vis_error==false) {
-                #if defined USE_FMOD_MIXER
-                result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
-                if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-                  ERRCHECK(result,0);
-                }
-                // get play length new version
-                result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
-                if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-                  ERRCHECK(result,do_play_music_aktiv_table_nr);
-                }
-                result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
-                if (result!=FMOD_OK) {
-                  ERRCHECK(result,0);
-                }
-                // do the calc
-                if (result==FMOD_OK) {
-                  //playtime_songlength=playtime_songlength/1000;
-                  radio_playtime=ms/1000;
-                } else {
-                  radio_playtime_songlength=0;
-                  radio_playtime=0;
-                }
-                #endif
-                #if defined USE_SDL_MIXER
-                #endif
-              } else if (vis_error) {
-                kbps=0;
-                ms=0;
+              #if defined USE_FMOD_MIXER
+              result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
+              if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+                ERRCHECK(result,0);
               }
+              // get play length new version
+              result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
+              if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+                ERRCHECK(result,do_play_music_aktiv_table_nr);
+              }
+              result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
+              if (result!=FMOD_OK) {
+                ERRCHECK(result,0);
+              }
+              // do the calc
+              if (result==FMOD_OK) {
+                //playtime_songlength=playtime_songlength/1000;
+                radio_playtime=ms/1000;
+              } else {
+                radio_playtime_songlength=0;
+                radio_playtime=0;
+              }
+              #endif
+              #if defined USE_SDL_MIXER
+              #endif
               glPushMatrix();
               glDisable(GL_TEXTURE_2D);
               // show song name
@@ -4495,7 +4481,78 @@ void display() {
             spec2[i] = specRight[i]*2;
           }
           // draw uv meter
+          int high=2;
+          int qq=1;
+          int uvypos=0;
           if ((configuvmeter==1) && (screen_size!=4)) {
+            printf("Draw UV\n");
+            glPushMatrix();
+            winsizx=16;
+            winsizy=16;
+            int xpos=1350;
+            int ypos=10;
+            for(qq=0;qq<10;qq++) {
+              high=3;
+              //high=sqrt(spec[(qq*1)+1])*10.0f;
+              ypos=10;
+              //high=sqrt(spec[(qq*2)+1])*30.0f;
+              for(i=0;i<high;i++) {
+                // uv
+                glEnable(GL_TEXTURE_2D);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glTranslatef(0.0f, 0.0f, 0.0f);
+                glBindTexture(GL_TEXTURE_2D,texturedot);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                switch(i) {
+                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
+                    break;
+                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
+                    break;
+                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
+                    break;
+                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
+                    break;
+                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
+                    break;
+                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
+                    break;
+                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
+                    break;
+                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
+                    break;
+                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
+                    break;
+                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
+                    break;
+                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
+                    break;
+                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
+                    break;
+                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
+                    break;
+                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
+                    break;
+                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    break;
+                }
+                glBegin(GL_QUADS); //Begin quadrilateral coordinates
+                glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
+                glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+winsizy , 0.0);
+                glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
+                glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
+                glEnd(); //End quadrilateral coordinates
+                ypos=ypos+(i*18);
+              }
+              uvypos+=18;
+            }
+            glPopMatrix();
+
+/*
             glPushMatrix();
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D,_textureuv1);
@@ -4554,6 +4611,7 @@ void display() {
               }
             }
             glPopMatrix();
+            */
           } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
             //glEnable(GL_TEXTURE_2D);
