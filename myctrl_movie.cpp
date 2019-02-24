@@ -390,7 +390,7 @@ void hentgenre(struct film_oversigt_type *film,unsigned int refnr) {
     res = mysql_store_result(conn);
     i=0;
     if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+      while ((res) && (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE))) {
         if (strlen(film->genre)<160) {
           if (i>0) strcat(film->genre,",");
           strcat(film->genre,row[1]);
@@ -420,7 +420,7 @@ void hentcast(struct film_oversigt_type *film, unsigned int refnr) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (i<19)) {
+      while ((res) && (((row = mysql_fetch_row(res)) != NULL) && (i<19))) {
         strcpy(film->cast[i],row[0]);		// hent crew
         i++;
       }
@@ -1005,8 +1005,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   res = mysql_store_result(conn);
                 }
               }
+              delete [] file_to_check_path;
             }
-            delete [] file_to_check_path;
           }
         }
         if (filhandle) fclose(filhandle);
@@ -1056,7 +1056,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
+        while ((res) && ((row = mysql_fetch_row(res)) != NULL)) {
           dbexist=true;
         }
       } else dbexist=false;
@@ -1071,7 +1071,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       res = mysql_store_result(conn);
       i=0;
       if (res) {
-        while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
+        while ((res) && (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE))) {
           filmantal++;
           filmoversigt[i].setfilmid(atoi(row[0]));
           filmoversigt[i].setfilmtitle(row[1]);
