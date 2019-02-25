@@ -4458,48 +4458,85 @@ void display() {
           #if defined USE_FMOD_MIXER
           FMOD_DSP_PARAMETER_FFT *fft=0;
           int chan;
+
+          float spectrum[2000];
+          int frequencyOctaves[13];
+          static bool build_frequencyOctaves=false;
+          if (build_frequencyOctaves==false) {
+            for(int zz=0;zz<sampleSize;zz++) {
+              spectrum[zz]=0.0f;
+            }
+            build_frequencyOctaves=true;
+            printf("Create table\n");
+            for (int i=0;i<13;i++) {
+              frequencyOctaves[i]=(int) (44100/2)/(float) pow(2,12-i);
+              printf("%d \n",frequencyOctaves[i]);
+            }
+          }
+          FMOD::ChannelGroup *mastergroup;
           if (!(dsp)) {
+            sndsystem->getMasterChannelGroup(&mastergroup);
             sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
-            dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, 128);
-            channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
+            dsp->setParameterInt(FMOD_DSP_FFT_WINDOWTYPE,FMOD_DSP_FFT_WINDOW_TRIANGLE);
+            dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, sampleSize);
+            mastergroup->addDSP(0, dsp);
+            //channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
             dsp->setActive(true);
           }
-          dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+          result=dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
           if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
           #endif
           spec = new float[sampleSize];
           spec2 = new float[sampleSize];
+          int length = fft->length/2;
+          int numChannels = fft->numchannels;
+          /*
+          if (fft) {
+            if (length > 0) {
+              int indexFFT = 0;
+              for (int index = 0; index < 15; ++index) {
+                for (int frec = 0; frec < frequencyOctaves[index]; ++frec) {
+                  for (int channel = 0; channel < fft->numchannels; channel++) {
+                    spectrum[index] += (int) fft->spectrum[channel][indexFFT];
+                  }
+                  ++indexFFT;
+                }
+                //spectrum[index] /= (float)(frequencyOctaves[index] * numChannels);
+              }
+            }
+          }
+          */
           if (fft) {
             // new ver
             for (int i=0; i<fft->length; i++) {
-              specLeft[i]=fft->spectrum[0][i];
-              specRight[i]=fft->spectrum[1][i];
+              spectrum[i]=fft->spectrum[0][i]+fft->spectrum[1][i];
             }
           }
-          for (i = 0; i < sampleSize; i++) {
-            spec[i] = specLeft[i]*2;
-            spec2[i] = specRight[i]*2;
+
+          /*
+          // show array data
+          printf("Data\n");
+          if (fft) {
+            for(int z=0;z<sampleSize;z++) {
+              printf("%f ",spectrum[z]*100);
+            }
           }
+          */
+
+
           // draw uv meter
           int high=2;
           int qq=1;
           int uvypos=0;
           if ((configuvmeter==1) && (screen_size!=4)) {
-            printf("Draw  22 = %f * ",(int) specLeft[24*3]);
-            for(int xx=0;xx<90;xx+=3) {
-              printf("%0.2f ",specLeft[xx]);
-            }
-            printf("\n");
             glPushMatrix();
             winsizx=16;
             winsizy=16;
             int xpos=1350;
             int ypos=10;
             for(qq=0;qq<16;qq++) {
-              high=3;
               ypos=10;
-              //high=(int) spec[(qq*2)+1]*30.0f;
-              high=(int) fabsf(specLeft[(21*3)+(qq*3)]);
+              high=sqrt(spectrum[qq])*10;
               high+=1;
               if (high>14) high=14;
               for(i=0;i<high;i++) {
@@ -4508,7 +4545,7 @@ void display() {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                 glColor3f(1.0f, 1.0f, 1.0f);
-                glTranslatef(0.0f, 0.0f, 0.0f);
+//                glTranslatef(0.0f, 0.0f, 0.0f);
                 glBindTexture(GL_TEXTURE_2D,texturedot);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4552,7 +4589,7 @@ void display() {
                 glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
                 glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
                 glEnd(); //End quadrilateral coordinates
-                ypos=ypos+(i*18);
+                ypos=ypos+16;
               }
               uvypos+=14;
             }
