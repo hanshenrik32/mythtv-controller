@@ -80,8 +80,13 @@ int movie_oversigt_loaded_nr=0;                                                 
 bool movie_oversigt_gfx_loading=false;
 bool show_status_update=false;
 
-
 FMOD::DSP* dsp = 0;                   // fmod Sound device
+
+// screen saver uv stuf
+float spectrum[2000];
+int frequencyOctaves[13];
+
+
 
 // from compiler (debuger)
 extern char __BUILD_DATE;
@@ -2320,6 +2325,7 @@ void display() {
     bool startup=true;
     // uv color table
     static int tmpcounter=0;
+    // fade colors (over time) for clock
     float analogclock_color_table[]={1.0,1.0,1.0, \
                                      0.8,0.8,0.8, \
                                      0.6,0.6,0.6, \
@@ -4459,8 +4465,8 @@ void display() {
           FMOD_DSP_PARAMETER_FFT *fft=0;
           int chan;
 
-          float spectrum[2000];
-          int frequencyOctaves[13];
+//          float spectrum[2000];
+//          int frequencyOctaves[13];
           static bool build_frequencyOctaves=false;
           if (build_frequencyOctaves==false) {
             for(int zz=0;zz<sampleSize;zz++) {
@@ -4523,7 +4529,6 @@ void display() {
           }
           */
 
-
           // draw uv meter
           int high=2;
           int qq=1;
@@ -4534,9 +4539,20 @@ void display() {
             winsizy=16;
             int xpos=1350;
             int ypos=10;
+/*
+            if (configuvmeter==3) {
+              glLoadIdentity();
+              glTranslatef(10, 19, 0.0f);                                          // orgwinsizey
+              glRotatef(rr,0.0f,1.0f,0.0f);
+              xpos=orgwinsizex/2;
+              ypos=orgwinsizey/2;
+              rr+=0.1;
+              if (rr>360) rr=0;
+            }
+*/
             for(qq=0;qq<16;qq++) {
               ypos=10;
-              high=sqrt(spectrum[qq])*10;
+              high=sqrt(spectrum[qq])*20;
               high+=1;
               if (high>14) high=14;
               for(i=0;i<high;i++) {
@@ -4545,116 +4561,54 @@ void display() {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                 glColor3f(1.0f, 1.0f, 1.0f);
-//                glTranslatef(0.0f, 0.0f, 0.0f);
                 glBindTexture(GL_TEXTURE_2D,texturedot);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 switch(i) {
-                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                  case 0: glColor4f(uvcolortable2[0],uvcolortable2[1],uvcolortable2[2],1.0);
                     break;
-                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
+                    case 1: glColor4f(uvcolortable2[3],uvcolortable2[4],uvcolortable2[5],1.0);
                     break;
-                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
+                    case 2: glColor4f(uvcolortable2[6],uvcolortable2[7],uvcolortable2[8],1.0);
                     break;
-                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
+                    case 3: glColor4f(uvcolortable2[9],uvcolortable2[10],uvcolortable2[11],1.0);
                     break;
-                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
+                    case 4: glColor4f(uvcolortable2[12],uvcolortable2[13],uvcolortable2[14],1.0);
                     break;
-                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
+                    case 5: glColor4f(uvcolortable2[15],uvcolortable2[16],uvcolortable2[17],1.0);
                     break;
-                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
+                    case 6: glColor4f(uvcolortable2[18],uvcolortable2[19],uvcolortable2[20],1.0);
                     break;
-                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
+                    case 7: glColor4f(uvcolortable2[21],uvcolortable2[22],uvcolortable2[23],1.0);
                     break;
-                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
+                    case 8: glColor4f(uvcolortable2[24],uvcolortable2[25],uvcolortable2[26],1.0);
                     break;
-                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
+                    case 9: glColor4f(uvcolortable2[27],uvcolortable2[28],uvcolortable2[29],1.0);
                     break;
-                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
+                    case 10:glColor4f(uvcolortable2[30],uvcolortable2[31],uvcolortable2[32],1.0);
                     break;
-                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
+                    case 11:glColor4f(uvcolortable2[33],uvcolortable2[34],uvcolortable2[35],1.0);
                     break;
-                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
+                    case 12:glColor4f(uvcolortable2[36],uvcolortable2[37],uvcolortable2[38],1.0);
                     break;
-                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
+                    case 13:glColor4f(uvcolortable2[39],uvcolortable2[40],uvcolortable2[41],1.0);
                     break;
-                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
+                    case 14:glColor4f(uvcolortable2[42],uvcolortable2[43],uvcolortable2[44],1.0);
                     break;
-                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                    default:glColor4f(uvcolortable2[0],uvcolortable2[1],uvcolortable2[2],1.0);
                     break;
                 }
-                glBegin(GL_QUADS); //Begin quadrilateral coordinates
+                glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
                 glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+winsizy , 0.0);
                 glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
                 glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
-                glEnd(); //End quadrilateral coordinates
+                glEnd();
                 ypos=ypos+16;
               }
               uvypos+=14;
             }
             glPopMatrix();
-
-/*
-            glPushMatrix();
-            glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D,_textureuv1);
-            glBindTexture(GL_TEXTURE_2D,texturedot);
-            //glColor4f(1.0f,1.0f,1.0f,1.0f);
-            int uvypos=0;
-            int high;
-            int qq;
-            // Draw uv lines 16
-            for(qq=0;qq<16;qq++) {
-              uvypos=0;
-              high=sqrt(spec[(qq*2)+1])*30.0f;
-              if (high>14) high=14;
-              for(i=0;i<high;i+=1) {
-                switch(i) {
-                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                    break;
-                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
-                    break;
-                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
-                    break;
-                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
-                    break;
-                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
-                    break;
-                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
-                    break;
-                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
-                    break;
-                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
-                    break;
-                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
-                    break;
-                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
-                    break;
-                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
-                    break;
-                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
-                    break;
-                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
-                    break;
-                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
-                    break;
-                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
-                    break;
-                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                    break;
-                }
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
-                glEnd();
-                uvypos+=16;
-              }
-            }
-            glPopMatrix();
-            */
           } else if ((configuvmeter==2) && (screen_size!=4)) {
             glPushMatrix();
             //glEnable(GL_TEXTURE_2D);
@@ -4746,7 +4700,138 @@ void display() {
             }
             // done uv stuf
             glPopMatrix();
+          } else if ((configuvmeter==3) && (screen_size!=4)) {
+            static float rr=0.0f;
+            glPushMatrix();
+            //glLoadIdentity();
+            //glTranslatef(400,400,0);
+            glTranslatef(100.0f, 100.0f, 0.0f);
+            glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
+            //glRotatef(rr,0.0f,1.0f,0.0f);
+            rr+=1.0f;
+            uvypos=0;
+            winsizx=16;
+            winsizy=16;
+            int xxofset;
+            float xpos=0.0f;
+            float ypos=0.0f;
+//            float siz=16.0f;
+            float siz_x=16.0f;
+            float siz_y=8.0f;
+            xpos=(-16)*10;
+            ypos=0.0f;
+            glEnable(GL_TEXTURE_2D);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glColor3f(1.0f, 1.0f, 1.0f);
+            //glBindTexture(GL_TEXTURE_2D,0);
+            glBindTexture(GL_TEXTURE_2D,texturedot);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            //float high=sqrt(spectrum[1])*20;
+            float high;
+            xxofset=10;
+            for(int xp=0;xp<16;xp++) {
+              xpos=(-siz_x)*xxofset;
+              ypos=(siz_y*2)+2.0;
+              high=sqrt(spectrum[xp])*20;
+              for(int yp=0;yp<high;yp++) {
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+                glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+                glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+                glEnd();
+                ypos+=(siz_y*2)+2.0;
+              }
+              xxofset=xxofset-3;
+            }
+              /*
+              xpos=(-siz_x)*13;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(-siz_x)*10;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(-siz_x)*7;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(-siz_x)*4;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(-siz_x)*1;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*2;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*5;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*8;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*11;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*14;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+              xpos=(siz_x)*17;
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+              glEnd();
+
+              ypos+=(siz_y*2)+2.0;
+              */
+
+            glPopMatrix();
           }
+
           // do clean up after uv meters
           delete [] spec;
           delete [] specLeft;
