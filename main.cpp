@@ -4707,128 +4707,74 @@ void display() {
             //glTranslatef(400,400,0);
             glTranslatef(100.0f, 100.0f, 0.0f);
             glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
-            //glRotatef(rr,0.0f,1.0f,0.0f);
-            rr+=1.0f;
+            glRotatef(45,0.0f,1.0f,0.0f);
+            //rr+=0.5f;
             uvypos=0;
             winsizx=16;
             winsizy=16;
             int xxofset;
             float xpos=0.0f;
             float ypos=0.0f;
-//            float siz=16.0f;
-            float siz_x=16.0f;
-            float siz_y=8.0f;
-            xpos=(-16)*10;
+            float siz_x=16.0f;                    // size 16
+            float siz_y=16.0f;                     // size 8
+            xpos=(-16)*16;
             ypos=0.0f;
             glEnable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             glColor3f(1.0f, 1.0f, 1.0f);
-            //glBindTexture(GL_TEXTURE_2D,0);
             glBindTexture(GL_TEXTURE_2D,texturedot);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-            //float high=sqrt(spectrum[1])*20;
             float high;
-            xxofset=10;
-            for(int xp=0;xp<16;xp++) {
+            xxofset=42;
+            for(int xp=0;xp<32;xp++) {
               xpos=(-siz_x)*xxofset;
-              ypos=(siz_y*2)+2.0;
-              high=sqrt(spectrum[xp])*20;
+              ypos=(-400)+((siz_y*2)+2.0);
+              high=sqrt(spectrum[xp])*30;
               for(int yp=0;yp<high;yp++) {
+                // front
                 glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-                glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-                glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
+                glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+                glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
                 glEnd();
+
+
+                // left
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 2
+                glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos), siz_y+(ypos) , 32.0f); // 3
+                glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) , -siz_y+(ypos) , 32.0f); // 4
+                glEnd();
+
+
+/*
+                // right
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+                glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) , -siz_y+(ypos) , 32.0f); // 4
+                glEnd();
+
+
+                // back
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+                glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+                glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+                glEnd();
+  */
+
                 ypos+=(siz_y*2)+2.0;
               }
-              xxofset=xxofset-3;
+              xxofset=xxofset-2;    // mellem rum mellem hver søjle
             }
-              /*
-              xpos=(-siz_x)*13;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(-siz_x)*10;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(-siz_x)*7;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(-siz_x)*4;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(-siz_x)*1;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*2;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*5;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*8;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*11;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*14;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-              xpos=(siz_x)*17;
-              glBegin(GL_QUADS);
-              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f);
-              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f);
-              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f);
-              glEnd();
-
-              ypos+=(siz_y*2)+2.0;
-              */
-
             glPopMatrix();
           }
 
