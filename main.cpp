@@ -4707,16 +4707,16 @@ void display() {
             //glTranslatef(400,400,0);
             glTranslatef(100.0f, 100.0f, 0.0f);
             glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
-            glRotatef(45,0.0f,1.0f,0.0f);
+            glRotatef(0,0.0f,1.0f,0.0f);
             //rr+=0.5f;
             uvypos=0;
             winsizx=16;
             winsizy=16;
-            int xxofset;
+            float xxofset;
             float xpos=0.0f;
             float ypos=0.0f;
-            float siz_x=16.0f;                    // size 16
-            float siz_y=16.0f;                     // size 8
+            float siz_x=22.0f;                    // size 16
+            float siz_y=6.0f;                     // size 8
             xpos=(-16)*16;
             ypos=0.0f;
             glEnable(GL_TEXTURE_2D);
@@ -4726,13 +4726,12 @@ void display() {
             glBindTexture(GL_TEXTURE_2D,texturedot);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
             float high;
-            xxofset=42;
-            for(int xp=0;xp<32;xp++) {
+            xxofset=40.0f;                            // start ofset
+            for(int xp=0;xp<35;xp++) {
               xpos=(-siz_x)*xxofset;
               ypos=(-400)+((siz_y*2)+2.0);
-              high=sqrt(spectrum[xp])*30;
+              high=sqrt(spectrum[xp*3])*30;
               for(int yp=0;yp<high;yp++) {
                 // front
                 glBegin(GL_QUADS);
@@ -4741,27 +4740,20 @@ void display() {
                 glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
                 glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
                 glEnd();
-
-
                 // left
                 glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 2
-                glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos), siz_y+(ypos) , 32.0f); // 3
-                glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) , -siz_y+(ypos) , 32.0f); // 4
+                glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+                glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
                 glEnd();
-
-
-/*
                 // right
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-                glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-                glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) , -siz_y+(ypos) , 32.0f); // 4
+                glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+                glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+                glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
                 glEnd();
-
-
                 // back
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
@@ -4769,11 +4761,9 @@ void display() {
                 glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
                 glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
                 glEnd();
-  */
-
                 ypos+=(siz_y*2)+2.0;
               }
-              xxofset=xxofset-2;    // mellem rum mellem hver søjle
+              xxofset=xxofset-1.8f;    // mellem rum mellem hver søjle
             }
             glPopMatrix();
           }
