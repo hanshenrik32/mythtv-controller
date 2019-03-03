@@ -25,6 +25,7 @@ const char *SHOWVER={"0.36.7"};
 //
 // xmltv update interval in sec
 // default 2 * 60 min
+// value in minute
 //
 const int doxmltvupdateinterval=60*60*2;
 const int dorssupdateinterval=60*60;
