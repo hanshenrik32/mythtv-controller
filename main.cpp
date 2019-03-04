@@ -85,7 +85,7 @@ FMOD::DSP* dsp = 0;                   // fmod Sound device
 // screen saver uv stuf
 float spectrum[2000];                                                           // used for spectium
 float uvmax_values[1024];
-int frequencyOctaves[13];                                                       // 13 octaver
+int frequencyOctaves[15];                                                       // 15 octaver
 
 
 
@@ -714,6 +714,7 @@ GLuint moviebutton;                       //
 GLuint gfxlandemask;                      //
 GLuint gfxlande[80];                      //
 GLuint texturedot;                        //
+GLuint texturedot1;                       //
 // loading window
 GLuint _textureIdloading;                 // loading window
 GLuint _textureIdloading1;                // empty window
@@ -2713,17 +2714,16 @@ void display() {
         //
         // show max value
         //
-        xxofset = 40.0f;                                            // start ofset
-        glBindTexture(GL_TEXTURE_2D,_textureuv1);
+        xxofset = 40.0f;                                                        // start ofset
+        glBindTexture(GL_TEXTURE_2D,texturedot1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //glBindTexture(GL_TEXTURE_2D,texturedot);
         glColor3f(1.0f, 1.0f, 1.0f);
         for(int xp=0;xp<40;xp++) {
           high = sqrt(uvmax_values[xp*3])*30;
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
-          ypos = (-400)+((siz_y*(high*2))+2.0);
+          ypos = (-388)+((siz_y*(high*2))+2.0);
           for(int yp=0;yp<1;yp++) {
             // front
             glBegin(GL_QUADS);
@@ -4663,22 +4663,24 @@ void display() {
       #endif
       int length = fft->length/2;
       int numChannels = fft->numchannels;
+
+
       /*
       if (fft) {
         if (length > 0) {
           int indexFFT = 0;
           for (int index = 0; index < 15; ++index) {
             for (int frec = 0; frec < frequencyOctaves[index]; ++frec) {
-              for (int channel = 0; channel < fft->numchannels; channel++) {
-                spectrum[index] += (int) fft->spectrum[channel][indexFFT];
-              }
+              printf("spectum[index]=value indexFFT=%d frequencyOctaves[index] antal %d \n",indexFFT,frequencyOctaves[index]);
+              spectrum[index] += (int) fft->spectrum[0][indexFFT] +  (int) fft->spectrum[1][indexFFT];
               ++indexFFT;
             }
-            //spectrum[index] /= (float)(frequencyOctaves[index] * numChannels);
+            //spectrum[index] /= (float)(frequencyOctaves[index]);
           }
         }
       }
       */
+
       if (fft) {
         // new ver 3
         for (int i=0; i<fft->length; i++) {
@@ -4688,6 +4690,7 @@ void display() {
           else uvmax_values[i] = fft->spectrum[0][i]+fft->spectrum[1][i];
         }
       }
+
     }
 
     //
@@ -12031,6 +12034,7 @@ void loadgfx() {
     screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
     screensaverbox1=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
+    texturedot1=loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
     _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
@@ -12170,6 +12174,7 @@ void freegfx() {
     glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
     glDeleteTextures( 1, &texturedot);
+    glDeleteTextures( 1, &texturedot1);
     glDeleteTextures( 1, &_textureuv1);                         // uv img
     glDeleteTextures( 1, &_textureuv1_top);                         // uv img
     glDeleteTextures( 1, &_errorbox);                           // error box
