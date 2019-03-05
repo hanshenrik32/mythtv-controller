@@ -2654,7 +2654,7 @@ void display() {
       float siz_y = 6.0f;                     // size 8
       if (snd) {
         glPushMatrix();
-        glTranslatef(100.0f, 100.0f, 0.0f);
+//        glTranslatef(100.0f, 100.0f, 0.0f);
         glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
         glRotatef(0,0.0f,1.0f,0.0f);
         static float rr=0.0f;
@@ -2677,7 +2677,7 @@ void display() {
         for(int xp=0;xp<40;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
-          high = sqrt(spectrum[xp*3])*30;
+          high = sqrt(spectrum[xp]*8)*2;
           for(int yp=0;yp<high;yp++) {
             // front
             glBegin(GL_QUADS);
@@ -2720,7 +2720,7 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor3f(1.0f, 1.0f, 1.0f);
         for(int xp=0;xp<40;xp++) {
-          high = sqrt(uvmax_values[xp*3])*30;
+          high = sqrt(uvmax_values[xp]*8)*2;
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
           ypos = (-388)+((siz_y*(high*2))+2.0);
@@ -2746,7 +2746,7 @@ void display() {
         for(int xp=0;xp<40;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-432)+((siz_y*4)+2.0);
-          high = sqrt(spectrum[xp*3])*30;
+          high = sqrt(spectrum[xp]*4);
           for(int yp=0;yp<high/2;yp++) {
             // front
             glBegin(GL_QUADS);
@@ -4682,17 +4682,16 @@ void display() {
       */
 
       if (fft) {
-        // new ver 3
+        // new ver 4
         for (int i=0; i<fft->length; i++) {
-          spectrum[i] = fft->spectrum[0][i]+fft->spectrum[1][i];
-          if ( (fft->spectrum[0][i]+fft->spectrum[1][i]) > uvmax_values[i] ) uvmax_values[i] = fft->spectrum[0][i]+fft->spectrum[1][i];
-          else if (uvmax_values[i] > 0.0f) uvmax_values[i] = uvmax_values[i] - 0.01f;
-          else uvmax_values[i] = fft->spectrum[0][i]+fft->spectrum[1][i];
+          float spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
+          spectrum[i] = spectum_value;
+          if (spectum_value > uvmax_values[i]) uvmax_values[i] = spectum_value;
+          else if (uvmax_values[i] > 0.0f) uvmax_values[i] = uvmax_values[i] - 1.00f;
+          else uvmax_values[i] = spectum_value;
         }
       }
-
     }
-
     //
     // show uv metter in music player
     //
@@ -4709,7 +4708,7 @@ void display() {
         int ypos = 10;
         for(qq=0;qq<16;qq++) {
           ypos = 10;
-          high = sqrt(spectrum[qq])*20;
+          high = sqrt(spectrum[qq]*2);
           high += 1;
           if (high>14) high=14;
           for(i=0;i<high;i++) {
@@ -4765,7 +4764,35 @@ void display() {
           }
           uvypos += 14;
         }
+
+        float siz_x = 6.0f;                    // size 16
+        float siz_y = 6.0f;                     // size 8
+        xpos = 1350;
+        ypos = 10;
+        for(qq=0;qq<16;qq++) {
+          high = sqrt(uvmax_values[qq]*2);
+          ypos = 10+((siz_y)*high);
+          for(i=0;i<1;i++) {
+            glEnable(GL_TEXTURE_2D);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBindTexture(GL_TEXTURE_2D,texturedot1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+winsizy , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
+            glEnd();
+          }
+          xpos=xpos+siz_x+2;
+        }
+
+
         glPopMatrix();
+
       } else if ((configuvmeter==2) && (screen_size!=4)) {
         glPushMatrix();
         //glEnable(GL_TEXTURE_2D);
