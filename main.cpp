@@ -84,6 +84,8 @@ FMOD::DSP* dsp = 0;                   // fmod Sound device
 
 // screen saver uv stuf
 float spectrum[2000];                                                           // used for spectium
+float spectrum_left[2000];                                                      // used for spectium
+float spectrum_right[2000];                                                     // used for spectium
 float uvmax_values[1024];
 int frequencyOctaves[15];                                                       // 15 octaver
 
@@ -2674,7 +2676,7 @@ void display() {
         glRotatef(0.0f,0.0f,0.0f,0.0f);
         float high;
         xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<40;xp++) {
+        for(int xp=0;xp<46;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
           high = sqrt(spectrum[xp]*8)*2;
@@ -2719,7 +2721,7 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor3f(1.0f, 1.0f, 1.0f);
-        for(int xp=0;xp<40;xp++) {
+        for(int xp=0;xp<46;xp++) {
           high = sqrt(uvmax_values[xp]*8)*2;
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
@@ -2743,7 +2745,7 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,texturedot);
         //glBindTexture(GL_TEXTURE_2D,_textureuv1);
         xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<40;xp++) {
+        for(int xp=0;xp<46;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-432)+((siz_y*4)+2.0);
           high = sqrt(spectrum[xp]*4);
@@ -3515,7 +3517,7 @@ void display() {
         glTranslatef(xof+20.0f,yof+10+5, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        aktivfont.selectfont((char *) "Courier 10 Pitch");
+        //aktivfont.selectfont((char *) "Courier 10 Pitch");
         glcRenderString("Playlist name :");
         glcRenderString(keybuffer);
         glPopMatrix();
@@ -4640,7 +4642,9 @@ void display() {
         build_frequencyOctaves = true;
         for(int zz=0;zz<sampleSize;zz++) {
           spectrum[zz] = 0.0f;
-          uvmax_values[zz] = 0.0f;
+          spectrum_left[zz] = 0.0f;                                             // used for spectium
+          spectrum_right[zz] = 0.0f;                                            // used for spectium
+          uvmax_values[zz] = 0.0f;                                              // used for spectium
         }
         printf("Create table\n");
         for (int i=0;i<13;i++) {
@@ -4686,6 +4690,8 @@ void display() {
         for (int i=0; i<fft->length; i++) {
           float spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
           spectrum[i] = spectum_value;
+          spectrum_left[i] = spectum_value;
+          spectrum_right[i] = spectum_value;
           if (spectum_value > uvmax_values[i]) uvmax_values[i] = spectum_value;
           else if (uvmax_values[i] > 0.0f) uvmax_values[i] = uvmax_values[i] - 1.00f;
           else uvmax_values[i] = spectum_value;
@@ -4700,7 +4706,7 @@ void display() {
       int high = 2;
       int qq = 1;
       int uvypos = 0;
-      if ((configuvmeter==1) && (screen_size!=4)) {
+      if (((configuvmeter==1) || (configuvmeter==3)) && (screen_size!=4)) {
         glPushMatrix();
         winsizx = 16;
         winsizy = 16;
@@ -4764,14 +4770,15 @@ void display() {
           }
           uvypos += 14;
         }
-
-        float siz_x = 6.0f;                    // size 16
-        float siz_y = 6.0f;                     // size 8
+        //
+        uvypos=0;
+        float siz_x = 6.0f;
+        float siz_y = 4.0f;
         xpos = 1350;
         ypos = 10;
         for(qq=0;qq<16;qq++) {
-          high = sqrt(uvmax_values[qq]*2);
-          ypos = 10+((siz_y)*high);
+          high = sqrt(uvmax_values[qq]*18);
+          ypos = 10+(siz_y*high);
           for(i=0;i<1;i++) {
             glEnable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
@@ -4782,17 +4789,14 @@ void display() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
-            glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+winsizy , 0.0);
-            glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+siz_y , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+siz_y , 0.0);
             glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
             glEnd();
           }
-          xpos=xpos+siz_x+2;
+          uvypos += 14;
         }
-
-
         glPopMatrix();
-
       } else if ((configuvmeter==2) && (screen_size!=4)) {
         glPushMatrix();
         //glEnable(GL_TEXTURE_2D);
@@ -4806,7 +4810,7 @@ void display() {
         for(qq=0;qq<32;qq++) {
           uvypos = 0;
           uvyypos = 0;
-          high=sqrt(spec[(qq*1)+1])*10.0f;
+          high=sqrt(spectrum_left[qq]*2);
           if (high>7) high = 6;
           // draw 1 bar
           for(i=0;i<high;i+=1) {
@@ -4844,7 +4848,8 @@ void display() {
             glEnd();
             uvypos+=16;
           }
-          high = sqrt(spec2[(qq*1)+1])*10.0f;
+
+          high = sqrt(spectrum_right[qq]*2);
           if (high > 7) high = 6;
           for(i=0;i<high;i+=1) {
             switch(i) {
@@ -4884,13 +4889,9 @@ void display() {
         }
         // done uv stuf
         glPopMatrix();
-      } else if ((configuvmeter==3) && (screen_size!=4)) {
-        ;
       }
       // do clean up after uv meters
     }
-
-
     // load new team gfx files from config
     if (do_save_config) {
       do_save_config = false;
