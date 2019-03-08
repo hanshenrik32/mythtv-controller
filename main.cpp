@@ -2676,7 +2676,7 @@ void display() {
         glRotatef(0.0f,0.0f,0.0f,0.0f);
         float high;
         xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<46;xp++) {
+        for(int xp=0;xp<45;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
           high = sqrt(spectrum[xp]*8)*2;
@@ -2721,7 +2721,7 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor3f(1.0f, 1.0f, 1.0f);
-        for(int xp=0;xp<46;xp++) {
+        for(int xp=0;xp<45;xp++) {
           high = sqrt(uvmax_values[xp]*8)*2;
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
@@ -2745,7 +2745,7 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,texturedot);
         //glBindTexture(GL_TEXTURE_2D,_textureuv1);
         xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<46;xp++) {
+        for(int xp=0;xp<45;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-432)+((siz_y*4)+2.0);
           high = sqrt(spectrum[xp]*4);
