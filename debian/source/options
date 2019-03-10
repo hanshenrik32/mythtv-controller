@@ -1,0 +1,4 @@
+tar-ignore = ".git/* radiostations/*"
+tar-ignore = "fmodapi44461linux/*"
+tar-ignore = "radiostations/*"
+
