@@ -692,8 +692,6 @@ GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
 GLuint _textureIdback; 	                  //
-GLuint _textureuv1;                       // uv img
-GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
 GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
@@ -3217,10 +3215,10 @@ void display() {
       glColor4f(1.0f,1.0f,1.0f,0.2f);
       glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
       glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D, _textureuv1);
+      glBindTexture(GL_TEXTURE_2D, texturedot);                                 // volume icon
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTranslatef(10, 19, 0.0f);                                          // orgwinsizey
+      glTranslatef(10, 19, 0.0f);
       int aa = 0;
       for(i=0;i<(configsoundvolume*10);i++) {
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
@@ -4701,7 +4699,7 @@ void display() {
     //
     // show uv metter in music player
     //
-    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt)) {
+    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
@@ -4712,6 +4710,14 @@ void display() {
         winsizy = 16;
         int xpos = 1350;
         int ypos = 10;
+        // uv
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         for(qq=0;qq<16;qq++) {
           ypos = 10;
           high = sqrt(spectrum[qq]*2);
@@ -4719,13 +4725,6 @@ void display() {
           if (high>14) high=14;
           for(i=0;i<high;i++) {
             // uv
-            glEnable(GL_TEXTURE_2D);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            glColor3f(1.0f, 1.0f, 1.0f);
-            glBindTexture(GL_TEXTURE_2D,texturedot);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             switch(i) {
               case 0: glColor4f(uvcolortable2[0],uvcolortable2[1],uvcolortable2[2],1.0);
                 break;
@@ -4799,9 +4798,13 @@ void display() {
         glPopMatrix();
       } else if ((configuvmeter==2) && (screen_size!=4)) {
         glPushMatrix();
-        //glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D,_textureuv1);
-        glColor4f(1.0f,1.0f,1.0f,1.0f);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);                              // texturedot
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         int uvypos = 0;
         int uvyypos = 0;
         int high;
@@ -4858,7 +4861,7 @@ void display() {
                 case 3:
                 case 4:
                         glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                        glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
                         break;
                 case 5:
                 case 6:
@@ -4871,11 +4874,11 @@ void display() {
                 case 13:
                 case 14:
                         glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
-                        glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot)
                 break;
                 default:
                         glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                        glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
                 break;
             }
             glBegin(GL_QUADS);
@@ -11912,8 +11915,6 @@ void loadgfx() {
       tema=1;
     }
     _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
-    _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
-    _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
     if (screen_size<3)
@@ -12203,8 +12204,6 @@ void freegfx() {
     glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
     glDeleteTextures( 1, &texturedot);
     glDeleteTextures( 1, &texturedot1);
-    glDeleteTextures( 1, &_textureuv1);                         // uv img
-    glDeleteTextures( 1, &_textureuv1_top);                         // uv img
     glDeleteTextures( 1, &_errorbox);                           // error box
     glDeleteTextures( 1, &_textureexit);
     glDeleteTextures( 1, &_textureIdreset_search);
@@ -12337,7 +12336,7 @@ int main(int argc, char** argv) {
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     //printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
     printf("Build date  : %s\n",__DATE__);
-    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
+    //printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
     printf("%s",SHOWVER);
     printf("\n");

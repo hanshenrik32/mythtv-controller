@@ -1,0 +1,22 @@
+Source: mythtv-controller
+Section: unknown
+Priority: optional
+Maintainer: hans <hanshenrik32@gmail.com>
+Build-Depends: xmltv,libical-dev,libglc-dev,libical-dev,unzip,libical-dev,lirc,libsqlite3-dev,libvlc-dev,libxrandr-dev,libxml2-dev
+Standards-Version: 0.37.4
+Version: 0.37.4
+Homepage: http://www.hjemmebioklubben.dk
+#Vcs-Git: git://anonscm.debian.org/collab-maint/mythtv-controller.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/mythtv-controller.git
+
+Package: mythtv-controller
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: mythtv-controller remote for xbmc/mythtv
+ xbmc support.
+ New easy debian/ubuntu installation.
+ Req. mysql and mythtv ver 0.23/0.24/0.25 and opengl stuf.
+ play music from mythtv backend.
+ Stream music over the internet from a mythtv backend server.
+ play movies from mythtv/mxbc database
+ play recordedtv programs from mythtv/xbmc backend not all.

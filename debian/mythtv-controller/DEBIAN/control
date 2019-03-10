@@ -1,0 +1,16 @@
+Package: mythtv-controller
+Version: 0.36-1
+Architecture: all
+Maintainer: hans <hanshenrik32@gmail.com>
+Installed-Size: 2
+Section: unknown
+Priority: optional
+Homepage: http://www.hjemmebioklubben.dk
+Description: mythtv-controller remote for xbmc/mythtv
+ xbmc support.
+ New easy debian/ubuntu installation.
+ Req. mysql and mythtv ver 0.23/0.24/0.25 and opengl stuf.
+ play music from mythtv backend.
+ Stream music over the internet from a mythtv backend server.
+ play movies from mythtv/mxbc database
+ play recordedtv programs from mythtv/xbmc backend not all.

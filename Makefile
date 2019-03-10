@@ -63,7 +63,7 @@ else
 endif
 
 all:
-	@echo "mythtv-controller ver 0.32.1 \nPossible targets:"
+	@echo "mythtv-controller ver 0.37.4 \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
 	@echo "'make compile'             - Compile mythtv-controller"
