@@ -1,4 +1,3 @@
-debian/usr/local/bin/mythtv-controller
 debian/usr/share/mythtv-controller/tema1/all_buttons.xcf
 debian/usr/share/mythtv-controller/tema1/buttons/music.png
 debian/usr/share/mythtv-controller/tema1/buttons/movie1.png

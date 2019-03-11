@@ -31,13 +31,9 @@ LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
 LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
-
 LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so
-
 LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2
-
 OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
-
 SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myth_vlcplayer.cpp
 
 %:
@@ -47,9 +43,10 @@ SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl
 # This is example for Cmake (See https://bugs.debian.org/641051 )
 override_dh_auto_configure:
 	install -D -m 0755 mythtv-controller $$(pwd)/debian/mythtv-controller/usr/bin/mythtv-controller
-	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
+	#dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
 
 clean:
+	-$(MAKE) clean
 	@# Do nothning
 
 build:
@@ -61,10 +58,13 @@ build:
 	@# Do nothning
 
 binary:
-	cp mythtv-controller debian/usr/local/bin
 	if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
-	#cp mythtv-controller.desktop  ~/.local/share/applications
-	cp mythtv-controller.desktop ~/Desktop
-	mkdir -p /usr/share/mythtv-controller/images/radiostations
+	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller
+	mkdir -p debian/mythtv-controller/usr/local/bin
+	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller/images/radiostations
+	cp mythtv-controller debian/mythtv-controller/usr/local/bin
+	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/usr/share/mythtv-controller/
+	cp -r xmltv_config debian/mythtv-controller/usr/share/mythtv-controller/
+	cp mythtv-controller.png fmodstudioapi11011linux.tar.gz debian/usr/share/mythtv-controller/mythtv-controller.png
 	dh_gencontrol
 	dh_builddeb
