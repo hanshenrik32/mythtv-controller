@@ -20,6 +20,8 @@ set -e
 
 case "$1" in
     configure)
+    tar -zxvf /usr/share/mythtv-controller/fmodstudioapi11011linux.tar.gz -C /usr/share/mythtv-controller/
+    ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 /usr/lib/libfmod.so.10
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
