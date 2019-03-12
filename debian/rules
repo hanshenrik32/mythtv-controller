@@ -58,13 +58,13 @@ build:
 	@# Do nothning
 
 binary:
-	if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
+	cp $(CONFIG_FILE) debian/mythtv-controller/etc
 	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller
 	mkdir -p debian/mythtv-controller/usr/local/bin
 	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller/images/radiostations
 	cp mythtv-controller debian/mythtv-controller/usr/local/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/usr/share/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/usr/share/mythtv-controller/
-	cp mythtv-controller.png fmodstudioapi11011linux.tar.gz debian/usr/share/mythtv-controller/
+	cp mythtv-controller.png fmodstudioapi11011linux.tar.gz debian/mythtv-controller/usr/share/mythtv-controller/
 	dh_gencontrol
 	dh_builddeb

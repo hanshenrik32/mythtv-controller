@@ -21,6 +21,10 @@ set -e
 
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    rm /usr/lib/libfmod.so.10
+    rm -r /usr/share/mythtv-controller
+    rm /etc/mythtv-controller.conf
+    rm /usr/local/bin/mythtv-controller
     ;;
 
     *)
