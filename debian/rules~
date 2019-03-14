@@ -60,11 +60,21 @@ build:
 binary:
 	cp $(CONFIG_FILE) debian/mythtv-controller/etc
 	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller
+	chmod 755 debian/mythtv-controller/usr/share/mythtv-controller
 	mkdir -p debian/mythtv-controller/usr/local/bin
+	chmod 755 debian/mythtv-controller/usr/local/bin
+	mkdir -p debian/mythtv-controller/usr/lib
+	chmod 755 debian/mythtv-controller/usr/lib
 	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller/images/radiostations
 	cp mythtv-controller debian/mythtv-controller/usr/local/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/usr/share/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/usr/share/mythtv-controller/
 	cp mythtv-controller.png fmodstudioapi11011linux.tar.gz debian/mythtv-controller/usr/share/mythtv-controller/
+	chmod 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux.tar.gz
+	chmod -R 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
+	tar -C debian/mythtv-controller/usr/share/mythtv-controller/ -zxf fmodstudioapi11011linux.tar.gz fmodstudioapi11011linux/api/
+	if [ -h "debian/mythtv-controller/usr/lib/libfmod.so.10" ]; then rm debian/mythtv-controller/usr/lib/libfmod.so.10; fi
+	ln -s  /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 debian/mythtv-controller/usr/lib/libfmod.so.10
+	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
 	dh_gencontrol
 	dh_builddeb
