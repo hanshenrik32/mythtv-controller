@@ -1,9 +1,9 @@
 Package: mythtv-controller
-Version: 0.37.4
+Version: 0.37-4
 Architecture: amd64
 Maintainer: Hans-Henrik Grüner-Pedersen <hanshenrik32@gmail.com>
-Installed-Size: 285013
-Depends: libvlccore9, libvlc-bin, libvlc5, freeglut3, libdevil1c2, libmysqlclient20, lirc
+Installed-Size: 285108
+Depends: libvlccore9, libvlc-bin, libvlc5, libglewmx1.13, libglc0, freeglut3, libsdl-image1.2, libdevil1c2, libmysqlclient20, lirc, liballegro4.4, libftdi1-2, libmng2, libportaudio2, libproxy-tools, libsdl1.2debian, libusb-0.1-4, mysql-common
 Section: unknown
 Priority: optional
 Homepage: http://www.hjemmebioklubben.dk
