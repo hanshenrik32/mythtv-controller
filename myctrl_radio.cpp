@@ -568,9 +568,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
             glcRenderString(base);
             pline++;
-            //glTranslatef(xof,(yof-18)-pline*1.2f,0);
-            //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
-            //puts(base);                                       // display string
             break;
           }
           right_margin = base+width;
@@ -590,8 +587,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
           glcRenderString(base);
           pline++;
           glTranslatef(xof,(yof-18)-pline*1.2f,0);
-          //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
-          //puts(base);
           length -= right_margin-base+1;                         // +1 for the space
           base = right_margin+1;
           if (pline>=2) break;
