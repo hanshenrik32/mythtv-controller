@@ -20,6 +20,11 @@
 // web file loader
 #include "myctrl_readwebfile.h"
 
+//
+// text render is glcRenderString for freetype font support
+//
+
+extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
@@ -609,9 +614,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               search_and_replace2(rssprgtitle);
               search_and_replace2(rssprgfeedtitle);
               search_and_replace2(rssprgdesc);
-
               if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-
               sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
               //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
               if (mysql_query(conn,sqlinsert)!=0) {
@@ -1900,6 +1903,77 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         rss_update=true;
       }
+
+      // Mdma
+      if (check_rss_feed_exist(conn,"Alt om Emma - en serie om MDMA")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Alt om Emma - en serie om MDMA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Alt om Emma - en serie om MDMA',NULL,NULL,'Alt om Emma - en serie om MDMA',0,0,NULL,'https://www.dr.dk/mu/Feed/alt-om-emma.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+
+      //Radio24syv Dokumentar
+      if (check_rss_feed_exist(conn,"24syv Dokumentar")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Dokumentar',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Dokumentar',NULL,NULL,'24syv Dokumentar',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3887302',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+
+
+      //Radio24syv Hadprædikanterne
+      if (check_rss_feed_exist(conn,"24syv Hadprædikanterne")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Hadprædikanterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Hadprædikanterne',NULL,NULL,'24syv Hadprædikanterne',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/38971368',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+      //Radio24syv
+      if (check_rss_feed_exist(conn,"24syv Den Korte Radioavis")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Den Korte Radioavis',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Den Korte Radioavis',NULL,NULL,'24syv Den Korte Radioavis',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/10839671',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+
+      // Radiofortællinger
+      if (check_rss_feed_exist(conn,"24syv Den Korte Radioavis")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Radiofortællinger',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Attack.");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Radiofortællinger',NULL,NULL,'Radiofortællinger',0,0,NULL,'https://www.dr.dk/mu/feed/radiofortaellinger.xml?format=podcast&limit=500',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Tilbage til Mars.\n");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        rss_update=true;
+      }
+
+
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
@@ -1989,7 +2063,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (!(file_exists(downloadfilenamelong))) {
                   if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   // download gfx file and use as icon
-                  if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                  if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
                 }
@@ -2068,7 +2142,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     if (!(file_exists(downloadfilenamelong))) {
                       if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                       // download gfx file and use as icon
-                      if (get_webfile2(tmpfilename,downloadfilenamelong)!=0) {
+                      if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                         printf("Download error \n");
                       } else strcpy(tmpfilename,"");
                     }
@@ -2132,6 +2206,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
+  if (debugmode & 4) printf("rss stream gfx download start \n");
   while(nr<antal) {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
@@ -2169,7 +2244,6 @@ int stream_class::loadweb_stream_iconoversigt() {
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-          //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -2177,7 +2251,11 @@ int stream_class::loadweb_stream_iconoversigt() {
     }
     nr++;
   }
-  this->gfx_loaded=true;
+  if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
+  if (debugmode & 4) {
+    if (gfx_loaded) printf("rss stream gfx download end ok. \n");
+    else printf("rss stream gfx download error. \n");
+  }
   return(1);
 }
 
@@ -2482,19 +2560,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTranslatef(xof+22,yof+14,0);
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(14.0, 14.0, 1.0);
+        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
         glcRenderString(temptxt);
         glPopMatrix();
       }
       // show text of element
-      float fontsiz=15.0f;
       glPushMatrix();
       pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(fontsiz, fontsiz, 1.0);
+      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
@@ -2504,11 +2581,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       width = 20;
       bool stop=false;
       while(*base) {
+        // if text can be on line
         if(length <= width) {
+          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
           glcRenderString(base);
           pline++;
-          glTranslatef(0.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-          //puts(base);                                       // display string
           break;
         }
         right_margin = base+width;
@@ -2527,13 +2604,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
-        glTranslatef(0.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-        //puts(base);
+        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
         length -= right_margin-base+1;                         // +1 for the space
         base = right_margin+1;
         if (pline>=2) break;
       }
       glPopMatrix();
+      // next button
       i++;
       xof+=(buttonsize+10);
     }

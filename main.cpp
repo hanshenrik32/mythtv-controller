@@ -3,7 +3,7 @@
 #include <string.h>
 // opengl
 #include <GL/gl.h>
-#include <GL/glut.h>
+#include <GL/glut.h>                     // print
 #include <IL/il.h>
 #include <math.h>
 #include <errno.h>
@@ -32,10 +32,10 @@
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
-bool ask_save_playlist=false;
-bool save_ask_save_playlist=false;
+bool ask_save_playlist = false;
+bool save_ask_save_playlist = false;
 
-bool stream_jump=false;
+bool stream_jump = false;
 
 // Set sound system used
 //#define USE_SDL_MIXER 1
@@ -55,23 +55,40 @@ bool stream_jump=false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/inc/fmod_errors.h"
+#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod.hpp"
+#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
+// glut fonts list
 
+// GLUT_BITMAP_8_BY_13 - A variable-width font with every character fitting in a rectangle of 13 pixels high by at most 8 pixels wide.
+// GLUT_BITMAP_9_BY_15 - A variable-width font with every character fitting in a rectangle of 15 pixels high by at most 9 pixels wide.
+// GLUT_BITMAP_TIMES_ROMAN_10 - A 10-point variable-width Times Roman font.
+// GLUT_BITMAP_TIMES_ROMAN_24 - A 24-point variable-width Times Roman font.
+// GLUT_BITMAP_HELVETICA_10 - A 10-point variable-width Helvetica font.
+// GLUT_BITMAP_HELVETICA_12 - A 12-point variable-width Helvetica font.
+// GLUT_BITMAP_HELVETICA_18 - A 18-point variable-width Helvetica font.
 
+bool tv_guide_firsttime_update = false;
 
 int radio_oversigt_loaded_nr=0;                                                  //
-bool radio_oversigt_loaded_begin=false;                                         // true first time radio is loaded
+bool radio_oversigt_loaded_begin = false;                                         // true first time radio is loaded
 int radio_oversigt_antal=0;                                                      //
 int music_oversigt_loaded_nr=0;                                                  //
 int movie_oversigt_loaded_nr=0;                                                  //
-bool movie_oversigt_gfx_loading=false;
-bool show_status_update=false;
-
+bool movie_oversigt_gfx_loading = false;
+bool show_status_update = false;
 
 FMOD::DSP* dsp = 0;                   // fmod Sound device
+
+// screen saver uv stuf
+float spectrum[2000];                                                           // used for spectium
+float spectrum_left[2000];                                                      // used for spectium
+float spectrum_right[2000];                                                     // used for spectium
+float uvmax_values[1024];
+int frequencyOctaves[15];                                                       // 15 octaver
+
+
 
 // from compiler (debuger)
 extern char __BUILD_DATE;
@@ -117,13 +134,14 @@ char keybuffer[512];                                    // keyboard buffer
 unsigned int keybufferindex=0;                          // keyboard buffer index
 int findtype=0;					                              	// bruges af search kunster/sange
 unsigned int do_show_setup_select_linie=0;              // bruges af setup
-bool do_save_config=false;                              // flag to save config
+bool do_save_config = false;                              // flag to save config
 
 channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
 channel_configfile  xmltv_configcontrol;                //
 
-bool firsttime_xmltvupdate=true;                        // update tvguide xml files first start (force)
-char playlistfilename[80];                                  // name to use thewn save playlist
+bool firsttime_xmltvupdate = true;                        // update tvguide xml files first start (force)
+char playlistfilename[80];                              // name to use thewn save playlist
+char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
 char configmysqlpass[256];                              //
@@ -133,8 +151,13 @@ char configxbmcuser[256];                               // /mythtv/mysql access 
 char configxbmcpass[256];                               //
 char configxbmchost[256];                               //
 // ************************************************************************************************
-bool hent_tv_channels=false;                            // if false update tv guide
+bool hent_tv_channels = false;                            // if false update tv guide
 long configtvguidelastupdate=0;                         // last date /unix time_t type) tvguide update
+float configdefaulttvguidefontsize=18;                  // default font size tv tvguide
+float configdefaultradiofontsize=18;                    // default font size
+float configdefaultmusicfontsize=18;                    // default font size
+float configdefaultstreamfontsize=18;                   // default font size
+float configdefaultmoviefontsize=18;                    // default font size
 char configdefaultmusicpath[256];                       // internal db for music
 char configdefaultmoviepath[256];                       // internal db for movie
 char configbackend_tvgraber[256];                       // internal tv graber to use
@@ -178,9 +201,9 @@ char *configlandsprog[]={(char *) "English",(char *) "Dansk",(char *) "France",(
 // ************************************************************************************************
 int tema=3;       					                            // aktiv tema (default is 3)
 int screen_size=3;		                            			// default screen size
-bool do_shift_song=false;				                        // jump to next song to play
-bool do_stop_music=false;                               // stop all play
-bool do_stop_radio=false;                               // stop all play
+bool do_shift_song = false;				                        // jump to next song to play
+bool do_stop_music = false;                               // stop all play
+bool do_stop_radio = false;                               // stop all play
 int soundsystem=0;		      		                      	// used sound system 1=FMOD 2=OPENSOUND
 int numbersofsoundsystems=0;                            // antal devices
 unsigned int musicoversigt_antal=0;                     // antal aktive sange
@@ -200,36 +223,37 @@ int debugmode=2+1;                                        // 64 = radio station 
                                                         // 1024 = flag loader
 
 char music_db_update_loader[256];                       //
-bool loading_tv_guide=false;                            // loading_tv_guide true if loading
+bool loading_tv_guide = false;                            // loading_tv_guide true if loading
 int tvchannel_startofset=0;
-bool showfps=true;
+bool showfps = true;
 int configmythtvver=0;            			                // mythtv config found version
-bool stopmovie=false;
+bool stopmovie = false;
 int film_key_selected=1;                                // den valgte med keyboard i film oversigt
 int vis_volume_timeout=0;
 int music_key_selected=1;                               // default music selected
-bool ask_open_dir_or_play=false;                        // ask open dir or play it ?
-bool ask_open_dir_or_play_aopen=false;                  // auto open dir
-bool do_swing_music_cover=true;                         // default swing music cover
+bool ask_open_dir_or_play = false;                        // ask open dir or play it ?
+bool ask_open_dir_or_play_aopen = false;                  // auto open dir
+bool do_swing_music_cover = true;                         // default swing music cover
 int music_selected_iconnr=0;                            // default valgt icon i music oversigt
 float _angle=0.00;                                      // bruges af 3d screen saver
-bool full_screen=true;
+bool full_screen = true;
 int do_play_music_aktiv_table_nr=0;                     // aktiv sang nr
 int do_play_music_aktiv_nr_select_array=0;
-bool show_uv=true;                                      // default show uv under menu
-bool vis_uv_meter=false;                                // uv meter er igang med at blive vist
-bool hent_music_search=false;                           // skal vi søge efter music
-bool keybufferopenwin=false;                            // er vindue open
-bool do_play_music_cover=false;                         // start play music
-bool do_find_playlist=false;                            // do find play list
-bool do_play_music_aktiv_play=false;
+bool show_uv = true;                                      // default show uv under menu
+bool vis_uv_meter = false;                                // uv meter er igang med at blive vist
+bool hent_music_search = false;                           // skal vi søge efter music
+bool keybufferopenwin = false;                            // er vindue open
+bool do_play_music_cover = false;                         // start play music
+bool do_find_playlist = false;                            // do find play list
+bool do_play_music_aktiv_play = false;
 
-bool do_play_music_aktiv=false;
-bool do_stop_music_all=false;
+bool do_play_music_aktiv = false;
+bool do_stop_music_all = false;
 char aktivplay_music_path[1024];
 
-bool hent_radio_search=false;                           // skal vi søge efter music
-bool hent_stream_search=false;                          // skal vi søge efter stream
+bool hent_radio_search = false;                           // skal vi søge efter music
+bool hent_film_search = false;                            // skal vi søge efter film title
+bool hent_stream_search = false;                          // skal vi søge efter stream
 
 int do_music_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast music
 
@@ -237,66 +261,66 @@ int sinusofset=0;      					                        // bruges af show_music_over
 
 int setupsinofset=0;
 
-bool show_volume_info=false;                        	// show vol info
+bool show_volume_info = false;                        	// show vol info
 int show_volume_info_timeout=0;                   		// time out to close vol info again
 
-bool stream_loadergfx_started=false;                	// thread stream gfx loader running ?
-bool stream_loadergfx_started_done=false;            	// thread stream gfx loader running ?
-bool stream_loadergfx_started_break=false;
+bool stream_loadergfx_started = false;                	// thread stream gfx loader running ?
+bool stream_loadergfx_started_done = false;            	// thread stream gfx loader running ?
+bool stream_loadergfx_started_break = false;
 
-bool vis_music_oversigt=false;                          // vis music player
-bool vis_film_oversigt=false;				                    // vis film oversigt
-bool vis_recorded_oversigt=false;                       // vis recorded oversigt
-bool vis_tv_oversigt=false;                             // vis tv oversigt
-bool vis_radio_oversigt=false;                          // vis radio player
+bool vis_music_oversigt = false;                          // vis music player
+bool vis_film_oversigt = false;				                    // vis film oversigt
+bool vis_recorded_oversigt = false;                       // vis recorded oversigt
+bool vis_tv_oversigt = false;                             // vis tv oversigt
+bool vis_radio_oversigt = false;                          // vis radio player
 
-bool vis_old_recorded=false;
-bool vis_tvrec_list=false;
+bool vis_old_recorded = false;
+bool vis_tvrec_list = false;
 
-bool saver_irq=false;
+bool saver_irq = false;                                 // er screen saver aktiv
 
-bool radio_oversigt_loaded=false;
+bool radio_oversigt_loaded = false;
 bool radio_oversigt_loaded_done=0;
 
 unsigned int do_show_play_open_select_line=0;           // bruges til at vælge hvilken music filer som skal spilles
 unsigned int do_show_play_open_select_line_ofset=0;     // bruges til at vælge hvilken music filer som skal spilles (start ofset)
 
-bool show_radio_options=false;
+bool show_radio_options = false;
 int radio_select_iconnr=0;
 float _rangley;
 
-bool do_show_setup=false;                               // show setup menu
-bool do_show_setup_sound=false;                         //
-bool do_show_setup_screen=false;                        //
-bool do_show_setup_tema=false;
-bool do_show_setup_sql=false;
-bool do_show_setup_network=false;
-bool do_show_setup_font=false;
-bool do_show_setup_keys=false;
-bool do_show_setup_rss=false;
-bool do_save_setup_rss=false;                           // update db flag to do it (call func)
-bool do_show_videoplayer=false;
-bool do_show_tvgraber=false;
-bool do_show_rss=false;                                 // show rss config
-bool use3deffect=false;                                 // use 3d scroll effect default no
-bool do_zoom_music_cover=false;
-bool do_zoom_radio=false;                               //
-bool do_zoom_stream=false;                              //
+bool do_show_setup = false;                               // show setup menu
+bool do_show_setup_sound = false;                         //
+bool do_show_setup_screen = false;                        //
+bool do_show_setup_tema = false;
+bool do_show_setup_sql = false;
+bool do_show_setup_network = false;
+bool do_show_setup_font = false;
+bool do_show_setup_keys = false;
+bool do_show_setup_rss = false;
+bool do_save_setup_rss = false;                           // update db flag to do it (call func)
+bool do_show_videoplayer = false;
+bool do_show_tvgraber = false;
+bool do_show_rss = false;                                 // show rss config
+bool use3deffect = false;                                 // use 3d scroll effect default no
+bool do_zoom_music_cover = false;
+bool do_zoom_radio = false;                               //
+bool do_zoom_stream = false;                              //
 
-bool show_wlan_select=false;
+bool show_wlan_select = false;
 
-bool do_zoom_film_cover=false;
-bool do_zoom_stream_cover=false;                        // show played cover
-bool vis_movie_options=false;
-bool vis_movie_sort_option=false;
+bool do_zoom_film_cover = false;
+bool do_zoom_stream_cover = false;                        // show played cover
+bool vis_movie_options = false;
+bool vis_movie_sort_option = false;
 
-bool vis_stream_oversigt=false;
-bool startstream=false;
-bool do_play_stream=false;
-bool do_stop_stream=false;
-bool stopstream=false;
+bool vis_stream_oversigt = false;
+bool startstream = false;
+bool do_play_stream = false;
+bool do_stop_stream = false;
+bool stopstream = false;
 
-bool do_pause_stream=false;                             // pause play
+bool do_pause_stream = false;                             // pause play
 
 int rknapnr=0;                                          // buttons vars
 int sknapnr=0;                                          // stream button
@@ -348,26 +372,25 @@ float _fangley=0.0f;					// bruges af vis_film_oversigt glob
 
 int do_zoom_film_aktiv_nr=0;
 
-bool vis_radio_or_music_oversigt=false;
-bool vis_stream_or_movie_oversigt=false;
-bool global_use_internal_music_loader_system=false;     // use internal db for musicdb or mysql/kodi/
+bool vis_radio_or_music_oversigt = false;
+bool vis_stream_or_movie_oversigt = false;
+bool global_use_internal_music_loader_system = false;     // use internal db for musicdb or mysql/kodi/
 
-bool ask_tv_record=false;
-bool do_play_radio=false;
+bool ask_tv_record = false;
+bool do_play_radio = false;
 
 GLint ctx, myFont;
 
-bool do_swing_movie_cover=false;                        // do anim
-bool vis_nyefilm_oversigt=true;                         // start med at vise nye film
+bool do_swing_movie_cover = false;                        // do anim
+bool vis_nyefilm_oversigt = true;                         // start med at vise nye film
 
 // stream
 
 stream_class streamoversigt;
-bool show_stream_options=false;
+bool show_stream_options = false;
 
 
-bool startmovie=false;                  		// start play movie
-
+bool startmovie = false;                  		// start play movie
 
 int sleep_ok=0;
 int sleeper=1;
@@ -378,11 +401,11 @@ bool starving;
 char aktivsongname[40];                         	// song name
 char aktivartistname[40];                      		// navn på aktiv artist (som spilles)
 
-bool check_radio_thread=true;            			  	// DO NOT check radio station online status
+bool check_radio_thread = true;            			  	// DO NOT check radio station online status
 
 const unsigned int ERROR_TIMEOUT=120;                    // show error timeout
 int vis_error_timeout=ERROR_TIMEOUT;
-bool vis_error=false;
+bool vis_error = false;
 int vis_error_flag=0;
 int vis_error_songnr;
 
@@ -424,7 +447,7 @@ char aktivsongstatus[40];
 // fmod stuf
 #if defined USE_FMOD_MIXER
 FMOD_OPENSTATE openstate;
-int fmodbuffersize=32*1024;
+int fmodbuffersize=16*1024;
 #endif
 
 #if defined USE_SDL_MIXER
@@ -449,7 +472,7 @@ int tvstartxofset=0;
 
 // ************************************************************************************************
 
-extern mplaylist aktiv_playlist;
+extern mplaylist aktiv_playlist;                                                // music play list
 
 struct dirmusic_list_type {
     char name[200];
@@ -483,11 +506,11 @@ class dirmusictype {
         GLuint textureId;		             			// directorys texture
         int emtydirmusic() {
             for(unsigned int i=0;i<listesize;i++) {			// reset all music info
-                strcpy(songliste[i].name,"");
-                songliste[i].songlength=0;
-                strcpy(dirliste[i].dirname,"");
-                dirliste[i].dirid=0;
-                dirliste[i]._textureId=0;			// reset Opengl cover id
+              strcpy(songliste[i].name,"");
+              songliste[i].songlength=0;
+              strcpy(dirliste[i].dirname,"");
+              dirliste[i].dirid=0;
+              dirliste[i]._textureId=0;			// reset Opengl cover id
             }
             numbersofsongs=0;
             numbersofdirs=0;
@@ -499,7 +522,7 @@ class dirmusictype {
             dirliste=new dirmusic_dirs_type[antal];
             songliste=new dirmusic_list_type[antal];
             emtydirmusic();
-            for(unsigned int i=0;i<listesize;i++) songliste[i].aktiv=true;	// set play flag for all music
+            for(unsigned int i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
         }
 
         // destructor
@@ -607,13 +630,14 @@ const int ANALOG=2;
 const int SAVER3D=3;
 const int SAVER3D2=4;
 const int PICTURE3D=5;
+const int MUSICMETER=6;
 
 int urtype=1;                           // set default screen saver
 
 // *************************************************************************************************
 
 recorded_overigt recordoversigt;       // optaget programer oversigt
-bool reset_recorded_texture=false;
+bool reset_recorded_texture = false;
 
 
 // *************************************************************************************************
@@ -667,10 +691,8 @@ GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
 GLuint _textureIdback; 	                  //
-GLuint _textureuv1;                       // uv img
-GLuint _textureuv1_top;                   // uv img
 GLuint _errorbox;	                        //
-
+GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
 
 // radio view icons
@@ -691,14 +713,12 @@ GLuint moviebutton;                       //
 GLuint gfxlandemask;                      //
 GLuint gfxlande[80];                      //
 GLuint texturedot;                        //
+GLuint texturedot1;                       //
 // loading window
 GLuint _textureIdloading;                 // loading window
-GLuint _textureIdloading1;                // empty window
-
 // setup menu textures
 GLuint setupupdatebutton;
 GLuint setuptexture;
-
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
@@ -762,6 +782,7 @@ GLuint _textureIdradiosearch;
 GLuint _textureIdplayinfo;
 GLuint _textureIdmusicsearch1;
 GLuint _textureIdmusicsearch;
+GLuint _textureIdmoviesearch;
 GLuint _textureIdrecorded_aktiv;
 GLuint _textureIdpup;
 GLuint _textureIdpdown;
@@ -782,13 +803,12 @@ GLuint analog_clock_background;             // background for analog clock
 
 GLuint _textureIdmusic_mask_anim[10];    // texture array to anim of music menu icon
 
-fontctrl aktivfont;                     // font control
+fontctrl aktivfont;                                                             // font control (default aktiv font all over (if opencl))
 
-unsigned int setupfontselectofset=0;            // valgte font i oversigt
-unsigned int setupwlanselectofset=0;            // valgte wlan nr i oversigt
+unsigned int setupfontselectofset=0;                                            // valgte font i oversigt
+unsigned int setupwlanselectofset=0;                                            // valgte wlan nr i oversigt
 
-const int TEMA_ANTAL=10;                                        // numbers of tema
-
+const int TEMA_ANTAL=10;                                                        // numbers of tema
 
 // define for use before function is created
 void *update_music_phread_loader();
@@ -842,10 +862,10 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
       fprintf(stderr,"File name %s\n",file_path);
     }
     vis_error_flag=result;
-    vis_error=true;			// set vis error flag
+    vis_error = true;			// set vis error flag
     vis_error_songnr=songnr;		// gem fil navn som ikke kan spilles
     vis_error_timeout=ERROR_TIMEOUT;
-    do_zoom_radio=false;		// close play info
+    do_zoom_radio = false;		// close play info
     if ((result!=23) && (result!=37) && (result!=27) && (result!=20)) {
       fprintf(stderr,"FMOD ERROR %d %s ",result,FMOD_ErrorString(result));
 //          exit(-1);
@@ -867,8 +887,8 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
   }
   vis_error=1;			// vis error
   if (strcmp(text,"music parameter was NULL")==0) vis_error_flag=36;
-  vis_error=true;			// set vis error falg
-  do_zoom_radio=false;            // close play info
+  vis_error = true;			// set vis error falg
+  do_zoom_radio = false;            // close play info
   vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
   vis_error_timeout=ERROR_TIMEOUT;
 }
@@ -887,300 +907,328 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize};
     int commandlength;
     char value[200];
-    bool command=false;
+    bool command = false;
     int command_nr;
     bool valueok;
     strcpy(configmythhost,"127.0.0.1");
     strcpy(configbackend,"mythtv");
     fil=fopen(filename,"r");
     if (fil) {
-        while(!(feof(fil))) {
-            fgets(buffer,512,fil);
-            n=0;
-            nn=0;
-            command=false;
-            valueok=false;
-            // remove all spaces
-            while((n<strlen(buffer)) && (*(buffer+n)==32)) n++;
-
-            if (n!=strlen(buffer)) {
-                // test for command
-                if (buffer[n]!='#') {
-                    if (strncmp(buffer+n,"backend",6)==0) {
-                      command=true;
-                      command_nr=setbackend;
-                      commandlength=6;
-                    } else if (strncmp(buffer+n,"mythhost",7)==0)  {
-                      command=true;
-                      command_nr=sethostname;
-                      commandlength=7;
-                    } else if (strncmp(buffer+n,"mysqlhost",8)==0) {
-                      command=true;
-                      command_nr=setmysqlhost;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"mysqluser",8)==0) {
-                      command=true;
-                      command_nr=setmysqluser;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"mysqlpass",8)==0) {
-                      command=true;
-                      command_nr=setmysqlpass;
-                      commandlength=8;
-                    } else if (strncmp(buffer+n,"soundsystem",10)==0) {
-                      command=true;
-                      command_nr=setsoundsystem;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"soundoutport",11)==0) {
-                      command=true;
-                      command_nr=setsoundoutport;
-                      commandlength=11;
-                    } else if (strncmp(buffer+n,"screensaver=",12)==0) {
-                      command=true;
-                      command_nr=setscreensaver;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"screensavername",14)==0) {
-                      command=true;
-                      command_nr=setscreensavername;
-                      commandlength=14;
-                    } else if (strncmp(buffer+n,"screensize",9)==0) {
-                      command=true;
-                      command_nr=setscreensize;
-                      commandlength=9;
-                    } else if (strncmp(buffer+n,"tema",3)==0) {
-                      command=true;
-                      command_nr=settema;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"font",3)==0) {
-                      command=true;
-                      command_nr=setfont;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"mouse",4)==0) {
-                      command=true;
-                      command_nr=setmouse;
-                      commandlength=4;
-                    } else if (strncmp(buffer+n,"use3d",4)==0) {
-                      command=true;
-                      command_nr=setuse3d;
-                      commandlength=4;
-                    } else if (strncmp(buffer+n,"land",3)==0) {
-                      command=true;
-                      command_nr=setland;
-                      commandlength=3;
-                    } else if (strncmp(buffer+n,"fullscreen",9)==0) {
-                      command=true;
-                      command_nr=setscreenmode;
-                      commandlength=9;
-                    } else if (strncmp(buffer+n,"configdefaultmusicpath",21)==0) {
-                      command=true;
-                      command_nr=setconfigdefaultmusicpath;
-                      commandlength=21;
-                    } else if (strncmp(buffer+n,"configdefaultmoviepath",21)==0) {
-                      command=true;
-                      command_nr=setconfigdefaultmoviepath;
-                      commandlength=21;
-                    } else if (strncmp(buffer+n,"videoplayer",10)==0) {
-                      command=true;
-                      command_nr=setvideoplayer;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"debug",4)==0) {
-                      command_nr=setdebugmode;
-                      command=true;
-                      commandlength=4;
-                      debugmode=atoi(value);		// set debug mode from config file
-                      showfps=true;
-                    } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
-                      command=true;
-                      command_nr=setuvmetertype;
-                      commandlength=10;
-                    } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
-                      command=true;
-                      command_nr=setvolume;
-                      commandlength=12;
-                    } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
-                      command=true;
-                      command_nr=tvgraberupdate;
-                      commandlength=13;
-                      // vi do not have tvgraberpath in config file
-                    } else if ((strncmp(buffer+n,"tvgraber",7)==0) && (strncmp(buffer+n,"tvgraberpath",11)!=0)) {
-                      command=true;
-                      command_nr=settvgraber;
-                      commandlength=7;
-                    } else if (strncmp(buffer+n,"tvguidercolor",12)==0) {
-                      command=true;
-                      command_nr=tvguidercolor;
-                      commandlength=12;
-                    } else command=false;
-                }
-                strcpy(value,"");
-                if (command) {
-                  while((n<strlen(buffer)) && (!(valueok))) {
-                    if ((buffer[n]!=10) && (buffer[n]!='=')) {
-                      if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
-                        valueok=true;
-                        strcpy(value,buffer+n+commandlength+2);
-                        nn=strlen(value);
-                        if (nn>0) {
-                            if (value[nn-1]=='\n') value[nn-1]=0;
-                            else value[nn]=0;
-                        }
-                      }
-                    }
-                    n++;
+      while(!(feof(fil))) {
+        fgets(buffer,512,fil);
+        n=0;
+        nn=0;
+        command = false;
+        valueok = false;
+        // remove all spaces
+        while((n<strlen(buffer)) && (*(buffer+n)==32)) n++;
+        if (n!=strlen(buffer)) {
+          // test for command
+          if (buffer[n]!='#') {
+            if (strncmp(buffer+n,"backend",6)==0) {
+              command = true;
+              command_nr=setbackend;
+              commandlength=6;
+            } else if (strncmp(buffer+n,"mythhost",7)==0)  {
+              command = true;
+              command_nr=sethostname;
+              commandlength=7;
+            } else if (strncmp(buffer+n,"mysqlhost",8)==0) {
+              command = true;
+              command_nr=setmysqlhost;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"mysqluser",8)==0) {
+              command = true;
+              command_nr=setmysqluser;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"mysqlpass",8)==0) {
+              command = true;
+              command_nr=setmysqlpass;
+              commandlength=8;
+            } else if (strncmp(buffer+n,"soundsystem",10)==0) {
+              command = true;
+              command_nr=setsoundsystem;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"soundoutport",11)==0) {
+              command = true;
+              command_nr=setsoundoutport;
+              commandlength=11;
+            } else if (strncmp(buffer+n,"screensaver=",12)==0) {
+              command = true;
+              command_nr=setscreensaver;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"screensavername",14)==0) {
+              command = true;
+              command_nr=setscreensavername;
+              commandlength=14;
+            } else if (strncmp(buffer+n,"screensize",9)==0) {
+              command = true;
+              command_nr=setscreensize;
+              commandlength=9;
+            } else if (strncmp(buffer+n,"tema",3)==0) {
+              command = true;
+              command_nr=settema;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"font",3)==0) {
+              command = true;
+              command_nr=setfont;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"mouse",4)==0) {
+              command = true;
+              command_nr=setmouse;
+              commandlength=4;
+            } else if (strncmp(buffer+n,"use3d",4)==0) {
+              command = true;
+              command_nr=setuse3d;
+              commandlength=4;
+            } else if (strncmp(buffer+n,"land",3)==0) {
+              command = true;
+              command_nr=setland;
+              commandlength=3;
+            } else if (strncmp(buffer+n,"fullscreen",9)==0) {
+              command = true;
+              command_nr=setscreenmode;
+              commandlength=9;
+            } else if (strncmp(buffer+n,"configdefaultmusicpath",21)==0) {
+              command = true;
+              command_nr=setconfigdefaultmusicpath;
+              commandlength=21;
+            } else if (strncmp(buffer+n,"configdefaultmoviepath",21)==0) {
+              command = true;
+              command_nr=setconfigdefaultmoviepath;
+              commandlength=21;
+            } else if (strncmp(buffer+n,"videoplayer",10)==0) {
+              command = true;
+              command_nr=setvideoplayer;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"debug",4)==0) {
+              command_nr=setdebugmode;
+              command = true;
+              commandlength=4;
+              debugmode=atoi(value);		// set debug mode from config file
+              showfps = true;
+            } else  if (strncmp(buffer+n,"uvmetertype",10)==0) {
+              command = true;
+              command_nr=setuvmetertype;
+              commandlength=10;
+            } else if (strncmp(buffer+n,"defaultvolume",12)==0) {
+              command = true;
+              command_nr=setvolume;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"tvgraberupdate",13)==0) {
+              command = true;
+              command_nr=tvgraberupdate;
+              commandlength=13;
+              // vi do not have tvgraberpath in config file
+            } else if ((strncmp(buffer+n,"tvgraber",7)==0) && (strncmp(buffer+n,"tvgraberpath",11)!=0)) {
+              command = true;
+              command_nr=settvgraber;
+              commandlength=7;
+            } else if (strncmp(buffer+n,"tvguidercolor",12)==0) {
+              command = true;
+              command_nr=tvguidercolor;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"tvguidefontsize",14)==0) {
+              command = true;
+              command_nr=tvguidefontsize;
+              commandlength=14;
+            } else if (strncmp(buffer+n,"radiofontsize",12)==0) {
+              command = true;
+              command_nr=radiofontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"musicfontsize",12)==0) {
+              command = true;
+              command_nr=musicfontsize;
+              commandlength=12;
+            } else if (strncmp(buffer+n,"streamfontsize",13)==0) {
+              command = true;
+              command_nr=streamfontsize;
+              commandlength=13;
+            } else if (strncmp(buffer+n,"moviefontsize",12)==0) {
+              command = true;
+              command_nr=moviefontsize;
+              commandlength=12;
+            } else command = false;
+          }
+          strcpy(value,"");
+          if (command) {
+            while((n<strlen(buffer)) && (!(valueok))) {
+              if ((buffer[n]!=10) && (buffer[n]!='=')) {
+                if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
+                  valueok = true;
+                  strcpy(value,buffer+n+commandlength+2);
+                  nn=strlen(value);
+                  if (nn>0) {
+                      if (value[nn-1]=='\n') value[nn-1]=0;
+                      else value[nn]=0;
                   }
                 }
-                if ((command) && (valueok)) {
-                    // set backupend system to XBMC or mythtv
-                    if (command_nr==setbackend) {
-                      strcpy(configbackend,value);
-                      printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
-                      printf("Mode selected : %s\n",configbackend);
-                      printf("*********************************************************\n");
-                    }
-                    // set tv graber
-                    else if (command_nr==settvgraber) {
-                      strcpy(configbackend_tvgraber,value);
-                      if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")==0) aktiv_tv_graber.graberaktivnr=1;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) aktiv_tv_graber.graberaktivnr=2;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")==0) aktiv_tv_graber.graberaktivnr=3;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) aktiv_tv_graber.graberaktivnr=4;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")==0) aktiv_tv_graber.graberaktivnr=5;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) aktiv_tv_graber.graberaktivnr=6;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) aktiv_tv_graber.graberaktivnr=7;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) aktiv_tv_graber.graberaktivnr=8;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")==0) aktiv_tv_graber.graberaktivnr=9;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")==0) aktiv_tv_graber.graberaktivnr=10;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) aktiv_tv_graber.graberaktivnr=11;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")==0) aktiv_tv_graber.graberaktivnr=12;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_huro")==0) aktiv_tv_graber.graberaktivnr=13;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")==0) aktiv_tv_graber.graberaktivnr=14;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) aktiv_tv_graber.graberaktivnr=15;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) aktiv_tv_graber.graberaktivnr=16;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) aktiv_tv_graber.graberaktivnr=17;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")==0) aktiv_tv_graber.graberaktivnr=18;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) aktiv_tv_graber.graberaktivnr=19;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")==0) aktiv_tv_graber.graberaktivnr=20;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) aktiv_tv_graber.graberaktivnr=21;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")==0) aktiv_tv_graber.graberaktivnr=22;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) aktiv_tv_graber.graberaktivnr=23;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")==0) aktiv_tv_graber.graberaktivnr=24;
-                      else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
-                      else aktiv_tv_graber.graberaktivnr=0;
-
-                      printf("**************** Set config xmltv graber ****************\n");
-                      printf("Tv graber ....: %s\n",configbackend_tvgraber);
-                      printf("*********************************************************\n");
-                    } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
-                    // set tvguide color or no color
-                    else if (command_nr==tvguidercolor) {
-                     if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors=true;
-                     else aktiv_tv_oversigt.vistvguidecolors=false;
-                    // set hostname
-                    } else if (command_nr==sethostname) strcpy(configmythhost,value);
-                    // mysql host
-                    else if (command_nr==setmysqlhost) strcpy(configmysqlhost,value);
-                    // mysql user
-                    else if (command_nr==setmysqluser) strcpy(configmysqluser,value);
-                    // mysql pass
-                    else if (command_nr==setmysqlpass) strcpy(configmysqlpass,value);
-                    // set sound system
-                    else if (command_nr==setsoundsystem) {
-                      strcpy(configmythsoundsystem,value);
-                      soundsystem=atoi(configmythsoundsystem);
-                    } else if (command_nr==setdebugmode) {
-                      if (strcmp(value,"0")!=0) {
-                        debugmode=atoi(value);
-                        fprintf(stderr,"Set debug mode %d  \n",debugmode);
-                      } else {
-                        debugmode=0;
-                        showfps=false;
-                      }
-                    }
-                    else if (command_nr==setvideoplayer) {
-                      if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
-                      strcpy(configvideoplayer,value);
-                    }
-                    // sound port
-                    else if (command_nr==setsoundoutport) strcpy(configsoundoutport,value);
-                    // screen saver timeout
-                    else if (command_nr==setscreensaver) {
-                      strcpy(configscreensavertimeout,value);
-                      if (atoi(configscreensavertimeout)==0) strcpy(configscreensavertimeout,"30");
-                    }
-                    // screen saver
-                    else if (command_nr==setscreensavername) {
-                      strcpy(configaktivescreensavername,value);
-                      if (strncmp(configaktivescreensavername,"analog",6)==0) {
-                          urtype=ANALOG;
-                      } else if (strncmp(configaktivescreensavername,"digital",6)==0) {
-                          urtype=DIGITAL;
-                      } else if (strncmp(configaktivescreensavername,"3D2",3)==0) {
-                          urtype=SAVER3D2;
-                      } else if (strncmp(configaktivescreensavername,"3D",2)==0) {
-                          urtype=SAVER3D;
-                      } else if (strncmp(configaktivescreensavername,"PICTURE3D",9)==0) {
-                          urtype=PICTURE3D;
-                      } else urtype=ANALOG;
-                    }
-                    // screen size
-                    else if (command_nr==setscreensize) {
-                      screen_size=atoi(value);
-                      if (screen_size==0) screen_size=1;		// set min default screen size mode 1 = 1024/768
-                    }
-                    // select tema
-                    else if (command_nr==settema) {
-                      tema=atoi(value);
-                      if (tema==0) tema=6;
-                    }
-                    // set font name
-                    else if (command_nr==setfont) strcpy(configfontname,value);
-                    // show mouse (visible)
-                    else if (command_nr==setmouse) strcpy(configmouse,value);
-                    // set full screen off
-                    else if (command_nr==setscreenmode) {
-                      if (strcmp(value,"true")==0) full_screen=true; else full_screen=false;
-                    } else if (command_nr==setconfigdefaultmusicpath) {
-                      strcpy(configdefaultmusicpath,value);
-                      strcpy(configmusicpath,value);
-                    } else if (command_nr==setconfigdefaultmoviepath) {
-                      strcpy(configdefaultmoviepath,value);
-                      strcpy(configmoviepath,value);
-                    }
-
-                    // use 3d effect
-                    else if (command_nr==setuse3d) {
-                        if (strcmp(value,"yes")) {
-                            use3deffect=true;
-                            strcpy(configuse3deffect,"yes");
-                        } else {
-                            use3deffect=false;
-                            strcpy(configuse3deffect,"no");
-                        }
-                    } else if (command_nr==setland) {
-                      configland=1; // set default land code
-                    } else if (command_nr==setuvmetertype) {
-                      configuvmeter=atoi(value);
-                    } else if (command_nr==setvolume) {
-                      configsoundvolume=atof(value);                         // set default volume under play
-                    }
-                }
+              }
+              n++;
             }
-            strcpy(buffer,"");
+          }
+          if ((command) && (valueok)) {
+            // set backupend system to XBMC or mythtv
+            if (command_nr==setbackend) {
+              strcpy(configbackend,value);
+              printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
+              printf("Mode selected : %s\n",configbackend);
+              printf("*********************************************************\n");
+            }
+            // set tv graber
+            else if (command_nr==settvgraber) {
+              strcpy(configbackend_tvgraber,value);
+              if (strcmp(configbackend_tvgraber,"tv_grab_na_dd")==0) aktiv_tv_graber.graberaktivnr=1;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_nl")==0) aktiv_tv_graber.graberaktivnr=2;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_es_laguiatv")==0) aktiv_tv_graber.graberaktivnr=3;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_il")==0) aktiv_tv_graber.graberaktivnr=4;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_na_tvmedia")==0) aktiv_tv_graber.graberaktivnr=5;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_dtv_la")==0) aktiv_tv_graber.graberaktivnr=6;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fi")==0) aktiv_tv_graber.graberaktivnr=7;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_eu_dotmedia")==0) aktiv_tv_graber.graberaktivnr=8;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_se_swedb")==0) aktiv_tv_graber.graberaktivnr=9;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_pt_meo")==0) aktiv_tv_graber.graberaktivnr=10;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fr")==0) aktiv_tv_graber.graberaktivnr=11;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_uk_bleb")==0) aktiv_tv_graber.graberaktivnr=12;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_huro")==0) aktiv_tv_graber.graberaktivnr=13;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_ch_search")==0) aktiv_tv_graber.graberaktivnr=14;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_it")==0) aktiv_tv_graber.graberaktivnr=15;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_is")==0) aktiv_tv_graber.graberaktivnr=16;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fi_sv")==0) aktiv_tv_graber.graberaktivnr=17;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_na_dtv")==0) aktiv_tv_graber.graberaktivnr=18;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_tr")==0) aktiv_tv_graber.graberaktivnr=19;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_eu_egon")==0) aktiv_tv_graber.graberaktivnr=20;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_dk_dr")==0) aktiv_tv_graber.graberaktivnr=21;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_se_tvzon")==0) aktiv_tv_graber.graberaktivnr=22;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_ar")==0) aktiv_tv_graber.graberaktivnr=23;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_fr_kazer")==0) aktiv_tv_graber.graberaktivnr=24;
+              else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
+              else aktiv_tv_graber.graberaktivnr=0;
+
+              printf("**************** Set config xmltv graber ****************\n");
+              printf("Tv graber ....: %s\n",configbackend_tvgraber);
+              printf("*********************************************************\n");
+            } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
+            // set tvguide color or no color
+            else if (command_nr==tvguidercolor) {
+             if (strcmp(value,"yes")==0) aktiv_tv_oversigt.vistvguidecolors = true;
+             else aktiv_tv_oversigt.vistvguidecolors = false;
+            // set hostname
+            } else if (command_nr==sethostname) strcpy(configmythhost,value);
+            // mysql host
+            else if (command_nr==setmysqlhost) strcpy(configmysqlhost,value);
+            // mysql user
+            else if (command_nr==setmysqluser) strcpy(configmysqluser,value);
+            // mysql pass
+            else if (command_nr==setmysqlpass) strcpy(configmysqlpass,value);
+            // set sound system
+            else if (command_nr==setsoundsystem) {
+              strcpy(configmythsoundsystem,value);
+              soundsystem=atoi(configmythsoundsystem);
+            } else if (command_nr==setdebugmode) {
+              if (strcmp(value,"0")!=0) {
+                debugmode=atoi(value);
+                fprintf(stderr,"Set debug mode %d  \n",debugmode);
+              } else {
+                debugmode=0;
+                showfps = false;
+              }
+            }
+            else if (command_nr==setvideoplayer) {
+              if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
+              strcpy(configvideoplayer,value);
+            }
+            // sound port
+            else if (command_nr==setsoundoutport) strcpy(configsoundoutport,value);
+            // screen saver timeout
+            else if (command_nr==setscreensaver) {
+              strcpy(configscreensavertimeout,value);
+              if (atoi(configscreensavertimeout)==0) strcpy(configscreensavertimeout,"30");
+            }
+            // screen saver
+            else if (command_nr==setscreensavername) {
+              strcpy(configaktivescreensavername,value);
+              if (strncmp(configaktivescreensavername,"analog",6)==0) {
+                  urtype=ANALOG;
+              } else if (strncmp(configaktivescreensavername,"digital",6)==0) {
+                  urtype=DIGITAL;
+              } else if (strncmp(configaktivescreensavername,"3D2",3)==0) {
+                  urtype=SAVER3D2;
+              } else if (strncmp(configaktivescreensavername,"3D",2)==0) {
+                  urtype=SAVER3D;
+              } else if (strncmp(configaktivescreensavername,"PICTURE3D",9)==0) {
+                  urtype=PICTURE3D;
+              } else if (strncmp(configaktivescreensavername,"MUSICMETER",9)==0) {
+                  urtype=MUSICMETER;
+              } else urtype=ANALOG;
+            }
+            // screen size
+            else if (command_nr==setscreensize) {
+              screen_size=atoi(value);
+              if (screen_size==0) screen_size=1;		// set min default screen size mode 1 = 1024/768
+            }
+            // select tema
+            else if (command_nr==settema) {
+              tema=atoi(value);
+              if (tema==0) tema=6;
+            }
+            // set font name
+            else if (command_nr==setfont) strcpy(configfontname,value);
+            // show mouse (visible)
+            else if (command_nr==setmouse) strcpy(configmouse,value);
+            // set full screen off
+            else if (command_nr==setscreenmode) {
+              if (strcmp(value,"true")==0) full_screen = true; else full_screen = false;
+            } else if (command_nr==setconfigdefaultmusicpath) {
+              strcpy(configdefaultmusicpath,value);
+              strcpy(configmusicpath,value);
+            } else if (command_nr==setconfigdefaultmoviepath) {
+              strcpy(configdefaultmoviepath,value);
+              strcpy(configmoviepath,value);
+            }
+            // use 3d effect
+            else if (command_nr==setuse3d) {
+                if (strcmp(value,"yes")) {
+                    use3deffect = true;
+                    strcpy(configuse3deffect,"yes");
+                } else {
+                    use3deffect = false;
+                    strcpy(configuse3deffect,"no");
+                }
+            } else if (command_nr==setland) {
+              configland=1; // set default land code
+            } else if (command_nr==setuvmetertype) {
+              configuvmeter=atoi(value);
+            } else if (command_nr==setvolume) {
+              configsoundvolume=atof(value);                            // set default volume under play
+            } else if (command_nr==tvguidefontsize) {
+              configdefaulttvguidefontsize=atof(value);                 // set tvguide font size
+            } else if (command_nr==radiofontsize) {
+               configdefaultradiofontsize=atof(value);                  // set radio font size
+            } else if (command_nr==musicfontsize) {
+                configdefaultmusicfontsize=atof(value);                 // set music font size
+            } else if (command_nr==streamfontsize) {
+              configdefaultstreamfontsize=atof(value);                  // set stream font size
+            } else if (command_nr==moviefontsize) {
+              configdefaultmoviefontsize=atof(value);                   // set movie font size
+            }
+          }
         }
-        fclose(fil);
+        strcpy(buffer,"");
+      }
+      fclose(fil);
     } else return(0);
     if (check_zerro_bytes_file(filename)>0) return(1); else return(0);
 }
 
 
-
-
 // save config to file
 
 int save_config(char * filename) {
-    bool error=false;
+    bool error = false;
     char temp[80];
     FILE *file;
     if ((file = fopen(filename, "w"))) {
@@ -1215,6 +1263,7 @@ int save_config(char * filename) {
       else if (urtype==SAVER3D) fputs("3D\n",file);
       else if (urtype==SAVER3D2) fputs("3D2\n",file);
       else if (urtype==PICTURE3D) fputs("PICTURE3D\n",file);
+      else if (urtype==MUSICMETER) fputs("MUSICMETER\n",file);
       else fputs("None\n",file);
       sprintf(temp,"screensize=%d\n",screen_size);
       fputs(temp,file);
@@ -1246,17 +1295,27 @@ int save_config(char * filename) {
       fputs(temp,file);
       sprintf(temp,"tvgraberupdate=%ld\n",configtvguidelastupdate);
       fputs(temp,file);
+      sprintf(temp,"tvguidefontsize=%0.0f\n",configdefaulttvguidefontsize);
+      fputs(temp,file);
+      sprintf(temp,"radiofontsize=%0.0f\n",configdefaultradiofontsize);
+      fputs(temp,file);
+      sprintf(temp,"musicfontsize=%0.0f\n",configdefaultmusicfontsize);
+      fputs(temp,file);
+      sprintf(temp,"streamfontsize=%0.0f\n",configdefaultstreamfontsize);
+      fputs(temp,file);
+      sprintf(temp,"moviefontsize=%0.0f\n",configdefaultmoviefontsize);
+      fputs(temp,file);
       //aktiv_tv_oversigt.vistvguidecolors=true;
       if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
       else sprintf(temp,"tvguidercolor=no\n");
       fputs(temp,file);
       fclose(file);
-    } else error=true;
+    } else error = true;
     file = fopen("mythtv-controller.keys", "w");
     if (file) {
       fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
       fclose(file);
-    } else error=true;
+    } else error = true;
     return(!(error));
 }
 
@@ -1303,72 +1362,77 @@ void load_config(char * filename) {
     configuvmeter=1;                                          // default uv meter type
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
-        strcpy(configaktivescreensavername,"analog");				  // default analog clock
-        urtype=2;								                              // default screen saver
-        strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
-        strcpy(configmysqlpass,"password");				         	  // default password
-        strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
-        strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
-        strcpy(configmythsoundsystem,"");			          		  //
-        strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
-        strcpy(configclosemythtvfrontend,"no");				     	  //
-        strcpy(configfontname,"FreeMono");			           		//
-        strcpy(configmouse,"1");						                  // enable mouse default
-        FILE * file = fopen(filename, "w");                   // open file for write
-        if (file) {
-          fputs("mysqluser=mythtv\n",file);                  // write config info to config file
-          fputs("mysqlpass=password\n",file);
-          fputs("mysqlhost=localhost\n",file);
-          fputs("mythhost=localhost\n",file);
-          fputs("soundsystem=0\n",file);
-          fputs("soundoutport=int\n",file);
-          fputs("screensaver=60\n",file);
-          strcpy(temptxt,"screensavername=");
-          strcat(temptxt,configaktivescreensavername);
-          strcat(temptxt,"\n");
-          fputs(temptxt,file);
-          fputs("screensize=3\n",file);
-          fputs("tema=3\n",file);
-          fputs("font=FreeMono\n",file);
-          fputs("mouse=1\n",file);
-          fputs("use3d=yes\n",file);
-          fputs("land=1\n",file);
-          fputs("debug=0\n",file);
-          fputs("videoplayer=default\n",file);
-          fputs("configdefaultmusicpath=Music\n",file);
-          fputs("configdefaultmovie=Movies\n",file);
-          fputs("uvmetertype=1\n",file);
-          fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
-          fputs("tvgraberupdate=0\n",file);
-          fputs("tvgrabercolor=yes\n",file);
-          fclose(file);
-        } else {
-          fprintf(stderr,"Config file not writeble ");
-          fprintf(stderr,"%s \n",filename);
-          fprintf(stderr,"check /etc/mythtv-controller.conf is writeble by user.");
-          exit(0);
-        }
+      strcpy(configaktivescreensavername,"analog");				  // default analog clock
+      urtype=2;								                              // default screen saver
+      strcpy(configmysqluser,"mythtv");				           	  // default userid for mythtv
+      strcpy(configmysqlpass,"password");				         	  // default password
+      strcpy(configmysqlhost,"localhost");		      		    // localhost mysql server default
+      strcpy(configmythhost,"localhost");				           	// localhost mythtv server default
+      strcpy(configmythsoundsystem,"");			          		  //
+      strcpy(configsoundoutport,"SPDIF");				         	  // spdif out default
+      strcpy(configclosemythtvfrontend,"no");				     	  //
+      strcpy(configfontname,"FreeMono");			           		//
+      strcpy(configmouse,"1");						                  // enable mouse default
+      FILE * file = fopen(filename, "w");                   // open file for write
+      if (file) {
+        fputs("mysqluser=mythtv\n",file);                  // write config info to config file
+        fputs("mysqlpass=password\n",file);
+        fputs("mysqlhost=localhost\n",file);
+        fputs("mythhost=localhost\n",file);
+        fputs("soundsystem=0\n",file);
+        fputs("soundoutport=int\n",file);
+        fputs("screensaver=60\n",file);
+        strcpy(temptxt,"screensavername=");
+        strcat(temptxt,configaktivescreensavername);
+        strcat(temptxt,"\n");
+        fputs(temptxt,file);
+        fputs("screensize=3\n",file);
+        fputs("tema=3\n",file);
+        fputs("font=FreeMono\n",file);
+        fputs("mouse=1\n",file);
+        fputs("use3d=yes\n",file);
+        fputs("land=1\n",file);
+        fputs("debug=0\n",file);
+        fputs("videoplayer=default\n",file);
+        fputs("configdefaultmusicpath=Music\n",file);
+        fputs("configdefaultmovie=Movies\n",file);
+        fputs("uvmetertype=1\n",file);
+        fputs("tvgraber=tv_grab_eu_dotmedia\n",file);
+        fputs("tvgraberupdate=0\n",file);
+        fputs("tvgrabercolor=yes\n",file);
+        fputs("tvguidefontsize=18\n",file);
+        fputs("radiofontsize=18\n",file);
+        fputs("musicfontsize=18\n",file);
+        fputs("streamfontsize=18\n",file);
+        fputs("moviefontsize=18\n",file);
+        fclose(file);
+      } else {
+        fprintf(stderr,"Config file not writeble ");
+        fprintf(stderr,"%s \n",filename);
+        fprintf(stderr,"check /etc/mythtv-controller.conf is writeble by user.");
+        exit(0);
+      }
     }
     remoteHost = gethostbyname(configmythhost);
     if (remoteHost) {
+      addr_list = (struct in_addr **) remoteHost->h_addr_list;
+      printf("mediacenter server name is : %s\n", remoteHost->h_name);
+      for(i = 0; addr_list[i] != NULL; i++) {
+        printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+      }
+      strcpy(confighostname,hostname);
+      strcpy(configmysqlhost,remoteHost->h_name);
+      strcpy(configmythhost,remoteHost->h_name);
+      strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
+      remoteHost = gethostbyname(confighostname);
+      if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
-        printf("mediacenter server name is : %s\n", remoteHost->h_name);
+        printf("Hostname : %s\n", remoteHost->h_name);
         for(i = 0; addr_list[i] != NULL; i++) {
-          printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+          printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
-        strcpy(confighostname,hostname);
-        strcpy(configmysqlhost,remoteHost->h_name);
-        strcpy(configmythhost,remoteHost->h_name);
-        strcpy(configmysqlip,inet_ntoa(*addr_list[0]));			// ip adress on sql server
-        remoteHost = gethostbyname(confighostname);
-        if (remoteHost) {
-          addr_list = (struct in_addr **) remoteHost->h_addr_list;
-          printf("Hostname : %s\n", remoteHost->h_name);
-          for(i = 0; addr_list[i] != NULL; i++) {
-            printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
-          }
-          strcpy(confighostip,inet_ntoa(*addr_list[0]));
-        } else strcpy(confighostip,"127.0.0.1");
+        strcpy(confighostip,inet_ntoa(*addr_list[0]));
+      } else strcpy(confighostip,"127.0.0.1");
     } else {
       printf("Error recolving hostname.\n");
     }
@@ -1382,107 +1446,107 @@ void load_config(char * filename) {
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          strcpy(configmusicpath,row[0]);
-          if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
-        }
-        //
-        // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
-        // load default
-        //
-        if (strcmp(configmusicpath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configmusicpath,row[0]);
-              if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
-            }
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(configmusicpath,row[0]);
+        if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
+      }
+      //
+      // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
+      // load default
+      //
+      if (strcmp(configmusicpath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation'");
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            strcpy(configmusicpath,row[0]);
+            if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
           }
         }
-        if ((strlen(configmusicpath)>0) && (configmusicpath[strlen(configmusicpath)-1]!='/')) strcat(configmusicpath,"/");             // add last '/' if not exist
-        strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir' and hostname like '");
-        strcat(sqlselect,configmysqlhost);
-        strcat(sqlselect,"' ");
+      }
+      if ((strlen(configmusicpath)>0) && (configmusicpath[strlen(configmusicpath)-1]!='/')) strcat(configmusicpath,"/");             // add last '/' if not exist
+      strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir' and hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' ");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          strcpy(configmoviepath,row[0]);
+        }
+      } else {
+        fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
+        exit(-1);
+      }
+      //
+      // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
+      // load default
+      //
+      if (strcmp(configmoviepath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
             strcpy(configmoviepath,row[0]);
-          }
-        } else {
-          fprintf(stderr,"No access to mysql database for mythtv... \nCan not read config infomations from mythtv settings.\n");
-          exit(-1);
-        }
-        //
-        // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
-        // load default
-        //
-        if (strcmp(configmoviepath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'VideoStartupDir'");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configmoviepath,row[0]);
-              if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
-            }
+            if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
           }
         }
-        if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
-        strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
+      }
+      if ((strlen(configmoviepath)>0) && (configmoviepath[strlen(configmoviepath)-1]!='/')) strcat(configmoviepath,"/");
+      strcpy(sqlselect,"SELECT data from settings where value like 'GalleryDir' and hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' ");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          strcpy(configpicturepath,row[0]);
+        }
+      } else {
+        printf("No access to mysql database... Can not read GalleryDir table.\n");
+        exit(-1);
+      }
+      if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
+      // find storagegroup dirs and load them
+      strcpy(sqlselect,"SELECT dirname,groupname from storagegroup where hostname like '");
+      strcat(sqlselect,configmysqlhost);
+      strcat(sqlselect,"' and groupname like 'Default' order by id");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        i=0;
+        while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
+          if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
+          strcpy(configstoragerecord[i].path,row[0]);
+          strcpy(configstoragerecord[i].name,row[1]);
+          if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
+          i++;
+        }
+        if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
+      } else {
+          printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
+      }
+
+      // er der ingen storagegroup defined. Load old type from settings table
+      if (strcmp(configrecordpath,"")==0) {
+        strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
         strcat(sqlselect,configmysqlhost);
         strcat(sqlselect,"' ");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(configpicturepath,row[0]);
+            strcpy(configrecordpath,row[0]);
+            if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
           }
         } else {
-          printf("No access to mysql database... Can not read GalleryDir table.\n");
+          printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
           exit(-1);
         }
-        if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
-        // find storagegroup dirs and load them
-        strcpy(sqlselect,"SELECT dirname,groupname from storagegroup where hostname like '");
-        strcat(sqlselect,configmysqlhost);
-        strcat(sqlselect,"' and groupname like 'Default' order by id");
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-          i=0;
-          while ((((row = mysql_fetch_row(res)) != NULL)) && (i<storagegroupantal)) {
-            if (i==0) strcpy(configrecordpath,row[0]);					                         // store fist found default path
-            strcpy(configstoragerecord[i].path,row[0]);
-            strcpy(configstoragerecord[i].name,row[1]);
-            if ((strlen(configstoragerecord[i].path)>0) && (configstoragerecord[i].path[strlen(configstoragerecord[i].path)-1]!='/')) strcat(configstoragerecord[i].path,"/");             // add last '/' if not exist
-            i++;
-          }
-          if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
-        } else {
-            printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
-        }
-
-        // er der ingen storagegroup defined. Load old type from settings table
-        if (strcmp(configrecordpath,"")==0) {
-          strcpy(sqlselect,"SELECT data from settings where value like 'RecordFilePrefix' and hostname like '");
-          strcat(sqlselect,configmysqlhost);
-          strcat(sqlselect,"' ");
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              strcpy(configrecordpath,row[0]);
-              if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
-            }
-          } else {
-            printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
-            exit(-1);
-          }
-          if (conn) mysql_close(conn);
-        }
+        if (conn) mysql_close(conn);
+      }
     } else {
       strcpy(configmusicpath,"");
       printf("No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
@@ -1614,54 +1678,54 @@ int hent_mythtv_playlist(int playlistnr) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
     while(!(finish)) {
-        // select sange fra myhthtv playlist
-        sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (res) {
-          while ((row = mysql_fetch_row(res)) != NULL) {
-            songintnr=atoi(row[0]);
-            songantal=atol(row[1]);
-            printf("Song antal fundet = %ld \n",songantal);
-            // find cd cover samt sange info i mythtv music database
-            sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
-            mysql_query(conn,sqlselect);
-            res1 = mysql_store_result(conn);
-            if ((res1) && (songantal>0)) {
-              while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                strcpy(songid,row1[0]);
-                strcpy(artistid,row1[5]);
-                strcpy(albumname,row1[3]);
-                strcpy(songname,row1[4]);
-                strcpy(artistname,row1[6]);
-                strcpy(songlength,row1[7]);
-                if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
-                strcpy(tmptxt,configmusicpath);		// start path
-                sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
-                hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
-                strcat(tmptxt,tmptxt1);				// add path
-                strcat(tmptxt,"/");
-                strcpy(tmptxt3,tmptxt);			// er = path
-                strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
-                strcat(tmptxt,row1[1]);				// add filename til sang
-                strcpy(tmptxt,row1[1]);				// add filename til sang
-                if (file_exists(tmptxt3)) {
-                  texture=loadTexture(tmptxt3);				// load texture
-                } else {
-                  printf(" Error loading texture file : %s \n",tmptxt3);
-                  texture=0;
-                }
+      // select sange fra myhthtv playlist
+      sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,' ',%d),' ',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          songintnr=atoi(row[0]);
+          songantal=atol(row[1]);
+          printf("Song antal fundet = %ld \n",songantal);
+          // find cd cover samt sange info i mythtv music database
+          sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
+          mysql_query(conn,sqlselect);
+          res1 = mysql_store_result(conn);
+          if ((res1) && (songantal>0)) {
+            while ((row1 = mysql_fetch_row(res1)) != NULL) {
+              strcpy(songid,row1[0]);
+              strcpy(artistid,row1[5]);
+              strcpy(albumname,row1[3]);
+              strcpy(songname,row1[4]);
+              strcpy(artistname,row1[6]);
+              strcpy(songlength,row1[7]);
+              if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
+              strcpy(tmptxt,configmusicpath);		// start path
+              sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
+              hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
+              strcat(tmptxt,tmptxt1);				// add path
+              strcat(tmptxt,"/");
+              strcpy(tmptxt3,tmptxt);			// er = path
+              strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
+              strcat(tmptxt,row1[1]);				// add filename til sang
+              strcpy(tmptxt,row1[1]);				// add filename til sang
+              if (file_exists(tmptxt3)) {
+                texture=loadTexture(tmptxt3);				// load texture
+              } else {
+                printf(" Error loading texture file : %s \n",tmptxt3);
+                texture=0;
               }
-              aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
-            } else {
-              finish=true;
-              error=1;
             }
+            aktiv_playlist.m_add_playlist(tmptxt,songid,artistid,albumname,songname,artistname,songlength,0,texture);	// add (gem) info i playlist
+          } else {
+            finish = true;
+            error=1;
           }
-          songnr++;
         }
-        if ((res==0) || (songnr==songantal)) finish=true;
-        if (songantal==1) finish=true;
+        songnr++;
+      }
+      if ((res==0) || (songnr==songantal)) finish = true;
+      if (songantal==1) finish = true;
     }
     mysql_close(conn);
     if ((finish) && (error==0)) return(songantal); else return(0);
@@ -1708,7 +1772,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     MYSQL_ROW row;
     // mysql stuf
     char database[256];
-    bool finish=false;
+    bool finish = false;
     char songid[20];
     char artistid[20];
     char albumname[40];
@@ -1755,7 +1819,7 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
         } // end while
       } // endif
       songnr++;
-      if (i==songantal) finish=true;
+      if (i==songantal) finish = true;
   } // endwhile
   mysql_close(conn);
   return(songnr);		// antal sange fundet i dir id
@@ -1888,26 +1952,26 @@ int init_ttf_fonts() {
     glcContext(ctx);
     // *********************************************************************************************************
     static GLint glc_font_id;
-    //GLint  master,master_count,ii;
-    //GLint face_count;
-    //int i,j;
+    GLint count,ii;
     // Get the number of entries in the catalog list
     /* Get a unique font ID. */
     glc_font_id = glcGenFontID();
+    // add dir for fonts
     glcAppendCatalog("/usr/share/fonts/truetype");
     myFont = glcGenFontID();
-    glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
-    if (glcFontFace(myFont, "Bold")!=GL_TRUE) printf("Open ttf font select error.\n");  // Regular
+    //glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
+    glcNewFontFromFamily(myFont, "Uroob");                                       // Droid Serif,UbuntumFreeMono
+    glcFontFace(myFont, "Bold");
     glcFont(myFont);
     aktivfont.updatefontlist();                                                          // update font list
     /* Draw letters as filled polygons. */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-/*
     // Get the number of entries in the catalog list
     count = glcGeti(GLC_CATALOG_COUNT);
-    // Print the path to the catalogs
-    for (ii = 0; ii < count; ii++) printf("%s\n", glcGetListc(GLC_CATALOG_LIST, ii));
-*/
+    // Print the path to the catalog
+    for (ii = 0; ii < count; ii++) {
+      printf("Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
+    }
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
@@ -1920,8 +1984,6 @@ int init_ttf_fonts() {
 //    glcEnable(GLC_HINTING_QSO);
     return(1);
 }
-
-
 
 
 // save command to be exectued to script exec
@@ -1948,7 +2010,7 @@ long find_music_song_placering(char *filename,char *songname) {
     char sqlselect[1024];
     char *database = (char *) "mythconverg";
     long recnr=0;
-    bool fundet=false;
+    bool fundet = false;
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -1963,7 +2025,7 @@ long find_music_song_placering(char *filename,char *songname) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         recnr=atol(row[0]);
-        fundet=true;						// sang fundet i music_songs
+        fundet = true;						// sang fundet i music_songs
       }
     }
     mysql_close(conn);
@@ -1987,10 +2049,6 @@ unsigned int do_playlist_restore_playlist() {
     char *database = (char *) "mythconverg";
     bool fundet;
     char playlistname[512];
-//    int songintnr;				// sang nr som skal i playliste
-//    long songantal=0;				// antal sange i array i database
-//    int songnr=1;
-
     fprintf(stderr,"Restore music from playlist backup \n");
     i=0;
     conn=mysql_init(NULL);
@@ -2002,67 +2060,64 @@ unsigned int do_playlist_restore_playlist() {
     mysql_query(conn,"select * from music_songs_tmp");
     res = mysql_store_result(conn);
     if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-            strcpy(playlistname,row[1]);				// hent playlist name
-            fundet=false;
-            while(!(fundet)) {
-                sprintf(sqlselect,"select * from music_playlist where playlist_name like '%s'",playlistname);
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(playlistname,row[1]);				// hent playlist name
+        fundet = false;
+        while(!(fundet)) {
+          sprintf(sqlselect,"select * from music_playlist where playlist_name like '%s'",playlistname);
+          mysql_query(conn,"set NAMES 'utf8'");
+          res1 = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res1 = mysql_store_result(conn);
+          if (res1) {
+            while ((row1 = mysql_fetch_row(res1)) != NULL) {
+              if (fundet==false) {
+                printf("Found playlist %s updating ",playlistname);
+                sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
                 mysql_query(conn,"set NAMES 'utf8'");
-                res1 = mysql_store_result(conn);
+                res2 = mysql_store_result(conn);
                 mysql_query(conn,sqlselect);
-                res1 = mysql_store_result(conn);
-                if (res1) {
-                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                    if (fundet==false) {
-                      printf("Found playlist %s updating ",playlistname);
-                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
-                      mysql_query(conn,"set NAMES 'utf8'");
-                      res2 = mysql_store_result(conn);
-                      mysql_query(conn,sqlselect);
-                      res2 = mysql_store_result(conn);
-                      // missing Check done
-                    }
-                    fundet=true;
-                    // find song in music database
-                    songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
-                    songlength=atol(row[8]);							// get song length
-                    // if song exist update playlist
-                    if (songplacering>0) {
-                      printf(".");
-                      sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
-                      mysql_query(conn,"set NAMES 'utf8'");
-                      res2 = mysql_store_result(conn);
-                      mysql_query(conn,sqlselect);
-                      res2 = mysql_store_result(conn);
-                    } // endif
-                  } // endwhile
-                } // endif
-                printf("\n");
-                if (!(fundet)) {
-                  // else create new playlist
-                  printf("Create new playlist %s......\n",playlistname);
-                  songplacering=find_music_song_placering(row[1],row[2]);
-                  sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
-                  mysql_query(conn,"set NAMES 'utf8'");
-                  res2 = mysql_store_result(conn);
-                  mysql_query(conn,sqlselect);
-                  res2 = mysql_store_result(conn);
-                }
+                res2 = mysql_store_result(conn);
+                // missing Check done
+              }
+              fundet = true;
+              // find song in music database
+              songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
+              songlength=atol(row[8]);							// get song length
+              // if song exist update playlist
+              if (songplacering>0) {
+                printf(".");
+                sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
+                mysql_query(conn,"set NAMES 'utf8'");
+                res2 = mysql_store_result(conn);
+                mysql_query(conn,sqlselect);
+                res2 = mysql_store_result(conn);
+              } // endif
             } // endwhile
+          } // endif
+          printf("\n");
+          if (!(fundet)) {
+            // else create new playlist
+            printf("Create new playlist %s......\n",playlistname);
+            songplacering=find_music_song_placering(row[1],row[2]);
+            sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
+            mysql_query(conn,"set NAMES 'utf8'");
+            res2 = mysql_store_result(conn);
+            mysql_query(conn,sqlselect);
+            res2 = mysql_store_result(conn);
+          }
         } // endwhile
-        // delete tmp tabel again
-        mysql_query(conn,"set NAMES 'utf8'");
-        res2 = mysql_store_result(conn);
-        mysql_query(conn,"drop table music_songs_tmp");
-        res2 = mysql_store_result(conn);
+      } // endwhile
+      // delete tmp tabel again
+      mysql_query(conn,"set NAMES 'utf8'");
+      res2 = mysql_store_result(conn);
+      mysql_query(conn,"drop table music_songs_tmp");
+      res2 = mysql_store_result(conn);
     } // endif
     printf("Finish\n");
     mysql_close(conn);
     return(1);		// exit all ok
 }
-
-
-
 
 
 //
@@ -2080,7 +2135,7 @@ unsigned int do_playlist_backup_playlist() {
     MYSQL_ROW row,row3;
     // mysql stuf
     char *database = (char *) "mythconverg";
-    bool finish=false;
+    bool finish = false;
     char playlistname[256];
 //    GLuint textureId;
     int songintnr;				// sang nr som skal i playliste
@@ -2110,7 +2165,7 @@ unsigned int do_playlist_backup_playlist() {
       while ((row3 = mysql_fetch_row(res3)) != NULL) {
         playlistnr=atol(row3[0]);							// hent playlist nr
         strcpy(playlistname,row3[1]);						// hent playlistname
-        finish=false;
+        finish = false;
         printf("Save music info from playlist name:%s \n",playlistname);
         i=0;
         while(!(finish)) {
@@ -2141,7 +2196,7 @@ unsigned int do_playlist_backup_playlist() {
             } // endwhile
           } // endif
           i++;
-          if (i>songantal) finish=true;
+          if (i>songantal) finish = true;
         } // endwhile
       } // endwhile
     } // endif
@@ -2196,27 +2251,28 @@ void show_background() {
 const float clockR=80.0f;
 
 void newLine(float rStart, float rEnd, float angle) {
-  float c = cos(angle), s = sin(angle);
+  float c = cos(angle);
+  float s = sin(angle);
   glVertex2f((clockR*rStart*c)+(screenx/2),(clockR*rStart*s)+(screeny/2));
   glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
 }
 
 
 
-static bool do_update_xmltv_show=false;
-static bool do_update_rss_show=true;
-static bool do_update_rss=false;
-static bool do_update_music=false;
-static bool do_update_music_now=false;                          // start the process to update music db from global dir
-static bool do_update_moviedb=false;                            // set true to start thread on update movie db
+static bool do_update_xmltv_show = false;
+static bool do_update_rss_show = true;
+static bool do_update_rss = false;
+static bool do_update_music = false;
+static bool do_update_music_now = false;                          // start the process to update music db from global dir
+static bool do_update_moviedb = false;                            // set true to start thread on update movie db
 
 void display() {
     // used by xmltv updater func
-    static bool getstarttidintvguidefromarray=true;
+    static bool getstarttidintvguidefromarray = true;
     static time_t today=0;
     static time_t lasttoday=0;
-    static bool do_update_xmltv=false;
-    static bool firsttime_rssupdate=false;                          // only used first time
+    static bool do_update_xmltv = false;
+    static bool firsttime_rssupdate = false;                          // only used first time
     static int starttimer=0;                                     // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
@@ -2226,7 +2282,7 @@ void display() {
     float mgrader,tgrader;
     static time_t rawtime,rawtime1=0;
     int min,tim;
-    static bool remove_log_file=true;
+    static bool remove_log_file = true;
     int sounderrflag;                           // husk last sound system status
     int numtags, numtagsupdated, count;         // bliver brugt til at vise stream tags
     GLuint textureId;
@@ -2259,9 +2315,22 @@ void display() {
     float *spec;
     float *spec2;
     float *specLeft, *specRight;
-    bool startup=true;
+    bool startup = true;
     // uv color table
     static int tmpcounter=0;
+    // fade colors (over time) for clock
+    float analogclock_color_table[]={1.0,1.0,1.0, \
+                                     0.8,0.8,0.8, \
+                                     0.6,0.6,0.6, \
+                                     0.4,0.4,0.4, \
+                                     0.2,0.2,0.2, \
+                                     0.2,0.2,0.2, \
+                                     0.4,0.4,0.4, \
+                                     0.6,0.6,0.6, \
+                                     0.8,0.8,0.8, \
+                                     0.9,0.9,0.9, \
+                                     1.0,1.0,1.0};
+
     float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
@@ -2310,75 +2379,78 @@ void display() {
                           0.8,0.1,0.1};
     struct timeb tb;
     struct tm* t;
-
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
-    float angleHour = 0,angleMin  = 0,angleSec  = 0;
-    float last_angleSec=0.0f;
-    float angleSec2=0.0f;
-
+    static float angleHour = 0,angleMin  = 0,angleSec  = 0;
+    static float last_angleSec=0.0f;
+    bool clock_udpate;
+    static int lastsec=0;
     int winsizx=1920;
     int winsizy=1080;
-
+    static bool firsttime = true;                                                 // gen first time clock
+    static bool clock_gluptimetime = false;
+    static GLuint index;
+    static int lastohur;
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    static int xrand=0;
+    static int yrand=0;
     //glLoadIdentity();
     rawtime=time(NULL);                                 // hent now time
     int savertimeout=atoi(configscreensavertimeout);
     if ((rawtime1==0) || (saver_irq)) {                 // ur timer
       rawtime1=rawtime+(60*savertimeout);             // x minuter hentet i config
-      visur=false;                                    // if (debug) printf("Start screen saver timer.\n");
-      saver_irq=false;
+      visur = false;                                    // if (debug) printf("Start screen saver timer.\n");
+      saver_irq = false;                          // start screen saver
     }
-    timeinfo = localtime ( &rawtime );
-    strftime(strhour, 20, "%I", timeinfo );
-    strftime(strmin, 20, "%M", timeinfo ); //%M
+    timeinfo = localtime(&rawtime);
+    strftime(strhour,20,"%I",timeinfo);
+    strftime(strmin,20,"%M",timeinfo);
     min=atoi(strmin);
     tim=atoi(strhour);
     // update clock
     if (rawtime>rawtime1) {
-      visur=true;
+      visur = true;
     }
     // make xmltv update
     today=time(NULL);
     t=localtime(&today);                                                        // local time
     ftime(&tb);
-
+    clock_udpate = false;
     // used by analog clock
-    if (last_angleSec==0.0f) {
-      last_angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-      angleSec=last_angleSec;
-    } else if (angleSec+10.0f>=last_angleSec) {
-      last_angleSec=angleSec;
-      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+    if (lastsec>=20) {
+      clock_udpate = true;
+      lastsec=0;
     }
-    angleSec2=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-    //angleSec = (float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
-    angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec2/60.0f;
-    angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
-    //
-
+    lastsec++;
+    if (clock_udpate) {
+      angleSec=(float)(t->tm_sec+ (float)tb.millitm/1000.0f)/30.0f * M_PI;
+      angleMin = (float)(t->tm_min)/30.0f * M_PI + angleSec/60.0f;
+      angleHour = (float)(t->tm_hour > 12 ? t->tm_hour-12 : t->tm_hour)/6.0f * M_PI+angleMin/12.0f;
+    }
+    clock_udpate = false;
+    // gvguide update
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
       if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
-      lasttoday=today;                                                          // rember last update
-      do_update_xmltv=true;                                                     // do update tvguide
-      do_update_xmltv_show=true;                                                // show we are updating
+      lasttoday = today;                                                          // rember last update
+      do_update_xmltv = true;                                                     // do update tvguide
+      do_update_xmltv_show = true;                                                // show we are updating
       firsttime_xmltvupdate=false;                                              // only used first time
     }
+    // rss update
+    // update interval
+    // set in main.h
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
       if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
-      lasttoday=today;                                                          // rember last update
-      do_update_rss=true;                                                       // do update rss
-      do_update_rss_show=true;                                                  // show we are updating rss
+      lasttoday = today;                                                          // rember last update
+      do_update_rss = true;                                                       // do update rss
+      do_update_rss_show = true;                                                  // show we are updating rss
       firsttime_rssupdate=false;                                                // only used first time
     }
-    //visur=true;
     glPushMatrix();
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
     //visur=1;
-    static int xrand=0;
-    static int yrand=0;
     if (visur) {
       glPushMatrix();
       switch (urtype) {
@@ -2387,9 +2459,9 @@ void display() {
             glPushMatrix();
             glDisable(GL_TEXTURE_2D);
             if (tmpcounter>200) {
-              tmpcounter=0;
-              xrand=(rand()/10240)/300;
-              yrand=(rand()/10240)/480;
+              tmpcounter = 0;
+              xrand = (rand()/10240)/300;
+              yrand = (rand()/10240)/480;
             }
             tmpcounter++;
             strftime(temptxt, 20, "%H:%M", timeinfo);
@@ -2414,47 +2486,102 @@ void display() {
             glPopMatrix();
             break;
         case ANALOG:
-            //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-            // background
-            glPushMatrix();
-            glEnable(GL_TEXTURE_2D);
-            glTranslatef(0.0f, 0.0f, 0.0f);
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-            glBindTexture(GL_TEXTURE_2D,analog_clock_background);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-            glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-            glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-            glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-            glEnd();
-            glPopMatrix();
-            glDisable(GL_TEXTURE_2D);
-            glLineWidth(5.0f);
-            glBegin(GL_LINES);
-            //glBegin(GL_QUADS);
-            for(i=0; i<60; i++) {
-              if(i%5) {                                                         // normal minute
-                if(i%5 == 1) glColor3f(1.0f, 1.0f, 1.0f);
-                newLine(minStart, minEnd, i*angle1min);
-              } else {
-                glColor3f(1.0f, 0.0f, 0.0f);
-                newLine(stepStart, stepEnd, i*angle1min);
+        case MUSICMETER:
+            // create one display list
+            if (((snd==0) && (visur==MUSICMETER)) || (urtype==ANALOG)) {
+              if (firsttime) {
+                index = glGenLists(1);
+                lastohur=t->tm_hour;
               }
+              if (t->tm_hour>lastohur) {
+                clock_gluptimetime = true;
+                lastohur = t->tm_hour;
+                // delete old display list and create new
+                glDeleteLists(index,1);
+                index = glGenLists(1);
+              }
+              //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+              // create display list index
+              if ((firsttime) || (clock_gluptimetime)) {
+                firsttime = false;
+                clock_gluptimetime = false;
+                // compile the display list, store a triangle in it
+                glNewList(index, GL_COMPILE);
+                // background
+                glPushMatrix();
+                glEnable(GL_TEXTURE_2D);
+                glTranslatef(0.0f, 0.0f, 0.0f);
+                // switch color over night
+                switch(t->tm_hour) {
+                  case 20:glColor4f(analogclock_color_table[0],analogclock_color_table[1],analogclock_color_table[2],1.0f);
+                          break;
+                  case 21:glColor4f(analogclock_color_table[3],analogclock_color_table[4],analogclock_color_table[5],1.0f);
+                          break;
+                  case 22:glColor4f(analogclock_color_table[6],analogclock_color_table[7],analogclock_color_table[8],1.0f);
+                          break;
+                  case 23:glColor4f(analogclock_color_table[9],analogclock_color_table[10],analogclock_color_table[11],1.0f);
+                          break;
+                  case 24:glColor4f(analogclock_color_table[12],analogclock_color_table[13],analogclock_color_table[14],1.0f);
+                          break;
+                  case 01:glColor4f(analogclock_color_table[15],analogclock_color_table[16],analogclock_color_table[17],1.0f);
+                          break;
+                  case 02:glColor4f(analogclock_color_table[18],analogclock_color_table[19],analogclock_color_table[20],1.0f);
+                          break;
+                  case 03:glColor4f(analogclock_color_table[21],analogclock_color_table[22],analogclock_color_table[23],1.0f);
+                          break;
+                  case 04:glColor4f(analogclock_color_table[24],analogclock_color_table[25],analogclock_color_table[26],1.0f);
+                          break;
+                  case 05:glColor4f(analogclock_color_table[27],analogclock_color_table[28],analogclock_color_table[29],1.0f);
+                          break;
+                  case 06:glColor4f(analogclock_color_table[30],analogclock_color_table[31],analogclock_color_table[32],1.0f);
+                          break;
+                  default:
+                          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                          break;
+                }
+                glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+                glBindTexture(GL_TEXTURE_2D,analog_clock_background);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glBegin(GL_QUADS);
+                glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
+                glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+                glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
+                glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
+                glEnd();
+                glPopMatrix();
+                // end display list
+                glEndList();
+              } else {
+                // Call display list to show object
+                glCallList(index);
+              }
+              // make the analog clock
+              glDisable(GL_TEXTURE_2D);
+              glLineWidth(5.0f);
+              glBegin(GL_LINES);
+              for(i=0; i<60; i++) {
+                if(i%5) {                                                         // normal minute
+                  if(i%5 == 1) glColor3f(1.0f, 1.0f, 1.0f);
+                  newLine(minStart, minEnd, i*angle1min);
+                } else {
+                  glColor3f(1.0f, 0.0f, 0.0f);
+                  newLine(stepStart, stepEnd, i*angle1min);
+                }
+              }
+              glEnd();
+              glLineWidth(5.0f);
+              glBegin(GL_LINES);
+              newLine(-0.2f, 3.5f, -angleHour+M_PI/2);                       // timer
+              newLine(-0.2f, 4.5f, -angleMin+M_PI/2);                        // min
+              glEnd();
+              glLineWidth(3.0f);
+              glColor3f(1.0f, 1.0f, 1.0f);
+              //glColor3f(0.0f, 0.0f, 1.0f);
+              glBegin(GL_LINES);
+              newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
+              glEnd();
             }
-            glEnd();
-            glLineWidth(5.0f);
-            glBegin(GL_LINES);
-            newLine(-0.2f, 3.5f, -angleHour+M_PI/2);                       // timer
-            newLine(-0.2f, 4.5f, -angleMin+M_PI/2);                        // min
-            glEnd();
-            glLineWidth(3.0f);
-            glColor3f(1.0f, 1.0f, 1.0f);
-            //glColor3f(0.0f, 0.0f, 1.0f);
-            glBegin(GL_LINES);
-            newLine(-0.2f, 4.7f, -angleSec+M_PI/2);                        // sec
-            glEnd();
             break;
         case SAVER3D:
             //reset pos
@@ -2463,7 +2590,6 @@ void display() {
             glTranslatef(0.0f, 0.0f, -7.0f);
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
-
 
             // music gfx loaded
             // if not load before screen saver
@@ -2497,59 +2623,187 @@ void display() {
             glLoadIdentity();
             glDisable(GL_BLEND);
             // picture_saver psaver;
-            //if (psaver==NULL) psaver=new picture_saver();
+            //ifsaver_irq (psaver==NULL) psaver=new picture_saver();
             // psaver.show_pictures();
             break;
       }
       glPopMatrix();
     }
+    //
+    // vis spectium in screen saver
+    //
+    if ((visur) && (urtype==MUSICMETER)) {
+      int uvypos = 0;
+      float xxofset;
+      float xpos = 0.0f;
+      float ypos = 0.0f;
+      float siz_x = 22.0f;                    // size 16
+      float siz_y = 6.0f;                     // size 8
+      if (snd) {
+        glPushMatrix();
+//        glTranslatef(100.0f, 100.0f, 0.0f);
+        glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
+        glRotatef(0,0.0f,1.0f,0.0f);
+        static float rr=0.0f;
+        uvypos =0;
+        winsizx = 16;
+        winsizy = 16;
+        xpos = (-16)*16;
+        ypos = 0.0f;
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glRotatef(0.0f,0.0f,0.0f,0.0f);
+        float high;
+        xxofset = 40.0f;                            // start ofset
+        for(int xp=0;xp<45;xp++) {
+          xpos = (-siz_x)*xxofset;
+          ypos = (-400)+((siz_y*2)+2.0);
+          high = sqrt(spectrum[xp]*8)*2;
+          for(int yp=0;yp<high;yp++) {
+            // front
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+            // left
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+            // right
+            glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+            // back
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+            glEnd();
+            ypos += (siz_y*2)+2.0;
+          }
+          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
+        }
+        //
+        // show max value
+        //
+        xxofset = 40.0f;                                                        // start ofset
+        glBindTexture(GL_TEXTURE_2D,texturedot1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        for(int xp=0;xp<45;xp++) {
+          high = sqrt(uvmax_values[xp]*8)*2;
+          //printf("xp =%2d high = %0.3f \n",xp,high*2);
+          xpos = (-siz_x)*xxofset;
+          ypos = (-388)+((siz_y*(high*2))+2.0);
+          for(int yp=0;yp<1;yp++) {
+            // front
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+            glEnd();
+            ypos += (siz_y*2)+2.0;
+          }
+          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
+        }
+        //
+        // Mirror
+        //
+        glColor3f(0.4f, 0.4f, 0.4f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);
+        //glBindTexture(GL_TEXTURE_2D,_textureuv1);
+        xxofset = 40.0f;                            // start ofset
+        for(int xp=0;xp<45;xp++) {
+          xpos = (-siz_x)*xxofset;
+          ypos = (-432)+((siz_y*4)+2.0);
+          high = sqrt(spectrum[xp]*4);
+          for(int yp=0;yp<high/2;yp++) {
+            // front
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+            // left
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+            // right
+            glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+            glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+            // back
+            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+            glEnd();
+            ypos -= (siz_y*2)+2.0;
+          }
+          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
+        }
+        glPopMatrix();
+      }
+    }
+    // end spectium
     if ((visur) && (sleeper)) {
-      sleeper=0;
+      sleeper = 0;
       FILE *sfile;
-      sleep_ok=1;
+      sleep_ok = 1;
       sfile=fopen("mythtv-controller.lock","w");
       if (sfile) {
         fputs("Lockfile",sfile);
         fclose(sfile);
-        remove_log_file=true;                                               // set flag to delete log file
+        remove_log_file = true;                                               // set flag to delete log file
       }
     }
     if ((visur==0) && (sleep_ok==0) && (remove_log_file)) {
       printf("remove logfile\n");
       remove("mythtv-controller.lock");       // fjern lock file
-      sleeper=1;
-      sleep_ok=0;
-      rawtime1=0;                             // reset timer så den henter ti
-      remove_log_file=false;                  // clear remove lock file flag
+      sleeper = 1;
+      sleep_ok = 0;
+      rawtime1 = 0;                             // reset timer så den henter ti
+      remove_log_file = false;                  // clear remove lock file flag
     }
-    int iconsizex=200;
-    int iconspacey=210;
-    if ((screen_size==3) || (screen_size==4)) {
-      iconsizex=192;                            // 200
-      iconspacey=192;
+    int iconsizex = 200;
+    int iconspacey = 210;
+    if ((screen_size == 3) || (screen_size == 4)) {
+      iconsizex = 192;                            // icon size
+      iconspacey = 192;
     }
     // vis menu **********************************************************************
-    if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer==0)) {
+    if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
         // tv icon
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
-        // tv icon
-        //glBlendFunc(GL_ONE, GL_ONE);
+        // tv icon or info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if ((vis_music_oversigt) || (vis_radio_oversigt)) {
+        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show musicplay info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(27);                  // Overwrite the first name in the buffer
-        } else {
-          glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// default tv
+          glLoadName(27);                                           // Info icon nr 27
+        } else {                                                                    // else default tv
+          glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// Tv texture icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(1);                  // Overwrite the first name in the buffer
+          glLoadName(1);                                            // Tv guide icon nr 1
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
@@ -2558,19 +2812,18 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
         glEnd();
         // movie stuf
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_film_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
           // glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// film icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(3); 			// load film icon name
+          glLoadName(3); 			                                                  // film icon name 3
         } else {
           if ((vis_music_oversigt) || (vis_radio_oversigt)) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);
+            glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                 //
           } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                              // music icon
+            glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                      // music icon
           }
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2584,7 +2837,6 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
         //film icon
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2609,13 +2861,12 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
         // recorded icon
-        //glBlendFunc(GL_ONE, GL_ONE);
         if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
           glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(24); 			                                                 // load film icon name
+          glLoadName(24); 			                                                // load film icon name
         } else {
           if (vis_recorded_oversigt) {
             glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
@@ -2626,17 +2877,31 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(4); 			// Overwrite the first name in the buffer
-        }                                                                                    // _textureId13			// default button mask
+          glLoadName(4);                                                        //
+        }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*4) , 0.0);
         glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
+        //
+        // show reset movie search oversigt
+        //
+        if ((vis_film_oversigt) && (film_oversigt.get_search_view())) {
+          glBindTexture(GL_TEXTURE_2D, _textureIdreset_search);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(28);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
+        }
         if (vis_uv_meter==false) {
           if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
-            //glBlendFunc(GL_ONE, GL_ONE);
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2673,7 +2938,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
@@ -2689,7 +2953,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
@@ -2708,7 +2971,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
@@ -2724,7 +2986,6 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
@@ -2735,43 +2996,64 @@ void display() {
       glEnd();
       glPopMatrix();
     }
+    //
     if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
-      show_newmovietimeout=0;
-      vis_nyefilm_oversigt=false;
-      if ((vis_tv_oversigt) && (getstarttidintvguidefromarray==true)) {
+      show_newmovietimeout = 0;
+      vis_nyefilm_oversigt = false;
+      if ((vis_tv_oversigt) && (getstarttidintvguidefromarray == true)) {
         printf("fundet start record in tv guide nr %d \n",aktiv_tv_oversigt.find_start_pointinarray(0));
-        tvsubvalgtrecordnr=aktiv_tv_oversigt.find_start_pointinarray(0)-1;
-        tvvalgtrecordnr=0;
-        getstarttidintvguidefromarray=false;
+        tvsubvalgtrecordnr = aktiv_tv_oversigt.find_start_pointinarray(0)-1;
+        tvvalgtrecordnr = 0;
+        getstarttidintvguidefromarray = false;
       }
     }
     // shopw oversigt over nye film
-    if ((vis_nyefilm_oversigt) && (do_show_setup==false)) {
-      if (show_newmovietimeout==0) vis_nyefilm_oversigt=false;
-      if (fknapnr==0) show_newmovietimeout--;
+    if ((vis_nyefilm_oversigt) && (do_show_setup == false)) {
+      if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
+      if (fknapnr == 0) show_newmovietimeout--;
       film_oversigt.show_minifilm_oversigt(0,0);
+    }
+    // search movies
+    if (vis_film_oversigt) {
+      if (keybufferindex>0) {
+        keybufferopenwin=true;					// yes open filename window
+        if ((keybufferopenwin) && (hent_film_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
+          hent_film_search=false;
+          if (debugmode & 8) fprintf(stderr,"Search movie string: %s \n ",keybuffer);
+          // start search for movie title. And fill movie view from db
+          if (strcmp(keybuffer,"")!=0) {
+            //film_oversigt.opdatere_search_film_oversigt(keybuffer);
+            film_oversigt.opdatere_film_oversigt(keybuffer);
+            film_oversigt.set_search_view(true);
+          }
+          keybuffer[0] = 0;
+          keybufferindex = 0;
+          film_select_iconnr = 0;
+          film_key_selected = 0;
+        }
+      }
     }
     // search radio station buffer search
     if ((vis_radio_oversigt) && (!(visur)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
-        keybufferopenwin=true;					// yes open filename window
+        keybufferopenwin = true;					// yes open filename window
         // hent søgte sange oversigt
         if ((keybufferopenwin) && (hent_radio_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
-          hent_radio_search=false;
-          if (debugmode & 8) fprintf(stderr,"Search string: %s \n ",keybuffer);
+          hent_radio_search = false;
+          if (debugmode & 8) fprintf(stderr,"Search radio string: %s \n ",keybuffer);
           radiooversigt.clean_radio_oversigt();			// clean old liste
           radiooversigt.opdatere_radio_oversigt(keybuffer);	// load new
           radiooversigt.load_radio_stations_gfx();
-          keybuffer[0]=0;
-          keybufferindex=0;
-          _angley=0.0f;
-          rknapnr=0;
-          radio_key_selected=1;   						        // reset cursor position
-          do_play_radio=false;							// Do not play station
+          keybuffer[0] = 0;
+          keybufferindex = 0;
+          _angley = 0.0f;
+          rknapnr = 0;
+          radio_key_selected = 1;   						        // reset cursor position
+          do_play_radio = false;							// Do not play station
         }
       }
     }
-    //
+    // search func for music
     if ((vis_music_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
         keybufferopenwin=true;					// yes open filename window
@@ -2784,16 +3066,16 @@ void display() {
           else
            opdatere_music_oversigt_searchtxt(musicoversigt,keybuffer,1);        // find det som der søges efter sange navn
           opdatere_music_oversigt_icons(); 					// load gfx icons
-          keybuffer[0]=0;
-          keybufferindex=0;
-          _angley=0.0f;
-          do_music_icon_anim_icon_ofset=-1;
-          music_icon_anim_icon_ofset=0;						// vis music oversigt fra start
-          music_icon_anim_icon_ofsety=0;						//
-          mknapnr=0;
-          music_key_selected=1;                    // reset cursor position
-          ask_open_dir_or_play_aopen=1;		//
-          ask_open_dir_or_play=0;
+          keybuffer[0] = 0;
+          keybufferindex = 0;
+          _angley = 0.0f;
+          do_music_icon_anim_icon_ofset = -1;
+          music_icon_anim_icon_ofset = 0;						// vis music oversigt fra start
+          music_icon_anim_icon_ofsety = 0;						//
+          mknapnr = 0;
+          music_key_selected = 1;                    // reset cursor position
+          ask_open_dir_or_play_aopen = 1;		//
+          ask_open_dir_or_play = 0;
         }
       }
     }
@@ -2804,7 +3086,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
         std::clock_t start;
         start = std::clock();
@@ -2812,19 +3094,23 @@ void display() {
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_stream_oversigt) {
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
         std::clock_t start;
         start = std::clock();
         radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        // show radio options menu
+        if ((show_radio_options) && (!(visur))) {
+          radiooversigt.show_radio_options();
+        }
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -2851,14 +3137,10 @@ void display() {
         std::clock_t start;
         start = std::clock();
         recordoversigt.show_recorded_oversigt1(0,0);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
-      // show radio options menu
-      if ((vis_radio_oversigt) && (show_radio_options) && (!(visur))) {
-        radiooversigt.show_radio_options();
-      }
-      // show tv record list
       if (vis_tvrec_list) {
+        // show tv record list
         std::clock_t start;
         start = std::clock();
         glPushMatrix();
@@ -2867,14 +3149,15 @@ void display() {
         if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
-    // show search box and text for radio and music
-    if ((vis_radio_oversigt) || (vis_music_oversigt)) {
+    // show search box and text for radio and music and movie
+    if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt)) {
       if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch); // mask _textureId5_!
         else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1); // mask _textureId5_!
+        else if (vis_film_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmoviesearch); // mask _textureId5_!
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -2899,18 +3182,18 @@ void display() {
     // show volume value
     if (show_volume_info) {
       vis_volume_timeout--;
-      if (vis_volume_timeout<=0) show_volume_info=false;
+      if (vis_volume_timeout<=0) show_volume_info = false;
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
       glColor4f(1.0f,1.0f,1.0f,0.2f);
       glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
       glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D, _textureuv1);
+      glBindTexture(GL_TEXTURE_2D, texturedot);                                 // volume icon
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTranslatef(10, 19, 0.0f);                                          // orgwinsizey
-      int aa=0;
+      glTranslatef(10, 19, 0.0f);
+      int aa = 0;
       for(i=0;i<(configsoundvolume*10);i++) {
         glBegin(GL_QUADS); //Begin quadrilateral coordinates
         glTexCoord2f(0, 0); glVertex3f( 10.0+aa, 0.0, 0.0);
@@ -2925,7 +3208,7 @@ void display() {
     // vis_error=true;
     // vis_error_timeout=10;
     // show music loader/player (sdl_mixer/fmod) error in program
-    if ((vis_error) && (!(visur)) && (vis_error_timeout)) {
+    if ((vis_error) && (vis_error_timeout)) {
       vis_error_timeout--;
       // background
       glPushMatrix();
@@ -2938,12 +3221,12 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTranslatef(550, 19, 0.0f);                                          // orgwinsizey
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
+      glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( 10.0, 0.0, 0.0);
       glTexCoord2f(0, 1); glVertex3f( 10.0, 50.0, 0.0);
       glTexCoord2f(1, 1); glVertex3f( 640.0, 50.0, 0.0);
       glTexCoord2f(1, 0); glVertex3f( 640.0, 0.0, 0.0);
-      glEnd(); //End quadrilateral coordinates
+      glEnd();
       glPopMatrix();
       if (film_oversigt.film_is_playing) {
         strcpy(temptxt1,"Error playing movie.");
@@ -2993,19 +3276,15 @@ void display() {
       glcRenderString(temptxt1);
       glPopMatrix();
     }
-
     //
     // skal vi til at spørge ask open dir or play (ask about play)
     //
     if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
-      do_swing_music_cover=false;
-      if (do_swing_music_cover) {
-        do_swing_music_cover=false;
-      }
+      do_swing_music_cover = false;
       if (do_swing_music_cover==false) {
-        xof=500;
-        yof=200;
-        buttonsize=200;
+        xof = 500;
+        yof = 200;
+        buttonsize = 200;
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
@@ -3021,7 +3300,7 @@ void display() {
         glTexCoord2f(0, 1); glVertex3f( xof,yof+800, 0.0);
         glTexCoord2f(1, 1); glVertex3f( xof+800, yof+800 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+800,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ***************************************************************** play icon
         xof=550;
@@ -3045,9 +3324,9 @@ void display() {
         glEnd();
         glPopMatrix();
         // ************************************************************ Open/or close window again
-        xof=650;
-        yof=250;
-        buttonsize=100;
+        xof = 650;
+        yof = 250;
+        buttonsize = 100;
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -3071,9 +3350,9 @@ void display() {
         glEnd();
         glPopMatrix();
         // swap ************************************************************** icon swap
-        xof=750;
-        yof=250;
-        buttonsize=100;
+        xof = 750;
+        yof = 250;
+        buttonsize = 100;
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -3091,10 +3370,10 @@ void display() {
         glEnd();
         glPopMatrix();
         // draw cd cover
-        xof=750;
-        yof=250;
-        no_open_dir=0;
-        buttonsize=300;
+        xof = 750;
+        yof = 250;
+        no_open_dir = 0;
+        buttonsize = 300;
         if (dirmusic.numbersindirlist()==0) {						// er der nogle dirs
           glPushMatrix();
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
@@ -3112,10 +3391,9 @@ void display() {
           glEnd();
           // ****************************************************************
           // draw cd cover
-          no_open_dir=1;
+          no_open_dir = 1;
           glColor4f(0.8f, 0.8f, 0.8f,1.0f);
           glRotatef(0.0f, 0.0f, 0.5f, 0.1f);
-          //glBlendFunc(GL_ONE, GL_ONE);
           glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
           if (dirmusic.textureId) {
             glBindTexture(GL_TEXTURE_2D, dirmusic.textureId);		// cover
@@ -3150,14 +3428,14 @@ void display() {
         glScalef(20.5, 20.5, 1.0);                                                    // danish charset ttf
         glcRenderString(temptxt);			                                                // show numbers of songs in list
         glPopMatrix();
-        i=0;
+        i = 0;
         if (dirmusic.numbersindirlist()==0) dirmusiclistemax=16; else dirmusiclistemax=8;		// hvis ingen dir mere plads til flere sange i sangliste
         //
         // show cd song list så man kan vælge
         //
         //aktivfont.selectfont("courier 10 Pitch");
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
-          ofset=18*i;
+          ofset = 18*i;
           dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
           pos=strrchr(temptxt,'/');
           if (pos>0) strcpy(temptxt,pos+1);
@@ -3187,13 +3465,12 @@ void display() {
     //
     if (vis_music_oversigt) {
       if (ask_save_playlist) {
-        xof=500;
-        yof=600;
+        xof = 500;
+        yof = 600;
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         glColor3f(1.0f, 1.0f, 1.0f);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
@@ -3206,14 +3483,13 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
         glEnd(); //End quadrilateral coordinates
         glPopMatrix();
-
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
         glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(xof+20.0f,yof+10+5, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
         glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        aktivfont.selectfont((char *) "Courier 10 Pitch");
+        //aktivfont.selectfont((char *) "Courier 10 Pitch");
         glcRenderString("Playlist name :");
         glcRenderString(keybuffer);
         glPopMatrix();
@@ -3241,20 +3517,19 @@ void display() {
           // yes stop play
           // stop old playing
           sound->release();                                                                       // stop last playing song
-          dsp=0;                                                                                  // reset uv
+          dsp = 0;                                                                                  // reset uv
           ERRCHECK(result,0);
           #endif
           #if defined USE_SDL_MIXER
           if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
-          sdlmusicplayer=NULL;
+          sdlmusicplayer = NULL;
           #endif
-          snd=0;                                // set play new flag
+          snd = 0;                                // set play new flag
         }
         if (snd==0) {
-          snd=1;
+          snd = 1;
           if (debugmode & 4) fprintf(stderr,"Play radio station nr %d url %s \n",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
-
-          if (snd==0) {
+          if (snd == 0) {
               #if defined USE_FMOD_MIXER
               result = sndsystem->init(32, FMOD_INIT_NORMAL, 0);
               ERRCHECK(result,0);
@@ -3276,7 +3551,6 @@ void display() {
               /* If we actually care about what we got, we can ask here.
               In this program we don't, but I'm showing the function call here anyway in case we'd want to know later. */
               Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
-
               sdlmusic=Mix_Init(flags);
               if(sdlmusic&flags != flags) {
                   printf("Mix_Init: Failed to init required ogg,mp3,flac support!\n");
@@ -3327,11 +3601,11 @@ void display() {
             if (sdlmusicplayer) do_zoom_radio=true;
             #endif
           }
-          aktiv_radio_station=rknapnr-1;		// Husk aktiv radio station så vi kan vi den senere
-          radio_key_selected=rknapnr;		// husk den valgte radio station
-          rknapnr=0;
-          mknapnr=0;				// reset select fire again
-          do_play_radio=false;
+          aktiv_radio_station = rknapnr-1;		                                    // Husk aktiv radio station så vi kan vi den senere
+          radio_key_selected = rknapnr;		                                        // husk den valgte radio station
+          rknapnr = 0;
+          mknapnr = 0;		                                                  		// reset select fire again
+          do_play_radio = false;
         }
       }
       // check om vi spiller radio
@@ -3375,7 +3649,6 @@ void display() {
           }
         }
       }
-      //        printf("rknapnr = %d online = %d \n",rknapnr-1,radiooversigt.get_radio_online(2));
       // create radio station online check tread
       #endif
       #if defined USE_SDL_MIXER
@@ -3399,7 +3672,7 @@ void display() {
          // stop old playing
          sound->release();                                                                       // stop last playing song
          ERRCHECK(result,0);
-         snd=0;
+         snd = 0;
         }
         #endif
         #if defined USE_SDL_MIXER
@@ -3509,16 +3782,15 @@ void display() {
       if (do_zoom_music_cover) {
         //  printf("numbers of songs = %d aktiv song =%d in array  play position %d sec   \n",aktiv_playlist.numbers_in_playlist(),do_play_music_aktiv_nr,(snd->getPlayPosition())/1000);
         // show background mask
-        int buttonsize=800;
-        int buttonsizey=500;
-        yof=200;
+        int buttonsize = 800;
+        int buttonsizey = 500;
+        yof = 200;
         // background
         glPushMatrix();
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glColor4f(1.0f,1.0f,1.0f,1.0f);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
-        //glDisable(GL_DEPTH_TEST);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         if (do_stop_music_all) {						// SKAL checkes om gfx er ok
             glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
@@ -3528,7 +3800,6 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.00f);					// lav alpha blending. 80%
-        //glLoadName(5);				                        // Overwrite the first name in the buffer
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4), yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4),yof+buttonsizey, 0.0);
@@ -3545,14 +3816,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemplay);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(8);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(8);                        // play button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(20+ (orgwinsizex/4), 20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(20+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(20+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(20+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************ last
         glPushMatrix();
@@ -3563,14 +3834,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemlast2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(6);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(6);                                              // last button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(120+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(120+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(120+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(120+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************ next
         glPushMatrix();
@@ -3581,14 +3852,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemnext);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(7);                     						   // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(7);                     						   // next button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(220+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(220+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(220+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(220+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************stop
         glPushMatrix();
@@ -3599,14 +3870,14 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, _texturemstop);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(9);                        // Overwrite the first name in the buffer
-        glBegin(GL_QUADS); //Begin quadrilateral coordinates
+        glLoadName(9);                                                          // Stop button
+        glBegin(GL_QUADS);
         // last
         glTexCoord2f(0, 0); glVertex3f(320+ (orgwinsizex/4),20+yof , 0.0);
         glTexCoord2f(0, 1); glVertex3f(320+ (orgwinsizex/4),20+yof+100, 0.0);
         glTexCoord2f(1, 1); glVertex3f(320+ (orgwinsizex/4)+100, 20+yof+100 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(320+ (orgwinsizex/4)+100,20+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // ************************************************************* draw cover
         // Draw music cover
@@ -3627,7 +3898,7 @@ void display() {
         glTexCoord2f(0, 1); glVertex3f(560+ (orgwinsizex/4),40+yof+200, 0.0);
         glTexCoord2f(1, 1); glVertex3f(560+ (orgwinsizex/4)+200, 40+yof+200 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(560+ (orgwinsizex/4)+200,40+yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
+        glEnd();
         glPopMatrix();
         // show artist
         glDisable(GL_TEXTURE_2D);
@@ -3703,6 +3974,7 @@ void display() {
           // play position
           unsigned int ms = 0;
           float frequency;
+          vis_error=false;
           if (vis_error==false)  {
             #if defined USE_FMOD_MIXER
             result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
@@ -3714,51 +3986,51 @@ void display() {
             if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
               ERRCHECK(result,do_play_music_aktiv_table_nr);
             }
-
             result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
             if (result!=FMOD_OK) {
               ERRCHECK(result,do_play_music_aktiv_table_nr);
             }
             #endif
             #if defined USE_SDL_MIXER
-            ms=2000;
-            playtime_songlength=20000;
-            lenbytes=200;
-            frequency=audio_rate;		// show rate
+            ms = 0;
+            playtime_songlength = 20000;
+            lenbytes = 200;
+            frequency = audio_rate;		// show rate
             //Mix_QuerySpec(int *frequency, Uint16 *format, int *channels);
             #endif
             // do the calc
             #if defined USE_FMOD_MIXER
-            ms=2000;
             if ((playtime_songlength>0) && (result==FMOD_OK)) {
               kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
             } else {
               kbps=0;
             }
             if (result==FMOD_OK) {
-              playtime_songlength=playtime_songlength/1000;
-              playtime=ms/1000;
+              playtime_songlength = playtime_songlength/1000;
+              playtime = ms/1000;
             } else {
-              playtime_songlength=0;
-              playtime=0;
+              playtime_songlength = 0;
+              playtime = ms/1000;
             }
             #endif
           } else if (vis_error) {
-            kbps=0;
-            ms=0;
+            kbps = 0;
+            ms = 0;
+            playtime_songlength=0;
+            playtime = ms/1000;
           }
           glPushMatrix();
           glColor3f(0.6f, 0.6f, 0.6f);
-          playtime_hour=(playtime/60)/60;
-          playtime_min=(playtime/60);
-          playtime_sec=playtime-(playtime_min*60);
-          playtime_min=playtime_min-(playtime_hour*60);
+          playtime_hour = (playtime/60)/60;
+          playtime_min = (playtime/60);
+          playtime_sec = playtime-(playtime_min*60);
+          playtime_min = playtime_min-(playtime_hour*60);
           // old metode.
-          playtime_length_min=playtime_songlength/60;
-          playtime_length_sec=playtime_songlength-(playtime_length_min*60);
+          playtime_length_min = playtime_songlength/60;
+          playtime_length_sec = playtime_songlength-(playtime_length_min*60);
           // configland = lande kode
           strcpy(temptxt,music_play_time[configland]);
-          temptxt[40]=0;
+          temptxt[40] = 0;
           glTranslatef(520.0f, 580.0f, 0.0f);
           glRasterPos2f(0.0f, 0.0f);
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
@@ -3982,7 +4254,6 @@ void display() {
             // window texture
             glEnable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
-            //glBlendFunc(GL_ONE, GL_ONE);
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
             glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
@@ -4013,7 +4284,7 @@ void display() {
             glBindTexture(GL_TEXTURE_2D,_texturemstop);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glLoadName(9	);                        // 9 = stop
+            glLoadName(9);                        // 9 = stop
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
             glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
@@ -4068,36 +4339,31 @@ void display() {
               // play position
               unsigned int ms = 0;
               float frequency;
-              if (vis_error==false) {
-                #if defined USE_FMOD_MIXER
-                result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
-                if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-                  ERRCHECK(result,0);
-                }
-                // get play length new version
-                result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
-                if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
-                  ERRCHECK(result,do_play_music_aktiv_table_nr);
-                }
-                result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
-                if (result!=FMOD_OK) {
-                  ERRCHECK(result,0);
-                }
-                // do the calc
-                if (result==FMOD_OK) {
-                  //playtime_songlength=playtime_songlength/1000;
-                  radio_playtime=ms/1000;
-                } else {
-                  radio_playtime_songlength=0;
-                  radio_playtime=0;
-                }
-                #endif
-                #if defined USE_SDL_MIXER
-                #endif
-              } else if (vis_error) {
-                kbps=0;
-                ms=0;
+              #if defined USE_FMOD_MIXER
+              result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
+              if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+                ERRCHECK(result,0);
               }
+              // get play length new version
+              result=sound->getLength(&radio_playtime_songlength,FMOD_TIMEUNIT_MS);
+              if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+                ERRCHECK(result,do_play_music_aktiv_table_nr);
+              }
+              result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
+              if (result!=FMOD_OK) {
+                ERRCHECK(result,0);
+              }
+              // do the calc
+              if (result==FMOD_OK) {
+                //playtime_songlength=playtime_songlength/1000;
+                radio_playtime=ms/1000;
+              } else {
+                radio_playtime_songlength=0;
+                radio_playtime=0;
+              }
+              #endif
+              #if defined USE_SDL_MIXER
+              #endif
               glPushMatrix();
               glDisable(GL_TEXTURE_2D);
               // show song name
@@ -4139,7 +4405,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // show station name
               switch (screen_size) {
@@ -4159,7 +4424,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // show station name
               switch (screen_size) {
@@ -4179,7 +4443,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // play time
               radio_playtime_hour=(radio_playtime/60)/60;
@@ -4205,7 +4468,6 @@ void display() {
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glcRenderString(temptxt);                // write text
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
@@ -4224,7 +4486,6 @@ void display() {
               sprintf(temptxt,": %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // speed info
               frequency=192;
@@ -4245,7 +4506,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               // speed info
               frequency=192;
@@ -4266,7 +4526,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
@@ -4287,7 +4546,6 @@ void display() {
               glScalef(20,20, 1.0);                    // danish charset ttf
               glcRenderString(temptxt);
               glPopMatrix();
-              //
               glPushMatrix();
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
@@ -4310,202 +4568,6 @@ void display() {
               glPopMatrix();
             }
           }
-        }
-        // create uv meter
-        if ((snd) && (show_uv)) vis_uv_meter=true;
-        if (((snd) && (vis_uv_meter) && (configuvmeter) && (radio_pictureloaded)) || (vis_music_oversigt)) {
-          // getSpectrum() performs the frequency analysis, see explanation below
-          sampleSize = 1024;                // nr of samples default 64
-          specLeft = new float[sampleSize];
-          specRight = new float[sampleSize];
-          for(int ii=0;ii<60;ii++) {
-            specLeft[ii]=0.0f;
-            specRight[ii]=0.0f;
-          }
-          // uv works only on fmod for now
-          #if defined USE_FMOD_MIXER
-          FMOD_DSP_PARAMETER_FFT *fft=0;
-          int chan;
-          if (!(dsp)) {
-            sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
-            dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, 128);
-            channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
-            dsp->setActive(true);
-          }
-          dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
-          if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
-          #endif
-          spec = new float[sampleSize];
-          spec2 = new float[sampleSize];
-          if (fft) {
-            // new ver
-            for (int i=0; i<fft->length; i++) {
-              specLeft[i]=fft->spectrum[0][i];
-              specRight[i]=fft->spectrum[1][i];
-            }
-          }
-          for (i = 0; i < sampleSize; i++) {
-            spec[i] = specLeft[i]*2;
-            spec2[i] = specRight[i]*2;
-          }
-          // draw uv meter
-          if ((configuvmeter==1) && (screen_size!=4)) {
-            glPushMatrix();
-            glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-            glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
-            //glColor4f(1.0f,1.0f,1.0f,1.0f);
-            int uvypos=0;
-            int high;
-            int qq;
-            // Draw uv lines 16
-            for(qq=0;qq<16;qq++) {
-              uvypos=0;
-              high=sqrt(spec[(qq*2)+1])*30.0f;
-              if (high>14) high=14;
-              for(i=0;i<high;i+=1) {
-                switch(i) {
-                  case 0: glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                    break;
-                    case 1: glColor4f(uvcolortable1[3],uvcolortable1[4],uvcolortable1[5],1.0);
-                    break;
-                    case 2: glColor4f(uvcolortable1[6],uvcolortable1[7],uvcolortable1[8],1.0);
-                    break;
-                    case 3: glColor4f(uvcolortable1[9],uvcolortable1[10],uvcolortable1[11],1.0);
-                    break;
-                    case 4: glColor4f(uvcolortable1[12],uvcolortable1[13],uvcolortable1[14],1.0);
-                    break;
-                    case 5: glColor4f(uvcolortable1[15],uvcolortable1[16],uvcolortable1[17],1.0);
-                    break;
-                    case 6: glColor4f(uvcolortable1[18],uvcolortable1[19],uvcolortable1[20],1.0);
-                    break;
-                    case 7: glColor4f(uvcolortable1[21],uvcolortable1[22],uvcolortable1[23],1.0);
-                    break;
-                    case 8: glColor4f(uvcolortable1[24],uvcolortable1[25],uvcolortable1[26],1.0);
-                    break;
-                    case 9: glColor4f(uvcolortable1[27],uvcolortable1[28],uvcolortable1[29],1.0);
-                    break;
-                    case 10:glColor4f(uvcolortable1[30],uvcolortable1[31],uvcolortable1[32],1.0);
-                    break;
-                    case 11:glColor4f(uvcolortable1[33],uvcolortable1[34],uvcolortable1[35],1.0);
-                    break;
-                    case 12:glColor4f(uvcolortable1[36],uvcolortable1[37],uvcolortable1[38],1.0);
-                    break;
-                    case 13:glColor4f(uvcolortable1[39],uvcolortable1[40],uvcolortable1[41],1.0);
-                    break;
-                    case 14:glColor4f(uvcolortable1[42],uvcolortable1[43],uvcolortable1[44],1.0);
-                    break;
-                    default:glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                    break;
-                }
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  4 +uvypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*11),  14+4+uvypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  14+4+uvypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+10 +(qq*11),  4+uvypos, 0.0);
-                glEnd();
-                uvypos+=16;
-              }
-            }
-            glPopMatrix();
-          } else if ((configuvmeter==2) && (screen_size!=4)) {
-            glPushMatrix();
-            //glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-            //glBindTexture(GL_TEXTURE_2D,texturedot);         //texturedot);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            int uvypos=0;
-            int uvyypos=0;
-            int high;
-            int qq;
-            // Draw uv lines
-            for(qq=0;qq<32;qq++) {
-              uvypos=0;
-              uvyypos=0;
-              high=sqrt(spec[(qq*1)+1])*10.0f;
-              if (high>7) high=6;
-              // draw 1 bar
-              for(i=0;i<high;i+=1) {
-                //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                switch(i) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                            glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                            //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                            break;
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                          glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
-                          //glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
-                          break;
-                    default:
-                          glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                          //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                          break;
-                }
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 +uvypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4+uvypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4+uvypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4+uvypos, 0.0);
-                glEnd();
-                uvypos+=16;
-              }
-              high=sqrt(spec2[(qq*1)+1])*10.0f;
-              if (high>7) high=6;
-              for(i=0;i<high;i+=1) {
-                switch(i) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                            glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                            break;
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                            glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
-                            glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
-                    break;
-                    default:
-                            glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
-                            glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
-                    break;
-                }
-                glBegin(GL_QUADS);
-                glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 -uvyypos, 0.0);
-                glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4-uvyypos, 0.0);
-                glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4-uvyypos , 0.0);
-                glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4-uvyypos, 0.0);
-                glEnd();
-                uvyypos+=16;
-              }
-            }
-            // done uv stuf
-            glPopMatrix();
-          }
-          // do clean up after uv meters
-          delete [] spec;
-          delete [] specLeft;
-          delete [] specRight;
         }
         // Show setup stuf windows
         if (do_show_setup) {
@@ -4532,9 +4594,284 @@ void display() {
         }
         glPopMatrix();
     }
+    // end radio stuf
+
+
+    // create uv meter
+    if ((snd) && (show_uv)) vis_uv_meter=true;
+    //
+    // calc spectrum
+    // from fmod
+    if (snd) {
+      // getSpectrum() performs the frequency analysis, see explanation below
+      sampleSize = 1024;                // nr of samples default 64
+      // uv works only on fmod for now
+      #if defined USE_FMOD_MIXER
+      FMOD_DSP_PARAMETER_FFT *fft = 0;
+      int chan;
+      static bool build_frequencyOctaves=false;
+      if (build_frequencyOctaves==false) {
+        build_frequencyOctaves = true;
+        for(int zz=0;zz<sampleSize;zz++) {
+          spectrum[zz] = 0.0f;
+          spectrum_left[zz] = 0.0f;                                             // used for spectium
+          spectrum_right[zz] = 0.0f;                                            // used for spectium
+          uvmax_values[zz] = 0.0f;                                              // used for spectium
+        }
+        printf("Create table\n");
+        for (int i=0;i<13;i++) {
+          frequencyOctaves[i]=(int) (44100/2)/(float) pow(2,12-i);
+          printf("%d \n",frequencyOctaves[i]);
+        }
+      }
+      FMOD::ChannelGroup *mastergroup;
+      if (!(dsp)) {
+        sndsystem->getMasterChannelGroup(&mastergroup);
+        sndsystem->createDSPByType(FMOD_DSP_TYPE_FFT, &dsp);
+        dsp->setParameterInt(FMOD_DSP_FFT_WINDOWTYPE,FMOD_DSP_FFT_WINDOW_TRIANGLE);
+        dsp->setParameterInt(FMOD_DSP_FFT_WINDOWSIZE, sampleSize);
+        mastergroup->addDSP(0, dsp);
+        //channel->addDSP(FMOD_DSP_PARAMETER_DATA_TYPE_FFT, dsp);
+        dsp->setActive(true);
+      }
+      result=dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
+      if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
+      #endif
+      int length = fft->length/2;
+      int numChannels = fft->numchannels;
+
+
+      /*
+      if (fft) {
+        if (length > 0) {
+          int indexFFT = 0;
+          for (int index = 0; index < 15; ++index) {
+            for (int frec = 0; frec < frequencyOctaves[index]; ++frec) {
+              printf("spectum[index]=value indexFFT=%d frequencyOctaves[index] antal %d \n",indexFFT,frequencyOctaves[index]);
+              spectrum[index] += (int) fft->spectrum[0][indexFFT] +  (int) fft->spectrum[1][indexFFT];
+              ++indexFFT;
+            }
+            //spectrum[index] /= (float)(frequencyOctaves[index]);
+          }
+        }
+      }
+      */
+
+      if (fft) {
+        // new ver 4
+        for (int i=0; i<fft->length; i++) {
+          float spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
+          spectrum[i] = spectum_value;
+          spectrum_left[i] = spectum_value;
+          spectrum_right[i] = spectum_value;
+          if (spectum_value > uvmax_values[i]) uvmax_values[i] = spectum_value;
+          else if (uvmax_values[i] > 0.0f) uvmax_values[i] = uvmax_values[i] - 1.00f;
+          else uvmax_values[i] = spectum_value;
+        }
+      }
+    }
+    //
+    // show uv metter in music player
+    //
+    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
+      // draw uv meter
+      int high = 2;
+      int qq = 1;
+      int uvypos = 0;
+      if (((configuvmeter==1) || (configuvmeter==3)) && (screen_size!=4)) {
+        glPushMatrix();
+        winsizx = 16;
+        winsizy = 16;
+        int xpos = 1350;
+        int ypos = 10;
+        // uv
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        for(qq=0;qq<16;qq++) {
+          ypos = 10;
+          high = sqrt(spectrum[qq]*2);
+          high += 1;
+          if (high>14) high=14;
+          for(i=0;i<high;i++) {
+            // uv
+            switch(i) {
+              case 0: glColor4f(uvcolortable2[0],uvcolortable2[1],uvcolortable2[2],1.0);
+                break;
+                case 1: glColor4f(uvcolortable2[3],uvcolortable2[4],uvcolortable2[5],1.0);
+                break;
+                case 2: glColor4f(uvcolortable2[6],uvcolortable2[7],uvcolortable2[8],1.0);
+                break;
+                case 3: glColor4f(uvcolortable2[9],uvcolortable2[10],uvcolortable2[11],1.0);
+                break;
+                case 4: glColor4f(uvcolortable2[12],uvcolortable2[13],uvcolortable2[14],1.0);
+                break;
+                case 5: glColor4f(uvcolortable2[15],uvcolortable2[16],uvcolortable2[17],1.0);
+                break;
+                case 6: glColor4f(uvcolortable2[18],uvcolortable2[19],uvcolortable2[20],1.0);
+                break;
+                case 7: glColor4f(uvcolortable2[21],uvcolortable2[22],uvcolortable2[23],1.0);
+                break;
+                case 8: glColor4f(uvcolortable2[24],uvcolortable2[25],uvcolortable2[26],1.0);
+                break;
+                case 9: glColor4f(uvcolortable2[27],uvcolortable2[28],uvcolortable2[29],1.0);
+                break;
+                case 10:glColor4f(uvcolortable2[30],uvcolortable2[31],uvcolortable2[32],1.0);
+                break;
+                case 11:glColor4f(uvcolortable2[33],uvcolortable2[34],uvcolortable2[35],1.0);
+                break;
+                case 12:glColor4f(uvcolortable2[36],uvcolortable2[37],uvcolortable2[38],1.0);
+                break;
+                case 13:glColor4f(uvcolortable2[39],uvcolortable2[40],uvcolortable2[41],1.0);
+                break;
+                case 14:glColor4f(uvcolortable2[42],uvcolortable2[43],uvcolortable2[44],1.0);
+                break;
+                default:glColor4f(uvcolortable2[0],uvcolortable2[1],uvcolortable2[2],1.0);
+                break;
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+winsizy , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+winsizy , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
+            glEnd();
+            ypos = ypos + 16;
+          }
+          uvypos += 14;
+        }
+        //
+        uvypos=0;
+        float siz_x = 6.0f;
+        float siz_y = 4.0f;
+        xpos = 1350;
+        ypos = 10;
+        for(qq=0;qq<16;qq++) {
+          high = sqrt(uvmax_values[qq]*18);
+          ypos = 10+(siz_y*high);
+          for(i=0;i<1;i++) {
+            glEnable(GL_TEXTURE_2D);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBindTexture(GL_TEXTURE_2D,texturedot1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos , 0.0);
+            glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos,ypos+siz_y , 0.0);
+            glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos+siz_y , 0.0);
+            glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+uvypos+winsizx,ypos , 0.0);
+            glEnd();
+          }
+          uvypos += 14;
+        }
+        glPopMatrix();
+      } else if ((configuvmeter==2) && (screen_size!=4)) {
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBindTexture(GL_TEXTURE_2D,texturedot);                              // texturedot
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        int uvypos = 0;
+        int uvyypos = 0;
+        int high;
+        int qq;
+        // Draw uv lines
+        for(qq=0;qq<32;qq++) {
+          uvypos = 0;
+          uvyypos = 0;
+          high=sqrt(spectrum_left[qq]*2);
+          if (high>7) high = 6;
+          // draw 1 bar
+          for(i=0;i<high;i+=1) {
+            switch(i) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                        glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                        //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                        break;
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                      glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
+                      //glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
+                      break;
+                default:
+                      glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                      //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                      break;
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 +uvypos, 0.0);
+            glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4+uvypos, 0.0);
+            glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4+uvypos , 0.0);
+            glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4+uvypos, 0.0);
+            glEnd();
+            uvypos+=16;
+          }
+
+          high = sqrt(spectrum_right[qq]*2);
+          if (high > 7) high = 6;
+          for(i=0;i<high;i+=1) {
+            switch(i) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                        glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
+                        break;
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                        glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot)
+                break;
+                default:
+                        glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                        glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
+                break;
+            }
+            glBegin(GL_QUADS);
+            glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 -uvyypos, 0.0);
+            glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+14+4-uvyypos, 0.0);
+            glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+14+4-uvyypos , 0.0);
+            glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+1250+5 +(qq*6),  120+4-uvyypos, 0.0);
+            glEnd();
+            uvyypos+=16;
+          }
+        }
+        // done uv stuf
+        glPopMatrix();
+      }
+      // do clean up after uv meters
+    }
     // load new team gfx files from config
     if (do_save_config) {
-      do_save_config=false;
+      do_save_config = false;
       if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
         printf("Error saving config file mythtv-controller.conf\n");
       } else printf("Saving config ok.\n");
@@ -4542,7 +4879,6 @@ void display() {
       //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
-
       //freegfx();                                                                // free gfx loaded
       //loadgfx();                                                                // reload all menu + icon gfx
     }
@@ -4586,8 +4922,8 @@ void display() {
         sdlmusicplayer=NULL;
         #endif
         // no play sound flag
-        snd=0;
-        sound=0;
+        snd = 0;
+        sound = 0;
         // clean music playlist
         aktiv_playlist.clean_playlist();                // clean play list (reset) play list
         do_play_music_aktiv_table_nr=1;			// reset play start nr
@@ -4599,11 +4935,11 @@ void display() {
         }
         // start movie
         if (film_oversigt.playmovie(fknapnr-1)==0) {
-          vis_error=true;
-          vis_error_timeout=60;
+          vis_error = true;
+          vis_error_timeout = 60;
         }
       }
-      startmovie=false;                   // start kun 1 instans
+      startmovie = false;                   // start kun 1 instans
     }
     if (stopmovie) {
       if (debugmode && 16) fprintf(stderr,"Stop movie\n");
@@ -4616,7 +4952,7 @@ void display() {
         film_oversigt.stopmovie();
       }
       //stop do it again next loop
-      stopmovie=false;
+      stopmovie = false;
     }
     // start play stream
     // still use the old system call bach file
@@ -4685,19 +5021,19 @@ void display() {
         }
       }
                                               // reset play function to new select
-      startstream=false;                      // start kun 1 instans
-      do_play_stream=false;                   //
-      stream_playnr=sknapnr;                  //
+      startstream = false;                      // start kun 1 instans
+      do_play_stream = false;                   //
+      stream_playnr = sknapnr;                  //
     }
     // stop stream if play
     //
     if (do_stop_stream) {
       if (stopstream) {
-        stopstream=false;                     // start kun 1 instans
-        stream_playnr=0;
+        stopstream = false;                     // start kun 1 instans
+        stream_playnr = 0;
         strcpy(stream_playing_name,"");
         strcpy(stream_playing_desc,"");
-        stream_playing_icon=0;
+        stream_playing_icon = 0;
         if (streamoversigt.stream_is_playing) {
           if (debugmode) printf("Stop playing stream\n");
           // stop playing (active movie)
@@ -4708,7 +5044,7 @@ void display() {
     // set play on pause rss stream
     if (do_pause_stream) {
       streamoversigt.pausestream(1);
-      do_pause_stream=false;
+      do_pause_stream = false;
     }
     // play recorded program
     if (do_play_recorded_aktiv_nr) {
@@ -4963,17 +5299,15 @@ void display() {
     //
     // show status of all the thread loaders
     //
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false)) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       show_status_update=true;
       // show loader status
-      int statuswxpos=1470;
-      int statuswypos=75;
+      int statuswxpos = 1470;
+      int statuswypos = 75;
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      //glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -4982,36 +5316,36 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f(statuswxpos+200+250, statuswypos+130 , 0.0);
       glTexCoord2f(1, 0); glVertex3f(statuswxpos+200+250, statuswypos , 0.0);
       glEnd();
-      float y=0;
-      int xx=0;
-      int valgtnr=0;
+      float y = 0;
+      int xx = 0;
+      int valgtnr = 0;
       if ((radio_oversigt_loaded_nr<radiooversigt.radioantal()) && (radio_oversigt_loaded_done==false)) {
-        y=(float) radio_oversigt_loaded_nr/radiooversigt.radioantal();
-        xx=(float) y*18;
-        if (y>0.0f) valgtnr=1;
+        y = (float) radio_oversigt_loaded_nr/radiooversigt.radioantal();
+        xx = (float) y*18;
+        if (y>0.0f) valgtnr = 1;
       }
       // show music loader status
       if (valgtnr==0) {
         if (music_oversigt_loaded_nr<7344) {
-          y=(float) music_oversigt_loaded_nr/7344;
-          xx=(float) y*18;
-          if (y>0.0f) valgtnr=2;
+          y = (float) music_oversigt_loaded_nr/7344;
+          xx = (float) y*18;
+          if (y>0.0f) valgtnr = 2;
         }
       }
       // show stream loader status
       if (valgtnr==0) {
         if (streamoversigt.streams_rss_loaded()) {
-          y=(float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
-          y=(float) streamoversigt.streams_rss_loaded()/88;
-          xx=(float) y*18;
+          y = (float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
+          y = (float) streamoversigt.streams_rss_loaded()/88;
+          xx = (float) y*18;
           if (y>0.0f) valgtnr=3;
         }
       }
       // show movie loader status
       if (valgtnr==0) {
-        y=(float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
-        xx=(float) y*18;
-        if (y>0.0f) valgtnr=4;
+        y = (float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
+        xx = (float) y*18;
+        if (y > 0.0f) valgtnr = 4;
       } else y=0;
 
       for(int x=0;x<xx;x++) {
@@ -5052,7 +5386,6 @@ void display() {
       GLfloat fps;
       GLfloat seconds = (t - T0) / 1000.0;
       fps = Frames / seconds;
-      //printf("%0.0f FPS\n", fps);
       T0 = t;
       Frames = 0;
       sprintf(temptxt,"FPS: %-4.0f", fps);
@@ -5064,8 +5397,8 @@ void display() {
     }
     //  STOP ALL sound
     if (do_stop_music) {				// pressed stop music
-      do_stop_music=false;
-      do_stop_music_all=true;
+      do_stop_music = false;
+      do_stop_music_all = true;
       #if defined USE_FMOD_MIXER
       if ((sound) && (snd)) result=sound->release();			// stop all music if user press show playlist stop button
       ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -5073,23 +5406,23 @@ void display() {
       #if defined USE_SDL_MIXER
       if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);	// stop music and free music
       #endif
-      snd=0;
-      do_zoom_music_cover=false;
-      aktiv_playlist.clean_playlist();                // clean play list (reset) play list
-      do_play_music_aktiv_table_nr=1;			// reset play start nr
+      snd = 0;
+      do_zoom_music_cover = false;
+      aktiv_playlist.clean_playlist();                    // clean play list (reset) play list
+      do_play_music_aktiv_table_nr = 1;             			// reset play start nr
     }
     // stop radio
     if (do_stop_radio) {
       #if defined USE_FMOD_MIXER
-      result=sound->release();
+      result = sound->release();
       ERRCHECK(result,0);
       #endif
       #if defined USE_SDL_MIXER
       if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
       #endif
-      snd=0;
-      do_stop_radio=false;
-      do_stop_music_all=true;
+      snd = 0;
+      do_stop_radio = false;
+      do_stop_music_all = true;
     }
     // is sound system working
     #if defined USE_FMOD_MIXER
@@ -5099,7 +5432,7 @@ void display() {
     if (!(do_stop_music_all)) {
     #endif
         // vent på sang er færdig
-        saver_irq=true;						// stop screen saver at starte timeout når vi spiller music
+        //saver_irq=true;						// stop screen saver at starte timeout når vi spiller music
         #if defined USE_FMOD_MIXER
         result = channel->isPlaying(&playing);
         if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
@@ -5107,7 +5440,7 @@ void display() {
         }
         #endif
         #if defined USE_SDL_MIXER
-        playing=Mix_Playing(0);
+        playing = Mix_Playing(0);
         #endif
         if (playing==false) {		//snd->isFinished()
             // hent next aktiv song
@@ -5134,42 +5467,41 @@ void display() {
                 result = sndsystem->playSound(sound,NULL,false, &channel);
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
                 if (sndsystem) channel->setVolume(configsoundvolume);
-                dsp=0;
+                dsp = 0;
               } else {
                 // play next song error (set skip song flag) jump to next song
                 if (do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) {
                   do_play_music_aktiv_table_nr++;
-                  do_shift_song=true;
+                  do_shift_song = true;
                 } else {
-                  do_stop_music_all=true;            // stop play music
+                  do_stop_music_all = true;            // stop play music
                 }
               }
               #endif
-
               #if defined USE_SDL_MIXER
               // aktivplay_music_path = next song to play
               if (debugmode & 2) fprintf(stderr,"Auto1 Next song %s \n",aktivplay_music_path);
-              sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path);
+              sdlmusicplayer = Mix_LoadMUS(aktivplay_music_path);
               Mix_PlayMusic(sdlmusicplayer, 0);
               if (!(sdlmusicplayer)) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
               #endif
               do_zoom_music_cover_remove_timeout=showtimeout;			              // set close info window timeout
-              do_zoom_music_cover=true;				                                  // show music cover info til timeout showtimeout
+              do_zoom_music_cover = true;				                                  // show music cover info til timeout showtimeout
             } else {				                                    		// else slet playliste (reset player)
-              do_play_music_aktiv_table_nr=1;
+              do_play_music_aktiv_table_nr = 1;
               #if defined USE_FMOD_MIXER
-              result=sound->release();          		                            // stop last played sound on soundsystem fmod
+              result = sound->release();          		                            // stop last played sound on soundsystem fmod
               ERRCHECK(result,do_play_music_aktiv_table_nr);
               #endif
               #if defined USE_SDL_MIXER
               Mix_FreeMusic(sdlmusicplayer);
-              sdlmusicplayer=NULL;
+              sdlmusicplayer = NULL;
               #endif
               if (debugmode & 2) fprintf(stderr,"STOP player and clear playlist\n");
-              do_stop_music_all=true;				// stop all music
-              snd=0;						// clear music pointer for irrsound
-              do_zoom_music_cover=false;			// remove play info window
-              aktiv_playlist.clean_playlist();		// clean play list (reset) play list
+              do_stop_music_all = true;				                                 // stop all music
+              snd = 0;	                                             					 // clear music pointer for irrsound
+              do_zoom_music_cover = false;			                                 // remove play info window
+              aktiv_playlist.clean_playlist();		                             // clean play list (reset) play list
               // do_play_music_aktiv_table_nr=1;
             }
         }
@@ -5203,8 +5535,8 @@ void display() {
           #endif
           #if defined USE_SDL_MIXER
           if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
-          sdlmusicplayer=NULL;
-          sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path);
+          sdlmusicplayer = NULL;
+          sdlmusicplayer = Mix_LoadMUS(aktivplay_music_path);
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (sdlmusicplayer==NULL) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
           #endif
@@ -5253,7 +5585,7 @@ void display() {
         if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
         sdlmusicplayer=NULL;
         // load new played
-        sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path);
+        sdlmusicplayer = Mix_LoadMUS(aktivplay_music_path);
         Mix_PlayMusic(sdlmusicplayer, 0);
         if (sdlmusicplayer==NULL) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
         #endif
@@ -5269,12 +5601,12 @@ void display() {
     if (do_update_rss) {
       // call update xmltv multi phread
       update_rss_phread_loader();
-      do_update_rss=false;
+      do_update_rss = false;
       //do_update_xmltv_show=false;
     }
     if (do_update_music) {
       update_music_phread_loader();
-      do_update_music=false;
+      do_update_music = false;
     }
     //  don't wait!
     //  start processing buffered OpenGL routines
@@ -5290,683 +5622,718 @@ void display() {
 // names is the array of gfx on screen as buttons
 
 int list_hits(GLint hits, GLuint *names,int x,int y) {
-    int i=hits;			// numbers of hits
-    bool fundet=false;
-    int returnfunc=0;
+    int i = hits;			// numbers of hits
+    bool fundet = false;
+    int returnfunc = 0;
     /* For each hit in the buffer are allocated 4 bytes:
       1. Number of hits selected (always one, beacuse when we draw each object we use glLoadName, so we replace the prevous name in the stack)
       2. Min Z  3. Max Z  4. Name of the hit (glLoadName)
     */
     do {
-        // setup menu
-        if ((fundet==false) && (do_show_setup)) {
-          // test for setup menu sound
-          if (((GLubyte) names[i*4+3]==30) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
-            do_show_setup_sound=true;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_screen=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            do_show_setup_rss=false;
-            fundet=true;
-          }
-          // test screen setup
-          if (((GLubyte) names[i*4+3]==31)  && (do_show_setup_sql==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=true;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for gfx opløsning
-          if (((GLubyte) names[i*4+3]==32) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_font=false;
-            do_show_setup_tema=true;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for tema setup
-          if (((GLubyte) names[i*4+3]==33)  && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_screen=true;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for sql setup/info
-          if (((GLubyte) names[i*4+3]==34) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=true;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for ttffont setup/info
-          if (((GLubyte) names[i*4+3]==35) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_setup_font=true;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for F keys setup/info
-          if (((GLubyte) names[i*4+3]==36) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_videoplayer=false;
-            do_show_setup_keys=true;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for setupclose
-          if (((GLubyte) names[i*4+3]==37) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_setup=false;
-            do_show_tvgraber=false;
-            fundet=true;
-            do_save_config=true;             // save setup now
-          }
-          if (((GLubyte) names[i*4+3]==38) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
-            do_show_videoplayer=true;
-            do_show_setup_sound=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_screen=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // do_show_tvgraber
-          if (((GLubyte) names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_screen=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=true;
-            fundet=true;
-          }
-          // test for close windows again icon for all other windows in setup glLoadName(40)
-          //
-          if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
-            do_show_setup_sound=false;
-            do_show_setup_screen=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_setup_rss=false;
-            if (do_show_tvgraber) {
-              // hent/update tv guide from db
-              // efter den er saved i db fra setup tvguide function som saver data.
-              aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-            }
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for tema setup/info
-          if (((GLubyte) names[i*4+3]==41) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
-            tema++;
-            if (tema>TEMA_ANTAL) tema=1;
-            fundet=true;
-          }
-          // test for rss
-          if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
-            do_show_setup_sound=false;
-            do_show_setup_sql=false;
-            do_show_setup_network=false;
-            do_show_setup_screen=false;
-            do_show_setup_tema=false;
-            do_show_setup_font=false;
-            do_show_setup_keys=false;
-            do_show_videoplayer=false;
-            do_show_tvgraber=false;
-            do_show_rss=false;
-            do_show_setup_rss=true;
-            fundet=true;
-          }
-          if ((GLubyte) names[i*4+3]==45) {
-            fundet=true;
-            printf("45 Button pressed \n");
-          }
+      // setup menu
+      if ((fundet==false) && (do_show_setup)) {
+        // test for setup menu sound
+        if (((GLubyte) names[i*4+3]==30) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          do_show_setup_sound = true;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          do_show_setup_rss = false;
+          fundet = true;
         }
-        // main menu
-        if ((fundet==false) && (do_show_setup==false)) {
-          // test for menu select tv
-          if ((GLubyte) names[i*4+3]==1) {
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=!vis_tv_oversigt;
-            vis_recorded_oversigt=false;
-            vis_radio_or_music_oversigt=false;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for menu select music
-          if ((GLubyte) names[i*4+3]==2) {
-            if (debugmode) printf("Select vis_radio_and_music \n");
-            vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
-            //vis_radio_oversigt=!vis_radio_oversigt;
-            //vis_music_oversigt=!vis_music_oversigt;
-            vis_radio_oversigt=false;
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=false;
-            vis_recorded_oversigt=false;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for menu select film/streams
-          if ((GLubyte) names[i*4+3]==3) {
-            vis_stream_or_movie_oversigt=!vis_stream_or_movie_oversigt;
-            vis_radio_oversigt=false;
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=false;
-            vis_recorded_oversigt=false;
-            vis_stream_oversigt=false;
-            vis_radio_or_music_oversigt=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
-          // test for menu select recorded
-          if ((GLubyte) names[i*4+3]==4) {
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=false;
-            vis_radio_or_music_oversigt=false;
-            vis_recorded_oversigt=!vis_recorded_oversigt;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
-            do_show_tvgraber=false;
-            fundet=true;
-          }
+        // test screen setup
+        if (((GLubyte) names[i*4+3]==31)  && (do_show_setup_sql==false) && (do_show_setup_sound==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = true;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          fundet = true;
         }
-        // setup menu i main
-        if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
-          // test for menu select setup
-          if ((GLubyte) names[i*4+3]==5) {
-            do_show_setup=!do_show_setup;
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=false;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
-            vis_radio_or_music_oversigt=false;
-            do_show_tvgraber=false;
-            do_show_setup_rss=false;
-            fundet=true;
-          }
-          // test for exit selected
-          if ((GLubyte) names[i*4+3]==6) {
-            vis_music_oversigt=false;
-            vis_film_oversigt=false;
-            vis_tv_oversigt=!vis_tv_oversigt;
-            vis_recorded_oversigt=false;
-            vis_radio_or_music_oversigt=false;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
-            do_show_tvgraber=false;
-            fundet=true;
-            remove("mythtv-controller.lock");
-            order_channel_list();                                               // order tv channel list
-            save_channel_list();                                                //
-            txmltvgraber_createconfig();                                        //
-            exit(0);                                                            // exit
-          }
+        // test for gfx opløsning
+        if (((GLubyte) names[i*4+3]==32) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_font = false;
+          do_show_setup_tema = true;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          fundet = true;
         }
+        // test for tema setup
+        if (((GLubyte) names[i*4+3]==33)  && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_sound==false) && (do_show_setup_keys==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_screen = true;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for sql setup/info
+        if (((GLubyte) names[i*4+3]==34) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = true;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for ttffont setup/info
+        if (((GLubyte) names[i*4+3]==35) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_setup_font = true;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for F keys setup/info
+        if (((GLubyte) names[i*4+3]==36) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false))  {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_videoplayer = false;
+          do_show_setup_keys = true;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for setupclose
+        if (((GLubyte) names[i*4+3]==37) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_keys==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_setup = false;
+          do_show_tvgraber = false;
+          fundet = true;
+          do_save_config = true;             // save setup now
+        }
+        if (((GLubyte) names[i*4+3]==38) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          do_show_videoplayer = true;
+          do_show_setup_sound = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // do_show_tvgraber
+        if (((GLubyte) names[i*4+3]==39) && (do_show_setup_sql==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = true;
+          fundet = true;
+        }
+        // test for close windows again icon for all other windows in setup glLoadName(40)
         //
-        // scroll
-        //
-        if (vis_stream_oversigt) {
-          if (!(fundet)) {
-            // we have a select mouse/touch element dirid
-            if ((GLubyte) names[i*4+3]==23) {
-              if (debugmode & 4) printf("scroll down\n");
-              returnfunc=1;
-              fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==24) {
-              if (debugmode & 4) printf("scroll up\n");
-              returnfunc=2;
-              fundet=true;
-            }
+        if (((GLubyte) names[i*4+3]==40) && ((do_show_setup_sound) || (do_show_setup_screen) || (do_show_setup_sql) || (do_show_setup_network) || (do_show_setup_tema) || (do_show_setup_font) || (do_show_setup_keys) || (do_show_videoplayer) || (do_show_tvgraber))) {
+          do_show_setup_sound = false;
+          do_show_setup_screen = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_setup_rss = false;
+          if (do_show_tvgraber) {
+            // hent/update tv guide from db
+            // efter den er saved i db fra setup tvguide function som saver data.
+            aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
           }
+          do_show_tvgraber = false;
+          fundet = true;
         }
-        if (vis_film_oversigt) {
-          if (!(fundet)) {
-            // we have a select mouse/touch element dirid
-            if ((GLubyte) names[i*4+3]==23) {
-              if (debugmode & 8) printf("scroll down\n");
-              returnfunc=1;
-              fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==24) {
-              printf("scroll up\n");
-              returnfunc=2;
-              fundet=true;
-            }
-          }
+        // test for tema setup/info
+        if (((GLubyte) names[i*4+3]==41) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
+          tema++;
+          if (tema>TEMA_ANTAL) tema = 1;
+          fundet = true;
         }
-        if (vis_music_oversigt) {
-          if (!(fundet)) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
-            // we have a select mouse/touch element dirid
-            if ((GLubyte) names[i*4+3]==23) {
-              if (debugmode & 2) fprintf(stderr,"scroll down\n");
-              returnfunc=1;
-              fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==24) {
-              if (debugmode & 2) fprintf(stderr,"scroll up\n");
-              returnfunc=2;
-              fundet=true;
-            }
-            if ((GLubyte) names[i*4+3]==27) {
-              if (debugmode & 2) fprintf(stderr,"Show music info\n");
-              do_zoom_music_cover=!do_zoom_music_cover;
-              ask_open_dir_or_play=false;
-              fundet=true;
-            }
-          }
-          // Bruges til mus/touch skærm
-          if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
-            // we have a select mouse/touch element dirid
-            if ((GLuint) names[i*4+3]>=100) {
-              mknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
-              if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
-              fundet=true;
-            }
-            // husk last
-            if (mknapnr!=0) swknapnr=mknapnr;
-            // mknapnr=mknapnr+(music_icon_anim_icon_ofsety*4);
-            mknapnr=mknapnr+(_mangley/41)*8;
-          }
-          //
-          // hvis vis ask_open_dir_or_play window
-          //
-          if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
-            // play button
-            if ((GLubyte) names[i*4+3]==20) {
-              ask_open_dir_or_play=false;                 // flag luk vindue igen
-              do_play_music_cover=1;                      // der er trykket på cover play det
-              do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
-              do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
-              fundet=true;
-            }
-            // open music dir or close window
-            if ((GLubyte) names[i*4+3]==21) {
-              // pressed close
-              if (debugmode) fprintf(stderr,"Close window again\n");
-              ask_open_dir_or_play=false;				// flag luk vindue igen
-              do_zoom_music_cover=false;
-              mknapnr=0;
-              fundet=true;
-            }
-            // swap selected
-            if ((GLubyte) names[i*4+3]==22) {
-              // pressed Swap
-              if (debugmode & 2) fprintf(stderr,"Swap button pressed\n");
-              for(int x=0;x<dirmusic.numbersinlist();x++) {
-                dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(x)),x);
-              }
-              fundet=true;
-            }
-          }
-          // hvis show player
-          // use as controller
-          if ((!(fundet)) && (do_zoom_music_cover)) {
-            if ((GLubyte) names[i*4+3]==5) {
-              // if touch/mouse click on window then close windows again
-              do_zoom_music_cover=false;
-              ask_open_dir_or_play=false;				// flag luk vindue igen
-              fundet=true;
-            }
-            // last song
-            if ((GLubyte) names[i*4+3]==6) {
-              if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
-                do_play_music_aktiv_table_nr--;                                         // skift aktiv sang
-                do_shift_song=true;                                                     // sæt flag til skift
-              }
-              fundet=true;
-            }
-            // next song
-            if ((GLubyte) names[i*4+3]==7) {
-              if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
-                do_play_music_aktiv_table_nr++;
-                do_shift_song=true;
-              }
-              fundet=true;
-            }
-            // stop song
-            if ((GLubyte) names[i*4+3]==9) {
-              do_stop_music=1;
-              fundet=true;
-            }
-            // play song
-            if ((GLubyte) names[i*4+3]==8) {
-              do_stop_music=0;
-              do_shift_song=true;
-              if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
-                  if (aktiv_playlist.numbers_in_playlist()==0) {
-                      do_stop_music_all=true;            // stop play music
-                      do_shift_song=false;
-                  } else {
-                      do_play_music_aktiv_table_nr=1;
-                  }
-              }
-              fundet=true;
-              if (debugmode & 2) fprintf(stderr,"Start play \n");
-            }
-          }
+        // test for rss
+        if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          do_show_rss = false;
+          do_show_setup_rss = true;
+          fundet = true;
         }
-        // vælg skal der spilles music eller radio
-        if ((vis_radio_or_music_oversigt) && (!(fundet))) {
-          // Radio
-          if ((GLubyte) names[i*4+3]==80) {
-            fundet=true;
-            vis_radio_oversigt=true;
-            vis_radio_or_music_oversigt=false;
-          }
-          // Music
-          if ((GLubyte) names[i*4+3]==81) {
-            fundet=true;
-            vis_music_oversigt=true;
-            vis_radio_or_music_oversigt=false;
-          }
+        if ((GLubyte) names[i*4+3]==45) {
+          fundet = true;
+          printf("45 Button pressed \n");
         }
-        // kun til mus/touch skærm (radio stationer)
-        // luk show play radio
-        if ((vis_radio_oversigt)  && (!(fundet))) {
+      }
+      // main menu
+      if ((fundet==false) && (do_show_setup==false)) {
+        // test for menu select tv
+        if ((GLubyte) names[i*4+3]==1) {
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt =! vis_tv_oversigt;
+          vis_recorded_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for menu select music
+        if ((GLubyte) names[i*4+3]==2) {
+          if (debugmode) printf("Select vis_radio_and_music \n");
+          vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
+          //vis_radio_oversigt=!vis_radio_oversigt;
+          //vis_music_oversigt=!vis_music_oversigt;
+          vis_radio_oversigt = false;
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt = false;
+          vis_recorded_oversigt = false;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for menu select film/streams
+        if ((GLubyte) names[i*4+3]==3) {
+          vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
+          vis_radio_oversigt = false;
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt = false;
+          vis_recorded_oversigt = false;
+          vis_stream_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+        // test for menu select recorded
+        if ((GLubyte) names[i*4+3]==4) {
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+          vis_recorded_oversigt =! vis_recorded_oversigt;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+          do_show_tvgraber = false;
+          fundet = true;
+        }
+      }
+      // setup menu i main
+      if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
+        // test for menu select setup
+        if ((GLubyte) names[i*4+3]==5) {
+          do_show_setup =! do_show_setup;
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt = false;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+          do_show_tvgraber = false;
+          do_show_setup_rss = false;
+          fundet = true;
+        }
+        // test for exit selected
+        if ((GLubyte) names[i*4+3]==6) {
+          vis_music_oversigt = false;
+          vis_film_oversigt = false;
+          vis_tv_oversigt =! vis_tv_oversigt;
+          vis_recorded_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+          do_show_tvgraber = false;
+          fundet = true;
+          remove("mythtv-controller.lock");
+          order_channel_list();                                               // order tv channel list
+          save_channel_list();                                                //
+          txmltvgraber_createconfig();                                        //
+          exit(0);                                                            // exit
+        }
+      }
+      //
+      // scroll
+      //
+      if (vis_stream_oversigt) {
+        if (!(fundet)) {
+          // we have a select mouse/touch element dirid
           if ((GLubyte) names[i*4+3]==23) {
-            if (debugmode & 8) fprintf(stderr,"scroll down\n");
-            returnfunc=1;
-            fundet=true;
+            if (debugmode & 4) printf("scroll down\n");
+            returnfunc = 1;
+            fundet = true;
           }
           if ((GLubyte) names[i*4+3]==24) {
-            if (debugmode & 8) fprintf(stderr,"scroll up\n");
-            returnfunc=2;
-            fundet=true;
+            if (debugmode & 4) printf("scroll up\n");
+            returnfunc = 2;
+            fundet = true;
           }
           if ((GLubyte) names[i*4+3]==27) {
-            if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
-            do_zoom_radio=!do_zoom_radio;
-            fundet=true;
+            printf("Close stream info\n");
+            returnfunc = 2;
+            do_zoom_stream_cover = false;
+            do_stop_stream = true;                                            // flag to stop play
+            stopstream = true;                                                // flag to stop play
+            do_play_stream = false;                                           // we are not play a
+            fundet = true;
           }
         }
-        if ((vis_radio_oversigt) && (show_radio_options==false)) {
-          // Bruges vist kun til mus/touch skærm (radio stationer)
-          if (!(fundet)) {		// hvis ingen valgt
-            // we have a select mouse/touch element dirid
-            if ((GLuint) names[i*4+3]>=100) {
-              rknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
-              if (debugmode & 8) fprintf(stderr,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
-              fundet=true;
-            }
-            // husk last
-            if (rknapnr!=0) swknapnr=rknapnr;
-            rknapnr=rknapnr+(_mangley/41)*8;
+      }
+      if (vis_film_oversigt) {
+        if (!(fundet)) {
+          // we have a select mouse/touch element dirid
+          // scroll down
+          if ((GLubyte) names[i*4+3]==23) {
+            if (debugmode & 8) printf("scroll down\n");
+            returnfunc = 1;
+            fundet = true;
           }
-          // stop radio player if vis_radio_oversigt
-          if (!(fundet)) {
-            // tryk stop radio
-            if ((GLubyte) names[i*4+3]==9) {
-              if (debugmode & 8) fprintf(stderr,"stop radio\n");
-              do_stop_radio=1;
-              do_play_radio=false;			// no playing
-              fundet=true;
-              rknapnr=0;
-            }
+          // scroll up
+          if ((GLubyte) names[i*4+3]==24) {
+            printf("scroll up\n");
+            returnfunc = 2;
+            fundet = true;
           }
-        } // radio overview
-        // vælg skal der spilles film eller stream
-        if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
-          // stream
-          if ((GLubyte) names[i*4+3]==80) {
-            fundet=true;
-            vis_stream_oversigt=true;
-            vis_stream_or_movie_oversigt=false;
+          // close window
+          if ((GLubyte) names[i*4+3]==27) {
+            printf("Close movie info\n");
+            returnfunc = 2;
+            do_zoom_film_cover = false;
+            fundet = true;
           }
-          // stream
-          if ((GLubyte) names[i*4+3]==81) {
-            fundet=true;
-            vis_film_oversigt=true;
-            vis_stream_or_movie_oversigt=false;
+          // reset movie search view
+          // show all movies again
+          if ((GLubyte) names[i*4+3]==28) {
+            film_oversigt.opdatere_film_oversigt("%");
+            //  remove search flag again and show all movies
+            film_oversigt.set_search_view(false);
           }
         }
-        if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==3) {
-            fundet=true;
-            vis_stream_oversigt=false;
-            vis_stream_or_movie_oversigt=false;
+      }
+      if (vis_music_oversigt) {
+        if (!(fundet)) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
+          // we have a select mouse/touch element dirid
+          // scroll down
+          if ((GLubyte) names[i*4+3]==23) {
+            if (debugmode & 2) fprintf(stderr,"scroll down\n");
+            returnfunc = 1;
+            fundet = true;
+          }
+          // scroll up
+          if ((GLubyte) names[i*4+3]==24) {
+            if (debugmode & 2) fprintf(stderr,"scroll up\n");
+            returnfunc = 2;
+            fundet = true;
+          }
+          if ((GLubyte) names[i*4+3]==27) {
+            if (debugmode & 2) fprintf(stderr,"Show music info\n");
+            do_zoom_music_cover =! do_zoom_music_cover;
+            ask_open_dir_or_play = false;
+            fundet = true;
           }
         }
-        // stream oversigt
-        if ((vis_stream_oversigt) && (!(fundet))) {
+        // Bruges til mus/touch skærm
+        if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
+          // we have a select mouse/touch element dirid
           if ((GLuint) names[i*4+3]>=100) {
-            sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
-            if (debugmode & 128) fprintf(stderr,"stream selected=%u\n",sknapnr);
-            fundet=true;
+            mknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
+            if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
+            fundet = true;
           }
-          // close open stream or movie
-          if ((GLubyte) names[i*4+3]==3) {
-            fundet=true;
-            vis_stream_or_movie_oversigt=false;
-            vis_stream_oversigt=false;
+          // husk last
+          if (mknapnr!=0) swknapnr=mknapnr;                                     // swknapnr
+          // mknapnr=mknapnr+(music_icon_anim_icon_ofsety*4);
+          mknapnr = mknapnr+(_mangley/41)*8;
+        }
+        //
+        // hvis vis ask_open_dir_or_play window
+        //
+        if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
+          // play button
+          if ((GLubyte) names[i*4+3]==20) {
+            ask_open_dir_or_play = false;                                         // flag luk vindue igen
+            do_play_music_cover = 1;                                              // der er trykket på cover play det
+            do_zoom_music_cover = false;                                          // ja den skal spilles lav zoom cover info window
+            do_find_playlist = true;                                              // find de sange som skal indsættes til playlist (og load playlist andet sted)
+            fundet = true;
           }
-          // play button pressed
-          if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover) && (fundet==false)) {
-            // start play
-            //do_zoom_stream_cover=!do_zoom_stream_cover;
-            fundet=true;
-            if (sknapnr>0) {
-              do_play_stream=1;						// select button do play
-              if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
+          // open music dir or close window
+          if ((GLubyte) names[i*4+3]==21) {
+            // pressed close
+            if (debugmode) fprintf(stderr,"Close window again\n");
+            ask_open_dir_or_play = false;				// flag luk vindue igen
+            do_zoom_music_cover = false;
+            mknapnr = 0;
+            fundet = true;
+          }
+          // swap selected
+          if ((GLubyte) names[i*4+3]==22) {
+            // pressed Swap
+            if (debugmode & 2) fprintf(stderr,"Swap button pressed\n");
+            for(int x=0;x<dirmusic.numbersinlist();x++) {
+              dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(x)),x);
             }
-          }
-          // stop button
-          if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover) && (fundet==false)) {
-            fundet=true;
-            if (streamoversigt.stream_is_playing) {
-              do_zoom_stream_cover=false;
-              do_stop_stream=true;                                            // flag to stop play
-              stopstream=true;                                                // flag to stop play
-              do_play_stream=false;                                           // we are not play any more
-              stream_jump=false;                                              // we can not jump in stream any more
-              streamoversigt.stopstream();
-            }
-          }
-          // pause play button pressed
-          // pause play
-          if (((GLubyte) names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
-            fundet=true;
-            if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
-            if (debugmode & 4) fprintf(stderr,"Set/reset player pause.\n");
-          }
-          // jump forward button stream
-          if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
-            fundet=true;
-            stream_jump=true;
-            if (streamoversigt.stream_is_playing) streamoversigt.jump_position(10.0f);
-          }
-          // jump backward button stream
-          if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover) && (fundet==false)) {
-            fundet=true;
-            stream_jump=true;
-            if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
+            fundet = true;
           }
         }
-        // film oversigt
-        if ((vis_film_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==25) {
-            if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
-            fundet=true;
-            startmovie=true;
+        // hvis show player
+        // use as controller
+        if ((!(fundet)) && (do_zoom_music_cover)) {
+          if ((GLubyte) names[i*4+3]==5) {
+            // if touch/mouse click on window then close windows again
+            do_zoom_music_cover = false;
+            ask_open_dir_or_play = false;				// flag luk vindue igen
+            fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==26) {
-            if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
-            fundet=true;
-            // stop movie playing
-            stopmovie=true;
+          // last song
+          if ((GLubyte) names[i*4+3]==6) {
+            if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
+              do_play_music_aktiv_table_nr--;                                   // skift aktiv sang
+              do_shift_song = true;                                             // sæt flag til skift
+            }
+            fundet = true;
           }
-          // we have a select mouse/touch
-          if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-            fknapnr=(GLuint) names[i*4+3]-99;			// hent filmknap nr
-            printf("Film selected=%d\n",fknapnr);
-            fundet=true;
+          // next song
+          if ((GLubyte) names[i*4+3]==7) {
+            if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
+              do_play_music_aktiv_table_nr++;
+              do_shift_song = true;
+            }
+            fundet = true;
+          }
+          // stop song
+          if ((GLubyte) names[i*4+3]==9) {
+            do_stop_music = 1;
+            fundet = true;
+          }
+          // play song
+          if ((GLubyte) names[i*4+3]==8) {
+            do_stop_music = 0;
+            do_shift_song = true;
+            if (do_play_music_aktiv_table_nr>=aktiv_playlist.numbers_in_playlist()) {
+                if (aktiv_playlist.numbers_in_playlist()==0) {
+                    do_stop_music_all = true;                                   // stop play music
+                    do_shift_song = false;
+                } else {
+                    do_play_music_aktiv_table_nr = 1;
+                }
+            }
+            fundet = true;
+            if (debugmode & 2) fprintf(stderr,"Start play \n");
           }
         }
-        // vis ny film oversigt
-        if ((vis_nyefilm_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==25) {
-            if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
-            fundet=true;
-            startmovie=true;
+      }
+      // vælg skal der spilles music eller radio
+      if ((vis_radio_or_music_oversigt) && (!(fundet))) {
+        // Radio
+        if ((GLubyte) names[i*4+3]==80) {
+          fundet = true;
+          vis_radio_oversigt = true;
+          vis_radio_or_music_oversigt=false;
+        }
+        // Music
+        if ((GLubyte) names[i*4+3]==81) {
+          fundet = true;
+          vis_music_oversigt = true;
+          vis_radio_or_music_oversigt = false;
+        }
+      }
+      // kun til mus/touch skærm (radio stationer)
+      // luk show play radio
+      // scroll down
+      if ((vis_radio_oversigt)  && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==23) {
+          if (debugmode & 8) fprintf(stderr,"scroll down\n");
+          returnfunc = 1;
+          fundet = true;
+        }
+        // scroll up
+        if ((GLubyte) names[i*4+3]==24) {
+          if (debugmode & 8) fprintf(stderr,"scroll up\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+        // show close radio info (27 need to move) 27 now is global exit
+        if ((GLubyte) names[i*4+3]==27) {
+          if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
+          do_zoom_radio =! do_zoom_radio;
+          fundet = true;
+        }
+      }
+      if ((vis_radio_oversigt) && (show_radio_options==false)) {
+        // Bruges vist kun til mus/touch skærm (radio stationer)
+        if (!(fundet)) {		// hvis ingen valgt
+          // we have a select mouse/touch element dirid
+          if ((GLuint) names[i*4+3]>=100) {
+            rknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
+            if (debugmode & 8) fprintf(stderr,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
+            fundet = true;
           }
-          if ((GLubyte) names[i*4+3]==26) {
-            if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
-            fundet=true;
-            stopmovie=true;
-          }
-          if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
-            fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
-            printf("Film new selected=%d\n",fknapnr);
-            fundet=true;
+          // husk last
+          if (rknapnr!=0) swknapnr=rknapnr;
+          rknapnr = rknapnr+(_mangley/41)*8;
+        }
+        // stop radio player if vis_radio_oversigt
+        if (!(fundet)) {
+          // tryk stop radio
+          if ((GLubyte) names[i*4+3]==9) {
+            if (debugmode & 8) fprintf(stderr,"stop radio\n");
+            do_stop_radio = 1;
+            do_play_radio = false;			// no playing
+            fundet = true;
+            rknapnr = 0;
           }
         }
-        if ((vis_tv_oversigt) && (!(fundet))) {
-          if ((GLubyte) names[i*4+3]==27) {
-            if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
-            vis_tv_oversigt=false;
-            fundet=true;
-          }
-          if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
-            if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
-            vis_tv_oversigt=false;
-            fundet=true;
-          }
-          if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
-            if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
-            ask_tv_record=true;
-            do_zoom_tvprg_aktiv_nr=0;
-            //                vis_tv_oversigt=false;
-            fundet=true;
-          }
-          //
-          // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
-          //
-          if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
-            // er der trykket på et tv program
-            if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-              tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
-              if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
-              fundet=true;
-            }
-          }
-          // show old recordings
-          if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
-            fprintf(stderr,"Show old recordings \n");
-            vis_old_recorded=!vis_old_recorded;							// SKAL fixes
-            fundet=true;
-          }
-          // show new recordings
-          if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
-            fprintf(stderr,"Show new recordings \n");
-            vis_tvrec_list=!vis_tvrec_list;
-            fundet=true;
-          }
-          // er vi igang med at spørge om vi skal optage programmet
-          if (ask_tv_record) {
-            if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
-              if (debugmode & 256) fprintf(stderr,"Close window again.\n");
-              ask_tv_record=false;
-              fundet=true;
-              returnfunc=3;
-              do_zoom_tvprg_aktiv_nr=0;
-            }
-            if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
-              if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
-              ask_tv_record=false;
-              fundet=true;
-              returnfunc=3;
-              do_zoom_tvprg_aktiv_nr=0;
-              // set start record tv prgoram
-              //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
-              aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
-              // opdatere tv guide med nyt info
-              aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
-            }
+      } // radio overview
+      // vælg skal der spilles film eller stream
+      if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
+        // stream
+        if ((GLubyte) names[i*4+3]==80) {
+          fundet = true;
+          vis_stream_oversigt=true;
+          vis_stream_or_movie_oversigt=false;
+        }
+        // stream
+        if ((GLubyte) names[i*4+3]==81) {
+          fundet = true;
+          vis_film_oversigt = true;
+          vis_stream_or_movie_oversigt = false;
+        }
+      }
+      //
+      if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==3) {
+          fundet = true;
+          vis_stream_oversigt = false;
+          vis_stream_or_movie_oversigt = false;
+        }
+      }
+      // stream oversigt
+      if ((vis_stream_oversigt) && (!(fundet))) {
+        if ((GLuint) names[i*4+3]>=100) {
+          sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
+          if (debugmode & 128) fprintf(stderr,"stream selected=%u\n",sknapnr);
+          fundet = true;
+        }
+        // close open stream or movie
+        if ((GLubyte) names[i*4+3]==3) {
+          fundet = true;
+          vis_stream_or_movie_oversigt = false;
+          vis_stream_oversigt = false;
+        }
+        // play button pressed
+        if (((GLubyte) names[i*4+3]==8) && (do_zoom_stream_cover) && (fundet==false)) {
+          // start play
+          //do_zoom_stream_cover=!do_zoom_stream_cover;
+          fundet = true;
+          if (sknapnr>0) {
+            do_play_stream=1;						// select button do play
+            if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
           }
         }
-        if (!(ask_tv_record)) {
-          // show old recorded and close
-          if ((!(fundet)) && (vis_old_recorded)) {
-            if ((GLubyte) names[i*4+3]==40) {
-              vis_old_recorded=!vis_old_recorded;
-              fundet=1;
-              returnfunc=3;
-            }
-          }
-          // show active tv rec list and close
-          if ((!(fundet)) && (vis_tvrec_list)) {
-            if ((GLubyte) names[i*4+3]==40) {
-              vis_tvrec_list=!vis_tvrec_list;
-              fundet=1;
-            }
+        // stop button
+        if (((GLubyte) names[i*4+3]==9) && (do_zoom_stream_cover) && (fundet==false)) {
+          fundet = true;
+          if (streamoversigt.stream_is_playing) {
+            do_zoom_stream_cover = false;
+            do_stop_stream = true;                                            // flag to stop play
+            stopstream = true;                                                // flag to stop play
+            do_play_stream = false;                                           // we are not play any more
+            stream_jump = false;                                              // we can not jump in stream any more
+            streamoversigt.stopstream();
           }
         }
-        i--;
+        // pause play button pressed
+        // pause play
+        if (((GLubyte) names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
+          fundet = true;
+          if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
+          if (debugmode & 4) fprintf(stderr,"Set/reset player pause.\n");
+        }
+        // jump forward button stream
+        if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
+          fundet = true;
+          stream_jump=true;
+          if (streamoversigt.stream_is_playing) streamoversigt.jump_position(10.0f);
+        }
+        // jump backward button stream
+        if (((GLubyte) names[i*4+3]==10) && (do_zoom_stream_cover) && (fundet==false)) {
+          fundet = true;
+          stream_jump = true;
+          if (streamoversigt.stream_is_playing) streamoversigt.jump_position(-10.0f);
+        }
+      }
+      // film oversigt
+      if ((vis_film_oversigt) && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==25) {
+          if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+          fundet = true;
+          startmovie = true;
+        }
+        // stop play movie
+        if ((GLubyte) names[i*4+3]==26) {
+          if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+          fundet = true;
+          // stop movie playing
+          stopmovie = true;
+        }
+        // we have a select mouse/touch
+        if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
+          fknapnr=(GLuint) names[i*4+3]-99;			                                // get movie id
+          printf("Film selected=%d\n",fknapnr);                                 //
+          fundet = true;
+        }
+      }
+      // vis ny film oversigt
+      if ((vis_nyefilm_oversigt) && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==25) {
+          if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+          fundet = true;
+          startmovie = true;
+        }
+        if ((GLubyte) names[i*4+3]==26) {
+          if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+          fundet = true;
+          stopmovie = true;
+        }
+        if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
+          fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
+          printf("Film new selected=%d\n",fknapnr);
+          fundet = true;
+        }
+      }
+      if ((vis_tv_oversigt) && (!(fundet))) {
+        // close view
+        if ((GLubyte) names[i*4+3]==27) {
+          if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
+          vis_tv_oversigt = false;
+          fundet = true;
+        }
+        // show recorded programs
+        if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
+          if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
+          vis_tv_oversigt = false;
+          fundet = true;
+        }
+        // close record
+        if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
+          if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
+          ask_tv_record = true;
+          do_zoom_tvprg_aktiv_nr = 0;
+          //                vis_tv_oversigt=false;
+          fundet = true;
+        }
+        //
+        // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
+        //
+        if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
+          // er der trykket på et tv program
+          if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
+            tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
+            if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
+            fundet = true;
+          }
+        }
+        // show old recordings
+        if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
+          fprintf(stderr,"Show old recordings \n");
+          vis_old_recorded =! vis_old_recorded;							// SKAL fixes
+          fundet = true;
+        }
+        // show new recordings
+        if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
+          fprintf(stderr,"Show new recordings \n");
+          vis_tvrec_list =! vis_tvrec_list;
+          fundet = true;
+        }
+        // er vi igang med at spørge om vi skal optage programmet
+        if (ask_tv_record) {
+          if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
+            if (debugmode & 256) fprintf(stderr,"Close window again.\n");
+            ask_tv_record = false;
+            fundet = true;
+            returnfunc = 3;
+            do_zoom_tvprg_aktiv_nr = 0;
+          }
+          if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
+            if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
+            ask_tv_record = false;
+            fundet = true;
+            returnfunc = 3;
+            do_zoom_tvprg_aktiv_nr = 0;
+            // set start record tv prgoram
+            //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
+            aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
+            // opdatere tv guide med nyt info
+            aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
+          }
+        }
+      }
+      if (!(ask_tv_record)) {
+        // show old recorded and close
+        if ((!(fundet)) && (vis_old_recorded)) {
+          if ((GLubyte) names[i*4+3]==40) {
+            vis_old_recorded =! vis_old_recorded;
+            fundet = 1;
+            returnfunc = 3;
+          }
+        }
+        // show active tv rec list and close
+        if ((!(fundet)) && (vis_tvrec_list)) {
+          if ((GLubyte) names[i*4+3]==40) {
+            vis_tvrec_list =! vis_tvrec_list;
+            fundet = 1;
+          }
+        }
+      }
+      i--;
     } while ((i>=0) && (!(fundet)));
     if (debugmode & 1) fprintf(stderr,"%d hits:\n", hits);
     if (hits) {
@@ -6026,346 +6393,335 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     strcpy(temptxt,"");
     saver_irq=true;					// stop screen saver
     if (visur==false) {
-        switch(button) {
-            case GLUT_LEFT_BUTTON:
-                if (state==GLUT_UP) {
-                  retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
-                  // nu er mknapnr/fknapnr/rknapnr=den som er trykket på bliver sat i gl_select
-                  // retfunc er !=0 hvis der er trykket på en knap up/down
-                  // give error
-                  if (debugmode & 2) {
-                    if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
-                      fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
-                    }
+      switch(button) {
+          case GLUT_LEFT_BUTTON:
+              if (state==GLUT_UP) {
+                retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
+                // nu er mknapnr/fknapnr/rknapnr=den som er trykket på bliver sat i gl_select
+                // retfunc er !=0 hvis der er trykket på en knap up/down
+                // give error
+                if (debugmode & 2) {
+                  if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
+                    fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt[mknapnr-1].oversigttype);
                   }
-                  if (vis_tv_oversigt) {
-                    if (debugmode & 8) fprintf(stderr,"tvknapnr = %d \n",tvknapnr-1);
-                  }
-                  if (debugmode & 4) {
-                    if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
-                  }
-                  if (debugmode & 8) {
-                    if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
-                  }
-                  // any music buttons active
-                  if ((mknapnr>0) && (vis_music_oversigt)) {
-                    if ((retfunc==0) && ((mknapnr-1==0) || (musicoversigt[mknapnr-1].directory_id!=0)) && (!(do_zoom_music_cover))) {
-                      if (musicoversigt[mknapnr-1].oversigttype==0) {
-                        if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
-                        do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id; 	// set det aktiv dir id
-                        antal_songs=hent_antal_dir_songs(musicoversigt[mknapnr-1].directory_id);    // loader antal dir/song i dir id
-
-                        if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d name %s \n",antal_songs,musicoversigt[mknapnr-1].album_name);
-                        if ((antal_songs==0) || (musicoversigt[mknapnr-1].directory_id==0)) {
-                          ask_open_dir_or_play_aopen=true;
-                        } else {
-                          ask_open_dir_or_play_aopen=false;
-                        }
+                }
+                if (vis_tv_oversigt) {
+                  if (debugmode & 8) fprintf(stderr,"tvknapnr = %d \n",tvknapnr-1);
+                }
+                if (debugmode & 4) {
+                  if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
+                }
+                if (debugmode & 8) {
+                  if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
+                }
+                // any music buttons active
+                if ((mknapnr>0) && (vis_music_oversigt)) {
+                  if ((retfunc==0) && ((mknapnr-1==0) || (musicoversigt[mknapnr-1].directory_id!=0)) && (!(do_zoom_music_cover))) {
+                    if (musicoversigt[mknapnr-1].oversigttype==0) {
+                      if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
+                      do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id; 	// set det aktiv dir id
+                      antal_songs=hent_antal_dir_songs(musicoversigt[mknapnr-1].directory_id);    // loader antal dir/song i dir id
+                      if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d name %s \n",antal_songs,musicoversigt[mknapnr-1].album_name);
+                      if ((antal_songs==0) || (musicoversigt[mknapnr-1].directory_id==0)) {
+                        ask_open_dir_or_play_aopen = true;
                       } else {
-                        // here
-
-                        if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
-                        // playlist loader
-                        do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
-                        if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
-                        if (do_play_music_aktiv_nr>0) {
-                          antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
-                        } else antal_songs=0;
-                        if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
-                        if (antal_songs==0) {
-                          ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
-                        } else {
-                          ask_open_dir_or_play_aopen=false;
-                        }
+                        ask_open_dir_or_play_aopen = false;
                       }
-                      if (do_play_music_aktiv_nr) {						// er der et dirid/playlistid
-                        ask_open_dir_or_play=true;						// yes ask om de skal spilles
-                      } else ask_open_dir_or_play=true;
+                    } else {
+                      // here
+                      if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt[mknapnr-1].directory_id);
+                      // playlist loader
+                      do_play_music_aktiv_nr=musicoversigt[mknapnr-1].directory_id;
+                      if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
+                      if (do_play_music_aktiv_nr>0) {
+                        antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
+                      } else antal_songs=0;
+                      if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                      if (antal_songs==0) {
+                        ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
+                      } else {
+                        ask_open_dir_or_play_aopen = false;
+                      }
                     }
-                  }
-
-                  // stream stuf open stram and show rss feeds
-                  if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false) && (do_zoom_stream_cover==false)) {
-                    if (sknapnr>0) {
-                      do_play_stream=1;						// select button do open or play
-                      if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
-                    }
-                  }
-
-                  // radio stuf
-                  if ((vis_radio_oversigt) && (retfunc==0)) {
-                    if (rknapnr>0) {
-                      do_play_radio=1;						// select button do play
-                      if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
-                    }
-                  }
-
-                  // ved vis film oversigt
-                  if ((vis_film_oversigt) & (retfunc==0)) {
-                    do_zoom_film_cover=true;
-                    do_zoom_film_aktiv_nr=fknapnr;
-                    do_swing_movie_cover=1;
-                  }
-                  // ved vis tv oversigt
-                  if ((vis_tv_oversigt) && (retfunc==0)) {
-                    /*
-                    ask_tv_record=true;
-                    do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
-                    tvsubvalgtrecordnr=tvknapnr;
-                    */
-                    ask_tv_record=true;
-                    do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
-                    tvvalgtrecordnr=(tvknapnr / 100);
-                    tvsubvalgtrecordnr=tvknapnr-(tvvalgtrecordnr*100);
-                    if (debugmode & 256) fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
-                    if (debugmode & 256) fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
-                  }
-
-                  // fra start film nyt fast show
-                  if ((vis_nyefilm_oversigt) && (retfunc==0)) {
-                    do_zoom_film_cover=true;
-                    do_zoom_film_aktiv_nr=fknapnr;
-                    do_swing_movie_cover=1;
-                  }
-
-                  // set flag to update
-                  if ((do_show_tvgraber) && (retfunc==0)) {
-                    printf("* Delete old tvguide *\n");
-                    unlink("~/tvguide_channels.dat");
-                    printf("* Update new tvguide *\n");
-                    hent_tv_channels=false;
-                  }
-
-
-                }
-                break;
-            case GLUT_RIGHT_BUTTON:
-                if (vis_music_oversigt) {
-                  if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
-                    ask_open_dir_or_play=false;
-                    mknapnr=0;
-                  } else if ((ask_open_dir_or_play==false) && (do_play_music_aktiv_table_nr>0) && (state==0) && (button==2)) {
-                    do_zoom_music_cover=!do_zoom_music_cover;
-                    if (ask_open_dir_or_play) ask_open_dir_or_play=false;
+                    if (do_play_music_aktiv_nr) {						// er der et dirid/playlistid
+                      ask_open_dir_or_play = true;						// yes ask om de skal spilles
+                    } else ask_open_dir_or_play = true;
                   }
                 }
-                // close/show net radio play status window flag
-                if ((vis_radio_oversigt) && (state==GLUT_UP)) {
-                  do_zoom_radio=!do_zoom_radio;
+                // stream stuf open stram and show rss feeds
+                if ((vis_stream_oversigt) && (retfunc==0) && (stopstream==false) && (do_zoom_stream_cover==false)) {
+                  if (sknapnr>0) {
+                    do_play_stream = 1;						// select button do open or play
+                    if (debugmode & 4) fprintf(stderr,"Set do_play_stream flag %d \n",sknapnr);
+                  }
                 }
-                // close ask film again
-                if ((vis_film_oversigt) && (state==GLUT_UP)) {
-                  if (do_zoom_film_cover) do_zoom_film_cover=false; else if (!(do_zoom_film_cover)) do_zoom_film_cover=true;
+                // radio stuf
+                if ((vis_radio_oversigt) && (retfunc==0)) {
+                  if (rknapnr>0) {
+                    do_play_radio = 1;						// select button do play
+                    if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
+                  }
                 }
-                // close ask tv again
-                if ((vis_tv_oversigt) && (state==GLUT_UP)) {
+                // ved vis film oversigt
+                if ((vis_film_oversigt) & (retfunc==0)) {
+                  do_zoom_film_cover = true;
+                  do_zoom_film_aktiv_nr = fknapnr;
+                  do_swing_movie_cover = 1;
+                }
+                // ved vis tv oversigt
+                if ((vis_tv_oversigt) && (retfunc==0)) {
+                  /*
                   ask_tv_record=true;
-                  do_zoom_tvprg_aktiv_nr=0;
+                  do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                  tvsubvalgtrecordnr=tvknapnr;
+                  */
+                  ask_tv_record=true;
+                  do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                  tvvalgtrecordnr=(tvknapnr / 100);
+                  tvsubvalgtrecordnr=tvknapnr-(tvvalgtrecordnr*100);
+                  if (debugmode & 256) fprintf(stderr,"tv prg selected in array is = %d  \n",tvknapnr);
+                  if (debugmode & 256) fprintf(stderr,"tv kanal %d prgnr %d  \n",tvvalgtrecordnr,tvsubvalgtrecordnr);
                 }
-                // close vis stream play
-                if ((vis_stream_oversigt) && (state==GLUT_UP)) {
-                  if (debugmode & 4) printf("sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
-                  if ((sknapnr>0) && (stream_playnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
+                // fra start film nyt fast show
+                if ((vis_nyefilm_oversigt) && (retfunc==0)) {
+                  do_zoom_film_cover = true;
+                  do_zoom_film_aktiv_nr = fknapnr;
+                  do_swing_movie_cover = 1;
                 }
-                //
-                if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
-                  vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
-                }
-                break;
-        }
-        if (vis_music_oversigt) {
-          // auto opendir
-          if ((ask_open_dir_or_play_aopen) && (retfunc==0)) {
-            ask_open_dir_or_play=false;
-            ask_open_dir_or_play_aopen=false;
-            if (musicoversigt[mknapnr-1].oversigttype==-1) {
-              if (debugmode & 2) fprintf(stderr,"Open/read playlist id %d \n",musicoversigt[mknapnr-1].directory_id);
-              if (debugmode & 2) fprintf(stderr,"Opdatere musicarray henter playlist oversigt \n");
-              // hent playlist oversigt
-              opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
-            } else {
-              if (debugmode & 2) fprintf(stderr,"Opdatere musicarray Henter oversigt dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
-              // opdate fra mythtv-backend if avable
-              if ((opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id))>0) {
-                opdatere_music_oversigt_icons();
-              } else {
-                // opdatere music oversigt fra internpath
-                fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
-                if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
-                  // no update posible
-                  fprintf(stderr,"No Music loaded/found by internal loader\n");
+                // set flag to update
+                if ((do_show_tvgraber) && (retfunc==0)) {
+                  printf("* Delete old tvguide *\n");
+                  unlink("~/tvguide_channels.dat");
+                  printf("* Update new tvguide *\n");
+                  hent_tv_channels=false;
                 }
               }
-            }
-            /// reset mouse/key pos in vis_music_oversigt
-            mknapnr=0;
-            music_key_selected=1;
-            music_select_iconnr=0;
-            music_icon_anim_icon_ofset=0;
-            music_icon_anim_icon_ofsety=0;
-            _mangley=0.0f;
-          } else {
-              //if (debugmode & 2) printf("der scrolles _mangley =%d \n",(_mangley/41)*5);
-              //do_find_playlist=true;
-              //do_play_music_cover=true;
-              // playlist oversigt fil loader
-              /*
-              if ((musicoversigt[mknapnr-1].oversigttype==-1) && (musicoversigt[mknapnr-1].directory_id!=0)) {	// der er et playlistid til mysql database
-                  // user open button pressed in ask_open_dir_or_play window
-              ask_open_dir_or_play=false;                                                     // luk vindue igen
-                  if (debugmode & 2) printf("Opdatere musicarray oversigt Henter dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
-                  opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id);               // ************************
-                  opdatere_music_oversigt_icons();                                                            // opdatere icons visning
-                  printf("Loaded numbers of covers: %d \n",musicoversigt_antal);
+              break;
+          case GLUT_RIGHT_BUTTON:
+              if (vis_music_oversigt) {
+                if ((ask_open_dir_or_play) && (state==GLUT_UP)) {
+                  ask_open_dir_or_play=false;
                   mknapnr=0;
-                  music_key_selected=1;
-                  music_icon_anim_icon_ofset=0;
-                  music_icon_anim_icon_ofsety=0;
-                  _mangley=0.0f;
-              }
-              */
-          }
-          // do scroll up/down view mouse or screen button
-          if  (!(ask_open_dir_or_play)) {
-            // scroll down
-            //printf("music_icon_anim_icon_ofsety= %d  divide = %d  \n",music_icon_anim_icon_ofsety,musicoversigt_antal/numbers_cd_covers_on_line);
-            if (((retfunc==2) || (button==4)) && ((_mangley/41.0f)+2<(int) (musicoversigt_antal/numbers_cd_covers_on_line)) && (music_icon_anim_icon_ofset==0)) { // scroll button
-              do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
-              _mangley+=(41.0f);				                      		// scroll window down one icon
-              music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
-            }
-            // scroll up
-            if (((retfunc==1) || (button==3)) && (_mangley>0)) {
-              do_music_icon_anim_icon_ofset=-1;			              // direction -1 = up 1 = down
-              _mangley-=(41.0f);			                       			// scroll window up
-              music_select_iconnr-=numbers_cd_covers_on_line;			// add to next line
-            }
-          }
-        }
-        // scroll tv guide up/down
-        if (vis_tv_oversigt) {
-          // scroll tv guide down
-          if ((retfunc==2) || (button==4)) { // scroll button
-            if (aktiv_tv_oversigt.vistvguidekl<24*2) aktiv_tv_oversigt.vistvguidekl++;
-          }
-          // scroll up
-          if ((retfunc==1) || (button==3)) {
-            if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
-          }
-        }
-        // scroll film up/down
-        if (vis_film_oversigt) {
-          if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+8<film_oversigt.film_antal()-1)) {
-            do_movie_icon_anim_icon_ofset=1;
-            switch(screen_size) {
-                case 1: _fangley+=(41.0f);					// 51 scroll 1 line
-                        break;
-                case 2: _fangley+=(41.0f);
-                        break;
-                case 3: _fangley+=(41.0f);					// scroll 2 lines
-                        break;
-                case 4: _fangley+=(41.0f);
-                        break;
-            }
-            film_select_iconnr+=numbers_film_covers_on_line;			// move to next line
-          }
-            if (((button==3) || (retfunc==1)) && (film_select_iconnr-4>0)) {
-              do_movie_icon_anim_icon_ofset=-1;
-              switch(screen_size) {
-                  case 1: _fangley-=(41.0f);					// 51 scroll 1 line
-                          break;
-                  case 2: _fangley-=(41.0f);					// 49
-                          break;
-                  case 3: _fangley-=(41.0f);					// 46 scroll 2 lines
-                          break;
-                  case 4: _fangley-=(41.0f);					// 44
-                          break;
-              }
-              film_select_iconnr-=numbers_film_covers_on_line;			// move to last line
-            }
-        }
-
-
-        // scroll radio up/down
-        if (vis_radio_oversigt) {
-          // scroll down
-          //printf("radio rangley= %d   \n",_rangley);
-          if (((retfunc==2) || (button==4)) && ((_rangley/41.0f)+4<(int) (radiooversigt_antal/numbers_radio_covers_on_line))) { // scroll button
-            //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
-            _rangley+=(41.0f);						// scroll window down one icon
-            radio_select_iconnr+=numbers_radio_covers_on_line;			// add to next line
-          }
-          // scroll up
-          if (((retfunc==1) || (button==3)) && (_rangley>0)) {
-            //do_music_icon_anim_icon_ofset=-1;				// direction -1 = up 1 = down
-            _rangley-=(41.0f);						// scroll window up
-            radio_select_iconnr-=numbers_radio_covers_on_line;			// add to next line
-          }
-        }
-
-        // update or scroll stream up/down/play
-        if ((vis_stream_oversigt) && (stream_jump==false)) {
-          if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
-            if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
-            if (streamoversigt.type==0) {
-              //
-              strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
-              streamoversigt.clean_stream_oversigt();
-              printf("stream nr %d name %s \n ",sknapnr-1,temptxt);
-              streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
-              do_play_stream=false;
-            } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
-              // update
-              streamoversigt.clean_stream_oversigt();
-              streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
-              do_play_stream=false;
-            } else {
-              // back button
-              if ((sknapnr-1)==0) {
-                if (streamoversigt.type==2) {
-                  // one level up
-                  streamoversigt.clean_stream_oversigt();
-                  streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),(char *)"");
-                  do_play_stream=false;
-                } else {
-                  // jump to top
-                  streamoversigt.clean_stream_oversigt();
-                  streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
-                  do_play_stream=false;
+                } else if ((ask_open_dir_or_play==false) && (do_play_music_aktiv_table_nr>0) && (state==0) && (button==2)) {
+                  do_zoom_music_cover=!do_zoom_music_cover;
+                  if (ask_open_dir_or_play) ask_open_dir_or_play=false;
                 }
               }
-            }
-            // play stream
-            if ((sknapnr-1>=0) && (do_play_stream)) {
-              if ((streamoversigt.get_stream_url(sknapnr-1)) && (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0)) {
-                startstream=true;
-                do_zoom_stream=true;                    // set show player
-              } else {
-                if (streamoversigt.get_stream_url(sknapnr-1)) startstream=true;
-                do_zoom_stream=true;                    // set show player
+              // close/show net radio play status window flag
+              if ((vis_radio_oversigt) && (state==GLUT_UP)) {
+                do_zoom_radio=!do_zoom_radio;
               }
-              printf("Set show playing stream\n ");
+              // close ask film again
+              if ((vis_film_oversigt) && (state==GLUT_UP)) {
+                if (do_zoom_film_cover) do_zoom_film_cover=false; else if (!(do_zoom_film_cover)) do_zoom_film_cover=true;
+              }
+              // close ask tv again
+              if ((vis_tv_oversigt) && (state==GLUT_UP)) {
+                ask_tv_record=true;
+                do_zoom_tvprg_aktiv_nr=0;
+              }
+              // close vis stream play
+              if ((vis_stream_oversigt) && (state==GLUT_UP)) {
+                if (debugmode & 4) printf("sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
+                if ((sknapnr>0) && (stream_playnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
+              }
+              //
+              if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
+                vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
+              }
+              break;
+      }
+      if (vis_music_oversigt) {
+        // auto opendir
+        if ((ask_open_dir_or_play_aopen) && (retfunc==0)) {
+          ask_open_dir_or_play=false;
+          ask_open_dir_or_play_aopen=false;
+          if (musicoversigt[mknapnr-1].oversigttype==-1) {
+            if (debugmode & 2) fprintf(stderr,"Open/read playlist id %d \n",musicoversigt[mknapnr-1].directory_id);
+            if (debugmode & 2) fprintf(stderr,"Opdatere musicarray henter playlist oversigt \n");
+            // hent playlist oversigt
+            opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
+          } else {
+            if (debugmode & 2) fprintf(stderr,"Opdatere musicarray Henter oversigt dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
+            // opdate fra mythtv-backend if avable
+            if ((opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id))>0) {
+              opdatere_music_oversigt_icons();
+            } else {
+              // opdatere music oversigt fra internpath
+              fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
+              if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
+                // no update posible
+                fprintf(stderr,"No Music loaded/found by internal loader\n");
+              }
             }
-            //sknapnr=0;
-            stream_key_selected=1;
-            stream_select_iconnr=0;
-            _sangley=0.0f;
           }
-
-          if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
-            //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
-            _sangley+=(41.0f);						                            // scroll window down one icon
-            stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
+          /// reset mouse/key pos in vis_music_oversigt
+          mknapnr = 0;
+          music_key_selected = 1;
+          music_select_iconnr = 0;
+          music_icon_anim_icon_ofset = 0;
+          music_icon_anim_icon_ofsety = 0;
+          _mangley= 0.0f;
+        } else {
+            //if (debugmode & 2) printf("der scrolles _mangley =%d \n",(_mangley/41)*5);
+            //do_find_playlist=true;
+            //do_play_music_cover=true;
+            // playlist oversigt fil loader
+            /*
+            if ((musicoversigt[mknapnr-1].oversigttype==-1) && (musicoversigt[mknapnr-1].directory_id!=0)) {	// der er et playlistid til mysql database
+                // user open button pressed in ask_open_dir_or_play window
+            ask_open_dir_or_play=false;                                                     // luk vindue igen
+                if (debugmode & 2) printf("Opdatere musicarray oversigt Henter dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
+                opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id);               // ************************
+                opdatere_music_oversigt_icons();                                                            // opdatere icons visning
+                printf("Loaded numbers of covers: %d \n",musicoversigt_antal);
+                mknapnr=0;
+                music_key_selected=1;
+                music_icon_anim_icon_ofset=0;
+                music_icon_anim_icon_ofsety=0;
+                _mangley=0.0f;
+            }
+            */
+        }
+        // do scroll up/down view mouse or screen button
+        if  (!(ask_open_dir_or_play)) {
+          // scroll down
+          //printf("music_icon_anim_icon_ofsety= %d  divide = %d  \n",music_icon_anim_icon_ofsety,musicoversigt_antal/numbers_cd_covers_on_line);
+          if (((retfunc==2) || (button==4)) && ((_mangley/41.0f)+2<(int) (musicoversigt_antal/numbers_cd_covers_on_line)) && (music_icon_anim_icon_ofset==0)) { // scroll button
+            do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
+            _mangley+=(41.0f);				                      		// scroll window down one icon
+            music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
           }
           // scroll up
-          if (((retfunc==1) || (button==3)) && (_sangley>0)) {
-            //do_music_icon_anim_icon_ofset=-1;				                // direction -1 = up 1 = down
-            _sangley-=(41.0f);						                            // scroll window up
-            stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+          if (((retfunc==1) || (button==3)) && (_mangley>0)) {
+            do_music_icon_anim_icon_ofset=-1;			              // direction -1 = up 1 = down
+            _mangley-=(41.0f);			                       			// scroll window up
+            music_select_iconnr-=numbers_cd_covers_on_line;			// add to next line
           }
         }
+      }
+      // scroll tv guide up/down
+      if (vis_tv_oversigt) {
+        // scroll tv guide down
+        if ((retfunc==2) || (button==4)) { // scroll button
+          if (aktiv_tv_oversigt.vistvguidekl<24*2) aktiv_tv_oversigt.vistvguidekl++;
+        }
+        // scroll up
+        if ((retfunc==1) || (button==3)) {
+          if (aktiv_tv_oversigt.vistvguidekl>0) aktiv_tv_oversigt.vistvguidekl--; else aktiv_tv_oversigt.vistvguidekl=24;
+        }
+      }
+      // scroll film up/down
+      // scroll down
+      if (vis_film_oversigt) {
+        if (((button==4) || (retfunc==2)) && ((unsigned int) film_select_iconnr+9<film_oversigt.film_antal()-1)) {
+          do_movie_icon_anim_icon_ofset=1;
+          switch(screen_size) {
+              case 1: _fangley+=(41.0f);					// 51 scroll 1 line
+                      break;
+              case 2: _fangley+=(41.0f);
+                      break;
+              case 3: _fangley+=(41.0f);					// scroll 2 lines
+                      break;
+              case 4: _fangley+=(41.0f);
+                      break;
+          }
+          film_select_iconnr+=numbers_film_covers_on_line;			// move to next line
+        }
+        // scroll up
+        if (((button==3) || (retfunc==1)) && (film_select_iconnr-4>0)) {
+          do_movie_icon_anim_icon_ofset=-1;
+          switch(screen_size) {
+              case 1: _fangley-=(41.0f);					// 51 scroll 1 line
+                      break;
+              case 2: _fangley-=(41.0f);					// 49
+                      break;
+              case 3: _fangley-=(41.0f);					// 46 scroll 2 lines
+                      break;
+              case 4: _fangley-=(41.0f);					// 44
+                      break;
+          }
+          film_select_iconnr-=numbers_film_covers_on_line;			// move to last line
+          if (film_select_iconnr<0) film_select_iconnr=0;       //
+        }
+      }
+      // scroll radio up/down
+      if (vis_radio_oversigt) {
+        // scroll down
+        //printf("radio rangley= %d   \n",_rangley);
+        if (((retfunc==2) || (button==4)) && ((_rangley/41.0f)+4<(int) (radiooversigt_antal/numbers_radio_covers_on_line))) { // scroll button
+          //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
+          _rangley+=(41.0f);						// scroll window down one icon
+          radio_select_iconnr+=numbers_radio_covers_on_line;			// add to next line
+        }
+        // scroll up
+        if (((retfunc==1) || (button==3)) && (_rangley>0)) {
+          //do_music_icon_anim_icon_ofset=-1;				// direction -1 = up 1 = down
+          _rangley-=(41.0f);						// scroll window up
+          radio_select_iconnr-=numbers_radio_covers_on_line;			// add to next line
+        }
+      }
+      // update or scroll stream up/down/play
+      if ((vis_stream_oversigt) && (stream_jump==false)) {
+        if ((retfunc==0) && (sknapnr>0) && (do_play_stream)) {
+          if (debugmode) fprintf(stderr,"sknapnr %d  path_antal=%d type %d stream antal = %d \n",sknapnr-1,streamoversigt.get_stream_groupantal(sknapnr-1),streamoversigt.type,streamoversigt.streamantal());
+          if (streamoversigt.type==0) {
+            //
+            strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
+            streamoversigt.clean_stream_oversigt();
+            printf("stream nr %d name %s \n ",sknapnr-1,temptxt);
+            streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
+            do_play_stream=false;
+          } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
+            // update
+            streamoversigt.clean_stream_oversigt();
+            streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),streamoversigt.get_stream_path(sknapnr-1));
+            do_play_stream=false;
+          } else {
+            // back button
+            if ((sknapnr-1)==0) {
+              if (streamoversigt.type==2) {
+                // one level up
+                streamoversigt.clean_stream_oversigt();
+                streamoversigt.opdatere_stream_oversigt(streamoversigt.get_stream_name(sknapnr-1),(char *)"");
+                do_play_stream=false;
+              } else {
+                // jump to top
+                streamoversigt.clean_stream_oversigt();
+                streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");
+                do_play_stream=false;
+              }
+            }
+          }
+          // play stream
+          if ((sknapnr-1>=0) && (do_play_stream)) {
+            if ((streamoversigt.get_stream_url(sknapnr-1)) && (strncmp(streamoversigt.get_stream_url(sknapnr-1),"mythflash",9)==0)) {
+              startstream=true;
+              do_zoom_stream=true;                    // set show player
+            } else {
+              if (streamoversigt.get_stream_url(sknapnr-1)) startstream=true;
+              do_zoom_stream=true;                    // set show player
+            }
+            printf("Set show playing stream\n ");
+          }
+          //sknapnr=0;
+          stream_key_selected = 1;
+          stream_select_iconnr = 0;
+          _sangley = 0.0f;
+        }
+        if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
+          //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
+          _sangley+=(41.0f);						                            // scroll window down one icon
+          stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
+        }
+        // scroll up
+        if (((retfunc==1) || (button==3)) && (_sangley>0)) {
+          //do_music_icon_anim_icon_ofset=-1;				                // direction -1 = up 1 = down
+          _sangley-=(41.0f);						                            // scroll window up
+          stream_select_iconnr-=numbers_stream_covers_on_line;			// add to next line
+        }
+      }
     }
-//    printf("button = %d \n",button);
 }
 
 
@@ -6400,17 +6756,17 @@ void handlespeckeypress(int key,int x,int y) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
                 } else if ((!(vis_radio_oversigt)) && (!(vis_radio_or_music_oversigt))) {
-                  if (do_show_setup) do_save_config=true;		                   // set save config file flag
-                  do_save_setup_rss=true;                                      // save rss setup
-                  vis_radio_oversigt=false;
-                  vis_tv_oversigt=false;
-                  vis_film_oversigt=false;
-                  vis_music_oversigt=false;
-                  vis_recorded_oversigt=false;
-                  vis_stream_oversigt=false;
-                  vis_radio_or_music_oversigt=false;
-                  vis_stream_or_movie_oversigt=false;
-                  do_show_setup=!do_show_setup;
+                  if (do_show_setup) do_save_config = true;		                   // set save config file flag
+                  do_save_setup_rss = true;                                      // save rss setup
+                  vis_radio_oversigt = false;
+                  vis_tv_oversigt = false;
+                  vis_film_oversigt = false;
+                  vis_music_oversigt = false;
+                  vis_recorded_oversigt = false;
+                  vis_stream_oversigt = false;
+                  vis_radio_or_music_oversigt = false;
+                  vis_stream_or_movie_oversigt = false;
+                  do_show_setup =! do_show_setup;
                 }
                 break;
         case 2:
@@ -6544,13 +6900,10 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
-
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) visvalgtnrtype=2;
                   else if (visvalgtnrtype==2) visvalgtnrtype=1;
                 }
-
-
                 if (vis_radio_oversigt) {
                   if (radio_key_selected>1) {
                     radio_key_selected--;
@@ -6563,8 +6916,6 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
-
-
                 if (vis_stream_oversigt) {
                   if (stream_key_selected>1) {
                     stream_key_selected--;
@@ -6622,18 +6973,17 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   music_key_selected++;
                 }
-                //
-                if ((vis_film_oversigt) && ((int unsigned) film_select_iconnr<film_oversigt.film_antal()-1)) {
+                //film_select_iconnr+film_key_selected
+                if ((vis_film_oversigt) && ((int unsigned) (film_select_iconnr)<film_oversigt.film_antal()-1)) {
                   if ((film_key_selected % (mnumbersoficonline*3)==0) || ((film_select_iconnr==14) && (film_key_selected % mnumbersoficonline==0))) {
                     _fangley+=MOVIE_CS;
                     film_key_selected-=mnumbersoficonline;	// den viste på skærm af 1 til 20
-                    film_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
                   } else {
-                    film_select_iconnr++;			// den rigtige valgte af 1 til cd antal
+                    film_select_iconnr++;			// den rigtige valgte af 1 til film antal
                   }
                   film_key_selected++;
                 }
-
                 if (vis_recorded_oversigt) {
                   if (visvalgtnrtype==1) visvalgtnrtype=2;
                   else if (visvalgtnrtype==2) visvalgtnrtype=1;
@@ -6743,7 +7093,7 @@ void handlespeckeypress(int key,int x,int y) {
                       subvalgtrecordnr++;
                     }
                   }
-                  reset_recorded_texture=true;                                //
+                  reset_recorded_texture = true;                                //
                 }
                 // tv overview
                 // if indside tv overoview
@@ -6830,8 +7180,8 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                     if ((do_show_setup_select_linie==13) && ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL)) tvchannel_startofset++; else if ((tvchannel_startofset+do_show_setup_select_linie)<PRGLIST_ANTAL) do_show_setup_select_linie++;
                   }
-                  keybuffer[0]=0;
-                  keybufferindex=0;
+                  keybuffer[0] = 0;
+                  keybufferindex = 0;
                 }
                 break;
         case 101: // up key
@@ -6843,29 +7193,29 @@ void handlespeckeypress(int key,int x,int y) {
                 if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr>(mnumbersoficonline-1)) ) {
                     if ((_mangley>0) && ((unsigned int) music_key_selected<=mnumbersoficonline) && (music_select_iconnr>(mnumbersoficonline-1))) {
                       _mangley-=MUSIC_CS;
-                      do_music_icon_anim_icon_ofset=-1;			// set scroll
-                      music_select_iconnr-=mnumbersoficonline;
+                      do_music_icon_anim_icon_ofset = -1;			// set scroll
+                      music_select_iconnr -= mnumbersoficonline;
                     } else if ((music_select_iconnr-mnumbersoficonline)>0) {
-                      music_select_iconnr-=mnumbersoficonline;
+                      music_select_iconnr -= mnumbersoficonline;
                     }
                     if (music_key_selected>(int ) mnumbersoficonline) music_key_selected-=mnumbersoficonline;
                 }
                 // movie stuf
                 if (vis_film_oversigt) {
-                    if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
-                      if ((film_key_selected<=fnumbersoficonline) && (film_select_iconnr>(fnumbersoficonline-1))) {
-                         _fangley-=MOVIE_CS;
-                         film_select_iconnr-=fnumbersoficonline;
-                      } else film_select_iconnr-=fnumbersoficonline;
-                      if (film_key_selected>fnumbersoficonline) film_key_selected-=fnumbersoficonline;
-                    }
+                  if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
+                    if ((film_key_selected<=fnumbersoficonline) && (film_select_iconnr>(fnumbersoficonline-1))) {
+                      _fangley -= MOVIE_CS;
+                      film_select_iconnr-=fnumbersoficonline;
+                    } else film_select_iconnr-=fnumbersoficonline;
+                    if (film_key_selected>fnumbersoficonline) film_key_selected-=fnumbersoficonline;
+                  }
                 }
                 // radio
                 if ((vis_radio_oversigt) && (show_radio_options==false)) {
                   if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
                     if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
-                       _rangley-=MOVIE_CS;
-                       radio_select_iconnr-=rnumbersoficonline;
+                      _rangley-=MOVIE_CS;
+                      radio_select_iconnr-=rnumbersoficonline;
                     } else radio_select_iconnr-=rnumbersoficonline;
                     if (radio_key_selected>rnumbersoficonline) radio_key_selected-=rnumbersoficonline;
                   }
@@ -6876,8 +7226,8 @@ void handlespeckeypress(int key,int x,int y) {
                                                                                                     //if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
                   if ((vis_stream_oversigt) && (stream_select_iconnr>(snumbersoficonline-1))) {
                     if ((_sangley>0) && (stream_key_selected<=snumbersoficonline) && (stream_select_iconnr>(snumbersoficonline-1))) {
-                       _sangley-=MOVIE_CS;
-                       stream_select_iconnr-=snumbersoficonline;
+                      _sangley-=MOVIE_CS;
+                      stream_select_iconnr-=snumbersoficonline;
                     } else stream_select_iconnr-=snumbersoficonline;
                     if (stream_key_selected>snumbersoficonline) stream_key_selected-=snumbersoficonline;
                   }
@@ -6968,13 +7318,11 @@ void handlespeckeypress(int key,int x,int y) {
                       strcpy(tempch.name,channel_list[(do_show_setup_select_linie)+tvchannel_startofset].name);
                       tempch.ordernr=channel_list[(do_show_setup_select_linie)+tvchannel_startofset].ordernr;
                       tempch.changeordernr=channel_list[(do_show_setup_select_linie)+tvchannel_startofset].changeordernr;
-
                       channel_list[(do_show_setup_select_linie)+tvchannel_startofset].selected=channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].selected;
                       strcpy(channel_list[(do_show_setup_select_linie)+tvchannel_startofset].id,channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].id);
                       strcpy(channel_list[(do_show_setup_select_linie)+tvchannel_startofset].name,channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].name);
                       channel_list[(do_show_setup_select_linie)+tvchannel_startofset].ordernr=channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].ordernr;
                       channel_list[(do_show_setup_select_linie)+tvchannel_startofset].changeordernr=channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].changeordernr;
-
                       channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].selected=tempch.selected;
                       strcpy(channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].id,tempch.id);
                       strcpy(channel_list[(do_show_setup_select_linie)+tvchannel_startofset-1].name,tempch.name);
@@ -7053,52 +7401,52 @@ void handlespeckeypress(int key,int x,int y) {
         case GLUT_KEY_HOME:
                 // reset music oversigt
                 if (vis_music_oversigt) {
-                  _mangley=0;     	                      							  // scroll start ofset reset to start
-                  music_select_iconnr=1;                                  // first icon in view left top conner
-                  do_music_icon_anim_icon_ofset=1;                        // set scroll
-                  music_key_selected=1;
+                  _mangley = 0;     	                      							  // scroll start ofset reset to start
+                  music_select_iconnr = 1;                                  // first icon in view left top conner
+                  do_music_icon_anim_icon_ofset = 1;                        // set scroll
+                  music_key_selected = 1;
                 }
                 // if indside tv overview reset show time to now (localtime)
                 if (vis_tv_oversigt) {
                     // reset tvgide time to now
                     aktiv_tv_oversigt.reset_tvguide_time();
                     if (ask_tv_record) {
-                      ask_tv_record=false;
-                      tvknapnr=0;
-                      do_zoom_tvprg_aktiv_nr=0;			                          		// slet valget
+                      ask_tv_record = false;
+                      tvknapnr = 0;
+                      do_zoom_tvprg_aktiv_nr = 0;			                          		// slet valget
                     }
                 }
                 // radio
                 if ((vis_radio_oversigt) && (radio_select_iconnr>(rnumbersoficonline-1))) {
-                    if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
-                       _rangley-=0;
-                       radio_select_iconnr=1;
-                    }
-                    _rangley=MOVIE_CS;
-                    radio_key_selected=1;
-                    radio_select_iconnr=1;
+                  if ((_rangley>0) && (radio_key_selected<=fnumbersoficonline) && (radio_select_iconnr>(rnumbersoficonline-1))) {
+                    _rangley-=0;
+                    radio_select_iconnr = 1;
+                  }
+                  _rangley = MOVIE_CS;
+                  radio_key_selected = 1;
+                  radio_select_iconnr = 1;
                 }
                 // if indside a setup menu
                 if (do_show_setup) {
                   if (do_show_tvgraber) {
                     // select line 0
-                    tvchannel_startofset=0;
-                    do_show_setup_select_linie=0;
+                    tvchannel_startofset = 0;
+                    do_show_setup_select_linie = 0;
                   }
                   // rss setup
                   if (show_setup_rss) {
-                    do_show_setup_select_linie=0;
-                    configrss_ofset=0;
+                    do_show_setup_select_linie = 0;
+                    configrss_ofset = 0;
                   }
                 }
                 break;
         case GLUT_KEY_END:
                 // music oversigt
                 if (vis_music_oversigt) {
-                  _mangley=0;     	                      							  // scroll start ofset reset to start
-                  music_select_iconnr=1;                                  // first icon in view left top conner
-                  do_music_icon_anim_icon_ofset=1;                        // set scroll
-                  music_key_selected=1;
+                  _mangley = 0;     	                      							  // scroll start ofset reset to start
+                  music_select_iconnr = 1;                                  // first icon in view left top conner
+                  do_music_icon_anim_icon_ofset = 1;                        // set scroll
+                  music_key_selected = 1;
                 }
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -7129,8 +7477,8 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
+      if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
     }
-    if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
 }
 
 
@@ -7168,7 +7516,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       show_volume_info=true;					// show volume info window
       vis_volume_timeout=80;
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup)) && (key!=27))) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -7339,22 +7687,32 @@ void handleKeypress(unsigned char key, int x, int y) {
                 playlistfilename[keybufferindex]='\0';       // else input key text in buffer
               }
             }
+            if (vis_film_oversigt) {
+              if (key!=13) {
+                if ((key>31) && (key<127)) {
+                  keybuffer[keybufferindex]=key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                }
+                fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              }
+            }
             //
             if (do_show_setup) {				// if setup window
               if (do_show_setup_sound) {
                   if (do_show_setup_select_linie==0) {
-                      if (key==32) {
-                        if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
-                        strcpy(keybuffer,avalible_device[soundsystem]);
-                        strcpy(configmythsoundsystem,avalible_device[soundsystem]);
-                      } else strcpy(keybuffer,avalible_device[soundsystem]);
+                    if (key==32) {
+                      if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
+                      strcpy(keybuffer,avalible_device[soundsystem]);
+                      strcpy(configmythsoundsystem,avalible_device[soundsystem]);
+                    } else strcpy(keybuffer,avalible_device[soundsystem]);
                   } else if (do_show_setup_select_linie==1) {
-                      if (key==32) {
-                        if (strcmp(keybuffer,"HDMI")==0) strcpy(keybuffer,"SPDIF");
-                        else if (strcmp(keybuffer,"SPDIF")==0) strcpy(keybuffer,"STREAM");
-                        else if (strcmp(keybuffer,"STREAM")==0) strcpy(keybuffer,"HDMI");
-                        else strcpy(keybuffer,"STREAM");
-                      } else strcpy(keybuffer,"DEFAULT");
+                    if (key==32) {
+                      if (strcmp(keybuffer,"HDMI")==0) strcpy(keybuffer,"SPDIF");
+                      else if (strcmp(keybuffer,"SPDIF")==0) strcpy(keybuffer,"STREAM");
+                      else if (strcmp(keybuffer,"STREAM")==0) strcpy(keybuffer,"HDMI");
+                      else strcpy(keybuffer,"STREAM");
+                    } else strcpy(keybuffer,"DEFAULT");
                   } else if (do_show_setup_select_linie==2) {
                     if (key==32) {
                       if (strcmp(keybuffer,"FMOD")==0) strcpy(keybuffer,"SDL");
@@ -7369,75 +7727,75 @@ void handleKeypress(unsigned char key, int x, int y) {
                     }
                   }
               } else if (do_show_setup_screen) {
-                  if (do_show_setup_select_linie==0) {
-                    if (key==32) {		// space key
-                      if (screen_size==1) {
-                        strcpy(keybuffer,"1280 x 1024 (720p)");
-                        screen_size=2;
-                      } else if (screen_size==2) {
-                        strcpy(keybuffer,"1920 x 1080 (1080p)");
-                        screen_size=3;
-                      } else if (screen_size==3) {
-                        strcpy(keybuffer,"1360 x 768         ");
-                        screen_size=4;
-                      } else if (screen_size==4) {
-                        strcpy(keybuffer,"1024 x 768 (720p)  ");
-                        screen_size=1;
-                      }
+                if (do_show_setup_select_linie==0) {
+                  if (key==32) {		// space key
+                    if (screen_size==1) {
+                      strcpy(keybuffer,"1280 x 1024 (720p)");
+                      screen_size=2;
+                    } else if (screen_size==2) {
+                      strcpy(keybuffer,"1920 x 1080 (1080p)");
+                      screen_size=3;
+                    } else if (screen_size==3) {
+                      strcpy(keybuffer,"1360 x 768         ");
+                      screen_size=4;
+                    } else if (screen_size==4) {
+                      strcpy(keybuffer,"1024 x 768 (720p)  ");
+                      screen_size=1;
                     }
-                  // screen saver
-                  } else if (do_show_setup_select_linie==1) {
-                    if (key==32) {		// space key
-                      if (strncmp(keybuffer,"analog",7)==0) {
-                        strcpy(keybuffer,"digital");
-                        urtype=DIGITAL;
-                      } else if (strcmp(keybuffer,"digital")==0) {
-                        strcpy(keybuffer,"3D");
-                        urtype=SAVER3D;
-                      } else if (strcmp(keybuffer,"3D")==0) {
-                        strcpy(keybuffer,"3D2");
-                        urtype=SAVER3D2;
-                      } else if (strcmp(keybuffer,"3D2")==0) {
-                        strcpy(keybuffer,"PICTURE3D");
-                        urtype=PICTURE3D;
-                      } else if (strcmp(keybuffer,"PICTURE3D")==0) {
-                        strcpy(keybuffer,"None");
-                        urtype=0;
-                      } else if (strcmp(keybuffer,"None")==0) {
-                        strcpy(keybuffer,"analog");
-                        urtype=ANALOG;
-                      } else strcpy(keybuffer,"analog");
-                    }
-                    // screen saver timeout
-                  } else if (do_show_setup_select_linie==2) {
-                    if (key!=13) {
-                      keybuffer[keybufferindex]=key;
-                      keybufferindex++;
-                      keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                    } // use3d
-                  } else if (do_show_setup_select_linie==3) {
-                    if (key==32) {
-                      if (use3deffect==true) {
-                        use3deffect=false;
-                        strcpy(configuse3deffect,"no");
-                        strcpy(keybuffer,"no");
-                      } else if (use3deffect==false) {
-                        strcpy(configuse3deffect,"yes");
-                        strcpy(keybuffer,"yes");
-                        use3deffect=true;
-                      }
-                    } else strcpy(keybuffer,configuse3deffect);
-                  // language
-                  } else if (do_show_setup_select_linie==4) {
-                    if (key==32) {
-                      if (configland<(configlandantal-1)) configland++;
-                      else configland=0;
-                    }
-                    strcpy(keybuffer,configlandsprog[configland]);
-                  } else if (do_show_setup_select_linie==5) {
-                    if (key==32) full_screen=!full_screen;
-                    if (full_screen) strcpy(keybuffer,"yes"); else strcpy(keybuffer,"no");
                   }
+                // screen saver
+                } else if (do_show_setup_select_linie==1) {
+                  if (key==32) {		// space key
+                    if (strncmp(keybuffer,"analog",7)==0) {
+                      strcpy(keybuffer,"digital");
+                      urtype=DIGITAL;
+                    } else if (strcmp(keybuffer,"digital")==0) {
+                      strcpy(keybuffer,"3D");
+                      urtype=SAVER3D;
+                    } else if (strcmp(keybuffer,"3D")==0) {
+                      strcpy(keybuffer,"3D2");
+                      urtype=SAVER3D2;
+                    } else if (strcmp(keybuffer,"3D2")==0) {
+                      strcpy(keybuffer,"PICTURE3D");
+                      urtype=PICTURE3D;
+                    } else if (strcmp(keybuffer,"PICTURE3D")==0) {
+                      strcpy(keybuffer,"None");
+                      urtype=0;
+                    } else if (strcmp(keybuffer,"None")==0) {
+                      strcpy(keybuffer,"analog");
+                      urtype=ANALOG;
+                    } else strcpy(keybuffer,"analog");
+                  }
+                  // screen saver timeout
+                } else if (do_show_setup_select_linie==2) {
+                  if (key!=13) {
+                    keybuffer[keybufferindex]=key;
+                    keybufferindex++;
+                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                  } // use3d
+                } else if (do_show_setup_select_linie==3) {
+                  if (key==32) {
+                    if (use3deffect==true) {
+                      use3deffect=false;
+                      strcpy(configuse3deffect,"no");
+                      strcpy(keybuffer,"no");
+                    } else if (use3deffect==false) {
+                      strcpy(configuse3deffect,"yes");
+                      strcpy(keybuffer,"yes");
+                      use3deffect=true;
+                    }
+                  } else strcpy(keybuffer,configuse3deffect);
+                // language
+                } else if (do_show_setup_select_linie==4) {
+                  if (key==32) {
+                    if (configland<(configlandantal-1)) configland++;
+                    else configland=0;
+                  }
+                  strcpy(keybuffer,configlandsprog[configland]);
+                } else if (do_show_setup_select_linie==5) {
+                  if (key==32) full_screen=!full_screen;
+                  if (full_screen) strcpy(keybuffer,"yes"); else strcpy(keybuffer,"no");
+                }
               } else if (do_show_setup_network) {
                 // hostname
                 if (do_show_setup_select_linie==0) {
@@ -7510,7 +7868,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // video player setting
                 if (do_show_setup_select_linie==0) {
                   if (key!=13) {
-                    keybuffer[keybufferindex]=key;
+                    keybuffer[keybufferindex] = key;
                     keybufferindex++;
                     keybuffer[keybufferindex]='\0';	// else input key text in buffer
                     if (debugmode) printf("Keybuffer=%s\n",keybuffer);
@@ -7520,21 +7878,21 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (do_show_setup_select_linie==1) {
                   if (key==32) {
                     if (configdefaultplayer_screenmode<3) configdefaultplayer_screenmode++;
-                    else configdefaultplayer_screenmode=0;
+                    else configdefaultplayer_screenmode = 0;
                   }
                 }
                 // select debug mode to show in console
                 if (do_show_setup_select_linie==2) {
                   if (key==32) {
                     if (debugmode>1) debugmode=debugmode*2; else debugmode++;
-                    if (debugmode>512) debugmode=0;
+                    if (debugmode>512) debugmode = 0;
                   }
                 }
                 // uv meter mode
                 if (do_show_setup_select_linie==3) {
                   if (key==32) {
                     configuvmeter=+1;
-                    if (configuvmeter>2) configuvmeter=0;
+                    if (configuvmeter>2) configuvmeter = 0;
                   }
                   if (configuvmeter==0) strcpy(keybuffer,"none");
                   if (configuvmeter==1) strcpy(keybuffer,"Simple");
@@ -7569,8 +7927,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
           }
-       }
-       // ved setup window
+        }
+        // ved setup window
         if (do_show_setup) {
            if (do_show_setup_sound) {
                switch(do_show_setup_select_linie) {
@@ -7835,7 +8193,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // hent/update tv guide from db
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                   // set update flag in display() func
-                  firsttime_xmltvupdate=true;                                 // if true reset xml config file
+                  firsttime_xmltvupdate = true;                                 // if true reset xml config file
                   // close tv graber windows again
                   do_show_tvgraber=false;
                   do_show_setup=false;
@@ -7865,7 +8223,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // stop show setup of rss feeds
                   do_show_setup_rss=false;
                   key=0;
-//                  do_save_setup_rss=true;
+                  // do_save_setup_rss=true;
                 } else do_show_setup=false;
                 key=0;
               }
@@ -7909,7 +8267,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
-                ask_tv_record=true;
+                ask_tv_record = true;
                 tvknapnr=tvsubvalgtrecordnr;
                 do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
               }
@@ -7957,7 +8315,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_music_oversigt) {
                 // save playlist
                 printf("Ask save playlist\n");
-                ask_save_playlist=true;                                         // set save playlist flag
+                ask_save_playlist = true;                                         // set save playlist flag
               }
               break;
             case 't':
@@ -7971,28 +8329,30 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // u key
                 // Update tv guide
                 printf("Update tv guide\n");
+                tv_guide_firsttime_update = true;
                 // set flag for show update
-                do_update_xmltv_show=true;
-                loading_tv_guide=true;
+                do_update_xmltv_show = true;
+                loading_tv_guide = true;
                 if (strcmp(configbackend,"mythtv")==0) {
                   update_xmltv_phread_loader();                   // start thred update flag in main loop
                 } else if (strcmp(configbackend,"xbmc")==0) {
                   update_xmltv_phread_loader();
                 }
+                tv_guide_firsttime_update = true;                                 // set update flag
               }
               if (vis_stream_oversigt) {
-                do_update_rss_show=true;
-                do_update_rss=true;
+                do_update_rss_show = true;
+                do_update_rss = true;
               }
               break;
             case 'U':
               if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
-                do_update_music=true;                                               // show update
-                do_update_music_now=true;                                           // and do the update flag
+                do_update_music = true;                                               // show update
+                do_update_music_now = true;                                           // and do the update flag
               }
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
-                do_update_moviedb=true;                                           // set update flag
-                pthread_t loaderthread1;           // the load
+                do_update_moviedb = true;                                           // set update flag
+                pthread_t loaderthread1;                                          // loader thread
                 // start multi thread and update movie overview
                 // movie loader
                 if (debugmode) printf("Update movie db.\n");
@@ -8026,16 +8386,20 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               // set save flag of playlist
               if (ask_save_playlist) {
-                save_ask_save_playlist=true;
+                save_ask_save_playlist = true;
               }
               if (vis_radio_oversigt) {
                 rknapnr=0;
-                hent_radio_search=true;			  	// start radio station search
+                hent_radio_search = true;			  	// start radio station search
                 radio_key_selected=1;
                 _rangley=0.0f;
               }
+              if (vis_film_oversigt) {
+                hent_film_search = true;			  	// start movie title search
+                fknapnr=0;
+              }
               if (vis_stream_oversigt) {
-                hent_stream_search=true;				// start stream station search
+                hent_stream_search = true;				// start stream station search
                 sknapnr=stream_select_iconnr;   // selected
                 stream_key_selected=1;
                 stream_select_iconnr=0;         // tmp
@@ -8046,10 +8410,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((vis_music_oversigt) && (keybufferopenwin)) {
                 mknapnr=0;				                            	// reset mouse/key pos in vis_music_overs
                 _mangley=0.0f;
-                hent_music_search=true;                         // start music search  (set flag)
-                music_key_selected=1;
-                music_select_iconnr=0;
-                music_icon_anim_icon_ofset=0;
+                hent_music_search = true;                         // start music search (set flag)
+                music_key_selected=1;                           // reset to first icon
+                music_select_iconnr=0;                          // reset to first icon
+                music_icon_anim_icon_ofset=0;                   // reset to first icon
                 music_icon_anim_icon_ofsety=0;
               }
               if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
@@ -8065,11 +8429,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                   } else antal_songs=0;
                   if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
                   if (antal_songs==0) {
-                    ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                    ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                   } else {
                     ask_open_dir_or_play_aopen=false;
                   }
-                  ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
+                  ask_open_dir_or_play = true;							// yes ask om vi skal spille den (play playlist)
                   //do_zoom_music_cover=true;
                 } else {
                   // playlist dir
@@ -8083,11 +8447,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
 
                   if (antal_songs==0) {
-                    ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                    ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                   } else {
                     ask_open_dir_or_play_aopen=false;
                   }
-                  ask_open_dir_or_play=true;							// yes ask om vi skal spille den
+                  ask_open_dir_or_play = true;							// yes ask om vi skal spille den
                 }
                 /*
                   mknapnr=music_key_selected;					// hent valget
@@ -8135,7 +8499,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 ask_open_dir_or_play=false;                 // flag luk vindue igen
                 do_play_music_cover=1;                      // der er trykket på cover play det
                 do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
-                do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
+                do_find_playlist = true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
               }
               if ((vis_radio_oversigt) && (show_radio_options==false)) {
                 rknapnr=radio_select_iconnr;					// hent button
@@ -8173,7 +8537,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                 } else {
                   // spørg kan/skal vi optage den ?
-                  ask_tv_record=true;
+                  ask_tv_record = true;
                   tvknapnr=tvsubvalgtrecordnr;
                   do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
                 }
@@ -8227,9 +8591,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // play stream
                 if ((sknapnr>=0) && (do_play_stream)) {
                   if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
-                    startstream=true;
+                    startstream = true;
                   } else {
-                    startstream=true;
+                    startstream = true;
                   }
                 }
               }
@@ -8310,7 +8674,7 @@ void update2(int value) {
         strcpy(cmd,code+20);
         n=strlen(cmd)-1;
         while((cmd[n]!=32) && (n>0)) {
-            n--;
+          n--;
         }
         cmd[n]='\0';
         if (debugmode) fprintf(stderr,"Lirc say %s\n",cmd);
@@ -8320,7 +8684,7 @@ void update2(int value) {
           vis_film_oversigt=false;
           do_zoom_film_cover=false;
           do_zoom_stream_cover=false;
-          vis_music_oversigt=true;                                    // show music oversigt
+          vis_music_oversigt = true;                                    // show music oversigt
           vis_recorded_oversigt=false;
           vis_radio_oversigt=false;
           vis_nyefilm_oversigt=false;
@@ -8334,7 +8698,7 @@ void update2(int value) {
           do_zoom_music_cover=false;							                  // sluk zoom cd cover
           do_zoom_stream_cover=false;
           vis_music_oversigt=false;
-          vis_radio_oversigt=true;
+          vis_radio_oversigt = true;
           vis_recorded_oversigt=false;
           vis_nyefilm_oversigt=false;
           vis_stream_oversigt=false;                                 // show rss stream oversigt
@@ -8342,7 +8706,7 @@ void update2(int value) {
         // lirc vis_film_oversigt
         if (strcmp(cmd,"KEY_VIDEO")==0) {						                  // Show video overview
           vis_tv_oversigt=false;
-          vis_film_oversigt=true;
+          vis_film_oversigt = true;
           vis_music_oversigt=false;
           vis_recorded_oversigt=false;
           vis_radio_oversigt=false;				   			                  // sluk radio oversigt
@@ -8359,7 +8723,7 @@ void update2(int value) {
           vis_music_oversigt=false;  							                  // sluk music oversigt
           do_zoom_music_cover=false;							                  // sluk zoom cd cover
           do_zoom_stream_cover=false;
-          vis_recorded_oversigt=true;	                  						// on recorded program oversigt
+          vis_recorded_oversigt = true;	                  						// on recorded program oversigt
           vis_radio_oversigt=false;						   	                  // sluk radio oversigt
           vis_nyefilm_oversigt=false;
           vis_stream_oversigt=false;                                 // show rss stream oversigt
@@ -8367,7 +8731,7 @@ void update2(int value) {
         // lirc vis_tv_oversigt
         if (strcmp(cmd,"KEY_EPG")==0) {                               // show tv guide
           do_play_music_aktiv=false;							                  // sluk music info cover
-          vis_tv_oversigt=true;             		                    // vis tv oversigt
+          vis_tv_oversigt = true;             		                    // vis tv oversigt
           vis_film_oversigt=false; 						   	                  // sluk film oversigt
           vis_music_oversigt=false;  							                  // sluk music oversigt
           do_zoom_film_cover=false;
@@ -8390,7 +8754,7 @@ void update2(int value) {
           vis_recorded_oversigt=false;                							// sluk recorded program oversigt
           vis_radio_oversigt=false;						   	                  // sluk radio oversigt
           vis_nyefilm_oversigt=false;
-          vis_stream_oversigt=true;                                 // show rss stream oversigt
+          vis_stream_oversigt = true;                                 // show rss stream oversigt
         }
         // lirc
         if ((strcmp(cmd,"KEY_HOME")==0) || (strcmp(cmd,"KEY_MEDIA")==0)) {
@@ -8598,7 +8962,7 @@ void update2(int value) {
               valgtrecordnr--;
               subvalgtrecordnr=0;
             } else if ((visvalgtnrtype==2) && (subvalgtrecordnr>0)) subvalgtrecordnr--;	// bruges til visning af optaget programmer
-            reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
+            reset_recorded_texture = true;		// load optaget programs texture gen by mythtv
           }
           // lirc
           // up key
@@ -8731,7 +9095,7 @@ void update2(int value) {
                   subvalgtrecordnr++;
                 }
               }
-              reset_recorded_texture=true;
+              reset_recorded_texture = true;
           }
           // lirc
           // down key
@@ -9243,11 +9607,11 @@ void update2(int value) {
                 } else antal_songs=0;
                 if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
                 if (antal_songs==0) {
-                  ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                  ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                 } else {
                   ask_open_dir_or_play_aopen=false;
                 }
-                ask_open_dir_or_play=true;							// yes ask om vi skal spille den (play playlist)
+                ask_open_dir_or_play = true;							// yes ask om vi skal spille den (play playlist)
                 //do_zoom_music_cover=true;
               } else {
                 // do playlist
@@ -9260,22 +9624,22 @@ void update2(int value) {
                 } else antal_songs=0;
                 if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
                 if (antal_songs==0) {
-                  ask_open_dir_or_play_aopen=true;					// ask om de skal spilles
+                  ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                 } else {
                   ask_open_dir_or_play_aopen=false;
                 }
-                ask_open_dir_or_play=true;							// yes ask om vi skal spille den
+                ask_open_dir_or_play = true;							// yes ask om vi skal spille den
               }
             } else if (ask_open_dir_or_play) {
               ask_open_dir_or_play=false;                 // flag luk vindue igen
-              do_play_music_cover=true;                   // der er trykket på cover play det
+              do_play_music_cover = true;                   // der er trykket på cover play det
               do_zoom_music_cover=false;                  // ja den skal spilles lav zoom cover info window
-              do_find_playlist=true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
+              do_find_playlist = true;                      // find de sange som skal indsættes til playlist (og load playlist andet sted)
             }
           }
           if (vis_film_oversigt) {				                                                          // select movie to show info for
             if ((do_zoom_film_cover==false) || (strcmp(cmd,"KEY_INFO")==0)) {
-              do_zoom_film_cover=true;
+              do_zoom_film_cover = true;
               do_swing_movie_cover=0;
               do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
               fknapnr=film_select_iconnr+1;		           		// OLD film_key_selected;
@@ -9283,13 +9647,13 @@ void update2(int value) {
             }
             if (do_zoom_film_cover) {
               // start play movie
-              if ((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) startmovie=true;
+              if ((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) startmovie = true;
             }
           }
           // start menu (show movies for some time)
           if (vis_nyefilm_oversigt) {
             if (do_zoom_film_cover==false) {
-              do_zoom_film_cover=true;
+              do_zoom_film_cover = true;
               do_swing_movie_cover=0;
               do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
               fknapnr=film_select_iconnr+1;		           		// OLD film_key_selected;
@@ -9297,7 +9661,7 @@ void update2(int value) {
             }
             if (do_zoom_film_cover) {
               // start play movie
-              if ((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) startmovie=true;
+              if ((strcmp(cmd,"KEY_OK")==0) || (strcmp(cmd,"KEY_PLAYPAUSE")==0)) startmovie = true;
             }
           }
           if (vis_recorded_oversigt) {
@@ -9325,7 +9689,7 @@ void update2(int value) {
           }
           if (vis_stream_oversigt) {
             //do_zoom_stream_cover=!do_zoom_stream_cover;
-            hent_stream_search=true;				                                  // start stream station search
+            hent_stream_search = true;				                                  // start stream station search
             sknapnr=stream_select_iconnr;                                   // selected
             stream_key_selected=1;
             stream_select_iconnr=0;         // tmp
@@ -9381,10 +9745,10 @@ void update2(int value) {
             // play stream
             if ((sknapnr>=0) && (do_play_stream)) {
               if (strncmp(streamoversigt.get_stream_url(sknapnr),"mythflash",9)==0) {
-                startstream=true;
+                startstream = true;
                 sknapnr+=1;
               } else {
-                startstream=true;
+                startstream = true;
                 sknapnr+=1;
               }
             }
@@ -9400,7 +9764,7 @@ void update2(int value) {
             film_oversigt.volumeup();
             configsoundvolume+=0.1f;
           }
-          show_volume_info=true;					// show volume info window
+          show_volume_info = true;					// show volume info window
           vis_volume_timeout=80;
         }
 
@@ -9413,7 +9777,7 @@ void update2(int value) {
             film_oversigt.volumedown();
             configsoundvolume-=0.1f;
           }
-          show_volume_info=true;					// show volume info window
+          show_volume_info = true;					// show volume info window
           vis_volume_timeout=80;
         }
         if (strcmp("KEY_NEXT",cmd)==0) {
@@ -9421,8 +9785,8 @@ void update2(int value) {
            if ((vis_music_oversigt) && (!(do_shift_song))) {
              if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
                do_play_music_aktiv_table_nr++;
-               do_shift_song=true;
-               do_zoom_music_cover=true;
+               do_shift_song = true;
+               do_zoom_music_cover = true;
              }
            }
            if (vis_tv_oversigt) {
@@ -9438,8 +9802,8 @@ void update2(int value) {
           if ((vis_music_oversigt) && (!(do_shift_song))) {
            if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
              do_play_music_aktiv_table_nr--;						// skift aktiv sang
-             do_shift_song=true;							// sæt flag til skift
-             do_zoom_music_cover=true;
+             do_shift_song = true;							// sæt flag til skift
+             do_zoom_music_cover = true;
            }
           }
           if (vis_tv_oversigt) {
@@ -9452,7 +9816,7 @@ void update2(int value) {
         }
         if (strcmp(cmd,"KEY_STOP")==0) {
           // stop all music
-          do_stop_music=true;
+          do_stop_music = true;
           // stop movie
           film_oversigt.stopmovie();
           if (streamoversigt.stream_is_playing) {
@@ -9511,12 +9875,12 @@ void update(int value) {
             if (lircconfig) {
                 while((ret=lirc_code2char(lircconfig,code,&c))==0 && c!=NULL) {
                     if (debugmode) fprintf(stderr,"Lirc Command %s \n ",c);
-                    saver_irq=true;				// RESET (sluk hvis aktiv) screen saver
+                    saver_irq = true;				// RESET (sluk hvis aktiv) screen saver
                     if (strcmp(c,"Music")==0) {							// show music directoy
                       vis_tv_oversigt=false;
                       vis_film_oversigt=false;
                       do_zoom_film_cover=false;
-                      vis_music_oversigt=true;
+                      vis_music_oversigt = true;
                       vis_recorded_oversigt=false;
                       vis_radio_oversigt=false;
                     }
@@ -9525,13 +9889,13 @@ void update(int value) {
                       vis_film_oversigt=false;
                       do_zoom_film_cover=false;
                       vis_music_oversigt=false;
-                      vis_radio_oversigt=true;
+                      vis_radio_oversigt = true;
                       vis_recorded_oversigt=false;
                     }
 
                     if (strcmp(c,"Videos")==0) {						// Show video directory
                       vis_tv_oversigt=false;
-                      vis_film_oversigt=true;
+                      vis_film_oversigt = true;
                       vis_music_oversigt=false;
                       vis_recorded_oversigt=false;
                       vis_radio_oversigt=false;
@@ -9542,7 +9906,7 @@ void update(int value) {
                       vis_film_oversigt=false;
                       vis_music_oversigt=false;
                       do_zoom_music_cover=false;
-                      vis_recorded_oversigt=true;
+                      vis_recorded_oversigt = true;
                       vis_radio_oversigt=false;
                     }
 
@@ -9552,27 +9916,27 @@ void update(int value) {
                       do_zoom_music_cover=false;
                       vis_recorded_oversigt=false;
                       vis_radio_oversigt=false;
-                      vis_tv_oversigt=true;
+                      vis_tv_oversigt = true;
                     }
 
                     // Home back to starvis_radio_oversigtt of program init
                     if (strcmp(c,"Home")==0) {
-                      do_play_music_aktiv=false;							// sluk music info cover
-                      vis_tv_oversigt=false;								// sluk tv oversigt
-                      vis_film_oversigt=false; 							// sluk film oversigt
-                      vis_music_oversigt=false;  							// sluk music oversigt
-                      do_zoom_music_cover=false;							// sluk zoom cd cover
-                      do_zoom_film_cover=false;
-                      vis_recorded_oversigt=false;							// sluk recorded program oversigt
-                      vis_radio_oversigt=false;							// sluk radio oversigt
+                      do_play_music_aktiv = false;							// sluk music info cover
+                      vis_tv_oversigt = false;								// sluk tv oversigt
+                      vis_film_oversigt = false; 							// sluk film oversigt
+                      vis_music_oversigt = false;  							// sluk music oversigt
+                      do_zoom_music_cover = false;							// sluk zoom cd cover
+                      do_zoom_film_cover = false;
+                      vis_recorded_oversigt = false;							// sluk recorded program oversigt
+                      vis_radio_oversigt = false;							// sluk radio oversigt
                     }
                     if (strcmp(c,"KEY_BACK")==0) {
-                      if (vis_music_oversigt) vis_music_oversigt=false;
-                      if (do_zoom_film_cover) do_zoom_film_cover=false;
-                      if (vis_tv_oversigt) vis_tv_oversigt=false;
-                      if (vis_film_oversigt) vis_film_oversigt=false;
-                      if (vis_recorded_oversigt) vis_recorded_oversigt=false;
-                      if (vis_radio_oversigt) vis_radio_oversigt=false;
+                      if (vis_music_oversigt) vis_music_oversigt = false;
+                      if (do_zoom_film_cover) do_zoom_film_cover = false;
+                      if (vis_tv_oversigt) vis_tv_oversigt = false;
+                      if (vis_film_oversigt) vis_film_oversigt = false;
+                      if (vis_recorded_oversigt) vis_recorded_oversigt = false;
+                      if (vis_radio_oversigt) vis_radio_oversigt = false;
                     }
                     // Pause music player
                     if (strcmp(c,"P")==0) {
@@ -9605,10 +9969,10 @@ void update(int value) {
                                               if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*3)+1)) {
                                                 do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
                                                 //_mangley+=(41.0f);						// scroll window down one icon
-                                                music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
+                                                music_select_iconnr += numbers_cd_covers_on_line;			// add to next line
                                               } else {
-                                                music_key_selected+=numbers_cd_covers_on_line;
-                                                music_select_iconnr+=numbers_cd_covers_on_line;
+                                                music_key_selected += numbers_cd_covers_on_line;
+                                                music_select_iconnr += numbers_cd_covers_on_line;
                                               }
                                             }
                                             break;
@@ -9622,11 +9986,11 @@ void update(int value) {
                                             if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+5<musicoversigt_antal)) {
                                                 if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*3)+1)) {
                                                     do_music_icon_anim_icon_ofset=1;						// do anim
-                                                    _mangley+=41.0f;								//scroll gfx down
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    _mangley += 41.0f;								//scroll gfx down
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 } else {
-                                                    music_key_selected+=numbers_cd_covers_on_line;
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    music_key_selected += numbers_cd_covers_on_line;
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 }
                                             }
                                             break;
@@ -9641,11 +10005,11 @@ void update(int value) {
                                             if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+9<musicoversigt_antal)) {
                                                 if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*4)+1)) {
                                                     do_music_icon_anim_icon_ofset=1;						// do anim
-                                                    _mangley+=41.0f;								//scroll gfx down
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    _mangley += 41.0f;								//scroll gfx down
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 } else {
-                                                    music_key_selected+=numbers_cd_covers_on_line;
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    music_key_selected += numbers_cd_covers_on_line;
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 }
                                             }
                                             break;
@@ -9658,12 +10022,12 @@ void update(int value) {
                                             // hvis ikke ask_open_dir_or_play
                                             if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+8<musicoversigt_antal)) {
                                                 if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*3)+1)) {
-                                                    do_music_icon_anim_icon_ofset=1;						//
-                                                    _mangley+=41.0f;								//scroll gfx down
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    do_music_icon_anim_icon_ofset = 1;						//
+                                                    _mangley += 41.0f;								//scroll gfx down
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 } else {
-                                                    music_key_selected+=numbers_cd_covers_on_line;
-                                                    music_select_iconnr+=numbers_cd_covers_on_line;
+                                                    music_key_selected += numbers_cd_covers_on_line;
+                                                    music_select_iconnr += numbers_cd_covers_on_line;
                                                 }
                                             }
                                             break;
@@ -9675,8 +10039,8 @@ void update(int value) {
                             switch (screen_size) {					// filmoversigt_antal
                                 case 1: if (((int) film_select_iconnr<(int) film_oversigt.film_antal()-5) && (movie_icon_anim_icon_ofset==0)) {
                                           if (film_select_iconnr+numbers_film_covers_on_line>11) {		// skal vi scroll liste up
-                                            do_movie_icon_anim_icon_ofset=1;
-                                            _fangley+=MOVIE_CS;
+                                            do_movie_icon_anim_icon_ofset = 1;
+                                            _fangley += MOVIE_CS;
                                             //film_select_iconnr-=numbers_film_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (film_key_selected>0) film_key_selected-=numbers_film_covers_on_line;
                                           }
@@ -9686,8 +10050,8 @@ void update(int value) {
                                         break;
                                 case 2: if (((int) film_select_iconnr<(int) film_oversigt.film_antal()-5) && (movie_icon_anim_icon_ofset==0)) {
                                           if (film_select_iconnr+numbers_film_covers_on_line>13) {		// skal vi scroll liste up
-                                            do_movie_icon_anim_icon_ofset=1;
-                                            _fangley+=MOVIE_CS;
+                                            do_movie_icon_anim_icon_ofset = 1;
+                                            _fangley += MOVIE_CS;
                                             //film_select_iconnr-=numbers_film_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (film_key_selected>0) film_key_selected-=numbers_film_covers_on_line;
                                           }
@@ -9698,8 +10062,8 @@ void update(int value) {
                                 case 3:
                                         if (((int) film_select_iconnr<(int) film_oversigt.film_antal()-5) && (movie_icon_anim_icon_ofset==0)) {
                                           if (film_select_iconnr+numbers_film_covers_on_line>19) {		// skal vi scroll liste up
-                                            do_movie_icon_anim_icon_ofset=1;
-                                            _fangley+=MOVIE_CS;
+                                            do_movie_icon_anim_icon_ofset= 1 ;
+                                            _fangley += MOVIE_CS;
                                             //film_select_iconnr-=numbers_film_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (film_key_selected>0) film_key_selected-=numbers_film_covers_on_line;
                                           }
@@ -9709,8 +10073,8 @@ void update(int value) {
                                         break;
                                 case 4: if (((int) film_select_iconnr<(int) film_oversigt.film_antal()-5) && (movie_icon_anim_icon_ofset==0)) {
                                           if (film_select_iconnr+numbers_film_covers_on_line>17) {		// skal vi scroll liste up
-                                            do_movie_icon_anim_icon_ofset=1;
-                                            _fangley+=MOVIE_CS;
+                                            do_movie_icon_anim_icon_ofset= 1 ;
+                                            _fangley += MOVIE_CS;
                                             //film_select_iconnr-=numbers_film_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (film_key_selected>0) film_key_selected-=numbers_film_covers_on_line;
                                           }
@@ -9725,8 +10089,8 @@ void update(int value) {
                         if ((vis_radio_oversigt) && (show_radio_options==false)) {
                             if (((int) radio_select_iconnr<(int) radiomoversigt_antal-5) && (radio_icon_anim_icon_ofset==0)) {
                               if (radio_select_iconnr+numbers_radio_covers_on_line>16) {		// skal vi scroll liste up
-                                do_radio_icon_anim_icon_ofset=1;
-                                _rangley+=RADIO_CS;
+                                do_radio_icon_anim_icon_ofset= 1 ;
+                                _rangley += RADIO_CS;
                                 //radio_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
                                 if (radio_key_selected>0) radio_key_selected-=numbers_radio_covers_on_line;
                               }
@@ -9795,8 +10159,8 @@ void update(int value) {
                             switch (screen_size) {
                                 case 1: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                           if (stream_select_iconnr+numbers_stream_covers_on_line>11) {		// skal vi scroll liste up
-                                            do_stream_icon_anim_icon_ofset=1;
-                                            _rangley+=RADIO_CS;
+                                            do_stream_icon_anim_icon_ofset = 1;
+                                            _rangley += RADIO_CS;
                                             //stream_select_iconnr-=numbers_stream_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
                                           }
@@ -9806,8 +10170,8 @@ void update(int value) {
                                         break;
                                 case 2: if ((stream_select_iconnr<(int ) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                           if (stream_select_iconnr+numbers_stream_covers_on_line>13) {		// skal vi scroll liste up
-                                            do_stream_icon_anim_icon_ofset=1;
-                                            _rangley+=RADIO_CS;
+                                            do_stream_icon_anim_icon_ofset = 1;
+                                            _rangley += RADIO_CS;
                                             //stream_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
                                           }
@@ -9818,8 +10182,8 @@ void update(int value) {
                                 case 3:
                                         if (((int) stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                           if (stream_select_iconnr+numbers_stream_covers_on_line>19) {		// skal vi scroll liste up
-                                              do_stream_icon_anim_icon_ofset=1;
-                                              _rangley+=RADIO_CS;
+                                              do_stream_icon_anim_icon_ofset = 1;
+                                              _rangley += RADIO_CS;
                                               //stream select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
                                               if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
                                           }
@@ -9829,13 +10193,13 @@ void update(int value) {
                                         break;
                                 case 4: if ((stream_select_iconnr<(int) streamoversigt.streamantal()-5) && (stream_icon_anim_icon_ofset==0)) {
                                           if (stream_select_iconnr+numbers_stream_covers_on_line>17) {		// skal vi scroll liste up
-                                            do_stream_icon_anim_icon_ofset=1;
-                                            _rangley+=RADIO_CS;
+                                            do_stream_icon_anim_icon_ofset = 1;
+                                            _rangley += RADIO_CS;
                                             //stream_select_iconnr-=numbers_radio_covers_on_line;		// husk at trække fra da vi står samme sted
                                             if (stream_key_selected>0) stream_key_selected-=numbers_stream_covers_on_line;
                                           }
-                                          stream_key_selected+=numbers_stream_covers_on_line;
-                                          stream_select_iconnr+=numbers_stream_covers_on_line;
+                                          stream_key_selected += numbers_stream_covers_on_line;
+                                          stream_select_iconnr += numbers_stream_covers_on_line;
                                         }
                                         break;
                                 }
@@ -9851,13 +10215,13 @@ void update(int value) {
                                     subvalgtrecordnr++;
                                 }
                             }
-                            reset_recorded_texture=true;
+                            reset_recorded_texture = true;
                         }
                         if (vis_tv_oversigt) {
                             if (tvvisvalgtnrtype==1) {
                                 if (tvvalgtrecordnr<aktiv_tv_oversigt.tv_kanal_antal()) {
                                     tvvalgtrecordnr++;
-                                    tvsubvalgtrecordnr=0;
+                                    tvsubvalgtrecordnr = 0;
                                 }
                             } else if (tvvisvalgtnrtype==2) {
                                 if (tvsubvalgtrecordnr<aktiv_tv_oversigt.kanal_prg_antal(tvvalgtrecordnr)) {
@@ -9877,9 +10241,9 @@ void update(int value) {
                                 case 1:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1)) ) {
                                           if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
-                                             _mangley-=41;
-                                             music_select_iconnr-=numbers_cd_covers_on_line;
-                                             do_music_icon_anim_icon_ofset=-1;
+                                             _mangley -= 41;
+                                             music_select_iconnr -= numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset = -1;
                                           } else music_select_iconnr-=numbers_cd_covers_on_line;
                                           if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
                                             music_key_selected-=numbers_cd_covers_on_line;
@@ -9889,9 +10253,9 @@ void update(int value) {
                                 case 2:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1)) ) {
                                           if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>((int) numbers_cd_covers_on_line-1))) {
-                                             _mangley-=41;
-                                             music_select_iconnr-=numbers_cd_covers_on_line;
-                                             do_music_icon_anim_icon_ofset=-1;
+                                             _mangley -= 41;
+                                             music_select_iconnr -= numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset = -1;
                                           } else music_select_iconnr-=numbers_cd_covers_on_line;
                                           if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
                                             music_key_selected-=numbers_cd_covers_on_line;
@@ -9901,9 +10265,9 @@ void update(int value) {
                                 case 3:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1)) ) {
                                           if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
-                                           _mangley-=41;
-                                           music_select_iconnr-=numbers_cd_covers_on_line;
-                                           do_music_icon_anim_icon_ofset=-1;
+                                           _mangley -= 41;
+                                           music_select_iconnr -= numbers_cd_covers_on_line;
+                                           do_music_icon_anim_icon_ofset = -1;
                                           } else music_select_iconnr-=numbers_cd_covers_on_line;
                                           if ((int) music_key_selected>(int) numbers_cd_covers_on_line) {
                                             music_key_selected-=numbers_cd_covers_on_line;
@@ -9913,9 +10277,9 @@ void update(int value) {
                                 case 4:
                                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1)) ) {
                                           if (((int) music_key_selected<=numbers_cd_covers_on_line) && ((int) music_select_iconnr>(numbers_cd_covers_on_line-1))) {
-                                             _mangley-=41;
-                                             music_select_iconnr-=numbers_cd_covers_on_line;
-                                             do_music_icon_anim_icon_ofset=-1;
+                                             _mangley -= 41;
+                                             music_select_iconnr -= numbers_cd_covers_on_line;
+                                             do_music_icon_anim_icon_ofset = -1;
                                           } else music_select_iconnr-=numbers_cd_covers_on_line;
                                           if (music_key_selected>numbers_cd_covers_on_line) {
                                             music_key_selected-=numbers_cd_covers_on_line;
@@ -9930,8 +10294,8 @@ void update(int value) {
                                 case 1:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
                                           if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                             _fangley-=MOVIE_CS;
-                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                             _fangley -= MOVIE_CS;
+                                             film_select_iconnr -= numbers_film_covers_on_line;
                                           } else film_select_iconnr-=numbers_film_covers_on_line;
                                           if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
@@ -9939,8 +10303,8 @@ void update(int value) {
                                 case 2:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
                                           if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                             _fangley-=MOVIE_CS;
-                                             film_select_iconnr-=numbers_film_covers_on_line;
+                                             _fangley -= MOVIE_CS;
+                                             film_select_iconnr -= numbers_film_covers_on_line;
                                           } else film_select_iconnr-=numbers_film_covers_on_line;
                                           if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
@@ -9948,18 +10312,18 @@ void update(int value) {
                                 case 3:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
                                           if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                             _fangley-=MOVIE_CS;
-                                             film_select_iconnr-=numbers_film_covers_on_line;
-                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                             _fangley -= MOVIE_CS;
+                                             film_select_iconnr -= numbers_film_covers_on_line;
+                                          } else film_select_iconnr -= numbers_film_covers_on_line;
                                           if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
                                         break;
                                 case 4:
                                         if ((vis_film_oversigt) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1)) ) {
                                           if (((int) film_key_selected<=numbers_film_covers_on_line) && ((int) film_select_iconnr>((int) numbers_film_covers_on_line-1))) {
-                                             _fangley-=MOVIE_CS;
-                                             film_select_iconnr-=numbers_film_covers_on_line;
-                                          } else film_select_iconnr-=numbers_film_covers_on_line;
+                                             _fangley -= MOVIE_CS;
+                                             film_select_iconnr -= numbers_film_covers_on_line;
+                                          } else film_select_iconnr -= numbers_film_covers_on_line;
                                           if ((int) film_key_selected>(int) numbers_film_covers_on_line) film_key_selected-=numbers_film_covers_on_line;
                                         }
                                         break;
@@ -9969,8 +10333,8 @@ void update(int value) {
                         if ((vis_radio_oversigt) && (show_radio_options==false)) {
                           if ((vis_radio_oversigt) && (radio_select_iconnr>(numbers_radio_covers_on_line-1)) ) {
                             if ((radio_key_selected<=numbers_radio_covers_on_line) && (radio_select_iconnr>(numbers_radio_covers_on_line-1))) {
-                              _rangley-=MOVIE_CS;
-                              radio_select_iconnr-=numbers_radio_covers_on_line;
+                              _rangley -= MOVIE_CS;
+                              radio_select_iconnr -= numbers_radio_covers_on_line;
                             } else radio_select_iconnr-=numbers_radio_covers_on_line;
                             if (radio_key_selected>numbers_radio_covers_on_line) radio_key_selected-=numbers_radio_covers_on_line;
                           }
@@ -10030,9 +10394,9 @@ void update(int value) {
                                 case 1:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
                                           if (((int) stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                             _rangley-=MOVIE_CS;
-                                             stream_select_iconnr-=numbers_stream_covers_on_line;
-                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                             _rangley -= MOVIE_CS;
+                                             stream_select_iconnr -= numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr -= numbers_stream_covers_on_line;
                                           if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
 
@@ -10040,27 +10404,27 @@ void update(int value) {
                                 case 2:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
                                           if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                             _rangley-=MOVIE_CS;
-                                             stream_select_iconnr-=numbers_stream_covers_on_line;
-                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                             _rangley -= MOVIE_CS;
+                                             stream_select_iconnr -= numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr -= numbers_stream_covers_on_line;
                                           if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
                                 case 3:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
                                           if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                             _rangley-=MOVIE_CS;
-                                             stream_select_iconnr-=numbers_stream_covers_on_line;
-                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                             _rangley -= MOVIE_CS;
+                                             stream_select_iconnr -= numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr -= numbers_stream_covers_on_line;
                                           if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
                                 case 4:
                                         if ((vis_stream_oversigt) && (stream_select_iconnr>(numbers_stream_covers_on_line-1)) ) {
                                           if ((stream_key_selected<=numbers_stream_covers_on_line) && (stream_select_iconnr>(numbers_stream_covers_on_line-1))) {
-                                             _rangley-=MOVIE_CS;
-                                             stream_select_iconnr-=numbers_stream_covers_on_line;
-                                          } else stream_select_iconnr-=numbers_stream_covers_on_line;
+                                             _rangley -= MOVIE_CS;
+                                             stream_select_iconnr -= numbers_stream_covers_on_line;
+                                          } else stream_select_iconnr -= numbers_stream_covers_on_line;
                                           if (stream_key_selected>numbers_stream_covers_on_line) stream_key_selected-=numbers_stream_covers_on_line;
                                         }
                                         break;
@@ -10072,9 +10436,9 @@ void update(int value) {
                         if (vis_recorded_oversigt) {
                           if ((visvalgtnrtype==1) && (valgtrecordnr>0)) {
                             valgtrecordnr--;
-                            subvalgtrecordnr=0;
+                            subvalgtrecordnr = 0;
                           } else if ((visvalgtnrtype==2) && (subvalgtrecordnr>0)) subvalgtrecordnr--;	// bruges til visning af optaget programmer
-                          reset_recorded_texture=true;		// load optaget programs texture gen by mythtv
+                          reset_recorded_texture = true;		// load optaget programs texture gen by mythtv
                         }
                         if (vis_tv_oversigt) {
                           if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
@@ -10099,8 +10463,8 @@ void update(int value) {
                                 music_select_iconnr--;
                               } else {
                                 if (music_select_iconnr>0) {
-                                   _mangley-=41;
-                                   music_key_selected+=numbers_cd_covers_on_line-1;  // den viste på skærm af 1 til 20
+                                   _mangley -= 41;
+                                   music_key_selected += numbers_cd_covers_on_line-1;  // den viste på skærm af 1 til 20
                                    music_select_iconnr--;                  	// den rigtige valgte af 1 til cd antal
                                 }
                               }
@@ -10116,17 +10480,17 @@ void update(int value) {
                                                   film_select_iconnr--;
                                                 } else {
                                                   if ((_fangley-MOVIE_CS)<0) {
-                                                    _fangley-=MOVIE_CS;
+                                                    _fangley -= MOVIE_CS;
                                                     film_key_selected--;
-                                                    film_select_iconnr=-3;
-                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                    film_select_iconnr = -3;
+                                                    do_movie_icon_anim_icon_ofset = -1;
                                                   }
                                                 }
                                             } else {
                                               if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                _fangley-=MOVIE_CS;
-                                                film_select_iconnr+=4;
-                                                do_movie_icon_anim_icon_ofset=-1;
+                                                _fangley -= MOVIE_CS;
+                                                film_select_iconnr += 4;
+                                                do_movie_icon_anim_icon_ofset = -1;
                                               }
                                               film_key_selected--;
                                               film_select_iconnr--;
@@ -10138,10 +10502,10 @@ void update(int value) {
                                                   film_select_iconnr--;
                                                 } else {
                                                   if (_fangley-MOVIE_CS<0) {
-                                                     _fangley-=MOVIE_CS;
+                                                     _fangley -= MOVIE_CS;
                                                     film_key_selected--;
-                                                    film_select_iconnr=-5;
-                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                    film_select_iconnr = -5;
+                                                    do_movie_icon_anim_icon_ofset = -1;
                                                   }
                                                 }
                                             } else {
@@ -10160,17 +10524,17 @@ void update(int value) {
                                                 film_select_iconnr--;
                                               } else {
                                                 if (_fangley-MOVIE_CS<0) {
-                                                  _fangley-=MOVIE_CS;
+                                                  _fangley -= MOVIE_CS;
                                                   film_key_selected--;
-                                                  film_select_iconnr=-8;
-                                                  do_movie_icon_anim_icon_ofset=-1;
+                                                  film_select_iconnr = -8;
+                                                  do_movie_icon_anim_icon_ofset = -1;
                                                 }
                                               }
                                             } else {
                                               if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                _fangley-=MOVIE_CS;
-                                                film_select_iconnr+=9;
-                                                do_movie_icon_anim_icon_ofset=-1;
+                                                _fangley -= MOVIE_CS;
+                                                film_select_iconnr += 9;
+                                                do_movie_icon_anim_icon_ofset = -1;
                                               }
                                               film_key_selected--;
                                               film_select_iconnr--;
@@ -10182,17 +10546,17 @@ void update(int value) {
                                                   film_select_iconnr--;
                                                 } else {
                                                   if (_fangley-MOVIE_CS<0) {
-                                                    _fangley-=MOVIE_CS;
+                                                    _fangley -= MOVIE_CS;
                                                     film_key_selected--;
-                                                    film_select_iconnr=-8;
-                                                    do_movie_icon_anim_icon_ofset=-1;
+                                                    film_select_iconnr = -8;
+                                                    do_movie_icon_anim_icon_ofset = -1;
                                                   }
                                                 }
                                             } else {
                                               if ((film_select_iconnr==1) && (_fangley>0)) {
-                                                _fangley-=MOVIE_CS;
-                                                film_select_iconnr+=9;
-                                                do_movie_icon_anim_icon_ofset=-1;
+                                                _fangley -= MOVIE_CS;
+                                                film_select_iconnr += 9;
+                                                do_movie_icon_anim_icon_ofset = -1;
                                               }
                                               film_key_selected--;
                                               film_select_iconnr--;
@@ -10210,17 +10574,17 @@ void update(int value) {
                                                   radio_select_iconnr--;
                                                 } else {
                                                     if ((_rangley-MOVIE_CS)<0) {
-                                                      _rangley-=MOVIE_CS;
+                                                      _rangley -= MOVIE_CS;
                                                       radio_key_selected--;
-                                                      radio_select_iconnr=-3;
-                                                      do_radio_icon_anim_icon_ofset=-1;
+                                                      radio_select_iconnr = -3;
+                                                      do_radio_icon_anim_icon_ofset = -1;
                                                     }
                                                 }
                                             } else {
                                                 if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                  _rangley-=MOVIE_CS;
-                                                  radio_select_iconnr+=4;
-                                                  do_radio_icon_anim_icon_ofset=-1;
+                                                  _rangley -= MOVIE_CS;
+                                                  radio_select_iconnr += 4;
+                                                  do_radio_icon_anim_icon_ofset = -1;
                                                 }
                                                 radio_key_selected--;
                                                 radio_select_iconnr--;
@@ -10232,17 +10596,17 @@ void update(int value) {
                                                 radio_select_iconnr--;
                                               } else {
                                                 if (_rangley-MOVIE_CS<0) {
-                                                   _rangley-=MOVIE_CS;
+                                                   _rangley -= MOVIE_CS;
                                                   radio_key_selected--;
-                                                  radio_select_iconnr=-5;
-                                                  do_radio_icon_anim_icon_ofset=-1;
+                                                  radio_select_iconnr = -5;
+                                                  do_radio_icon_anim_icon_ofset = -1;
                                                 }
                                               }
                                             } else {
                                               if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                radio_select_iconnr+=6;
-                                                do_radio_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                radio_select_iconnr += 6;
+                                                do_radio_icon_anim_icon_ofset = -1;
                                               }
                                               radio_key_selected--;
                                               radio_select_iconnr--;
@@ -10256,15 +10620,15 @@ void update(int value) {
                                                   if (_rangley-MOVIE_CS<0) {
                                                     _rangley-=MOVIE_CS;
                                                     radio_key_selected--;
-                                                    radio_select_iconnr=-8;
+                                                    radio_select_iconnr = -8;
                                                     do_radio_icon_anim_icon_ofset=-1;
                                                   }
                                                 }
                                             } else {
                                               if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                radio_select_iconnr+=9;
-                                                do_radio_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                radio_select_iconnr += 9;
+                                                do_radio_icon_anim_icon_ofset = -1;
                                               }
                                               radio_key_selected--;
                                               radio_select_iconnr--;
@@ -10284,9 +10648,9 @@ void update(int value) {
                                               }
                                             } else {
                                               if ((radio_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                radio_select_iconnr+=9;
-                                                do_radio_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                radio_select_iconnr += 9;
+                                                do_radio_icon_anim_icon_ofset = -1;
                                               }
                                               radio_key_selected--;
                                               radio_select_iconnr--;
@@ -10308,15 +10672,15 @@ void update(int value) {
                                                 if ((_rangley-MOVIE_CS)<0) {
                                                   _rangley-=MOVIE_CS;
                                                   stream_key_selected--;
-                                                  stream_select_iconnr=-3;
-                                                  do_stream_icon_anim_icon_ofset=-1;
+                                                  stream_select_iconnr = -3;
+                                                  do_stream_icon_anim_icon_ofset = -1;
                                                 }
                                               }
                                             } else {
                                               if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                stream_select_iconnr+=4;
-                                                do_stream_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                stream_select_iconnr += 4;
+                                                do_stream_icon_anim_icon_ofset = -1;
                                               }
                                               stream_key_selected--;
                                               stream_select_iconnr--;
@@ -10328,17 +10692,17 @@ void update(int value) {
                                                 stream_select_iconnr--;
                                               } else {
                                                 if (_rangley-MOVIE_CS<0) {
-                                                   _rangley-=MOVIE_CS;
+                                                   _rangley -= MOVIE_CS;
                                                   stream_key_selected--;
-                                                  stream_select_iconnr=-5;
-                                                  do_stream_icon_anim_icon_ofset=-1;
+                                                  stream_select_iconnr = -5;
+                                                  do_stream_icon_anim_icon_ofset = -1;
                                                 }
                                               }
                                             } else {
                                               if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                stream_select_iconnr+=6;
-                                                do_stream_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                stream_select_iconnr += 6;
+                                                do_stream_icon_anim_icon_ofset =- 1;
                                               }
                                               stream_key_selected--;
                                               stream_select_iconnr--;
@@ -10350,17 +10714,17 @@ void update(int value) {
                                                 stream_select_iconnr--;
                                               } else {
                                                 if (_rangley-MOVIE_CS<0) {
-                                                  _rangley-=MOVIE_CS;
+                                                  _rangley -= MOVIE_CS;
                                                   stream_key_selected--;
-                                                  stream_select_iconnr=-8;
+                                                  stream_select_iconnr = -8;
                                                   do_stream_icon_anim_icon_ofset=-1;
                                                 }
                                               }
                                             } else {
                                               if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                stream_select_iconnr+=9;
-                                                do_stream_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                stream_select_iconnr += 9;
+                                                do_stream_icon_anim_icon_ofset = -1;
                                               }
                                               stream_key_selected--;
                                               stream_select_iconnr--;
@@ -10372,17 +10736,17 @@ void update(int value) {
                                                 stream_select_iconnr--;
                                               } else {
                                                 if (_rangley-MOVIE_CS<0) {
-                                                  _rangley-=MOVIE_CS;
+                                                  _rangley -= MOVIE_CS;
                                                   stream_key_selected--;
-                                                  stream_select_iconnr=-8;
-                                                  do_stream_icon_anim_icon_ofset=-1;
+                                                  stream_select_iconnr = -8;
+                                                  do_stream_icon_anim_icon_ofset = -1;
                                                 }
                                               }
                                             } else {
                                               if ((stream_select_iconnr==1) && (_rangley>0)) {
-                                                _rangley-=MOVIE_CS;
-                                                stream_select_iconnr+=9;
-                                                do_stream_icon_anim_icon_ofset=-1;
+                                                _rangley -= MOVIE_CS;
+                                                stream_select_iconnr += 9;
+                                                do_stream_icon_anim_icon_ofset = -1;
                                               }
                                               stream_key_selected--;
                                               stream_select_iconnr--;
@@ -10408,7 +10772,7 @@ void update(int value) {
                               if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) && (music_select_iconnr<musicoversigt_antal)) {
                                 if (((int) music_key_selected % (numbers_cd_covers_on_line*4)==0) || (((int) music_select_iconnr==((numbers_cd_covers_on_line*4)-1)) && ((int) music_key_selected % numbers_cd_covers_on_line==0))) {
                                   _mangley+=41;
-                                  music_key_selected-=numbers_cd_covers_on_line;			// den viste på skærm af 1 til 20
+                                  music_key_selected -= numbers_cd_covers_on_line;			// den viste på skærm af 1 til 20
                                   music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                 } else {
                                   music_select_iconnr++;						// den rigtige valgte af 1 til cd antal
@@ -10423,8 +10787,8 @@ void update(int value) {
                                         if ((vis_film_oversigt) && ((int unsigned) film_select_iconnr<film_oversigt.film_antal()-1)) {
                                           if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
                                             if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                              _fangley+=MOVIE_CS;
-                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              _fangley += MOVIE_CS;
+                                              film_key_selected -= numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
                                               film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             } else {
                                               film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
@@ -10437,8 +10801,8 @@ void update(int value) {
                                         if ((vis_film_oversigt) && (film_select_iconnr<(int) film_oversigt.film_antal()-1)) {
                                           if ((int) film_select_iconnr<(int) film_oversigt.film_antal()) {
                                             if (((int) film_key_selected % (numbers_film_covers_on_line*3)==0) || (((int) film_select_iconnr==((numbers_film_covers_on_line*4)-1)) && ((int) film_key_selected % numbers_film_covers_on_line==0))) {
-                                              _fangley+=MOVIE_CS;
-                                              film_key_selected-=numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
+                                              _fangley += MOVIE_CS;
+                                              film_key_selected -= numbers_film_covers_on_line;			// den viste på skærm af 1 til 20
                                               film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             } else {
                                               film_select_iconnr++;						// den rigtige valgte af 1 til cd antal
@@ -10486,8 +10850,8 @@ void update(int value) {
                                         if ((vis_radio_oversigt) && (radio_select_iconnr<(int) radiooversigt_antal-1)) {
                                           if (radio_select_iconnr<(int) radiooversigt_antal) {
                                             if (((int) radio_key_selected % (numbers_radio_covers_on_line*3)==0) || (((int) radio_select_iconnr==((numbers_radio_covers_on_line*4)-1)) && ((int) radio_key_selected % numbers_radio_covers_on_line==0))) {
-                                              _rangley+=MOVIE_CS;
-                                              radio_key_selected-=numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
+                                              _rangley += MOVIE_CS;
+                                              radio_key_selected -= numbers_radio_covers_on_line;			// den viste på skærm af 1 til 20
                                               radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                             } else {
                                               radio_select_iconnr++;						// den rigtige valgte af 1 til cd antal
@@ -10534,8 +10898,8 @@ void update(int value) {
                               if ((vis_stream_oversigt) && (stream_select_iconnr<(int) streamoversigt.streamantal()-1)) {
                                 if (stream_select_iconnr<(int) streamoversigt.streamantal()) {
                                   if (((int) stream_key_selected % (numbers_stream_covers_on_line*3)==0) || (((int) stream_select_iconnr==((numbers_stream_covers_on_line*4)-1)) && ((int) stream_key_selected % numbers_stream_covers_on_line==0))) {
-                                    _rangley+=MOVIE_CS;
-                                    stream_key_selected-=numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
+                                    _rangley += MOVIE_CS;
+                                    stream_key_selected -= numbers_stream_covers_on_line;			// den viste på skærm af 1 til 20
                                     stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
                                   } else {
                                     stream_select_iconnr++;						// den rigtige valgte af 1 til cd antal
@@ -10561,10 +10925,10 @@ void update(int value) {
                             }
                         }
                         if (vis_recorded_oversigt) {
-                          visvalgtnrtype=2;
+                          visvalgtnrtype = 2;
                         }
                         if (vis_tv_oversigt) {
-                          tvvisvalgtnrtype=2;
+                          tvvisvalgtnrtype = 2;
                         }
                     }
 
@@ -10588,8 +10952,8 @@ void update(int value) {
                       if ((vis_music_oversigt) && (!(do_shift_song))) {
                         if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
                           do_play_music_aktiv_table_nr++;
-                          do_shift_song=true;
-                          do_zoom_music_cover=true;
+                          do_shift_song = true;
+                          do_zoom_music_cover = true;
                         }
                       }
                       if (vis_tv_oversigt) {
@@ -10604,8 +10968,8 @@ void update(int value) {
                        if ((vis_music_oversigt) && (!(do_shift_song))) {
                           if ((do_play_music_aktiv_table_nr>1) && (do_shift_song==false)) {
                             do_play_music_aktiv_table_nr--;						// skift aktiv sang
-                            do_shift_song=true;							// sæt flag til skift
-                            do_zoom_music_cover=true;
+                            do_shift_song = true;							// sæt flag til skift
+                            do_zoom_music_cover = true;
                           }
                        }
                        if (vis_tv_oversigt) {
@@ -10619,8 +10983,8 @@ void update(int value) {
                       #if defined USE_FMOD_MIXER
                       if (sndsystem) channel->setVolume(configsoundvolume);
                       #endif
-                      show_volume_info=true;					// show volume info window
-                      vis_volume_timeout=80;
+                      show_volume_info = true;					// show volume info window
+                      vis_volume_timeout = 80;
                     }
                     // lirc
                     if (strcmp("Key-vol-down",c)==0) {
@@ -10628,23 +10992,23 @@ void update(int value) {
                       #if defined USE_FMOD_MIXER
                       if (sndsystem) channel->setVolume(configsoundvolume);
                       #endif
-                      show_volume_info=true;					// show volume info window
-                      vis_volume_timeout=80;
+                      show_volume_info = true;					// show volume info window
+                      vis_volume_timeout = 80;
                     }
                     // lirc
                     // start some func
                     if (strcmp("Return",c)==0) {
                       if ((vis_music_oversigt) && (!(do_zoom_music_cover))) {
                         if (ask_open_dir_or_play) {
-                          ask_open_dir_or_play=0;			// flag luk vindue igen
-                          do_play_music_cover=1;			// der er trykket på cover play det
-                          do_zoom_music_cover=false;			// ja den skal spilles lav zoom cover info window
-                          do_find_playlist=true;			// find de sange som skal indsættes til playlist (og load playlist andet sted)
-                          mknapnr=music_select_iconnr;		// OLD VER music_key_selected;
+                          ask_open_dir_or_play = 0;			// flag luk vindue igen
+                          do_play_music_cover = 1;			// der er trykket på cover play det
+                          do_zoom_music_cover = false;			// ja den skal spilles lav zoom cover info window
+                          do_find_playlist = true;			// find de sange som skal indsættes til playlist (og load playlist andet sted)
+                          mknapnr = music_select_iconnr;		// OLD VER music_key_selected;
                           if (debugmode & 2) fprintf(stderr,"music_key_selected =%d \n",music_key_selected);
                         } else {
                           // er det et normal dir
-                          mknapnr=music_select_iconnr; // OLD VER music_key_selected-1;
+                          mknapnr = music_select_iconnr; // OLD VER music_key_selected-1;
                           if (debugmode & 2) fprintf(stderr,"Lirc music selected:%d \n",mknapnr);
 
                           // if (debugmode & 2) printf("Mouse pressed over %d husk knap= %d \n",mknapnr,husk_knapnr);
@@ -10655,23 +11019,23 @@ void update(int value) {
                             antal_songs=hent_antal_dir_songs(musicoversigt[mknapnr].directory_id);		//
                             if (debugmode & 2) fprintf(stderr,"Found numers of songs in :%4d dirid:%4d  named:%s \n",antal_songs,musicoversigt[mknapnr].directory_id,musicoversigt[mknapnr].album_name);
                             if ((antal_songs==0) || (musicoversigt[mknapnr].directory_id==0)) {	// er der ingen sange i dir lav en auto open
-                              ask_open_dir_or_play_aopen=1; 						// flag auto open
+                              ask_open_dir_or_play_aopen = 1; 						// flag auto open
                               if (musicoversigt[mknapnr].directory_id==0) antal_songs=0;
                             } else {
-                              ask_open_dir_or_play_aopen=0;						// ingen auto open
+                              ask_open_dir_or_play_aopen = 0;						// ingen auto open
                             }
                           } else {
                           // nej det er playlister
-                          mknapnr=music_select_iconnr;
+                          mknapnr = music_select_iconnr;
                           do_play_music_aktiv_nr=musicoversigt[mknapnr].directory_id;			// = playlistnr
                           if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
                           if (do_play_music_aktiv_nr>0) {
                             antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
-                          } else antal_songs=0;
-                          if (antal_songs==0) {							// er der ingen sange i dir lav en auto open
-                            ask_open_dir_or_play_aopen=1; 						// flag auto open
+                          } else antal_songs = 0;
+                          if (antal_songs==0) {					                    		// er der ingen sange i dir lav en auto open
+                            ask_open_dir_or_play_aopen = 1; 						        // flag auto open
                           } else {
-                            ask_open_dir_or_play_aopen=0;						// ingen auto open
+                            ask_open_dir_or_play_aopen = 0;						          // ingen auto open
                           }
                         }
                         // do auto open
@@ -10679,13 +11043,13 @@ void update(int value) {
                           // normalt dir (IKKE playlist)
                           opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr].directory_id);
                           opdatere_music_oversigt_icons();
-                          music_icon_anim_icon_ofset=0;
-                          music_icon_anim_icon_ofsety=0;
-                          mknapnr=0;
-                          ask_open_dir_or_play_aopen=1;
+                          music_icon_anim_icon_ofset = 0;
+                          music_icon_anim_icon_ofsety = 0;
+                          mknapnr = 0;
+                          ask_open_dir_or_play_aopen = 1;
                           if (debugmode & 2) fprintf(stderr,"Set Autoopen on dir id %d \n ", musicoversigt[mknapnr].directory_id);
-                          music_key_selected=1;		// reset cursor position
-                          music_select_iconnr=1;		// reset this to (beskriver hvor vi er på skærmen og ikke på listen som music_key_selected
+                          music_key_selected = 1;		// reset cursor position
+                          music_select_iconnr = 1;		// reset this to (beskriver hvor vi er på skærmen og ikke på listen som music_key_selected
                         } else if (musicoversigt[mknapnr].oversigttype==-1) {
                           // playliste
                           if (antal_songs>0) ask_open_dir_or_play_aopen=0;			// skal vi spørge slå auto fra
@@ -10694,17 +11058,17 @@ void update(int value) {
                           opdatere_music_oversigt_playlists(musicoversigt);			// vis alle playlister
                         }
                         if ((antal_songs>0) && (do_play_music_aktiv_nr)) {
-                          do_swing_music_cover=1;
-                          ask_open_dir_or_play=1;
+                          do_swing_music_cover = 1;
+                          ask_open_dir_or_play = 1;
                         }
                         if (ask_open_dir_or_play_aopen) {
                           /// reset mouse/key pos in vis_music_oversigt
-                          mknapnr=0;
-                          music_key_selected=1;
-                          music_select_iconnr=0;
-                          music_icon_anim_icon_ofset=0;
-                          music_icon_anim_icon_ofsety=0;
-                          _mangley=0.0f;
+                          mknapnr = 0;
+                          music_key_selected = 1;
+                          music_select_iconnr = 0;
+                          music_icon_anim_icon_ofset = 0;
+                          music_icon_anim_icon_ofsety = 0;
+                          _mangley = 0.0f;
                         }
                       }
                       do_zoom_music_cover_remove_timeout=showtimeout;		// show music info timeout
@@ -10712,10 +11076,10 @@ void update(int value) {
                     }
                     if ((vis_film_oversigt) && (do_zoom_film_cover)) {
                       fprintf(stderr,"lirc Start movie player.\n");
-                      startmovie=true;
+                      startmovie = true;
                     }
                     if (vis_film_oversigt) {				// select movie to show info for
-                      do_zoom_film_cover=true;
+                      do_zoom_film_cover = true;
                       do_swing_movie_cover=0;
                       do_zoom_film_aktiv_nr=film_select_iconnr+1;		// OLD film_key_selected;
                       fknapnr=film_select_iconnr+1;				// OLD film_key_selected;
@@ -10747,7 +11111,7 @@ void update(int value) {
                   // lirc
                   if (strcmp("Stop",c)==0) {
                     // stop all music
-                    do_stop_music=true;
+                    do_stop_music = true;
                   }
                   // lirc
                   if (strcmp("Power",c)==0) {
@@ -10768,11 +11132,11 @@ void update(int value) {
       if (sinusofset>7200) sinusofset=0;
       // stop sinus igen
       if ((do_music_icon_anim_icon_ofset==1) && ((int) sinusofset>50)) {
-        sinusofset=0;
+        sinusofset = 0;
         do_music_icon_anim_icon_ofset=0;
       }
       if ((do_music_icon_anim_icon_ofset==-1) && ((int) sinusofset>50)) {
-        sinusofset=0;
+        sinusofset = 0;
         do_music_icon_anim_icon_ofset=0;
       }
     }
@@ -10876,13 +11240,11 @@ int init_sound_system(int devicenr) {
     ERRCHECK(result,0);
     strcpy(configmythsoundsystem,avalible_device[0]);
     #endif
-
     #if defined USE_SDL_MIXER
     printf("Setup SDL_MIXER soundsystem\n");
     // load support for the OGG and MOD sample/music formats
     int flags=MIX_INIT_OGG|MIX_INIT_MP3|MIX_INIT_FLAC;
     SDL_Init(SDL_INIT_AUDIO);
-
     /* This is where we open up our audio device.  Mix_OpenAudio takes
     as its parameters the audio format we'd /like/ to have. */
     if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
@@ -10943,22 +11305,22 @@ void *datainfoloader_music(void *data) {
     // opdatere music oversigt
     // hent alt music info fra database
     // check if internal music db exist if yes do set global use it
-    if (global_use_internal_music_loader_system_exist()==true) {
+    if (global_use_internal_music_loader_system_exist() == true) {
       if (debugmode % 2) printf("******** Use global music database ********\n");
-      global_use_internal_music_loader_system=true;
+      global_use_internal_music_loader_system = true;
     } else {
       if (debugmode & 2) printf("Search for music in :%s\n",configdefaultmusicpath);
       // build new db (internal db loader)
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
       if (debugmode & 2) printf("Done update db from datasource.\n");
-      global_use_internal_music_loader_system=true;
+      global_use_internal_music_loader_system = true;
     }
     // update music db from disk
     if ((do_update_music) || (do_update_music_now)) {
       // update the music db
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
-      do_update_music_now=false;                                              // do not call update any more
-      do_update_music=false;                                                  // stop show music update
+      do_update_music_now = false;                                              // do not call update any more
+      do_update_music = false;                                                  // stop show music update
     }
     // load music db created by opdatere_music_oversigt_nodb function
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
@@ -11160,7 +11522,7 @@ void *xbmcdatainfoloader(void *data) {
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
-    allokay=true;
+    allokay = true;
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -11168,7 +11530,7 @@ void *xbmcdatainfoloader(void *data) {
     mysql_query(conn,"SHOW TABLES LIKE 'music_albums'");
     res = mysql_store_result(conn);
     while ((row = mysql_fetch_row(res)) != NULL) {
-      dbexist=true;
+      dbexist = true;
     }
     // create databases if not exist
     if (!(dbexist)) {
@@ -11283,7 +11645,7 @@ void *xbmcdatainfoloader(void *data) {
     if (debugmode & 2) printf("loader thread done loaded kodi \n");
   }
   // set use internal db for music
-  global_use_internal_music_loader_system=true;
+  global_use_internal_music_loader_system = true;
   // load db
   if (debugmode & 2) printf("Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
   if (debugmode & 2) printf("Nusic db loaded.\n");
@@ -11316,7 +11678,7 @@ void *xbmcdatainfoloader_movie(void *data) {
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
-    allokay=true;
+    allokay = true;
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -11324,7 +11686,7 @@ void *xbmcdatainfoloader_movie(void *data) {
     mysql_query(conn,"SHOW TABLES LIKE 'Videometadata'");
     res = mysql_store_result(conn);
     while ((row = mysql_fetch_row(res)) != NULL) {
-      dbexist=true;
+      dbexist = true;
     }
     // create databases/tables if not exist
     // needed by movie loader
@@ -11397,27 +11759,27 @@ void *xbmcdatainfoloader_movie(void *data) {
         if (ext) strcpy(filename,de->d_name);
         if ((strncmp(filename,"MyVideos",8)==0) && (!(kodiverfound))) {
           if (strcmp(filename,kodivermovie[0])==0) {
-            kodiverfound=17;
+            kodiverfound = 17;
             printf("Kodi version 17 is found \n");
           }
           if (strcmp(filename,kodivermovie[1])==0) {
-            kodiverfound=15;
+            kodiverfound = 15;
             printf("Kodi version 15 is found \n");
           }
           if (strcmp(filename,kodivermovie[2])==0) {
-            kodiverfound=14;
+            kodiverfound = 14;
             printf("Kodi version 14 is found \n");
           }
           if (strcmp(filename,kodivermovie[3])==0) {
-            kodiverfound=13;
+            kodiverfound = 13;
             printf("Kodi version 13 is found \n");
           }
           if (strcmp(filename,kodivermovie[4])==0) {
-            kodiverfound=12;
+            kodiverfound = 12;
             printf("Kodi version 12 is found \n");
           }
           if (strcmp(filename,kodivermovie[5])==0) {
-            kodiverfound=11;
+            kodiverfound = 11;
             printf("Kodi version 11 is found \n");
           }
         }
@@ -11456,7 +11818,7 @@ void *xbmcdatainfoloader_movie(void *data) {
       // load xbmc movie db
       xbmcSQL->xbmc_readmoviedb();                // load movies from kodi db to internal db
       // set use internal db for movies
-      global_use_internal_music_loader_system=true;
+      global_use_internal_music_loader_system = true;
       //xbmcSQL->xbmc_readmusicdb();     // IN use
       if (debugmode & 16) printf("XBMC - loader done.\n");
       // load movies in from db
@@ -11465,7 +11827,7 @@ void *xbmcdatainfoloader_movie(void *data) {
     }
   }
   if (debugmode & 16) printf("loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
-  do_update_moviedb=false;
+  do_update_moviedb = false;
   pthread_exit(NULL);
 }
 
@@ -11492,9 +11854,9 @@ GLuint loadgfxfile(char *temapath,char *dir,char *file) {
         strcat(fileload,file);
         strcat(fileload,".jpg");
         if (file_exists(fileload)) gl_img = loadTexture ((char *) fileload);
-        else gl_img=0;
+        else gl_img = 0;
     }
-    if (gl_img==0) printf("GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
+    if (gl_img == 0) printf("GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
     return(gl_img);
 }
 
@@ -11512,23 +11874,21 @@ void loadgfx() {
     printf ("Loading init graphic.\n");
     strcpy(temapath,"");
     strcpy(temapath1,"");
-    if (tema==1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema==2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema==3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema==4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema==5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema==6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema==7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema==8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema==9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema==10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
+    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
       // default tema
       strcpy(temapath,"tema1/");
       tema=1;
     }
     _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
-    _textureuv1           = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map1");
-    _textureuv1_top       = loadgfxfile(temapath1,(char *) "images/",(char *) "uv_map2");
     _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
     if (screen_size<3)
@@ -11587,17 +11947,14 @@ void loadgfx() {
     _textureIdmusicsearch = loadgfxfile(temapath,(char *) "images/",(char *) "music_search");
     _textureIdradiosearch = loadgfxfile(temapath,(char *) "images/",(char *) "radio_search");
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
+    _textureIdmoviesearch = loadgfxfile(temapath,(char *) "images/",(char *) "movie_search");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
-    _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
     _textureIdclosemask 	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close_mask");
     _texturelock        	= loadgfxfile(temapath,(char *) "images/",(char *) "lock");
-
-
-// ************************ icons ******************************************
-
+    // ************************ icons ******************************************
     _texturesetupmenu   	= loadgfxfile(temapath,(char *) "buttons/",(char *) "setupmenu");				// setup menu
     _texturesetupmenu_select	= loadgfxfile(temapath,(char *) "buttons/",(char *) "setupmenu1");		// setup menu selected
     _texturesoundsetup		= loadgfxfile(temapath,(char *) "images/",(char *) "setupsound");
@@ -11621,9 +11978,7 @@ void loadgfx() {
     _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
     _tvnewprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "newrecordedbutton");
     _tvmaskprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbutton_mask");
-
     // ****************** backgrounds **************************************
-
     setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
     setuptemaback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptemaback");
@@ -11633,12 +11988,8 @@ void loadgfx() {
     setupfontback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupfontback");
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
-
     _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
-
-
 // ************************* screen shot *******************************
-
     screenshot1=loadTexture ((char *) "images/screenshot1.png");
     screenshot2=loadTexture ((char *) "images/screenshot2.png");
     screenshot3=loadTexture ((char *) "images/screenshot3.png");
@@ -11649,12 +12000,10 @@ void loadgfx() {
     screenshot8=loadTexture ((char *) "images/screenshot8.png");
     screenshot9=loadTexture ((char *) "images/screenshot9.png");
     screenshot10=loadTexture ((char *) "images/screenshot10.png");
-
     _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
     _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
     _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
-
     // icons buttons
     // radio buttons
     onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
@@ -11669,11 +12018,9 @@ void loadgfx() {
     radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
     radiooptionsmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptionsmask");
-
     onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
     onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
     onlinestream_empty1  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
-
     // stream stuf
     // stream/movie button mask
     streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
@@ -11689,14 +12036,16 @@ void loadgfx() {
     screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
     screensaverbox1=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
+    texturedot1=loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
     _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
+    _textureIdreset_search=loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
     analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
-        _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
+      _textureIdmusic_aktiv=loadTexture ((char *) tmpfilename);
     } else _textureIdmusic_aktiv=0;
     printf ("Done loading init graphic.\n");
 }
@@ -11759,8 +12108,8 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdmusicsearch);	     	// search felt til music
     glDeleteTextures( 1, &_textureIdradiosearch);		    // sang search
     glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
+    glDeleteTextures( 1, &_textureIdmoviesearch);	   	// artist search
     glDeleteTextures( 1, &_textureIdloading);
-    glDeleteTextures( 1, &_textureIdloading1);
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
     glDeleteTextures( 1, &_textureIdclose);
     glDeleteTextures( 1, &_textureIdclose1);
@@ -11810,7 +12159,6 @@ void freegfx() {
     glDeleteTextures( 1, &screenshot8);                         // screen shots
     glDeleteTextures( 1, &screenshot9);                         // screen shots
     glDeleteTextures( 1, &screenshot10);                        // screen shots
-
     glDeleteTextures( 1, &_tvbar1);
     glDeleteTextures( 1, &_tvbar3);
     glDeleteTextures( 1, &onlineradio_empty);
@@ -11827,13 +12175,13 @@ void freegfx() {
     glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
     glDeleteTextures( 1, &texturedot);
-    glDeleteTextures( 1, &_textureuv1);                         // uv img
-    glDeleteTextures( 1, &_textureuv1_top);                         // uv img
+    glDeleteTextures( 1, &texturedot1);
     glDeleteTextures( 1, &_errorbox);                           // error box
     glDeleteTextures( 1, &_textureexit);
+    glDeleteTextures( 1, &_textureIdreset_search);
     // delete radio lande flags
-    i=0;
-    while(i<69) {
+    i = 0;
+    while(i < 69) {
       if (gfxlande[i]) glDeleteTextures( 1, &gfxlande[i]);
       i++;
     }
@@ -11865,14 +12213,14 @@ void load_lande_flags() {
                    (char *) "ks.jpg",(char *) "romania.jpg",(char *) "it.jpg",(char *) "fi.jpg",(char *) "bahrain.jpg",(char *) "dk.jpg",(char *) "chile.jpg",(char *) "chile.jpg",(char *) "Slovakia.jpg",(char *) "Ukraine.jpg", //
                    (char *) "hu.jpg",(char *) "co.jpg",(char *) "do.jpg",(char *) "Azerbaijan.jpg",(char *) "Lithuania.jpg",(char *) "Andorra.jpg",(char *) "Estonia.jpg",(char *) "Tajikistan.jpg",(char *) "Turkey.jpg",(char *) "Mongolia.jpg", //
                    (char *) "Belarus.jpg",(char *) "Slovenia.jpg",(char *) "Cyprus.jpg",(char *) "China.jpg",(char *) "Cambodia.jpg",(char *) "Indonesia.jpg",(char *) "Singapore.jpg",(char *) "Croatia.jpg",(char *) "Czech Republic.jpg",(char *) ""};
-    i=0;
+    i = 0;
     strcpy(path2,"");
-    while(i<69) {
+    while(i < 69) {
       printf("load flag %d %s \n",i,lande[i]);
       strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
       strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
       strcpy(path,"/usr/share/mythtv-controller/images/");
-      if (strcmp(lande[i],"")!=0) {
+      if (strcmp(lande[i],"") != 0) {
         gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
         //gfxlande[i]=loadTexture ((char *) tmpfilename);
       }
@@ -11889,34 +12237,33 @@ void InitGL()              // We call this right after our OpenGL window is crea
     char fileload[256];
     char temapath[256];
     strcpy(temapath,"");
-    if (tema==1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema==2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema==3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema==4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema==5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema==6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema==7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema==8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema==9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema==10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else
-    if (tema==11) strcpy(temapath,"/usr/share/mythtv-controller/tema11/"); else
-    if (tema==12) strcpy(temapath,"/usr/share/mythtv-controller/tema12/"); else
-    if (tema==13) strcpy(temapath,"/usr/share/mythtv-controller/tema13/"); else
-    if (tema==14) strcpy(temapath,"/usr/share/mythtv-controller/tema14/"); else
-    if (tema==15) strcpy(temapath,"/usr/share/mythtv-controller/tema15/"); else
-    if (tema==16) strcpy(temapath,"/usr/share/mythtv-controller/tema16/"); else
-    if (tema==17) strcpy(temapath,"/usr/share/mythtv-controller/tema17/"); else
-    if (tema==18) strcpy(temapath,"/usr/share/mythtv-controller/tema18/"); else
-    if (tema==19) strcpy(temapath,"/usr/share/mythtv-controller/tema19/"); else
-    if (tema==20) strcpy(temapath,"/usr/share/mythtv-controller/tema20/"); else {
+    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else
+    if (tema == 11) strcpy(temapath,"/usr/share/mythtv-controller/tema11/"); else
+    if (tema == 12) strcpy(temapath,"/usr/share/mythtv-controller/tema12/"); else
+    if (tema == 13) strcpy(temapath,"/usr/share/mythtv-controller/tema13/"); else
+    if (tema == 14) strcpy(temapath,"/usr/share/mythtv-controller/tema14/"); else
+    if (tema == 15) strcpy(temapath,"/usr/share/mythtv-controller/tema15/"); else
+    if (tema == 16) strcpy(temapath,"/usr/share/mythtv-controller/tema16/"); else
+    if (tema == 17) strcpy(temapath,"/usr/share/mythtv-controller/tema17/"); else
+    if (tema == 18) strcpy(temapath,"/usr/share/mythtv-controller/tema18/"); else
+    if (tema == 19) strcpy(temapath,"/usr/share/mythtv-controller/tema19/"); else
+    if (tema == 20) strcpy(temapath,"/usr/share/mythtv-controller/tema20/"); else {
       strcpy(temapath,"tema1/");
-      tema=1;
+      tema = 1;
     }
-    //load_lande_flags();
+
 // Load radio stations gfx **********************************************
 // virker vis aktiveres
 // bliver loaded første gang de bruges
-
 //    radiooversigt.load_radio_stations_gfx();
 // *********************************************************************
 //    mybox.settexture(musicoversigt);
@@ -11930,7 +12277,6 @@ int check_radio_stations_icons() {
   MYSQL_ROW row;
   bool dbexist=false;
   char resl[1024];
-
   conn=mysql_init(NULL);
   // Connect to database
   if (conn) {
@@ -11951,12 +12297,18 @@ int check_radio_stations_icons() {
 
 
 
+//
+// main
+//
+
 int main(int argc, char** argv) {
-    Display *dpy=NULL;
+    Display *dpy = NULL;
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
-    printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
-    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
+    strcpy(movie_search_name,"");                                               // used then search for movies in movie view
+    //printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
+    printf("Build date  : %s\n",__DATE__);
+    //printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
     printf("%s",SHOWVER);
     printf("\n");
@@ -11975,10 +12327,8 @@ int main(int argc, char** argv) {
         exit(0);
       }
     }
-
     numCPU = sysconf( _SC_NPROCESSORS_ONLN );
     printf("Numbers of cores :%d found.\n",numCPU);
-
     // Load config
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
@@ -11986,7 +12336,6 @@ int main(int argc, char** argv) {
       printf("mythtv - Backend\n");
       printf("Mythtv database version %d\n",configmythtvver);
       printf("configmysqluser   =%s \n",configmysqluser);
-      //printf("configmysqlpass   =%s \n",configmysqlpass);
       printf("configmysqlhost   =%s \n",configmysqlhost);
       printf("config movie path =%s \n",configmoviepath);
       printf("config music path =%s \n",configmusicpath);
@@ -12036,7 +12385,7 @@ int main(int argc, char** argv) {
     }
     if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
     create_radio_oversigt();										                          // Create radio mysql database if not exist
-    radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
+    radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
     strcpy(configbackend_tvgraber_old,"");
     // if kodi
     if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
@@ -12059,7 +12408,7 @@ int main(int argc, char** argv) {
       // music loader
       if (configmythtvver>=0) {
         pthread_t loaderthread;
-        int rc=pthread_create(&loaderthread,NULL,datainfoloader_music,NULL);
+        int rc = pthread_create(&loaderthread,NULL,datainfoloader_music,NULL);
         if (rc) {
          printf("ERROR; return code from pthread_create() is %d\n", rc);
          exit(-1);
@@ -12068,7 +12417,7 @@ int main(int argc, char** argv) {
       // movie loader
       if (configmythtvver>=0) {
         pthread_t loaderthread1;           // the load
-        int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
+        int rc1 = pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
         if (rc1) {
           printf("ERROR; return code from pthread_create() is %d\n", rc1);
           exit(-1);
@@ -12077,15 +12426,13 @@ int main(int argc, char** argv) {
     }
     // stream loader
     pthread_t loaderthread2;           // the load
-    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
+    int rc2 = pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
     if (rc2) {
       printf("ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
-
     // Load the VLC engine
 //    vlc_inst = libvlc_new(5,opt);
-
 /*
     vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
     // Create a media player playing environement
@@ -12097,7 +12444,6 @@ int main(int argc, char** argv) {
     //sleep(10); // play
     //libvlc_media_player_stop(vlc_mp);
     //libvlc_media_player_release(vlc_mp);
-
     sock=initlirc();
     // bruges til at checke_copy radio icons som virker til nyt dir
     //check_radio_stations_icons();
@@ -12116,7 +12462,7 @@ int main(int argc, char** argv) {
     printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
     printf("Screen mode %d\n",screen_size);
     // get first monitor screen size (pixel)
-    dpy = XOpenDisplay(":0");
+    dpy = XOpenDisplay(":1");
     if (dpy) {
       rootxwindow = RootWindow(dpy, 0);
       XRRScreenResources *xscreen_conf = XRRGetScreenResources(dpy, rootxwindow);
@@ -12137,19 +12483,13 @@ int main(int argc, char** argv) {
     //GC gc=XCreateGC(dpy, w, 0,0);
     // set title
     //XStoreName(dpy, w, "Mythtv-controller status window");
-
     //XDrawString(dpy,w,gc,1,1, "test", 4);
-
     //XFlush(dpy);
-
     //XDrawString(dpy, w,  gc ,	0,	0,	"abc",	3);
     //XDrawString(dpy, w, gc, 10, 10, "TEST", strlen("TEST"));
     //XFlush(dpy);
-
     //sleep(10);
-
      // Sleep long enough to see the window.
-
     InitGL();
     glutInitDisplayMode (GLUT_RGBA | GLUT_DOUBLE); // (GLUT_SINGLE | GLUT_RGB);
     // set screen size
@@ -12159,20 +12499,20 @@ int main(int argc, char** argv) {
     glutCreateWindow ("mythtv-controller");
     init();
     loadgfx();
-    if (full_screen) glutFullScreen();                  // set full screen mode
-    glutDisplayFunc(display);
-    glutIdleFunc(NULL);                            // idle func
+    if (full_screen) glutFullScreen();                // set full screen mode
+    glutDisplayFunc(display);                         // main loop func
+    glutIdleFunc(NULL);                               // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
-    glutTimerFunc(25, update2, 0);                     // set start loop
-    init_ttf_fonts();                                   // init fonts
+    glutTimerFunc(25, update2, 0);                    // set start loop
+    init_ttf_fonts();                                 // init fonts
     // select start func if argc is this
-    if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt=true;
-    if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt=true;
-    if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt=true;
-    if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt=true;
-    if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt=true;
+    if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt = true;
+    if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;
+    if ((argc>1) && (strcmp(argv[1],"-m")==0)) vis_music_oversigt = true;
+    if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
+    if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
     //aktivfont.updatefontlist();
     //aktivfont.selectfont((char *) "Tlwg Mono");
     // select font from configfile (/etc/mythtv-controller.conf)

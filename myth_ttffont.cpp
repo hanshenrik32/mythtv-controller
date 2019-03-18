@@ -32,7 +32,7 @@ int fontctrl::updatefontlist()
     GLint  master;
     GLint face_count;
     int i,j;
-    int count;
+    GLint count;
     // Get the number of entries in the catalog list
     /* Get a unique font ID. */
     glc_font_id = glcGenFontID();
@@ -49,7 +49,9 @@ int fontctrl::updatefontlist()
     // Print the path to the catalogs
     count = glcGeti(GLC_FONT_COUNT);                                       // GLC_FONT_COUNT GLC_CATALOG_COUNT
     if (debugmode) printf("\nTrue type fonts is found in this path\n");
-    for (i = 0; i<count; i++) printf("%s\n",(char *) glcGetListc(GLC_CATALOG_LIST, i));
+    for (i = 0; i<count; i++) {
+      printf("%s\n",(char *) glcGetListc(GLC_CATALOG_LIST, i));
+    }
     // load font list
     i=0;
     while((i < (int) mastercount) && (i<TYPE_MAX)) {

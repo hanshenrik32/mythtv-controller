@@ -205,5 +205,4 @@ void vlc_controller::pause(int pause) {
       is_pause=true;
     }
   }
-  //if (vlc_mp) libvlc_media_player_pause(vlc_mp);
 }

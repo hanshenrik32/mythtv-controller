@@ -1,4 +1,4 @@
 #fakeroot dpkg-deb --build .debian
 #debuild -us -uc -nc
-goto homedir and do
-$dpkg-deb --build mythtv-controller-0.36
+#goto mythtv-controller dir and do
+dpkg-buildpackage -b  -khanshenrik32@gmail.com

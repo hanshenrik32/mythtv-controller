@@ -3,7 +3,7 @@ C = gcc
 # -Wall
 CFLAGS = -Wformat-truncation -pthread -m32 -Wformat-overflow -std=c++11
 
-PROG     = mythtv-controller
+PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
@@ -12,7 +12,7 @@ DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi11008linux.tar.gz
+FMODFILE   = fmodstudioapi11011linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -27,14 +27,14 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so
 
 #	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10605linux/api/lowlevel/lib/x86_64/libfmod.so
 
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -63,7 +63,7 @@ else
 endif
 
 all:
-	@echo "mythtv-controller ver 0.32.1 \nPossible targets:"
+	@echo "mythtv-controller ver 0.37.4 \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
 	@echo "'make compile'             - Compile mythtv-controller"
@@ -77,8 +77,6 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-
-
 
 $(PROG): $(SRCS)
 	$(CC) $(CFLAGS) $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
@@ -112,8 +110,9 @@ installsound:
 	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
-	@ln -s /usr/share/mythtv-controller/fmodstudioapi11008linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
+	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
+	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
@@ -134,7 +133,7 @@ install:
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
-	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10	
+	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \

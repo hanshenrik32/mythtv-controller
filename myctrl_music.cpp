@@ -6,10 +6,7 @@
 #include <string.h>
 #include <mysql.h>
 #include <GL/glc.h>
-
-
-// listdir.c
-#include <sys/types.h>
+#include <sys/types.h>                                    // listdir.c
 #include <dirent.h>
 #include <stdio.h>
 
@@ -23,6 +20,7 @@
 
 #include "myth_saver.h"
 
+extern float configdefaultmusicfontsize;                        // default font
 extern char music_db_update_loader[256];                       //
 extern int music_oversigt_loaded_nr;
 
@@ -47,8 +45,6 @@ extern GLuint _textureIdback1;
 extern GLuint _textureId28_1;
 extern GLuint _textureId29_1;
 extern GLuint _textureIdloading;
-extern GLuint _textureIdloading1;
-
 
 // Screen saver box ********************************************************************************
 extern boxarray mybox;                         // 3D screen saver
@@ -961,6 +957,11 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
     char temptxt[200];
     int bonline=8;                    //# of element pr line
     int ofs;
+    int pline=0;
+    int width = 20;
+    bool stop=false;
+    char *base,*right_margin;
+    int length;
     sofset=(_mangley/40)*8;
     while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && ((int) i<(int) MUSIC_OVERSIGT_TYPE_SIZE)) {
       // do new line (if not first line)
@@ -1026,65 +1027,39 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       strcpy(temptxt,musicoversigt[i+sofset].album_name);      	// album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
-      glScalef(20.0, 20.0, 1.0);
+      //glScalef(20.0, 20.0, 1.0);
+      glScalef(configdefaultmusicfontsize, configdefaultmusicfontsize, 1.0);
       glDisable(GL_TEXTURE_2D);
-      if (strlen(temptxt)<17) {
-        ofs=(strlen(temptxt)/2)*9;
-        glRasterPos2f(0.0f, 10.0f);
-        glcRenderString(temptxt);
-      } else {
-        glRasterPos2f(0.0f, 10.0f);
-        temptxt[18]=0;
-        glcRenderString(temptxt);
-/*
-          while(ytextofset<=10) {
-              j=0;
-              while(!isspace(temptxt[ii])) {
-                  if (temptxt[ii]=='\0') break;
-                  word[j]=temptxt[ii];
-                  ii++;
-                  j++;
-              }
-              word[j]='\0';		// j = word length
-              if (j>13) {		// print char by char
-                  k=0;
-                  while(word[k]!='\0') {
-                      if (pos>=13) {
-                        if ( k != 0 ) glcRenderChar('-');
-                        pos=0;
-                        ytextofset+=10.0f;
-//                            glLoadIdentity();
-//                            glRasterPos2f(0.0f, 0.0f);
-//                            glScalef(1.0, 1.0, 1.0);
-                      }
-                      glTranslatef(xof,yof,0.0f);
-                      glRasterPos2f(0.0f, 0.0f);
-                      glcRenderChar(word[k]);
-                      pos++;
-                      k++;
-                  }
-              } else {
-                  if (pos+j>13) {	// word doesn't fit line
-                      ytextofset+=15.0f;
-                      pos=0;
-//                     glLoadIdentity();
-//                        glRasterPos2f(0.0f, 0.0f);
-//                        glScalef(1.0, 1.0, 1.0);
-                  glTranslatef(xof,yof,0.0f);
-                  glRasterPos2f(0.0f, 0.0f);
-                  }
-                  ofs=(int) (strlen(word)/2)*9;
-                  glcRenderString(word);
-                  pos+=j;
-              }
-              if (pos<12) {
-                  glcRenderChar(' ');
-                  pos++;
-              }
-              if (temptxt[ii]=='\0') break;
-              ii++;	// skip space
+      length=strlen(temptxt);
+      base=temptxt;
+      while(*base) {
+        // if text can be on line
+        if(length <= width) {
+          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+          glcRenderString(base);
+          pline++;
+          break;
+        }
+        right_margin = base+width;
+        while((!isspace(*right_margin)) && (stop==false)) {
+          right_margin--;
+          if (right_margin == base) {
+            right_margin += width;
+            while(!isspace(*right_margin)) {
+              if (*right_margin == '\0') break;
+              else stop=true;
+              right_margin++;
+            }
           }
-*/
+        }
+        if (stop) *(base+width)='\0';
+        *right_margin = '\0';
+        glcRenderString(base);
+        pline++;
+        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
+        length -= right_margin-base+1;                         // +1 for the space
+        base = right_margin+1;
+        if (pline>=2) break;
       }
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
@@ -1096,7 +1071,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
