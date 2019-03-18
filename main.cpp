@@ -59,7 +59,6 @@ bool stream_jump = false;
 #include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
-
 // glut fonts list
 
 // GLUT_BITMAP_8_BY_13 - A variable-width font with every character fitting in a rectangle of 13 pixels high by at most 8 pixels wide.
@@ -717,12 +716,9 @@ GLuint texturedot;                        //
 GLuint texturedot1;                       //
 // loading window
 GLuint _textureIdloading;                 // loading window
-GLuint _textureIdloading1;                // empty window
-
 // setup menu textures
 GLuint setupupdatebutton;
 GLuint setuptexture;
-
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
@@ -1990,8 +1986,6 @@ int init_ttf_fonts() {
 }
 
 
-
-
 // save command to be exectued to script exec
 
 int saveexitcommand(configkeytype command) {
@@ -2055,10 +2049,6 @@ unsigned int do_playlist_restore_playlist() {
     char *database = (char *) "mythconverg";
     bool fundet;
     char playlistname[512];
-//    int songintnr;				// sang nr som skal i playliste
-//    long songantal=0;				// antal sange i array i database
-//    int songnr=1;
-
     fprintf(stderr,"Restore music from playlist backup \n");
     i=0;
     conn=mysql_init(NULL);
@@ -2128,9 +2118,6 @@ unsigned int do_playlist_restore_playlist() {
     mysql_close(conn);
     return(1);		// exit all ok
 }
-
-
-
 
 
 //
@@ -2658,7 +2645,6 @@ void display() {
         glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
         glRotatef(0,0.0f,1.0f,0.0f);
         static float rr=0.0f;
-        //rr+=0.5f;
         uvypos =0;
         winsizx = 16;
         winsizy = 16;
@@ -2685,23 +2671,17 @@ void display() {
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-            glEnd();
             // left
-            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            glEnd();
             // right
-            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
             glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            glEnd();
             // back
-            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
@@ -2754,23 +2734,17 @@ void display() {
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-//            glEnd();
             // left
-//            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-//            glEnd();
             // right
-//            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
             glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
             glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-//            glEnd();
             // back
-//            glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
             glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
             glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
@@ -5333,7 +5307,7 @@ void display() {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -11975,7 +11949,6 @@ void loadgfx() {
     _textureIdmusicsearch1= loadgfxfile(temapath,(char *) "images/",(char *) "music_search1");
     _textureIdmoviesearch = loadgfxfile(temapath,(char *) "images/",(char *) "movie_search");
     _textureIdloading   	= loadgfxfile(temapath,(char *) "images/",(char *) "loading");			// window
-    _textureIdloading1  	= loadgfxfile(temapath,(char *) "images/",(char *) "loading1");			// window
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
@@ -12137,7 +12110,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
     glDeleteTextures( 1, &_textureIdmoviesearch);	   	// artist search
     glDeleteTextures( 1, &_textureIdloading);
-    glDeleteTextures( 1, &_textureIdloading1);
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
     glDeleteTextures( 1, &_textureIdclose);
     glDeleteTextures( 1, &_textureIdclose1);

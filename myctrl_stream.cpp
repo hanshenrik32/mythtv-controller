@@ -2581,11 +2581,11 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       width = 20;
       bool stop=false;
       while(*base) {
+        // if text can be on line
         if(length <= width) {
+          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
           glcRenderString(base);
           pline++;
-          glTranslatef(0.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-          //puts(base);                                       // display string
           break;
         }
         right_margin = base+width;
@@ -2604,13 +2604,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
-        glTranslatef(0.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-        //puts(base);
+        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
         length -= right_margin-base+1;                         // +1 for the space
         base = right_margin+1;
         if (pline>=2) break;
       }
       glPopMatrix();
+      // next button
       i++;
       xof+=(buttonsize+10);
     }

@@ -69,6 +69,10 @@ binary:
 	cp mythtv-controller debian/mythtv-controller/usr/local/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/usr/share/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/usr/share/mythtv-controller/
+	# icons
+	cp mythtv-controller.desktop debian/usr/share/applications/
+	cp mythtv-controller.desktop debian/usr/share/icons/hicolor/48x48/apps/
+	# sound system fmod
 	cp mythtv-controller.png fmodstudioapi11011linux.tar.gz debian/mythtv-controller/usr/share/mythtv-controller/
 	chmod 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux.tar.gz
 	chmod -R 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
@@ -77,4 +81,6 @@ binary:
 	ln -s  /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 debian/mythtv-controller/usr/lib/libfmod.so.10
 	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
 	dh_gencontrol
+	dh_installdeb
 	dh_builddeb
+	

@@ -45,7 +45,7 @@ extern GLuint onlineradiomask;					                      //
 extern GLuint radiooptions,radiooptionsmask;			            //
 extern int fonttype;
 extern fontctrl aktivfont;
-extern GLuint _textureIdloading,_textureIdloading1;
+extern GLuint _textureIdloading;
 extern GLuint gfxlande[45];
 extern GLuint gfxlandemask;
 extern radiostation_class radiooversigt;
@@ -565,9 +565,10 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         width = 22;                                                             // normal 22 18 point font
         while(*base) {
           if(length <= width) {
+            glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
             glcRenderString(base);
             pline++;
-            glTranslatef(xof,(yof-18)-pline*1.2f,0);
+            //glTranslatef(xof,(yof-18)-pline*1.2f,0);
             //glTranslatef(0.0f-(strlen(base)/1.6f),-pline*1.2f,0.0f);
             //puts(base);                                       // display string
             break;
@@ -628,7 +629,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
