@@ -45,8 +45,6 @@ extern GLuint _textureIdback1;
 extern GLuint _textureId28_1;
 extern GLuint _textureId29_1;
 extern GLuint _textureIdloading;
-extern GLuint _textureIdloading1;
-
 
 // Screen saver box ********************************************************************************
 extern boxarray mybox;                         // 3D screen saver
@@ -1095,7 +1093,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading1);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
