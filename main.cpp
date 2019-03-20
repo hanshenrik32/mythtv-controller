@@ -2001,7 +2001,19 @@ int saveexitcommand(configkeytype command) {
   } else return(0);
 }
 
-
+void doexitcommand() {
+  char command[1024];
+  FILE *file;
+  bool ok=false;
+  file=fopen("mythtv-controller.cmd","r");
+  if (file) {
+    fgets(command,1023,file);
+    fclose(file);
+    if (command!=NULL) ok=true;
+    printf("Command to run %s \n",command);
+  }
+  if (ok) system(command);
+}
 
 // find sangs id til playlist opdatering/restore
 // returnere songid fra music_songstablen
@@ -6782,7 +6794,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[0].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[0]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 4: // F4 start mythtv og luk mythtv_controller
@@ -6792,7 +6805,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[1].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[1]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 5: // F5 start mythtv og luk mythtv_controller
@@ -6802,7 +6816,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[2].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[2]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 6: // F6 start mythtv og luk mythtv_controller
@@ -6812,7 +6827,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[3].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[3]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 7: // F7 start mythtv og luk mythtv_controller
@@ -6822,7 +6838,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[4].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[4]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 8: // F8 start mythtv og luk mythtv_controller
@@ -6832,7 +6849,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[5].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[5]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 9: // F9 start mythtv og luk mythtv_controller
@@ -6842,7 +6860,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[6].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[6]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 10: // F10 start mythtv og luk mythtv_controller
@@ -6852,7 +6871,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[7].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[7]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 11: // F11 start mythtv og luk mythtv_controller
@@ -6862,7 +6882,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[8].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[8]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 12: // F12 start mythtv og luk mythtv_controller
@@ -6872,7 +6893,8 @@ void handlespeckeypress(int key,int x,int y) {
                   do_playlist_restore_playlist();
                 } else  if (strcmp(configkeyslayout[9].cmdname,"")!=0) {
                   saveexitcommand(configkeyslayout[9]);
-                  exit(100);
+                  doexitcommand();
+                  //exit(100);
                 }
                 break;
         case 100:  // left key
