@@ -210,34 +210,34 @@ unsigned int musicoversigt_antal=0;                     // antal aktive sange
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
-                                                        // 1  = wifi net
-                                                        // 2  = music
-                                                        // 4  = stream
-                                                        // 8  = keyboard/mouse move
-                                                        // 16 = movie
-                                                        // 32 = searcg
+                                                          // 1  = wifi net
+                                                          // 2  = music
+                                                          // 4  = stream
+                                                          // 8  = keyboard/mouse move
+                                                          // 16 = movie
+                                                          // 32 = searcg
 int debugmode=2+1;                                        // 64 = radio station land icon loader
-                                                        // 128= stream search
-                                                        // 256 = tv program stuf
-                                                        // 512 = media importer
-                                                        // 1024 = flag loader
+                                                          // 128= stream search
+                                                          // 256 = tv program stuf
+                                                          // 512 = media importer
+                                                          // 1024 = flag loader
 
-char music_db_update_loader[256];                       //
+char music_db_update_loader[256];                         //
 bool loading_tv_guide = false;                            // loading_tv_guide true if loading
 int tvchannel_startofset=0;
 bool showfps = true;
-int configmythtvver=0;            			                // mythtv config found version
+int configmythtvver=0;            			                  // mythtv config found version
 bool stopmovie = false;
-int film_key_selected=1;                                // den valgte med keyboard i film oversigt
+int film_key_selected=1;                                  // den valgte med keyboard i film oversigt
 int vis_volume_timeout=0;
-int music_key_selected=1;                               // default music selected
+int music_key_selected=1;                                 // default music selected
 bool ask_open_dir_or_play = false;                        // ask open dir or play it ?
 bool ask_open_dir_or_play_aopen = false;                  // auto open dir
 bool do_swing_music_cover = true;                         // default swing music cover
-int music_selected_iconnr=0;                            // default valgt icon i music oversigt
-float _angle=0.00;                                      // bruges af 3d screen saver
+int music_selected_iconnr=0;                              // default valgt icon i music oversigt
+float _angle=0.00;                                        // bruges af 3d screen saver
 bool full_screen = true;
-int do_play_music_aktiv_table_nr=0;                     // aktiv sang nr
+int do_play_music_aktiv_table_nr=0;                       // aktiv sang nr
 int do_play_music_aktiv_nr_select_array=0;
 bool show_uv = true;                                      // default show uv under menu
 bool vis_uv_meter = false;                                // uv meter er igang med at blive vist
@@ -245,27 +245,27 @@ bool hent_music_search = false;                           // skal vi søge efter
 bool keybufferopenwin = false;                            // er vindue open
 bool do_play_music_cover = false;                         // start play music
 bool do_find_playlist = false;                            // do find play list
-bool do_play_music_aktiv_play = false;
+bool do_play_music_aktiv_play = false;                    //
 
-bool do_play_music_aktiv = false;
-bool do_stop_music_all = false;
-char aktivplay_music_path[1024];
+bool do_play_music_aktiv = false;                         //
+bool do_stop_music_all = false;                           //
+char aktivplay_music_path[1024];                          //
 
 bool hent_radio_search = false;                           // skal vi søge efter music
 bool hent_film_search = false;                            // skal vi søge efter film title
 bool hent_stream_search = false;                          // skal vi søge efter stream
 
-int do_music_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast music
+int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
 
-int sinusofset=0;      					                        // bruges af show_music_oversigt
+int sinusofset=0;      					                          // bruges af show_music_oversigt
 
 int setupsinofset=0;
 
-bool show_volume_info = false;                        	// show vol info
-int show_volume_info_timeout=0;                   		// time out to close vol info again
+bool show_volume_info = false;                        	  // show vol info
+int show_volume_info_timeout=0;                   		    // time out to close vol info again
 
-bool stream_loadergfx_started = false;                	// thread stream gfx loader running ?
-bool stream_loadergfx_started_done = false;            	// thread stream gfx loader running ?
+bool stream_loadergfx_started = false;                	  // thread stream gfx loader running ?
+bool stream_loadergfx_started_done = false;            	  // thread stream gfx loader running ?
 bool stream_loadergfx_started_break = false;
 
 bool vis_music_oversigt = false;                          // vis music player
@@ -274,45 +274,45 @@ bool vis_recorded_oversigt = false;                       // vis recorded oversi
 bool vis_tv_oversigt = false;                             // vis tv oversigt
 bool vis_radio_oversigt = false;                          // vis radio player
 
-bool vis_old_recorded = false;
-bool vis_tvrec_list = false;
+bool vis_old_recorded = false;                            //
+bool vis_tvrec_list = false;                              //
 
-bool saver_irq = false;                                 // er screen saver aktiv
+bool saver_irq = false;                                   // er screen saver aktiv
 
-bool radio_oversigt_loaded = false;
-bool radio_oversigt_loaded_done=0;
+bool radio_oversigt_loaded = false;                       //
+bool radio_oversigt_loaded_done=0;                        //
 
-unsigned int do_show_play_open_select_line=0;           // bruges til at vælge hvilken music filer som skal spilles
-unsigned int do_show_play_open_select_line_ofset=0;     // bruges til at vælge hvilken music filer som skal spilles (start ofset)
+unsigned int do_show_play_open_select_line=0;             // bruges til at vælge hvilken music filer som skal spilles
+unsigned int do_show_play_open_select_line_ofset=0;       // bruges til at vælge hvilken music filer som skal spilles (start ofset)
 
-bool show_radio_options = false;
-int radio_select_iconnr=0;
-float _rangley;
+bool show_radio_options = false;                          //
+int radio_select_iconnr=0;                                //
+float _rangley;                                           //
 
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         //
 bool do_show_setup_screen = false;                        //
-bool do_show_setup_tema = false;
-bool do_show_setup_sql = false;
-bool do_show_setup_network = false;
-bool do_show_setup_font = false;
-bool do_show_setup_keys = false;
-bool do_show_setup_rss = false;
+bool do_show_setup_tema = false;                          //
+bool do_show_setup_sql = false;                           //
+bool do_show_setup_network = false;                       //
+bool do_show_setup_font = false;                          //
+bool do_show_setup_keys = false;                          //
+bool do_show_setup_rss = false;                           //
 bool do_save_setup_rss = false;                           // update db flag to do it (call func)
-bool do_show_videoplayer = false;
-bool do_show_tvgraber = false;
+bool do_show_videoplayer = false;                         //
+bool do_show_tvgraber = false;                            //
 bool do_show_rss = false;                                 // show rss config
 bool use3deffect = false;                                 // use 3d scroll effect default no
-bool do_zoom_music_cover = false;
+bool do_zoom_music_cover = false;                         //
 bool do_zoom_radio = false;                               //
 bool do_zoom_stream = false;                              //
 
-bool show_wlan_select = false;
+bool show_wlan_select = false;                            //
 
-bool do_zoom_film_cover = false;
+bool do_zoom_film_cover = false;                          //
 bool do_zoom_stream_cover = false;                        // show played cover
-bool vis_movie_options = false;
-bool vis_movie_sort_option = false;
+bool vis_movie_options = false;                           //
+bool vis_movie_sort_option = false;                       //
 
 bool vis_stream_oversigt = false;
 bool startstream = false;
@@ -322,12 +322,12 @@ bool stopstream = false;
 
 bool do_pause_stream = false;                             // pause play
 
-int rknapnr=0;                                          // buttons vars
-int sknapnr=0;                                          // stream button
-int mknapnr=0;                                          // music
-int tvknapnr=0;                                         // tv
-int fknapnr=0;                                          // movie
-int swknapnr=0;                                         //
+int rknapnr=0;                                            // buttons vars
+int sknapnr=0;                                            // stream button
+int mknapnr=0;                                            // music
+int tvknapnr=0;                                           // tv
+int fknapnr=0;                                            // movie
+int swknapnr=0;                                           //
 
 // aktiv stream play
 int stream_playnr=0;
@@ -341,23 +341,22 @@ int do_zoom_tvprg_aktiv_nr=0;
 
 int PRGLIST_ANTAL=0;                                      // used in tvguide xml program selector
 
-int music_select_iconnr;
+int music_select_iconnr;                                  //
+int antal_songs=0;                                        //
 
-int antal_songs=0;
+int _sangley;                                             //
+int _mangley;                                             //
+int _angley;                                              //
 
-int _sangley;
-int _mangley;
-int _angley;
-
-int music_icon_anim_icon_ofset=0;
-int music_icon_anim_icon_ofsety=0;
+int music_icon_anim_icon_ofset=0;                         //
+int music_icon_anim_icon_ofsety=0;                        //
 
 
 int do_play_music_aktiv_nr=0;                           // den aktiv dirid som er trykket på
 
 
-int screenx=1920;
-int screeny=1080;
+int screenx=1920;                                         // default screen size
+int screeny=1080;                                         // default screen size
 
 
 // xbmc/kodi db version files
@@ -369,69 +368,44 @@ const float selecttextcolor[3]={0.4f,0.4f,0.4f};
 
 
 float _fangley=0.0f;					// bruges af vis_film_oversigt glob
-
 int do_zoom_film_aktiv_nr=0;
-
 bool vis_radio_or_music_oversigt = false;
 bool vis_stream_or_movie_oversigt = false;
 bool global_use_internal_music_loader_system = false;     // use internal db for musicdb or mysql/kodi/
-
 bool ask_tv_record = false;
 bool do_play_radio = false;
-
 GLint ctx, myFont;
-
 bool do_swing_movie_cover = false;                        // do anim
 bool vis_nyefilm_oversigt = true;                         // start med at vise nye film
-
 // stream
-
 stream_class streamoversigt;
 bool show_stream_options = false;
-
-
 bool startmovie = false;                  		// start play movie
-
 int sleep_ok=0;
 int sleeper=1;
-
 unsigned int percent;
 bool starving;
-
 char aktivsongname[40];                         	// song name
 char aktivartistname[40];                      		// navn på aktiv artist (som spilles)
-
 bool check_radio_thread = true;            			  	// DO NOT check radio station online status
-
 const unsigned int ERROR_TIMEOUT=120;                    // show error timeout
 int vis_error_timeout=ERROR_TIMEOUT;
 bool vis_error = false;
 int vis_error_flag=0;
 int vis_error_songnr;
-
 int do_stream_icon_anim_icon_ofset=0;                   //
 int stream_icon_anim_icon_ofset=0;                      //
-
 unsigned int configrss_ofset=0;
-
 unsigned int realrssrecordnr=0;                         //
-
 int do_radio_icon_anim_icon_ofset=0;                    //
 int radio_icon_anim_icon_ofset=0;                       //
 unsigned int radiomoversigt_antal=0;                            // antal radio stationer
-
 int do_movie_icon_anim_icon_ofset=0;
 int film_select_iconnr=0;
 int movie_icon_anim_icon_ofset=0;
-
-
 // ************************************************************************************************
-
 int visvalgtnrtype=1;
 int visvalgttype=1;
-
-
-
 // ************************************************************************************************
 int do_play_recorded_aktiv_nr=0;                        // flag for start play af recorded
 int valgtrecordnr=0;                                    // valgte recorded program
@@ -440,16 +414,12 @@ int tvvalgtrecordnr=0;                                  // valgte tv recorded pr
 int tvsubvalgtrecordnr=0;                               // valgte tv sub recorded program som skal vises                (SIMPLE)
 int tvvisvalgtnrtype=1;
 int tvvisvalgttype=1;
-
-
-
 char aktivsongstatus[40];
 // fmod stuf
 #if defined USE_FMOD_MIXER
 FMOD_OPENSTATE openstate;
 int fmodbuffersize=16*1024;
 #endif
-
 #if defined USE_SDL_MIXER
 Mix_Music *sdlmusicplayer=0;
 int audio_buffers=1024;
@@ -458,20 +428,14 @@ Uint16 audio_format=MIX_DEFAULT_FORMAT;
 int audio_channels;
 int sdlmusic;
 #endif
-
 // ************************************************************************************************
-
 tv_oversigt     aktiv_tv_oversigt;
 tv_graber_config  aktiv_tv_graber;
 earlyrecorded aktiv_crecordlist;
-
 GLuint tvoversigt;
 GLuint canalnames;
-
 int tvstartxofset=0;
-
 // ************************************************************************************************
-
 extern mplaylist aktiv_playlist;                                                // music play list
 
 struct dirmusic_list_type {
@@ -491,6 +455,7 @@ const int dirliste_size=512;
 
 void loadgfx();
 void freegfx();
+
 
 // class to playlist gfx *****************************************************************************
 
@@ -1360,6 +1325,13 @@ void load_config(char * filename) {
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
+    for(int t=0;t<12;t++) {
+      strcpy(configkeyslayout[t].cmdname,"");
+      configkeyslayout[t].scrnr=0;
+    }
+    // set default keys
+    strcpy(configkeyslayout[0].cmdname,"spotify");
+    //
     // load/parse config file in to globals ver
     if (!(parse_config(filename))) {
       strcpy(configaktivescreensavername,"analog");				  // default analog clock
@@ -1976,17 +1948,19 @@ int init_ttf_fonts() {
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
     // glScale() instead of glRasterPos() and glcScale() (p. 64).
     glcDisable(GLC_GL_OBJECTS);
-//    glcRenderStyle(GLC_LINE);                 // lines
-//    glcRenderStyle(GLC_TEXTURE);
+    //glcRenderStyle(GLC_LINE);                 // lines
+    //glcRenderStyle(GLC_TEXTURE);
     glcRenderStyle(GLC_TRIANGLE);               // filled                       // NORMAL used in mythtv-controller
     //glcRenderStyle(GLC_BITMAP);
     glcStringType(GLC_UTF8_QSO);
-//    glcEnable(GLC_HINTING_QSO);
+    //glcEnable(GLC_HINTING_QSO);
     return(1);
 }
 
 
+//
 // save command to be exectued to script exec
+//
 
 int saveexitcommand(configkeytype command) {
   FILE *file;
@@ -2000,6 +1974,10 @@ int saveexitcommand(configkeytype command) {
     return(1);
   } else return(0);
 }
+
+//
+// do shell command from functions key pressed
+//
 
 void doexitcommand() {
   char command[1024];
@@ -2015,8 +1993,10 @@ void doexitcommand() {
   if (ok) system(command);
 }
 
+//
 // find sangs id til playlist opdatering/restore
 // returnere songid fra music_songstablen
+//
 
 long find_music_song_placering(char *filename,char *songname) {
     char sqlselect[1024];
@@ -2045,7 +2025,9 @@ long find_music_song_placering(char *filename,char *songname) {
 }
 
 
+//
 // restore database til mythtv music playlist datbase
+//
 
 unsigned int do_playlist_restore_playlist() {
 //    long playlistnr;
@@ -2097,7 +2079,7 @@ unsigned int do_playlist_restore_playlist() {
               songplacering=find_music_song_placering(row[1],row[2]);				// get song recnr
               songlength=atol(row[8]);							// get song length
               // if song exist update playlist
-              if (songplacering>0) {
+              if ( songplacering > 0 ) {
                 printf(".");
                 sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
                 mysql_query(conn,"set NAMES 'utf8'");
@@ -2108,7 +2090,7 @@ unsigned int do_playlist_restore_playlist() {
             } // endwhile
           } // endif
           printf("\n");
-          if (!(fundet)) {
+          if (!( fundet )) {
             // else create new playlist
             printf("Create new playlist %s......\n",playlistname);
             songplacering=find_music_song_placering(row[1],row[2]);
@@ -2165,7 +2147,7 @@ unsigned int do_playlist_backup_playlist() {
     strcpy(sqlselect,"create table music_songs_tmp(playlist_id int not null AUTO_INCREMENT,PRIMARY KEY(playlist_id), playlist_name varchar(255), filename text, song_name varchar(255), artist_name varchar(255), album_name varchar(255), genre_name varchar(255), year int, length int,numplays int, rating int, lastplayed datetime,date_entered datetime, date_modified datetime, format varchar(4), size int, descrition varchar(255), comment varchar(255), disc_count int, disc_number int, track_count int, start_time int, stop_stime int,eq_preset varchar(255), relative_volume int, sample_rate int, bitrate int, bpm int,  directory_name varchar(255))");
     mysql_query(conn,sqlselect);
     res2 = mysql_store_result(conn);
-    if (!(res2)) {
+    if (!( res2 )) {
         printf("NO create temp database\n ");
         return(0);
     }
@@ -2173,7 +2155,7 @@ unsigned int do_playlist_backup_playlist() {
     strcpy(sqlselect,"select playlist_id,playlist_name from music_playlist where playlist_songs!=''");
     mysql_query(conn,sqlselect);
     res3 = mysql_store_result(conn);
-    if (res3) {
+    if ( res3 ) {
       while ((row3 = mysql_fetch_row(res3)) != NULL) {
         playlistnr=atol(row3[0]);							// hent playlist nr
         strcpy(playlistname,row3[1]);						// hent playlistname
@@ -2237,7 +2219,7 @@ void show_background() {
   // glBlendFunc(GL_ONE, GL_ONE);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-  if (screen_size!=4) {
+  if ( screen_size != 4 ) {
     if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);					// background picture
     else if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _textureIdback_setup);
     else if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D, _textureIdback_music);
