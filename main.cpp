@@ -108,6 +108,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
+#include "myctrl_spotify.h"
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
