@@ -708,7 +708,7 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test about rss table exist
-      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.internetcontentarticles limit 1");
+      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
@@ -719,7 +719,7 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // create db if not exist
       // and dump some default rss feeed in
       //
-      printf("Creating/Update RSS/PODCAST for new rss feed\n");
+      printf("Creating/Update spotify.\n");
       // thumbnail   = name of an local image file
       // commandline = Program to fetch content with
       // updated     = Time of last update
@@ -728,21 +728,21 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       res = mysql_store_result(conn);
       // create db
-      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sqlselect)!=0) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sqlselect);
       }
       res = mysql_store_result(conn);
       // create db
-      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.internetcontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128),id int NOT NULL AUTO_INCREMENT PRIMARY KEY,INDEX Idx (name (15),thumbnail (15),type, author (15),  description (15),commandline (15),version,updated,search ,tree,podcast,download,host (15))) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128),id int NOT NULL AUTO_INCREMENT PRIMARY KEY,INDEX Idx (name (15),thumbnail (15),type, author (15),  description (15),commandline (15),version,updated,search ,tree,podcast,download,host (15))) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sqlselect)!=0) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sqlselect);
       }
       if (!(dbexist)) {
         // create index
-        sprintf(sqlselect,"CREATE INDEX `internetcontentarticles_feedtitle`  ON `mythtvcontroller`.`internetcontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
+        sprintf(sqlselect,"CREATE INDEX `spotifycontentarticles_feedtitle`  ON `mythtvcontroller`.`spotifycontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql create index error.\n");
         }
@@ -768,15 +768,15 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
 //      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
-      sprintf(sqlselect,"select (internetcontentarticles.feedtitle) as feedtitle,(internetcontentarticles.path) as path,(internetcontentarticles.title) as title,(internetcontentarticles.description) as description,(internetcontentarticles.url) as url,(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,(internetcontent.thumbnail) as thumbnail,(internetcontentarticles.time) as nroftimes,(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
+      sprintf(sqlselect,"select (spotifycontentarticles.feedtitle) as feedtitle,(spotifycontentarticles.path) as path,(spotifycontentarticles.title) as title,(spotifycontentarticles.description) as description,(spotifycontentarticles.url) as url,(spotifycontent.thumbnail),count(spotifycontentarticles.feedtitle) as counter,(spotifycontent.thumbnail) as thumbnail,(spotifycontentarticles.time) as nroftimes,(spotifycontentarticles.paththumb) from spotifycontentarticles left join spotifycontent on spotifycontentarticles.feedtitle=spotifycontent.name where mediaURL is NOT NULL group by (spotifycontent.name) ORDER BY feedtitle,title DESC");
       getart=0;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
-      sprintf(sqlselect,"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NOT NULL and feedtitle like '");
+      sprintf(sqlselect,"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from spotifycontentarticles where mediaURL is NOT NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' GROUP BY title ORDER BY id");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      sprintf(sqlselect,"select ANY_VALUE(feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from spotifycontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
@@ -784,7 +784,7 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
       getart=2;
     }
     this->type=getart;					// husk sql type
-    if (debugmode & 4) printf("RSS stream loader started... \n");
+    if (debugmode & 4) printf("spotify loader started... \n");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -835,7 +835,7 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 }
                 getuserhomedir(homedir);                                                  // get homedir
                 strcpy(downloadfilenamelong,homedir);
-                strcat(downloadfilenamelong,"/rss/images/");
+                strcat(downloadfilenamelong,"/spotify/images/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
@@ -914,7 +914,7 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     // save file in  user homedir rss/
                     getuserhomedir(homedir);                                  // get homedir
                     strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
+                    strcat(downloadfilenamelong,"/spotify/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     if (!(file_exists(downloadfilenamelong))) {
                       if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
@@ -953,8 +953,8 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
         exit(-1);
       }
       return(antal-1);
-    } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) printf("RSS/PODCAST loader done... \n");
+    } else printf("Failed to update Spotify db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+    if (debugmode & 4) printf("Spotify loader done... \n");
     return(0);
 }
 
@@ -964,9 +964,9 @@ int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
 //
 
 void *load_spotify_web(void *data) {
-  if (debugmode & 4) printf("Start web icon loader thread\n");
+  if (debugmode & 4) printf("Start spotify loader thread\n");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("Stop web icon loader thread\n");
+  if (debugmode & 4) printf("Stop spotify loader thread\n");
 }
 
 
@@ -996,7 +996,7 @@ int spotify_class::loadweb_stream_iconoversigt() {
         // add download path
         // add download filename to class opbject
         getuserhomedir(downloadfilenamelong);
-        strcat(downloadfilenamelong,"/rss/images/");
+        strcat(downloadfilenamelong,"/spotify/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
@@ -1012,7 +1012,7 @@ int spotify_class::loadweb_stream_iconoversigt() {
         get_webfilename(downloadfilename,tmpfilename);
         getuserhomedir(downloadfilenamelong);
         // build path
-        strcat(downloadfilenamelong,"/rss/images/");
+        strcat(downloadfilenamelong,"/spotify/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
@@ -1030,8 +1030,8 @@ int spotify_class::loadweb_stream_iconoversigt() {
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
-    if (gfx_loaded) printf("rss stream gfx download end ok. \n");
-    else printf("rss stream gfx download error. \n");
+    if (gfx_loaded) printf("spotify download end ok. \n");
+    else printf("spotify download error. \n");
   }
   return(1);
 }
