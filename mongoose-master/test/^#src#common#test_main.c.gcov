@@ -1,0 +1,85 @@
+        -:    0:Source:../src/common/test_main.c
+        -:    0:Programs:3
+        -:    1:/*
+        -:    2: * Copyright (c) 2014-2018 Cesanta Software Limited
+        -:    3: * All rights reserved
+        -:    4: *
+        -:    5: * Licensed under the Apache License, Version 2.0 (the ""License"");
+        -:    6: * you may not use this file except in compliance with the License.
+        -:    7: * You may obtain a copy of the License at
+        -:    8: *
+        -:    9: *     http://www.apache.org/licenses/LICENSE-2.0
+        -:   10: *
+        -:   11: * Unless required by applicable law or agreed to in writing, software
+        -:   12: * distributed under the License is distributed on an ""AS IS"" BASIS,
+        -:   13: * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   14: * See the License for the specific language governing permissions and
+        -:   15: * limitations under the License.
+        -:   16: */
+        -:   17:
+        -:   18:#include "common/cs_dbg.h"
+        -:   19:#include "common/test_main.h"
+        -:   20:#include "common/test_util.h"
+        -:   21:
+        -:   22:#if defined(_MSC_VER) && _MSC_VER >= 1900
+        -:   23:#include <crtdbg.h>
+        -:   24:
+        -:   25:int __cdecl CrtDbgHook(int nReportType, char *szMsg, int *pnRet) {
+        -:   26:  (void) nReportType;
+        -:   27:  (void) szMsg;
+        -:   28:  (void) pnRet;
+        -:   29:
+        -:   30:  fprintf(stderr, "CRT debug hook: type: %d, msg: %s\n", nReportType, szMsg);
+        -:   31:  /* Return true - Abort,Retry,Ignore dialog will *not* be displayed */
+        -:   32:  return 1;
+        -:   33:}
+        -:   34:#endif
+        -:   35:
+        -:   36:#ifndef __cdecl
+        -:   37:#define __cdecl
+        -:   38:#endif
+        -:   39:
+        -:   40:int g_num_tests = 0;
+        -:   41:int g_num_checks = 0;
+        -:   42:const char *g_argv_0 = NULL;
+        -:   43:
+        1:   44:int __cdecl main(int argc, char *argv[]) {
+        -:   45:  const char *fail_msg;
+        1:   46:  const char *filter = argc > 1 ? argv[1] : "";
+        1:   47:  char *seed_str = getenv("TEST_SEED");
+        -:   48:  double started;
+        1:   49:  int seed = 0;
+        -:   50:
+        1:   51:  if (seed_str != NULL) {
+    #####:   52:    seed = atoi(seed_str);
+        -:   53:  } else {
+        1:   54:    seed = (int) time(NULL);
+        -:   55:  }
+        1:   56:  printf("seed: %d\n", seed);
+        1:   57:  srand(seed);
+        -:   58:
+        1:   59:  setvbuf(stdout, NULL, _IONBF, 0);
+        1:   60:  setvbuf(stderr, NULL, _IONBF, 0);
+        -:   61:#if defined(_MSC_VER) && _MSC_VER >= 1900
+        -:   62:  /* NOTE: not available on wine/vc6 */
+        -:   63:  _CrtSetReportHook2(_CRT_RPTHOOK_INSTALL, CrtDbgHook);
+        -:   64:#endif
+        -:   65:
+        1:   66:  g_argv_0 = argv[0];
+        -:   67:
+        1:   68:  tests_setup();
+        -:   69:
+        1:   70:  started = cs_time();
+        1:   71:  fail_msg = tests_run(filter);
+        1:   72:  printf("%s, ran %d tests (%d checks) in %.3lfs\n", fail_msg ? "FAIL" : "PASS",
+        1:   73:         g_num_tests, g_num_checks, cs_time() - started);
+        -:   74:
+        1:   75:  tests_teardown();
+        -:   76:
+        1:   77:  if (fail_msg != NULL) {
+        -:   78:    /* Prevent leak analyzer from running: there will be "leaks" because of
+        -:   79:     * premature return from the test, and in this case we don't care. */
+    #####:   80:    _exit(EXIT_FAILURE);
+        -:   81:  }
+        1:   82:  return EXIT_SUCCESS;
+        -:   83:}
