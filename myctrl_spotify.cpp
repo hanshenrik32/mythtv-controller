@@ -10,6 +10,15 @@
 #include <libxml/parser.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <curl/curl.h>
+#include <unistd.h>
+//#include <http_parser.h>
+
+// web server stuf
+#include "mongoose-master/mongoose.h"
+
+static const char *s_http_port = "8000";
+static struct mg_serve_http_opts s_http_server_opts;
 
 const int spotify_pathlength=80;
 const int spotify_namelength=80;
@@ -76,6 +85,23 @@ extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
 
+static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+  if (ev == MG_EV_HTTP_REQUEST) {
+    struct http_message *hm = (struct http_message *) ev_data;
+
+    struct mg_serve_http_opts opts;
+    memset(&opts, 0, sizeof(opts));
+    opts.document_root = ".";       // Serve files from the current directory
+    mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
+    /*
+    // We have received an HTTP request. Parsed request is contained in `hm`.
+    // Send HTTP reply to the client which shows full original request.
+    mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
+    mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
+    */
+  }
+}
+
 // constructor
 spotify_class::spotify_class() : antal(0) {
     int i;
@@ -87,11 +113,20 @@ spotify_class::spotify_class() : antal(0) {
     gfx_loaded=false;			      // gfx loaded
     stream_is_playing=false;    // is we playing any media
     stream_is_pause=false;      // is player on pause
+    int port_cnt, n;
+    int err = 0;
+    // create web server
+    mg_mgr_init(&mgr, NULL);
+    printf("Starting web server on port %s\n", s_http_port);
+    this->c = mg_bind(&mgr, s_http_port, ev_handler);
+    mg_set_protocol_http_websocket(this->c);
+
 }
 
 
 // destructor
 spotify_class::~spotify_class() {
+    mg_mgr_free(&mgr);                        // delete web server again
     clean_spotify_oversigt();
 }
 
@@ -269,7 +304,9 @@ int spotify_class::loadrssfile(bool updaterssfile) {
     strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
-    // go to all record have the url in xml files to download
+    //
+    //
+    //
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
@@ -680,7 +717,7 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 // fpath=stream path
 // atr = stream name
 
-int spotify_class::opdatere_stream_oversigt(char *art,char *fpath) {
+int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
     char sqlselect[2048];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
@@ -1038,15 +1075,15 @@ int spotify_class::loadweb_stream_iconoversigt() {
 
 
 //
-// play stream by vlc
+// play stream by
 //
 
 void spotify_class::playstream(char *url) {
-    vlc_controller::playmedia(url);
+    //vlc_controller::playmedia(url);
 }
 
 
-void spotify_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
 
 {
     int j,ii,k,pos;
