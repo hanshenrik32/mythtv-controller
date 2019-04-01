@@ -59,6 +59,8 @@ bool stream_jump = false;
 #include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
+#include "mongoose-master/mongoose.h"
+
 // glut fonts list
 
 // GLUT_BITMAP_8_BY_13 - A variable-width font with every character fitting in a rectangle of 13 pixels high by at most 8 pixels wide.
@@ -115,6 +117,8 @@ extern char __BUILD_NUMBER;
 // #include "myth_picture.h"
 
 extern rss_stream_class rssstreamoversigt;
+
+spotify_class spotify_oversigt;
 
 // struct used by keyboard config of functions keys
 
@@ -2442,6 +2446,16 @@ void display() {
       do_update_rss_show = true;                                                  // show we are updating rss
       firsttime_rssupdate=false;                                                // only used first time
     }
+
+
+
+    std::clock_t start;
+    start = std::clock();
+    mg_mgr_poll(&spotify_oversigt.mgr, 50);
+    std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+
+
+
     glPushMatrix();
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();

@@ -5,6 +5,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "myth_vlcplayer.h"
+// web server
+#include "mongoose-master/mongoose.h"
 
 struct spotify_oversigt_type {
     char feed_showtxt[80+1];			// show name
@@ -27,6 +29,8 @@ class spotify_class : vlc_controller {
         spotify_oversigt_type *stack[maxantal];			                            // radio stack
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
+        char client_id[120];                                                    // spotify client id
+        char client_secret[120];                                                // spotify client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      //
@@ -38,6 +42,8 @@ class spotify_class : vlc_controller {
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
+        struct mg_mgr mgr;
+        struct mg_connection *c;
         bool stream_is_playing;
         bool stream_is_pause;
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
@@ -71,12 +77,12 @@ class spotify_class : vlc_controller {
         ~spotify_class();
         int streamantal() { return(antal); }
         void clean_spotify_oversigt();
-        int opdatere_stream_oversigt(char *art,char *fpath);
+        int opdatere_stotify_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web
 //        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
         float getstream_pos();
-        void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
+        void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 
 void *load_spotify_web(void *data);
