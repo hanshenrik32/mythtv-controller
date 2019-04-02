@@ -86,23 +86,33 @@ extern bool stream_loadergfx_started_break;
 
 
 static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
-  if (ev == MG_EV_HTTP_REQUEST) {
-    struct http_message *hm = (struct http_message *) ev_data;
-
-    struct mg_serve_http_opts opts;
-    memset(&opts, 0, sizeof(opts));
-    opts.document_root = ".";       // Serve files from the current directory
-    mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
-    /*
-    // We have received an HTTP request. Parsed request is contained in `hm`.
-    // Send HTTP reply to the client which shows full original request.
-    mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
-    mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
-    */
+  struct http_message *hm = (struct http_message *) ev_data;
+  struct mg_serve_http_opts opts;
+  switch (ev) {
+    case MG_EV_HTTP_REQUEST:
+      memset(&opts, 0, sizeof(opts));
+      opts.document_root = ".";       // Serve files from the current directory
+      mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
+      /*
+      // We have received an HTTP request. Parsed request is contained in `hm`.
+      // Send HTTP reply to the client which shows full original request.
+      mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
+      mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
+      */
+      break;
+    case MG_EV_HTTP_REPLY:
+      c->flags |= MG_F_CLOSE_IMMEDIATELY;
+      fwrite(hm->body.p, 1, hm->body.len, stdout);
+      putchar('\n');
+      break;
   }
 }
 
+
+//
 // constructor
+//
+
 spotify_class::spotify_class() : antal(0) {
     int i;
     for(i=0;i<maxantal;i++) stack[i]=0;
@@ -116,15 +126,16 @@ spotify_class::spotify_class() : antal(0) {
     int port_cnt, n;
     int err = 0;
     // create web server
-    mg_mgr_init(&mgr, NULL);
+    mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     printf("Starting web server on port %s\n", s_http_port);
-    this->c = mg_bind(&mgr, s_http_port, ev_handler);
-    mg_set_protocol_http_websocket(this->c);
-
+    this->c = mg_bind(&mgr, s_http_port, ev_handler);           // Create listening connection and add it to the event manager
+    mg_set_protocol_http_websocket(this->c);                    // make http protocol
+    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 }
 
-
+//
 // destructor
+//
 spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
     clean_spotify_oversigt();

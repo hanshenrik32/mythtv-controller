@@ -2448,11 +2448,11 @@ void display() {
     }
 
 
-
+    // run the webserver
     std::clock_t start;
     start = std::clock();
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
-    std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
 
 
