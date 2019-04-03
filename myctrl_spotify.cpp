@@ -90,15 +90,18 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   struct mg_serve_http_opts opts;
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
-      memset(&opts, 0, sizeof(opts));
-      opts.document_root = ".";       // Serve files from the current directory
-      mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
-      /*
+      if (mg_vcmp(&hm->uri, "/callback") == 0) {
+        printf("**************************************\n");
+      } else {
+      // show inhold
+        memset(&opts, 0, sizeof(opts));
+        opts.document_root = ".";       // Serve files from the current directory
+        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
+      }
       // We have received an HTTP request. Parsed request is contained in `hm`.
       // Send HTTP reply to the client which shows full original request.
-      mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
-      mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
-      */
+      //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
+      //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
       break;
     case MG_EV_HTTP_REPLY:
       c->flags |= MG_F_CLOSE_IMMEDIATELY;
