@@ -23,6 +23,7 @@ struct spotify_oversigt_type {
     long intnr;
 };
 
+
 class spotify_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
@@ -42,7 +43,9 @@ class spotify_class : vlc_controller {
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
+        char spotify_authorize_token[255];
         struct mg_mgr mgr;
+        struct mg_mgr client_mgr;
         struct mg_connection *c;
         bool stream_is_playing;
         bool stream_is_pause;
@@ -82,6 +85,7 @@ class spotify_class : vlc_controller {
 //        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
         float getstream_pos();
+        int spotify_req_playlist();
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 
