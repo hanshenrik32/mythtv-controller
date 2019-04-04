@@ -106,16 +106,14 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           *(user_token+251)='\0';
 //          printf("\n");
 //          printf("key is %s \n", callback_code);
-          if (strcmp(spotify_oversigt.spotify_authorize_token,"")==0) {
             strcpy(spotify_oversigt.spotify_authorize_token,user_token);
             printf("spotify authorize token : %s \n", spotify_oversigt.spotify_authorize_token);
-          }
         }
         c->flags |= MG_F_SEND_AND_CLOSE;
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = ".";       // Serve files from the current directory
+        opts.document_root = "./web";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.
@@ -131,27 +129,38 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   }
 }
 
+
+
 // client handler
+// get JSON return from spotify
+
+static int s_exit_flag = 0;
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
   struct http_message *hm = (struct http_message *) ev_data;
+  int connect_status;
   switch (ev) {
-    case MG_EV_CONNECT:
-      if (*(int *) ev_data != 0) {
-        fprintf(stderr, "connect() failed: %s\n", strerror(*(int *) ev_data));
-      }
-      break;
-    case MG_EV_HTTP_REPLY:
-      nc->flags |= MG_F_CLOSE_IMMEDIATELY;
-      fwrite(hm->message.p, 1, hm->message.len, stdout);
-      fwrite(hm->body.p, 1, hm->body.len, stdout);
-      putchar('\n');
-      break;
-    case MG_EV_CLOSE:
-      break;
-    default:
-      break;
-  }
+      case MG_EV_CONNECT:
+        connect_status = *(int *) ev_data;
+        if (connect_status != 0) {
+          printf("Error connecting %s\n", strerror(connect_status));
+          s_exit_flag = 1;
+        }
+        break;
+      case MG_EV_HTTP_REPLY:
+        printf("Got reply:\n%.*s\n", (int) hm->body.len, hm->body.p);
+        nc->flags |= MG_F_SEND_AND_CLOSE;
+        s_exit_flag = 1;
+        break;
+      case MG_EV_CLOSE:
+        if (s_exit_flag == 0) {
+          printf("Server closed connection\n");
+          s_exit_flag = 1;
+        };
+        break;
+      default:
+        break;
+    }
 }
 
 
@@ -190,11 +199,19 @@ spotify_class::~spotify_class() {
 }
 
 
-
+//
+// get users play lists
+//
 
 int spotify_class::spotify_req_playlist() {
+  struct mg_connection *nc;
   mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
-  mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
+  nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
+  mg_set_protocol_http_websocket(nc);
+  while (s_exit_flag == 0) {
+    mg_mgr_poll(&mgr, 1000);
+  }
+  //mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
 }
 
 
