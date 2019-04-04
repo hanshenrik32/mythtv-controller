@@ -39,6 +39,8 @@ const int feed_url=2000;
 // text render is glcRenderString for freetype font support
 //
 
+extern spotify_class spotify_oversigt;
+
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -84,16 +86,34 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
+// server handler
 
-static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+  const char *p;
+  char user_token[255];
   struct http_message *hm = (struct http_message *) ev_data;
   struct mg_serve_http_opts opts;
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
-      if (mg_vcmp(&hm->uri, "/callback") == 0) {
-        printf("**************************************\n");
+      // Invoked when the full HTTP request is in the buffer (including body).
+      // from spotify servers
+      if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
+        printf("Got reply: %s \n", hm->uri);
+        p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
+        // get soptify code from server
+        if (p) {
+          strncpy(user_token,p+5,251);
+          *(user_token+251)='\0';
+//          printf("\n");
+//          printf("key is %s \n", callback_code);
+          if (strcmp(spotify_oversigt.spotify_authorize_token,"")==0) {
+            strcpy(spotify_oversigt.spotify_authorize_token,user_token);
+            printf("spotify authorize token : %s \n", spotify_oversigt.spotify_authorize_token);
+          }
+        }
+        c->flags |= MG_F_SEND_AND_CLOSE;
       } else {
-      // show inhold
+        // else show normal indhold
         memset(&opts, 0, sizeof(opts));
         opts.document_root = ".";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
@@ -107,6 +127,29 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       c->flags |= MG_F_CLOSE_IMMEDIATELY;
       fwrite(hm->body.p, 1, hm->body.len, stdout);
       putchar('\n');
+      break;
+  }
+}
+
+// client handler
+
+static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
+  struct http_message *hm = (struct http_message *) ev_data;
+  switch (ev) {
+    case MG_EV_CONNECT:
+      if (*(int *) ev_data != 0) {
+        fprintf(stderr, "connect() failed: %s\n", strerror(*(int *) ev_data));
+      }
+      break;
+    case MG_EV_HTTP_REPLY:
+      nc->flags |= MG_F_CLOSE_IMMEDIATELY;
+      fwrite(hm->message.p, 1, hm->message.len, stdout);
+      fwrite(hm->body.p, 1, hm->body.len, stdout);
+      putchar('\n');
+      break;
+    case MG_EV_CLOSE:
+      break;
+    default:
       break;
   }
 }
@@ -128,10 +171,11 @@ spotify_class::spotify_class() : antal(0) {
     stream_is_pause=false;      // is player on pause
     int port_cnt, n;
     int err = 0;
+    strcpy(spotify_authorize_token,"");
     // create web server
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     printf("Starting web server on port %s\n", s_http_port);
-    this->c = mg_bind(&mgr, s_http_port, ev_handler);           // Create listening connection and add it to the event manager
+    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 }
@@ -141,8 +185,18 @@ spotify_class::spotify_class() : antal(0) {
 //
 spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
+    mg_mgr_free(&client_mgr);
     clean_spotify_oversigt();
 }
+
+
+
+
+int spotify_class::spotify_req_playlist() {
+  mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
+  mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
+}
+
 
 
 // return the name
