@@ -44,6 +44,9 @@ class spotify_class : vlc_controller {
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
         char spotify_authorize_token[255];
+        int spotify_get_access_token();
+        int spotify_get_users_playlist();
+        int spotify_get_playlist(char *playlist);
         struct mg_mgr mgr;
         struct mg_mgr client_mgr;
         struct mg_connection *c;
