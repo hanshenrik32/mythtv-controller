@@ -119,6 +119,8 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
+static bool do_update_spotify_playlist = false;
+
 
 // struct used by keyboard config of functions keys
 
@@ -2258,6 +2260,7 @@ void newLine(float rStart, float rEnd, float angle) {
 
 
 
+
 static bool do_update_xmltv_show = false;
 static bool do_update_rss_show = true;
 static bool do_update_rss = false;
@@ -2454,6 +2457,14 @@ void display() {
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
+
+    if (do_update_spotify_playlist) {
+      //spotify_oversigt.spotify_req_playlist();
+      spotify_oversigt.spotify_get_access_token();                              // get access token
+      //spotify_oversigt.spotify_get_users_playlist();                            // get users playlist
+      spotify_oversigt.spotify_get_playlist("59ZbFPES4DQwEjBpWHzrtC");
+      do_update_spotify_playlist=false;
+    }
 
 
     glPushMatrix();
@@ -8278,6 +8289,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               } else key=0;
               break;
             case '*':
+
+              do_update_spotify_playlist=true;
+
+
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;

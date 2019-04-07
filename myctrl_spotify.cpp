@@ -97,6 +97,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
       // from spotify servers
+      // is callback call
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
         printf("Got reply: %s \n", hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
@@ -107,15 +108,18 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 //          printf("\n");
 //          printf("key is %s \n", callback_code);
             strcpy(spotify_oversigt.spotify_authorize_token,user_token);
-            printf("spotify authorize token : %s \n", spotify_oversigt.spotify_authorize_token);
+            //printf("spotify authorize token : %s \n", spotify_oversigt.spotify_authorize_token);
         }
-        c->flags |= MG_F_SEND_AND_CLOSE;
+        //c->flags |= MG_F_SEND_AND_CLOSE;
+        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = "./web";       // Serve files from the current directory
+        opts.document_root = ".";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
       }
+
+
       // We have received an HTTP request. Parsed request is contained in `hm`.
       // Send HTTP reply to the client which shows full original request.
       //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
@@ -126,6 +130,8 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       fwrite(hm->body.p, 1, hm->body.len, stdout);
       putchar('\n');
       break;
+    case MG_EV_CLOSE:
+      printf("Server closed connection\n");
   }
 }
 
@@ -184,8 +190,8 @@ spotify_class::spotify_class() : antal(0) {
     // create web server
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     printf("Starting web server on port %s\n", s_http_port);
-    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
-    mg_set_protocol_http_websocket(this->c);                    // make http protocol
+//    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
+//    mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 }
 
@@ -201,9 +207,10 @@ spotify_class::~spotify_class() {
 
 //
 // get users play lists
-//
+// write to spotify_users_playlist.txt
 
-int spotify_class::spotify_req_playlist() {
+int spotify_class::spotify_get_users_playlist() {
+/*
   struct mg_connection *nc;
   mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
   nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
@@ -211,9 +218,54 @@ int spotify_class::spotify_req_playlist() {
   while (s_exit_flag == 0) {
     mg_mgr_poll(&mgr, 1000);
   }
-  //mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "", NULL, NULL);
+*/
+  char doget[4096];
+  if (strcmp(spotify_authorize_token,"")!=0) {
+    sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/me/playlists' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",spotify_authorize_token);
+    system(doget);
+  }
 }
 
+
+
+// get user play list
+// write to spotify_playlist.txt
+
+int spotify_class::spotify_get_playlist(char *playlist) {
+  char doget[4096];
+  if (strcmp(spotify_authorize_token,"")!=0) {
+    sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_playlist.txt",playlist,spotify_authorize_token);
+    system(doget);
+  }
+}
+
+
+// get user access token
+// write to spotify_access_token
+//
+
+int spotify_class::spotify_get_access_token() {
+/*  struct mg_connection *nc;
+  mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
+  nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "https://accounts.spotify.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
+  mg_set_protocol_http_websocket(nc);
+  while (s_exit_flag == 0) {
+    mg_mgr_poll(&mgr, 1000);
+  }
+*/
+  FILE *myfile;
+  char filedata[4096];
+  system("curl -X 'POST' -H 'Authorization: Basic MDViNDBjNzAwNzhhNDI5ZmE0MGFiMGY5Y2NiNDg1ZGU6ZTUwYzQxMWQyZDJmNGZhZjg1ZGRmZjE2ZjU4N2ZlYTE=' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt");
+  myfile=fopen("spotify_access_token.txt","r");
+  if (myfile) {
+    fgets(filedata,4095,myfile);
+    strcpy(spotify_authorize_token,filedata+17);      // get token
+    *(spotify_authorize_token+83)='\0';
+    printf("Found token : %s\n",spotify_authorize_token);
+    fclose(myfile);
+    remove("spotify_access_token.txt");                         // remove file again
+  }
+}
 
 
 // return the name
