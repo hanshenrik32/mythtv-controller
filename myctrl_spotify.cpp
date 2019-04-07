@@ -255,7 +255,7 @@ int spotify_class::spotify_get_access_token() {
 */
   FILE *myfile;
   char filedata[4096];
-  system("curl -X 'POST' -H 'Authorization: Basic MDViNDBjNzAwNzhhNDI5ZmE0MGFiMGY5Y2NiNDg1ZGU6ZTUwYzQxMWQyZDJmNGZhZjg1ZGRmZjE2ZjU4N2ZlYTE=' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt");
+  system("curl -X 'POST' -H 'Authorization: Basic ' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt");
   myfile=fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(filedata,4095,myfile);
