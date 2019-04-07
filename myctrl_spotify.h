@@ -44,6 +44,8 @@ class spotify_class : vlc_controller {
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
     public:
         char spotify_authorize_token[255];
+        char spotify_client_id[255];
+        char spotify_secret_id[255];
         int spotify_get_access_token();
         int spotify_get_users_playlist();
         int spotify_get_playlist(char *playlist);
@@ -93,5 +95,7 @@ class spotify_class : vlc_controller {
 };
 
 void *load_spotify_web(void *data);
+
+char *b64_encode(const unsigned char *in, size_t len);
 
 #endif
