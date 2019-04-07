@@ -12,6 +12,7 @@
 #include <time.h>
 #include <curl/curl.h>
 #include <unistd.h>
+#include <stdlib.h>
 //#include <http_parser.h>
 
 // web server stuf
@@ -193,6 +194,9 @@ spotify_class::spotify_class() : antal(0) {
 //    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
 //    mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
+
+    strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
+    strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
 }
 
 //
@@ -254,14 +258,25 @@ int spotify_class::spotify_get_access_token() {
   }
 */
   FILE *myfile;
-  char filedata[4096];
-  system("curl -X 'POST' -H 'Authorization: Basic ' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt");
+
+  char data[4096];
+  char call[4096];
+  char *base64_code;
+  strcpy(data,spotify_client_id);
+  strcat(data,":");
+  strcat(data,spotify_secret_id);
+  //calc base64
+  base64_code=b64_encode((const unsigned char *) data, 65);
+  *(base64_code+88)='\0';
+  sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
+  system(call);
   myfile=fopen("spotify_access_token.txt","r");
   if (myfile) {
-    fgets(filedata,4095,myfile);
-    strcpy(spotify_authorize_token,filedata+17);      // get token
+    fgets(data,4095,myfile);
+    strcpy(spotify_authorize_token,data+17);      // get token
     *(spotify_authorize_token+83)='\0';
     printf("Found token : %s\n",spotify_authorize_token);
+    //printf("base64_code : %s\n",base64_code);
     fclose(myfile);
     remove("spotify_access_token.txt");                         // remove file again
   }
@@ -1490,4 +1505,50 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+}
+
+
+
+const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+size_t b64_encoded_size(size_t inlen) {
+	size_t ret;
+	ret = inlen;
+	if (inlen % 3 != 0)
+		ret += 3 - (inlen % 3);
+	ret /= 3;
+	ret *= 4;
+	return ret;
+}
+
+
+char *b64_encode(const unsigned char *in, size_t len) {
+	char   *out;
+	size_t  elen;
+	size_t  i;
+	size_t  j;
+	size_t  v;
+	if (in == NULL || len == 0)
+		return NULL;
+	elen = b64_encoded_size(len);
+	out  = (char *) malloc(elen+1);
+	out[elen] = '\0';
+	for (i=0, j=0; i<len; i+=3, j+=4) {
+		v = in[i];
+		v = i+1 < len ? v << 8 | in[i+1] : v << 8;
+		v = i+2 < len ? v << 8 | in[i+2] : v << 8;
+		out[j]   = b64chars[(v >> 18) & 0x3F];
+		out[j+1] = b64chars[(v >> 12) & 0x3F];
+		if (i+1 < len) {
+			out[j+2] = b64chars[(v >> 6) & 0x3F];
+		} else {
+			out[j+2] = '=';
+		}
+		if (i+2 < len) {
+			out[j+3] = b64chars[v & 0x3F];
+		} else {
+			out[j+3] = '=';
+		}
+	}
+	return out;
 }
