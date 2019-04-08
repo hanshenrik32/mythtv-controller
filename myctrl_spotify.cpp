@@ -258,10 +258,12 @@ static void process_object(json_value* value, int depth) {
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
+    if (strcmp(value->u.object.values[x].name,"name")==0)
     printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
     process_value(value->u.object.values[x].value, depth+1);
   }
 }
+
 
 static void process_array(json_value* value, int depth)
 {
@@ -276,38 +278,35 @@ static void process_array(json_value* value, int depth)
   }
 }
 
-static void process_value(json_value* value, int depth)
-{
-int j;
-if (value == NULL) {
-  return;
-}
-if (value->type != json_object) {
-  print_depth_shift(depth);
-}
-switch (value->type) {
-  case json_none:
-    printf("none\n");
-    break;
-  case json_object:
-    process_object(value, depth+1);
-    break;
-  case json_array:
-    process_array(value, depth+1);
-    break;
-  case json_integer:
-    printf("int: %10" PRId64 "\n", value->u.integer);
-    break;
-  case json_double:
-    printf("double: %f\n", value->u.dbl);
-    break;
-  case json_string:
-    printf("string: %s\n", value->u.string.ptr);
-    break;
-  case json_boolean:
-    printf("bool: %d\n", value->u.boolean);
-    break;
-  }
+static void process_value(json_value* value, int depth) {
+    int j;
+    if (value == NULL) return;
+    if (value->type != json_object) {
+      print_depth_shift(depth);
+    }
+    switch (value->type) {
+      case json_none:
+        printf("none\n");
+        break;
+      case json_object:
+        process_object(value, depth+1);
+        break;
+      case json_array:
+        process_array(value, depth+1);
+        break;
+      case json_integer:
+        printf("int: %10" PRId64 "\n", value->u.integer);
+        break;
+      case json_double:
+        printf("double: %f\n", value->u.dbl);
+        break;
+      case json_string:
+        printf("string: %s\n", value->u.string.ptr);
+        break;
+      case json_boolean:
+        printf("bool: %d\n", value->u.boolean);
+        break;
+    }
 }
 
 
@@ -342,9 +341,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   value = json_parse(json,file_size);
    //spotify_playlist.txt
 
-
   process_value(value, 0);
-
 
   json_value_free(value);
   free(file_contents);
@@ -1025,21 +1022,21 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
       }
       res = mysql_store_result(conn);
       // create db
-      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles(feedtitle varchar(255),path text,paththumb text,title varchar(255),season smallint(5) DEFAULT 0,episode smallint(5) DEFAULT 0,description text,url text,type smallint(3),thumbnail text,mediaURL text,author varchar(255),date datetime,time int(11),rating varchar(255),filesize bigint(20),player varchar(255),playerargs text,download varchar(255),downloadargs text,width smallint(6),height smallint(6),language varchar(128),podcast tinyint(1),downloadable tinyint(1),customhtml tinyint(1),countries varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles(name varchar(255),paththumb text,player varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sqlselect)!=0) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sqlselect);
       }
       res = mysql_store_result(conn);
       // create db
-      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent(name varchar(255),thumbnail varchar(255),type smallint(3),author varchar(128),description text,commandline text,version double,updated datetime,search tinyint(1),tree tinyint(1),podcast tinyint(1),download tinyint(1),host varchar(128),id int NOT NULL AUTO_INCREMENT PRIMARY KEY,INDEX Idx (name (15),thumbnail (15),type, author (15),  description (15),commandline (15),version,updated,search ,tree,podcast,download,host (15))) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      sprintf(sqlselect,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent(name varchar(255),thumbnail varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY,INDEX Idx (name (15),thumbnail (15),type, author (15),  description (15),commandline (15),version,updated,search ,tree,podcast,download,host (15))) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sqlselect)!=0) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sqlselect);
       }
       if (!(dbexist)) {
         // create index
-        sprintf(sqlselect,"CREATE INDEX `spotifycontentarticles_feedtitle`  ON `mythtvcontroller`.`spotifycontentarticles` (feedtitle) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
+        sprintf(sqlselect,"CREATE INDEX `spotifycontentarticles_title`  ON `mythtvcontroller`.`spotifycontentarticles` (name) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql create index error.\n");
         }
@@ -1063,9 +1060,7 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
     }
     // find records after type to find
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
-      // select internetcontentarticles.feedtitle,
-//      sprintf(sqlselect,"select ANY_VALUE(internetcontentarticles.feedtitle) as feedtitle,ANY_VALUE(internetcontentarticles.path) as path,ANY_VALUE(internetcontentarticles.title) as title,ANY_VALUE(internetcontentarticles.description) as description,ANY_VALUE(internetcontentarticles.url) as url,ANY_VALUE(internetcontent.thumbnail),count(internetcontentarticles.feedtitle) as counter,ANY_VALUE(internetcontent.thumbnail) as thumbnail,ANY_VALUE(internetcontentarticles.time) as nroftimes,ANY_VALUE(internetcontentarticles.paththumb) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name where mediaURL is NOT NULL group by (internetcontent.name) ORDER BY feedtitle,title DESC");
-      sprintf(sqlselect,"select (spotifycontentarticles.feedtitle) as feedtitle,(spotifycontentarticles.path) as path,(spotifycontentarticles.title) as title,(spotifycontentarticles.description) as description,(spotifycontentarticles.url) as url,(spotifycontent.thumbnail),count(spotifycontentarticles.feedtitle) as counter,(spotifycontent.thumbnail) as thumbnail,(spotifycontentarticles.time) as nroftimes,(spotifycontentarticles.paththumb) from spotifycontentarticles left join spotifycontent on spotifycontentarticles.feedtitle=spotifycontent.name where mediaURL is NOT NULL group by (spotifycontent.name) ORDER BY feedtitle,title DESC");
+      sprintf(sqlselect,"select (spotifycontentarticles.name) as name from spotifycontentarticles");
       getart=0;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")==0)) {
       sprintf(sqlselect,"select (feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),count(path),(paththumb),(mediaURL),(time) as nroftimes,(id) as id from spotifycontentarticles where mediaURL is NOT NULL and feedtitle like '");
