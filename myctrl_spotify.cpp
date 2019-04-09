@@ -285,7 +285,7 @@ void spotify_class::process_object(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
       process_name=true;
     }
-    if (strcmp(value->u.object.values[x].name , "item" )==0) {
+    if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
     }
     process_value(value->u.object.values[x].value, depth+1);
@@ -355,8 +355,10 @@ void spotify_class::process_value(json_value* value, int depth) {
           process_description=false;
         }
         if (process_items) {
+          antal++;
+          printf("Antal %d \n ",antal);
           // set start of items in list
-          strcpy(stack[antal]->feed_name,value->u.string.ptr);                           // desc
+          strcpy(stack[antal]->feed_name,value->u.string.ptr);                           // name
           process_items=false;
         }
         if (process_tracks) {
@@ -365,7 +367,7 @@ void spotify_class::process_value(json_value* value, int depth) {
           process_tracks=false;
         }
         if (process_image) {
-          strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);                           // desc
+          strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);                           //
           process_image=false;
         }
         break;
