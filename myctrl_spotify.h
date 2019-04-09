@@ -5,6 +5,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "myth_vlcplayer.h"
+#include "json-parser/json.h"
+
 // web server
 #include "mongoose-master/mongoose.h"
 
@@ -12,10 +14,9 @@ struct spotify_oversigt_type {
     char feed_showtxt[80+1];			// show name
     char feed_name[80+1];				// mythtv db feedtitle
     char feed_desc[80+1];				// desc
-    char feed_path[80+1];				// mythtv db path
     char feed_gfx_url[4000+1];
     char feed_gfx_mythtv[2000+1];				  // icon gfx path in mythtv system
-    char feed_streamurl[2000+1];
+    char playlistid[100+1];
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
     bool nyt;
@@ -23,9 +24,8 @@ struct spotify_oversigt_type {
     long intnr;
 };
 
-
 class spotify_class : vlc_controller {
-    private:
+    public:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // radio stack
         int antal;					                       	                            // Antal streams
@@ -42,7 +42,7 @@ class spotify_class : vlc_controller {
         int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
         int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
-    public:
+
         char spotify_authorize_token[255];
         char spotify_client_id[255];
         char spotify_secret_id[255];
@@ -63,7 +63,7 @@ class spotify_class : vlc_controller {
         char *get_stream_desc(int nr);                                          // get desc
         //char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
         //char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); }
-        char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
+        //char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
         //char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
         //unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_group_antal); }
         //unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_path_antal); }
@@ -91,6 +91,13 @@ class spotify_class : vlc_controller {
         void playstream(char *url);
         float getstream_pos();
         int spotify_req_playlist();
+
+        void print_depth_shift(int);
+        void process_value(json_value*, int);
+        void process_object(json_value*, int);
+        void process_array(json_value*, int);
+
+
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
 };
 
