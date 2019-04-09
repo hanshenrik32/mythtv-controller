@@ -144,6 +144,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 // get JSON return from spotify
 
 static int s_exit_flag = 0;
+bool debug_json=false;
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
   struct http_message *hm = (struct http_message *) ev_data;
@@ -187,6 +188,7 @@ spotify_class::spotify_class() : antal(0) {
     gfx_loaded=false;			      // gfx loaded
     stream_is_playing=false;    // is we playing any media
     stream_is_pause=false;      // is player on pause
+    antalplaylists=0;           // antal playlists
     int port_cnt, n;
     int err = 0;
     strcpy(spotify_authorize_token,"");
@@ -240,7 +242,7 @@ void spotify_class::print_depth_shift(int depth)
 {
   int j;
   for (j=0; j < depth; j++) {
-    printf(" ");
+    if (debug_json) printf(" ");
   }
 }
 
@@ -256,7 +258,6 @@ bool process_name=false;
 bool process_items=false;
 
 
-
 void spotify_class::process_object(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
@@ -266,7 +267,7 @@ void spotify_class::process_object(json_value* value, int depth) {
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
     //if (strcmp(value->u.object.values[x].name,"name")==0)
-    printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
+    if (debug_json) printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       process_tracks=true;
     }
@@ -299,7 +300,7 @@ void spotify_class::process_array(json_value* value, int depth) {
     return;
   }
   length = value->u.array.length;
-  printf("array\n");
+  if (debug_json) printf("array\n");
   for (x = 0; x < length; x++) {
     process_value(value->u.array.values[x], depth);
   }
@@ -318,7 +319,7 @@ void spotify_class::process_value(json_value* value, int depth) {
     }
     switch (value->type) {
       case json_none:
-        printf("none\n");
+        if (debug_json) printf("none\n");
         break;
       case json_object:
         process_object(value, depth+1);
@@ -327,13 +328,13 @@ void spotify_class::process_value(json_value* value, int depth) {
         process_array(value, depth+1);
         break;
       case json_integer:
-        printf("int: %10" PRId64 "\n", value->u.integer);
+        if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
-        printf("double: %f\n", value->u.dbl);
+        if (debug_json) printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        printf("string: %s\n", value->u.string.ptr);
+        if (debug_json) printf("string: %s\n", value->u.string.ptr);
         if (process_description) {
           if (antal<maxantal) {
             stack[antal]=new (struct spotify_oversigt_type);
@@ -355,7 +356,7 @@ void spotify_class::process_value(json_value* value, int depth) {
           process_description=false;
         }
         if (process_items) {
-          antal++;
+          antalplaylists++;
           printf("Antal %d \n ",antal);
           // set start of items in list
           strcpy(stack[antal]->feed_name,value->u.string.ptr);                           // name
@@ -372,7 +373,7 @@ void spotify_class::process_value(json_value* value, int depth) {
         }
         break;
       case json_boolean:
-        printf("bool: %d\n", value->u.boolean);
+        if (debug_json) printf("bool: %d\n", value->u.boolean);
         break;
     }
 }
@@ -1023,7 +1024,7 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        antalrss_feeds=atoi(row[0]);
+        //antalrss_feeds=atoi(row[0]);
       }
     }
   }
