@@ -233,14 +233,10 @@ int spotify_class::spotify_get_users_playlist() {
 
 }
 
-
-
-
+// json parser used to parse the return files from spotify api
 /* ***************************************************************************************** */
-
-
-
-static void print_depth_shift(int depth)
+//
+void spotify_class::print_depth_shift(int depth)
 {
   int j;
   for (j=0; j < depth; j++) {
@@ -248,9 +244,20 @@ static void print_depth_shift(int depth)
   }
 }
 
-static void process_value(json_value* value, int depth);
+//static void spotify_class::process_value(json_value* value, int depth);
 
-static void process_object(json_value* value, int depth) {
+bool process_tracks=false;
+bool process_playlist=false;
+bool process_songs=false;
+bool process_href=false;
+bool process_description=false;
+bool process_image=false;
+bool process_name=false;
+bool process_items=false;
+
+
+
+void spotify_class::process_object(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
@@ -258,15 +265,35 @@ static void process_object(json_value* value, int depth) {
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
-    if (strcmp(value->u.object.values[x].name,"name")==0)
+    //if (strcmp(value->u.object.values[x].name,"name")==0)
     printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
+    if (strcmp(value->u.object.values[x].name,"tracks")==0) {
+      process_tracks=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "href" )==0) {
+      process_tracks=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "process_playlist" )==0) {
+      process_playlist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "description" )==0) {
+      process_description=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "images" )==0) {
+      process_image=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "name" )==0) {
+      process_name=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "item" )==0) {
+      process_items=true;
+    }
     process_value(value->u.object.values[x].value, depth+1);
   }
 }
 
 
-static void process_array(json_value* value, int depth)
-{
+void spotify_class::process_array(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
@@ -278,7 +305,12 @@ static void process_array(json_value* value, int depth)
   }
 }
 
-static void process_value(json_value* value, int depth) {
+
+//
+// json parser start call function
+//
+
+void spotify_class::process_value(json_value* value, int depth) {
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -302,6 +334,40 @@ static void process_value(json_value* value, int depth) {
         break;
       case json_string:
         printf("string: %s\n", value->u.string.ptr);
+        if (process_description) {
+          if (antal<maxantal) {
+            stack[antal]=new (struct spotify_oversigt_type);
+            if (stack[antal]) {
+              strcpy(stack[antal]->feed_desc,value->u.string.ptr);                           // desc
+              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+              strcpy(stack[antal]->feed_showtxt,"");          	            // show name
+              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
+              strcpy(stack[antal]->feed_desc,"");                           // desc
+              strcpy(stack[antal]->feed_gfx_url,"");
+              strcpy(stack[antal]->feed_gfx_mythtv,"");
+              stack[antal]->feed_group_antal=0;
+              stack[antal]->feed_path_antal=0;
+              stack[antal]->textureId=0;
+              stack[antal]->intnr=0;
+              stack[antal]->nyt=false;
+            }
+          }
+          process_description=false;
+        }
+        if (process_items) {
+          // set start of items in list
+          strcpy(stack[antal]->feed_name,value->u.string.ptr);                           // desc
+          process_items=false;
+        }
+        if (process_tracks) {
+          // playlist id from spotify
+          strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
+          process_tracks=false;
+        }
+        if (process_image) {
+          strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);                           // desc
+          process_image=false;
+        }
         break;
       case json_boolean:
         printf("bool: %d\n", value->u.boolean);
@@ -327,11 +393,11 @@ int spotify_class::spotify_get_playlist(char *playlist) {
     system(doget);
   }
   stat("spotify_playlist.txt", &filestatus);
-  file_size=filestatus.st_size;                        // get filesize
+  file_size=filestatus.st_size;                                                // get filesize
   file_contents = (char*)malloc(filestatus.st_size);
   json_file = fopen("spotify_playlist.txt", "rt");
   if ( fread(file_contents, file_size, 1, json_file ) != 1 ) {
-    fprintf(stderr, "Unable t read content of %s\n", "spotify_playlist.txt");
+    fprintf(stderr, "Unable to read spotify playlist content of %s\n", "spotify_playlist.txt");
     fclose(json_file);
     free(file_contents);
     return 1;
@@ -341,11 +407,12 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   value = json_parse(json,file_size);
    //spotify_playlist.txt
 
+  // parse from root
   process_value(value, 0);
 
   json_value_free(value);
   free(file_contents);
-  exit(0);
+  return 0;
 }
 
 
@@ -363,7 +430,6 @@ int spotify_class::spotify_get_access_token() {
   }
 */
   FILE *myfile;
-
   char data[4096];
   char call[4096];
   char *base64_code;
@@ -377,13 +443,13 @@ int spotify_class::spotify_get_access_token() {
   system(call);
   myfile=fopen("spotify_access_token.txt","r");
   if (myfile) {
-    fgets(data,4095,myfile);
-    strcpy(spotify_authorize_token,data+17);      // get token
+    fgets(data,4095,myfile);                      // read file
+    strcpy(spotify_authorize_token,data+17);      // and get token
     *(spotify_authorize_token+83)='\0';
     printf("Found token : %s\n",spotify_authorize_token);
     //printf("base64_code : %s\n",base64_code);
     fclose(myfile);
-    remove("spotify_access_token.txt");                         // remove file again
+    remove("spotify_access_token.txt");           // remove file again
   }
 }
 
@@ -473,7 +539,7 @@ int spotify_class::pausestream(int pause) {
 int spotify_class::playstream(int nr) {
     char path[PATH_MAX];                                  // max path length from os
     strcpy(path,"");
-    strcat(path,get_stream_url(nr));
+//    strcat(path,get_stream_url(nr));
     stream_is_playing=true;
     vlc_controller::playmedia(path);
     return(1);
@@ -1097,10 +1163,9 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
               strcpy(stack[antal]->feed_showtxt,"");          	            // show name
               strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
               strcpy(stack[antal]->feed_desc,"");                           // desc
-              strcpy(stack[antal]->feed_path,"");                           // mythtv db path
+              //strcpy(stack[antal]->feed_path,"");                           // mythtv db path
               strcpy(stack[antal]->feed_gfx_url,"");
               strcpy(stack[antal]->feed_gfx_mythtv,"");
-              strcpy(stack[antal]->feed_streamurl,"");
               stack[antal]->feed_group_antal=0;
               stack[antal]->feed_path_antal=0;
               stack[antal]->textureId=0;
@@ -1110,7 +1175,7 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
               if (getart==0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
+                //if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
                 if (row[0]) stack[antal]->feed_group_antal=0;        // get antal
                 else stack[antal]->feed_group_antal=0;
                 if (row[3]) strncpy(stack[antal]->feed_desc,row[3],spotify_desclength);
@@ -1144,7 +1209,7 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
                   stack[antal]->textureId=_textureIdback;			                    // back icon
                   strcpy(stack[antal]->feed_showtxt,"BACK");
                   if (row[0]) strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                  if (row[1]) strncpy(stack[antal]->feed_path,row[1],spotify_pathlength);
+                  //if (row[1]) strncpy(stack[antal]->feed_path,row[1],spotify_pathlength);
                   //strcpy(stack[antal]->feed_streamurl,row[4]);
                   if (row[3]) strncpy(stack[antal]->feed_desc,row[3],spotify_desclength);
                   if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);            // feed (db link) url
@@ -1163,11 +1228,11 @@ int spotify_class::opdatere_stotify_oversigt(char *art,char *fpath) {
                 } else {
                   if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],spotify_pathlength);
                 }
-                if (row[1]) strncpy(stack[antal]->feed_path,row[1],spotify_pathlength);		// path
+                //if (row[1]) strncpy(stack[antal]->feed_path,row[1],spotify_pathlength);		// path
                 if (row[2]) strncpy(stack[antal]->feed_name,row[0],spotify_namelength);		// feedtitle
                 // old ver
                 //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                //if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
                 switch(getart) {
                   case 0: if (row[9]) strcpy(tmpfilename,row[9]);
                           break;
