@@ -29,7 +29,7 @@ class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // radio stack
         int antal;					                       	                            // Antal streams
-        int antalrss_feeds;                                                     // antal feeds
+        int antalplaylists;                                                     // antal feeds
         char client_id[120];                                                    // spotify client id
         char client_secret[120];                                                // spotify client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
@@ -71,7 +71,7 @@ class spotify_class : vlc_controller {
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
         //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         //int antalstreams() { return antal; };
-        int antal_rss_streams() { return antalrss_feeds; };
+        int antal_rss_streams() { return antalplaylists; };
         //int streams_loaded() { return stream_oversigt_loaded_nr; };
         //int streams_rss_loaded() { return stream_rssparse_nowloading; };
         void stopstream();
