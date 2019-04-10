@@ -280,6 +280,7 @@ bool vis_film_oversigt = false;				                    // vis film oversigt
 bool vis_recorded_oversigt = false;                       // vis recorded oversigt
 bool vis_tv_oversigt = false;                             // vis tv oversigt
 bool vis_radio_oversigt = false;                          // vis radio player
+bool vis_spotify_oversigt = false;                          // vis radio player
 
 bool vis_old_recorded = false;                            //
 bool vis_tvrec_list = false;                              //
@@ -675,6 +676,7 @@ GLuint onlineradio320;                    //
 GLuint radiooptions;                      //
 GLuint radiooptionsmask;                  //
 GLuint radiobutton;                       //
+GLuint spotifybutton;                     //
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
 GLuint onlinestream;                      // stream default icon
@@ -2462,7 +2464,10 @@ void display() {
       //spotify_oversigt.spotify_req_playlist();
       spotify_oversigt.spotify_get_access_token();                              // get access token
       //spotify_oversigt.spotify_get_users_playlist();                            // get users playlist
-      spotify_oversigt.spotify_get_playlist("59ZbFPES4DQwEjBpWHzrtC");
+      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      // abc 4azabxHM2cqBEhjUD3fVJB
+      // public 59ZbFPES4DQwEjBpWHzrtC
+      spotify_oversigt.spotify_play_now(1);
       do_update_spotify_playlist=false;
     }
 
@@ -2952,7 +2957,7 @@ void display() {
     }
     // radio stuf
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
-      // img
+      // img radio button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, radiobutton);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2961,13 +2966,13 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/2)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/2)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+500, (orgwinsizey/2)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, (orgwinsizey/2)+0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, (orgwinsizey-400)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+500, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, (orgwinsizey-400)+0, 0.0);
       glEnd();
       glPopMatrix();
-      // img
+      // img music button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, musicbutton);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2976,12 +2981,28 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/4)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, (orgwinsizey/4)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+500, (orgwinsizey/4)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, (orgwinsizey/4)+0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, ((orgwinsizey/2)-125)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/2)-125)+0, 0.0);
       glEnd();
       glPopMatrix();
+      // img spotify button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, spotifybutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(82);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3)+0, ((orgwinsizey/3)-200)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3)+0, ((orgwinsizey/3)-200)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+0, 0.0);
+      glEnd();
+      glPopMatrix();
+
     }
     // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
@@ -3130,7 +3151,11 @@ void display() {
         if ((show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
         }
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+      } else if (vis_spotify_oversigt) {
+        std::clock_t start;
+        start = std::clock();
+        spotify_oversigt.show_spotify_oversigt(_textureId7,0,_textureIdback,_textureId28,_rangley);
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -6096,18 +6121,48 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((GLubyte) names[i*4+3]==80) {
           fundet = true;
           vis_radio_oversigt = true;
+          vis_music_oversigt = false;
+          vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt=false;
         }
         // Music
         if ((GLubyte) names[i*4+3]==81) {
           fundet = true;
           vis_music_oversigt = true;
+          vis_radio_oversigt = false;
+          vis_spotify_oversigt = false;
+          vis_radio_or_music_oversigt = false;
+        } // spotify
+        if ((GLubyte) names[i*4+3]==82) {
+          fundet = true;
+          vis_music_oversigt = false;
+          vis_radio_oversigt = false;
+          vis_spotify_oversigt = true;
           vis_radio_or_music_oversigt = false;
         }
       }
       // kun til mus/touch skærm (radio stationer)
       // luk show play radio
       // scroll down
+      if ((vis_spotify_oversigt)  && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==23) {
+          if (debugmode & 8) fprintf(stderr,"scroll down\n");
+          returnfunc = 1;
+          fundet = true;
+        }
+        // scroll up
+        if ((GLubyte) names[i*4+3]==24) {
+          if (debugmode & 8) fprintf(stderr,"scroll up\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+        // show close spotify info (27 need to move) 27 now is global exit
+        if ((GLubyte) names[i*4+3]==27) {
+          if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
+          do_zoom_radio =! do_zoom_radio;
+          fundet = true;
+        }
+      }
       if ((vis_radio_oversigt)  && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
@@ -6127,6 +6182,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
+
       if ((vis_radio_oversigt) && (show_radio_options==false)) {
         // Bruges vist kun til mus/touch skærm (radio stationer)
         if (!(fundet)) {		// hvis ingen valgt
@@ -12046,6 +12102,7 @@ void loadgfx() {
     onlineradio320   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
     radiobutton      =loadgfxfile(temapath,(char *) "images/",(char *) "radio_button");
     musicbutton      =loadgfxfile(temapath,(char *) "images/",(char *) "music_button");
+    spotifybutton      =loadgfxfile(temapath,(char *) "images/",(char *) "spotify_button");
     // radio/music button mask
     radiomusicbuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiomusic_button_mask");
     // radio options (O) key in radio oversigt
@@ -12204,6 +12261,7 @@ void freegfx() {
     glDeleteTextures( 1, &onlinestream_empty);                  // stream default icons
     glDeleteTextures( 1, &onlinestream_empty1);                 // stream default icons
     glDeleteTextures( 1, &musicbutton);
+    glDeleteTextures( 1, &spotifybutton);
     glDeleteTextures( 1, &radiooptions);
     glDeleteTextures( 1, &radiooptionsmask);
     glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
