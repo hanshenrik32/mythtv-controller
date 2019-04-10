@@ -182,8 +182,8 @@ spotify_class::spotify_class() : antal(0) {
     int i;
     for(i=0;i<maxantal;i++) stack[i]=0;
     stream_optionselect=0;							// selected line in stream options
-    stream_oversigt_loaded=false;
-    stream_oversigt_loaded_nr=0;
+    spotify_oversigt_loaded=false;
+    spotify_oversigt_loaded_nr=0;
     antal=0;
     gfx_loaded=false;			      // gfx loaded
     stream_is_playing=false;    // is we playing any media
@@ -272,7 +272,7 @@ void spotify_class::process_object(json_value* value, int depth) {
       process_tracks=true;
     }
     if (strcmp(value->u.object.values[x].name , "href" )==0) {
-      process_tracks=true;
+      process_href=true;
     }
     if (strcmp(value->u.object.values[x].name , "process_playlist" )==0) {
       process_playlist=true;
@@ -289,7 +289,7 @@ void spotify_class::process_object(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
     }
-    process_value(value->u.object.values[x].value, depth+1);
+    process_value(value->u.object.values[x].value, depth+1,x);
   }
 }
 
@@ -302,7 +302,7 @@ void spotify_class::process_array(json_value* value, int depth) {
   length = value->u.array.length;
   if (debug_json) printf("array\n");
   for (x = 0; x < length; x++) {
-    process_value(value->u.array.values[x], depth);
+    process_value(value->u.array.values[x], depth,x);
   }
 }
 
@@ -311,7 +311,7 @@ void spotify_class::process_array(json_value* value, int depth) {
 // json parser start call function
 //
 
-void spotify_class::process_value(json_value* value, int depth) {
+void spotify_class::process_value(json_value* value, int depth,int x) {
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -334,42 +334,57 @@ void spotify_class::process_value(json_value* value, int depth) {
         if (debug_json) printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        if (debug_json) printf("string: %s\n", value->u.string.ptr);
-        if (process_description) {
-          if (antal<maxantal) {
+        //if (debug_json) printf("string: %s\n", value->u.string.ptr);
+        if ((process_description) && (depth==11) && (x==7)) {
+          if (!(stack[antal])) {
+            antal++;
             stack[antal]=new (struct spotify_oversigt_type);
-            if (stack[antal]) {
-              strcpy(stack[antal]->feed_desc,value->u.string.ptr);                           // desc
-              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
-              strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
-              strcpy(stack[antal]->feed_desc,"");                           // desc
-              strcpy(stack[antal]->feed_gfx_url,"");
-              strcpy(stack[antal]->feed_gfx_mythtv,"");
-              stack[antal]->feed_group_antal=0;
-              stack[antal]->feed_path_antal=0;
-              stack[antal]->textureId=0;
-              stack[antal]->intnr=0;
-              stack[antal]->nyt=false;
-            }
           }
+          //strcpy(stack[antal]->feed_desc,value->u.string.ptr);                           // desc
           process_description=false;
         }
         if (process_items) {
-          antalplaylists++;
-          printf("Antal %d \n ",antal);
           // set start of items in list
-          strcpy(stack[antal]->feed_name,value->u.string.ptr);                           // name
           process_items=false;
         }
         if (process_tracks) {
           // playlist id from spotify
-          strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
+          if (stack[antal]) {
+            //strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
+          }
           process_tracks=false;
         }
-        if (process_image) {
-          strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);                           //
+        if ((process_image) && (depth==14) && (x==1)) {
+          if (stack[antal]) {
+            strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);                           //
+          }
           process_image=false;
+        }
+        if ((process_href) && (depth==9) && (x==9)) {
+          if (stack[antal]) {
+            strcpy(stack[antal]->playlisturl,value->u.string.ptr);                           //
+          }
+          process_href=false;
+        }
+        if (process_name) {
+          //printf("x = %2d deep=%2d ",x,depth);
+          //printf(" string = %10s \n ",value->u.string.ptr);
+        }
+        // get Song name
+        if ((process_name) && (depth==9) && (x==12)) {
+          if (antal==0) {
+            stack[antal]=new (struct spotify_oversigt_type);
+          } else {
+            antal++;
+            antalplaylists++;
+          }
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal]))  {
+              stack[antal]=new (struct spotify_oversigt_type);
+            }
+            if (stack[antal]) strcpy(stack[antal]->feed_name,value->u.string.ptr);
+          }
+          process_name=false;
         }
         break;
       case json_boolean:
@@ -379,7 +394,8 @@ void spotify_class::process_value(json_value* value, int depth) {
 }
 
 
-// get user play list (any public user)
+
+// get songs from playlist (any public user)
 // write to spotify_playlist.txt
 
 int spotify_class::spotify_get_playlist(char *playlist) {
@@ -408,14 +424,40 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   fclose(json_file);
   json = (json_char*)file_contents;
   value = json_parse(json,file_size);
-   //spotify_playlist.txt
-
   // parse from root
-  process_value(value, 0);
-
+  process_value(value, 0,0);
   json_value_free(value);
   free(file_contents);
+  // show colected data
+  int tt=0;
+  while(tt<antalplaylists) {
+    if (stack[tt]) printf("#%2d  Name %40s url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl);
+    tt++;
+  }
+  printf("total antal fundet %4d antalplaylists %d \n",antal,antalplaylists);
   return 0;
+}
+
+
+//
+// play songs
+//
+
+int spotify_class::spotify_play_songs(char *songarray) {
+  char call[4096];
+  sprintf(call,"curl -X 'PUT' 'https://api.spotify.com/v1/me/player/play' --data '{\"context_uri\":\"spotify:album:5ht7ItJgpBH7W6vJ5BqpPr\",\"offset\":{\"position\":5},\"position_ms\":0}' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+//
+// play playlist
+//
+
+int spotify_class::spotify_play_now(bool now) {
+  char call[4096];
+  printf("curl -X PUT https://api.spotify.com/v1/me/player/play -H \"Authorization: Bearer %s\" \n",spotify_authorize_token);
+  sprintf(call,"curl -X PUT https://api.spotify.com/v1/me/player/play -H \"Authorization: Bearer %s\"",spotify_authorize_token);
+  system(call);
 }
 
 
@@ -447,12 +489,12 @@ int spotify_class::spotify_get_access_token() {
   myfile=fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
-    strcpy(spotify_authorize_token,data+17);      // and get token
+    strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
     *(spotify_authorize_token+83)='\0';
     printf("Found token : %s\n",spotify_authorize_token);
     //printf("base64_code : %s\n",base64_code);
     fclose(myfile);
-    remove("spotify_access_token.txt");           // remove file again
+    //remove("spotify_access_token.txt");           // remove file again
   }
 }
 
@@ -477,8 +519,8 @@ void spotify_class::clean_spotify_oversigt() {
         //if (stack[i]) delete stack[i];							// delete radio station
     }
     antal=0;
-    stream_oversigt_loaded=false;			// set load icon texture again
-    stream_oversigt_loaded_nr=0;
+    spotify_oversigt_loaded=false;			// set load icon texture again
+    spotify_oversigt_loaded_nr=0;
     stream_oversigt_nowloading=0;
 }
 
@@ -667,7 +709,7 @@ int spotify_class::loadrssfile(bool updaterssfile) {
             // if title ok and not podcast bud real rss feed
             if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
               // parse downloaded xmlfile now (create db records)
-              parsexmlrssfile(parsefilename,baseicon);
+              //parsexmlrssfile(parsefilename,baseicon);
             }
           } else if ((!(file_exists(parsefilename))) || (updaterssfile)) {
             // download rss file
@@ -682,7 +724,7 @@ int spotify_class::loadrssfile(bool updaterssfile) {
             if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
               // parse downloaded xmlfile now (create db records)
               // and get base image from funccall (baseicon (url to image))
-              parsexmlrssfile(parsefilename,baseicon);
+            //  parsexmlrssfile(parsefilename,baseicon);
             } else {
               printf("XML FILE is missing/not working on %s file.\n",row[3]);
             }
@@ -735,274 +777,6 @@ char spotify_search_and_replace2(char *text) {
   newtext[n]=0;
   strcpy(text,newtext);
 }
-
-//
-// xml parser
-//
-
-int spotify_class::parsexmlrssfile(char *filename,char *baseiconfile) {
-  xmlChar *tmpdat;
-  xmlDoc *document;
-  xmlNode *root, *first_child, *node, *node1 ,*subnode,*subnode2,*subnode3;
-  xmlChar *xmlrssid;
-  xmlChar *content;
-  char rssprgtitle[2048];
-  char rssprgfeedtitle[2048];
-  char rssprgdesc[2048];
-  char rssprgimage[2048];
-  char rssprgimage1[2048];
-  char rssvideolink[2048];
-  char rssprgpubdate[256];
-  char rsstime[2048];
-  char rssauthor[2048];
-  char rssduration[2048];
-  int rssepisode;
-  int rssseason;
-  char result[2048+1];
-  char sqlinsert[32768];
-  char sqlselect[32768];
-  char *database = (char *) "mythtvcontroller";
-  bool recordexist=false;
-  time_t raw_tid;
-  struct tm *opret_dato;
-  char rssopretdato[200];
-  MYSQL *conn;
-  MYSQL_RES *res;
-  MYSQL_ROW row;
-  strcpy(rssprgtitle,"");
-  strcpy(rssprgfeedtitle,"");
-  strcpy(rssprgdesc,"");
-  strcpy(rssvideolink,"");
-  strcpy(rsstime,"");
-  strcpy(rssauthor,"");
-  strcpy(rssprgimage,"");
-  strcpy(rssprgimage1,"");
-  conn=mysql_init(NULL);
-  document = xmlReadFile(filename, NULL, 0);            // open xml file
-  // if exist do all the parse and update db
-  // it use REPLACE in mysql to create/update records if changed in xmlfile
-  raw_tid=time(NULL);
-  opret_dato=localtime(&raw_tid);
-  strftime(rssopretdato,28,"%F %T",opret_dato);
-  if ((document) && (conn)) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    if (conn) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-    }
-    root = xmlDocGetRootElement(document);
-    first_child = root->children;
-    for (node = first_child; node; node = node->next) {
-      if (node->type==XML_ELEMENT_NODE) {
-        if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
-          content = xmlNodeGetContent(node);
-          if (content) {
-            //strcpy(result,(char *) content);
-          }
-          subnode=node->xmlChildrenNode;
-          while(subnode) {
-            xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
-            content = xmlNodeGetContent(subnode);
-            if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
-              content = xmlNodeGetContent(subnode);
-              strcpy(rssprgtitle,(char *) content);
-            }
-            // images
-            // rssprgimage
-            // paththumb
-            //
-            if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                strcpy(baseiconfile,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            // item type element
-            if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
-              subnode2=subnode->xmlChildrenNode;
-              while(subnode2) {
-                if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  strcpy(rssprgfeedtitle,(char *) content);
-                }
-                // get play url
-                if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
-                  if (tmpdat) {
-                    strcpy(rssvideolink,(char *) tmpdat);
-                    xmlFree(tmpdat);
-                  }
-                }
-                // rssprgpubdate
-                if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  strcpy(rssprgpubdate,(char *) content);
-                }
-                // get length
-                if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rsstime,(char *) content);
-                }
-                // get episode
-                if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssepisode=atoi((char *) content);
-                }
-                // get season
-                if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssseason=atoi((char *) content);
-                }
-                // get author
-                if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rssauthor,(char *) content);
-                }
-                // get description
-                if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) {
-                    xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
-                    if (xmlrssid) strcpy(rssprgdesc,(char *) content);
-                    xmlFree(xmlrssid);
-                  }
-                }
-                subnode2=subnode2->next;
-              }
-              recordexist=false;
-              // check if record exist
-              if (strcmp(rssvideolink,"")!=0) {
-                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
-                mysql_query(conn,sqlinsert);
-                res = mysql_store_result(conn);
-                if (res) {
-                  while ((row = mysql_fetch_row(res)) != NULL) {
-                    recordexist=true;
-                  }
-                }
-                // creoate record if not exist
-                if (!(recordexist)) {
-                  spotify_search_and_replace2(rssprgtitle);
-                  spotify_search_and_replace2(rssprgfeedtitle);
-                  spotify_search_and_replace2(rssprgdesc);
-                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                  if (mysql_query(conn,sqlinsert)!=0) {
-                    printf("mysql REPLACE table error. %s\n",sqlinsert);
-                  }
-                  res = mysql_store_result(conn);
-                }
-              }
-            }
-            subnode=subnode->next;
-          }
-          // end while loop
-        }
-        // youtube type
-        // get title
-        if (strcmp((char *) node->name,"title")==0) {
-          strcpy(rssprgtitle,"");
-          content = xmlNodeGetContent(node);
-          if (content) strcpy(rssprgtitle,(char *) content);
-        }
-        if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
-          // reset for earch element loading
-          strcpy(rssvideolink,"");
-          strcpy(rssprgfeedtitle,"");
-          rssepisode=0;
-          rssseason=0;
-          strcpy(rssauthor,"");
-          strcpy(rssprgdesc,"");
-          strcpy(rssprgimage1,"");
-          strcpy(rssprgimage,"");
-          if (strcmp((char *) node->name,"entry")==0) {
-            subnode2=node->xmlChildrenNode;
-            while(subnode2) {
-              strcpy(rssprgimage,"");
-              if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                strcpy(rssprgfeedtitle,(char *) content);
-              }
-              // get play url
-              if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
-                if (tmpdat) {
-                  strcpy(rssvideolink,(char *) tmpdat);
-                  xmlFree(tmpdat);
-                }
-              }
-              if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
-                subnode3=subnode2->xmlChildrenNode;
-                while(subnode3) {
-                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgtitle,(char *) content);
-                  }
-                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgdesc,(char *) content);
-                  }
-                  // get icon gfx
-                  if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
-                    content = xmlNodeGetContent(subnode3);
-                    tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
-                    if (tmpdat) {
-                      //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
-                      strcpy(rssprgimage1,(char *) tmpdat);
-                      xmlFree(tmpdat);
-                    }
-                  }
-                  subnode3=subnode3->next;
-                }
-              }
-              subnode2=subnode2->next;
-            }
-            recordexist=false;
-            sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
-            mysql_query(conn,sqlinsert);
-            res = mysql_store_result(conn);
-            if (res) {
-              while ((row = mysql_fetch_row(res)) != NULL) {
-                recordexist=true;
-              }
-            }
-            if (!(recordexist)) {
-              spotify_search_and_replace2(rssprgtitle);
-              spotify_search_and_replace2(rssprgfeedtitle);
-              spotify_search_and_replace2(rssprgdesc);
-              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
-              //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
-              if (mysql_query(conn,sqlinsert)!=0) {
-                printf("mysql REPLACE table error. %s\n",sqlinsert);
-              }
-              res = mysql_store_result(conn);
-            }
-          }
-        }
-      }
-    }
-    xmlFreeDoc(document);
-    mysql_close(conn);
-  } else {
-    if (debugmode & 4) printf("Read error on %s xmlfile downloaded to rss dir \n",filename);
-  }
-  return(1);
-}
-
 
 
 
@@ -1435,9 +1209,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     int length,width;
     int pline=0;
 
-    if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-    if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-      if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
+    if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
+    if ((this->streamantal()) && (spotify_oversigt_loaded==false) && (this->spotify_oversigt_loaded_nr<this->streamantal())) {
+      if (stack[spotify_oversigt_loaded_nr]) strcpy(gfxfilename,stack[spotify_oversigt_loaded_nr]->feed_gfx_mythtv);
       else strcpy(gfxfilename,"");
       strcpy(gfxshortname,"");
       gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
@@ -1446,7 +1220,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       }
       // load texture if none loaded
       // get_texture return 0 if not loaded
-      if (get_texture(stream_oversigt_loaded_nr)==0) {
+      if (get_texture(spotify_oversigt_loaded_nr)==0) {
         if (strcmp(gfxfilename,"")!=0) {
           // check om der findes en downloaded icon
           strcpy(downloadfilenamelong,"");
@@ -1455,19 +1229,19 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
             // check om filen findes i cache dir eller i mythtv netvision dir
             if (file_exists(gfxfilename)) {
               texture=loadTexture ((char *) gfxfilename);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              if (texture) set_texture(spotify_oversigt_loaded_nr,texture);
               last_texture=texture;
               antal_loaded+=1;
             } else if (file_exists(downloadfilenamelong)) {
               // er det ikke samme texture som sidst loaded så load it
               // else set last used
               texture=loadTexture ((char *) downloadfilenamelong);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+              if (texture) set_texture(spotify_oversigt_loaded_nr,texture);
               last_texture=texture;
               antal_loaded+=1;
             } else texture=0;
           } else {
-            if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+            if (last_texture) set_texture(spotify_oversigt_loaded_nr,last_texture);
             antal_loaded+=1;
           }
           // husk last file name
@@ -1475,15 +1249,14 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         }
       }
       // down loading ?
-      if (stream_oversigt_loaded_nr==this->streamantal()) {
-        stream_oversigt_loaded=true;
+      if (spotify_oversigt_loaded_nr==this->streamantal()) {
+        spotify_oversigt_loaded=true;
         stream_oversigt_loaded_done=true;
-      } else stream_oversigt_loaded_nr++;
+      } else spotify_oversigt_loaded_nr++;
     }
-
     if (!(gfx_loaded)) {
-      stream_oversigt_loaded_nr=0;
-      stream_oversigt_loaded=false;
+      spotify_oversigt_loaded_nr=0;
+      spotify_oversigt_loaded=false;
     }
     // calc start pos (ofset)
     sofset=(_sangley/40)*8;
@@ -1651,8 +1424,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       i++;
       xof+=(buttonsize+10);
     }
+
     // no records loaded error
-    if ((i==0) && (antal_rss_streams()==0)) {
+    if ((i==0) && (antal_spotify_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);

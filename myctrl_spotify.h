@@ -17,6 +17,7 @@ struct spotify_oversigt_type {
     char feed_gfx_url[4000+1];
     char feed_gfx_mythtv[2000+1];				  // icon gfx path in mythtv system
     char playlistid[100+1];
+    char playlisturl[200+1];
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
     bool nyt;
@@ -36,11 +37,11 @@ class spotify_class : vlc_controller {
         void set_texture(int nr,GLuint idtexture);
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      //
         bool startup_loaded;					                                          // load stream icons statios list
-        bool stream_oversigt_loaded;
-        int stream_oversigt_loaded_nr;
+        bool spotify_oversigt_loaded;
+        int spotify_oversigt_loaded_nr;
         int stream_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
         int stream_rssparse_nowloading;				                                  // denne tæller op når der loades rss
-        int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
+        //int parsexmlrssfile(char *filename,char *baseiconfile);                // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
 
         char spotify_authorize_token[255];
@@ -71,7 +72,7 @@ class spotify_class : vlc_controller {
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
         //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         //int antalstreams() { return antal; };
-        int antal_rss_streams() { return antalplaylists; };
+        int antal_spotify_streams() { return antal; };
         //int streams_loaded() { return stream_oversigt_loaded_nr; };
         //int streams_rss_loaded() { return stream_rssparse_nowloading; };
         void stopstream();
@@ -83,7 +84,7 @@ class spotify_class : vlc_controller {
         float jump_position(float ofset);
         spotify_class();
         ~spotify_class();
-        int streamantal() { return(antal); }
+        int streamantal() { return(antal-1); }
         void clean_spotify_oversigt();
         int opdatere_stotify_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web
@@ -91,9 +92,11 @@ class spotify_class : vlc_controller {
         void playstream(char *url);
         float getstream_pos();
         int spotify_req_playlist();
-
+        int spotify_play_songs(char *songarray);
+        int spotify_play_playlist(char *songarray);
+        int spotify_play_now(bool now);
         void print_depth_shift(int);
-        void process_value(json_value*, int);
+        void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
         void process_array(json_value*, int);
 
