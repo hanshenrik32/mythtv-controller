@@ -445,7 +445,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 
 int spotify_class::spotify_play_songs(char *songarray) {
   char call[4096];
-  sprintf(call,"curl -X 'PUT' 'https://api.spotify.com/v1/me/player/play' --data '{\"context_uri\":\"spotify:album:5ht7ItJgpBH7W6vJ5BqpPr\",\"offset\":{\"position\":5},\"position_ms\":0}' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -X 'PUT' 'https://api.spotify.com/v1/me/player/play' --data '{\"context_uri\":\"spotify:album:59ZbFPES4DQwEjBpWHzrtC\",\"offset\":{\"position\":5},\"position_ms\":0}' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
@@ -455,8 +455,8 @@ int spotify_class::spotify_play_songs(char *songarray) {
 
 int spotify_class::spotify_play_now(bool now) {
   char call[4096];
-  printf("curl -X PUT https://api.spotify.com/v1/me/player/play -H \"Authorization: Bearer %s\" \n",spotify_authorize_token);
-  sprintf(call,"curl -X PUT https://api.spotify.com/v1/me/player/play -H \"Authorization: Bearer %s\"",spotify_authorize_token);
+  printf("curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"offset\":{\"position\":5},\"position_ms\":0} -H \"Authorization: Bearer %s\" \n",spotify_authorize_token);
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data 'offset:{position:5},position_ms:0}' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
