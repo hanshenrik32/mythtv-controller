@@ -786,6 +786,7 @@ const int TEMA_ANTAL=10;                                                        
 
 // define for use before function is created
 void *update_music_phread_loader();
+void *update_spotify_phread_loader();
 
 // hent mythtv version and return it
 
@@ -2269,6 +2270,7 @@ static bool do_update_rss = false;
 static bool do_update_music = false;
 static bool do_update_music_now = false;                          // start the process to update music db from global dir
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
+static bool do_update_spotify = false;                            // set true to start thread on update movie db
 
 void display() {
     // used by xmltv updater func
@@ -5653,6 +5655,13 @@ void display() {
       update_music_phread_loader();
       do_update_music = false;
     }
+
+    if (do_update_spotify) {
+      update_spotify_phread_loader();
+      do_update_spotify = false;
+    }
+
+
     //  don't wait!
     //  start processing buffered OpenGL routines
     //
@@ -8436,9 +8445,14 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 'U':
+              // music
               if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
                 do_update_music = true;                                               // show update
                 do_update_music_now = true;                                           // and do the update flag
+              }
+              // spotify
+              if (vis_spotify_oversigt) {
+                do_update_spotify = true;                                       // set flag to update spotify
               }
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
                 do_update_moviedb = true;                                           // set update flag
@@ -11469,6 +11483,19 @@ void *datainfoloader_stream(void *data) {
 
 
 //
+// phread dataload spotify
+//
+
+void *datainfoloader_spotify(void *data) {
+  if (debugmode & 4) printf("loader thread starting - Loading spotify info from db.\n");
+  //streamoversigt.loadrssfile(0);
+  spotify_oversigt.opdatere_spotify_oversigt();
+  if (debugmode & 4) printf("loader thread done loaded spotify\n");
+  pthread_exit(NULL);
+}
+
+
+//
 // phread dataload xmltv
 //
 
@@ -11548,6 +11575,23 @@ void *update_music_phread_loader() {
 
 
 //
+// rss loader start from main loop then trigged by date
+//
+
+void *update_spotify_phread_loader() {
+  if (true) {
+    pthread_t loaderthread2;           // load tvguide xml file in to db
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_spotify,NULL);
+    if (rc2) {
+      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+  }
+}
+
+
+
+//
 // phread dataload
 // NOT IN USE
 
@@ -11558,12 +11602,10 @@ void *datainfoloader(void *data) {
   if (strcmp(configbackend,"mythtv")==0) {
       // Opdatere tv oversigt fra mythtv db
       aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-
       // opdatere music oversigt
       opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
-
       film_oversigt.opdatere_film_oversigt();      					        // gen covers 3d hvis de ikke findes.
-                                                                    // load record file list
+                                                                  // load record file list
 /*
       recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
       // load old recorded list not some recorded any more
@@ -11573,8 +11615,6 @@ void *datainfoloader(void *data) {
 */
       //create_radio_oversigt();										                          // Create radio mysql database if not exist
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-
-
   }
   printf("loader thread done loaded %d radio stations \n",radiooversigt_antal);
   pthread_exit(NULL);
@@ -11584,6 +11624,9 @@ void *datainfoloader(void *data) {
 CXBMCClient *xbmcclient=new CXBMCClient("");
 int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
+
+
+
 
 
 //

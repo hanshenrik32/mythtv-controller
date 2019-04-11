@@ -7,7 +7,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL.h>
 
-
+// only disk files
 int loadTexture ( char *filename );
 
 #endif
