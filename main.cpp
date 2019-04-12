@@ -32,6 +32,7 @@
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
+bool do_open_spotifyplaylist=false;
 bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 
@@ -6208,13 +6209,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // play
         if ((GLubyte) names[i*4+3]==20) {
           fprintf(stderr,"play spotify playlist\n");
-          returnfunc = 1;
+          returnfunc = 3;
           fundet = true;
         }
         // open
         if ((GLubyte) names[i*4+3]==21) {
           fprintf(stderr,"open spotify playlist\n");
-          returnfunc = 1;
+          returnfunc = 4;
           fundet = true;
         }
 
@@ -6646,11 +6647,24 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   }
                 }
-                if ((vis_spotify_oversigt) && (retfunc==0)) {
+
+
+                // spotify stuf
+                if ((vis_spotify_oversigt) && (retfunc==3)) {
                   if (spotifyknapnr>0)
                     do_play_spotify=1;
+                    do_open_spotifyplaylist=0;
                     if (debugmode) fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
                 }
+
+                if ((vis_spotify_oversigt) && (retfunc==4)) {
+                  if (spotifyknapnr>0)
+                    do_play_spotify=0;
+                    do_open_spotifyplaylist=1;
+                    if (debugmode) fprintf(stderr,"Set do_open_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                }
+
+
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
                   do_zoom_film_cover = true;
@@ -6794,6 +6808,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       }
 
       // scroll spotify up/down
+      // and open / play
       if (vis_spotify_oversigt) {
         // scroll tv guide down
         if ((retfunc==2) || (button==4)) { // scroll button
@@ -6803,9 +6818,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((retfunc==1) || (button==3)) {
           spotify_select_iconnr--;
         }
+        if ((retfunc==3) || (button==3)) {
+          spotify_oversigt.opdatere_spotify_oversigt(0);
+        }
+        if ((retfunc==4) || (button==3)) {
+          // play spotify song
+        }
       }
-
-
 
       // scroll tv guide up/down
       if (vis_tv_oversigt) {
