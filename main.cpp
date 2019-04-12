@@ -334,6 +334,7 @@ int rknapnr=0;                                            // buttons vars
 int sknapnr=0;                                            // stream button
 int mknapnr=0;                                            // music
 int tvknapnr=0;                                           // tv
+int spotifyknapnr=0;                                      // spotify
 int fknapnr=0;                                            // movie
 int swknapnr=0;                                           //
 
@@ -2264,6 +2265,8 @@ void newLine(float rStart, float rEnd, float angle) {
 
 
 
+
+
 static bool do_update_xmltv_show = false;
 static bool do_update_rss_show = true;
 static bool do_update_rss = false;
@@ -2476,7 +2479,7 @@ void display() {
 
     glPushMatrix();
     // background picture
-    if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_tv_oversigt))) show_background();
+    if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tv_oversigt))) show_background();
     //visur=1;
     if (visur) {
       glPushMatrix();
@@ -2943,7 +2946,7 @@ void display() {
           }
         }
         // exit button
-        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_radio_oversigt))) {
+        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_radio_oversigt))) {
           glBindTexture(GL_TEXTURE_2D, _textureexit);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -5874,6 +5877,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_recorded_oversigt = false;
           vis_radio_or_music_oversigt = false;
           vis_stream_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_stream_or_movie_oversigt = false;
           do_show_tvgraber = false;
           fundet = true;
@@ -5890,6 +5894,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_tv_oversigt = false;
           vis_recorded_oversigt = false;
           vis_stream_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_stream_or_movie_oversigt = false;
           do_show_tvgraber = false;
           fundet = true;
@@ -5903,6 +5908,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_tv_oversigt = false;
           vis_recorded_oversigt = false;
           vis_stream_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_radio_or_music_oversigt = false;
           do_show_tvgraber = false;
           fundet = true;
@@ -5913,6 +5919,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_film_oversigt = false;
           vis_tv_oversigt = false;
           vis_radio_or_music_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_recorded_oversigt =! vis_recorded_oversigt;
           vis_stream_oversigt = false;
           vis_stream_or_movie_oversigt = false;
@@ -5921,7 +5928,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       // setup menu i main
-      if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
+      if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
         // test for menu select setup
         if ((GLubyte) names[i*4+3]==5) {
           do_show_setup =! do_show_setup;
@@ -5929,6 +5936,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_film_oversigt = false;
           vis_tv_oversigt = false;
           vis_stream_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_stream_or_movie_oversigt = false;
           vis_radio_or_music_oversigt = false;
           do_show_tvgraber = false;
@@ -5943,6 +5951,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_recorded_oversigt = false;
           vis_radio_or_music_oversigt = false;
           vis_stream_oversigt = false;
+          vis_spotify_oversigt=false;
           vis_stream_or_movie_oversigt = false;
           do_show_tvgraber = false;
           fundet = true;
@@ -6493,6 +6502,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (vis_tv_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"tvknapnr = %d \n",tvknapnr-1);
                 }
+                if (vis_spotify_oversigt) {
+                  if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d \n",spotifyknapnr-1);
+                }
+
                 if (debugmode & 4) {
                   if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
                 }
