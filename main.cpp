@@ -384,6 +384,7 @@ bool vis_stream_or_movie_oversigt = false;
 bool global_use_internal_music_loader_system = false;     // use internal db for musicdb or mysql/kodi/
 bool ask_tv_record = false;
 bool do_play_radio = false;
+bool do_play_spotify = false;
 GLint ctx, myFont;
 bool do_swing_movie_cover = false;                        // do anim
 bool vis_nyefilm_oversigt = true;                         // start med at vise nye film
@@ -3054,7 +3055,7 @@ void display() {
         getstarttidintvguidefromarray = false;
       }
     }
-    // shopw oversigt over nye film
+    // show oversigt over nye film
     if ((vis_nyefilm_oversigt) && (do_show_setup == false)) {
       if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
       if (fknapnr == 0) show_newmovietimeout--;
@@ -6134,7 +6135,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
-      // vælg skal der spilles music eller radio
+      // vælg skal der spilles music eller radio eller spotify
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
         if ((GLubyte) names[i*4+3]==80) {
@@ -6161,9 +6162,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       // kun til mus/touch skærm (spotify oversigt)
-      // luk show play radio
       // scroll down
       if ((vis_spotify_oversigt)  && (!(fundet))) {
+        if ((GLuint) names[i*4+3]>=100) {
+          spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
+          fprintf(stderr,"spotify selected=%d  \n",spotifyknapnr);
+          fundet = true;
+        }
+
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
           returnfunc = 1;
@@ -6182,7 +6188,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
-
+      // radio stuf
       if ((vis_radio_oversigt)  && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
@@ -6202,7 +6208,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
-
+      // radio stuf
       if ((vis_radio_oversigt) && (show_radio_options==false)) {
         // Bruges vist kun til mus/touch skærm (radio stationer)
         if (!(fundet)) {		// hvis ingen valgt
@@ -6243,7 +6249,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_stream_or_movie_oversigt = false;
         }
       }
-      //
+      // stream stuf
       if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==3) {
           fundet = true;
@@ -6507,7 +6513,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (vis_spotify_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d \n",spotifyknapnr-1);
                 }
-
                 if (debugmode & 4) {
                   if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
                 }
@@ -6561,6 +6566,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_play_radio = 1;						// select button do play
                     if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   }
+                }
+                if ((vis_spotify_oversigt) && (retfunc==0)) {
+                  if (spotifyknapnr>0)
+                    do_play_spotify=1;
+                    if (debugmode) fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
                 }
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
@@ -11419,7 +11429,7 @@ void *radio_check_statusloader(void *data) {
 
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode % 1) printf("loader thread starting - Loading music info from mythtv.\n");
+  if (debugmode % 1) printf("loader thread starting - Loading music info.\n");
   if (strcmp(configbackend,"mythtv")==0) {
     // opdatere music oversigt
     // hent alt music info fra database
@@ -11504,7 +11514,7 @@ void *datainfoloader_stream(void *data) {
 void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading spotify info from db.\n");
   //streamoversigt.loadrssfile(0);
-  spotify_oversigt.opdatere_spotify_oversigt();
+  spotify_oversigt.opdatere_spotify_oversigt(0);
   if (debugmode & 4) printf("loader thread done loaded spotify\n");
   pthread_exit(NULL);
 }
