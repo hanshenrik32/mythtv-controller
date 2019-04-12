@@ -57,6 +57,10 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
+extern GLuint spotify_askplay;                   //
+extern GLuint spotify_askopen;                   //
+
+
                                                                 // debug mode
                                                                 // 1  = wifi net
                                                                 // 2  = music
