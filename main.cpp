@@ -313,6 +313,7 @@ bool do_show_rss = false;                                 // show rss config
 bool use3deffect = false;                                 // use 3d scroll effect default no
 bool do_zoom_music_cover = false;                         //
 bool do_zoom_radio = false;                               //
+bool do_zoom_spotify = false;                               //
 bool do_zoom_stream = false;                              //
 
 bool show_wlan_select = false;                            //
@@ -6159,7 +6160,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_or_music_oversigt = false;
         }
       }
-      // kun til mus/touch skærm (radio stationer)
+      // kun til mus/touch skærm (spotify oversigt)
       // luk show play radio
       // scroll down
       if ((vis_spotify_oversigt)  && (!(fundet))) {
@@ -6176,11 +6177,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // show close spotify info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
-          if (debugmode & 8) fprintf(stderr,"Show/close radio info\n");
-          do_zoom_radio =! do_zoom_radio;
+          if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
+          do_zoom_spotify =! do_zoom_spotify;
           fundet = true;
         }
       }
+
       if ((vis_radio_oversigt)  && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
