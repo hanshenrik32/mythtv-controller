@@ -548,7 +548,8 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 
 int spotify_class::spotify_play_songs(char *songarray) {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  // https://api.spotify.com/v1/me/player/play
+  sprintf(call,"curl -X PUT 'open.spotify.com/playlist/%s' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",songarray,spotify_authorize_token);
   system(call);
 }
 

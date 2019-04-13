@@ -3888,8 +3888,7 @@ void display() {
 
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
-      printf("Start play by fmod spotify song nr %d %s \n", spotifyknapnr-1 , spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
-
+      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
       spotify_oversigt.spotify_play_songs(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
       /*
       result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
