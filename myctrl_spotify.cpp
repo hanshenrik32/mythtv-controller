@@ -526,7 +526,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
         //
         //
         //
-        sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,refid,id) values ('%s','%s','%s',%d,%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, refid , 0 );
+        sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,refid,id) values ('%s','%s','%s','%s',%d,%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, refid , 0 );
         mysql_query(conn,sql);
         mysql_store_result(conn);
       }
@@ -543,10 +543,12 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 //
 // play songs
 //
+// --data '{\"context_uri\":\"spotify:album:59ZbFPES4DQwEjBpWHzrtC\",\"offset\":{\"position\":5},\"position_ms\":0}
+
 
 int spotify_class::spotify_play_songs(char *songarray) {
   char call[4096];
-  sprintf(call,"curl -X 'PUT' 'https://api.spotify.com/v1/me/player/play' --data '{\"context_uri\":\"spotify:album:59ZbFPES4DQwEjBpWHzrtC\",\"offset\":{\"position\":5},\"position_ms\":0}' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
@@ -631,232 +633,6 @@ void spotify_class::clean_spotify_oversigt() {
 void spotify_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
-
-//
-// vlc player interface
-//
-
-// default player
-// stop playing stream sound or video
-
-void spotify_class::stopstream() {
-  if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
-  stream_is_playing=false;
-}
-
-// vlc stop player
-
-void spotify_class::softstopstream() {
-  if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
-  stream_is_playing=false;
-}
-
-
-// get length on stream
-
-unsigned long spotify_class::get_length_in_ms() {
-  vlc_controller::get_length_in_ms();
-}
-
-
-// jump in player
-
-float spotify_class::jump_position(float ofset) {
-    ofset=vlc_controller::jump_position(ofset);
-    return(ofset);
-}
-
-// to play streams from web
-//vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
-
-
-// pause stream
-
-int spotify_class::pausestream(int pause) {
-    //stream_is_playing=true;
-    vlc_controller::pause(1);
-    if (!(stream_is_pause)) stream_is_pause=true; else stream_is_pause=false;
-    return(1);
-}
-
-
-
-// start playing movie by vlclib
-
-int spotify_class::playstream(int nr) {
-    char path[PATH_MAX];                                  // max path length from os
-    strcpy(path,"");
-//    strcat(path,get_stream_url(nr));
-    stream_is_playing=true;
-    vlc_controller::playmedia(path);
-    return(1);
-}
-
-
-int spotify_class::playstream_url(char *path) {
-    stream_is_playing=true;
-    vlc_controller::playwebmedia(path);
-    return(1);
-}
-
-
-float spotify_class::getstream_pos() {
-    return(vlc_controller::get_position());
-}
-
-
-// update nr of view
-
-void spotify_class::update_rss_nr_of_view(char *url) {
-  // mysql vars
-  char sqlinsert[32768];
-  MYSQL *conn;
-  MYSQL_RES *res,*res1;
-  MYSQL_ROW row;
-  char *database = (char *) "mythtvcontroller";
-  conn=mysql_init(NULL);
-  // get homedir
-  if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
-    mysql_query(conn,sqlinsert);
-    res = mysql_store_result(conn);
-    mysql_free_result(res);
-    mysql_close(conn);
-  }
-}
-
-
-//
-// used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
-// in db if mediaURL have url this is the rss feed loaded from rss file
-// updaterssfile bool is do it now (u key in overview)
-
-int spotify_class::loadrssfile(bool updaterssfile) {
-  bool haveupdated=false;
-  char sqlselect[2048];
-  char sqlinsert[32768];
-  char totalurl[2048];
-  char parsefilename[2048];
-  char homedir[2048];
-  char baseicon[2048];
-  unsigned int recantal;
-  MYSQL *conn;
-  MYSQL_RES *res,*res1;
-  MYSQL_ROW row;
-  time_t timenow;
-  char *database = (char *) "mythtvcontroller";
-  struct stat attr;
-  const int updateinterval=86400;
-  time(&timenow);
-  conn=mysql_init(NULL);
-  // get homedir
-  getuserhomedir(homedir);
-  strcat(homedir,"/rss");
-  if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  strcat(homedir,"/images");
-  if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  // Connect to database
-  //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
-  //strcpy(sqlselect,"select * from internetcontentarticles");
-  if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL IS NULL");
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        recantal=atoi(row[0]);
-      }
-      mysql_free_result(res);
-    }
-    spotify_rssparse_nowloading=0;
-    strcpy(sqlselect,"select * from internetcontentarticles where mediaURL is NULL");
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    //
-    //
-    //
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        spotify_rssparse_nowloading++;
-        if (debugmode & 4) printf("Get rss file on stream title %10s \n",row[0]);
-        if ((row[3]) && (strcmp(row[3],"")!=0)) {
-          getuserhomedir(homedir);                                          // get user homedir
-          strcpy(totalurl,"wget -U Netscape '");
-          if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
-          strcat(totalurl,"' -o '");
-          strcat(totalurl,homedir);                                         // add user homedir
-          strcat(totalurl,"/rss/wget.log'");                                // log file
-          strcat(totalurl," -O '");
-          strcat(totalurl,homedir);                                         // add user homedir
-          strcat(totalurl,"/rss/");                                         // add output filename
-          if (row[3]) strcat(totalurl,row[3]);
-          strcat(totalurl,".rss'");
-          strcpy(parsefilename,homedir);                                    // copy user homedir
-          strcat(parsefilename,"/rss/");
-          strcat(parsefilename,row[3]);
-          strcat(parsefilename,".rss");
-          strcpy(baseicon,"");
-          stat(parsefilename, &attr);
-          if ((file_exists(parsefilename)) && (attr.st_mtime+updateinterval<timenow)) {
-            // download rss file
-            system(totalurl);
-            // parse file
-            strcpy(parsefilename,homedir);
-            strcat(parsefilename,"/rss/");
-            strcat(parsefilename,row[3]);
-            strcat(parsefilename,".rss");
-            // if podcast is rss
-            // if title ok and not podcast bud real rss feed
-            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
-              // parse downloaded xmlfile now (create db records)
-              //parsexmlrssfile(parsefilename,baseicon);
-            }
-          } else if ((!(file_exists(parsefilename))) || (updaterssfile)) {
-            // download rss file
-            system(totalurl);
-            // parse file
-            strcpy(parsefilename,homedir);
-            strcat(parsefilename,"/rss/");
-            strcat(parsefilename,row[3]);
-            strcat(parsefilename,".rss");
-            // if podcast is rss
-            // if title ok and not podcast bud real rss feed
-            if ((strcmp(row[3],"")!=0) && (!(row[23]))) {
-              // parse downloaded xmlfile now (create db records)
-              // and get base image from funccall (baseicon (url to image))
-            //  parsexmlrssfile(parsefilename,baseicon);
-            } else {
-              printf("XML FILE is missing/not working on %s file.\n",row[3]);
-            }
-          }
-          // update master icon if none
-          if ((strcmp(row[0],"")!=0) && (strcmp(baseicon,"")!=0)) {
-            sprintf(sqlinsert,"UPDATE internetcontentarticles set paththumb='%s' where feedtitle like '%s' and paththumb IS NULL",baseicon,row[0]);
-            mysql_query(conn,sqlinsert);
-            res1 = mysql_store_result(conn);
-            haveupdated=true;
-          }
-          // if podcast is not rss and title ok
-          if ((strcmp(row[3],"")!=0) && (row[23])) {
-            if (atoi(row[23])==1) {
-              sprintf(sqlinsert,"UPDATE internetcontentarticles set mediaURL=url where podcast=1 and feedtitle like '%s'",row[0]);
-              mysql_query(conn,sqlinsert);
-              res1 = mysql_store_result(conn);
-              haveupdated=true;
-            }
-          }
-        }
-      }
-      mysql_free_result(res);
-      spotify_rssparse_nowloading=0;
-    }
-    mysql_close(conn);
-  } else return(-1);
-  if (haveupdated) return(1); else return(0);
-}
-
 
 
 char spotify_search_and_replace2(char *text) {
@@ -964,10 +740,10 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
     }
     // find records after type to find
     if (refid==0) {
-      sprintf(sqlselect,"select (spotifycontent.name) as name,(spotifycontent.paththumb) as paththumb,id as id from spotifycontent");
+      sprintf(sqlselect,"select name,paththumb,id,id from spotifycontent");
       getart=0;
     } else {
-      sprintf(sqlselect,"select (spotifycontent.name) as name,(spotifycontent.paththumb) as paththumb,id as id from spotifycontentarticles where refid=%d",refid);
+      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where refid=%d",refid);
       getart=1;
     }
     this->type=getart;					                                                 // husk sql type
@@ -994,10 +770,11 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
               strcpy(stack[antal]->feed_desc,"");                           // desc
               strcpy(stack[antal]->feed_gfx_url,"");
               strcpy(stack[antal]->feed_gfx_mythtv,"");
+              strcpy(stack[antal]->playlisturl,"");
               stack[antal]->feed_group_antal=0;
               stack[antal]->feed_path_antal=0;
               stack[antal]->textureId=0;
-              stack[antal]->intnr=atoi(row[2]);
+              stack[antal]->intnr=atoi(row[3]);
               stack[antal]->nyt=false;
               // top level
               if (getart==0) {
@@ -1043,6 +820,20 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
                   mmm++;
                 }
 */
+                antal++;
+              }
+              if (getart==1) {
+                // back button
+                if (antal==0) {
+                  strncpy(stack[antal]->feed_showtxt,"Back",spotify_pathlength);
+                  stack[antal]->intnr=0;
+                  antal++;
+                  if (stack[antal]==NULL) stack[antal]=new (struct spotify_oversigt_type);
+                }
+                strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
+                strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
+                strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
+                strncpy(stack[antal]->playlisturl,row[2],spotify_namelength);
                 antal++;
               }
             }
@@ -1150,16 +941,8 @@ int spotify_class::loadweb_stream_iconoversigt() {
 }
 
 
-//
-// play stream by
-//
 
-void spotify_class::playstream(char *url) {
-    //vlc_controller::playmedia(url);
-}
-
-
-void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected)
 
 {
     int j,ii,k,pos;
@@ -1247,10 +1030,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
 //        glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,empty_icon1);
+        glBindTexture(GL_TEXTURE_2D,empty_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);

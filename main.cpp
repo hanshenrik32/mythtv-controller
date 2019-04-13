@@ -255,6 +255,7 @@ bool vis_uv_meter = false;                                // uv meter er igang m
 bool hent_music_search = false;                           // skal vi søge efter music
 bool keybufferopenwin = false;                            // er vindue open
 bool do_play_music_cover = false;                         // start play music
+bool do_play_spotify_cover = false;                       // start play spotify song/playlist
 bool do_find_playlist = false;                            // do find play list
 bool do_play_music_aktiv_play = false;                    //
 
@@ -3884,6 +3885,24 @@ void display() {
         }
       }
     }
+
+    // do play spotify song/playlist
+    if (do_play_spotify_cover) {
+      printf("Start play by fmod spotify song nr %d %s \n", spotifyknapnr-1 , spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
+
+      spotify_oversigt.spotify_play_songs(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
+      /*
+      result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
+      ERRCHECK(result,do_play_music_aktiv_table_nr);
+      if (result==FMOD_OK) {
+        result = sndsystem->playSound( sound,NULL,false, &channel);
+        ERRCHECK(result,do_play_music_aktiv_table_nr);
+        if (sndsystem) channel->setVolume(configsoundvolume);
+      }
+      */
+    }
+
+
     // ******************************************************************************************************************
     // ******************************************************************************************************************
     // ******************************************************************************************************************
@@ -4224,6 +4243,30 @@ void display() {
         }
       }
     }
+
+    //
+    // *************** Spotify stuf *******************************************************************************
+
+    if ((do_play_spotify_cover) && (!(visur))) {
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      // window texture
+      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_BLEND);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glDisable(GL_DEPTH_TEST);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
+      glEnd();
+    }
+
+
     //
     // *************** Stream stuf *******************************************************************************
     // show stream player control
@@ -6823,17 +6866,24 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((retfunc==1) || (button==3)) {
           spotify_select_iconnr--;
         }
+        // open spotify playlist
         if ((retfunc==3) || (button==3)) {
           ask_open_dir_or_play_spotify=false;
           printf("Open spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
           spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.stack[spotifyknapnr-1]->intnr);
         }
+        // play spotify song
         if ((retfunc==4) || (button==3)) {
-          // play spotify song
+          printf("play spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
+          do_play_spotify_cover=true;
+
+
         }
       }
 
+      //
       // scroll tv guide up/down
+      //
       if (vis_tv_oversigt) {
         // scroll tv guide down
         if ((retfunc==2) || (button==4)) { // scroll button
