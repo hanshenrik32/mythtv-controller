@@ -6024,7 +6024,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       //
-      // scroll
+      // stream control
       //
       if (vis_stream_oversigt) {
         if (!(fundet)) {
@@ -6050,6 +6050,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
+      //
+      // film
+      //
       if (vis_film_oversigt) {
         if (!(fundet)) {
           // we have a select mouse/touch element dirid
@@ -6081,6 +6084,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
+      //
+      // music
+      //
       if (vis_music_oversigt) {
         if (!(fundet)) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
           // we have a select mouse/touch element dirid
@@ -6209,13 +6215,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // play
         if ((GLubyte) names[i*4+3]==20) {
           fprintf(stderr,"play spotify playlist\n");
-          returnfunc = 3;
+          returnfunc = 4;
           fundet = true;
         }
         // open
         if ((GLubyte) names[i*4+3]==21) {
           fprintf(stderr,"open spotify playlist\n");
-          returnfunc = 4;
+          returnfunc = 3;
           fundet = true;
         }
 
@@ -6810,8 +6816,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       // scroll spotify up/down
       // and open / play
       if (vis_spotify_oversigt) {
-        // scroll tv guide down
-        if ((retfunc==2) || (button==4)) { // scroll button
+        if ((retfunc==2) || (button==4)) {
           spotify_select_iconnr++;
         }
         // scroll up
@@ -6819,7 +6824,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           spotify_select_iconnr--;
         }
         if ((retfunc==3) || (button==3)) {
-          spotify_oversigt.opdatere_spotify_oversigt(0);
+          ask_open_dir_or_play_spotify=false;
+          printf("Open spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
+          spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.stack[spotifyknapnr-1]->intnr);
         }
         if ((retfunc==4) || (button==3)) {
           // play spotify song
