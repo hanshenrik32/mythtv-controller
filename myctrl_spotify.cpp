@@ -57,22 +57,9 @@ extern int configmythtvver;
 extern int screen_size;
 extern int screensizey;
 extern int screeny;
-extern GLuint spotify_askplay;                   //
-extern GLuint spotify_askopen;                   //
-
-
-                                                                // debug mode
-                                                                // 1  = wifi net
-                                                                // 2  = music
-                                                                // 4  = stream
-                                                                // 8  = keyboard/mouse move
-                                                                // 16 = movie
-                                                                // 32 = searcg
-extern int debugmode;                                           // 64 = radio station land icon loader
-                                                                // 128= stream search
-                                                                // 256 = tv program stuf
-                                                                // 512 = media importer
-                                                                // 1024 = flag loader
+extern GLuint spotify_askplay;                                  // ask open icon
+extern GLuint spotify_askopen;                                  // ask play icon
+extern int debugmode;
 extern unsigned int musicoversigt_antal;                        //
 extern int do_stream_icon_anim_icon_ofset;                      //
 extern GLuint radiooptions,radiooptionsmask;			              //
@@ -201,9 +188,10 @@ spotify_class::spotify_class() : antal(0) {
     // create web server
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     printf("Starting web server on port %s\n", s_http_port);
-//    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
-//    mg_set_protocol_http_websocket(this->c);                    // make http protocol
-    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
+    // start web server
+    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
+    mg_set_protocol_http_websocket(this->c);                    // make http protocol
+    mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
@@ -219,6 +207,19 @@ spotify_class::~spotify_class() {
 }
 
 
+// Get a List of a User's Playlists
+//
+//
+int spotify_class::spotify_get_list_of_users_playlists() {
+  char doget[4096];
+  if (strcmp(spotify_authorize_token,"")!=0) {
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists'  -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",spotify_client_id,spotify_client_id,spotify_authorize_token);
+    printf("doget = %s \n",doget);
+    system(doget);
+  }
+}
+
+// Get a List of Current User's Playlists
 //
 // get users play lists
 // write to spotify_users_playlist.txt
@@ -235,7 +236,8 @@ int spotify_class::spotify_get_users_playlist() {
 */
   char doget[4096];
   if (strcmp(spotify_authorize_token,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",spotify_authorize_token);
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists'  -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",spotify_client_id,spotify_authorize_token);
+    printf("doget = %s \n",doget);
     system(doget);
   }
 
@@ -410,6 +412,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 // get songs from playlist (any public user)
 // write to spotify_playlist.txt
 
+
 int spotify_class::spotify_get_playlist(char *playlist) {
   int tt;
   bool dbexist=false;
@@ -540,7 +543,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 }
 
 
-//
+// do not work
 // play songs
 //
 // --data '{\"context_uri\":\"spotify:album:59ZbFPES4DQwEjBpWHzrtC\",\"offset\":{\"position\":5},\"position_ms\":0}
@@ -553,7 +556,9 @@ int spotify_class::spotify_play_songs(char *songarray) {
   system(call);
 }
 
-//
+
+
+// do now work
 // play playlist
 //
 
@@ -561,6 +566,17 @@ int spotify_class::spotify_play_now(bool now) {
   char call[4096];
   printf("curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"offset\":{\"position\":5},\"position_ms\":0} -H \"Authorization: Bearer %s\" \n",spotify_authorize_token);
   sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data 'offset:{position:5},position_ms:0}' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+//
+// Do not work
+// get device list
+
+int spotify_class::spotify_get_available_devices() {
+  char call[4096];
+  printf("curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' \n",spotify_authorize_token);
+  sprintf(call,"curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.txt",spotify_authorize_token);
   system(call);
 }
 
@@ -588,6 +604,7 @@ int spotify_class::spotify_get_access_token() {
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
   *(base64_code+88)='\0';
+  //sprintf(call,"curl -X GET https://accounts.spotify.com/authorize?client_id=%s&scopes=playlist-read-private&response_type=code&redirect_uri=http://localhost > spotify_respons.txt",base64_code);
   sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
   system(call);
   myfile=fopen("spotify_access_token.txt","r");
@@ -601,6 +618,8 @@ int spotify_class::spotify_get_access_token() {
     //remove("spotify_access_token.txt");           // remove file again
   }
 }
+
+
 
 
 // return the name
@@ -971,11 +990,11 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     char *base,*right_margin;
     int length,width;
     int pline=0;
-
+    // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     //if ((this->streamantal()) && (spotify_oversigt_loaded==false) && (this->spotify_oversigt_loaded_nr<this->streamantal())) {
     if ((this->streamantal()) && (spotify_oversigt_loaded==false)) {
-      if (stack[spotify_oversigt_loaded_nr]) strcpy(gfxfilename,stack[spotify_oversigt_loaded_nr]->feed_gfx_mythtv);
+      if (stack[spotify_oversigt_loaded_nr]) strcpy(gfxfilename,stack[spotify_oversigt_loaded_nr]->feed_gfx_url);
       else strcpy(gfxfilename,"");
       // load texture if none loaded
       // get_texture return 0 if not loaded
@@ -1003,32 +1022,18 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         stream_oversigt_loaded_done=true;
       } else spotify_oversigt_loaded_nr++;
     }
-    /*
-    if (!(gfx_loaded)) {
-      spotify_oversigt_loaded_nr=0;
-      spotify_oversigt_loaded=false;
-    }
-    */
     // calc start pos (ofset)
     sofset=(_sangley/40)*8;
-
-//    printf("Antal %d       antalplaylists %d\n",this->streamantal(),antalplaylists);
-
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
       }
-      // error is in this IF block
-      // stream har et icon in db
-
       if (i+1==(int) stream_key_selected) buttonsizey=170.0f;
       else buttonsizey=180.0f;
-
       if (stack[i+sofset]->textureId) {
         // stream icon
-//        glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,empty_icon);
@@ -1040,16 +1045,11 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
-//        glPopMatrix();
 
         glPushMatrix();
         // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1086,10 +1086,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        //glBindTexture(GL_TEXTURE_2D,normal_icon);
-        glBindTexture(GL_TEXTURE_2D,normal_icon);
+        if (type==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+        else if ((type==1) && ((i+sofset)==0)) glBindTexture(GL_TEXTURE_2D,backicon);
+        else glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);

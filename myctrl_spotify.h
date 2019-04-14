@@ -50,6 +50,7 @@ class spotify_class : vlc_controller {
         int spotify_get_access_token();
         int spotify_get_users_playlist();
         int spotify_get_playlist(char *playlist);
+        int spotify_get_available_devices();                                    // get list of devices
         // used my webserver
         struct mg_mgr mgr;
         struct mg_mgr client_mgr;
@@ -68,6 +69,7 @@ class spotify_class : vlc_controller {
         int streamantal() { return(antal-1); }
         void clean_spotify_oversigt();
         int spotify_req_playlist();
+        int spotify_get_list_of_users_playlists();                              // Get a List of a User's Playlists
         int spotify_play_songs(char *songarray);
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(bool now);
