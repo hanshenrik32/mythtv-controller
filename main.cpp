@@ -2273,18 +2273,13 @@ void newLine(float rStart, float rEnd, float angle) {
   glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
 }
 
-
-
-
-
-
 static bool do_update_xmltv_show = false;
 static bool do_update_rss_show = true;
 static bool do_update_rss = false;
 static bool do_update_music = false;
 static bool do_update_music_now = false;                          // start the process to update music db from global dir
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
-static bool do_update_spotify = false;                            // set true to start thread on update movie db
+static bool do_update_spotify = true;                            // set true to start thread on update spotify db (true = update first run)
 
 void display() {
     // used by xmltv updater func
@@ -2475,15 +2470,14 @@ void display() {
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
-
     if (do_update_spotify_playlist) {
       //spotify_oversigt.spotify_req_playlist();
       spotify_oversigt.spotify_get_access_token();                              // get access token
-      //spotify_oversigt.spotify_get_users_playlist();                            // get users playlist
-      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      spotify_oversigt.spotify_get_users_playlist();                            // get users playlist
+      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
       // abc 4azabxHM2cqBEhjUD3fVJB
       // public 59ZbFPES4DQwEjBpWHzrtC
-      spotify_oversigt.spotify_play_now(1);
+      //spotify_oversigt.spotify_play_now(1);
       do_update_spotify_playlist=false;
     }
 
@@ -3601,19 +3595,22 @@ void display() {
       yof=200;
       buttonsize=100;
       glPushMatrix();
+
       glEnable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
       glBlendFunc(GL_ONE, GL_ONE);
-      glBindTexture(GL_TEXTURE_2D, spotify_askopen);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBindTexture(GL_TEXTURE_2D, spotify_askopen);						// texture9
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(21);                      				  // open icon nr
-      glBegin(GL_QUADS);
+      glLoadName(21);                      				  // play icon nr
+      glBegin(GL_QUADS); // draw ask box
       glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof, yof+328-80, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+328-80, 0.0);
       glTexCoord2f(1, 1); glVertex3f( xof+651-80, yof+328-80 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+651-80, yof , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
       glEnd();
       glPopMatrix();
     }
@@ -4826,7 +4823,7 @@ void display() {
     //
     // show uv metter in music player
     //
-    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
+    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_spotify_oversigt) || (vis_radio_or_music_oversigt)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
@@ -6251,7 +6248,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
           fprintf(stderr,"spotify selected=%d  \n",spotifyknapnr);
           fundet = true;
-          ask_open_dir_or_play_spotify=true;
+          if (spotify_oversigt.type==0) {
+            ask_open_dir_or_play_spotify=true;
+          } else {
+            ask_open_dir_or_play_spotify=false;
+            // update
+            spotify_oversigt.opdatere_spotify_oversigt(0);
+          }
         }
 
         // play
