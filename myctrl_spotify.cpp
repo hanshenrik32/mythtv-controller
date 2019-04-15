@@ -189,9 +189,10 @@ spotify_class::spotify_class() : antal(0) {
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     printf("Starting web server on port %s\n", s_http_port);
     // start web server
-    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
-    mg_set_protocol_http_websocket(this->c);                    // make http protocol
-    mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
+
+    //this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
+    //mg_set_protocol_http_websocket(this->c);                    // make http protocol
+    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
@@ -219,6 +220,7 @@ int spotify_class::spotify_get_list_of_users_playlists() {
   }
 }
 
+
 // Get a List of Current User's Playlists
 //
 // get users play lists
@@ -244,8 +246,9 @@ int spotify_class::spotify_get_users_playlist() {
 }
 
 // json parser used to parse the return files from spotify api
-/* ***************************************************************************************** */
 //
+//
+
 void spotify_class::print_depth_shift(int depth)
 {
   int j;
@@ -254,7 +257,9 @@ void spotify_class::print_depth_shift(int depth)
   }
 }
 
-//static void spotify_class::process_value(json_value* value, int depth);
+//
+// static void spotify_class::process_value(json_value* value, int depth);
+//
 
 bool process_tracks=false;
 bool process_playlist=false;
@@ -265,6 +270,9 @@ bool process_image=false;
 bool process_name=false;
 bool process_items=false;
 
+//
+// process types in file
+//
 
 void spotify_class::process_object(json_value* value, int depth) {
   int length, x;
@@ -437,11 +445,11 @@ int spotify_class::spotify_get_playlist(char *playlist) {
     sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_playlist.txt",playlist,spotify_authorize_token);
     system(doget);
   }
-  stat("spotify_playlist.txt", &filestatus);
-  file_size=filestatus.st_size;                                                // get filesize
+  stat("spotify_playlist.txt", &filestatus);                                    // get file info
+  file_size = filestatus.st_size;                                                 // get filesize
   file_contents = (char*)malloc(filestatus.st_size);
   json_file = fopen("spotify_playlist.txt", "rt");
-  if ( fread(file_contents, file_size, 1, json_file ) != 1 ) {
+  if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
     fprintf(stderr, "Unable to read spotify playlist content of %s\n", "spotify_playlist.txt");
     fclose(json_file);
     free(file_contents);
@@ -455,11 +463,11 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   json_value_free(value);
   free(file_contents);
   // save data to mysql db
-  conn=mysql_init(NULL);
+  conn = mysql_init(NULL);
   // Connect to database
   if (conn) {
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
-      dbexist=false;
+      dbexist = false;
     }
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -468,7 +476,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        dbexist=true;
+        dbexist = true;
       }
     }
     if ((!(dbexist)) && (mysql_query(conn,"CREATE database if not exist mythtvcontroller")!=0)) {
@@ -490,7 +498,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
       printf("mysql create table error.\n");
       printf("SQL : %s\n",sql);
     }
-    tt=0;
+    tt = 0;
     while(tt<antalplaylists) {
       if (stack[tt]) {
         //printf("#%2d  Name %40s url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl);
@@ -501,10 +509,10 @@ int spotify_class::spotify_get_playlist(char *playlist) {
         strcat(downloadfilenamelong,".jpg");
         // check if exist
         playlistexist=false;
-        refid=0;
+        refid = 0;
         sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname , "", "" , 0 );
         mysql_query(conn,sql);
-        res=mysql_store_result(conn);
+        res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
             refid=atoi(row[0]);
@@ -527,7 +535,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
           }
         }
         //
-        //
+        // insert record created
         //
         sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,refid,id) values ('%s','%s','%s','%s',%d,%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, refid , 0 );
         mysql_query(conn,sql);
@@ -537,8 +545,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
     }
   }
   mysql_close(conn);
-
-  printf("total antal fundet %4d antalplaylists %d \n",antal,antalplaylists);
+  printf("Created spotify songs %d \n",antal);
   return 0;
 }
 
@@ -553,6 +560,7 @@ int spotify_class::spotify_play_songs(char *songarray) {
   char call[4096];
   // https://api.spotify.com/v1/me/player/play
   sprintf(call,"curl -X PUT 'open.spotify.com/playlist/%s' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",songarray,spotify_authorize_token);
+  printf("call %s \n",call);
   system(call);
 }
 
@@ -607,7 +615,7 @@ int spotify_class::spotify_get_access_token() {
   //sprintf(call,"curl -X GET https://accounts.spotify.com/authorize?client_id=%s&scopes=playlist-read-private&response_type=code&redirect_uri=http://localhost > spotify_respons.txt",base64_code);
   sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
   system(call);
-  myfile=fopen("spotify_access_token.txt","r");
+  myfile = fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
     strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
@@ -624,13 +632,13 @@ int spotify_class::spotify_get_access_token() {
 
 // return the name
 char *spotify_class::get_spotify_name(int nr) {
-  if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
+  if (nr < antal) return (stack[nr]->feed_name); else return (NULL);
 }
 
 
 // return the description
 char *spotify_class::get_spotify_desc(int nr) {
-  if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
+  if (nr < antal) return (stack[nr]->feed_desc); else return (NULL);
 }
 
 // clean up number of created
@@ -649,61 +657,33 @@ void spotify_class::clean_spotify_oversigt() {
 }
 
 
-// set en stream icon image
+//
+// set spotify icon image
+//
 void spotify_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
 
-char spotify_search_and_replace2(char *text) {
-  int n=0;
-  int nn=0;
-  char newtext[2048];
-  strcpy(newtext,"");
-  while(n<strlen(text)) {
-    if (text[n]=='"') {
-      strcat(newtext,"'");
-      n++;
-//      nn+=1;
-    } else {
-      newtext[nn]=text[n];
-      newtext[nn+1]='\0';                               // null terminate string
-      nn++;
-      n++;
-    }
-  }
-  newtext[n]=0;
-  strcpy(text,newtext);
-}
-
-
-
-
 //
-// get nr of rss feed
+// get nr of spotify playlists
 //
 
 int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
-  char sqlselect[4096];
+  int antalrss_feeds;
   MYSQL_RES *res;
   MYSQL_ROW row;
-
-  printf("*************************************************************************************\n");
-
   if (conn) {
-    sprintf(sqlselect,"SELECT count(name) from mythtvcontroller.internetcontent");
-    mysql_query(conn,sqlselect);
+    mysql_query(conn,"SELECT count(name) from mythtvcontroller.spotifycontent");
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        //antalrss_feeds=atoi(row[0]);
+        antalrss_feeds=atoi(row[0]);
       }
     }
   }
-  return(1);
+  return(antalrss_feeds);
 }
-
-
 
 
 
@@ -723,7 +703,6 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
     char downloadfilename1[1024];
     char downloadfilenamelong[1024];
     char homedir[1024];
-    // mysql vars
     bool rss_update=false;
     MYSQL *conn;
     MYSQL_RES *res;
@@ -752,14 +731,13 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
         }
       }
     }
-    //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
-    clean_spotify_oversigt();                // clean old list
-    strcpy(lasttmpfilename,"");    					// reset
+    clean_spotify_oversigt();                                                   // clean old list
+    strcpy(lasttmpfilename,"");
     if (debugmode & 4) {
       printf("loading spotify data.\n");
     }
-    // find records after type to find
-    if (refid==0) {
+    // find records after type (0 = root, else = refid)
+    if (refid == 0) {
       sprintf(sqlselect,"select name,paththumb,id,id from spotifycontent");
       getart=0;
     } else {
@@ -771,7 +749,7 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-      get_antal_rss_feeds_sources(conn);
+      //get_antal_rss_feeds_sources(conn);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
@@ -781,7 +759,6 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
       res = mysql_store_result(conn);
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-          //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
           if (antal<maxantal) {
             stack[antal]=new (struct spotify_oversigt_type);
             if (stack[antal]) {
@@ -797,7 +774,7 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
               stack[antal]->intnr=atoi(row[3]);
               stack[antal]->nyt=false;
               // top level
-              if (getart==0) {
+              if (getart == 0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
@@ -842,10 +819,11 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
 */
                 antal++;
               }
-              if (getart==1) {
-                // back button
-                if (antal==0) {
-                  strncpy(stack[antal]->feed_showtxt,"Back",spotify_pathlength);
+              if (getart == 1) {
+                // First create back button
+                if (antal == 0) {
+                  strcpy(stack[antal]->feed_showtxt,"Back");
+                  strcpy(stack[antal]->playlisturl,"");
                   stack[antal]->intnr=0;
                   antal++;
                   if (stack[antal]==NULL) stack[antal]=new (struct spotify_oversigt_type);

@@ -756,7 +756,6 @@ GLuint _tvprgrecordedr;
 GLuint tvprginfobig;
 GLuint _tvoverskrift;             // overskrift window
 GLuint _texturesetupmenu_select;
-GLuint _textureIdclosemask;
 GLuint _texturesetupmenu;
 GLuint _textureIdclose;
 GLuint _textureIdclose1;
@@ -781,7 +780,6 @@ GLuint _textureIdfilm;
 GLuint _textureIdmusic;
 GLuint _textureIdtv;
 GLuint _tvbar1_1;
-GLuint radiomusicbuttonmask;
 GLuint streammoviebuttonmask;
 
 GLuint newstuf_icon;                        // icon for new stuf in stream view
@@ -6877,9 +6875,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         // play spotify song
         if ((retfunc==4) || (button==3)) {
           printf("play spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
-          do_play_spotify_cover=true;
-
-
+          //do_play_spotify_cover=true;
         }
       }
 
@@ -12345,7 +12341,6 @@ void loadgfx() {
     _textureIdplayinfo  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "playinfo");
     _textureIdclose     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close");
     _textureIdclose1    	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close1");
-    _textureIdclosemask 	= loadgfxfile(temapath,(char *) "buttons/",(char *) "close_mask");
     _texturelock        	= loadgfxfile(temapath,(char *) "images/",(char *) "lock");
     // ************************ icons ******************************************
     _texturesetupmenu   	= loadgfxfile(temapath,(char *) "buttons/",(char *) "setupmenu");				// setup menu
@@ -12403,14 +12398,12 @@ void loadgfx() {
     onlineradio      =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
     onlineradio192   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
     onlineradio320   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
-    radiobutton      =loadgfxfile(temapath,(char *) "images/",(char *) "radio_button");
-    musicbutton      =loadgfxfile(temapath,(char *) "images/",(char *) "music_button");
-
-    spotify_askplay  =loadgfxfile(temapath,(char *) "images/",(char *) "spotify_askplay");
-    spotify_askopen  =loadgfxfile(temapath,(char *) "images/",(char *) "spotify_askopen");
-    spotifybutton    =loadgfxfile(temapath,(char *) "images/",(char *) "spotify_button");
-    // radio/music button mask
-    radiomusicbuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiomusic_button_mask");
+    radiobutton      =loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
+    musicbutton      =loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
+    // spotify buttons
+    spotify_askplay  =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
+    spotify_askopen  =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
+    spotifybutton    =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     // radio options (O) key in radio oversigt
     radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -12421,9 +12414,10 @@ void loadgfx() {
     // stream stuf
     // stream/movie button mask
     streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
-    streambutton=loadgfxfile(temapath,(char *) "images/",(char *) "stream_button");
-    // movie
-    moviebutton=loadgfxfile(temapath,(char *) "images/",(char *) "movie_button");
+    // podcast button
+    streambutton=loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
+    // movie button
+    moviebutton=loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
     // main logo
     _mainlogo=loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
@@ -12510,7 +12504,6 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
     glDeleteTextures( 1, &_textureIdclose);
     glDeleteTextures( 1, &_textureIdclose1);
-    glDeleteTextures( 1, &_textureIdclosemask);
     glDeleteTextures( 1, &_texturelock);			// en lille hænge lås bruges i tvguide
     glDeleteTextures( 1, &_texturesetupmenu);			// icons
     glDeleteTextures( 1, &_texturesetupmenu_select);
