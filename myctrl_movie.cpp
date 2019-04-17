@@ -30,7 +30,6 @@ extern int film_key_selected;
 extern int film_select_iconnr;
 extern GLuint _defaultdvdcover;
 extern GLuint _defaultdvdcover2;
-extern GLuint _dvdcovermask;
 extern bool global_use_internal_music_loader_system;
 const float textcolor_movie_oversigt[3]={0.8f,0.8f,0.8f};
 extern GLint cur_avail_mem_kb;
@@ -1157,7 +1156,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         //glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -1187,7 +1186,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -1339,7 +1338,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);                           //
+        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);                           //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+film_nr+sofset);
@@ -1369,7 +1368,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+        glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+film_nr+sofset);

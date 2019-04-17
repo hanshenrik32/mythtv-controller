@@ -3476,7 +3476,7 @@ void show_setup_tv_graber(int startofset) {
         printf("Create config file for xmltv first time.\n");
         if (txmltvgraber_createconfig()==0) {
           printf("\nError xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
-          exit(0);
+          //exit(0);
         }
         //
         // load all channels name from tv_graber

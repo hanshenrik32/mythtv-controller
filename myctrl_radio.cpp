@@ -41,8 +41,7 @@ extern GLuint onlineradio;					                          //
 extern GLuint onlineradio_empty;				                      //
 extern GLuint onlineradio192;					                        //
 extern GLuint onlineradio320;					                        //
-extern GLuint onlineradiomask;					                      //
-extern GLuint radiooptions,radiooptionsmask;			            //
+extern GLuint radiooptions;                                   //
 extern int fonttype;
 extern fontctrl aktivfont;
 extern GLuint _textureIdloading;
@@ -670,6 +669,7 @@ void radiostation_class::show_radio_options() {
     int xpos=0;
     int ypos=0;
     // mask
+    /*
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
     glTranslatef(0.0f, 0.0f, 0.0f);
@@ -688,6 +688,7 @@ void radiostation_class::show_radio_options() {
     glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
     glEnd();
     glPopMatrix();
+    */
     // background
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
