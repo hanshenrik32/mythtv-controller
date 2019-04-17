@@ -661,15 +661,11 @@ GLuint _textureId11; 	                    // tv program oversigt logo
 GLuint _textureId12; 	                    // background 1
 GLuint _textureId12_1; 	                  // background 2
 GLuint _textureId14; 	                    // pause knap
-GLuint _textureId15; 	                    // lille cover mask
 GLuint _texture_nocdcover; 	              // cdnocover big icon
-GLuint _dvdcovermask; 	                  // dvdcovermask
 GLuint _textureId20; 	                    // mask movie options box
-GLuint _textureId21; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
 GLuint _textureId23; 	                    // movie options box
 GLuint _textureId24; 	                    // movie options box
-GLuint _textureId25; 	                    //
 GLuint _textureId26; 	                    //
 GLuint _textureId27; 	                    //
 GLuint _textureId28; 	                    // dir playlist_icon
@@ -684,7 +680,6 @@ GLuint onlineradio_empty;                 //
 GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
 GLuint radiooptions;                      //
-GLuint radiooptionsmask;                  //
 GLuint radiobutton;                       //
 GLuint spotifybutton;                     //
 GLuint spotify_askplay;                   //
@@ -743,7 +738,6 @@ GLuint _textureIdback_setup;
 GLuint  screensaverbox;
 GLuint  screensaverbox1;
 GLuint _textureIdmusic_aktiv;
-GLuint _tvmaskprgrecordedbutton;
 GLuint _tvbar1,_tvbar3;
 GLuint _mainlogo;
 GLuint _tvnewprgrecordedbutton;
@@ -780,7 +774,6 @@ GLuint _textureIdfilm;
 GLuint _textureIdmusic;
 GLuint _textureIdtv;
 GLuint _tvbar1_1;
-GLuint streammoviebuttonmask;
 
 GLuint newstuf_icon;                        // icon for new stuf in stream view
 GLuint analog_clock_background;             // background for analog clock
@@ -5286,7 +5279,7 @@ void display() {
       glDisable(GL_BLEND);
       // show movie dvd cover
       glPushMatrix();
-      glBindTexture(GL_TEXTURE_2D,_dvdcovermask);
+      glBindTexture(GL_TEXTURE_2D,_defaultdvdcover);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -12303,15 +12296,11 @@ void loadgfx() {
     _textureIdback_other  = loadgfxfile(temapath,(char *) "images/",(char *) "background_other");
     // mask for knap
     _textureId14         	= loadgfxfile(temapath,(char *) "images/",(char *) "stor_knap3_2_pause");
-    _textureId15         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecovermask");
     _texture_nocdcover   	= loadgfxfile(temapath,(char *) "images/",(char *) "nocdcover");
-    _dvdcovermask       	= loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover_mask");
     _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
-    _textureId21         	= loadgfxfile(temapath,(char *) "images/",(char *) "textbox");
     _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
     _textureId23         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox2");
     _textureId24         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox3");
-    _textureId25         	= loadgfxfile(temapath,(char *) "images/",(char *) "recorded_vis_mask");
     _textureId26         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar");
     _textureId27         	= loadgfxfile(temapath,(char *) "images/",(char *) "volbar_back");
     _textureId28         	= loadgfxfile(temapath,(char *) "images/",(char *) "dirplaylist");
@@ -12365,7 +12354,6 @@ void loadgfx() {
     _tvrecordcancelbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "tvrecord_cancel");
     _tvoldprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "oldrecordedbutton");
     _tvnewprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "newrecordedbutton");
-    _tvmaskprgrecordedbutton	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbutton_mask");
     // ****************** backgrounds **************************************
     setupsoundback      	= loadgfxfile(temapath,(char *) "images/",(char *) "setup-soundback");
     setupsqlback        	= loadgfxfile(temapath,(char *) "images/",(char *) "setupsqlback");
@@ -12407,13 +12395,9 @@ void loadgfx() {
     // radio options (O) key in radio oversigt
     radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
-    radiooptionsmask=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptionsmask");
     onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
     onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
     onlinestream_empty1  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
-    // stream stuf
-    // stream/movie button mask
-    streammoviebuttonmask=loadgfxfile(temapath,(char *) "images/",(char *) "streammovie_button_mask");
     // podcast button
     streambutton=loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
     // movie button
@@ -12429,9 +12413,12 @@ void loadgfx() {
     texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
     texturedot1=loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
     _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
+    // new stuf mini icon
     newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
+    // exit
     _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
     _textureIdreset_search=loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
+    // analog clock background
     analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
@@ -12466,15 +12453,11 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback_setup);                // setup background
     glDeleteTextures( 1, &_textureIdback_other);		    // other background
     glDeleteTextures( 1, &_textureId14);	           		//pause knap
-    glDeleteTextures( 1, &_textureId15);					   		// bruges ikk
     glDeleteTextures( 1, &_texture_nocdcover);         	// hvis ingen texture (music cover) set default (box2.bmp)
-    glDeleteTextures( 1, &_dvdcovermask);	          		// dvd cover mask
     glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
-    glDeleteTextures( 1, &_textureId21);		  					// bruges ikke
     glDeleteTextures( 1, &_textureId22);		          	// bruges ved recorded programs
     glDeleteTextures( 1, &_textureId23);	           		// bruges ved recorded programs
     glDeleteTextures( 1, &_textureId24);			          // bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId25);			          // recorded vis recorded border
     glDeleteTextures( 1, &_textureId26);			          // vol control
     glDeleteTextures( 1, &_textureId27);	           		// vol control
     glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
@@ -12528,7 +12511,6 @@ void freegfx() {
     glDeleteTextures( 1, &_tvrecordcancelbutton);
     glDeleteTextures( 1, &_tvoldprgrecordedbutton);
     glDeleteTextures( 1, &_tvnewprgrecordedbutton);
-    glDeleteTextures( 1, &_tvmaskprgrecordedbutton);
     glDeleteTextures( 1, &setupsoundback);
     glDeleteTextures( 1, &setupsqlback);
     glDeleteTextures( 1, &setuptemaback);
@@ -12564,7 +12546,6 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_askplay);
     glDeleteTextures( 1, &spotifybutton);
     glDeleteTextures( 1, &radiooptions);
-    glDeleteTextures( 1, &radiooptionsmask);
     glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
     glDeleteTextures( 1, &texturedot);

@@ -15,7 +15,6 @@
 #include <ctype.h>
 #include <ical.h>
 #include <libxml/parser.h>
-//#include "text3d.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
@@ -47,7 +46,6 @@ extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
 extern GLuint _tvoldprgrecordedbutton;
 extern GLuint _tvnewprgrecordedbutton;
-extern GLuint _tvmaskprgrecordedbutton;
 extern GLuint _tvoverskrift;
 extern fontctrl aktivfont;
 extern int orgwinsizex,orgwinsizey;
