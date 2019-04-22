@@ -760,7 +760,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
           }
         }
         if (!(playlistexist)) {
-          sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", playlist , "",stack[tt]->playlistid, 0 );
+          sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , "",playlist, 0 );
           mysql_query(conn,sql);
           res=mysql_store_result(conn);
           if (refid==0) {
