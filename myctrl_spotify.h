@@ -48,7 +48,7 @@ class spotify_class : vlc_controller {
         //int parsexmlrssfile(char *filename,char *baseiconfile);               // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         int spotify_get_access_token();
-        int spotify_get_users_playlist();
+        int spotify_get_user_playlists();
         int spotify_get_playlist(char *playlist);
         int spotify_get_available_devices();                                    // get list of devices
         // used my webserver
@@ -70,6 +70,7 @@ class spotify_class : vlc_controller {
         void clean_spotify_oversigt();
         int spotify_req_playlist();
         int spotify_get_list_of_users_playlists();                              // Get a List of a User's Playlists
+        int spotify_get_user_id();
         int spotify_play_songs(char *songarray);
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(bool now);
@@ -77,6 +78,12 @@ class spotify_class : vlc_controller {
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
         void process_array(json_value*, int);
+
+        void playlist_print_depth_shift(int depth);
+        void playlist_process_object(json_value* value, int depth,MYSQL *conn);
+        void playlist_process_array(json_value* value, int depth,MYSQL *conn);
+        void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
+
         int opdatere_spotify_oversigt(int refid);
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected);
 };

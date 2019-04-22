@@ -646,14 +646,13 @@ int radio_key_selected=1;                 // default
 int radiooversigt_antal=0;                // antal aktive sange
 GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ændres gfx zoom lidt så det passer på ati/intel)
 GLuint _textureutvbgmask;                 // background in tv guide programs
-GLuint _textureId2;                     	// error window
 GLuint _defaultdvdcover;                	// The id of the texture
 GLuint _texturemovieinfobox;	            //  movie image
 GLuint _textureId7; 	                    // folder image
 GLuint _texturemusicplayer; 	            // music image		// show player
 GLuint _textureId9_askbox; 	              // askbox image
 GLuint _textureId9_2; 	                  // askbox music image
-GLuint _textureId10; 	                    // play icon
+GLuint _textureIdplayicon; 	                    // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
 GLuint _textureswap; 	                    // swap icon
@@ -2456,16 +2455,19 @@ void display() {
 
 
     // run the webserver
-    std::clock_t start;
-    start = std::clock();
-    mg_mgr_poll(&spotify_oversigt.mgr, 50);
+    //std::clock_t start;
+    //start = std::clock();
+    //mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
     if (do_update_spotify_playlist) {
       //spotify_oversigt.spotify_req_playlist();
       spotify_oversigt.spotify_get_access_token();                              // get access token
-      spotify_oversigt.spotify_get_users_playlist();                            // get users playlist
-      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      spotify_oversigt.spotify_get_user_id();                                                    // get user id
+      //spotify_oversigt.spotify_get_users_playlist();                          // get users playlist
+      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      spotify_oversigt.spotify_get_user_playlists();
+
       // abc 4azabxHM2cqBEhjUD3fVJB
       // public 59ZbFPES4DQwEjBpWHzrtC
       //spotify_oversigt.spotify_play_now(1);
@@ -3357,7 +3359,7 @@ void display() {
         glColor3f(1.0f, 1.0f, 1.0f);
         glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, _textureId10);
+        glBindTexture(GL_TEXTURE_2D, _textureIdplayicon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(20);                      				  // play icon nr
@@ -3876,8 +3878,9 @@ void display() {
 
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
-      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
-      spotify_oversigt.spotify_play_songs(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl);
+      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.stack[spotifyknapnr-1]->playlistid);
+      spotify_oversigt.spotify_play_songs(spotify_oversigt.stack[spotifyknapnr-1]->playlistid);
+      do_play_spotify_cover=false;
       /*
       result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
       ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -12271,7 +12274,6 @@ void loadgfx() {
       tema=1;
     }
     _textureutvbgmask     = loadgfxfile(temapath,(char *) "images/",(char *) "tv_carbon");
-    _textureId2           = loadgfxfile(temapath,(char *) "images/",(char *) "error");
     _defaultdvdcover      = loadgfxfile(temapath,(char *) "images/",(char *) "dvdcover");
     if (screen_size<3)
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
@@ -12281,7 +12283,7 @@ void loadgfx() {
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
     _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
-    _textureId10         	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
+    _textureIdplayicon   	= loadgfxfile(temapath,(char *) "images/",(char *) "play");
     _textureopen         	= loadgfxfile(temapath,(char *) "images/",(char *) "open");
     _textureclose        	= loadgfxfile(temapath,(char *) "images/",(char *) "close");
     _textureswap         	= loadgfxfile(temapath,(char *) "images/",(char *) "swap");
@@ -12376,50 +12378,50 @@ void loadgfx() {
     screenshot8=loadTexture ((char *) "images/screenshot8.png");
     screenshot9=loadTexture ((char *) "images/screenshot9.png");
     screenshot10=loadTexture ((char *) "images/screenshot10.png");
-    _tvbar1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
-    _tvoverskrift=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
-    _tvbar1_1=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
-    _tvbar3=loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
-    // icons buttons
-    // radio buttons
-    onlineradio_empty=loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
-    onlineradio      =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
-    onlineradio192   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
-    onlineradio320   =loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
-    radiobutton      =loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
-    musicbutton      =loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
-    // spotify buttons
-    spotify_askplay  =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
-    spotify_askopen  =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
-    spotifybutton    =loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
+// ************************* Tv guide ***********************************
+    _tvbar1               = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1");
+    _tvoverskrift         = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar_top");
+    _tvbar1_1             = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
+    _tvbar3               = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
+// ************************ radio buttons *******************************
+    onlineradio_empty     = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
+    onlineradio           = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
+    onlineradio192        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
+    onlineradio320        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio320");
+    radiobutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "radio_button");
+    musicbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "music_button");
+// ************************** spotify buttons ****************************
+    spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
+    spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
+    spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     // radio options (O) key in radio oversigt
-    radiooptions=loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
+    radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
-    onlinestream  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
-    onlinestream_empty  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
-    onlinestream_empty1  =loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
+    onlinestream          = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream");
+    onlinestream_empty    = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty");
+    onlinestream_empty1   = loadgfxfile(temapath,(char *) "images/",(char *) "onlinestream_empty1");
     // podcast button
-    streambutton=loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
+    streambutton          = loadgfxfile(temapath,(char *) "buttons/",(char *) "stream_button");
     // movie button
-    moviebutton=loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
+    moviebutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "movie_button");
     // main logo
-    _mainlogo=loadgfxfile(temapath,(char *) "images/",(char *) "logo");
+    _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
     strcpy(fileload,(char *) "/usr/share/mythtv-controller/images/landemask.jpg");
-    gfxlandemask=loadTexture (fileload);
-    // screen saver boxes
-    screensaverbox=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
-    screensaverbox1=loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
-    texturedot=loadgfxfile(temapath,(char *) "images/",(char *) "dot");
-    texturedot1=loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
-    _errorbox=loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
+    gfxlandemask          = loadTexture (fileload);
+// ************************** screen saver boxes **************************************
+    screensaverbox        = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
+    screensaverbox1       = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix1");
+    texturedot            = loadgfxfile(temapath,(char *) "images/",(char *) "dot");
+    texturedot1           = loadgfxfile(temapath,(char *) "images/",(char *) "dot1");
+    _errorbox             = loadgfxfile(temapath,(char *) "images/",(char *) "errorbox");
     // new stuf mini icon
-    newstuf_icon=loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
+    newstuf_icon          = loadgfxfile(temapath,(char *) "images/",(char *) "new_stuf");
     // exit
-    _textureexit=loadgfxfile(temapath,(char *) "images/",(char *) "exit");
-    _textureIdreset_search=loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
+    _textureexit          = loadgfxfile(temapath,(char *) "images/",(char *) "exit");
+    _textureIdreset_search = loadgfxfile(temapath,(char *) "buttons/",(char *) "reset_search");
     // analog clock background
-    analog_clock_background=loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
+    analog_clock_background = loadgfxfile(temapath,(char *) "images/",(char *) "clock_background");
     strcpy(tmpfilename,temapath);
     strcat(tmpfilename,(char *) "buttons/music1.png");
     if (file_exists(tmpfilename)) {
@@ -12436,134 +12438,133 @@ void loadgfx() {
 void freegfx() {
     int i;
     glDeleteTextures( 1, &_textureutvbgmask);
-    glDeleteTextures( 1, &_textureId2); 			  // backside of roller windows in movie select func
-    glDeleteTextures( 1, &_defaultdvdcover);		// default dvd cover hvis der ikke er nogle at loade
-    glDeleteTextures( 1, &_texturemovieinfobox);		  // movie info box
-    glDeleteTextures( 1, &_textureId7);				  // cd/dir icon in music oversigt (hvis ingen cd cover findes)
-    glDeleteTextures( 1, &_texturemusicplayer); // show music info player
-    glDeleteTextures( 1, &_textureId9_askbox);				  // ask box
-    glDeleteTextures( 1, &_textureId9_2);			  // ask box
-    glDeleteTextures( 1, &_textureId10);			  // play icon
-    glDeleteTextures( 1, &_textureopen);        // open icon
-    glDeleteTextures( 1, &_textureclose);			          // no dont play icon
-    glDeleteTextures( 1, &_textureswap);			        // no dont play icon
-    glDeleteTextures( 1, &_textureId11);			          // tv program oversigt logo
-    glDeleteTextures( 1, &_textureIdback_main);       	// main background
-    glDeleteTextures( 1, &_textureIdback_music);                // music background
-    glDeleteTextures( 1, &_textureIdback_setup);                // setup background
-    glDeleteTextures( 1, &_textureIdback_other);		    // other background
-    glDeleteTextures( 1, &_textureId14);	           		//pause knap
-    glDeleteTextures( 1, &_texture_nocdcover);         	// hvis ingen texture (music cover) set default (box2.bmp)
-    glDeleteTextures( 1, &_textureId20);		          	// bruges af 3d screen saver (lille logo)
-    glDeleteTextures( 1, &_textureId22);		          	// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId23);	           		// bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId24);			          // bruges ved recorded programs
-    glDeleteTextures( 1, &_textureId26);			          // vol control
-    glDeleteTextures( 1, &_textureId27);	           		// vol control
-    glDeleteTextures( 1, &_textureId28);		           	// playlist default icon
-    glDeleteTextures( 1, &_textureIdback);		        	// bruges ved music
-    glDeleteTextures( 1, &setuptexture);			          // bruges af setup
-    glDeleteTextures( 1, &setupupdatebutton);			      // global update button
-    glDeleteTextures( 1, &setuptvgraberback);           // bryges af setup tv graber
-    glDeleteTextures( 1, &_textureIdtv);							  // bruges ikke
-    glDeleteTextures( 1, &_textureIdmusic);			        // music
-    glDeleteTextures( 1, &_textureIdfilm);			        // default film icon
-    glDeleteTextures( 1, &_textureIdrecorded);			    // default recorded icon
-    glDeleteTextures( 1, &_texturemlast);							  // bruges ikke
-    glDeleteTextures( 1, &_texturemlast2);			        // bruges
-    glDeleteTextures( 1, &_texturemnext);			          // next song
-    glDeleteTextures( 1, &_texturemplay);		           	// play song
-    glDeleteTextures( 1, &_texturempause);              // pause play
-    glDeleteTextures( 1, &_textureIdpup);		           	//
-    glDeleteTextures( 1, &_textureIdpdown);		         	//
-    glDeleteTextures( 1, &_texturemstop);			          // stop
-    glDeleteTextures( 1, &_textureIdrecorded_aktiv);		// film
-    glDeleteTextures( 1, &_textureIdfilm_aktiv);	     	// film
-    glDeleteTextures( 1, &_textureIdmusicsearch);	     	// search felt til music
-    glDeleteTextures( 1, &_textureIdradiosearch);		    // sang search
-    glDeleteTextures( 1, &_textureIdmusicsearch1);	   	// artist search
-    glDeleteTextures( 1, &_textureIdmoviesearch);	   	// artist search
-    glDeleteTextures( 1, &_textureIdloading);
+    glDeleteTextures( 1, &_defaultdvdcover);		    // default dvd cover hvis der ikke er nogle at loade
+    glDeleteTextures( 1, &_texturemovieinfobox);		// movie info box
+    glDeleteTextures( 1, &_textureId7);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
+    glDeleteTextures( 1, &_texturemusicplayer);     // show music info player
+    glDeleteTextures( 1, &_textureId9_askbox);			// ask box
+    glDeleteTextures( 1, &_textureId9_2);			      // ask box
+    glDeleteTextures( 1, &_textureIdplayicon);			// play icon
+    glDeleteTextures( 1, &_textureopen);            // open icon
+    glDeleteTextures( 1, &_textureclose);			      // no dont play icon
+    glDeleteTextures( 1, &_textureswap);			      // no dont play icon
+    glDeleteTextures( 1, &_textureId11);			      // tv program oversigt logo
+    glDeleteTextures( 1, &_textureIdback_main);     // main background
+    glDeleteTextures( 1, &_textureIdback_music);    // music background
+    glDeleteTextures( 1, &_textureIdback_setup);    // setup background
+    glDeleteTextures( 1, &_textureIdback_other);		// other background
+    glDeleteTextures( 1, &_textureId14);	          // pause knap
+    glDeleteTextures( 1, &_texture_nocdcover);      // hvis ingen texture (music cover) set default (box2.bmp)
+    glDeleteTextures( 1, &_textureId20);		        // bruges af 3d screen saver (lille logo)
+    glDeleteTextures( 1, &_textureId22);		        // bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId23);	          // bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId24);			      // bruges ved recorded programs
+    glDeleteTextures( 1, &_textureId26);			      // vol control
+    glDeleteTextures( 1, &_textureId27);	          // vol control
+    glDeleteTextures( 1, &_textureId28);		        // playlist default icon
+    glDeleteTextures( 1, &_textureIdback);		      // bruges ved music
+    glDeleteTextures( 1, &setuptexture);			      // bruges af setup
+    glDeleteTextures( 1, &setupupdatebutton);			  // global update button
+    glDeleteTextures( 1, &setuptvgraberback);       // bryges af setup tv graber
+    glDeleteTextures( 1, &_textureIdtv);						// bruges ikke
+    glDeleteTextures( 1, &_textureIdmusic);			    // music
+    glDeleteTextures( 1, &_textureIdfilm);			    // default film icon
+    glDeleteTextures( 1, &_textureIdrecorded);			// default recorded icon
+    glDeleteTextures( 1, &_texturemlast);						// bruges ikke
+    glDeleteTextures( 1, &_texturemlast2);			    // bruges
+    glDeleteTextures( 1, &_texturemnext);			      // next song
+    glDeleteTextures( 1, &_texturemplay);		        // play song
+    glDeleteTextures( 1, &_texturempause);          // pause play
+    glDeleteTextures( 1, &_textureIdpup);		        //
+    glDeleteTextures( 1, &_textureIdpdown);		      //
+    glDeleteTextures( 1, &_texturemstop);			      // stop
+    glDeleteTextures( 1, &_textureIdrecorded_aktiv);// film
+    glDeleteTextures( 1, &_textureIdfilm_aktiv);	  // film
+    glDeleteTextures( 1, &_textureIdmusicsearch);	  // search felt til music
+    glDeleteTextures( 1, &_textureIdradiosearch);		// sang search
+    glDeleteTextures( 1, &_textureIdmusicsearch1);	// artist search
+    glDeleteTextures( 1, &_textureIdmoviesearch);	  // artist search
+    glDeleteTextures( 1, &_textureIdloading);       //
     glDeleteTextures( 1, &_textureIdplayinfo);			// default show musicplay info
-    glDeleteTextures( 1, &_textureIdclose);
-    glDeleteTextures( 1, &_textureIdclose1);
-    glDeleteTextures( 1, &_texturelock);			// en lille hænge lås bruges i tvguide
-    glDeleteTextures( 1, &_texturesetupmenu);			// icons
-    glDeleteTextures( 1, &_texturesetupmenu_select);
-    glDeleteTextures( 1, &_texturesoundsetup);        // setup
-    glDeleteTextures( 1, &_texturesourcesetup);	  	 	// setup
-    glDeleteTextures( 1, &_textureimagesetup);		  	// setup
-    glDeleteTextures( 1, &_texturetemasetup);		    	// setup
-    glDeleteTextures( 1, &_texturemythtvsql);		    	// setup
-    glDeleteTextures( 1, &_texturesetupfont);			    // setup
-    glDeleteTextures( 1, &_texturesetupclose);		  	//
-    glDeleteTextures( 1, &_texturekeyssetup);		     	// setup
-    glDeleteTextures( 1, &_texturekeysrss);	  	     	// setup
-    glDeleteTextures( 1, &_texturevideoplayersetup);  // setup
-    glDeleteTextures( 1, &_texturetvgrabersetup);     //
-    glDeleteTextures( 1, &setupkeysbar1);			// bruges af myth_setup.cpp
-    glDeleteTextures( 1, &setupkeysbar2);			// setupkeysbar1
-    glDeleteTextures( 1, &tvprginfobig);			// bruges til tv oversigt kanal info
-    glDeleteTextures( 1, &_tvoverskrift);     // tv oversigt top window
-    glDeleteTextures( 1, &_tvprgrecorded);			// tv
-    glDeleteTextures( 1, &_tvprgrecordedr);						// bruges ikke mere
-    glDeleteTextures( 1, &_tvrecordbutton);			// tv
-    glDeleteTextures( 1, &_tvrecordcancelbutton);
-    glDeleteTextures( 1, &_tvoldprgrecordedbutton);
-    glDeleteTextures( 1, &_tvnewprgrecordedbutton);
-    glDeleteTextures( 1, &setupsoundback);
-    glDeleteTextures( 1, &setupsqlback);
-    glDeleteTextures( 1, &setuptemaback);
-    glDeleteTextures( 1, &setupnetworkback);
-    glDeleteTextures( 1, &setupnetworkwlanback);
-    glDeleteTextures( 1, &setupscreenback);
-    glDeleteTextures( 1, &setupfontback);
-    glDeleteTextures( 1, &setupkeysback);
-    glDeleteTextures( 1, &setuprssback);
-    glDeleteTextures( 1, &_texturesaveplaylist);
-    glDeleteTextures( 1, &screenshot1);		                   		// screen shots
-    glDeleteTextures( 1, &screenshot2);			                  	// screen shots
-    glDeleteTextures( 1, &screenshot3);			                  	// screen shots
-    glDeleteTextures( 1, &screenshot4);				                  // screen shots
-    glDeleteTextures( 1, &screenshot5);				                  // screen shots
-    glDeleteTextures( 1, &screenshot6);                         // screen shots
-    glDeleteTextures( 1, &screenshot7);                         // screen shots
-    glDeleteTextures( 1, &screenshot8);                         // screen shots
-    glDeleteTextures( 1, &screenshot9);                         // screen shots
-    glDeleteTextures( 1, &screenshot10);                        // screen shots
-    glDeleteTextures( 1, &_tvbar1);
-    glDeleteTextures( 1, &_tvbar3);
-    glDeleteTextures( 1, &onlineradio_empty);
-    glDeleteTextures( 1, &onlineradio);		                   		// radio icon
-    glDeleteTextures( 1, &onlineradio192);			                // radio icon
-    glDeleteTextures( 1, &onlineradio320);			                // radio icon
-    glDeleteTextures( 1, &radiobutton);
-    glDeleteTextures( 1, &onlinestream);                        // stream default icons
-    glDeleteTextures( 1, &onlinestream_empty);                  // stream default icons
-    glDeleteTextures( 1, &onlinestream_empty1);                 // stream default icons
-    glDeleteTextures( 1, &musicbutton);
-    glDeleteTextures( 1, &spotify_askopen);
-    glDeleteTextures( 1, &spotify_askplay);
-    glDeleteTextures( 1, &spotifybutton);
-    glDeleteTextures( 1, &radiooptions);
-    glDeleteTextures( 1, &_mainlogo);								             // Main logo not in use any more
-    glDeleteTextures( 1, &gfxlandemask);			                   // lande mask
-    glDeleteTextures( 1, &texturedot);
-    glDeleteTextures( 1, &texturedot1);
-    glDeleteTextures( 1, &_errorbox);                           // error box
-    glDeleteTextures( 1, &_textureexit);
-    glDeleteTextures( 1, &_textureIdreset_search);
+    glDeleteTextures( 1, &_textureIdclose);         //
+    glDeleteTextures( 1, &_textureIdclose1);        //
+    glDeleteTextures( 1, &_texturelock);			      // en lille hænge lås bruges i tvguide
+    glDeleteTextures( 1, &_texturesetupmenu);			  // icons
+    glDeleteTextures( 1, &_texturesetupmenu_select);//
+    glDeleteTextures( 1, &_texturesoundsetup);      // setup
+    glDeleteTextures( 1, &_texturesourcesetup);	  	// setup
+    glDeleteTextures( 1, &_textureimagesetup);		  // setup
+    glDeleteTextures( 1, &_texturetemasetup);		    // setup
+    glDeleteTextures( 1, &_texturemythtvsql);		    // setup
+    glDeleteTextures( 1, &_texturesetupfont);			  // setup
+    glDeleteTextures( 1, &_texturesetupclose);		  //
+    glDeleteTextures( 1, &_texturekeyssetup);		    // setup
+    glDeleteTextures( 1, &_texturekeysrss);	  	    // setup
+    glDeleteTextures( 1, &_texturevideoplayersetup);// setup
+    glDeleteTextures( 1, &_texturetvgrabersetup);   //
+    glDeleteTextures( 1, &setupkeysbar1);			      // bruges af myth_setup.cpp
+    glDeleteTextures( 1, &setupkeysbar2);			      // setupkeysbar1
+    glDeleteTextures( 1, &tvprginfobig);			      // bruges til tv oversigt kanal info
+    glDeleteTextures( 1, &_tvoverskrift);           // tv oversigt top window
+    glDeleteTextures( 1, &_tvprgrecorded);			    // tv
+    glDeleteTextures( 1, &_tvprgrecordedr);					// bruges ikke mere
+    glDeleteTextures( 1, &_tvrecordbutton);			    // tv
+    glDeleteTextures( 1, &_tvrecordcancelbutton);   //
+    glDeleteTextures( 1, &_tvoldprgrecordedbutton); //
+    glDeleteTextures( 1, &_tvnewprgrecordedbutton); //
+    glDeleteTextures( 1, &setupsoundback);          //
+    glDeleteTextures( 1, &setupsqlback);            //
+    glDeleteTextures( 1, &setuptemaback);           //
+    glDeleteTextures( 1, &setupnetworkback);        //
+    glDeleteTextures( 1, &setupnetworkwlanback);    //
+    glDeleteTextures( 1, &setupscreenback);         //
+    glDeleteTextures( 1, &setupfontback);           //
+    glDeleteTextures( 1, &setupkeysback);           //
+    glDeleteTextures( 1, &setuprssback);            //
+    glDeleteTextures( 1, &_texturesaveplaylist);    //
+    glDeleteTextures( 1, &screenshot1);		          // screen shots
+    glDeleteTextures( 1, &screenshot2);			        // screen shots
+    glDeleteTextures( 1, &screenshot3);			        // screen shots
+    glDeleteTextures( 1, &screenshot4);				      // screen shots
+    glDeleteTextures( 1, &screenshot5);				      // screen shots
+    glDeleteTextures( 1, &screenshot6);             // screen shots
+    glDeleteTextures( 1, &screenshot7);             // screen shots
+    glDeleteTextures( 1, &screenshot8);             // screen shots
+    glDeleteTextures( 1, &screenshot9);             // screen shots
+    glDeleteTextures( 1, &screenshot10);            // screen shots
+    glDeleteTextures( 1, &_tvbar1);                 //
+    glDeleteTextures( 1, &_tvbar3);                 //
+    glDeleteTextures( 1, &onlineradio_empty);       //
+    glDeleteTextures( 1, &onlineradio);		          // radio icon
+    glDeleteTextures( 1, &onlineradio192);			    // radio icon
+    glDeleteTextures( 1, &onlineradio320);			    // radio icon
+    glDeleteTextures( 1, &radiobutton);             //
+    glDeleteTextures( 1, &onlinestream);            // stream default icons
+    glDeleteTextures( 1, &onlinestream_empty);      // stream default icons
+    glDeleteTextures( 1, &onlinestream_empty1);     // stream default icons
+    glDeleteTextures( 1, &musicbutton);             //
+    glDeleteTextures( 1, &spotify_askopen);         //
+    glDeleteTextures( 1, &spotify_askplay);         //
+    glDeleteTextures( 1, &spotifybutton);           //
+    glDeleteTextures( 1, &radiooptions);            //
+    glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
+    glDeleteTextures( 1, &gfxlandemask);			      // lande mask
+    glDeleteTextures( 1, &texturedot);              //
+    glDeleteTextures( 1, &texturedot1);             //
+    glDeleteTextures( 1, &_errorbox);               // error box
+    glDeleteTextures( 1, &_textureexit);            //
+    glDeleteTextures( 1, &_textureIdreset_search);  //
     // delete radio lande flags
     i = 0;
     while(i < 69) {
       if (gfxlande[i]) glDeleteTextures( 1, &gfxlande[i]);
       i++;
     }
-    glDeleteTextures( 1,&_textureIdmusic_aktiv);
-    glDeleteTextures( 1,&screensaverbox);
-    glDeleteTextures( 1,&screensaverbox1);
-    glDeleteTextures( 1,&newstuf_icon);
-    glDeleteTextures( 1,&analog_clock_background);
+    glDeleteTextures( 1,&_textureIdmusic_aktiv);      //
+    glDeleteTextures( 1,&screensaverbox);             //
+    glDeleteTextures( 1,&screensaverbox1);            //
+    glDeleteTextures( 1,&newstuf_icon);               //
+    glDeleteTextures( 1,&analog_clock_background);    // analog clock
 }
 
 

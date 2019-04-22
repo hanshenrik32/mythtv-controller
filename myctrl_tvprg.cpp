@@ -86,7 +86,7 @@ void myglprinttv(char *string) {
 
 
 //
-// ceck if process is running
+// check if process is running
 //
 
 bool check_tvguide_process_running(char *processname) {
@@ -127,6 +127,9 @@ int get_tvguide_fromweb() {
 }
 
 
+//
+// hash func
+//
 
 unsigned int ELFHash(const char *s) {
     /* ELF hash uses unsigned chars and unsigned arithmetic for portability */
