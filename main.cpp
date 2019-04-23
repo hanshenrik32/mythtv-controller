@@ -2470,7 +2470,8 @@ void display() {
 
       // abc 4azabxHM2cqBEhjUD3fVJB
       // public 59ZbFPES4DQwEjBpWHzrtC
-      //spotify_oversigt.spotify_play_now(1);
+      // working
+      //  spotify_oversigt.spotify_play_now("4azabxHM2cqBEhjUD3fVJB",1);
       do_update_spotify_playlist=false;
     }
 
@@ -3878,8 +3879,14 @@ void display() {
 
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
-      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.stack[spotifyknapnr-1]->playlistid);
-      spotify_oversigt.spotify_play_songs(spotify_oversigt.stack[spotifyknapnr-1]->playlistid);
+      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
+
+
+      if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),"")!=0) {
+        printf("play nr %d spotify playliste %s \n",spotifyknapnr, spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
+        //spotify_oversigt.spotify_play_now(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),1);
+      }
+
       do_play_spotify_cover=false;
       /*
       result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
@@ -6283,7 +6290,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
 
-
       // vælg skal der spilles music eller radio
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
@@ -6856,22 +6862,25 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       // and open / play
       if (vis_spotify_oversigt) {
         if ((retfunc==2) || (button==4)) {
-          spotify_select_iconnr++;
+//          spotify_select_iconnr++;
         }
         // scroll up
         if ((retfunc==1) || (button==3)) {
-          spotify_select_iconnr--;
+//          spotify_select_iconnr--;
         }
         // open spotify playlist
         if ((retfunc==3) || (button==3)) {
           ask_open_dir_or_play_spotify=false;
-          printf("Open spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
-          spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.stack[spotifyknapnr-1]->intnr);
+          printf("Open spotify playliste %d \n", spotify_oversigt.get_spotify_intnr(spotifyknapnr));
+          spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_intnr(spotifyknapnr));
         }
         // play spotify song
         if ((retfunc==4) || (button==3)) {
-          printf("play spotify playliste %d \n", spotify_oversigt.stack[spotifyknapnr-1]->intnr);
-          //do_play_spotify_cover=true;
+          //if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),"")!=0) {
+            printf("play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            spotify_oversigt.spotify_play_now(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),1);
+          //}
+          do_play_spotify_cover=true;
         }
       }
 
