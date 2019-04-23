@@ -76,7 +76,11 @@ class spotify_class : vlc_controller {
         int spotify_get_user_playlists();                                       // get user playlist (list of playlist)
         int spotify_get_playlist(char *playlist);                               // get playlist + songs
         int spotify_get_available_devices();                                    // get list of devices
-
+        int spotify_do_we_play();                                               // Do we play song now
+        int spotify_pause_play();                                               // Do we play song now
+        int spotify_resume_play();                                              // resume play
+        int spotify_last_play();
+        int spotify_next_play();
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
