@@ -790,6 +790,87 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 }
 
 
+//
+// get active song playing
+//
+
+int spotify_class::spotify_do_we_play() {
+  char call[4096];
+  FILE *json_file;
+  int file_size;
+  char *contents;
+  char filename[512];
+  char *file_contents;
+  struct stat filestatus;
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.txt",spotify_authorize_token);
+  system(call);
+  strcpy(filename,"spotify_song_playing.txt");
+  stat(filename, &filestatus);                                          // get file info
+  file_size = filestatus.st_size;                                               // get filesize
+  file_contents = (char*)malloc(filestatus.st_size);
+  json_file = fopen(filename, "rt");
+  if (json_file == NULL) {
+    fprintf(stderr, "Unable to open %s\n", filename);
+    free(file_contents);                                                        //
+    return 0;
+  }
+  if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
+    fprintf(stderr, "Unable to read spotify play info file %s\n", filename);
+    fclose(json_file);
+    free(file_contents);                                                        //
+    return 0;
+  }
+
+  free(file_contents);
+  fclose(json_file);
+  return 1;
+}
+
+
+//
+// pause play
+//
+
+int spotify_class::spotify_pause_play() {
+  char call[4096];
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+
+
+//
+// resume play
+//
+
+int spotify_class::spotify_resume_play() {
+  char call[4096];
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+
+//
+// last play
+//
+
+int spotify_class::spotify_last_play() {
+  char call[4096];
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+//
+// next play
+//
+
+int spotify_class::spotify_next_play() {
+  char call[4096];
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  system(call);
+}
+
+
 // do not work
 // play songs
 //
@@ -811,7 +892,7 @@ int spotify_class::spotify_play_songs(char *songarray) {
 
 int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer BQD9GS0CCPtouEbYan74THvNdU2YDoFIB3ShTckLsO6AEDQPMFOhntULYCuzZNnAFAreatvz6nZSR-qcuNjAP-9nOLL61-6QsE0Rr9utDBkyTkm9ZZwMJyhX7ADauw0654_4Ua1VANyneJIJsQSFI7ZZzuwQ_pPANHnAbZ8VDfozoZ8oQB7VnuKIWuo85y_-Ae2gLkzzBwTChML7zykcfKf4Vb5T63jBq7-ykXLODdd5z9JQCszJpwQ6wk4AuWdEdu3mn5qTDuYsSHuKcw'",playlist_song,spotify_oversigt.spotify_authorize_token);
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer BQCOVsYvsBWFosUHZ729lyFlknoIkoL_o2_lsBtkB17mmCL0btDdEdUSZBMXA70n7--WImnPT80FN_cA8srJT6zC8DJIGLvzXS75VbyISEQRSKRxFxYSI01MH9XUruomP2Ghi3hCfnu--wQebD4JI0dq785sui_7lHEjCm9LZyZI856c7zWgoL9NDsCDsBuSB5TtUOdhqCzlXb4g6Rbu55S3LapzrMnZ1R-hB8lEhT6whoQDf8k2TLI0Z5xhLIBo0QgIh0ze-rFk5JZBLg'",playlist_song,spotify_oversigt.spotify_authorize_token);
   printf("Call : %s \n",call);
   system(call);
 }
@@ -861,7 +942,7 @@ int spotify_class::spotify_get_access_token() {
     strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
 
 
-    strcpy(spotify_authorize_token,"BQD9GS0CCPtouEbYan74THvNdU2YDoFIB3ShTckLsO6AEDQPMFOhntULYCuzZNnAFAreatvz6nZSR-qcuNjAP-9nOLL61-6QsE0Rr9utDBkyTkm9ZZwMJyhX7ADauw0654_4Ua1VANyneJIJsQSFI7ZZzuwQ_pPANHnAbZ8VDfozoZ8oQB7VnuKIWuo85y_-Ae2gLkzzBwTChML7zykcfKf4Vb5T63jBq7-ykXLODdd5z9JQCszJpwQ6wk4AuWdEdu3mn5qTDuYsSHuKcw");
+    strcpy(spotify_authorize_token,"BQCOVsYvsBWFosUHZ729lyFlknoIkoL_o2_lsBtkB17mmCL0btDdEdUSZBMXA70n7--WImnPT80FN_cA8srJT6zC8DJIGLvzXS75VbyISEQRSKRxFxYSI01MH9XUruomP2Ghi3hCfnu--wQebD4JI0dq785sui_7lHEjCm9LZyZI856c7zWgoL9NDsCDsBuSB5TtUOdhqCzlXb4g6Rbu55S3LapzrMnZ1R-hB8lEhT6whoQDf8k2TLI0Z5xhLIBo0QgIh0ze-rFk5JZBLg");
 
     //*(spotify_authorize_token+83)='\0';
     printf("Found token : %s\n",spotify_authorize_token);

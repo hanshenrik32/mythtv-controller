@@ -318,7 +318,7 @@ bool do_show_rss = false;                                 // show rss config
 bool use3deffect = false;                                 // use 3d scroll effect default no
 bool do_zoom_music_cover = false;                         //
 bool do_zoom_radio = false;                               //
-bool do_zoom_spotify = false;                               //
+bool do_zoom_spotify_cover = false;                       //
 bool do_zoom_stream = false;                              //
 
 bool show_wlan_select = false;                            //
@@ -3199,7 +3199,7 @@ void display() {
       }
     }
     // show search box and text for radio and music and movie
-    if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt)) {
+    if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || (vis_spotify_oversigt)) {
       if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
@@ -3879,15 +3879,8 @@ void display() {
 
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
-      printf("Start play by fmod spotify song %s call spotify_play_songs \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
-
-
-      if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),"")!=0) {
-        printf("play nr %d spotify playliste %s \n",spotifyknapnr, spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
-        //spotify_oversigt.spotify_play_now(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),1);
-      }
-
-      do_play_spotify_cover=false;
+      do_zoom_spotify_cover=true;
+      ask_open_dir_or_play_spotify=false;
       /*
       result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
       ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -4244,7 +4237,7 @@ void display() {
     //
     // *************** Spotify stuf *******************************************************************************
 
-    if ((do_play_spotify_cover) && (!(visur))) {
+    if ((do_zoom_spotify_cover) && (!(visur))) {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
       glEnable(GL_TEXTURE_2D);
@@ -4261,6 +4254,60 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
       glEnd();
+
+
+      // music info icon
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,_texturemlast);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+395 ,  470 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+395,200+470, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+470 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,470, 0.0);
+      glEnd();
+
+
+      // backward button
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,_texturemlast);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(10);                        // 10 = forward(10)
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+150+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
+      glEnd();
+      // stop button
+      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,_texturemstop);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(9);                        // 9 = stop
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
+      glEnd();
+      // forward button
+      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,_texturemnext);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(11);                        // 10 = forward(10)
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+350 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+350,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
+      glEnd();
+
     }
 
 
@@ -6285,7 +6332,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // show close spotify info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
-          do_zoom_spotify =! do_zoom_spotify;
+          do_zoom_spotify_cover =! do_zoom_spotify_cover;
           fundet = true;
         }
       }
@@ -6881,6 +6928,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.spotify_play_now(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),1);
           //}
           do_play_spotify_cover=true;
+          do_zoom_spotify_cover=true;                                           // show we play
         }
       }
 
