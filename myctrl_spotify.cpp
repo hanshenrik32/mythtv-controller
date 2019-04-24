@@ -194,9 +194,11 @@ spotify_class::spotify_class() : antal(0) {
     //this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
     //mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-    strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
-    strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCrUUpIIeWlQHcc3GdzREfcOjBG6L952vuzc1spBfbvpquNGhRnCqe9NraPt-8hSopKJHdNl8G3KuT7NcHODqEE1AMxc33J7kmRvH9WKzsGxTcxlFEo3YjjcxeEpvlJflKTYB-Xn0nUEk2Rm9_LlhBP0VHmWTYBr637xhqPbXET8dxq6Gz_CAUHwNDLeMzDECYYxVY70vi9lX6ZsQVGPU0dr6axSm4kKJDByYYNZipEJMna-mHJk5hoHF-cNzyLdvP68v4GlYLx_kgeFg");
+
+    strcpy(spotify_client_id,"");
+    strcpy(spotify_secret_id,"");
+    strcpy(spotify_authorize_token,"");
+
 }
 
 //

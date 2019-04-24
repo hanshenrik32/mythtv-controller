@@ -28,6 +28,16 @@ struct spotify_oversigt_type {
 class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
+        void print_depth_shift(int);
+        void process_value(json_value*, int,int x);
+        void process_object(json_value*, int);
+        void process_array(json_value*, int);
+
+        void playlist_print_depth_shift(int depth);
+        void playlist_process_object(json_value* value, int depth,MYSQL *conn);
+        void playlist_process_array(json_value* value, int depth,MYSQL *conn);
+        void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
+
     public:
         char spotify_playlistname[256];
         int antal;					                       	                            // Antal songs in playlist
@@ -57,10 +67,11 @@ class spotify_class : vlc_controller {
         int type;
         bool gfx_loaded;					                                              //
         int get_spotify_intnr(int nr);
-        char *get_spotify_playlistid(int nr);                                        //
+        char *get_spotify_playlistid(int nr);                                   //
         char *get_spotify_name(int nr);                                         // get name
         char *get_spotify_desc(int nr);                                         // get desc
-        GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
+        char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };
         spotify_class();
         ~spotify_class();
@@ -79,17 +90,8 @@ class spotify_class : vlc_controller {
         int spotify_do_we_play();                                               // Do we play song now
         int spotify_pause_play();                                               // Do we play song now
         int spotify_resume_play();                                              // resume play
-        int spotify_last_play();
-        int spotify_next_play();
-        void print_depth_shift(int);
-        void process_value(json_value*, int,int x);
-        void process_object(json_value*, int);
-        void process_array(json_value*, int);
-
-        void playlist_print_depth_shift(int depth);
-        void playlist_process_object(json_value* value, int depth,MYSQL *conn);
-        void playlist_process_array(json_value* value, int depth,MYSQL *conn);
-        void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
+        int spotify_last_play();                                                // play last song
+        int spotify_next_play();                                                // play next song
 
         int opdatere_spotify_oversigt(int refid);
         // show spotify playlist overview
