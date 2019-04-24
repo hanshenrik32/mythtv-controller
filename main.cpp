@@ -652,7 +652,7 @@ GLuint _textureId7; 	                    // folder image
 GLuint _texturemusicplayer; 	            // music image		// show player
 GLuint _textureId9_askbox; 	              // askbox image
 GLuint _textureId9_2; 	                  // askbox music image
-GLuint _textureIdplayicon; 	                    // play icon
+GLuint _textureIdplayicon; 	              // play icon
 GLuint _textureopen; 	                    // open icon
 GLuint _textureclose; 	                  // close icon
 GLuint _textureswap; 	                    // swap icon
@@ -683,6 +683,7 @@ GLuint radiobutton;                       //
 GLuint spotifybutton;                     //
 GLuint spotify_askplay;                   //
 GLuint spotify_askopen;                   //
+GLuint spotify_ecover;                   //
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
 GLuint onlinestream;                      // stream default icon
@@ -2271,6 +2272,9 @@ static bool do_update_music_now = false;                          // start the p
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
 static bool do_update_spotify = true;                            // set true to start thread on update spotify db (true = update first run)
 
+
+
+
 void display() {
     // used by xmltv updater func
     static bool getstarttidintvguidefromarray = true;
@@ -2461,20 +2465,12 @@ void display() {
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
     if (do_update_spotify_playlist) {
-      //spotify_oversigt.spotify_req_playlist();
       spotify_oversigt.spotify_get_access_token();                              // get access token
-      spotify_oversigt.spotify_get_user_id();                                                    // get user id
-      //spotify_oversigt.spotify_get_users_playlist();                          // get users playlist
+      spotify_oversigt.spotify_get_user_id();                                   // get user id
       spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
       spotify_oversigt.spotify_get_user_playlists();
-
-      // abc 4azabxHM2cqBEhjUD3fVJB
-      // public 59ZbFPES4DQwEjBpWHzrtC
-      // working
-      //  spotify_oversigt.spotify_play_now("4azabxHM2cqBEhjUD3fVJB",1);
       do_update_spotify_playlist=false;
     }
-
 
     glPushMatrix();
     // background picture
@@ -2821,12 +2817,12 @@ void display() {
         glDisable(GL_DEPTH_TEST);
         // tv icon or info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt)) {
+        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt)|| (vis_spotify_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show musicplay info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(27);                                           // Info icon nr 27
+          glLoadName(27);                                                           // Info icon nr 27
         } else {                                                                    // else default tv
           glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// Tv texture icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2865,8 +2861,8 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
-        //film icon
-        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
+        //film icon or pil up
+        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2890,7 +2886,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
         // recorded icon
-        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt)) {
+        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
           glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3879,7 +3875,6 @@ void display() {
 
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
-      do_zoom_spotify_cover=true;
       ask_open_dir_or_play_spotify=false;
       /*
       result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
@@ -4233,11 +4228,9 @@ void display() {
         }
       }
     }
-
     //
     // *************** Spotify stuf *******************************************************************************
-
-    if ((do_zoom_spotify_cover) && (!(visur))) {
+    if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
       glEnable(GL_TEXTURE_2D);
@@ -4254,11 +4247,12 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
       glEnd();
-
-
-      // music info icon
+      // spotify play info icon
       glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemlast);
+      if (spotify_oversigt.get_texture(spotifyknapnr))
+        glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr));
+      else
+        glBindTexture(GL_TEXTURE_2D,spotify_ecover);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -4267,8 +4261,6 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+470 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,470, 0.0);
       glEnd();
-
-
       // backward button
       glEnable(GL_BLEND);
       glBindTexture(GL_TEXTURE_2D,_texturemlast);
@@ -4307,10 +4299,7 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
       glEnd();
-
     }
-
-
     //
     // *************** Stream stuf *******************************************************************************
     // show stream player control
@@ -6746,7 +6735,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   }
                 }
 
-
                 // spotify stuf
                 if ((vis_spotify_oversigt) && (retfunc==3)) {
                   if (spotifyknapnr>0)
@@ -6832,6 +6820,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               //
               if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                 vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
+              }
+              //
+              if ((vis_spotify_oversigt) && (state==GLUT_UP)) {
+                do_zoom_spotify_cover=!do_zoom_spotify_cover;
+
               }
               break;
       }
@@ -12451,6 +12444,7 @@ void loadgfx() {
     spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
+    spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -12603,6 +12597,7 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_askopen);         //
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
+    glDeleteTextures( 1, &spotify_ecover);          //
     glDeleteTextures( 1, &radiooptions);            //
     glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			      // lande mask
