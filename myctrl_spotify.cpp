@@ -199,6 +199,9 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_secret_id,"");
     strcpy(spotify_authorize_token,"");
 
+    strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
+    strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
+    strcpy(spotify_authorize_token,"BQCjzUAQWv_Kj8PvZVxSfOPbjjsNuzx1F14ePJA2V1c1vZqILBzBtk6AN6W6DoMducJUlHjFDbzleafz1hT6xHkb1Nh5JlfDLx2DAS7uV8itBhgIylvbx7jyQKPJ_N1GSJiB535N5xe0W111kAALdQfv9KV0aHrjVici7XLmEB69C2Sw92TcpPi8yb3yqUyPOWiisiftHNiR8qrYGHGv5WZA0vAkh5MhQSPhk2R5dBkJ0Dtbi6YkG_1nbCjBEBgqZxwGcVtP8cZe3NY_uA");
 }
 
 //
