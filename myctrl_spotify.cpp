@@ -101,10 +101,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         if (p) {
           strncpy(user_token,p+5,251);
           *(user_token+251)='\0';
-//          printf("\n");
-//          printf("key is %s \n", callback_code);
             strcpy(spotify_oversigt.spotify_authorize_token,user_token);
-            //printf("spotify authorize token : %s \n", spotify_oversigt.spotify_authorize_token);
         }
         //c->flags |= MG_F_SEND_AND_CLOSE;
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
@@ -191,15 +188,15 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_authorize_token,"");
     // create web server
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
-    printf("Starting web server on port %s\n", s_http_port);
-    // start web server
 
+    // start web server
+    //printf("Starting web server on port %s\n", s_http_port);
     //this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
     //mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
+    strcpy(spotify_authorize_token,"BQCrUUpIIeWlQHcc3GdzREfcOjBG6L952vuzc1spBfbvpquNGhRnCqe9NraPt-8hSopKJHdNl8G3KuT7NcHODqEE1AMxc33J7kmRvH9WKzsGxTcxlFEo3YjjcxeEpvlJflKTYB-Xn0nUEk2Rm9_LlhBP0VHmWTYBr637xhqPbXET8dxq6Gz_CAUHwNDLeMzDECYYxVY70vi9lX6ZsQVGPU0dr6axSm4kKJDByYYNZipEJMna-mHJk5hoHF-cNzyLdvP68v4GlYLx_kgeFg");
 }
 
 //
@@ -892,7 +889,7 @@ int spotify_class::spotify_play_songs(char *songarray) {
 
 int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer BQCOVsYvsBWFosUHZ729lyFlknoIkoL_o2_lsBtkB17mmCL0btDdEdUSZBMXA70n7--WImnPT80FN_cA8srJT6zC8DJIGLvzXS75VbyISEQRSKRxFxYSI01MH9XUruomP2Ghi3hCfnu--wQebD4JI0dq785sui_7lHEjCm9LZyZI856c7zWgoL9NDsCDsBuSB5TtUOdhqCzlXb4g6Rbu55S3LapzrMnZ1R-hB8lEhT6whoQDf8k2TLI0Z5xhLIBo0QgIh0ze-rFk5JZBLg'",playlist_song,spotify_oversigt.spotify_authorize_token);
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
   printf("Call : %s \n",call);
   system(call);
 }
@@ -939,11 +936,7 @@ int spotify_class::spotify_get_access_token() {
   myfile = fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
-    strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
-
-
-    strcpy(spotify_authorize_token,"BQCOVsYvsBWFosUHZ729lyFlknoIkoL_o2_lsBtkB17mmCL0btDdEdUSZBMXA70n7--WImnPT80FN_cA8srJT6zC8DJIGLvzXS75VbyISEQRSKRxFxYSI01MH9XUruomP2Ghi3hCfnu--wQebD4JI0dq785sui_7lHEjCm9LZyZI856c7zWgoL9NDsCDsBuSB5TtUOdhqCzlXb4g6Rbu55S3LapzrMnZ1R-hB8lEhT6whoQDf8k2TLI0Z5xhLIBo0QgIh0ze-rFk5JZBLg");
-
+    //strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
     //*(spotify_authorize_token+83)='\0';
     printf("Found token : %s\n",spotify_authorize_token);
     //printf("base64_code : %s\n",base64_code);
