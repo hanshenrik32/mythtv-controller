@@ -172,6 +172,22 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 // constructor
 //
 
+
+spotify_device_def::spotify_device_def() {
+  strcpy(id,"");
+  is_active=false;
+  is_private_session=false;
+  is_restricted=false;
+  strcpy(name,"");
+  strcpy(devtype,"");
+  devvolume=0;
+}
+
+
+//
+// constructor
+//
+
 spotify_class::spotify_class() : antal(0) {
     int i;
     for(i=0;i<maxantal;i++) stack[i]=0;
@@ -194,14 +210,14 @@ spotify_class::spotify_class() : antal(0) {
     //this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
     //mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-
+    active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
     strcpy(spotify_client_id,"");
     strcpy(spotify_secret_id,"");
     strcpy(spotify_authorize_token,"");
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCjzUAQWv_Kj8PvZVxSfOPbjjsNuzx1F14ePJA2V1c1vZqILBzBtk6AN6W6DoMducJUlHjFDbzleafz1hT6xHkb1Nh5JlfDLx2DAS7uV8itBhgIylvbx7jyQKPJ_N1GSJiB535N5xe0W111kAALdQfv9KV0aHrjVici7XLmEB69C2Sw92TcpPi8yb3yqUyPOWiisiftHNiR8qrYGHGv5WZA0vAkh5MhQSPhk2R5dBkJ0Dtbi6YkG_1nbCjBEBgqZxwGcVtP8cZe3NY_uA");
+    strcpy(spotify_authorize_token,"BQDLRw-OESd2ZCNsdC-dKZEBuaG0RN-cYAW5JdFn3b1ZgoaeGO__-ZQMqqgmS7J6DRgioFPpN6oCySZuW-2ni7SfPIGJDLVjQdfrfWY3aFN5EDB7aTlhR4UaIu3ptYQC9B20ZT91ik2wYHqLv0ZWmncOyQwbpa9PEJu9Uz0Upx1vZmE1xq92Tzn7ScAgceZqkrTaDB9_J5U-TdHblXmjZ86m8g5gyrY8DVBHtbzEcIWSntemM2OhNtGQ8_Vdcy-uw3UnQFiQAb_nkwlQkQ");
 }
 
 //
@@ -901,14 +917,58 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
 
 
 //
-// Do not work
-// get device list
+// Work
+// get device list and have it in spotify class
 
 int spotify_class::spotify_get_available_devices() {
+  size_t jsonfile_len = 0;
+  char *tmp_content_line=NULL;
+  FILE *json_file;
   char call[4096];
+  char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
+  int devicenr=0;
+  int active_devicenr=-1;
   printf("curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' \n",spotify_authorize_token);
-  sprintf(call,"curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.txt",spotify_authorize_token);
+  sprintf(call,"curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json",spotify_authorize_token);
   system(call);
+  // convert file
+  system(call_sed);
+  json_file = fopen("spotify_device_list.txt", "rt");
+  if (json_file == NULL) {
+    fprintf(stderr, "Unable to open spotify_device_list.txt\n");
+    return 1;
+  } else {
+    // read devices info
+    while ((!(feof(json_file))) && (devicenr<10)) {
+      // get id
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      strcpy(spotify_device[devicenr].id,tmp_content_line);
+      // get active status
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      if (strcmp(tmp_content_line+10,"false")==0) spotify_device[devicenr].is_active=false; else spotify_device[devicenr].is_active=true;
+      // if active rember to return from func
+      if (( spotify_device[devicenr].is_active ) && (active_devicenr==-1)) active_devicenr=devicenr;
+      // get is_private_session
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      if (strcmp(tmp_content_line+19,"false")==0) spotify_device[devicenr].is_private_session=false; else spotify_device[devicenr].is_private_session=true;
+      // get private info
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      if (strcmp(tmp_content_line+14,"false")==0) spotify_device[devicenr].is_restricted=false; else spotify_device[devicenr].is_restricted=true;
+      // get dev name
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      strcpy(spotify_device[devicenr].name,tmp_content_line+5);
+      // get dev type
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      strcpy(spotify_device[devicenr].devtype,tmp_content_line+5);
+      // get dev volume info
+      getline(&tmp_content_line,&jsonfile_len,json_file);
+      spotify_device[devicenr].devvolume=atoi(tmp_content_line+15);
+      devicenr++;
+    }
+    free(tmp_content_line);
+  }
+  fclose(json_file);
+  return active_devicenr;
 }
 
 
