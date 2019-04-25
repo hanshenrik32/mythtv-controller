@@ -10,6 +10,24 @@
 // web server
 #include "mongoose-master/mongoose.h"
 
+
+// device struct
+
+class spotify_device_def {
+  public:
+    char id[41];
+    bool is_active;
+    bool is_private_session;
+    bool is_restricted;
+    char name[256];
+    char devtype[20];
+    int devvolume;
+    spotify_device_def();
+};
+
+
+// playlist/song overview def
+
 struct spotify_oversigt_type {
     char feed_showtxt[80+1];			        // what to show in overview
     char feed_name[80+1];				          // playlist/song name
@@ -25,20 +43,22 @@ struct spotify_oversigt_type {
     long intnr;
 };
 
+// spotify global class
+
 class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
+        spotify_device_def spotify_device[10];
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
         void process_array(json_value*, int);
-
         void playlist_print_depth_shift(int depth);
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
-
     public:
+        int active_spotify_device;                                              // active device
         char spotify_playlistname[256];
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
@@ -97,6 +117,9 @@ class spotify_class : vlc_controller {
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected);
 };
+
+
+
 
 void *load_spotify_web(void *data);
 char *b64_encode(const unsigned char *in, size_t len);

@@ -2467,8 +2467,9 @@ void display() {
     if (do_update_spotify_playlist) {
       spotify_oversigt.spotify_get_access_token();                              // get access token
       spotify_oversigt.spotify_get_user_id();                                   // get user id
-      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
-      spotify_oversigt.spotify_get_user_playlists();
+      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      //spotify_oversigt.spotify_get_user_playlists();
+      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       do_update_spotify_playlist=false;
     }
 
