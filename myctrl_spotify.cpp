@@ -666,7 +666,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   MYSQL_ROW row;
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[1024];
-  strcpy(playlistfilename,"spotify_playlist_");
+  strcpy(playlistfilename,"spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
   char sql[8192];
@@ -815,23 +815,23 @@ int spotify_class::spotify_do_we_play() {
   FILE *json_file;
   int file_size;
   char *contents;
-  char filename[512];
+  char filename_song_playing[]="spotify_song_playing.json";
   char *file_contents;
   struct stat filestatus;
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.txt",spotify_authorize_token);
+  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
   system(call);
-  strcpy(filename,"spotify_song_playing.txt");
-  stat(filename, &filestatus);                                          // get file info
+  strcpy(filename_song_playing,"spotify_song_playing.json");
+  stat(filename_song_playing, &filestatus);                                          // get file info
   file_size = filestatus.st_size;                                               // get filesize
   file_contents = (char*)malloc(filestatus.st_size);
-  json_file = fopen(filename, "rt");
+  json_file = fopen(filename_song_playing, "rt");
   if (json_file == NULL) {
-    fprintf(stderr, "Unable to open %s\n", filename);
+    fprintf(stderr, "Unable to open %s\n", filename_song_playing);
     free(file_contents);                                                        //
     return 0;
   }
   if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-    fprintf(stderr, "Unable to read spotify play info file %s\n", filename);
+    fprintf(stderr, "Unable to read spotify play info file %s\n", filename_song_playing);
     fclose(json_file);
     free(file_contents);                                                        //
     return 0;
@@ -852,8 +852,6 @@ int spotify_class::spotify_pause_play() {
   sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
-
-
 
 //
 // resume play
