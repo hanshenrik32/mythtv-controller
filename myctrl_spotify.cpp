@@ -217,7 +217,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQBM6pN05Jqoj5Efv70tCYPp4akx2OS8EvlrHOyukAK3OMMllaOBn0BkTw2sK4SoXa0pJCrezP-ufg4G8VNpjCwtJ5bfLsZ-DjyfsDhez6QT7-bFm4OIxA4KOHGIOTiVJXHNJXmeyEGIkgKKGFpoBgzv2qjMrWVsuWdSZsu7FgIR6edn1uToTEoqtMouUjjWCNF5KGS5wV-X83jMctex29yIEUPJkrlbL77tCsbpaiB2Pj8UyY1u8U_mCA1RPPj3YN_9hwgx3f5Zd6wcUw");
+    strcpy(spotify_authorize_token,"BQCMQzrXfCjoZmI1zevoQRxEa9T7M9nr5zPwqORe9obZWtGgG7r2Z31xQ_kZgX16DgtxCoeU1TiRN-eKLuUD6XvyVsd2OLHUfbNU1Lh1YUoIFK4nS7jBv2iIrjeV-7aeatPGxYB4Br-a0yh6GihOily_0Xvei-GqmDb6KZVpxCs94xeSfEh2jEiR05HBcYXEsdZUZLUeTjuhsM5rNOGL6iz1srQAts_mhYMyg-VDP_BavVE_etGdHUdn19ag3keBNNvMmf0sNEs3X-VDjw");
 }
 
 //
@@ -725,7 +725,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
       }
     }
     if ((!(dbexist)) && (mysql_query(conn,"CREATE database if not exist mythtvcontroller")!=0)) {
-      printf("mysql db create error. mythtvcontroller\n");
+      //printf("mysql db create error. mythtvcontroller\n");
     }
     //
     // create db if not exist
