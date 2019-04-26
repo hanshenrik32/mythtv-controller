@@ -78,13 +78,13 @@ class spotify_class : vlc_controller {
         //int parsexmlrssfile(char *filename,char *baseiconfile);               // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used my webserver
-        struct mg_mgr mgr;
-        struct mg_mgr client_mgr;
-        struct mg_connection *c;
-        bool stream_is_playing;
-        bool stream_is_pause;
+        struct mg_mgr mgr;                                                      // web server
+        struct mg_mgr client_mgr;                                               // web server client
+        struct mg_connection *c;                                                // connection struct
+        bool stream_is_playing;                                                 // do we play ?
+        bool stream_is_pause;                                                   // do we pause
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
-        int type;
+        int type;                                                               //
         bool gfx_loaded;					                                              //
         int get_spotify_intnr(int nr);
         char *get_spotify_playlistid(int nr);                                   //
