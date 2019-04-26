@@ -217,7 +217,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCMQzrXfCjoZmI1zevoQRxEa9T7M9nr5zPwqORe9obZWtGgG7r2Z31xQ_kZgX16DgtxCoeU1TiRN-eKLuUD6XvyVsd2OLHUfbNU1Lh1YUoIFK4nS7jBv2iIrjeV-7aeatPGxYB4Br-a0yh6GihOily_0Xvei-GqmDb6KZVpxCs94xeSfEh2jEiR05HBcYXEsdZUZLUeTjuhsM5rNOGL6iz1srQAts_mhYMyg-VDP_BavVE_etGdHUdn19ag3keBNNvMmf0sNEs3X-VDjw");
+    strcpy(spotify_authorize_token,"BQCYENnqV-pntQNjJyBggyeSrNm4mR1mYw2DPqZeQTtVCyW2lMqoMBI7xF-yVbfu93FEs6g8jtUhKg_uToKWxe0WI0uruKH3YOMFPDKehFIu9JaxmaF5G5gt3N9BbqhBQqknBd4dyYmJSYSaQkdQklD2P6NtJrgus7KBT4is61pZrVmEdi8ukU2lryb_yXwULL55ac-oaH9t9H347M8nfdrjZC1VPYD-q8PszfQcHIzG8QHoSbUaCjzC0QXHJXKpsbSqz9XWKqLU6J9x1Q");
 }
 
 //
@@ -238,7 +238,7 @@ int spotify_class::spotify_get_user_id() {
   char doget[4096];
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotify_authorize_token);
-    printf("doget = %s \n",doget);
+    //printf("doget = %s \n",doget);
     system(doget);
   }
   return 1;
@@ -255,7 +255,7 @@ int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
   char doget[4096];
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotify_authorize_token);
-    printf("doget = %s \n",doget);
+    //printf("doget = %s \n",doget);
     //system(doget);
   }
 }
@@ -441,7 +441,7 @@ int spotify_class::spotify_get_user_playlists() {
     }
     if (strcmp(spotify_authorize_token,"")!=0) {
       sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotify_client_id,spotify_authorize_token);
-      printf("doget = %s \n",doget);
+      //printf("doget = %s \n",doget);
       //system(doget);
       stat("spotify_users_playlist.json", &filestatus);                              // get file info
       file_size = filestatus.st_size;                                               // get filesize
@@ -814,31 +814,33 @@ int spotify_class::spotify_do_we_play() {
   char call[4096];
   FILE *json_file;
   int file_size;
+  int curl_error;
   char *contents;
   char filename_song_playing[]="spotify_song_playing.json";
   char *file_contents;
   struct stat filestatus;
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
-  system(call);
-  strcpy(filename_song_playing,"spotify_song_playing.json");
-  stat(filename_song_playing, &filestatus);                                          // get file info
-  file_size = filestatus.st_size;                                               // get filesize
-  file_contents = (char*)malloc(filestatus.st_size);
-  json_file = fopen(filename_song_playing, "rt");
-  if (json_file == NULL) {
-    fprintf(stderr, "Unable to open %s\n", filename_song_playing);
-    free(file_contents);                                                        //
-    return 0;
-  }
-  if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-    fprintf(stderr, "Unable to read spotify play info file %s\n", filename_song_playing);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
+  curl_error=system(call);
+  if (curl_error==0) {
+    strcpy(filename_song_playing,"spotify_song_playing.json");
+    stat(filename_song_playing, &filestatus);                                          // get file info
+    file_size = filestatus.st_size;                                               // get filesize
+    file_contents = (char*)malloc(filestatus.st_size);
+    json_file = fopen(filename_song_playing, "rt");
+    if (json_file == NULL) {
+      fprintf(stderr, "Unable to open %s\n", filename_song_playing);
+      free(file_contents);                                                        //
+      return 0;
+    }
+    if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
+      fprintf(stderr, "Unable to read spotify play info file %s\n", filename_song_playing);
+      fclose(json_file);
+      free(file_contents);                                                        //
+      return 0;
+    }
+    free(file_contents);
     fclose(json_file);
-    free(file_contents);                                                        //
-    return 0;
   }
-
-  free(file_contents);
-  fclose(json_file);
   return 1;
 }
 
@@ -913,59 +915,82 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
 
 
 //
-// Work
+// Works
 // get device list and have it in spotify class
+//
+
+// char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
 
 int spotify_class::spotify_get_available_devices() {
+  int devicenr=0;
   size_t jsonfile_len = 0;
   char *tmp_content_line=NULL;
   FILE *json_file;
+  int curl_exitcode;
   char call[4096];
-  char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
-  int devicenr=0;
-  int active_devicenr=-1;
-  printf("curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' \n",spotify_authorize_token);
-  sprintf(call,"curl -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json",spotify_authorize_token);
-  system(call);
-  // convert file
-  system(call_sed);
-  json_file = fopen("spotify_device_list.txt", "rt");
-  if (json_file == NULL) {
-    fprintf(stderr, "Unable to open spotify_device_list.txt\n");
-    return 1;
-  } else {
-    // read devices info
-    while ((!(feof(json_file))) && (devicenr<10)) {
-      // get id
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      strcpy(spotify_device[devicenr].id,tmp_content_line);
-      // get active status
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      if (strcmp(tmp_content_line+10,"false")==0) spotify_device[devicenr].is_active=false; else spotify_device[devicenr].is_active=true;
-      // if active rember to return from func
-      if (( spotify_device[devicenr].is_active ) && (active_devicenr==-1)) active_devicenr=devicenr;
-      // get is_private_session
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      if (strcmp(tmp_content_line+19,"false")==0) spotify_device[devicenr].is_private_session=false; else spotify_device[devicenr].is_private_session=true;
-      // get private info
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      if (strcmp(tmp_content_line+14,"false")==0) spotify_device[devicenr].is_restricted=false; else spotify_device[devicenr].is_restricted=true;
-      // get dev name
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      strcpy(spotify_device[devicenr].name,tmp_content_line+5);
-      // get dev type
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      strcpy(spotify_device[devicenr].devtype,tmp_content_line+5);
-      // get dev volume info
-      getline(&tmp_content_line,&jsonfile_len,json_file);
-      spotify_device[devicenr].devvolume=atoi(tmp_content_line+15);
-      devicenr++;
+  char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
+  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotify_authorize_token);
+  curl_exitcode=WEXITSTATUS(system(call));
+  if (curl_exitcode==0) {
+    // convert file by sed (call_sed) easy hack
+    system(call_sed);
+    json_file = fopen("spotify_device_list.txt", "rt");
+    if (json_file == NULL) {
+      fprintf(stderr, "Unable to open spotify_device_list.txt\n");
+      return 1;
+    } else {
+      // read devices info
+      while ((!(feof(json_file))) && (devicenr<10)) {
+        // get id
+        getline(&tmp_content_line,&jsonfile_len,json_file);
+        if (strlen(tmp_content_line)>5) {
+          strcpy(spotify_device[devicenr].id,tmp_content_line+3);
+          // get active status
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          if (strncmp(tmp_content_line,"is_active=true",14)==0) spotify_device[devicenr].is_active=true; else spotify_device[devicenr].is_active=false;
+          // if active rember to return from func
+          if (( spotify_device[devicenr].is_active ) && (active_spotify_device==-1)) active_spotify_device=devicenr;
+          // get is_private_session
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          if (strcmp(tmp_content_line,"is_private_session=true")==0) spotify_device[devicenr].is_private_session=true; else spotify_device[devicenr].is_private_session=false;
+          // get private info
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          if (strcmp(tmp_content_line,"is_restricted=true")==0) spotify_device[devicenr].is_restricted=true; else spotify_device[devicenr].is_restricted=false;
+          // get dev name
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          strcpy(spotify_device[devicenr].name,tmp_content_line+5);
+          // get dev type
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          strcpy(spotify_device[devicenr].devtype,tmp_content_line+5);
+          // get dev volume info
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          spotify_device[devicenr].devvolume=atoi(tmp_content_line+15);
+          getline(&tmp_content_line,&jsonfile_len,json_file);
+          devicenr++;
+        }
+      }
+      free(tmp_content_line);
     }
-    free(tmp_content_line);
+    fclose(json_file);
+    if ( debugmode ) {
+      printf("Found devices : %d\n",devicenr);
+      for( int t = 0 ; t < devicenr ; t++ ) {
+        if ( strcmp(spotify_device[t].name,"") !=0 ) {
+          printf("Device name      : %s ",spotify_device[t].name);
+          printf("Device is active : %d \n",spotify_device[t].is_active);
+        }
+      }
+      printf("\n*****************\n");
+    }
   }
-  fclose(json_file);
-  return active_devicenr;
+  // no device to use is found or no token
+  if ( curl_exitcode == 22 ) {
+    active_spotify_device=-1;
+    printf("Error loading device list from spodify by api.\n");
+  }
+  return active_spotify_device;
 }
+
 
 
 // get user access token
@@ -998,9 +1023,6 @@ int spotify_class::spotify_get_access_token() {
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
     //strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
-    //*(spotify_authorize_token+83)='\0';
-    printf("Found token : %s\n",spotify_authorize_token);
-    //printf("base64_code : %s\n",base64_code);
     fclose(myfile);
     //remove("spotify_access_token.txt");           // remove file again
   }
@@ -1060,7 +1082,7 @@ void spotify_class::set_texture(int nr,GLuint idtexture) {
 //
 
 int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
-  int antalrss_feeds;
+  int antalrss_feeds=0;
   MYSQL_RES *res;
   MYSQL_ROW row;
   if (conn) {
@@ -1329,6 +1351,14 @@ int spotify_class::loadweb_stream_iconoversigt() {
   return(1);
 }
 
+
+//
+//
+//
+
+char *spotify_class::get_active_spotify_device_name() {
+  return(spotify_device[active_spotify_device].name);
+}
 
 
 void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected)
