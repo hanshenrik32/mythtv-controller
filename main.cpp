@@ -120,7 +120,7 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;
+static bool do_update_spotify_playlist = true;          // do it first time
 
 
 // struct used by keyboard config of functions keys
@@ -4231,7 +4231,8 @@ void display() {
       }
     }
     //
-    // *************** Spotify stuf *******************************************************************************
+    // *************** Spotify play stuf **********************************************************
+    //
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
@@ -4301,6 +4302,39 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
       glEnd();
+
+      // play list name
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 640.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);
+      glcRenderString("playlist : ");
+      glcRenderString(spotify_oversigt.spotify_playlistname);
+      glPopMatrix();
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 620.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString("Songname : ");
+      glPopMatrix();
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 580.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString("Player   : ");
+      if (spotify_oversigt.active_spotify_device>-1) {
+        glcRenderString(spotify_oversigt.get_active_spotify_device_name());
+      }
+      glPopMatrix();
+
     }
     //
     // *************** Stream stuf *******************************************************************************
