@@ -217,7 +217,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQDLRw-OESd2ZCNsdC-dKZEBuaG0RN-cYAW5JdFn3b1ZgoaeGO__-ZQMqqgmS7J6DRgioFPpN6oCySZuW-2ni7SfPIGJDLVjQdfrfWY3aFN5EDB7aTlhR4UaIu3ptYQC9B20ZT91ik2wYHqLv0ZWmncOyQwbpa9PEJu9Uz0Upx1vZmE1xq92Tzn7ScAgceZqkrTaDB9_J5U-TdHblXmjZ86m8g5gyrY8DVBHtbzEcIWSntemM2OhNtGQ8_Vdcy-uw3UnQFiQAb_nkwlQkQ");
+    strcpy(spotify_authorize_token,"BQBM6pN05Jqoj5Efv70tCYPp4akx2OS8EvlrHOyukAK3OMMllaOBn0BkTw2sK4SoXa0pJCrezP-ufg4G8VNpjCwtJ5bfLsZ-DjyfsDhez6QT7-bFm4OIxA4KOHGIOTiVJXHNJXmeyEGIkgKKGFpoBgzv2qjMrWVsuWdSZsu7FgIR6edn1uToTEoqtMouUjjWCNF5KGS5wV-X83jMctex29yIEUPJkrlbL77tCsbpaiB2Pj8UyY1u8U_mCA1RPPj3YN_9hwgx3f5Zd6wcUw");
 }
 
 //
@@ -254,13 +254,11 @@ int spotify_class::spotify_get_user_id() {
 int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
   char doget[4096];
   if (strcmp(spotify_authorize_token,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",client_id,spotify_authorize_token);
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotify_authorize_token);
     printf("doget = %s \n",doget);
     //system(doget);
   }
 }
-
-
 
 
 
@@ -416,7 +414,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 // Get a List of Current User's Playlists
 //
 // get users play lists
-// write to spotify_users_playlist.txt
+// write to spotify_users_playlist.json
 
 int spotify_class::spotify_get_user_playlists() {
   MYSQL *conn;
@@ -442,20 +440,20 @@ int spotify_class::spotify_get_user_playlists() {
        //exit(1);
     }
     if (strcmp(spotify_authorize_token,"")!=0) {
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0'  -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.txt",spotify_client_id,spotify_authorize_token);
+      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotify_client_id,spotify_authorize_token);
       printf("doget = %s \n",doget);
       //system(doget);
-      stat("spotify_users_playlist.txt", &filestatus);                              // get file info
+      stat("spotify_users_playlist.json", &filestatus);                              // get file info
       file_size = filestatus.st_size;                                               // get filesize
       file_contents = (char*)malloc(filestatus.st_size);
-      json_file = fopen("spotify_users_playlist.txt", "rt");
+      json_file = fopen("spotify_users_playlist.json", "rt");
         if (json_file == NULL) {
-        fprintf(stderr, "Unable to open spotify_users_playlist.txt\n");
+        fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
         free(file_contents);                                                        //
         return 1;
       }
       if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.txt\n");
+        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
         fclose(json_file);
         free(file_contents);                                                        //
         return 1;
@@ -657,7 +655,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 
 // get songs from playlist (any public user)
-// write to spotify_playlist.txt
+// write to spotify_playlist.json
 
 int spotify_class::spotify_get_playlist(char *playlist) {
   int tt;
@@ -669,8 +667,8 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[1024];
   strcpy(playlistfilename,"spotify_playlist_");
-  strcat(playlistfilename,playlist);
-  strcat(playlistfilename,".txt");
+  strcat(playlistfilename,playlist);                                            // add the spotify playlist id
+  strcat(playlistfilename,".json");
   char sql[8192];
   char doget[4096];
   char filename[4096];

@@ -2464,12 +2464,13 @@ void display() {
     //mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
+    // do the update from spotify
     if (do_update_spotify_playlist) {
       spotify_oversigt.spotify_get_access_token();                              // get access token
       spotify_oversigt.spotify_get_user_id();                                   // get user id
-      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
-      //spotify_oversigt.spotify_get_user_playlists();
-      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      spotify_oversigt.spotify_get_user_playlists();
+      //spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       do_update_spotify_playlist=false;
     }
 
