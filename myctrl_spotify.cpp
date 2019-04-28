@@ -101,7 +101,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         if (p) {
           strncpy(user_token,p+5,251);
           *(user_token+251)='\0';
-            strcpy(spotify_oversigt.spotify_authorize_token,user_token);
+//          strcpy(spotify_oversigt.spotify_authorize_token,user_token);
         }
         //c->flags |= MG_F_SEND_AND_CLOSE;
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
@@ -111,8 +111,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         opts.document_root = ".";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
       }
-
-
       // We have received an HTTP request. Parsed request is contained in `hm`.
       // Send HTTP reply to the client which shows full original request.
       //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
@@ -135,9 +133,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 
 static int s_exit_flag = 0;
 bool debug_json=false;
-
-
-
 
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
@@ -217,7 +212,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCYENnqV-pntQNjJyBggyeSrNm4mR1mYw2DPqZeQTtVCyW2lMqoMBI7xF-yVbfu93FEs6g8jtUhKg_uToKWxe0WI0uruKH3YOMFPDKehFIu9JaxmaF5G5gt3N9BbqhBQqknBd4dyYmJSYSaQkdQklD2P6NtJrgus7KBT4is61pZrVmEdi8ukU2lryb_yXwULL55ac-oaH9t9H347M8nfdrjZC1VPYD-q8PszfQcHIzG8QHoSbUaCjzC0QXHJXKpsbSqz9XWKqLU6J9x1Q");
+    strcpy(spotify_authorize_token,"BQBCUL7US5bfZkwdkm6R3QVrLKXbPdOwbp11lQuP0Q4MAOY7G1lzl2f_66C5CmTJyMJfZagokpT3ntR7AFC-8hPgp3kVVuDjhdFbwHT83URHGrSbMbFU3NYiWPfRAGwGqzX3XqBawf1rZT9ZMCOtpCKTP0eBrloet_ZEFWI_U-CgNwtLZGB3XFdYeqvUDhtuWgaVOpTT6AOWpoiMptLHx0lqQ4xYdeqdieSV4rg35RB7eycMAeuP2NDO_O-9GJQmDEtsa-53XN2CGGr4bg");
 }
 
 //
@@ -820,7 +815,7 @@ int spotify_class::spotify_do_we_play() {
   char *file_contents;
   struct stat filestatus;
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
-  curl_error=system(call);
+  curl_error=WEXITSTATUS(system(call));
   if (curl_error==0) {
     strcpy(filename_song_playing,"spotify_song_playing.json");
     stat(filename_song_playing, &filestatus);                                          // get file info
@@ -851,7 +846,7 @@ int spotify_class::spotify_do_we_play() {
 
 int spotify_class::spotify_pause_play() {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
@@ -861,7 +856,7 @@ int spotify_class::spotify_pause_play() {
 
 int spotify_class::spotify_resume_play() {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
@@ -872,7 +867,7 @@ int spotify_class::spotify_resume_play() {
 
 int spotify_class::spotify_last_play() {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
@@ -882,35 +877,30 @@ int spotify_class::spotify_last_play() {
 
 int spotify_class::spotify_next_play() {
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   system(call);
 }
 
 
-// do not work
-// play songs
-//
-// --data '{\"context_uri\":\"spotify:album:59ZbFPES4DQwEjBpWHzrtC\",\"offset\":{\"position\":5},\"position_ms\":0}
-
-
-int spotify_class::spotify_play_songs(char *songarray) {
-  char call[4096];
-  // https://api.spotify.com/v1/me/player/play
-  sprintf(call,"curl -X PUT 'open.spotify.com/playlist/%s' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",songarray,spotify_authorize_token);
-  printf("call %s \n",call);
-  system(call);
-}
 
 
 // work
 // play song/playlist
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// error codes
+
+// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
+// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
+// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
+// 429	Too Many Requests - Rate limiting has been applied.
+
 
 int spotify_class::spotify_play_now(char *playlist_song,bool now) {
+  int curl_error;
   char call[4096];
-  sprintf(call,"curl -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
-  printf("Call : %s \n",call);
-  system(call);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
+  curl_error=WEXITSTATUS(system(call));
+  return(curl_error);
 }
 
 
