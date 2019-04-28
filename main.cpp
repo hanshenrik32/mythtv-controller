@@ -3157,7 +3157,7 @@ void display() {
         std::clock_t start;
         start = std::clock();
         spotify_oversigt.show_spotify_oversigt(_textureId7,0,_textureIdback,_textureId28,_rangley);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -6687,6 +6687,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     char tmp[80];
     char temptxt[200];
     int retfunc;
+    int spotify_player_start_status;
     int numbers_cd_covers_on_line;
     int numbers_film_covers_on_line;
     int numbers_radio_covers_on_line;
@@ -6952,12 +6953,17 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
         // play spotify song
         if ((retfunc==4) || (button==3)) {
-          //if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr),"")!=0) {
-            printf("play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
-            spotify_oversigt.spotify_play_now(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),1);
-          //}
-          do_play_spotify_cover=true;
-          do_zoom_spotify_cover=true;                                           // show we play
+          printf("play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+          if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
+            // try load and start playing
+            spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+            printf("spotify start play return value %d \n ",spotify_player_start_status);
+            if (spotify_player_start_status == 0) {
+              strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+              do_play_spotify_cover=true;
+              do_zoom_spotify_cover=true;                                       // show we play
+            }
+          }
         }
       }
 

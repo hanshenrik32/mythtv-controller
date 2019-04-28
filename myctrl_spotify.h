@@ -49,6 +49,9 @@ class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
+        char spotify_authorize_token[512];                                      // token get from spotify
+        char spotify_client_id[255];                                            // Client id
+        char spotify_secret_id[255];                                            // Secret id
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
@@ -57,6 +60,7 @@ class spotify_class : vlc_controller {
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
+
     public:
         char *get_active_spotify_device_name();
         int active_spotify_device;                                              // active device or -1
@@ -65,9 +69,6 @@ class spotify_class : vlc_controller {
         int antalplaylists;                                                     // antal
         char client_id[120];                                                    // spotify client id
         char client_secret[120];                                                // spotify client secret
-        char spotify_authorize_token[512];                                      // token get from spotify
-        char spotify_client_id[255];                                            // Client id
-        char spotify_secret_id[255];                                            // Secret id
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);                              // set texture
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      // NOT in use
@@ -76,7 +77,6 @@ class spotify_class : vlc_controller {
         int spotify_oversigt_loaded_nr;                                         //
         int spotify_oversigt_nowloading;				                                // denne tæller op når der loades gfx
         int spotify_rssparse_nowloading;				                                // denne tæller op når der loades rss
-        //int parsexmlrssfile(char *filename,char *baseiconfile);               // parse file from web and return bane icons from xml file
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used my webserver
         struct mg_mgr mgr;                                                      // web server
@@ -101,7 +101,6 @@ class spotify_class : vlc_controller {
         int spotify_req_playlist();
         int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
         int spotify_get_user_id();
-        int spotify_play_songs(char *songarray);
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);
         int spotify_get_access_token();                                         // get token
@@ -113,7 +112,6 @@ class spotify_class : vlc_controller {
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
-
         int opdatere_spotify_oversigt(int refid);
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected);
