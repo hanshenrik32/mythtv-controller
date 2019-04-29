@@ -108,11 +108,12 @@ class spotify_class : vlc_controller {
         int spotify_get_playlist(char *playlist);                               // get playlist + songs
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
-        int spotify_pause_play();                                               // Do we play song now
+        int spotify_pause_play();                                               // Pause
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
         int opdatere_spotify_oversigt(int refid);
+        void select_device_to_play();                                           // show device list to play on
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected);
 };
