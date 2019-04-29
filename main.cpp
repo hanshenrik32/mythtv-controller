@@ -33,6 +33,7 @@ extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
 bool do_open_spotifyplaylist=false;
+bool do_select_device_to_play=false;
 bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 
@@ -3157,6 +3158,10 @@ void display() {
         std::clock_t start;
         start = std::clock();
         spotify_oversigt.show_spotify_oversigt(_textureId7,0,_textureIdback,_textureId28,_rangley);
+
+
+        if (do_select_device_to_play) spotify_oversigt.select_device_to_play();
+
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
@@ -6329,10 +6334,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             spotify_oversigt.opdatere_spotify_oversigt(0);
           }
         }
-
         // play
         if ((GLubyte) names[i*4+3]==20) {
           fprintf(stderr,"play spotify playlist\n");
+          do_select_device_to_play=true;
           returnfunc = 4;
           fundet = true;
         }
@@ -6342,7 +6347,25 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 3;
           fundet = true;
         }
-
+        // Stop play
+        if ((GLubyte) names[i*4+3]==9) {
+          fprintf(stderr,"(Spotify) Stop play\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+        // Next
+        if ((GLubyte) names[i*4+3]==11) {
+          fprintf(stderr,"(Spotify) Next song\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+        // last
+        if ((GLubyte) names[i*4+3]==10) {
+          fprintf(stderr,"(Spotify) last song\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+/*
         if ((GLubyte) names[i*4+3]==23) {
           fprintf(stderr,"scroll down\n");
           returnfunc = 1;
@@ -6354,6 +6377,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 2;
           fundet = true;
         }
+*/
         // show close spotify info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
@@ -6774,19 +6798,36 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
                 // spotify stuf
                 if ((vis_spotify_oversigt) && (retfunc==3)) {
-                  if (spotifyknapnr>0)
+                  if (spotifyknapnr>0) {
                     do_play_spotify=1;
                     do_open_spotifyplaylist=0;
                     if (debugmode) fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                  }
                 }
-
-                if ((vis_spotify_oversigt) && (retfunc==4)) {
-                  if (spotifyknapnr>0)
+                // stop play
+                if ((vis_spotify_oversigt) && (retfunc==2)) {
+                  if (spotifyknapnr==9) {
+                    do_play_spotify=0;
+                    do_open_spotifyplaylist=0;
+                    if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                  }
+                }
+                // next play
+                if ((vis_spotify_oversigt) && (retfunc==2)) {
+                  if (spotifyknapnr==10) {
                     do_play_spotify=0;
                     do_open_spotifyplaylist=1;
-                    if (debugmode) fprintf(stderr,"Set do_open_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                    if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                  }
                 }
-
+                // last play
+                if ((vis_spotify_oversigt) && (retfunc==2)) {
+                  if (spotifyknapnr==10) {
+                    do_play_spotify=0;
+                    do_open_spotifyplaylist=1;
+                    if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                  }
+                }
 
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
@@ -6945,10 +6986,35 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((retfunc==1) || (button==3)) {
 //          spotify_select_iconnr--;
         }
+
+        // pause music
+        if ((retfunc==2) || (button==3)) {
+          if (spotifyknapnr==9) {
+            spotify_oversigt.spotify_pause_play();
+          }
+          spotifyknapnr=0;
+        }
+
+        // last
+        if ((retfunc==2) || (button==3)) {
+          if (spotifyknapnr==10) {
+            spotify_oversigt.spotify_last_play();
+          }
+          spotifyknapnr=0;
+        }
+        // next
+        if ((retfunc==2) || (button==3)) {
+          if (spotifyknapnr==11) {
+            spotify_oversigt.spotify_next_play();
+          }
+          spotifyknapnr=0;
+        }
+
         // open spotify playlist
         if ((retfunc==3) || (button==3)) {
           ask_open_dir_or_play_spotify=false;
           printf("Open spotify playliste %d \n", spotify_oversigt.get_spotify_intnr(spotifyknapnr));
+          // opdate view from intnr id.
           spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_intnr(spotifyknapnr));
         }
         // play spotify song
@@ -6957,7 +7023,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
             // try load and start playing
             spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-            printf("spotify start play return value %d \n ",spotify_player_start_status);
+            //do_select_device_to_play=false;
+            if (spotify_player_start_status==0) printf("spotify start play return ok.\n");
+              else printf("spotify start play return value %d \n ",spotify_player_start_status);
             if (spotify_player_start_status == 0) {
               strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
               do_play_spotify_cover=true;

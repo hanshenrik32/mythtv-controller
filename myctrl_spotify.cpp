@@ -46,6 +46,8 @@ const int feed_url=2000;
 
 extern spotify_class spotify_oversigt;
 
+extern GLuint _texturemovieinfobox;
+
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -212,7 +214,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQAVzBR6n7rheD4kAxzr7HbcUBi4iVc-kra3_fuHQ1xxbqQSm1SipFU0L5FCOxzivnv3Nw_jhD3AU1Dg0eA1aqy0dcl55BEdAztoZvUEfm_4NDFztmORYadtu1bugyZNZVvGtmACaq68n146K4rnX8QdEDoxl6ZfXx8IPOR5_u9MO3RZ9cM_mPTaEf2oa7gaztVz3wGyMXVTTRvGHV_HhE8RTkmljjRD9VXpsV_QCYIg5zaGiVwS1ZV2iMXsmQJqZPv4PlYU9QD_5_sH6A");
+    strcpy(spotify_authorize_token,"BQBtGbXHt5PQcCJ3qzb09laoH2JGianHy_wXkwGe11RPaM1mCRT9_fiHO_TEUgLVS80JXxrSjqnLCtFJPizaeDRJGPoMl9mw3p8_8eb473ItQiocpKLaPzjK86kQjuq2JQSj2O0hjUCZX_DXBtnQBvhbHnVDzHjLTwP0j9v0yhinBi33iMFkbwsEi1JRYYYYygFx26emgka4ggG4S00amiR2AyNxSAd8QMcsj5LmmHMhQtBqbq5qgzzdwuLXWGJD3f69VM27XpTNsWNnQw");
 }
 
 //
@@ -230,11 +232,14 @@ spotify_class::~spotify_class() {
 //
 //
 int spotify_class::spotify_get_user_id() {
-  char doget[4096];
+  int curl_error;
+  char doget[2048];
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotify_authorize_token);
     //printf("doget = %s \n",doget);
-    system(doget);
+    curl_error=system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+    }
   }
   return 1;
 }
@@ -247,11 +252,14 @@ int spotify_class::spotify_get_user_id() {
 //
 
 int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
-  char doget[4096];
+  int curl_error;
+  char doget[2048];
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotify_authorize_token);
     //printf("doget = %s \n",doget);
     //system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+    }
   }
 }
 
@@ -410,6 +418,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 //
 // get users play lists
 // write to spotify_users_playlist.json
+//
 
 int spotify_class::spotify_get_user_playlists() {
   MYSQL *conn;
@@ -650,7 +659,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 
 // get songs from playlist (any public user)
-// write to spotify_playlist.json
+// write to spotify_playlist_{spotifyid}.json
 
 int spotify_class::spotify_get_playlist(char *playlist) {
   int tt;
@@ -680,6 +689,9 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotify_authorize_token,playlistfilename);
     curl_error=system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+      printf("Curl error get playlist \n");
+    }
   }
   stat(playlistfilename, &filestatus);                                          // get file info
   file_size = filestatus.st_size;                                               // get filesize
@@ -939,7 +951,9 @@ int spotify_class::spotify_get_available_devices() {
   if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
     curl_exitcode=system(call_sed);
-    if (WEXITSTATUS(curl_exitcode)!=0) printf("Error get devices\n");
+    if (WEXITSTATUS(curl_exitcode)!=0) {
+      printf("Error get devices\n");
+    }
     json_file = fopen("spotify_device_list.txt", "rt");
     if (json_file == NULL) {
       fprintf(stderr, "Unable to open spotify_device_list.txt\n");
@@ -1359,12 +1373,64 @@ int spotify_class::loadweb_stream_iconoversigt() {
 
 
 //
-//
+// get active play device name
 //
 
 char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
+
+
+void spotify_class::select_device_to_play() {
+  float yof=orgwinsizey/2+50;                                        // start ypos
+  float xof=orgwinsizex/2+200;
+  float winsizex=400;
+  float winsizey=300;
+  int i;
+  char temptxt[1024];
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof+10, yof+winsizey-20, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof+winsizex-10, yof+winsizey-20 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof+winsizex-10, yof+10 , 0.0);
+  glEnd();
+  glPopMatrix();
+  glPushMatrix();
+  glDisable(GL_TEXTURE_2D);
+  glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+  glTranslatef(xof+52,yof+240,0);
+  glRasterPos2f(0.0f, 0.0f);
+  glScalef(configdefaultstreamfontsize+8, configdefaultstreamfontsize+8, 1.0);
+  glcRenderString("Default play device");
+  if (active_spotify_device>=0) strcpy( temptxt , spotify_device[active_spotify_device].name );
+  else strcpy( temptxt , "None" );
+  glTranslatef(10,10,0);
+  glcRenderString( temptxt );
+  glPopMatrix();
+  //active_spotify_device
+  i=0;
+  while(strcmp(spotify_device[i].id,"")!=0) {
+    glPushMatrix();
+    strcpy(temptxt,spotify_device[i].name);
+    if ( i == active_spotify_device ) glColor4f( 1.0f, 1.0f, 0.0f, 1.0f); else glColor4f( 1.0f, 1.0f, 1.0f, 1.0f);
+    glTranslatef(xof+22,(yof+200)-(i*18),0);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+    glcRenderString(temptxt);
+    glcRenderString(" - ");
+    glcRenderString(spotify_device[i].devtype);
+    glPopMatrix();
+    i++;
+  }
+}
+
 
 
 void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected)
