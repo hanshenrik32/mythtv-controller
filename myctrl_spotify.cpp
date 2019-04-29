@@ -846,11 +846,11 @@ int spotify_class::spotify_do_we_play() {
 //
 
 int spotify_class::spotify_pause_play() {
-  int exitcode;
+  int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
-  exitcode=system(call);
-  if (WEXITSTATUS(exitcode)==0) {
+  curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
   }
 }
 
@@ -863,6 +863,8 @@ int spotify_class::spotify_resume_play() {
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
+  }
 }
 
 
@@ -875,6 +877,8 @@ int spotify_class::spotify_last_play() {
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
+  }
 }
 
 //
@@ -886,6 +890,8 @@ int spotify_class::spotify_next_play() {
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
   curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
+  }
 }
 
 
@@ -907,6 +913,8 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
   curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
+  }
   return(curl_error);
 }
 
@@ -930,7 +938,8 @@ int spotify_class::spotify_get_available_devices() {
   curl_exitcode=system(call);
   if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
-    system(call_sed);
+    curl_exitcode=system(call_sed);
+    if (WEXITSTATUS(curl_exitcode)!=0) printf("Error get devices\n");
     json_file = fopen("spotify_device_list.txt", "rt");
     if (json_file == NULL) {
       fprintf(stderr, "Unable to open spotify_device_list.txt\n");
