@@ -212,7 +212,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQBCUL7US5bfZkwdkm6R3QVrLKXbPdOwbp11lQuP0Q4MAOY7G1lzl2f_66C5CmTJyMJfZagokpT3ntR7AFC-8hPgp3kVVuDjhdFbwHT83URHGrSbMbFU3NYiWPfRAGwGqzX3XqBawf1rZT9ZMCOtpCKTP0eBrloet_ZEFWI_U-CgNwtLZGB3XFdYeqvUDhtuWgaVOpTT6AOWpoiMptLHx0lqQ4xYdeqdieSV4rg35RB7eycMAeuP2NDO_O-9GJQmDEtsa-53XN2CGGr4bg");
+    strcpy(spotify_authorize_token,"BQAVzBR6n7rheD4kAxzr7HbcUBi4iVc-kra3_fuHQ1xxbqQSm1SipFU0L5FCOxzivnv3Nw_jhD3AU1Dg0eA1aqy0dcl55BEdAztoZvUEfm_4NDFztmORYadtu1bugyZNZVvGtmACaq68n146K4rnX8QdEDoxl6ZfXx8IPOR5_u9MO3RZ9cM_mPTaEf2oa7gaztVz3wGyMXVTTRvGHV_HhE8RTkmljjRD9VXpsV_QCYIg5zaGiVwS1ZV2iMXsmQJqZPv4PlYU9QD_5_sH6A");
 }
 
 //
@@ -459,7 +459,7 @@ int spotify_class::spotify_get_user_playlists() {
       // parse from root
       playlist_process_value(value, 0,0,conn);                                      // fill stack array
       json_value_free(value);                                                       // json clean up
-      free(file_contents);                                                          //
+      free(file_contents);                                                          // free memory again
       // save data to mysql db
     }
     sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
@@ -656,6 +656,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   int tt;
   bool dbexist=false;
   int refid;
+  int curl_error;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -678,7 +679,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   json_value* value;
   if (strcmp(spotify_authorize_token,"")!=0) {
     sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotify_authorize_token,playlistfilename);
-    system(doget);
+    curl_error=system(doget);
   }
   stat(playlistfilename, &filestatus);                                          // get file info
   file_size = filestatus.st_size;                                               // get filesize
@@ -815,8 +816,8 @@ int spotify_class::spotify_do_we_play() {
   char *file_contents;
   struct stat filestatus;
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
-  curl_error=WEXITSTATUS(system(call));
-  if (curl_error==0) {
+  curl_error=system(call);
+  if (WEXITSTATUS(curl_error)==0) {
     strcpy(filename_song_playing,"spotify_song_playing.json");
     stat(filename_song_playing, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
@@ -845,9 +846,12 @@ int spotify_class::spotify_do_we_play() {
 //
 
 int spotify_class::spotify_pause_play() {
+  int exitcode;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
-  system(call);
+  exitcode=system(call);
+  if (WEXITSTATUS(exitcode)==0) {
+  }
 }
 
 //
@@ -855,9 +859,10 @@ int spotify_class::spotify_pause_play() {
 //
 
 int spotify_class::spotify_resume_play() {
+  int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
-  system(call);
+  curl_error=system(call);
 }
 
 
@@ -866,9 +871,10 @@ int spotify_class::spotify_resume_play() {
 //
 
 int spotify_class::spotify_last_play() {
+  int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
-  system(call);
+  curl_error=system(call);
 }
 
 //
@@ -876,9 +882,10 @@ int spotify_class::spotify_last_play() {
 //
 
 int spotify_class::spotify_next_play() {
+  int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
-  system(call);
+  curl_error=system(call);
 }
 
 
@@ -899,7 +906,7 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
-  curl_error=WEXITSTATUS(system(call));
+  curl_error=system(call);
   return(curl_error);
 }
 
@@ -920,8 +927,8 @@ int spotify_class::spotify_get_available_devices() {
   char call[4096];
   char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
   sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotify_authorize_token);
-  curl_exitcode=WEXITSTATUS(system(call));
-  if (curl_exitcode==0) {
+  curl_exitcode=system(call);
+  if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
     system(call_sed);
     json_file = fopen("spotify_device_list.txt", "rt");
