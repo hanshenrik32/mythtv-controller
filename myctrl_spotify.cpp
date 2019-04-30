@@ -45,8 +45,14 @@ const int feed_url=2000;
 //
 
 extern spotify_class spotify_oversigt;
-
 extern GLuint _texturemovieinfobox;
+
+
+extern bool do_select_device_to_play;
+
+extern GLuint mobileplayer_icon;
+extern GLuint pcplayer_icon;
+extern GLuint unknownplayer_icon;
 
 extern float configdefaultstreamfontsize;
 extern int tema;
@@ -214,7 +220,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQBtGbXHt5PQcCJ3qzb09laoH2JGianHy_wXkwGe11RPaM1mCRT9_fiHO_TEUgLVS80JXxrSjqnLCtFJPizaeDRJGPoMl9mw3p8_8eb473ItQiocpKLaPzjK86kQjuq2JQSj2O0hjUCZX_DXBtnQBvhbHnVDzHjLTwP0j9v0yhinBi33iMFkbwsEi1JRYYYYygFx26emgka4ggG4S00amiR2AyNxSAd8QMcsj5LmmHMhQtBqbq5qgzzdwuLXWGJD3f69VM27XpTNsWNnQw");
+    strcpy(spotify_authorize_token,"BQAmVtfHFKWHmwZf6mcwdLCjOyL9lc1ZJPpqrVi1K1We-C6lDS65UMTzME1iTf4AiK_CcLTS3rb-10k46w6R9nFGF1adAZDVZAFGIT9y1a9Its4WJikhbaM_61QmJJSleyq2vQObA_ZZQz3kHcJsWZSjRKqAKMV33hefSjsVc7bXVTuw6xRp-8cJsiObXy21kWLRgm615lc5ecrC9F1ctCaih41qOBpG7Cr3I5dcQz7nXog9nNOHHLvio0jFQQLHzez4UAWa9A48ASQxQw");
 }
 
 //
@@ -998,6 +1004,7 @@ int spotify_class::spotify_get_available_devices() {
         if ( strcmp(spotify_device[t].name,"") !=0 ) {
           printf("Device name      : %s ",spotify_device[t].name);
           printf("Device is active : %d \n",spotify_device[t].is_active);
+          printf("Device type      : %s \n",spotify_device[t].devtype);
         }
       }
       printf("\n*****************\n");
@@ -1380,6 +1387,9 @@ char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
 
+float select_device_to_playfader=1.0;
+
+int playfader_timer=500;
 
 void spotify_class::select_device_to_play() {
   float yof=orgwinsizey/2+50;                                        // start ypos
@@ -1390,9 +1400,9 @@ void spotify_class::select_device_to_play() {
   char temptxt[1024];
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
-  //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);
+  glColor4f( 1.0f, 1.0f, 1.0f, select_device_to_playfader);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glBegin(GL_QUADS);
@@ -1404,30 +1414,96 @@ void spotify_class::select_device_to_play() {
   glPopMatrix();
   glPushMatrix();
   glDisable(GL_TEXTURE_2D);
-  glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f,select_device_to_playfader);
   glTranslatef(xof+52,yof+240,0);
   glRasterPos2f(0.0f, 0.0f);
   glScalef(configdefaultstreamfontsize+8, configdefaultstreamfontsize+8, 1.0);
   glcRenderString("Default play device");
-  if (active_spotify_device>=0) strcpy( temptxt , spotify_device[active_spotify_device].name );
-  else strcpy( temptxt , "None" );
-  glTranslatef(10,10,0);
-  glcRenderString( temptxt );
   glPopMatrix();
   //active_spotify_device
   i=0;
+
+  int xof3=xof+330;
+  int yof3=(yof+184)-(i*30);
+  int winsizey3=400;
+  int winsizex3=20;
+
+  int xof2=xof+330;
+  int yof2=(yof+184)-(i*30);
+  int winsizey2=53;
+  int winsizex2=43;
+
   while(strcmp(spotify_device[i].id,"")!=0) {
+    xof3=xof+14;
+    yof3=(yof+184)-(i*30);
+    winsizey3=60;
+    winsizex3=365;
+    // make bar backgound
     glPushMatrix();
-    strcpy(temptxt,spotify_device[i].name);
-    if ( i == active_spotify_device ) glColor4f( 1.0f, 1.0f, 0.0f, 1.0f); else glColor4f( 1.0f, 1.0f, 1.0f, 1.0f);
-    glTranslatef(xof+22,(yof+200)-(i*18),0);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);
+    glColor4f( 1.0f, 1.0f, 1.0f, select_device_to_playfader);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(40+i);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( xof3+10, yof3+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof3+10, yof3+winsizey3-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof3+winsizex3-10, yof3+winsizey3-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof3+winsizex3-10, yof3+10 , 0.0);
+    glEnd();
+    glPopMatrix();
+    // draw text
+    glPushMatrix();
+    glTranslatef(xof+30,(yof+200)-(i*30),0);
     glRasterPos2f(0.0f, 0.0f);
-    glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(configdefaultstreamfontsize+2, configdefaultstreamfontsize+2, 1.0);
+    if (active_spotify_device>=0) strcpy( temptxt , spotify_device[i].name );
+    else strcpy( temptxt , "None" );
+    if ( i == active_spotify_device ) glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader); else glColor4f( 1.0f, 1.0f, 1.0f, select_device_to_playfader);
     glcRenderString(temptxt);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(xof+180,(yof+200)-(i*30),0);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(configdefaultstreamfontsize+2, configdefaultstreamfontsize+2, 1.0);
     glcRenderString(" - ");
     glcRenderString(spotify_device[i].devtype);
     glPopMatrix();
+    //draw icon
+    xof2=xof+330;
+    yof2=(yof+184)-(i*30);
+    winsizey2=53;
+    winsizex2=43;
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    if (strncmp(spotify_device[i].devtype,"Smartphone",10)==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
+    else if (strncmp(spotify_device[i].devtype,"Computer",8)==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
+    else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
+    glColor4f( 1.0f, 1.0f, 1.0f, select_device_to_playfader);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(40+i);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( xof2+10, yof2+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof2+10, yof2+winsizey2-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof2+winsizex2-10, yof2+winsizey2-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof2+winsizex2-10, yof2+10 , 0.0);
+    glEnd();
+    glPopMatrix();
     i++;
+  }
+  if (playfader_timer>0) playfader_timer--;
+  if (playfader_timer==0) {
+    select_device_to_playfader=select_device_to_playfader-0.05f;
+    if (select_device_to_playfader<0.0f) {
+      select_device_to_playfader=1.0;
+      do_select_device_to_play=false;
+      playfader_timer=500;
+    }
   }
 }
 
