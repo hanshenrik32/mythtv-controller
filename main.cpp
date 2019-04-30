@@ -712,6 +712,9 @@ GLuint setupfontback;
 GLuint setupkeysback;
 GLuint setuprssback;
 GLuint _texturesetupclose;
+GLuint mobileplayer_icon;                   // mobile pplayer icon
+GLuint pcplayer_icon;                       // pc player icon
+GLuint unknownplayer_icon;
 
 // setup menu textures
 GLuint _texturesoundsetup;                  // setup icon
@@ -3157,7 +3160,7 @@ void display() {
       } else if (vis_spotify_oversigt) {
         std::clock_t start;
         start = std::clock();
-        spotify_oversigt.show_spotify_oversigt(_textureId7,0,_textureIdback,_textureId28,_rangley);
+        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,_rangley,spotifyknapnr);
 
 
         if (do_select_device_to_play) spotify_oversigt.select_device_to_play();
@@ -8023,7 +8026,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       show_volume_info=true;					// show volume info window
       vis_volume_timeout=80;
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || (vis_spotify_oversigt) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -8204,6 +8207,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                 fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               }
             }
+
+            // show/select device to play on
+            if (vis_spotify_oversigt) {
+              if (key=='d') {
+                do_select_device_to_play=true;
+
+              }
+            }
+
+
             //
             if (do_show_setup) {				// if setup window
               if (do_show_setup_sound) {
@@ -12527,6 +12540,10 @@ void loadgfx() {
     setupkeysback       	= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeysback");
     setuprssback         	= loadgfxfile(temapath,(char *) "images/",(char *) "setuprssback");
     _texturesaveplaylist  = loadgfxfile(temapath,(char *) "images/",(char *) "filename");
+    mobileplayer_icon     = loadgfxfile(temapath,(char *) "images/",(char *) "mobileplayer");
+    pcplayer_icon         = loadgfxfile(temapath,(char *) "images/",(char *) "pcplayer");
+    unknownplayer_icon    = loadgfxfile(temapath,(char *) "images/",(char *) "unknownplayer");
+
 // ************************* screen shot *******************************
     screenshot1=loadTexture ((char *) "images/screenshot1.png");
     screenshot2=loadTexture ((char *) "images/screenshot2.png");
@@ -12683,6 +12700,9 @@ void freegfx() {
     glDeleteTextures( 1, &setupkeysback);           //
     glDeleteTextures( 1, &setuprssback);            //
     glDeleteTextures( 1, &_texturesaveplaylist);    //
+    glDeleteTextures( 1, &mobileplayer_icon);       // mobile icon
+    glDeleteTextures( 1, &pcplayer_icon);           // pc player icon
+    glDeleteTextures( 1, &unknownplayer_icon);      //
     glDeleteTextures( 1, &screenshot1);		          // screen shots
     glDeleteTextures( 1, &screenshot2);			        // screen shots
     glDeleteTextures( 1, &screenshot3);			        // screen shots

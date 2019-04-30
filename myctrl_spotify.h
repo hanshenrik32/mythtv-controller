@@ -20,7 +20,7 @@ class spotify_device_def {
     bool is_private_session;
     bool is_restricted;
     char name[256];
-    char devtype[20];
+    char devtype[30];
     int devvolume;
     spotify_device_def();
 };
