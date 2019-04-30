@@ -1415,10 +1415,10 @@ void spotify_class::select_device_to_play() {
   glPushMatrix();
   glDisable(GL_TEXTURE_2D);
   glColor4f(1.0f, 1.0f, 1.0f,select_device_to_playfader);
-  glTranslatef(xof+52,yof+240,0);
+  glTranslatef(xof+60,yof+240,0);
   glRasterPos2f(0.0f, 0.0f);
   glScalef(configdefaultstreamfontsize+8, configdefaultstreamfontsize+8, 1.0);
-  glcRenderString("Default play device");
+  glcRenderString("Select play device");
   glPopMatrix();
   //active_spotify_device
   i=0;
