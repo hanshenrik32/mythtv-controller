@@ -214,13 +214,14 @@ spotify_class::spotify_class() : antal(0) {
     //mg_set_protocol_http_websocket(this->c);                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
+    active_default_play_device=active_spotify_device;
     strcpy(spotify_client_id,"");
     strcpy(spotify_secret_id,"");
     strcpy(spotify_authorize_token,"");
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQAmVtfHFKWHmwZf6mcwdLCjOyL9lc1ZJPpqrVi1K1We-C6lDS65UMTzME1iTf4AiK_CcLTS3rb-10k46w6R9nFGF1adAZDVZAFGIT9y1a9Its4WJikhbaM_61QmJJSleyq2vQObA_ZZQz3kHcJsWZSjRKqAKMV33hefSjsVc7bXVTuw6xRp-8cJsiObXy21kWLRgm615lc5ecrC9F1ctCaih41qOBpG7Cr3I5dcQz7nXog9nNOHHLvio0jFQQLHzez4UAWa9A48ASQxQw");
+    strcpy(spotify_authorize_token,"BQCQMikQcFKCYuqpn3djL2OZLDbwxqgmVsYmODlPE2jpmYADNEoXMXPJBDLto7v7P5LwAAXSVK2KoiVgky5FlRz_3OF6RdxEve7-KAIeczchDY55qvjTI5WluTHQrJjfvRWTGmkBmJNWrp8YUjD86I3HPknbg43jtW1o3Z3TT6mYOUU3OCCeT53RCVrG5wEPB5ZDMR4ra2EwJbu4CslqF94Vo8RAmFIdV7g48vs2uZBDowwwV5l06cSXICp5cCh1J1pXvX6jc7AOK25Ccw");
 }
 
 //
@@ -925,13 +926,17 @@ int spotify_class::spotify_next_play() {
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
-
 int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",playlist_song,spotify_authorize_token);
+  char *devid=spotify_oversigt.get_active_device_id();
+
+  devid[40]='\0';
+  printf("Devid *%s*\n",devid);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\"  -H 'Authorization: Bearer %s'",devid,playlist_song,spotify_authorize_token);
   curl_error=system(call);
-  if (WEXITSTATUS(curl_error)==0) {
+  if (WEXITSTATUS(curl_error)!=0) {
+    printf("Error start play\n");
   }
   return(curl_error);
 }
@@ -1005,6 +1010,7 @@ int spotify_class::spotify_get_available_devices() {
           printf("Device name      : %s ",spotify_device[t].name);
           printf("Device is active : %d \n",spotify_device[t].is_active);
           printf("Device type      : %s \n",spotify_device[t].devtype);
+          printf("Device id        : %s \n",spotify_device[t].id);
         }
       }
       printf("\n*****************\n");
