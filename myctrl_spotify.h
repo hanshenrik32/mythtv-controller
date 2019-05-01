@@ -62,8 +62,10 @@ class spotify_class : vlc_controller {
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
 
     public:
+        char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
         char *get_active_spotify_device_name();
-        int active_spotify_device;                                              // active device or -1
+        int active_spotify_device;                                              // active device then get spotify devices or -1
+        int active_default_play_device;                                         // active device or -1
         char spotify_playlistname[256];
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
