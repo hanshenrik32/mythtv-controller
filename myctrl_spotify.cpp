@@ -221,7 +221,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQC78rHo6_8YUbzGOQuupZYAsWmZiaq-JSDwr_uECKrroTYKrrTOptiRcc0-KEDw9t3Yau6QQTAjANIEnbMeumy_4XpBb5D9QhXx173V2-1MxiIvdfLg77hGmfxc0MMza5mnptTFbSIOB-pKkiYt9wBLtkA_1l2eaytru6wQgbrq7Nvk0ruE0mJrWG95QBF_-qGfQlvHTp5IZ_i6QyaX4EG3lOzuqrUrWenQlph-r7GfVPHXu3jWXBDCsRmAs2DHvZtfx5xEcjZllJNZgw");
+    strcpy(spotify_authorize_token,"BQAGs5cI7MY3c9p1NWdL9R5j-6f6HonTB0T8m6dN-73BFKr2w1UdDW7IfXuj3qTzn5jNBVeBNKxpUX7I3kOXf9Bn-7LkNkYhO0eHJ51z-V3IxXfvVE7GMDN7ngmTZx_E7kCzLznN1xtQ1ZBqq0SdXMbHJymaXcj-MXlTznPO3P_a6E408KxdfDQkCeLjRirkWKOcqWfxOufrpZQzUA-VZE4w12iA2AlieP-2WYRrGPSLPCV5XUfRnRilCpBbWPnV2yJcUjWOZfk48KMsyA");
 }
 
 //
@@ -235,9 +235,10 @@ spotify_class::~spotify_class() {
 
 
 
-// Get user id
 //
+// Spotify Get user id
 //
+
 int spotify_class::spotify_get_user_id() {
   int curl_error;
   char doget[2048];
@@ -1392,16 +1393,23 @@ char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
 
-float select_device_to_playfader=1.0;
-
-int playfader_timer=500;
-
 void spotify_class::select_device_to_play() {
+  static float select_device_to_playfader=1.0;
+  static int playfader_timer=500;
   float yof=orgwinsizey/2+50;                                        // start ypos
   float xof=orgwinsizex/2+200;
+  // background size (window)
   float winsizex=400;
   float winsizey=300;
-  int i;
+  int i=0;
+  int xof3=xof+330;
+  int yof3=(yof+184)-(i*30);
+  int winsizey3=400;
+  int winsizex3=20;
+  int xof2=xof+330;
+  int yof2=(yof+184)-(i*30);
+  int winsizey2=53;
+  int winsizex2=43;
   char temptxt[1024];
   glPushMatrix();
   glEnable(GL_TEXTURE_2D);
@@ -1426,18 +1434,6 @@ void spotify_class::select_device_to_play() {
   glcRenderString("Select play device");
   glPopMatrix();
   //active_spotify_device
-  i=0;
-
-  int xof3=xof+330;
-  int yof3=(yof+184)-(i*30);
-  int winsizey3=400;
-  int winsizex3=20;
-
-  int xof2=xof+330;
-  int yof2=(yof+184)-(i*30);
-  int winsizey2=53;
-  int winsizex2=43;
-
   while(strcmp(spotify_device[i].id,"")!=0) {
     xof3=xof+14;
     yof3=(yof+184)-(i*30);
@@ -1501,6 +1497,7 @@ void spotify_class::select_device_to_play() {
     glPopMatrix();
     i++;
   }
+  // fader
   if (playfader_timer>0) playfader_timer--;
   if (playfader_timer==0) {
     select_device_to_playfader=select_device_to_playfader-0.05f;
