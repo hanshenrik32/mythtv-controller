@@ -9153,7 +9153,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // send spotify player to new device
               //
               if ((vis_spotify_oversigt) && (do_select_device_to_play)) {
-                printf("Send play command to spotify device \n");
+                if (debugmode) printf("Send play command to spotify device \n");
                 spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ) ,1);
               }
               // enter pressed in setup window xmltv
