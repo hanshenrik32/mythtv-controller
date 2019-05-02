@@ -7537,8 +7537,8 @@ void handlespeckeypress(int key,int x,int y) {
 
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
                   if (do_select_device_to_play) {
+                    // select play device
                     if ((spotify_oversigt.active_spotify_device!=-1) && (spotify_oversigt.active_spotify_device<9)) {
-                      printf("Doit\n");
                       if (strcmp(spotify_oversigt.get_device_name(spotify_oversigt.active_spotify_device+1),"")!=0) {
                         if (spotify_oversigt.active_spotify_device<9) spotify_oversigt.active_spotify_device+=1;
                       }
@@ -7713,8 +7713,8 @@ void handlespeckeypress(int key,int x,int y) {
 
                 // spotify stuf
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
+                  // select play device
                   if (do_select_device_to_play) {
-                    printf("Doit\n");
                     if (spotify_oversigt.active_spotify_device>0) spotify_oversigt.active_spotify_device-=1;
                   } else {
                     /*
@@ -8048,7 +8048,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       show_volume_info=true;					// show volume info window
       vis_volume_timeout=80;
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || (vis_spotify_oversigt) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13)) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -8934,6 +8934,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
                 else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
                 else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
+                else if (vis_spotify_oversigt) fprintf(stderr,"Enter key pressed in vis show spotify\n");
               }
               // set save flag of playlist
               if (ask_save_playlist) {
@@ -9147,6 +9148,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                     startstream = true;
                   }
                 }
+              }
+              //
+              // send spotify player to new device
+              //
+              if ((vis_spotify_oversigt) && (do_select_device_to_play)) {
+                printf("Send play command to spotify device \n");
+                spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ) ,1);
               }
               // enter pressed in setup window xmltv
               // select new tv guide provider
