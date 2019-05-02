@@ -930,7 +930,6 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   int curl_error;
   char call[4096];
   char *devid=spotify_oversigt.get_active_device_id();
-
   devid[40]='\0';
   printf("Devid *%s*\n",devid);
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\"  -H 'Authorization: Bearer %s'",devid,playlist_song,spotify_authorize_token);
