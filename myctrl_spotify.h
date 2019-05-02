@@ -64,6 +64,8 @@ class spotify_class : vlc_controller {
     public:
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
         char *get_active_spotify_device_name();
+        char *get_device_id(int nr) { return(spotify_device[nr].id); };   // get active dev id
+        char *get_device_name(int nr) { return(spotify_device[nr].name); };   // get active dev id
         int active_spotify_device;                                              // active device then get spotify devices or -1
         int active_default_play_device;                                         // active device or -1
         char spotify_playlistname[256];

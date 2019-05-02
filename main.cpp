@@ -7531,18 +7531,32 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 // spotify stuf
-                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify)) && (spotify_select_iconnr+mnumbersoficonline<=spotifycoversigt_antal)) {
-                  if ((unsigned int) spotify_key_selected>=((snumbersoficonline*3)+1)) {
-                    if (spotify_key_selected<(spotify_select_iconnr+snumbersoficonline)) {
-                      _spangley+=MUSIC_CS;								//scroll gfx down
-                      spotify_select_iconnr+=snumbersoficonline;
+
+                // old
+                // if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify)) && (spotify_select_iconnr+mnumbersoficonline<=spotifycoversigt_antal)) {
+
+                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
+                  if (do_select_device_to_play) {
+                    if ((spotify_oversigt.active_spotify_device!=-1) && (spotify_oversigt.active_spotify_device<9)) {
+                      printf("Doit\n");
+                      if (strcmp(spotify_oversigt.get_device_name(spotify_oversigt.active_spotify_device+1),"")!=0) {
+                        if (spotify_oversigt.active_spotify_device<9) spotify_oversigt.active_spotify_device+=1;
+                      }
                     }
                   } else {
-                    spotify_key_selected+=snumbersoficonline;
-                    spotify_select_iconnr+=snumbersoficonline;
+                    /*
+                    if ((unsigned int) spotify_key_selected>=((snumbersoficonline*3)+1)) {
+                      if (spotify_key_selected<(spotify_select_iconnr+snumbersoficonline)) {
+                        _spangley+=MUSIC_CS;								//scroll gfx down
+                        spotify_select_iconnr+=snumbersoficonline;
+                      }
+                    } else {
+                      spotify_key_selected+=snumbersoficonline;
+                      spotify_select_iconnr+=snumbersoficonline;
+                    }
+                    */
                   }
                 }
-
 
                 if ((vis_film_oversigt) && (debugmode)) fprintf(stderr,"select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
@@ -7698,7 +7712,12 @@ void handlespeckeypress(int key,int x,int y) {
                 }
 
                 // spotify stuf
-                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify)) && (spotify_select_iconnr>(snumbersoficonline-1)) ) {
+                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
+                  if (do_select_device_to_play) {
+                    printf("Doit\n");
+                    if (spotify_oversigt.active_spotify_device>0) spotify_oversigt.active_spotify_device-=1;
+                  } else {
+                    /*
                     if ((_spangley>0) && ((unsigned int) spotify_key_selected<=snumbersoficonline) && (spotify_select_iconnr>(snumbersoficonline-1))) {
                       _spangley-=MUSIC_CS;
                       do_music_icon_anim_icon_ofset = -1;			// set scroll
@@ -7707,6 +7726,8 @@ void handlespeckeypress(int key,int x,int y) {
                       spotify_select_iconnr -= snumbersoficonline;
                     }
                     if (spotify_key_selected>(int ) snumbersoficonline) spotify_key_selected-=snumbersoficonline;
+                    */
+                  }
                 }
 
 
@@ -7988,6 +8009,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
       if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
+      if (vis_spotify_oversigt) fprintf(stderr,"Spotify_key_selected = %d  spotify_select_iconnr = %d spotifyoversigt_antal= \n ",spotify_key_selected,spotify_select_iconnr);
     }
 }
 

@@ -221,7 +221,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCQMikQcFKCYuqpn3djL2OZLDbwxqgmVsYmODlPE2jpmYADNEoXMXPJBDLto7v7P5LwAAXSVK2KoiVgky5FlRz_3OF6RdxEve7-KAIeczchDY55qvjTI5WluTHQrJjfvRWTGmkBmJNWrp8YUjD86I3HPknbg43jtW1o3Z3TT6mYOUU3OCCeT53RCVrG5wEPB5ZDMR4ra2EwJbu4CslqF94Vo8RAmFIdV7g48vs2uZBDowwwV5l06cSXICp5cCh1J1pXvX6jc7AOK25Ccw");
+    strcpy(spotify_authorize_token,"BQC78rHo6_8YUbzGOQuupZYAsWmZiaq-JSDwr_uECKrroTYKrrTOptiRcc0-KEDw9t3Yau6QQTAjANIEnbMeumy_4XpBb5D9QhXx173V2-1MxiIvdfLg77hGmfxc0MMza5mnptTFbSIOB-pKkiYt9wBLtkA_1l2eaytru6wQgbrq7Nvk0ruE0mJrWG95QBF_-qGfQlvHTp5IZ_i6QyaX4EG3lOzuqrUrWenQlph-r7GfVPHXu3jWXBDCsRmAs2DHvZtfx5xEcjZllJNZgw");
 }
 
 //
