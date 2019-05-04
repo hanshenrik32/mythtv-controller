@@ -187,6 +187,19 @@ spotify_device_def::spotify_device_def() {
 }
 
 
+
+spotify_active_play_info_type::spotify_active_play_info_type() {                // sample data down here
+  progress_ms=0;
+  duration_ms=0;
+  strcpy(artist_name,"");
+  strcpy(cover_image,"");
+  strcpy(album_name,"");
+  strcpy(release_date,"");
+  popularity=0;
+  is_playing=false;
+};
+
+
 //
 // constructor
 //
@@ -198,11 +211,13 @@ spotify_class::spotify_class() : antal(0) {
     spotify_oversigt_loaded=false;
     spotify_oversigt_loaded_nr=0;
     antal=0;
-    gfx_loaded=false;			      // gfx loaded
-    stream_is_playing=false;    // is we playing any media
-    stream_is_pause=false;      // is player on pause
-    antalplaylists=0;           // antal playlists
+    spotify_aktiv_song_antal=0;                                                 //
+    gfx_loaded=false;			                                                      // gfx loaded
+    stream_is_playing=false;                                                    // is we playing any media
+    stream_is_pause=false;                                                      // is player on pause
+    antalplaylists=0;                                                           // antal playlists
     int port_cnt, n;
+    strcpy(spotify_aktiv_song[0].release_date,"");
     int err = 0;
     strcpy(spotify_authorize_token,"");
     // create web server
@@ -221,7 +236,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQAGs5cI7MY3c9p1NWdL9R5j-6f6HonTB0T8m6dN-73BFKr2w1UdDW7IfXuj3qTzn5jNBVeBNKxpUX7I3kOXf9Bn-7LkNkYhO0eHJ51z-V3IxXfvVE7GMDN7ngmTZx_E7kCzLznN1xtQ1ZBqq0SdXMbHJymaXcj-MXlTznPO3P_a6E408KxdfDQkCeLjRirkWKOcqWfxOufrpZQzUA-VZE4w12iA2AlieP-2WYRrGPSLPCV5XUfRnRilCpBbWPnV2yJcUjWOZfk48KMsyA");
+    strcpy(spotify_authorize_token,"BQCT4x-bUnkpqEUlbFBuWc7lf5ruG8Tq2Od8zBl1FyYyIgtLAEiGhJb7HdadkfqWviI4AmfcfdTL3-F-evMI6hgwMZg74h075oLcfjIuUI8RGspUoeRzYBKpU6jPh5_caGFIJJCGJLnR-4ITlvki-q-KqEuUtlxBf8MkEIHeDdCcWLCs83T17-4dmJvPOJxbI7MAaZCy6v9p3Co-Ylkokk2IrQpd8VfJ3zIeGMYATR4m40nAuRw0iF0425y5qA0jBOXgkZ2SzThIpkL2bg");
 }
 
 //
@@ -822,6 +837,9 @@ int spotify_class::spotify_get_playlist(char *playlist) {
 }
 
 
+// *********************************************************************************************************************************
+
+
 //
 // get active song playing
 //
@@ -831,35 +849,55 @@ int spotify_class::spotify_do_we_play() {
   FILE *json_file;
   int file_size;
   int curl_error;
-  char *contents;
+  ssize_t nread;
+  char *file_contents=NULL;
+  size_t stringlength=0;
   char filename_song_playing[]="spotify_song_playing.json";
-  char *file_contents;
-  struct stat filestatus;
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
+  char sed[]="cat spotify_song_playing.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' > spotify_song_playing.txt";
+  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
   curl_error=system(call);
-  if (WEXITSTATUS(curl_error)==0) {
-    strcpy(filename_song_playing,"spotify_song_playing.json");
-    stat(filename_song_playing, &filestatus);                                          // get file info
-    file_size = filestatus.st_size;                                               // get filesize
-    file_contents = (char*)malloc(filestatus.st_size);
+  printf("curl_error = %d \n",curl_error);
+  if (curl_error==0) {
+    curl_error=system(sed);                                                     // make info file (.txt)
+    strcpy(filename_song_playing,"spotify_song_playing.txt");
     json_file = fopen(filename_song_playing, "rt");
     if (json_file == NULL) {
       fprintf(stderr, "Unable to open %s\n", filename_song_playing);
-      free(file_contents);                                                        //
+      free(file_contents);
       return 0;
     }
-    if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-      fprintf(stderr, "Unable to read spotify play info file %s\n", filename_song_playing);
-      fclose(json_file);
-      free(file_contents);                                                        //
-      return 0;
+    spotify_aktiv_song_antal=0;
+    while ((nread = getline(&file_contents, &stringlength, json_file)) != -1) {
+      if (nread>4) {
+        if (strncmp(file_contents,"duration_ms=",12)==0) {
+          spotify_aktiv_song[spotify_aktiv_song_antal].duration_ms=atol(file_contents+13);
+        }
+        if (strncmp(file_contents,"progress_ms=",12)==0) {
+          spotify_aktiv_song[spotify_aktiv_song_antal].progress_ms=atol(file_contents+13);
+        }
+        if (strncmp(file_contents,"name=",5)==0) {
+          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,file_contents+6);
+        }
+        if (strncmp(file_contents,"url=",4)==0) {
+          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image,file_contents+5);
+        }
+        if (strncmp(file_contents,"release_date=",13)==0) {
+          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].release_date,file_contents+13);
+        }
+      }
     }
     free(file_contents);
     fclose(json_file);
+  } else {
+    printf("Error processs playing info\n");
   }
   return 1;
 }
 
+
+
+
+// *******************************************************************************************************
 
 //
 // pause play

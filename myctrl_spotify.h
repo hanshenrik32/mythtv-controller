@@ -43,12 +43,27 @@ struct spotify_oversigt_type {
     long intnr;
 };
 
+class spotify_active_play_info_type {                // sample data down here
+  public:
+    spotify_active_play_info_type();
+    long progress_ms;                                   // 27834
+    long duration_ms;                                   // 245119
+    char artist_name[256];                              // Joe Bonamassa
+    char cover_image[256];                              // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
+    char album_name[256];                               // (British Blues Explosion Live)
+    char release_date[24];
+    long popularity;                                    // (27)
+    bool is_playing;                                    // (true)
+};
+
 // spotify global class
 
 class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
+        spotify_active_play_info_type spotify_aktiv_song[1];                   //
+        int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         char spotify_authorize_token[512];                                      // token get from spotify
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
@@ -60,8 +75,11 @@ class spotify_class : vlc_controller {
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
-
     public:
+        int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
+        int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
+        char *spotify_aktiv_song_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
+        char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
         char *get_active_spotify_device_name();
         char *get_device_id(int nr) { return(spotify_device[nr].id); };   // get active dev id
