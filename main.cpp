@@ -4242,6 +4242,14 @@ void display() {
     // *************** Spotify play stuf **********************************************************
     //
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
+      static int do_we_play_check=0;
+      if (do_we_play_check==0) {
+        spotify_oversigt.spotify_do_we_play();
+        printf("do_we_play_check %d \n",do_we_play_check);
+      }
+      do_we_play_check++;
+      if (do_we_play_check>200) do_we_play_check=0;
+
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
       glEnable(GL_TEXTURE_2D);
@@ -4329,6 +4337,9 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Songname : ");
+      // show artist name
+      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_artist_name());
+      glcRenderString(temptxt1);
       glPopMatrix();
 
       glPushMatrix();
@@ -4342,7 +4353,28 @@ void display() {
         glcRenderString(spotify_oversigt.get_active_spotify_device_name());
       }
       glPopMatrix();
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 560.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      sprintf(temptxt1,"playtime : %d",spotify_oversigt.spotify_aktiv_song_msplay());
+      glcRenderString(temptxt1);
+      sprintf(temptxt1," - %d",spotify_oversigt.spotify_aktiv_song_mslength());
+      glcRenderString(temptxt1);
+      glPopMatrix();
 
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 540.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString("Release   : ");
+      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
+      glcRenderString(temptxt1);
+      glPopMatrix();
     }
     //
     // *************** Stream stuf *******************************************************************************
