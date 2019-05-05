@@ -121,7 +121,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           strncpy(user_token,p+5,251);
           *(user_token+251)='\0';
         }
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000 https://accounts.spotify.com/api/token ",base64_code,user_token);
+        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token ",base64_code,user_token);
         printf("sql=%s \n",sql);
         system(sql);
         printf("\n***************************************** CALL BACK server ***************************************\n");
@@ -1133,8 +1133,8 @@ int spotify_class::spotify_get_access_token2() {
   //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
 
 
-  sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=authorization_code&response_type=code&redirect_uri=http://localhost:8000 https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
-  system(call);
+  //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=authorization_code&response_type=code&redirect_uri=http://localhost:8000 https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
+  //system(call);
   myfile = fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
