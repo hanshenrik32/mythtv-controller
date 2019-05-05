@@ -236,7 +236,7 @@ spotify_class::spotify_class() : antal(0) {
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCT4x-bUnkpqEUlbFBuWc7lf5ruG8Tq2Od8zBl1FyYyIgtLAEiGhJb7HdadkfqWviI4AmfcfdTL3-F-evMI6hgwMZg74h075oLcfjIuUI8RGspUoeRzYBKpU6jPh5_caGFIJJCGJLnR-4ITlvki-q-KqEuUtlxBf8MkEIHeDdCcWLCs83T17-4dmJvPOJxbI7MAaZCy6v9p3Co-Ylkokk2IrQpd8VfJ3zIeGMYATR4m40nAuRw0iF0425y5qA0jBOXgkZ2SzThIpkL2bg");
+    strcpy(spotify_authorize_token,"BQCPzfX3NaqUYaSQ7lAIMWEpk9pVgCKb785F_sqXayevf46D1-kSctuWNGz3HfBoRMF8JD1C10Qgpd54SFyPQoed5hn21BaQJSB6-7MNemKd5bg_rSS1eCuT5rUO4RdUAS4MyOPw-ggxJgjQa065lG3tKiNpyh9jziRv1K5f9vSR3XIuB0jMrwY9dWyUvGdPvc4YuDVYFp15SZqmmbyORh97_2Xjnzn_CH3e5g9LT2IsA7viUSLaq4W57ua4jmkbPkx5IF0u94BXXW9qVQ");
 }
 
 //
@@ -452,6 +452,7 @@ int spotify_class::spotify_get_user_playlists() {
   char doget[4096];
   char filename[4096];
   char downloadfilenamelong[4096];
+  int curl_error;
   FILE *json_file;
   char *jons_string;
   struct stat filestatus;
@@ -467,9 +468,12 @@ int spotify_class::spotify_get_user_playlists() {
        //exit(1);
     }
     if (strcmp(spotify_authorize_token,"")!=0) {
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotify_client_id,spotify_authorize_token);
-      //printf("doget = %s \n",doget);
-      //system(doget);
+      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotify_authorize_token);
+      printf("doget = %s \n",doget);
+      curl_error=system(doget);
+      if (WEXITSTATUS(curl_error)==0) {
+        printf("Curl error get user playlists\n");
+      }
       stat("spotify_users_playlist.json", &filestatus);                              // get file info
       file_size = filestatus.st_size;                                               // get filesize
       file_contents = (char*)malloc(filestatus.st_size);
@@ -683,6 +687,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
+// and update db
 
 int spotify_class::spotify_get_playlist(char *playlist) {
   int tt;

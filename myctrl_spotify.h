@@ -121,13 +121,15 @@ class spotify_class : vlc_controller {
         int streamantal() { return(antal-1); }
         void clean_spotify_oversigt();
         int spotify_req_playlist();
+        // spotify_get_list_of_users_playlists NOT in use
         int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
+        // in use
+        int spotify_get_user_playlists();                                       // get user playlist (list of playlist)
+        int spotify_get_playlist(char *playlist);                               // get playlist + songs
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);
         int spotify_get_access_token();                                         // get token
-        int spotify_get_user_playlists();                                       // get user playlist (list of playlist)
-        int spotify_get_playlist(char *playlist);                               // get playlist + songs
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
         int spotify_pause_play();                                               // Pause
