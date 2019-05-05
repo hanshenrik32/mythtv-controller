@@ -2465,12 +2465,12 @@ void display() {
     // run the webserver
     //std::clock_t start;
     //start = std::clock();
-    //mg_mgr_poll(&spotify_oversigt.mgr, 50);
+    mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
     // do the update from spotify
     if (do_update_spotify_playlist) {
-      spotify_oversigt.spotify_get_access_token();                              // get access token
+      //spotify_oversigt.spotify_get_access_token();                              // get access token
       spotify_oversigt.spotify_get_user_id();                                   // get user id
       spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
       spotify_oversigt.spotify_get_user_playlists();                            // get all the playlist and update db
@@ -3161,10 +3161,10 @@ void display() {
         std::clock_t start;
         start = std::clock();
         spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,_rangley,spotifyknapnr);
-
-
-        if (do_select_device_to_play) spotify_oversigt.select_device_to_play();
-
+        // select play device
+        if (do_select_device_to_play) {
+          spotify_oversigt.select_device_to_play();
+        }
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_tv_oversigt) {
         // show tv guide
@@ -4359,9 +4359,9 @@ void display() {
       glTranslatef(520.0f, 560.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      sprintf(temptxt1,"playtime : %d",spotify_oversigt.spotify_aktiv_song_msplay());
+      sprintf(temptxt1,"playtime : %d",spotify_oversigt.spotify_aktiv_song_msplay()/1000);
       glcRenderString(temptxt1);
-      sprintf(temptxt1," - %d",spotify_oversigt.spotify_aktiv_song_mslength());
+      sprintf(temptxt1," - %d ",spotify_oversigt.spotify_aktiv_song_mslength()/1000);
       glcRenderString(temptxt1);
       glPopMatrix();
 

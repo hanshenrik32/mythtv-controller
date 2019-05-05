@@ -76,6 +76,8 @@ class spotify_class : vlc_controller {
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
     public:
+        //char *get_client_id(); { return (spotify_client_id); };
+        //char *get_secret_id(); { return (spotify_secret_id); };
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
         char *spotify_aktiv_song_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
@@ -130,6 +132,7 @@ class spotify_class : vlc_controller {
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);
         int spotify_get_access_token();                                         // get token
+        int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
         int spotify_pause_play();                                               // Pause
