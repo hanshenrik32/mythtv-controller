@@ -98,9 +98,15 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   char sql[2048];
   struct http_message *hm = (struct http_message *) ev_data;
   struct mg_serve_http_opts opts;
-
+  int curl_error;
+  struct stat filestatus;
+  int file_size;
+  char* file_contents;
+  FILE *tokenfile;
   char *base64_code;
   char data[512];
+  char token[1024];
+  char refresh_token[1024];
   strcpy(data,"05b40c70078a429fa40ab0f9ccb485de:e50c411d2d2f4faf85ddff16f587fea1");
 
   //calc base64
@@ -121,10 +127,28 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           strncpy(user_token,p+5,251);
           *(user_token+251)='\0';
         }
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token ",base64_code,user_token);
-        printf("sql=%s \n",sql);
-        system(sql);
-        printf("\n***************************************** CALL BACK server ***************************************\n");
+        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
+        curl_error=system(sql);
+        if (curl_error==0) {
+          printf("\n***************************************** CALL BACK server ***************************************\n");
+          stat("spotify_access_token2.txt", &filestatus);                              // get file info
+          file_size = filestatus.st_size;                                               // get filesize
+          file_contents = (char*)malloc(filestatus.st_size);
+          tokenfile=fopen("spotify_access_token2.txt","rt");
+          if (fread(file_contents, file_size, 1, tokenfile ) != 1 ) {
+            fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
+            fclose(tokenfile);
+          }
+          strncpy(token,file_contents+17,170+17);
+          strncpy(refresh_token,file_contents+239,170+17);
+          token[163]=0;
+          refresh_token[134]=0;
+          printf("token     %s\n",token);
+          printf("ref token %s\n",refresh_token);
+          free(file_contents);
+          fclose(tokenfile);
+        }
+
         //c->flags |= MG_F_SEND_AND_CLOSE;
 
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
