@@ -341,7 +341,7 @@ int rknapnr=0;                                            // buttons vars
 int sknapnr=0;                                            // stream button
 int mknapnr=0;                                            // music
 int tvknapnr=0;                                           // tv
-int spotifyknapnr=0;                                      // spotify
+int spotifyknapnr=1;                                      // spotify
 int fknapnr=0;                                            // movie
 int swknapnr=0;                                           //
 
@@ -3160,7 +3160,7 @@ void display() {
       } else if (vis_spotify_oversigt) {
         std::clock_t start;
         start = std::clock();
-        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,_rangley,spotifyknapnr);
+        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,spotifyknapnr);
         // select play device
         if (do_select_device_to_play) {
           spotify_oversigt.select_device_to_play();
@@ -6831,36 +6831,39 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   }
                 }
 
-                // spotify stuf
-                if ((vis_spotify_oversigt) && (retfunc==3)) {
-                  if (spotifyknapnr>0) {
-                    do_play_spotify=1;
-                    do_open_spotifyplaylist=0;
-                    if (debugmode) fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                // spotify
+                if (vis_spotify_oversigt) {
+                  // spotify stuf
+                  if (retfunc==3) {
+                    if (spotifyknapnr>0) {
+                      do_play_spotify=1;
+                      do_open_spotifyplaylist=0;
+                      if (debugmode) fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                    }
                   }
-                }
-                // stop play
-                if ((vis_spotify_oversigt) && (retfunc==2)) {
-                  if (spotifyknapnr==9) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=0;
-                    if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                  // stop play
+                  if (retfunc==2) {
+                    if (spotifyknapnr==9) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=0;
+                      if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                    }
                   }
-                }
-                // next play
-                if ((vis_spotify_oversigt) && (retfunc==2)) {
-                  if (spotifyknapnr==10) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                  // next play
+                  if (retfunc==2) {
+                    if (spotifyknapnr==10) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=1;
+                      if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                    }
                   }
-                }
-                // last play
-                if ((vis_spotify_oversigt) && (retfunc==2)) {
-                  if (spotifyknapnr==10) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                  // last play
+                  if (retfunc==2) {
+                    if (spotifyknapnr==10) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=1;
+                      if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                    }
                   }
                 }
 
@@ -7371,20 +7374,13 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                 }
 
-
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
                   if (spotify_key_selected>1) {
+                    spotifyknapnr--;
                     spotify_key_selected--;
                     spotify_select_iconnr--;
-                  } else {
-                    if ((spotify_select_iconnr>0) && (_spangley>0)) {
-                       _spangley-=MUSIC_CS;
-                       spotify_key_selected+=snumbersoficonline-1;  // den viste på skærm af 1 til 20
-                       spotify_select_iconnr--;                  	// den rigtige valgte af 1 til cd antal
-                    }
                   }
                 }
-
 
                 if (vis_film_oversigt) {
                   if (film_key_selected>1) {
@@ -7472,18 +7468,14 @@ void handlespeckeypress(int key,int x,int y) {
                   music_key_selected++;
                 }
 
-
-                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify)) && (spotify_select_iconnr<spotifycoversigt_antal)) {
-                  if ((spotify_key_selected % (snumbersoficonline*4)==0) || ((spotify_select_iconnr==((snumbersoficonline*4)-1)) && (spotify_key_selected % snumbersoficonline==0))) {
-                    _spangley+=MUSIC_CS;
-                    spotify_key_selected-=mnumbersoficonline;			// den viste på skærm af 1 til 20
-                    spotify_select_iconnr++;	                 		// den rigtige valgte af 1 til cd antal
-                  } else {
-                    spotify_select_iconnr++;			                // den rigtige valgte af 1 til cd antal
+                // spotify
+                if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
+                  if (spotifyknapnr<spotify_oversigt.streamantal()) {
+                    spotifyknapnr++;
+                    spotify_key_selected++;
+                    spotify_select_iconnr++;
                   }
-                  spotify_key_selected++;
                 }
-
 
                 //film_select_iconnr+film_key_selected
                 if ((vis_film_oversigt) && ((int unsigned) (film_select_iconnr)<film_oversigt.film_antal()-1)) {
@@ -7576,6 +7568,11 @@ void handlespeckeypress(int key,int x,int y) {
                       }
                     }
                   } else {
+                    spotifyknapnr+=snumbersoficonline;
+                    spotify_key_selected+=snumbersoficonline;
+                    spotify_select_iconnr+=snumbersoficonline;
+                    //_spangley+=MUSIC_CS;
+
                     /*
                     if ((unsigned int) spotify_key_selected>=((snumbersoficonline*3)+1)) {
                       if (spotify_key_selected<(spotify_select_iconnr+snumbersoficonline)) {
@@ -7749,6 +7746,12 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_select_device_to_play) {
                     if (spotify_oversigt.active_spotify_device>0) spotify_oversigt.active_spotify_device-=1;
                   } else {
+                    if ((spotifyknapnr-snumbersoficonline)>=1) {
+                      spotifyknapnr-=snumbersoficonline;
+                      spotify_key_selected-=snumbersoficonline;
+                      spotify_select_iconnr-=snumbersoficonline;
+                    }
+
                     /*
                     if ((_spangley>0) && ((unsigned int) spotify_key_selected<=snumbersoficonline) && (spotify_select_iconnr>(snumbersoficonline-1))) {
                       _spangley-=MUSIC_CS;

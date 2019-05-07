@@ -15,33 +15,39 @@
 
 class spotify_device_def {
   public:
-    char id[41];
-    bool is_active;
-    bool is_private_session;
-    bool is_restricted;
-    char name[256];
-    char devtype[30];
-    int devvolume;
+    char        id[41];
+    bool        is_active;
+    bool        is_private_session;
+    bool        is_restricted;
+    char        name[256];
+    char        devtype[30];
+    int         devvolume;
     spotify_device_def();
 };
 
 
+//
 // playlist/song overview def
+//
 
 struct spotify_oversigt_type {
-    char feed_showtxt[80+1];			        // what to show in overview
-    char feed_name[80+1];				          // playlist/song name
-    char feed_desc[80+1];				          // desc
-    char feed_gfx_url[4000+1];            //
-    char feed_gfx_mythtv[2000+1];				  //
-    char playlistid[100+1];               // playlist id
-    char playlisturl[200+1];              // play list url + spotify command
+    char        feed_showtxt[80+1];			        // what to show in overview
+    char        feed_name[80+1];				          // playlist/song name
+    char        feed_desc[80+1];				          // desc
+    char        feed_gfx_url[4000+1];            //
+    char        feed_gfx_mythtv[2000+1];				  //
+    char        playlistid[100+1];               // playlist id
+    char        playlisturl[200+1];              // play list url + spotify command
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
-    bool nyt;
-    GLuint textureId;                     // gfx icon loaded
-    long intnr;
+    bool        nyt;
+    GLuint      textureId;                     // gfx icon loaded
+    long        intnr;
 };
+
+//
+// active song to play
+//
 
 class spotify_active_play_info_type {                // sample data down here
   public:
@@ -51,7 +57,7 @@ class spotify_active_play_info_type {                // sample data down here
     char artist_name[256];                              // Joe Bonamassa
     char cover_image[256];                              // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
     char album_name[256];                               // (British Blues Explosion Live)
-    char release_date[24];
+    char release_date[24];                              //
     long popularity;                                    // (27)
     bool is_playing;                                    // (true)
 };
@@ -76,6 +82,10 @@ class spotify_class : vlc_controller {
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
     public:
+        char spotifytoken[512];                                                 // access_token
+        char spotifytoken_refresh[512];                                         // refresh_token
+        void spotify_set_token();
+        int spotify_refresh_token();                                            // refresh token on postify api
         //char *get_client_id(); { return (spotify_client_id); };
         //char *get_secret_id(); { return (spotify_secret_id); };
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
@@ -142,9 +152,8 @@ class spotify_class : vlc_controller {
         int opdatere_spotify_oversigt(int refid);
         void select_device_to_play();                                           // show device list to play on
         // show spotify playlist overview
-        void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected);
+        void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int stream_key_selected);
 };
-
 
 
 
