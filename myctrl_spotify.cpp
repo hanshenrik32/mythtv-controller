@@ -105,8 +105,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   FILE *tokenfile;
   char *base64_code;
   char data[512];
-  char token[1024];
-  char refresh_token[1024];
   strcpy(data,"05b40c70078a429fa40ab0f9ccb485de:e50c411d2d2f4faf85ddff16f587fea1");
 
   //calc base64
@@ -122,12 +120,14 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get soptify code from server
-
         if (p) {
           strncpy(user_token,p+5,251);
           *(user_token+251)='\0';
         }
         sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
+
+        printf("sql curl : %s \n ",sql);
+
         curl_error=system(sql);
         if (curl_error==0) {
           printf("\n***************************************** CALL BACK server ***************************************\n");
@@ -139,12 +139,13 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
             fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
             fclose(tokenfile);
           }
-          strncpy(token,file_contents+17,170+17);
-          strncpy(refresh_token,file_contents+239,170+17);
-          token[163]=0;
-          refresh_token[134]=0;
-          printf("token     %s\n",token);
-          printf("ref token %s\n",refresh_token);
+          strncpy(spotify_oversigt.spotifytoken,file_contents+17,170+17);
+          strncpy(spotify_oversigt.spotifytoken_refresh,file_contents+239,170+17);
+          spotify_oversigt.spotifytoken[163]=0;
+          spotify_oversigt.spotifytoken_refresh[134]=0;
+          printf("token     %s\n",spotify_oversigt.spotifytoken);
+          printf("ref token %s\n",spotify_oversigt.spotifytoken_refresh);
+          spotify_oversigt.spotify_set_token();
           free(file_contents);
           fclose(tokenfile);
         }
@@ -261,7 +262,6 @@ spotify_class::spotify_class() : antal(0) {
     int port_cnt, n;
     strcpy(spotify_aktiv_song[0].release_date,"");
     int err = 0;
-    strcpy(spotify_authorize_token,"");
     // create web server
     mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
     // start web server
@@ -274,12 +274,12 @@ spotify_class::spotify_class() : antal(0) {
     active_default_play_device=active_spotify_device;
     strcpy(spotify_client_id,"");
     strcpy(spotify_secret_id,"");
-    strcpy(spotify_authorize_token,"");
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQA4oEm2PJglL7yt4WMC_lvyTIFq0ogRv-13EeRB0K_utrXsM0wSCVKMjJyzYXGM9e5Uc-Eb0Ewc6ALFAZG6LR5S3PwQfCGPAKt_92zae51X3cWuhPUpKc514EKWuE1pyj6zahYbUnYpm9OTAwh4nfJsoEJiY8N7vBzQtjwYyVPyF-zBYYartA0ADI7jaMjFSMezoWwrgB5_PJ-AsQYQKlKaiONz8ZbMTzEB8D0gZsgR9cSBiY-3KB2oTZ_9VOoSxysqvschS2bPvAKbyQ");
+    strcpy(spotify_authorize_token,"BQAziGb0FOLN9aT4OoPcyQrGat0081nTiKkBxZVWRe3pzGyqBDdkN9GRhSL1Ci_Sr3HtjlFqFiRerNRVPIfjNhhFGUvpKFOhaR2MNGHg-bJvi6PGJBj_fx6NZbSRxEvHvuk8-ZaXQ2fN46UZtOV-ZOkVZoiEpVbsFLLrvW-MCahvQm9kBPaSioIwG4y0pD8pgPc3iVh9JzpxdR8EqCjDdd9u1Irqla6OC-6KHT8VBOS9zJW5tGLnzPxiCtYjYsFw1jmkVwMJKGADrB7m8g");
 }
+
 
 //
 // destructor
@@ -289,6 +289,34 @@ spotify_class::~spotify_class() {
     mg_mgr_free(&client_mgr);
     clean_spotify_oversigt();
 }
+
+//
+// save token to use
+//
+
+void spotify_class::spotify_set_token() {
+  if (strcmp(spotify_authorize_token,"")==0) strcpy(spotify_authorize_token,spotifytoken);
+}
+
+
+//
+// refresh token
+//
+
+int spotify_class::spotify_refresh_token() {
+  int curl_error;
+  char doget[2048];
+  if (strcmp(spotify_authorize_token,"")!=0) {
+    sprintf(doget,"curl -X POST 'https://api.spotify.com/api/token' -d grant_type=refresh_token -d refresh_token=%s -H 'Authorization: Bearer %s'",spotify_authorize_token,spotifytoken_refresh);
+    curl_error=system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+      printf("Error \n");
+    }
+  }
+  return 1;
+}
+
+
 
 
 
@@ -1659,7 +1687,11 @@ void spotify_class::select_device_to_play() {
 
 
 
-void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int _mangley,int stream_key_selected)
+//
+// show spotify overview
+//
+
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int stream_key_selected)
 
 {
     int j,ii,k,pos;
@@ -1727,7 +1759,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         yof=yof-(buttonsizey+20);
         xof=0;
       }
-      if (i+1==(int) stream_key_selected) buttonsizey=170.0f;
+      if (i+1==(int) stream_key_selected) buttonsizey=190.0f;
       else buttonsizey=180.0f;
       if (stack[i+sofset]->textureId) {
         // stream icon
