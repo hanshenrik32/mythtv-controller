@@ -94,19 +94,22 @@ extern bool stream_loadergfx_started_break;
 
 static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
-  char user_token[255];
+  const char *pspace;
+  int n=0;
+  char user_token[1024];
   char sql[2048];
   struct http_message *hm = (struct http_message *) ev_data;
   struct mg_serve_http_opts opts;
   int curl_error;
-  struct stat filestatus;
-  int file_size;
-  char* file_contents;
+  char* file_contents=NULL;
+  size_t len;
+  int error;
   FILE *tokenfile;
   char *base64_code;
   char data[512];
+  unsigned int codel;
   strcpy(data,"05b40c70078a429fa40ab0f9ccb485de:e50c411d2d2f4faf85ddff16f587fea1");
-
+  char sed[]="cat spotify_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
   *(base64_code+88)='\0';
@@ -117,37 +120,36 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       // is callback call
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
         printf("Got reply server : %s \n", hm->uri);
-
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get soptify code from server
         if (p) {
-          strncpy(user_token,p+5,251);
-          *(user_token+251)='\0';
+          pspace=strchr(p,' ');
+          if (pspace) {
+            codel=(pspace-p);
+            strncpy(user_token,p+5,pspace-p);
+            *(user_token+(pspace-p))='\0';
+          }
+          user_token[codel-4]='\0';
         }
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
-
-        printf("sql curl : %s \n ",sql);
-
+        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
+        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
         if (curl_error==0) {
-          printf("\n***************************************** CALL BACK server ***************************************\n");
-          stat("spotify_access_token2.txt", &filestatus);                              // get file info
-          file_size = filestatus.st_size;                                               // get filesize
-          file_contents = (char*)malloc(filestatus.st_size);
-          tokenfile=fopen("spotify_access_token2.txt","rt");
-          if (fread(file_contents, file_size, 1, tokenfile ) != 1 ) {
-            fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
-            fclose(tokenfile);
+          curl_error=system(sed);
+          if (curl_error==0) {
           }
-          strncpy(spotify_oversigt.spotifytoken,file_contents+17,170+17);
-          strncpy(spotify_oversigt.spotifytoken_refresh,file_contents+239,170+17);
-          spotify_oversigt.spotifytoken[163]=0;
-          spotify_oversigt.spotifytoken_refresh[134]=0;
+          printf("\n******** CALL BACK server/Get token okay ********\n");
+          tokenfile=fopen("spotify_access_token2.txt","r");
+          error=getline(&file_contents,&len,tokenfile);
+          strcpy(spotify_oversigt.spotifytoken,file_contents);
+          error=getline(&file_contents,&len,tokenfile);
+          strcpy(spotify_oversigt.spotifytoken_refresh,file_contents);
           printf("token     %s\n",spotify_oversigt.spotifytoken);
           printf("ref token %s\n",spotify_oversigt.spotifytoken_refresh);
-          spotify_oversigt.spotify_set_token();
-          free(file_contents);
+          //spotify_oversigt.spotify_set_token();
           fclose(tokenfile);
+          free(file_contents);
         }
 
         //c->flags |= MG_F_SEND_AND_CLOSE;
@@ -214,6 +216,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 }
 
 
+
 //
 // constructor
 //
@@ -274,10 +277,11 @@ spotify_class::spotify_class() : antal(0) {
     active_default_play_device=active_spotify_device;
     strcpy(spotify_client_id,"");
     strcpy(spotify_secret_id,"");
+    strcpy(spotify_authorize_token,"");
 
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQAziGb0FOLN9aT4OoPcyQrGat0081nTiKkBxZVWRe3pzGyqBDdkN9GRhSL1Ci_Sr3HtjlFqFiRerNRVPIfjNhhFGUvpKFOhaR2MNGHg-bJvi6PGJBj_fx6NZbSRxEvHvuk8-ZaXQ2fN46UZtOV-ZOkVZoiEpVbsFLLrvW-MCahvQm9kBPaSioIwG4y0pD8pgPc3iVh9JzpxdR8EqCjDdd9u1Irqla6OC-6KHT8VBOS9zJW5tGLnzPxiCtYjYsFw1jmkVwMJKGADrB7m8g");
+    //strcpy(spotify_authorize_token,"");
 }
 
 
@@ -290,14 +294,6 @@ spotify_class::~spotify_class() {
     clean_spotify_oversigt();
 }
 
-//
-// save token to use
-//
-
-void spotify_class::spotify_set_token() {
-  if (strcmp(spotify_authorize_token,"")==0) strcpy(spotify_authorize_token,spotifytoken);
-}
-
 
 //
 // refresh token
@@ -307,7 +303,7 @@ int spotify_class::spotify_refresh_token() {
   int curl_error;
   char doget[2048];
   if (strcmp(spotify_authorize_token,"")!=0) {
-    sprintf(doget,"curl -X POST 'https://api.spotify.com/api/token' -d grant_type=refresh_token -d refresh_token=%s -H 'Authorization: Bearer %s'",spotify_authorize_token,spotifytoken_refresh);
+    sprintf(doget,"curl -X POST 'https://api.spotify.com/api/token' -d grant_type=refresh_token -d refresh_token=%s -H 'Authorization: Bearer %s'",spotifytoken,spotifytoken_refresh);
     curl_error=system(doget);
     if (WEXITSTATUS(curl_error)==0) {
       printf("Error \n");
@@ -327,8 +323,8 @@ int spotify_class::spotify_refresh_token() {
 int spotify_class::spotify_get_user_id() {
   int curl_error;
   char doget[2048];
-  if (strcmp(spotify_authorize_token,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotify_authorize_token);
+  if (strcmp(spotifytoken,"")!=0) {
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
     //printf("doget = %s \n",doget);
     curl_error=system(doget);
     if (WEXITSTATUS(curl_error)==0) {
@@ -347,8 +343,8 @@ int spotify_class::spotify_get_user_id() {
 int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
   int curl_error;
   char doget[2048];
-  if (strcmp(spotify_authorize_token,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotify_authorize_token);
+  if (strcmp(spotifytoken,"")!=0) {
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotifytoken);
     //printf("doget = %s \n",doget);
     //system(doget);
     if (WEXITSTATUS(curl_error)==0) {
@@ -540,8 +536,8 @@ int spotify_class::spotify_get_user_playlists() {
        //exit(1);
     }
     // download all playlist (name + id) in one big file NOT songs
-    if (strcmp(spotify_authorize_token,"")!=0) {
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotify_authorize_token);
+    if (strcmp(spotifytoken,"")!=0) {
+      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotifytoken);
       printf("doget = %s \n",doget);
       curl_error=system(doget);
       if (curl_error==0) {
@@ -789,8 +785,8 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   json_char* json;
   json_value* value;
   if (!(file_exists(playlistfilename))) {
-    if (strcmp(spotify_authorize_token,"")!=0) {
-      sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotify_authorize_token,playlistfilename);
+    if (strcmp(spotifytoken,"")!=0) {
+      sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
       curl_error=system(doget);
       if (curl_error==0) {
         //printf("Curl error get playlist \n");
@@ -937,7 +933,7 @@ int spotify_class::spotify_do_we_play() {
   size_t stringlength=0;
   char filename_song_playing[]="spotify_song_playing.json";
   char sed[]="cat spotify_song_playing.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' > spotify_song_playing.txt";
-  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotify_authorize_token);
+  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_song_playing.json",spotifytoken);
   curl_error=system(call);
   printf("curl_error = %d \n",curl_error);
   if (curl_error==0) {
@@ -991,7 +987,7 @@ int spotify_class::spotify_do_we_play() {
 int spotify_class::spotify_pause_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error!=0) {
     return 1;
@@ -1006,7 +1002,7 @@ int spotify_class::spotify_pause_play() {
 int spotify_class::spotify_resume_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error==0) {
     return 1;
@@ -1022,7 +1018,7 @@ int spotify_class::spotify_resume_play() {
 int spotify_class::spotify_last_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error==0) {
     return 1;
@@ -1037,7 +1033,7 @@ int spotify_class::spotify_last_play() {
 int spotify_class::spotify_next_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error==0) {
     return 1;
@@ -1064,7 +1060,7 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   char *devid=spotify_oversigt.get_active_device_id();
   devid[40]='\0';
   printf("Devid *%s*\n",devid);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\"  -H 'Authorization: Bearer %s'",devid,playlist_song,spotify_authorize_token);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\"  -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
   curl_error=system(call);
   if (WEXITSTATUS(curl_error)!=0) {
     printf("Error start play\n");
@@ -1088,7 +1084,7 @@ int spotify_class::spotify_get_available_devices() {
   int curl_exitcode;
   char call[4096];
   char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
-  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotify_authorize_token);
+  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotifytoken);
   curl_exitcode=system(call);
   if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
@@ -1179,14 +1175,8 @@ int spotify_class::spotify_get_access_token2() {
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
   *(base64_code+88)='\0';
-  //sprintf(call,"curl -X GET https://accounts.spotify.com/authorize?client_id=%s&scopes=playlist-read-private&response_type=code&redirect_uri=http://localhost > spotify_respons.txt",base64_code);
-
   // works
   //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
-
-
-  //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=authorization_code&response_type=code&redirect_uri=http://localhost:8000 https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
-  //system(call);
   myfile = fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file

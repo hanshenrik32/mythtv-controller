@@ -71,8 +71,6 @@ class spotify_class : vlc_controller {
         spotify_active_play_info_type spotify_aktiv_song[1];                   //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         char spotify_authorize_token[512];                                      // token get from spotify
-        char spotify_client_id[255];                                            // Client id
-        char spotify_secret_id[255];                                            // Secret id
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
@@ -82,6 +80,8 @@ class spotify_class : vlc_controller {
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
     public:
+      char spotify_client_id[255];                                            // Client id
+      char spotify_secret_id[255];                                            // Secret id
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
         void spotify_set_token();
