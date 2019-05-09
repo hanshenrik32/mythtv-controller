@@ -139,7 +139,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           curl_error=system(sed);
           if (curl_error==0) {
           }
-          printf("\n******** CALL BACK server/Get token okay ********\n");
+          printf("\n******** Get token okay ********\n");
           tokenfile=fopen("spotify_access_token2.txt","r");
           error=getline(&file_contents,&len,tokenfile);
           strcpy(spotify_oversigt.spotifytoken,file_contents);
@@ -1068,10 +1068,10 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
   char *devid=spotify_oversigt.get_active_device_id();
   devid[40]='\0';
   printf("Devid *%s*\n",devid);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\"  -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
   curl_error=system(call);
   if (WEXITSTATUS(curl_error)!=0) {
-    printf("Error start play\n");
+    printf("Error start play %d \n",WEXITSTATUS(curl_error));
   }
   return(curl_error);
 }
@@ -1100,7 +1100,7 @@ int spotify_class::spotify_get_available_devices() {
     if (WEXITSTATUS(curl_exitcode)!=0) {
       printf("Error get devices\n");
     }
-    json_file = fopen("spotify_device_list.txt", "rt");
+    json_file = fopen("spotify_device_list.txt", "r");
     if (json_file == NULL) {
       fprintf(stderr, "Unable to open spotify_device_list.txt\n");
       return 1;
