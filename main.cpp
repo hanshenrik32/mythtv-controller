@@ -3576,7 +3576,6 @@ void display() {
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
       glBindTexture(GL_TEXTURE_2D, spotify_askplay);						// texture9
@@ -3595,11 +3594,9 @@ void display() {
       yof=200;
       buttonsize=100;
       glPushMatrix();
-
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
       glColor3f(1.0f, 1.0f, 1.0f);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
       glBindTexture(GL_TEXTURE_2D, spotify_askopen);						// texture9
@@ -3614,8 +3611,6 @@ void display() {
       glEnd();
       glPopMatrix();
     }
-
-
 
     // start play radio station
     if (vis_radio_oversigt) {
@@ -4249,12 +4244,10 @@ void display() {
       }
       do_we_play_check++;
       if (do_we_play_check>200) do_we_play_check=0;
-
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
-      //glBlendFunc(GL_ONE, GL_ONE);
       glDisable(GL_DEPTH_TEST);
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
@@ -4275,10 +4268,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+395 ,  470 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+395,200+470, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+470 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,470, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+395 ,   370 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+395,200+370, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+370 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,370, 0.0);
       glEnd();
       // backward button
       glEnable(GL_BLEND);
@@ -4287,10 +4280,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(10);                        // 10 = forward(10)
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+150+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+50+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+50+100,320, 0.0);
       glEnd();
       // stop button
       glEnable(GL_TEXTURE_2D);
@@ -4300,10 +4293,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(9);                        // 9 = stop
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+150+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
       glEnd();
       // forward button
       glEnable(GL_TEXTURE_2D);
@@ -4313,10 +4306,10 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(11);                        // 10 = forward(10)
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+350 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+350,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
       glEnd();
 
       // play list name
@@ -4366,12 +4359,29 @@ void display() {
       glPopMatrix();
 
       glPushMatrix();
+      int statuswxpos = 420;
+      int statuswypos = 500;
+      float y = (float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/(spotify_oversigt.spotify_aktiv_song_mslength()/1000);
+      y=(float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/100;
+      int xxx = (float) y*18;
+      for(int x=0;x<xxx;x++) {
+        glDisable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(25), 0.0);
+        glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(25) , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos , 0.0);
+        glEnd();
+      }
+      glPopMatrix();
+
+      glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
       glTranslatef(520.0f, 540.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      glcRenderString("Release   : ");
+      glcRenderString("Release  : ");
       sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
       glcRenderString(temptxt1);
       glPopMatrix();
