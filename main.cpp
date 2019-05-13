@@ -121,7 +121,7 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = true;          // do it first time
+static bool do_update_spotify_playlist = false;          // do it first time
 
 
 // struct used by keyboard config of functions keys
@@ -2470,11 +2470,10 @@ void display() {
 
     // do the update from spotify
     if (do_update_spotify_playlist) {
-      //spotify_oversigt.spotify_get_access_token();                              // get access token
-      spotify_oversigt.spotify_get_user_id();                                   // get user id
-      spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
+      //spotify_oversigt.spotify_get_user_id();                                   // get user id
+      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
       spotify_oversigt.spotify_get_user_playlists();                            // get all the playlist and update db
-      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+      //spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       do_update_spotify_playlist=false;
     }
 
@@ -4240,10 +4239,10 @@ void display() {
       static int do_we_play_check=0;
       if (do_we_play_check==0) {
         spotify_oversigt.spotify_do_we_play();
-        printf("do_we_play_check %d \n",do_we_play_check);
       }
       do_we_play_check++;
-      if (do_we_play_check>200) do_we_play_check=0;
+      // check again ?
+      if (do_we_play_check>50) do_we_play_check=0;
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       // window texture
       glEnable(GL_TEXTURE_2D);
@@ -4265,6 +4264,9 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr));
       else
         glBindTexture(GL_TEXTURE_2D,spotify_ecover);
+
+      if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);
+
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -4345,6 +4347,7 @@ void display() {
       if (spotify_oversigt.active_spotify_device>-1) {
         glcRenderString(spotify_oversigt.get_active_spotify_device_name());
       }
+
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
@@ -4352,15 +4355,14 @@ void display() {
       glTranslatef(520.0f, 560.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      sprintf(temptxt1,"playtime : %d",spotify_oversigt.spotify_aktiv_song_msplay()/1000);
-      glcRenderString(temptxt1);
-      sprintf(temptxt1," - %d ",spotify_oversigt.spotify_aktiv_song_mslength()/1000);
+      sprintf(temptxt1,"playtime : ");
       glcRenderString(temptxt1);
       glPopMatrix();
 
       glPushMatrix();
-      int statuswxpos = 420;
-      int statuswypos = 500;
+      glColor3f(1.0f, 1.0f, 1.0f);
+      int statuswxpos = 432;
+      int statuswypos = 557;
       float y = (float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/(spotify_oversigt.spotify_aktiv_song_mslength()/1000);
       y=(float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/100;
       int xxx = (float) y*18;
@@ -4368,8 +4370,8 @@ void display() {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(25), 0.0);
-        glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(25) , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);
+        glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(15) , 0.0);
         glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos , 0.0);
         glEnd();
       }
@@ -8848,7 +8850,6 @@ void handleKeypress(unsigned char key, int x, int y) {
             case '*':
 
               do_update_spotify_playlist=true;
-
 
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;               // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;               // show/hide music info
