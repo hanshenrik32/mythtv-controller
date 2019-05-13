@@ -31,17 +31,17 @@ class spotify_device_def {
 //
 
 struct spotify_oversigt_type {
-    char        feed_showtxt[80+1];			        // what to show in overview
+    char        feed_showtxt[80+1];			          // what to show in overview
     char        feed_name[80+1];				          // playlist/song name
     char        feed_desc[80+1];				          // desc
-    char        feed_gfx_url[4000+1];            //
+    char        feed_gfx_url[4000+1];             //
     char        feed_gfx_mythtv[2000+1];				  //
-    char        playlistid[100+1];               // playlist id
-    char        playlisturl[200+1];              // play list url + spotify command
+    char        playlistid[100+1];                // playlist id
+    char        playlisturl[200+1];               // play list url + spotify command
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
-    bool        nyt;
-    GLuint      textureId;                     // gfx icon loaded
+    bool        nyt;                              //
+    GLuint      textureId;                        // gfx icon loaded
     long        intnr;
 };
 
@@ -55,7 +55,8 @@ class spotify_active_play_info_type {                // sample data down here
     long progress_ms;                                   // 27834
     long duration_ms;                                   // 245119
     char artist_name[256];                              // Joe Bonamassa
-    char cover_image[256];                              // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
+    char cover_image_url[256];                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
+    GLuint cover_image;
     char album_name[256];                               // (British Blues Explosion Live)
     char release_date[24];                              //
     long popularity;                                    // (27)
@@ -80,8 +81,9 @@ class spotify_class : vlc_controller {
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
     public:
-      char spotify_client_id[255];                                            // Client id
-      char spotify_secret_id[255];                                            // Secret id
+        GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
+        char spotify_client_id[255];                                            // Client id
+        char spotify_secret_id[255];                                            // Secret id
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
         void spotify_set_token();
@@ -141,7 +143,6 @@ class spotify_class : vlc_controller {
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);
-        int spotify_get_access_token();                                         // get token
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
