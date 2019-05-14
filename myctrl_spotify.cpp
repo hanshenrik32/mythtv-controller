@@ -1122,6 +1122,7 @@ int spotify_class::spotify_get_available_devices() {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
+  bool dbexist;
   char *database = (char *) "mythtvcontroller";
   char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
   sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotifytoken);
@@ -1143,6 +1144,7 @@ int spotify_class::spotify_get_available_devices() {
         getline(&tmp_content_line,&jsonfile_len,json_file);
         if (strlen(tmp_content_line)>5) {
           strcpy(spotify_device[devicenr].id,tmp_content_line+3);
+          spotify_device[devicenr].id[strlen(spotify_device[devicenr].id)-1]='\0';  // remove newline char
           // get active status
           getline(&tmp_content_line,&jsonfile_len,json_file);
           if (strncmp(tmp_content_line,"is_active=true",14)==0) spotify_device[devicenr].is_active=true; else spotify_device[devicenr].is_active=false;
@@ -1157,9 +1159,11 @@ int spotify_class::spotify_get_available_devices() {
           // get dev name
           getline(&tmp_content_line,&jsonfile_len,json_file);
           strcpy(spotify_device[devicenr].name,tmp_content_line+5);
+          spotify_device[devicenr].name[strlen(spotify_device[devicenr].name)-1]='\0';   // remove newline char
           // get dev type
           getline(&tmp_content_line,&jsonfile_len,json_file);
           strcpy(spotify_device[devicenr].devtype,tmp_content_line+5);
+          spotify_device[devicenr].devtype[strlen(spotify_device[devicenr].devtype)-1]='\0';   // remove newline char
           // get dev volume info
           getline(&tmp_content_line,&jsonfile_len,json_file);
           spotify_device[devicenr].devvolume=atoi(tmp_content_line+15);
@@ -1171,25 +1175,39 @@ int spotify_class::spotify_get_available_devices() {
     }
     fclose(json_file);
     if ( devicenr>0 ) {
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
-        mysql_query(conn,"create TABLE if not exist mythtvcontroller.spotify_device (device_name varchar[255],active bool,devtype varchar 255,dev_id varchar [255],intnr INT AUTO_INCREMENT)");
-        res = mysql_store_result(conn);
-        printf("Found devices : %d\n",devicenr);
-        for( int t = 0 ; t < devicenr ; t++ ) {
-          if ( strcmp(spotify_device[t].name,"") !=0 ) {
-            printf("Device name      : %s ",spotify_device[t].name);
-            printf("Device is active : %d \n",spotify_device[t].is_active);
-            printf("Device type      : %s \n",spotify_device[t].devtype);
-            printf("Device id        : %s \n",spotify_device[t].id);
-            sprintf(sql,"INSERT into mythtvcontroller.spotify_device values (spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id,0)");
-            mysql_query(conn,sql);
-            res = mysql_store_result(conn);
+      conn=mysql_init(NULL);
+      if (conn) {
+          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
+          res = mysql_store_result(conn);
+          printf("Found devices : %d\n",devicenr);
+          for( int t = 0 ; t < devicenr ; t++ ) {
+            if ( strcmp(spotify_device[t].name,"") !=0 ) {
+              printf("Device name      : %s \n",spotify_device[t].name);
+              printf("Device is active : %d \n",spotify_device[t].is_active);
+              printf("Device type      : %s \n",spotify_device[t].devtype);
+              printf("Device id        : %s \n",spotify_device[t].id);
+              sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+              dbexist=false;
+              if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                  dbexist=true;
+                }
+              }
+              // create if not exist
+              if (dbexist==false) {
+                sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id,spotify_device[t].id);
+                mysql_query(conn,sql);
+                res = mysql_store_result(conn);
+              }
+            }
           }
-        }
-        mysql_close(conn);
-        printf("\n*****************\n");
-      } else {
-        fprintf(stderr,"Unable to create spotify device info db \n");
+          if (conn) mysql_close(conn);
+          printf("\n*****************\n");
       }
     }
   }

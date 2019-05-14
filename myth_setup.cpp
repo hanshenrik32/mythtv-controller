@@ -92,6 +92,7 @@ extern GLuint _texturetemasetup;
 extern GLuint _texturesetupfont;
 extern GLuint _texturekeyssetup;
 extern GLuint _texturekeysrss;
+extern GLuint _texturespotify;
 extern GLuint _texturelock;			                  // en hænge lås
 extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
@@ -3449,8 +3450,147 @@ int order_channel_list_in_tvguide_db() {
 
 
 //
-// ********************* show setup tv graber ************************************************************************
+// ********************* show setup spotify ************************************************************************
 //
+
+void show_setup_spotify(char *spotify_client_id,char *spotify_secret_id) {
+    int winsizx=100;
+    struct tm *xmlupdatelasttime;
+    int winsizy=300;
+    int xpos=0;
+    int ypos=0;
+    char text[200];
+    // spotify setup
+    // background
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glBindTexture(GL_TEXTURE_2D,setuprssback);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,100 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
+    glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+950,800 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+950,100 , 0.0);
+    glEnd();
+    glPopMatrix();
+    glPushMatrix();
+    // close buttons
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBindTexture(GL_TEXTURE_2D,_textureclose);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    winsizx=100;
+    winsizy=100;
+    xpos=475;
+    ypos=-10;
+    glLoadName(40);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+
+
+    glPopMatrix();
+    // start af input felter
+    glPushMatrix();
+    winsizx=310;
+    winsizy=30;
+    xpos=300;
+    ypos=500;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPushMatrix();
+    // start af input felter
+    winsizx=310;
+    winsizy=30;
+    xpos=300;
+    ypos=450;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(680 , 600 , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f,1.0f,1.0f);
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(520, 650, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Client ID        ");
+    myglprint4((char *) spotify_client_id);   // keybuffer
+    glPopMatrix();
+    // update button
+    glPushMatrix();
+    winsizx=100;
+    winsizy=50;
+    xpos=620;
+    ypos=490;
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,setupupdatebutton);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(45);                                                             // update button name
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(540, 600, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    myglprint4((char *) "Client Secret    ");
+    myglprint4((char *) spotify_secret_id);
+    if (do_show_setup_select_linie>=0) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+}
+
+
+//
+// tv guide
+//
+
 
 void show_setup_tv_graber(int startofset) {
     const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
@@ -3873,6 +4013,23 @@ void show_setup_interface() {
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
+
+    // setup spotify
+    xpos=800;
+    ypos=100;
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,_texturespotify);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(43);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+
+
     // close button
     xpos=200;
     ypos=100;

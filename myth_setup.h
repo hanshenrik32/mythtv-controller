@@ -114,6 +114,7 @@ void show_setup_font(int startofset);
 void show_setup_keys();
 void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup
+void show_setup_spotify(char *spotify_client_id,char *spotify_secret_id);
 void show_wlan_networks(int valgtnr);
 
 #endif

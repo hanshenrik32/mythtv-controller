@@ -312,6 +312,7 @@ bool do_show_setup_network = false;                       //
 bool do_show_setup_font = false;                          //
 bool do_show_setup_keys = false;                          //
 bool do_show_setup_rss = false;                           //
+bool do_show_setup_spotify = false;                       //
 bool do_save_setup_rss = false;                           // update db flag to do it (call func)
 bool do_show_videoplayer = false;                         //
 bool do_show_tvgraber = false;                            //
@@ -725,6 +726,7 @@ GLuint _texturemythtvsql;                   //
 GLuint _texturesetupfont;                   //
 GLuint _texturekeyssetup;                   //
 GLuint _texturekeysrss;                     //
+GLuint _texturespotify;
 GLuint _texturevideoplayersetup;            //
 GLuint _texturetvgrabersetup;               //
 
@@ -4866,6 +4868,7 @@ void display() {
             show_setup_tv_graber(tvchannel_startofset);   //
           }
           if (do_show_setup_rss) show_setup_rss(configrss_ofset);             //
+          if (do_show_setup_spotify) show_setup_spotify(spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);             //
         }
         glPopMatrix();
     }
@@ -5926,6 +5929,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_videoplayer = false;
           do_show_tvgraber = false;
           do_show_setup_rss = false;
+          do_show_setup_spotify = false;
           fundet = true;
         }
         // test screen setup
@@ -6058,6 +6062,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_setup_rss = false;
+          do_show_setup_spotify = false;
           if (do_show_tvgraber) {
             // hent/update tv guide from db
             // efter den er saved i db fra setup tvguide function som saver data.
@@ -6085,8 +6090,28 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_tvgraber = false;
           do_show_rss = false;
           do_show_setup_rss = true;
+          do_show_setup_spotify = false;
           fundet = true;
         }
+
+        // test for rss
+        if (((GLubyte) names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
+          do_show_setup_sound = false;
+          do_show_setup_sql = false;
+          do_show_setup_network = false;
+          do_show_setup_screen = false;
+          do_show_setup_tema = false;
+          do_show_setup_font = false;
+          do_show_setup_keys = false;
+          do_show_videoplayer = false;
+          do_show_tvgraber = false;
+          do_show_rss = false;
+          do_show_setup_rss = false;
+          do_show_setup_spotify = true;
+          fundet = true;
+        }
+
+
         if ((GLubyte) names[i*4+3]==45) {
           fundet = true;
           printf("45 Button pressed \n");
@@ -6166,6 +6191,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_or_music_oversigt = false;
           do_show_tvgraber = false;
           do_show_setup_rss = false;
+          do_show_setup_spotify = false;
           fundet = true;
         }
         // test for exit selected
@@ -7702,6 +7728,10 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
+                  // setup rss source window
+                  if (do_show_setup_spotify) {
+                    if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
+                  }
                   // tv graber setup
                   if (do_show_tvgraber) {
                     if ((do_show_setup_select_linie+tvchannel_startofset)>0) {
@@ -7871,6 +7901,10 @@ void handlespeckeypress(int key,int x,int y) {
                     else if (configrss_ofset>0) configrss_ofset--;
                     if ((((do_show_setup_select_linie+configrss_ofset) % 2)==0) && ((do_show_setup_select_linie+configrss_ofset)>0)) realrssrecordnr--;
                   }
+                  if (do_show_setup_spotify) {
+                    if (do_show_setup_select_linie>0) do_show_setup_select_linie--;
+                  }
+
                   // config af xmltv graber
                   if (do_show_tvgraber) {
                     if (do_show_setup_select_linie>0) {
@@ -8215,6 +8249,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                   break;
         }
       }
+      if (do_show_setup_spotify) {
+        switch (do_show_setup_select_linie) {
+          case 0: strcpy(keybuffer,spotify_oversigt.spotify_client_id);
+                  keybufferindex=strlen(keybuffer);
+                  break;
+          case 1: strcpy(keybuffer,spotify_oversigt.spotify_secret_id);
+                  keybufferindex=strlen(keybuffer);
+                  break;
+        }
+      }
       if (do_show_setup_screen) {
         switch (do_show_setup_select_linie) {
           case 0: break;
@@ -8453,6 +8497,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
+              } else if (do_show_setup_spotify) {
+                if (key!=13) {
+                  keybuffer[keybufferindex]=key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                }
+
               } else if (do_show_videoplayer) {
                 // video player setting
                 if (do_show_setup_select_linie==0) {
@@ -8677,6 +8728,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                 case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
                         break;
                }
+           } else if (do_show_setup_spotify) {
+               switch(do_show_setup_select_linie) {
+                 case 0: strcpy(spotify_oversigt.spotify_client_id,keybuffer);
+                         break;
+                 case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
+                         break;
+               }
            } else if (do_show_setup_keys) {
                switch(do_show_setup_select_linie) {
                    case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
@@ -8811,6 +8869,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 } else if (do_show_setup_rss) {
                   // stop show setup of rss feeds
                   do_show_setup_rss=false;
+                  key=0;
+                } else if (do_show_setup_spotify) {
+                  do_show_setup_spotify=false;
                   key=0;
                   // do_save_setup_rss=true;
                 } else do_show_setup=false;
@@ -12593,6 +12654,7 @@ void loadgfx() {
     _texturesetupfont 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupfont");
     _texturekeyssetup 		= loadgfxfile(temapath,(char *) "images/",(char *) "setupkeys");
     _texturekeysrss		    = loadgfxfile(temapath,(char *) "images/",(char *) "setuprss");
+    _texturespotify       = loadgfxfile(temapath,(char *) "images/",(char *) "setupspotify");
     _texturevideoplayersetup	= loadgfxfile(temapath,(char *) "images/",(char *) "setupplayer");
     _texturetvgrabersetup = loadgfxfile(temapath,(char *) "images/",(char *) "setupxmltv");
     _texturesetupclose		= loadgfxfile(temapath,(char *) "images/",(char *) "setupclose");
@@ -12753,7 +12815,8 @@ void freegfx() {
     glDeleteTextures( 1, &_texturesetupfont);			  // setup
     glDeleteTextures( 1, &_texturesetupclose);		  //
     glDeleteTextures( 1, &_texturekeyssetup);		    // setup
-    glDeleteTextures( 1, &_texturekeysrss);	  	    // setup
+    glDeleteTextures( 1, &_texturekeysrss);	  	    // setup rss
+    glDeleteTextures( 1, &_texturespotify);         // setup spotify
     glDeleteTextures( 1, &_texturevideoplayersetup);// setup
     glDeleteTextures( 1, &_texturetvgrabersetup);   //
     glDeleteTextures( 1, &setupkeysbar1);			      // bruges af myth_setup.cpp
