@@ -16,6 +16,7 @@
 #include "json-parser/json.h"
 #include "readjpg.h"
 #include "myctrl_readwebfile.h"
+#include "myth_setup.h"
 
 // web server stuf
 #include "mongoose-master/mongoose.h"
@@ -42,9 +43,12 @@ const int feed_url=2000;
 // text render is glcRenderString for freetype font support
 //
 
+extern int spotifyknapnr;
+
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
 
+extern char *keybuffer;
 
 extern bool do_select_device_to_play;
 
@@ -65,6 +69,11 @@ extern int screensizey;
 extern int screeny;
 extern GLuint spotify_askplay;                                  // ask open icon
 extern GLuint spotify_askopen;                                  // ask play icon
+
+extern GLuint setuprssback;
+extern GLuint _textureclose;
+extern GLuint setupkeysbar1;
+
 extern int debugmode;
 extern unsigned int musicoversigt_antal;                        //
 extern int do_stream_icon_anim_icon_ofset;                      //
@@ -75,6 +84,8 @@ extern int fonttype;
 extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
 extern int _sangley;
+extern int do_show_setup_select_linie;
+
 extern GLuint _textureIdloading,_textureIdloading1;
 //extern GLuint _textureIdloading_mask;
 
@@ -105,6 +116,8 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   FILE *tokenfile;
   char *base64_code;
   char data[512];
+  char token_string[512];
+  char token_refresh[512];
   unsigned int codel;
   strcpy(data,"05b40c70078a429fa40ab0f9ccb485de:e50c411d2d2f4faf85ddff16f587fea1");
   char sed[]="cat spotify_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
@@ -137,28 +150,27 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           curl_error=system(sed);
           if (curl_error==0) {
           }
-          printf("\n******** Get token okay ********\n");
+          printf("\n******** Got token ********\n");
           tokenfile=fopen("spotify_access_token2.txt","r");
           error=getline(&file_contents,&len,tokenfile);
-          strcpy(spotify_oversigt.spotifytoken,file_contents);
-          spotify_oversigt.spotifytoken[strlen(spotify_oversigt.spotifytoken)-1]='\0';
+          strcpy(token_string,file_contents);
+          token_string[strlen(token_string)-1]='\0';
           error=getline(&file_contents,&len,tokenfile);
-          strcpy(spotify_oversigt.spotifytoken_refresh,file_contents);
-          spotify_oversigt.spotifytoken_refresh[strlen(spotify_oversigt.spotifytoken_refresh)-1]='\0';
-          printf("token     %s\n",spotify_oversigt.spotifytoken);
-          printf("ref token %s\n",spotify_oversigt.spotifytoken_refresh);
-          //spotify_oversigt.spotify_set_token();
+          strcpy(token_refresh,file_contents);
+          token_refresh[strlen(token_refresh)-1]='\0';
+          printf("token     %s\n",token_string);
+          printf("ref token %s\n",token_refresh);
+          spotify_oversigt.spotify_set_token(token_string,token_refresh);
           fclose(tokenfile);
           free(file_contents);
-          if (strcmp(spotify_oversigt.spotifytoken,"")!=0) {
+          if (strcmp(token_string,"")!=0) {
             spotify_oversigt.spotify_get_user_id();                                   // get user id
             spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+            // set default spotify device if none
             if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
           }
         }
-
         //c->flags |= MG_F_SEND_AND_CLOSE;
-
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
       } else {
         // else show normal indhold
@@ -259,9 +271,8 @@ spotify_active_play_info_type::spotify_active_play_info_type() {                
 //
 
 spotify_class::spotify_class() : antal(0) {
-    int i;
-    for(i=0;i<maxantal;i++) stack[i]=0;
-    stream_optionselect=0;							// selected line in stream options
+    for(int i=0;i<maxantal;i++) stack[i]=0;
+    stream_optionselect=0;							                                        // selected line in stream options
     spotify_oversigt_loaded=false;
     spotify_oversigt_loaded_nr=0;
     antal=0;
@@ -271,14 +282,14 @@ spotify_class::spotify_class() : antal(0) {
     stream_is_pause=false;                                                      // is player on pause
     antalplaylists=0;                                                           // antal playlists
     int port_cnt, n;
-    strcpy(spotify_aktiv_song[0].release_date,"");
     int err = 0;
+    strcpy(spotify_aktiv_song[0].release_date,"");
     // create web server
-    mg_mgr_init(&mgr, NULL);                                    // Initialize event manager object
+    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
     printf("Starting web server on port %s\n", s_http_port);
-    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);           // Create listening connection and add it to the event manager
-    mg_set_protocol_http_websocket(this->c);                    // make http protocol
+    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
+    mg_set_protocol_http_websocket(this->c);                                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
 
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
@@ -286,14 +297,12 @@ spotify_class::spotify_class() : antal(0) {
     aktiv_song_spotify_icon=0;                                                  //
     strcpy(spotify_client_id,"");                                               //
     strcpy(spotify_secret_id,"");                                               //
-    strcpy(spotify_authorize_token,"");                                         //
     strcpy(spotifytoken,"");                                                    //
     strcpy(spotifytoken_refresh,"");                                            //
-
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotify_authorize_token,"BQCK2Ubelxpsqcu9M7zPuWH9_--MTqTa-tv5O7X2kZimJE9u9mg7K0DOoRZNAglIdsFrjjNNKuq17ePv7-ltQDYKYAtNMp6gSLL0-VJdA7VJvQK-UXzJtahI9bVeZ5P3zoaEgbmOws-4FJjn9lAL9LGzAn61v0GWblrccw");
-    strcpy(spotifytoken,spotify_authorize_token);
+    strcpy(spotifytoken,"");
+    spotify_device_antal=0;
 }
 
 
@@ -335,7 +344,7 @@ int spotify_class::spotify_get_user_id() {
   char doget[2048];
   if (strcmp(spotifytoken,"")!=0) {
     sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
-    //printf("doget = %s \n",doget);
+    printf("curl = %s \n",doget);
     curl_error=system(doget);
     if (WEXITSTATUS(curl_error)==0) {
     }
@@ -344,6 +353,14 @@ int spotify_class::spotify_get_user_id() {
 }
 
 
+//
+// save the token in used
+//
+
+void spotify_class::spotify_set_token(char *token,char *refresh) {
+  strcpy(spotifytoken,token);
+  strcpy(spotifytoken_refresh,refresh);
+}
 
 //
 // Get a List of a User's Playlists
@@ -364,9 +381,10 @@ int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
 
 
 
-// json parser used to parse the return files from spotify api
 //
+//  json parser used to parse the return files from spotify api
 //
+
 
 void spotify_class::playlist_print_depth_shift(int depth) {
   bool debug_json=false;
@@ -1112,6 +1130,7 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
 // char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
 
 int spotify_class::spotify_get_available_devices() {
+  int device_antal=0;
   int devicenr=0;
   size_t jsonfile_len = 0;
   char *tmp_content_line=NULL;
@@ -1185,6 +1204,7 @@ int spotify_class::spotify_get_available_devices() {
           printf("Found devices : %d\n",devicenr);
           for( int t = 0 ; t < devicenr ; t++ ) {
             if ( strcmp(spotify_device[t].name,"") !=0 ) {
+              device_antal++;
               printf("Device name      : %s \n",spotify_device[t].name);
               printf("Device is active : %d \n",spotify_device[t].is_active);
               printf("Device type      : %s \n",spotify_device[t].devtype);
@@ -1206,6 +1226,7 @@ int spotify_class::spotify_get_available_devices() {
               }
             }
           }
+          this->spotify_device_antal=device_antal;
           if (conn) mysql_close(conn);
           printf("\n*****************\n");
       }
@@ -1590,6 +1611,11 @@ char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
 
+
+//
+//
+//
+
 void spotify_class::select_device_to_play() {
   static float select_device_to_playfader=1.0;
   static int playfader_timer=500;
@@ -1774,6 +1800,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     }
     // calc start pos (ofset)
     sofset=(_sangley/40)*8;
+
+    printf("spotifyknapnr = %d antal %d \n",spotifyknapnr,antalplaylists);
+
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -1996,4 +2025,190 @@ char *b64_encode(const unsigned char *in, size_t len) {
 		}
 	}
 	return out;
+}
+
+
+
+//
+// ********************* show setup spotify **************************************
+//
+
+void spotify_class::show_setup_spotify() {
+    int i;
+    int winsizx=100;
+    struct tm *xmlupdatelasttime;
+    int winsizy=300;
+    int xpos=0;
+    int ypos=0;
+    char text[200];
+    // spotify setup
+    // background
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glBindTexture(GL_TEXTURE_2D,setuprssback);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,100 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f( (orgwinsizex/4)-50,800 , 0.0);
+    glTexCoord2f(1, 1); glVertex3f( (orgwinsizex/4)+550,800 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+550,100 , 0.0);
+    glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(550, 750, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glScalef(27.0, 27.0, 1.0);
+    glcRenderString("Spotify Account setup");
+    glPopMatrix();
+
+    // close buttons
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBindTexture(GL_TEXTURE_2D,_textureclose);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    winsizx=100;
+    winsizy=100;
+    xpos=310;
+    ypos=-10;
+    glLoadName(40);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+
+    // start af input felter
+    glPushMatrix();
+    winsizx=310;
+    winsizy=30;
+    xpos=300;
+    ypos=500;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+    glPushMatrix();
+    // start af input felter
+    winsizx=310;
+    winsizy=30;
+    xpos=300;
+    ypos=450;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(680 , 600 , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f,1.0f,1.0f);
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(520, 650, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (do_show_setup_select_linie==0) glColor4f(1.0f, 1.0f, 0.0f, 1.0f); else glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glScalef(15.0, 15.0, 1.0);
+    glcRenderString("Client ID        ");
+    glcRenderString(spotify_client_id);
+    glPopMatrix();
+
+  /*
+    // update button
+    glPushMatrix();
+    winsizx=100;
+    winsizy=50;
+    xpos=620;
+    ypos=490;
+    glEnable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(0.0f, 0.0f, 0.0f);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,setupupdatebutton);			// setupkeysbar1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(45);                                                             // update button name
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+    glPopMatrix();
+  */
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(520, 600, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (do_show_setup_select_linie==1) glColor4f(1.0f, 1.0f, 0.0f, 1.0f); else glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glScalef(15.0, 15.0, 1.0);
+    glcRenderString("Client Secrect   ");
+    glcRenderString(spotify_secret_id);
+    if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+    glPopMatrix();
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(520, 500, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glScalef(15.0, 15.0, 1.0);
+    glcRenderString("Active play device ");
+    if (active_default_play_device==-1) glcRenderString("None");
+    else glcRenderString(get_active_spotify_device_name());
+    glPopMatrix();
+
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(520, 450, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glScalef(15.0, 15.0, 1.0);
+    glcRenderString("Device avable");
+    i=0;
+    do {
+      glTranslatef(520, 450-(i*50), 0.0f);
+      if (i<spotify_device_antal) glcRenderString(spotify_device[i].name);
+      i++;
+    } while((i<spotify_device_antal) && (strcmp(spotify_device[i].name,"")!=0));
+    if (i==0) {
+      glcRenderString("None");
+    }
+    glPopMatrix();
 }

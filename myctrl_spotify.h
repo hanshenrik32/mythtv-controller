@@ -66,12 +66,13 @@ class spotify_active_play_info_type {                // sample data down here
 // spotify global class
 
 class spotify_class : vlc_controller {
+    private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
+        int spotify_device_antal;
         spotify_active_play_info_type spotify_aktiv_song[1];                   //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
-        char spotify_authorize_token[512];                                      // token get from spotify
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
@@ -80,16 +81,14 @@ class spotify_class : vlc_controller {
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
-    public:
-        GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
-        char spotify_client_id[255];                                            // Client id
-        char spotify_secret_id[255];                                            // Secret id
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
-        void spotify_set_token();
+    public:
+        char spotify_client_id[255];                                            // Client id
+        char spotify_secret_id[255];                                            // Secret id
+        GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
+        void spotify_set_token(char *token,char *refresh);
         int spotify_refresh_token();                                            // refresh token on postify api
-        //char *get_client_id(); { return (spotify_client_id); };
-        //char *get_secret_id(); { return (spotify_secret_id); };
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
         char *spotify_aktiv_song_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
@@ -152,6 +151,7 @@ class spotify_class : vlc_controller {
         int spotify_next_play();                                                // play next song
         int opdatere_spotify_oversigt(int refid);
         void select_device_to_play();                                           // show device list to play on
+        void show_setup_spotify();                                              //
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int stream_key_selected);
 };
