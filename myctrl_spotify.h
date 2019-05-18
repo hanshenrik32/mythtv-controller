@@ -137,8 +137,8 @@ class spotify_class : vlc_controller {
         // spotify_get_list_of_users_playlists NOT in use
         int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
         // in use
-        int spotify_get_user_playlists();                                       // get user playlist (list of playlist)
-        int spotify_get_playlist(char *playlist);                               // get playlist + songs
+        int spotify_get_user_playlists(bool force);                             // get user playlist (list of playlist)
+        int spotify_get_playlist(char *playlist,bool force);                    // get playlist + songs and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);
