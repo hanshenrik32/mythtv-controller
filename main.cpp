@@ -2474,7 +2474,7 @@ void display() {
     if (do_update_spotify_playlist) {
       //spotify_oversigt.spotify_get_user_id();                                   // get user id
       //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
-      spotify_oversigt.spotify_get_user_playlists();                            // get all the playlist and update db
+      spotify_oversigt.spotify_get_user_playlists(false);                         // get all the playlist and update db (no force update)
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       do_update_spotify_playlist=false;
     }
@@ -5888,6 +5888,7 @@ void display() {
     }
 
     if (do_update_spotify) {
+      printf("Start phread spotify update loader \n");
       update_spotify_phread_loader();
       do_update_spotify = false;
     }
@@ -9019,10 +9020,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_update_music = true;                                               // show update
                 do_update_music_now = true;                                           // and do the update flag
               }
+
               // spotify
               if (vis_spotify_oversigt) {
                 do_update_spotify = true;                                       // set flag to update spotify
               }
+
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
                 do_update_moviedb = true;                                           // set update flag
                 pthread_t loaderthread1;                                          // loader thread
@@ -12069,6 +12072,7 @@ void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading spotify info from db.\n");
   //streamoversigt.loadrssfile(0);
   spotify_oversigt.opdatere_spotify_oversigt(0);
+
   if (debugmode & 4) printf("loader thread done loaded spotify\n");
   pthread_exit(NULL);
 }

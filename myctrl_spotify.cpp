@@ -537,7 +537,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 // write to spotify_users_playlist.json
 //
 
-int spotify_class::spotify_get_user_playlists() {
+int spotify_class::spotify_get_user_playlists(bool force) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -638,11 +638,12 @@ int spotify_class::spotify_get_user_playlists() {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
-        if (spotify_oversigt.spotify_get_playlist(row[1])==1) {
+        if (spotify_oversigt.spotify_get_playlist(row[1],force)==1) {
           printf("Error create playlist %s \n",row[1]);
         }
       }
     }
+    printf("process playlist done.. \n");
     mysql_close(conn);
   }
 }
@@ -823,7 +824,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 // write to spotify_playlist_{spotifyid}.json
 // and update db
 
-int spotify_class::spotify_get_playlist(char *playlist) {
+int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   int tt;
   bool dbexist=false;
   int refid;
@@ -848,7 +849,7 @@ int spotify_class::spotify_get_playlist(char *playlist) {
   char* file_contents;
   json_char* json;
   json_value* value;
-  if (!(file_exists(playlistfilename))) {
+  if ((!(file_exists(playlistfilename))) || (force))  {
     if (strcmp(spotifytoken,"")!=0) {
       sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
       curl_error=system(doget);
@@ -1746,7 +1747,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     float buttonsizey=180.0f;                                                   // button size
     float yof=orgwinsizey-(buttonsizey);                                        // start ypos
     float xof=0.0f;
-    int lstreamoversigt_antal=9*6;
+    int lstreamoversigt_antal=8*5;
     int i=0;                                                                    // data ofset in stack array
     unsigned int sofset=0;
     int bonline=8;                                                              // antal pr linie
@@ -1801,7 +1802,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     // calc start pos (ofset)
     sofset=(_sangley/40)*8;
 
-    printf("spotifyknapnr = %d antal %d \n",spotifyknapnr,antalplaylists);
+    printf("spotifyknapnr = %d antal %d  start ofset %d  \n",spotifyknapnr,antalplaylists,lstreamoversigt_antal);
 
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
