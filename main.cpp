@@ -3882,15 +3882,6 @@ void display() {
     // do play spotify song/playlist
     if (do_play_spotify_cover) {
       ask_open_dir_or_play_spotify=false;
-      /*
-      result = sndsystem->createSound(spotify_oversigt.stack[spotifyknapnr-1]->playlisturl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
-      ERRCHECK(result,do_play_music_aktiv_table_nr);
-      if (result==FMOD_OK) {
-        result = sndsystem->playSound( sound,NULL,false, &channel);
-        ERRCHECK(result,do_play_music_aktiv_table_nr);
-        if (sndsystem) channel->setVolume(configsoundvolume);
-      }
-      */
     }
 
 
@@ -4266,9 +4257,7 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr));
       else
         glBindTexture(GL_TEXTURE_2D,spotify_ecover);
-
       if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);
-
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -4349,8 +4338,23 @@ void display() {
       if (spotify_oversigt.active_spotify_device>-1) {
         glcRenderString(spotify_oversigt.get_active_spotify_device_name());
       }
-
       glPopMatrix();
+      // player play status background
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,0);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+170 ,        555 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+170 ,     19+555 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+170+200,  19+555 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555 , 0.0);
+      glEnd();
+      glPopMatrix();
+
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -4367,7 +4371,7 @@ void display() {
       int statuswypos = 557;
       float y = (float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/(spotify_oversigt.spotify_aktiv_song_mslength()/1000);
       y=(float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/100;
-      int xxx = (float) y*18;
+      int xxx = (float) (y*18)/2;
       for(int x=0;x<xxx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
@@ -5892,7 +5896,6 @@ void display() {
       update_spotify_phread_loader();
       do_update_spotify = false;
     }
-
 
     //  don't wait!
     //  start processing buffered OpenGL routines
