@@ -70,7 +70,7 @@ class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
-        int spotify_device_antal;
+        int spotify_device_antal;                                              // antal device found
         spotify_active_play_info_type spotify_aktiv_song[1];                   //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         void print_depth_shift(int);
@@ -95,8 +95,8 @@ class spotify_class : vlc_controller {
         char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
         char *get_active_spotify_device_name();
-        char *get_device_id(int nr) { return(spotify_device[nr].id); };   // get active dev id
-        char *get_device_name(int nr) { return(spotify_device[nr].name); };   // get active dev id
+        char *get_device_id(int nr) { return(spotify_device[nr].id); };         // get active dev id
+        char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int active_spotify_device;                                              // active device then get spotify devices or -1
         int active_default_play_device;                                         // active device or -1
         char spotify_playlistname[256];
