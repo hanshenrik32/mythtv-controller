@@ -891,7 +891,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1035,6 +1035,10 @@ int parse_config(char *filename) {
               command = true;
               command_nr=moviefontsize;
               commandlength=12;
+            } else if (strncmp(buffer+n,"spotifydefaultdevice=",20)==0) {
+              command = true;
+              command_nr=spotifydefaultdevice;
+              commandlength=19;
             } else command = false;
           }
           strcpy(value,"");
@@ -1187,17 +1191,19 @@ int parse_config(char *filename) {
             } else if (command_nr==setuvmetertype) {
               configuvmeter=atoi(value);
             } else if (command_nr==setvolume) {
-              configsoundvolume=atof(value);                            // set default volume under play
+              configsoundvolume=atof(value);                                    // set default volume under play
             } else if (command_nr==tvguidefontsize) {
-              configdefaulttvguidefontsize=atof(value);                 // set tvguide font size
+              configdefaulttvguidefontsize=atof(value);                         // set tvguide font size
             } else if (command_nr==radiofontsize) {
-               configdefaultradiofontsize=atof(value);                  // set radio font size
+               configdefaultradiofontsize=atof(value);                          // set radio font size
             } else if (command_nr==musicfontsize) {
-                configdefaultmusicfontsize=atof(value);                 // set music font size
+                configdefaultmusicfontsize=atof(value);                         // set music font size
             } else if (command_nr==streamfontsize) {
-              configdefaultstreamfontsize=atof(value);                  // set stream font size
+              configdefaultstreamfontsize=atof(value);                          // set stream font size
             } else if (command_nr==moviefontsize) {
-              configdefaultmoviefontsize=atof(value);                   // set movie font size
+              configdefaultmoviefontsize=atof(value);                           // set movie font size
+            } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
+              strcpy(spotify_oversigt.active_default_play_device_name,value);   //
             }
           }
         }
@@ -1292,6 +1298,8 @@ int save_config(char * filename) {
       //aktiv_tv_oversigt.vistvguidecolors=true;
       if (aktiv_tv_oversigt.vistvguidecolors) sprintf(temp,"tvguidercolor=yes\n");
       else sprintf(temp,"tvguidercolor=no\n");
+      fputs(temp,file);
+      sprintf(temp,"spotifydefaultdevice=%s\n",spotify_oversigt.get_device_name(spotify_oversigt.active_default_play_device));
       fputs(temp,file);
       fclose(file);
     } else error = true;
@@ -1396,6 +1404,7 @@ void load_config(char * filename) {
         fputs("musicfontsize=18\n",file);
         fputs("streamfontsize=18\n",file);
         fputs("moviefontsize=18\n",file);
+        fputs("spotifydefaultdevice=\n",file);
         fclose(file);
       } else {
         fprintf(stderr,"Config file not writeble ");
@@ -1554,6 +1563,19 @@ void load_config(char * filename) {
         fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
         fclose(file);
       } else printf("Disk write error, saving mythtv-controller.keys\n");
+    }
+    // get/set default play device on spotify
+    if (strcmp(spotify_oversigt.active_default_play_device_name,"")!=0) {
+      sprintf(sqlselect,"SELECT device_name,intnr from spotify_device where device_name like '%s'",spotify_oversigt.active_default_play_device_name);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        spotify_oversigt.active_default_play_device=atoi(row[1]);
+        spotify_oversigt.active_spotify_device=atoi(row[1]);
+        printf("Default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+      } else {
+        printf("No default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+      }
     }
     if (conn) mysql_close(conn);
 }
@@ -6398,7 +6420,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       //
       // spotify stuf
       //
-      if ((vis_spotify_oversigt)  && (!(fundet))) {
+      if ((vis_spotify_oversigt) && (!(do_show_setup_spotify))  && (!(fundet))) {
         if ((GLuint) names[i*4+3]>=100) {
           spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
           fprintf(stderr,"spotify selected=%d  \n",spotifyknapnr);
@@ -6459,6 +6481,58 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
           do_zoom_spotify_cover =! do_zoom_spotify_cover;
+          fundet = true;
+        }
+      }
+      // set default device to play on
+      if ((do_show_setup_spotify)  && (!(fundet))) {
+        // select default play device
+        if ((GLubyte) names[i*4+3]==10) {
+          fprintf(stderr,"slected first devce\n");
+          spotify_oversigt.set_default_device_to_play(0);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==11) {
+          fprintf(stderr,"slected 2 devce\n");
+          spotify_oversigt.set_default_device_to_play(1);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==12) {
+          fprintf(stderr,"slected 3 devce\n");
+          spotify_oversigt.set_default_device_to_play(2);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==13) {
+          fprintf(stderr,"slected 4 devce\n");
+          spotify_oversigt.set_default_device_to_play(3);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==14) {
+          fprintf(stderr,"slected 5 devce\n");
+          spotify_oversigt.set_default_device_to_play(4);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==15) {
+          fprintf(stderr,"slected 6 devce\n");
+          spotify_oversigt.set_default_device_to_play(5);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==16) {
+          fprintf(stderr,"slected 7 devce\n");
+          spotify_oversigt.set_default_device_to_play(6);
+          returnfunc = 0;
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==17) {
+          fprintf(stderr,"slected 8 devce\n");
+          spotify_oversigt.set_default_device_to_play(7);
+          returnfunc = 0;
           fundet = true;
         }
       }

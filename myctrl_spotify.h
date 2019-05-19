@@ -99,6 +99,7 @@ class spotify_class : vlc_controller {
         char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int active_spotify_device;                                              // active device then get spotify devices or -1
         int active_default_play_device;                                         // active device or -1
+        char active_default_play_device_name[256];                              // active device name
         char spotify_playlistname[256];
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
@@ -151,6 +152,7 @@ class spotify_class : vlc_controller {
         int spotify_next_play();                                                // play next song
         int opdatere_spotify_oversigt(int refid);
         void select_device_to_play();                                           // show device list to play on
+        void set_default_device_to_play(int nr);                                // show device list to play on
         void show_setup_spotify();                                              //
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int stream_key_selected);
