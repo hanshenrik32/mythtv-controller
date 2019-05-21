@@ -1740,7 +1740,7 @@ void spotify_class::select_device_to_play() {
 // show spotify overview
 //
 
-void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int stream_key_selected)
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected)
 
 {
     int j,ii,k,pos;
@@ -1750,7 +1750,6 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     float xof=0.0f;
     int lstreamoversigt_antal=8*5;
     int i=0;                                                                    // data ofset in stack array
-    unsigned int sofset=0;
     int bonline=8;                                                              // antal pr linie
     float boffset;
     char gfxfilename[200];
@@ -1801,9 +1800,10 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       } else spotify_oversigt_loaded_nr++;
     }
     // calc start pos (ofset)
-    sofset=(_sangley/40)*8;
 
-    printf("spotifyknapnr = %d antal %d  start ofset %d  \n",spotifyknapnr,antalplaylists,lstreamoversigt_antal);
+
+
+    printf("spotifyknapnr = %d antal %d sofset = %d \n",spotifyknapnr,antalplaylists,sofset);
 
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
