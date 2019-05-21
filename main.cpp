@@ -267,6 +267,7 @@ char aktivplay_music_path[1024];                          //
 bool hent_radio_search = false;                           // skal vi søge efter music
 bool hent_film_search = false;                            // skal vi søge efter film title
 bool hent_stream_search = false;                          // skal vi søge efter stream
+bool hent_spotify_search = false;                          // skal vi søge efter spotify stuf
 
 int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
 
@@ -360,6 +361,7 @@ int PRGLIST_ANTAL=0;                                      // used in tvguide xml
 
 int music_select_iconnr;                                  // selected icon
 int spotify_select_iconnr;                                // selected icon
+int spotify_selected_startofset=0;                                 //
 int antal_songs=0;                                        //
 
 int _sangley;                                             //
@@ -3183,7 +3185,7 @@ void display() {
       } else if (vis_spotify_oversigt) {
         std::clock_t start;
         start = std::clock();
-        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,spotifyknapnr);
+        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,spotify_selected_startofset,spotifyknapnr);
         // select play device
         if (do_select_device_to_play) {
           spotify_oversigt.select_device_to_play();
@@ -7684,12 +7686,9 @@ void handlespeckeypress(int key,int x,int y) {
                     music_select_iconnr+=mnumbersoficonline;
                   }
                 }
-
                 // spotify stuf
-
                 // old
                 // if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify)) && (spotify_select_iconnr+mnumbersoficonline<=spotifycoversigt_antal)) {
-
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
                   if (do_select_device_to_play) {
                     // select play device
@@ -7699,27 +7698,20 @@ void handlespeckeypress(int key,int x,int y) {
                       }
                     }
                   } else {
-                    if ((spotifyknapnr+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
+                    if ((spotifyknapnr+spotify_selected_startofset+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
                       spotifyknapnr+=snumbersoficonline;
                       spotify_key_selected+=snumbersoficonline;
                       spotify_select_iconnr+=snumbersoficonline;
-                    }
-                    //_spangley+=MUSIC_CS;
-                    /*
-                    if ((unsigned int) spotify_key_selected>=((snumbersoficonline*3)+1)) {
-                      if (spotify_key_selected<(spotify_select_iconnr+snumbersoficonline)) {
-                        _spangley+=MUSIC_CS;								//scroll gfx down
+                      if (spotifyknapnr>40) {
+                        spotify_selected_startofset+=8;
+                        spotifyknapnr+=snumbersoficonline;
+                        spotify_key_selected+=snumbersoficonline;
                         spotify_select_iconnr+=snumbersoficonline;
                       }
-                    } else {
-                      spotify_key_selected+=snumbersoficonline;
-                      spotify_select_iconnr+=snumbersoficonline;
                     }
-                    */
                   }
                 }
-
-                if ((vis_film_oversigt) && (debugmode)) fprintf(stderr,"select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
+                //if ((vis_film_oversigt) && (debugmode)) fprintf(stderr,"select = %d Antal=%d /n",film_select_iconnr,film_oversigt.film_antal());
                 if ((vis_film_oversigt) && ((int) (film_select_iconnr+fnumbersoficonline)<(int) film_oversigt.film_antal()-1)) {
                   if (film_key_selected>=11) {
                     _fangley+=MOVIE_CS;
@@ -7882,26 +7874,28 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_select_device_to_play) {
                     if (spotify_oversigt.active_spotify_device>0) spotify_oversigt.active_spotify_device-=1;
                   } else {
-                    if ((spotifyknapnr-snumbersoficonline)>=1) {
-                      spotifyknapnr-=snumbersoficonline;
-                      spotify_key_selected-=snumbersoficonline;
-                      spotify_select_iconnr-=snumbersoficonline;
+                    // move coursor
+                    if (((spotifyknapnr+spotify_selected_startofset)-snumbersoficonline)>=1) {
+                      if (spotify_selected_startofset>0) {
+                        if ((spotifyknapnr>=1) && (spotifyknapnr<=8)) {
+                          spotify_selected_startofset-=8;
+                        } else {
+                          if (spotifyknapnr>1) {
+                            spotifyknapnr-=snumbersoficonline;
+                            spotify_key_selected-=snumbersoficonline;
+                            spotify_select_iconnr-=snumbersoficonline;
+                          }
+                        }
+                      } else {
+                        if (spotifyknapnr>1) {
+                          spotifyknapnr-=snumbersoficonline;
+                          spotify_key_selected-=snumbersoficonline;
+                          spotify_select_iconnr-=snumbersoficonline;
+                        }
+                      }
                     }
-
-                    /*
-                    if ((_spangley>0) && ((unsigned int) spotify_key_selected<=snumbersoficonline) && (spotify_select_iconnr>(snumbersoficonline-1))) {
-                      _spangley-=MUSIC_CS;
-                      do_music_icon_anim_icon_ofset = -1;			// set scroll
-                      spotify_select_iconnr -= snumbersoficonline;
-                    } else if ((spotify_select_iconnr-snumbersoficonline)>0) {
-                      spotify_select_iconnr -= snumbersoficonline;
-                    }
-                    if (spotify_key_selected>(int ) snumbersoficonline) spotify_key_selected-=snumbersoficonline;
-                    */
                   }
                 }
-
-
                 // movie stuf
                 if (vis_film_oversigt) {
                   if ((vis_film_oversigt) && (film_select_iconnr>(fnumbersoficonline-1))) {
@@ -9152,6 +9146,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 hent_film_search = true;			  	// start movie title search
                 fknapnr=0;
               }
+              // search podcast
               if (vis_stream_oversigt) {
                 hent_stream_search = true;				// start stream station search
                 sknapnr=stream_select_iconnr;   // selected
@@ -9159,6 +9154,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                 stream_select_iconnr=0;         // tmp
                 _sangley=0.0f;
                 do_play_stream=0;
+              }
+              // search spotify
+              if (vis_spotify_oversigt) {
+                hent_spotify_search = true;				      // start stream station search
+                spotifyknapnr=spotify_select_iconnr;   // selected
+                spotify_key_selected=1;
+                spotify_select_iconnr=0;
+                //_sangley=0.0f;
+                do_play_spotify=0;
               }
               // start music search
               if ((vis_music_oversigt) && (keybufferopenwin)) {
@@ -9268,10 +9272,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 show_radio_options=false;
                 _rangley=0;
               }
-              if ((do_show_setup) && (do_show_setup_font)) {
-                if (debugmode & 4) fprintf(stderr,"Set aktiv font to %s \n",aktivfont.typeinfo[setupfontselectofset].fontname);
-                strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
-                aktivfont.selectfont(configfontname);
+              if (do_show_setup) {
+                if (do_show_setup_font) {
+                  if (debugmode & 4) fprintf(stderr,"Set aktiv font to %s \n",aktivfont.typeinfo[setupfontselectofset].fontname);
+                  strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
+                  aktivfont.selectfont(configfontname);
+                }
               }
               if (vis_recorded_oversigt) {
                 do_play_recorded_aktiv_nr=1;							// set play aktiv recorded program flag (bliver sat igang i draw)
@@ -9354,12 +9360,20 @@ void handleKeypress(unsigned char key, int x, int y) {
               //
               // send spotify player to new device
               //
-              if ((vis_spotify_oversigt) && (do_select_device_to_play)) {
-                if (debugmode) printf("Send play command to spotify device \n");
-                spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ) ,1);
-                // close window again
-                do_select_device_to_play=false;
+              if (vis_spotify_oversigt) {
+                if (do_select_device_to_play) {
+                  // select device to play on
+                  if (debugmode) printf("Send play command to spotify device \n");
+                  spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ) ,1);
+                  // close window again
+                  do_select_device_to_play=false;
+                }
+                // search func
+                if (!(do_select_device_to_play)) {
+                  if (debugmode) printf("Start search spotify \n");
+                }
               }
+
               // enter pressed in setup window xmltv
               // select new tv guide provider
               if ((do_show_tvgraber) && (do_show_setup_select_linie==0)) {
