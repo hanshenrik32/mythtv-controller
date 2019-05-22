@@ -44,6 +44,7 @@ const int feed_url=2000;
 //
 
 extern int spotifyknapnr;
+extern int spotify_select_iconnr;
 
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
@@ -585,7 +586,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
       }
       res = mysql_store_result(conn);
       // create db (spotify songs)
-      sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),refid int,id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sql)!=0) {
         printf("mysql create table error.\n");
         printf("SQL : %s\n",sql);
@@ -823,7 +824,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
-// and update db
+// and update db from that file
 
 int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   int tt;
@@ -891,7 +892,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
       }
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      // test about rss table exist
+      // test about table exist
       mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
@@ -947,7 +948,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           // insert record created
           //
           if (stack[tt+1]) {
-            sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,refid,id) values ('%s','%s','%s','%s',%d,%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, refid , 0 );
+            sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,id) values ('%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , 0 );
             mysql_query(conn,sql);
             mysql_store_result(conn);
           }
@@ -1210,7 +1211,7 @@ int spotify_class::spotify_get_available_devices() {
               printf("Device name      : %s \n",spotify_device[t].name);
               printf("Device is active : %d \n",spotify_device[t].is_active);
               printf("Device type      : %s \n",spotify_device[t].devtype);
-              printf("Device id        : %s \n",spotify_device[t].id);
+              printf("Device id        : %s \n\n",spotify_device[t].id);
               sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
               mysql_query(conn,sql);
               res = mysql_store_result(conn);
@@ -1360,7 +1361,7 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 // fpath=stream path
 // atr = stream name
 
-int spotify_class::opdatere_spotify_oversigt(int refid) {
+int spotify_class::opdatere_spotify_oversigt(char *refid) {
     char sqlselect[2048];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
@@ -1402,11 +1403,11 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
       printf("loading spotify data.\n");
     }
     // find records after type (0 = root, else = refid)
-    if (refid == 0) {
+    if (refid == NULL) {
       sprintf(sqlselect,"select name,paththumb,playid,id from spotifycontent");
       getart = 0;
     } else {
-      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where refid=%d",refid);
+      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where playlistid=%s",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
@@ -1438,7 +1439,7 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
               stack[antal]->textureId=0;
               stack[antal]->intnr=atoi(row[3]);
               stack[antal]->nyt=false;
-              // top level
+              // top level (load playlist)
               if (getart == 0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
@@ -1485,6 +1486,7 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
 */
                 antal++;
               }
+              // load playlist songs
               if (getart == 1) {
                 // First create the back button
                 if (antal == 0) {
@@ -1498,6 +1500,7 @@ int spotify_class::opdatere_spotify_oversigt(int refid) {
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
                 strncpy(stack[antal]->playlisturl,row[2],spotify_namelength);
+                strncpy(stack[antal]->playlistid,row[3],spotify_namelength);
                 antal++;
               }
             }
@@ -1802,8 +1805,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     // calc start pos (ofset)
 
 
-
-    printf("spotifyknapnr = %d antal %d sofset = %d \n",spotifyknapnr,antalplaylists,sofset);
+//  printf("spotifyknapnr = %d spotify_select_iconnr = %d antal %d sofset = %d \n",spotifyknapnr,spotify_select_iconnr,antalplaylists,sofset);
 
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
@@ -1811,7 +1813,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         yof=yof-(buttonsizey+20);
         xof=0;
       }
-      if (i+1==(int) stream_key_selected) buttonsizey=190.0f;
+      if (i+1==(int) stream_key_selected) buttonsizey=200.0f;
       else buttonsizey=180.0f;
       if (stack[i+sofset]->textureId) {
         // stream icon
