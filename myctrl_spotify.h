@@ -124,7 +124,7 @@ class spotify_class : vlc_controller {
         int type;                                                               //
         bool gfx_loaded;					                                              //
         int get_spotify_intnr(int nr);
-        char *get_spotify_playlistid(int nr);                                   //
+        char *get_spotify_playlistid(int nr);                                   // get id to play
         char *get_spotify_name(int nr);                                         // get name
         char *get_spotify_desc(int nr);                                         // get desc
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
@@ -150,7 +150,7 @@ class spotify_class : vlc_controller {
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
-        int opdatere_spotify_oversigt(int refid);
+        int opdatere_spotify_oversigt(char *refid);
         void select_device_to_play();                                           // show device list to play on
         void set_default_device_to_play(int nr);                                // show device list to play on
         void show_setup_spotify();                                              //
