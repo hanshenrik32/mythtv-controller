@@ -1161,6 +1161,50 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
 }
 
 
+
+
+// work
+// play song
+// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// error codes
+
+// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
+// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
+// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
+// 429	Too Many Requests - Rate limiting has been applied.
+
+int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
+  int curl_error;
+  char call[4096];
+  char temptxt[2048];
+  char *devid=spotify_oversigt.get_active_device_id();
+  devid[40]='\0';
+  printf("Devid *%s*\n",devid);
+  strcpy(temptxt,playlist_song);
+  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
+  if (strlen(temptxt)>34) {
+    strcpy(temptxt,playlist_song+34);
+  }
+  printf("Go play song id %s \n",temptxt);
+//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:track:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  curl_error=system(call);
+  if (WEXITSTATUS(curl_error)!=0) {
+    printf("Error start play %d \n",WEXITSTATUS(curl_error));
+    printf("sql=%s\n",call);
+  }
+  return(curl_error);
+}
+
+
+
+
+
+
+
+
+
+
 //
 // Works
 // get device list and have it in spotify class
@@ -1443,7 +1487,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       sprintf(sqlselect,"select name,paththumb,playid,id from spotifycontent");
       getart = 0;
     } else {
-      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where playlistid='%s'",refid);
+      sprintf(sqlselect,"select name,paththumb,player,playlistid from spotifycontentarticles where playlistid='%s'",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
@@ -1536,7 +1580,14 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
                 strncpy(stack[antal]->playlisturl,row[2],spotify_namelength);
-                strncpy(stack[antal]->playlistid,row[3],spotify_namelength);
+                char temptxt1[2048];
+                char temptxt2[2048];
+                char *songstrpointer;
+                songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
+                if (songstrpointer) {
+                  strcpy(temptxt2,songstrpointer);
+                  strncpy(stack[antal]->playlistid,temptxt2,spotify_namelength);
+                } else strcpy(stack[antal]->playlistid,"");
                 antal++;
               }
             }

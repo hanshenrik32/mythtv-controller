@@ -3614,27 +3614,29 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
       glEnd();
       glPopMatrix();
-      // ***************************************************************** open icon
-      xof=550;
-      yof=200;
-      buttonsize=100;
-      glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-      glBindTexture(GL_TEXTURE_2D, spotify_askopen);						// texture9
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(21);                      				  // play icon nr
-      glBegin(GL_QUADS); // draw ask box
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+328-80, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+651-80, yof+328-80 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
-      glEnd();
-      glPopMatrix();
+      if (spotify_oversigt.type==0) {
+        // ***************************************************************** open icon
+        xof=550;
+        yof=200;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, spotify_askopen);						// texture9
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(21);                      				  // play icon nr
+        glBegin(GL_QUADS); // draw ask box
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+328-80, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+651-80, yof+328-80 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
+        glEnd();
+        glPopMatrix();
+      }
     }
 
     // start play radio station
@@ -7221,7 +7223,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((retfunc==5) || (button==3)) {
             printf("play nr %d spotify song %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
-              spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               printf("Song id %s \n ",spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ));
               if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
