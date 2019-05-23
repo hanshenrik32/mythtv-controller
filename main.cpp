@@ -7197,9 +7197,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // open spotify playlist
           if ((retfunc==3) || (button==3)) {
             ask_open_dir_or_play_spotify=false;
-            printf("Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
+            printf("Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
-            spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr));
+            spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
           }
           // play spotify playlist
           if ((retfunc==4) || (button==3)) {
@@ -7219,11 +7219,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // play song not playlist
           if ((retfunc==5) || (button==3)) {
-            spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-            printf("Song id %s \n ",spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ));
-            if (spotify_player_start_status == 0) {
-              do_play_spotify_cover=true;
-              do_zoom_spotify_cover=true;                                       // show we play
+            printf("play nr %d spotify song %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
+              spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              printf("Song id %s \n ",spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ));
+              if (spotify_player_start_status == 0) {
+                do_play_spotify_cover=true;
+                do_zoom_spotify_cover=true;                                       // show we play
+              }
             }
           }
         }
