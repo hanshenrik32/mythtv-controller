@@ -2957,7 +2957,7 @@ void display() {
           glEnd();
         }
         if (vis_uv_meter==false) {
-          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(show_status_update))) {
+          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_spotify_oversigt)) && (!(show_status_update))) {
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select); else  glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3186,6 +3186,10 @@ void display() {
         std::clock_t start;
         start = std::clock();
         spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,spotify_selected_startofset,spotifyknapnr);
+        // 7 ms is my timer
+        vis_uv_meter=false;
+        show_uv=false;
+        snd=0;
         // select play device
         if (do_select_device_to_play) {
           spotify_oversigt.select_device_to_play();
@@ -4981,7 +4985,7 @@ void display() {
     //
     // show uv metter in music player
     //
-    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_spotify_oversigt) || (vis_radio_or_music_oversigt)) {
+    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
@@ -7224,7 +7228,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             printf("play nr %d spotify song %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-              printf("Song id %s \n ",spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ));
+              if (spotify_player_start_status==0) printf("spotify start play return ok.\n");
+                else printf("spotify start play return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
