@@ -267,6 +267,29 @@ spotify_active_play_info_type::spotify_active_play_info_type() {                
 };
 
 
+
+//
+// constructor spotify oversigt type
+//
+
+spotify_oversigt_type::spotify_oversigt_type() {
+  strcpy(feed_showtxt,"");
+  strcpy(feed_name,"");
+  strcpy(feed_desc,"");
+  strcpy(feed_gfx_url,"");
+  strcpy(feed_gfx_mythtv,"");
+  strcpy(playlistid,"");
+  strcpy(playlisturl,"");
+  feed_group_antal=0;
+  feed_path_antal=0;
+  nyt=false;
+  textureId=0;
+  intnr=0;
+};
+
+
+
+
 //
 // constructor
 //
@@ -412,7 +435,7 @@ char playlistid[256];
 char playlistgfx[2048];
 
 //
-// process types in file
+// process types in file playlist
 //
 
 void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *conn) {
@@ -525,7 +548,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           playlist_process_name=false;
         }
         break;
-        case json_boolean:
+      case json_boolean:
         if (debug_json) printf("bool: %d\n", value->u.boolean);
         break;
     }
@@ -676,7 +699,7 @@ bool process_name=false;
 bool process_items=false;
 
 //
-// process types in file
+// process types in file for process playlist
 //
 
 void spotify_class::process_object(json_value* value, int depth) {
@@ -729,8 +752,8 @@ void spotify_class::process_array(json_value* value, int depth) {
 
 
 //
-// json parser start call function
-//
+// json parser start call function for process playlist
+// do the data progcessing from json
 
 void spotify_class::process_value(json_value* value, int depth,int x) {
     int j;
@@ -798,14 +821,15 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
         // get Song name
         if ((process_name) && (depth==9) && (x==12)) {
           if (antal==0) {
-            stack[antal]=new (struct spotify_oversigt_type);
+            stack[antal]=new (spotify_oversigt_type);
           } else {
+            // new record
             antal++;
             antalplaylists++;
           }
           if (antalplaylists<maxantal) {
             if (!(stack[antal]))  {
-              stack[antal]=new (struct spotify_oversigt_type);
+              stack[antal]=new (spotify_oversigt_type);
             }
             if (stack[antal]) {
               strcpy(stack[antal]->feed_name,value->u.string.ptr);
@@ -852,7 +876,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   json_char* json;
   json_value* value;
   if ((!(file_exists(playlistfilename))) || (force))  {
-    if (strcmp(spotifytoken,"")!=0) {
+    if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
       sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
       curl_error=system(doget);
       if (curl_error!=0) {
@@ -944,16 +968,28 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               }
             }
           }
+
+          playlistexist=false;
+          sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
+          mysql_query(conn,sql);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              playlistexist=true;
+            }
+          }
           //
-          // insert record created
+          // insert record created if not exist
           //
-          if (stack[tt+1]) {
+          if ((stack[tt+1]) && (playlistexist==false)) {
             sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,id) values ('%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , 0 );
+            //printf("sql to spotify article %s \n",sql);
             mysql_query(conn,sql);
             mysql_store_result(conn);
           }
         }
         tt++;
+        //printf("tt=%d playlist id %s \n",tt,playlist);
       }
     }
     mysql_close(conn);
@@ -1407,7 +1443,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       sprintf(sqlselect,"select name,paththumb,playid,id from spotifycontent");
       getart = 0;
     } else {
-      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where playlistid=%s",refid);
+      sprintf(sqlselect,"select name,paththumb,player,id from spotifycontentarticles where playlistid='%s'",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type

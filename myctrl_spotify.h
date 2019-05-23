@@ -30,7 +30,8 @@ class spotify_device_def {
 // playlist/song overview def
 //
 
-struct spotify_oversigt_type {
+class spotify_oversigt_type {
+  public:
     char        feed_showtxt[80+1];			          // what to show in overview
     char        feed_name[80+1];				          // playlist/song name
     char        feed_desc[80+1];				          // desc
@@ -43,6 +44,7 @@ struct spotify_oversigt_type {
     bool        nyt;                              //
     GLuint      textureId;                        // gfx icon loaded
     long        intnr;
+    spotify_oversigt_type();                      // constructor
 };
 
 //
