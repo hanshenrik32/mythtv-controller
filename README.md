@@ -5,6 +5,13 @@
 
 Version.
 
+mythtv-controller ver 37.0
+
+Spotify playlist is now avable to play.
+
+In the setup menu you can select the default player.
+
+
 mythtv-controller ver 0.36.3
 
 xmltv now works. you can do setup in the setup on f1.
