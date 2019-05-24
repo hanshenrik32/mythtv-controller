@@ -7225,7 +7225,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // play song not playlist
           if ((retfunc==5) || (button==3)) {
-            printf("play nr %d spotify song %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            printf("play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               if (spotify_player_start_status==0) printf("spotify start play return ok.\n");
