@@ -3185,11 +3185,8 @@ void display() {
       } else if (vis_spotify_oversigt) {
         std::clock_t start;
         start = std::clock();
-        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureId28,spotify_selected_startofset,spotifyknapnr);
+        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureIdback,spotify_selected_startofset,spotifyknapnr); // _textureId28
         // 7 ms is my timer
-        vis_uv_meter=false;
-        show_uv=false;
-        snd=0;
         // select play device
         if (do_select_device_to_play) {
           spotify_oversigt.select_device_to_play();
@@ -4354,7 +4351,19 @@ void display() {
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Songname : ");
       // show artist name
-      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_artist_name());
+      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_name());
+      glcRenderString(temptxt1);
+      glPopMatrix();
+
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f, 600.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString("Artist   : ");
+      // show artist name
+      sprintf(temptxt1,spotify_oversigt.spotify_aktiv_artist_name());
       glcRenderString(temptxt1);
       glPopMatrix();
 

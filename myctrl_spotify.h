@@ -57,6 +57,7 @@ class spotify_active_play_info_type {                // sample data down here
     spotify_active_play_info_type();
     long progress_ms;                                   // 27834
     long duration_ms;                                   // 245119
+    char song_name[256];                              // Joe Bonamassa
     char artist_name[256];                              // Joe Bonamassa
     char cover_image_url[256];                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
     GLuint cover_image;
@@ -94,7 +95,8 @@ class spotify_class : vlc_controller {
         int spotify_refresh_token();                                            // refresh token on postify api
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
-        char *spotify_aktiv_song_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
+        char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };
+        char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
         char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
         char *get_active_spotify_device_name();
