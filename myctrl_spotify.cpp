@@ -43,6 +43,8 @@ const int feed_url=2000;
 // text render is glcRenderString for freetype font support
 //
 
+
+
 extern int spotifyknapnr;
 extern int spotify_select_iconnr;
 
@@ -257,6 +259,7 @@ spotify_device_def::spotify_device_def() {
 spotify_active_play_info_type::spotify_active_play_info_type() {                // sample data down here
   progress_ms=0;
   duration_ms=0;
+  strcpy(song_name,"");
   strcpy(artist_name,"");
   strcpy(cover_image_url,"");
   cover_image=0;
@@ -831,11 +834,9 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
           }
           process_name=false;
         }
+        // get artis
         if ((process_name) && (depth==12) && (x==3)) {
-          //printf("x = %2d deep=%2d ",x,depth);
-          //printf(" string = %10s \n ",value->u.string.ptr);
           if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
-          //printf("artist = %s \n ",value->u.string.ptr);
         }
         break;
       case json_boolean:
@@ -1042,7 +1043,7 @@ int spotify_class::spotify_do_we_play() {
           spotify_aktiv_song[spotify_aktiv_song_antal].progress_ms=atol(file_contents+12);
         }
         if (strncmp(file_contents,"name=",5)==0) {
-          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,file_contents+5);
+          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].song_name,file_contents+5);
         }
         if (strncmp(file_contents,"release_date=",13)==0) {
           strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].release_date,file_contents+13);
@@ -1057,6 +1058,8 @@ int spotify_class::spotify_do_we_play() {
         }
       }
     }
+    // get artist name playing
+    if (spotifyknapnr>0) strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,stack[spotifyknapnr-1]->feed_artist);
     free(file_contents);
     fclose(json_file);
   } else {
@@ -1888,10 +1891,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       } else spotify_oversigt_loaded_nr++;
     }
     // calc start pos (ofset)
-
-
-//  printf("spotifyknapnr = %d spotify_select_iconnr = %d antal %d sofset = %d \n",spotifyknapnr,spotify_select_iconnr,antalplaylists,sofset);
-
+    //  printf("spotifyknapnr = %d spotify_select_iconnr = %d antal %d sofset = %d \n",spotifyknapnr,spotify_select_iconnr,antalplaylists,sofset);
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -1955,6 +1955,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
         if (type==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
+        // else back icon
         else if ((type==1) && ((i+sofset)==0)) glBindTexture(GL_TEXTURE_2D,backicon);
         else glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -2064,7 +2065,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString("Please wait Loading ...");
+      glcRenderString("   No data ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
