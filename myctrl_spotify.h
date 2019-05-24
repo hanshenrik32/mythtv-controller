@@ -34,6 +34,7 @@ class spotify_oversigt_type {
   public:
     char        feed_showtxt[80+1];			          // what to show in overview
     char        feed_name[80+1];				          // playlist/song name
+    char        feed_artist[80+1];                // artist
     char        feed_desc[80+1];				          // desc
     char        feed_gfx_url[4000+1];             //
     char        feed_gfx_mythtv[2000+1];				  //
@@ -125,7 +126,7 @@ class spotify_class : vlc_controller {
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
         int type;                                                               //
         bool gfx_loaded;					                                              //
-        int get_spotify_intnr(int nr);
+        int get_spotify_intnr(int nr);                                          //
         char *get_spotify_playlistid(int nr);                                   // get id to play
         char *get_spotify_name(int nr);                                         // get name
         char *get_spotify_desc(int nr);                                         // get desc
