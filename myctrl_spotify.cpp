@@ -328,7 +328,6 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotifytoken_refresh,"");                                            //
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
-    strcpy(spotifytoken,"");
     strcpy(active_default_play_device_name,"");
     spotify_device_antal=0;
 }
@@ -1031,7 +1030,7 @@ int spotify_class::spotify_do_we_play() {
       free(file_contents);
       return 0;
     }
-      spotify_aktiv_song_antal=0;
+    spotify_aktiv_song_antal=0;
     while ((nread = getline(&file_contents, &stringlength, json_file)) != -1) {
       if (nread>4) {
         if ((find_length) && (strncmp(file_contents,"duration_ms=",12)==0)) {
@@ -1058,8 +1057,9 @@ int spotify_class::spotify_do_we_play() {
         }
       }
     }
-    // get artist name playing
+    // get artist name play
     if (spotifyknapnr>0) strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,stack[spotifyknapnr-1]->feed_artist);
+    else strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,"Unknown");
     free(file_contents);
     fclose(json_file);
   } else {
