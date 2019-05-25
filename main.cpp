@@ -798,6 +798,7 @@ const int TEMA_ANTAL=10;                                                        
 // define for use before function is created
 void *update_music_phread_loader();
 void *update_spotify_phread_loader();
+void *update_webserver_phread_loader();
 
 // hent mythtv version and return it
 
@@ -2300,7 +2301,7 @@ static bool do_update_rss = false;
 static bool do_update_music = false;
 static bool do_update_music_now = false;                          // start the process to update music db from global dir
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
-static bool do_update_spotify = true;                            // set true to start thread on update spotify db (true = update first run)
+static bool do_update_spotify = true;                            // set true to start thread on update spotify + run web server
 
 
 
@@ -2369,7 +2370,6 @@ void display() {
                                      0.8,0.8,0.8, \
                                      0.9,0.9,0.9, \
                                      1.0,1.0,1.0};
-
     float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
@@ -2384,7 +2384,6 @@ void display() {
                           0.7,0.3,0.3, \
                           0.9,0.0,0.0, \
                           0.9,0.0,0.0};
-
     // uv color table 2
     float uvcolortable2[]={0.8,0.8,0.8, \
                           0.8,0.8,0.8, \
@@ -2400,7 +2399,6 @@ void display() {
                           0.3,0.3,0.3, \
                           0.1,0.1,0.1, \
                           0.0,0.0,0.0};
-
     // uv color table 2
     float uvcolortable1[]={0.8,0.8,0.8, \
                           0.8,0.4,0.8, \
@@ -2491,7 +2489,7 @@ void display() {
     // run the webserver
     //std::clock_t start;
     //start = std::clock();
-    mg_mgr_poll(&spotify_oversigt.mgr, 50);
+    //mg_mgr_poll(&spotify_oversigt.mgr, 50);
     //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
     // do the update from spotify
@@ -3185,7 +3183,14 @@ void display() {
       } else if (vis_spotify_oversigt) {
         std::clock_t start;
         start = std::clock();
+        static bool startwebbrowser=true;
         spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureIdback,spotify_selected_startofset,spotifyknapnr); // _textureId28
+        if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
+          if (startwebbrowser) {
+            system("firefox localhost:8000");
+            startwebbrowser=false;
+          }
+        }
         // 7 ms is my timer
         // select play device
         if (do_select_device_to_play) {
@@ -5933,6 +5938,7 @@ void display() {
     if (do_update_spotify) {
       printf("Start phread spotify update loader \n");
       update_spotify_phread_loader();
+      update_webserver_phread_loader();
       do_update_spotify = false;
     }
 
@@ -12198,10 +12204,21 @@ void *datainfoloader_stream(void *data) {
 
 void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) printf("loader thread starting - Loading spotify info from db.\n");
-  //streamoversigt.loadrssfile(0);
   spotify_oversigt.opdatere_spotify_oversigt(0);
-
   if (debugmode & 4) printf("loader thread done loaded spotify\n");
+  pthread_exit(NULL);
+}
+
+
+//
+// phread dataload webserver
+//
+
+void *datainfoloader_webserver(void *data) {
+  while(true) {
+    // run the webserver
+    mg_mgr_poll(&spotify_oversigt.mgr, 50);
+  }
   pthread_exit(NULL);
 }
 
@@ -12227,7 +12244,7 @@ void *datainfoloader_xmltv(void *data) {
       if (debugmode & 256) printf("Parse xmltv error (mysql connection error)\n");
     }
   }
-  // save config again
+    // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
   if (debugmode & 256) printf("parser xmltv guide done.\n");
   // set update flag for done
@@ -12300,6 +12317,21 @@ void *update_spotify_phread_loader() {
   }
 }
 
+
+//
+// rss loader start from main loop start webserver
+//
+
+void *update_webserver_phread_loader() {
+  if (true) {
+    pthread_t loaderthread2;           // load tvguide xml file in to db
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_webserver,NULL);
+    if (rc2) {
+      printf("ERROR; return code from pthread_create() webserver is %d\n", rc2);
+      exit(-1);
+    }
+  }
+}
 
 
 //

@@ -92,6 +92,7 @@ class spotify_class : vlc_controller {
         char spotify_secret_id[255];                                            // Secret id
         GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
         void spotify_set_token(char *token,char *refresh);
+        char *spotify_get_token() { return(spotifytoken); };
         int spotify_refresh_token();                                            // refresh token on postify api
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
