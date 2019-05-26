@@ -27,7 +27,7 @@ class spotify_device_def {
 
 
 //
-// playlist/song overview def
+// playlist/song overview def spotify
 //
 
 class spotify_oversigt_type {
@@ -161,6 +161,7 @@ class spotify_class : vlc_controller {
         void select_device_to_play();                                           // show device list to play on
         void set_default_device_to_play(int nr);                                // show device list to play on
         void show_setup_spotify();                                              //
+        int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
 };
