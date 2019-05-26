@@ -3149,6 +3149,25 @@ void display() {
         }
       }
     }
+
+    // spotify do the search after enter is pressed
+    if (vis_spotify_oversigt) {
+      if ((keybufferopenwin) && (hent_spotify_search)) {
+        hent_spotify_search=false;
+        if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
+          if (debugmode) fprintf(stderr,"Search string: %s \n ",keybuffer);
+          if (findtype==0)
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);	// find det som der søges kunster
+          else
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);        // find det som der søges efter sange navn
+          //opdatere_spotify_oversigt_icons(); 					// load gfx icons
+          keybuffer[0] = 0;
+          keybufferindex = 0;
+        }
+      }
+    }
+
+
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
@@ -3235,15 +3254,17 @@ void display() {
         if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
-    // show search box and text for radio and music and movie
+    // show search box and text for radio and music and movie and spotify
     if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || (vis_spotify_oversigt)) {
+      if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
       if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
-        if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch); // mask _textureId5_!
-        else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1); // mask _textureId5_!
-        else if (vis_film_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmoviesearch); // mask _textureId5_!
+        if (vis_radio_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdradiosearch);
+        else if (vis_music_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
+        else if (vis_film_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmoviesearch);
+        else if (vis_spotify_oversigt) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -5937,8 +5958,8 @@ void display() {
 
     if (do_update_spotify) {
       printf("Start phread spotify update loader \n");
-      update_spotify_phread_loader();
-      update_webserver_phread_loader();
+      update_spotify_phread_loader();                                           //
+      update_webserver_phread_loader();                                         //
       do_update_spotify = false;
     }
 
@@ -6480,7 +6501,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
 
-
         // open
         if ((GLubyte) names[i*4+3]==21) {
           fprintf(stderr,"open spotify playlist\n");
@@ -6505,19 +6525,25 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 7;                                                       //
           fundet = true;
         }
-/*
+
+        //
         if ((GLubyte) names[i*4+3]==23) {
           fprintf(stderr,"scroll down\n");
+          // move coursor
+          spotify_selected_startofset+=8;
           returnfunc = 1;
           fundet = true;
         }
+
         // scroll up
         if ((GLubyte) names[i*4+3]==24) {
           fprintf(stderr,"scroll up\n");
+          if (spotify_selected_startofset+8>0) spotify_selected_startofset-=8;
           returnfunc = 2;
           fundet = true;
         }
-*/
+
+
         // show close spotify info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
@@ -7554,15 +7580,17 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
-
+                // move left
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
                   if (spotify_key_selected>1) {
                     spotifyknapnr--;
                     spotify_key_selected--;
                     spotify_select_iconnr--;
+                  } else {
+                    if (spotify_selected_startofset>0) spotify_selected_startofset--;
                   }
                 }
-
+                //
                 if (vis_film_oversigt) {
                   if (film_key_selected>1) {
                     film_key_selected--;
@@ -7651,7 +7679,7 @@ void handlespeckeypress(int key,int x,int y) {
 
                 // spotify
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
-                  if (spotifyknapnr<spotify_oversigt.streamantal()) {
+                  if ((spotifyknapnr+spotify_selected_startofset)<spotify_oversigt.streamantal()) {
                     spotifyknapnr++;
                     spotify_key_selected++;
                     spotify_select_iconnr++;
@@ -7748,10 +7776,13 @@ void handlespeckeypress(int key,int x,int y) {
                   } else {
                     // move coursor
                     if ((spotifyknapnr+spotify_selected_startofset+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
-                      if ((spotifyknapnr+snumbersoficonline)>40) spotify_selected_startofset+=8;
-                      spotifyknapnr+=snumbersoficonline;
-                      spotify_key_selected+=snumbersoficonline;
-                      spotify_select_iconnr+=snumbersoficonline;
+                      if ((spotifyknapnr+snumbersoficonline)>40) {
+                        spotify_selected_startofset+=8;
+                      } else {
+                        spotifyknapnr+=snumbersoficonline;
+                        spotify_key_selected+=snumbersoficonline;
+                        spotify_select_iconnr+=snumbersoficonline;
+                      }
                     }
                   }
                 }
@@ -7920,7 +7951,7 @@ void handlespeckeypress(int key,int x,int y) {
                     // move coursor
                     if (((spotifyknapnr+spotify_selected_startofset)-snumbersoficonline)>=1) {
                       if (spotify_selected_startofset>0) {
-                        if ((spotifyknapnr>=1) && (spotifyknapnr<=8)) {
+                        if ((spotifyknapnr>=1) && (spotifyknapnr<=9)) {
                           spotify_selected_startofset-=8;
                         } else {
                           if (spotifyknapnr>1) {
@@ -8422,6 +8453,15 @@ void handleKeypress(unsigned char key, int x, int y) {
                     keybufferindex++;
                     keybuffer[keybufferindex]='\0';       // else input key text in buffer
                   }
+              }
+            }
+            // søg efter spotify fill buffer from keyboard
+            if (vis_spotify_oversigt) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               }
             }
             // søg efter radio station navn
@@ -9031,6 +9071,13 @@ void handleKeypress(unsigned char key, int x, int y) {
               } else if (vis_stream_or_movie_oversigt) {
                 vis_stream_or_movie_oversigt=false;
                 key=0;
+              } else if (vis_spotify_oversigt) {
+                ask_save_playlist=false;
+                hent_spotify_search=false;
+                vis_spotify_oversigt=false;
+                keybufferopenwin=false;
+                spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+                key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
                 order_channel_list();
@@ -9206,6 +9253,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 spotify_select_iconnr=0;
                 //_sangley=0.0f;
                 do_play_spotify=0;
+                //spotifyknapnr = the one to play
               }
               // start music search
               if ((vis_music_oversigt) && (keybufferopenwin)) {
