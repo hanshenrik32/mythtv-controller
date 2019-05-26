@@ -1097,7 +1097,7 @@ int spotify_class::spotify_resume_play() {
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
-  if (curl_error==0) {
+  if (WEXITSTATUS(curl_error)!=0) {
     return 1;
   }
   return 0;
@@ -1111,9 +1111,10 @@ int spotify_class::spotify_resume_play() {
 int spotify_class::spotify_last_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
+  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
-  if (curl_error==0) {
+  if (WEXITSTATUS(curl_error)!=0) {
+    printf("curl_error %d \n",curl_error);
     return 1;
   }
   return 0;
@@ -1126,9 +1127,10 @@ int spotify_class::spotify_last_play() {
 int spotify_class::spotify_next_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
+  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error==0) {
+    printf("curl_error %d \n",curl_error);
     return 1;
   }
   return 0;

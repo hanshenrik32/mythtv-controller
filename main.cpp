@@ -6525,8 +6525,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 7;                                                       //
           fundet = true;
         }
-
-        //
+        //  scroll down
         if ((GLubyte) names[i*4+3]==23) {
           fprintf(stderr,"scroll down\n");
           // move coursor
@@ -6534,7 +6533,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 1;
           fundet = true;
         }
-
         // scroll up
         if ((GLubyte) names[i*4+3]==24) {
           fprintf(stderr,"scroll up\n");
@@ -6542,8 +6540,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 2;
           fundet = true;
         }
-
-
         // show close spotify info (27 need to move) 27 now is global exit
         if ((GLubyte) names[i*4+3]==27) {
           if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
@@ -6551,7 +6547,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
+      //
+      // spotify stuf
       // set default device to play on
+      //
       if ((do_show_setup_spotify)  && (!(fundet))) {
         // select default play device
         if ((GLubyte) names[i*4+3]==10) {
@@ -7033,20 +7032,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     }
                   }
                   // next play
-                  if (retfunc==2) {
-                    if (spotifyknapnr==10) {
-                      do_play_spotify=0;
-                      do_open_spotifyplaylist=1;
-                      if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
-                    }
+                  if (retfunc==6) {
+                    do_play_spotify=0;
+                    do_open_spotifyplaylist=1;
+                    if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                    spotify_oversigt.spotify_next_play();
                   }
                   // last play
-                  if (retfunc==2) {
-                    if (spotifyknapnr==11) {
-                      do_play_spotify=0;
-                      do_open_spotifyplaylist=1;
-                      if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
-                    }
+                  if (retfunc==7) {
+                    do_play_spotify=0;
+                    do_open_spotifyplaylist=1;
+                    if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                    spotify_oversigt.spotify_last_play();
                   }
                 }
 
@@ -7226,18 +7223,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             do_play_spotify_cover=false;
             do_zoom_spotify_cover=false;
             do_select_device_to_play=false;                                     // stop show device
-            spotifyknapnr=0;
-          }
-          // last
-          if ((retfunc==6) || (button==3)) {
-            printf("Spotify play do last command\n");
-            spotify_oversigt.spotify_last_play();
-            spotifyknapnr=0;
-          }
-          // next
-          if ((retfunc==7) || (button==3)) {
-            printf("Spotify play do next command\n");
-            spotify_oversigt.spotify_next_play();
             spotifyknapnr=0;
           }
         } else {
