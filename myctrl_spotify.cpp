@@ -350,11 +350,38 @@ spotify_class::~spotify_class() {
 int spotify_class::spotify_refresh_token() {
   int curl_error;
   char doget[2048];
+  char data[4096];
+  char call[4096];
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  strcpy(data,spotify_client_id);
+  strcat(data,":");
+  strcat(data,spotify_secret_id);
+  strcpy(newtoken,"");
+  //calc base64
+  base64_code=b64_encode((const unsigned char *) data, 65);
+  *(base64_code+88)='\0';
   if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X POST 'https://api.spotify.com/api/token' -d grant_type=refresh_token -d refresh_token=%s -H 'Authorization: Bearer %s'",spotifytoken,spotifytoken_refresh);
+    sprintf(doget,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=refresh_token -d refresh_token=%s https://accounts.spotify.com/api/token > spotify_refresh_token.txt", base64_code ,spotifytoken_refresh);
     curl_error=system(doget);
     if (WEXITSTATUS(curl_error)==0) {
-      printf("Error \n");
+      printf("Ok Spotify new token. ");
+      tokenfil=fopen("spotify_refresh_token.txt","rt");
+      if (tokenfil) {
+        fgets(data,4096,tokenfil);
+        if (strcmp(data,"")!=0) {
+          if (strncmp(data,"{\"access_token\":",16)==0) {
+            strncpy(newtoken,data+17,180);
+            newtoken[181]='\0';
+          }
+        }
+        printf(" %s \n",newtoken);
+        strcpy(spotifytoken,newtoken);                                         // update spotify token
+        fclose(tokenfil);
+      }
+    } else {
+      printf("Error Spotify renew token.\n");
     }
   }
   return 1;
@@ -846,6 +873,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 
 
+// work
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
 // and update db from that file
@@ -1000,6 +1028,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
 
 
 //
+// work
 // get active song playing
 //
 
@@ -1074,6 +1103,7 @@ int spotify_class::spotify_do_we_play() {
 // *******************************************************************************************************
 
 //
+// work
 // pause play
 //
 
@@ -1121,6 +1151,7 @@ int spotify_class::spotify_last_play() {
 }
 
 //
+// work
 // next play
 //
 
