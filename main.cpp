@@ -6487,20 +6487,18 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // play playlist icon select (20) type 0
         if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
-          fprintf(stderr,"play spotify playlist\n");
+          fprintf(stderr,"play spotify playlist.\n");
           do_select_device_to_play=true;
           returnfunc = 4;
           fundet = true;
         }
-
         // play song icon select (20) type 1
         if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
-          fprintf(stderr,"play spotify song \n");
+          fprintf(stderr,"play spotify song.\n");
           do_select_device_to_play=true;
           returnfunc = 5;
           fundet = true;
         }
-
         // open
         if ((GLubyte) names[i*4+3]==21) {
           fprintf(stderr,"open spotify playlist\n");
@@ -6526,17 +6524,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
         //  scroll down
-        if ((GLubyte) names[i*4+3]==23) {
-          fprintf(stderr,"scroll down\n");
-          // move coursor
+        if ((GLubyte) names[i*4+3]==24) {
+          fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+          // move playlists down
+          if (spotify_selected_startofset+40<spotify_oversigt.streamantal())
           spotify_selected_startofset+=8;
           returnfunc = 1;
           fundet = true;
         }
         // scroll up
-        if ((GLubyte) names[i*4+3]==24) {
-          fprintf(stderr,"scroll up\n");
-          if (spotify_selected_startofset+8>0) spotify_selected_startofset-=8;
+        if ((GLubyte) names[i*4+3]==23) {
+          fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+          // move playlists up
+          if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
+          if (spotify_selected_startofset<0) spotify_selected_startofset=0;
           returnfunc = 2;
           fundet = true;
         }
@@ -6602,7 +6603,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
-
       // vælg skal der spilles music eller radio
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
@@ -6632,7 +6632,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       // kun til mus/touch skærm (spotify oversigt)
       // luk show play radio
       // scroll down
-
       if ((vis_radio_oversigt)  && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==23) {
           if (debugmode & 8) fprintf(stderr,"scroll down\n");
@@ -6652,7 +6651,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
-
       if ((vis_radio_oversigt) && (show_radio_options==false)) {
         // Bruges vist kun til mus/touch skærm (radio stationer)
         if (!(fundet)) {		// hvis ingen valgt
@@ -7012,7 +7010,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   }
                 }
-
                 // spotify
                 if (vis_spotify_oversigt) {
                   // spotify stuf
@@ -7046,7 +7043,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     spotify_oversigt.spotify_last_play();
                   }
                 }
-
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
                   do_zoom_film_cover = true;
@@ -12248,9 +12244,23 @@ void *datainfoloader_spotify(void *data) {
 //
 
 void *datainfoloader_webserver(void *data) {
+  struct tm* t;
+  static time_t lasttime=0;
+  static time_t nowdate;
+  time(&lasttime);
+  time(&nowdate);
   while(true) {
     // run the webserver
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
+    // run time server to update spotify token
+    if (difftime(nowdate, lasttime)>3500) {
+      time(&lasttime);
+      printf("update spotify token\n");
+      if ((spotify_oversigt.spotify_get_token(),"")!=0) {
+        spotify_oversigt.spotify_refresh_token();
+      }
+    }
+    time(&nowdate);
   }
   pthread_exit(NULL);
 }

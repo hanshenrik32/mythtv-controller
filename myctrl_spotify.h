@@ -87,6 +87,8 @@ class spotify_class : vlc_controller {
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
+        int antal;					                       	                            // Antal songs in playlist
+        int antalplaylists;                                                     // antal
     public:
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
@@ -107,8 +109,6 @@ class spotify_class : vlc_controller {
         int active_default_play_device;                                         // active device or -1
         char active_default_play_device_name[256];                              // active device name
         char spotify_playlistname[256];
-        int antal;					                       	                            // Antal songs in playlist
-        int antalplaylists;                                                     // antal
         char client_id[120];                                                    // spotify client id
         char client_secret[120];                                                // spotify client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
