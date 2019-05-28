@@ -2496,7 +2496,7 @@ void display() {
     if (do_update_spotify_playlist) {
       //spotify_oversigt.spotify_get_user_id();                                   // get user id
       //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
-      spotify_oversigt.spotify_get_user_playlists(false);                         // get all the playlist and update db (no force update)
+      spotify_oversigt.spotify_get_user_playlists(true);                                        // get all the playlist and update db (force update)
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       do_update_spotify_playlist=false;
     }
@@ -7745,7 +7745,15 @@ void handlespeckeypress(int key,int x,int y) {
                     // move coursor
                     if ((spotifyknapnr+spotify_selected_startofset+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
                       if ((spotifyknapnr+snumbersoficonline)>40) {
-                        spotify_selected_startofset+=8;
+                        if ((spotifyknapnr+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
+                          spotify_selected_startofset+=8;
+                        } else {
+                          if ((spotifyknapnr-1)<spotify_oversigt.antal_spotify_streams()) {
+                            spotifyknapnr++;
+                            spotify_key_selected+=1;
+                            spotify_select_iconnr+=1;
+                          }
+                        }
                       } else {
                         spotifyknapnr+=snumbersoficonline;
                         spotify_key_selected+=snumbersoficonline;
