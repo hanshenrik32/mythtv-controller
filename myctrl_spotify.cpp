@@ -513,7 +513,7 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 
 
 //
-// json parser start call function
+// json parser start call function playlist db update
 //
 
 void spotify_class::playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) {
@@ -523,6 +523,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
     char tempstring[1024];
     char sql[8192];
     bool debug_json=false;
+    bool playlistexist=false;
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -572,9 +573,20 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
         if ((playlist_process_name) && (depth==5) && (x==5)) {
           if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
           strcpy(playlistname,value->u.string.ptr);
-          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
+          playlistexist=false;
+          sprintf(sql,"select id from mythtvcontroller.spotifycontentplaylist where playlistname like '%s' limit 1", playlistname );
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              playlistexist=true;
+            }
+          }
+          if (!(playlistexist)) {
+            sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
+            mysql_query(conn,sql);
+            res = mysql_store_result(conn);
+          }
           playlist_process_name=false;
         }
         break;
@@ -724,6 +736,7 @@ bool process_description=false;
 bool process_image=false;
 bool process_name=false;
 bool process_items=false;
+bool process_track_nr=false;
 
 //
 // process types in file for process playlist files (songs)
@@ -756,6 +769,9 @@ void spotify_class::process_object(json_value* value, int depth) {
     }
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
       process_name=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
+      process_track_nr=true;
     }
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
@@ -864,6 +880,14 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
         if ((process_name) && (depth==12) && (x==3)) {
           if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
         }
+
+        // get tracknr
+        if (process_track_nr) {
+          process_track_nr=false;
+          //printf(" text %s \n",value->u.string.ptr);
+          // if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+        }
+
         break;
       case json_boolean:
         if (debug_json) printf("bool: %d\n", value->u.boolean);
@@ -996,22 +1020,24 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               }
             }
           }
-          playlistexist=false;
-          sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              playlistexist=true;
-            }
-          }
-          //
-          // insert record created if not exist
-          //
-          if ((stack[tt+1]) && (playlistexist==false)) {
-            sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
+          if (stack[tt+1]) {
+            playlistexist=false;
+            sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
             mysql_query(conn,sql);
-            mysql_store_result(conn);
+            res = mysql_store_result(conn);
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                playlistexist=true;
+              }
+            }
+            //
+            // insert record created if not exist
+            //
+            if (playlistexist==false) {
+              sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
+              mysql_query(conn,sql);
+              mysql_store_result(conn);
+            }
           }
         }
         tt++;

@@ -3132,9 +3132,9 @@ void display() {
           hent_music_search=false;
           if (debugmode & 2) fprintf(stderr,"Search string: %s \n ",keybuffer);
           if (findtype==0)
-           opdatere_music_oversigt_searchtxt(musicoversigt,keybuffer,0);	// find det som der søges kunster
+           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
           else
-           opdatere_music_oversigt_searchtxt(musicoversigt,keybuffer,1);        // find det som der søges efter sange navn
+           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );        // find det som der søges efter sange navn
           opdatere_music_oversigt_icons(); 					// load gfx icons
           keybuffer[0] = 0;
           keybufferindex = 0;
@@ -3170,40 +3170,32 @@ void display() {
 
     if (!(visur)) {
       // music view
+      std::clock_t start;
+      start = std::clock();
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
-        std::clock_t start;
-        start = std::clock();
         show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
-        std::clock_t start;
-        start = std::clock();
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_stream_oversigt) {
-        std::clock_t start;
-        start = std::clock();
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
-        std::clock_t start;
-        start = std::clock();
-        radio_pictureloaded=radiooversigt.show_radio_oversigt1(_textureId7,0,_textureIdback,_textureId28,_rangley);
+        radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId7 , 0 , _textureIdback , _textureId28 , _rangley);
         // show radio options menu
         if ((show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
         }
       } else if (vis_spotify_oversigt) {
-        std::clock_t start;
-        start = std::clock();
         static bool startwebbrowser=true;
-        spotify_oversigt.show_spotify_oversigt(_textureId7,_textureIdback,_textureIdback,spotify_selected_startofset,spotifyknapnr); // _textureId28
+        spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ); // _textureId28
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
             system("firefox localhost:8000");
@@ -3219,35 +3211,27 @@ void display() {
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
-        std::clock_t start;
-        start = std::clock();
-        aktiv_tv_oversigt.show_fasttv_oversigt(tvvalgtrecordnr,tvsubvalgtrecordnr,do_update_xmltv_show);
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
+        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << std::endl;
         //
         // show tv program info about selected program in tv guide
         //
         if ((do_zoom_tvprg_aktiv_nr)>0) {
-          std::clock_t start;
-          start = std::clock();
           glPushMatrix();
           // show info om program selected
           //aktivfont.selectfont("FreeMono");
           aktivfont.selectfont(configfontname);
-          aktiv_tv_oversigt.showandsetprginfo(tvvalgtrecordnr,tvsubvalgtrecordnr);
+          aktiv_tv_oversigt.showandsetprginfo( tvvalgtrecordnr , tvsubvalgtrecordnr );
           glPopMatrix();
           //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         }
         // show record program menu
       } else if (vis_recorded_oversigt) {
-        std::clock_t start;
-        start = std::clock();
         recordoversigt.show_recorded_oversigt1(0,0);
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
       if (vis_tvrec_list) {
         // show tv record list
-        std::clock_t start;
-        start = std::clock();
         glPushMatrix();
         aktiv_crecordlist.showtvreclist();
         glPopMatrix();
@@ -5972,6 +5956,8 @@ void display() {
 
 
 
+
+
 // used by mouse stuf
 // to check mouse buttons
 // names is the array of gfx on screen as buttons
@@ -6484,6 +6470,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // update
           spotify_oversigt.opdatere_spotify_oversigt(0);
           ask_open_dir_or_play_spotify=false;
+          fundet = true;
         }
         // play playlist icon select (20) type 0
         if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
@@ -7223,14 +7210,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         } else {
           // open spotify playlist
-          if ((retfunc==3) || (button==3)) {
+          if (((retfunc==3) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             printf("Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
           }
           // play spotify playlist
-          if ((retfunc==4) || (button==3)) {
+          if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
             printf("play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               // try load and start playing playlist
