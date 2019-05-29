@@ -1065,9 +1065,9 @@ int parse_config(char *filename) {
             // set backupend system to XBMC or mythtv
             if (command_nr==setbackend) {
               strcpy(configbackend,value);
-              printf("*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
-              printf("Mode selected : %s\n",configbackend);
-              printf("*********************************************************\n");
+              fprintf(stderr,"*********** Set config mode MYTHTV/XBMC+KODI  ***********\n");
+              fprintf(stderr,"Mode selected : %s\n",configbackend);
+              fprintf(stderr,"*********************************************************\n");
             }
             // set tv graber
             else if (command_nr==settvgraber) {
@@ -1099,9 +1099,9 @@ int parse_config(char *filename) {
               else if (strcmp(configbackend_tvgraber,"tv_grab_uk_tvguide")==0) aktiv_tv_graber.graberaktivnr=25;
               else aktiv_tv_graber.graberaktivnr=0;
 
-              printf("**************** Set config xmltv graber ****************\n");
-              printf("Tv graber ....: %s\n",configbackend_tvgraber);
-              printf("*********************************************************\n");
+              fprintf(stderr,"**************** Set config xmltv graber ****************\n");
+              fprintf(stderr,"Tv graber ....: %s\n",configbackend_tvgraber);
+              fprintf(stderr,"*********************************************************\n");
             } else if (command_nr==tvgraberupdate) configtvguidelastupdate=atol(value);
             // set tvguide color or no color
             else if (command_nr==tvguidercolor) {
@@ -1419,9 +1419,9 @@ void load_config(char * filename) {
     remoteHost = gethostbyname(configmythhost);
     if (remoteHost) {
       addr_list = (struct in_addr **) remoteHost->h_addr_list;
-      printf("mediacenter server name is : %s\n", remoteHost->h_name);
+      fprintf(stderr,"mediacenter server name is : %s\n", remoteHost->h_name);
       for(i = 0; addr_list[i] != NULL; i++) {
-        printf("mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
+        fprintf(stderr,"mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
       }
       strcpy(confighostname,hostname);
       strcpy(configmysqlhost,remoteHost->h_name);
@@ -1430,19 +1430,19 @@ void load_config(char * filename) {
       remoteHost = gethostbyname(confighostname);
       if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
-        printf("Hostname : %s\n", remoteHost->h_name);
+        fprintf(stderr,"Hostname : %s\n", remoteHost->h_name);
         for(i = 0; addr_list[i] != NULL; i++) {
-          printf("Ip is  : %s\n", inet_ntoa(*addr_list[i]));
+          fprintf(stderr,"Ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
         strcpy(confighostip,inet_ntoa(*addr_list[0]));
       } else strcpy(confighostip,"127.0.0.1");
     } else {
-      printf("Error recolving hostname.\n");
+      fprintf(stderr,"Error recolving hostname.\n");
     }
     strcpy(sqlselect,"SELECT data from settings where value like 'MusicLocation' and hostname like '");
     strcat(sqlselect,configmysqlhost);
     strcat(sqlselect,"' ");
-    printf("start reading database setup.....\n");
+    fprintf(stderr,"start reading database setup.....\n");
     conn=mysql_init(NULL);
     // Connect to database
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -1508,7 +1508,7 @@ void load_config(char * filename) {
           strcpy(configpicturepath,row[0]);
         }
       } else {
-        printf("No access to mysql database... Can not read GalleryDir table.\n");
+        fprintf(stderr,"No access to mysql database... Can not read GalleryDir table.\n");
         exit(-1);
       }
       if (strlen(configpicturepath)>0) strcat(configpicturepath,"/mythc-gallery/");
@@ -1529,7 +1529,7 @@ void load_config(char * filename) {
         }
         if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
       } else {
-          printf("No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
+          fprintf(stderr,"No storagegroup table or access to mysql database... Can not read storagegroup infomations from mythtv.\n");
       }
 
       // er der ingen storagegroup defined. Load old type from settings table
@@ -1545,14 +1545,14 @@ void load_config(char * filename) {
             if ((strlen(configrecordpath)>0) && (configrecordpath[strlen(configrecordpath)-1]!='/')) strcat(configrecordpath,"/");             // add last '/' if not exist
           }
         } else {
-          printf("No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
+          fprintf(stderr,"No access to settings table searching for RecordFilePrefix in mysql database... Can not read config infomations from mythtv.\n");
           exit(-1);
         }
         if (conn) mysql_close(conn);
       }
     } else {
       strcpy(configmusicpath,"");
-      printf("No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
+      fprintf(stderr,"No access to mysql database... Can not read config infomations.\n\nUse setup (F1) to config mythtv sql access.\n");
     }
     // read key file setup
     if ((file = fopen("mythtv-controller.keys", "r"))) {
@@ -1565,7 +1565,7 @@ void load_config(char * filename) {
       if (file) {
         fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
         fclose(file);
-      } else printf("Disk write error, saving mythtv-controller.keys\n");
+      } else fprintf(stderr,"Disk write error, saving mythtv-controller.keys\n");
     }
     // get/set default play device on spotify
     if (strcmp(spotify_oversigt.active_default_play_device_name,"")!=0) {
@@ -1575,9 +1575,9 @@ void load_config(char * filename) {
       if (res) {
         spotify_oversigt.active_default_play_device=atoi(row[1]);
         spotify_oversigt.active_spotify_device=atoi(row[1]);
-        printf("Default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+        fprintf(stderr,"Default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
       } else {
-        printf("No default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+        fprintf(stderr,"No default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
       }
     }
     if (conn) mysql_close(conn);
@@ -1702,7 +1702,7 @@ int hent_mythtv_playlist(int playlistnr) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           songintnr=atoi(row[0]);
           songantal=atol(row[1]);
-          printf("Song antal fundet = %ld \n",songantal);
+          fprintf(stderr,"Song antal fundet = %ld \n",songantal);
           // find cd cover samt sange info i mythtv music database
           sprintf(sqlselect,"select song_id,filename,directory_id,music_albums.album_name,name,music_artists.artist_id,music_artists.artist_name,length from music_songs,music_artists,music_albums where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id",songintnr);
           mysql_query(conn,sqlselect);
@@ -1728,7 +1728,7 @@ int hent_mythtv_playlist(int playlistnr) {
               if (file_exists(tmptxt3)) {
                 texture=loadTexture(tmptxt3);				// load texture
               } else {
-                printf(" Error loading texture file : %s \n",tmptxt3);
+                fprintf(stderr," Error loading texture file : %s \n",tmptxt3);
                 texture=0;
               }
             }
@@ -1945,14 +1945,14 @@ int initlirc() {
       if(flags!=-1) {
         fcntl(sock,F_SETFL,flags|O_NONBLOCK);
       }
-      printf("Lirc mythtv-controller info loaded.\n");
+      fprintf(stderr,"Lirc mythtv-controller info loaded.\n");
     }
-    printf("Remote control init done ok (config file found at %s.\n","~/.config/lirc/mythtv-controller.lircrc");
+    fprintf(stderr,"Remote control init done ok (config file found at %s.\n","~/.config/lirc/mythtv-controller.lircrc");
     return(sock);
   } else {
     // no lirc support error
-    printf("Remote control not found...\n");
-    printf("No lirc. (No remote control support)\n");
+    fprintf(stderr,"Remote control not found...\n");
+    fprintf(stderr,"No lirc. (No remote control support)\n");
   }
   return(-1);
 }
@@ -1986,7 +1986,7 @@ int init_ttf_fonts() {
     count = glcGeti(GLC_CATALOG_COUNT);
     // Print the path to the catalog
     for (ii = 0; ii < count; ii++) {
-      printf("Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
+      fprintf(stderr,"Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
     }
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
@@ -2032,7 +2032,7 @@ void doexitcommand() {
     fgets(command,1023,file);
     fclose(file);
     if (command!=NULL) ok=true;
-    printf("Command to run %s \n",command);
+    fprintf(stderr,"Command to run %s \n",command);
   }
   if (ok) system(command);
 }
@@ -2110,7 +2110,7 @@ unsigned int do_playlist_restore_playlist() {
           if (res1) {
             while ((row1 = mysql_fetch_row(res1)) != NULL) {
               if (fundet==false) {
-                printf("Found playlist %s updating ",playlistname);
+                fprintf(stderr,"Found playlist %s updating ",playlistname);
                 sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs='', music_playlist.length=0, music_playlist.songcount=0 where playlist_id=%s",row1[0]);
                 mysql_query(conn,"set NAMES 'utf8'");
                 res2 = mysql_store_result(conn);
@@ -2124,7 +2124,7 @@ unsigned int do_playlist_restore_playlist() {
               songlength=atol(row[8]);							// get song length
               // if song exist update playlist
               if ( songplacering > 0 ) {
-                printf(".");
+                fprintf(stderr,".");
                 sprintf(sqlselect,"update music_playlists set music_playlist.playlist_songs=concat(playlist_songs,',%ld'), music_playlist.songcount=music_playlist.songcount+1, music_playlist.length=music_playlist.length+%s where music_playlist.playlist_id=%ld",songplacering,row1[0],songlength);
                 mysql_query(conn,"set NAMES 'utf8'");
                 res2 = mysql_store_result(conn);
@@ -2133,10 +2133,10 @@ unsigned int do_playlist_restore_playlist() {
               } // endif
             } // endwhile
           } // endif
-          printf("\n");
+          fprintf(stderr,"\n");
           if (!( fundet )) {
             // else create new playlist
-            printf("Create new playlist %s......\n",playlistname);
+            fprintf(stderr,"Create new playlist %s......\n",playlistname);
             songplacering=find_music_song_placering(row[1],row[2]);
             sprintf(sqlselect,"insert into music_playlists values (0,'%s','%ld','','%s',1,'')",playlistname,songplacering,row[8]);
             mysql_query(conn,"set NAMES 'utf8'");
@@ -2192,7 +2192,7 @@ unsigned int do_playlist_backup_playlist() {
     mysql_query(conn,sqlselect);
     res2 = mysql_store_result(conn);
     if (!( res2 )) {
-        printf("NO create temp database\n ");
+        fprintf(stderr,"NO create temp database\n ");
         return(0);
     }
     // Hent playlistes med sange tilknyttet elementer i playlist_songs array
@@ -2204,7 +2204,7 @@ unsigned int do_playlist_backup_playlist() {
         playlistnr=atol(row3[0]);							// hent playlist nr
         strcpy(playlistname,row3[1]);						// hent playlistname
         finish = false;
-        printf("Save music info from playlist name:%s \n",playlistname);
+        fprintf(stderr,"Save music info from playlist name:%s \n",playlistname);
         i=0;
         while(!(finish)) {
           sprintf(sqlselect,"SELECT substring_index(substring_index(playlist_songs,',',%d),',',-1) as songs,songcount FROM music_playlist where playlist_id=%d",songnr,playlistnr);
@@ -2824,7 +2824,7 @@ void display() {
       }
     }
     if ((visur==0) && (sleep_ok==0) && (remove_log_file)) {
-      printf("remove logfile\n");
+      fprintf(stderr,"remove logfile\n");
       remove("mythtv-controller.lock");       // fjern lock file
       sleeper = 1;
       sleep_ok = 0;
@@ -3071,7 +3071,7 @@ void display() {
       show_newmovietimeout = 0;
       vis_nyefilm_oversigt = false;
       if ((vis_tv_oversigt) && (getstarttidintvguidefromarray == true)) {
-        printf("fundet start record in tv guide nr %d \n",aktiv_tv_oversigt.find_start_pointinarray(0));
+        fprintf(stderr,"fundet start record in tv guide nr %d \n",aktiv_tv_oversigt.find_start_pointinarray(0));
         tvsubvalgtrecordnr = aktiv_tv_oversigt.find_start_pointinarray(0)-1;
         tvvalgtrecordnr = 0;
         getstarttidintvguidefromarray = false;
@@ -3679,7 +3679,7 @@ void display() {
           }
           #if defined USE_SDL_MIXER
           if (sdlmusicplayer==0) {
-              printf("Setup SDL_MIXER soundsystem\n");
+              fprintf(stderr,"Setup SDL_MIXER soundsystem\n");
               // load support for the OGG and MOD sample/music formats
               int flags=MIX_INIT_OGG|MIX_INIT_MP3|MIX_INIT_FLAC;
               SDL_Init(SDL_INIT_AUDIO);
@@ -3687,7 +3687,7 @@ void display() {
               /* This is where we open up our audio device.  Mix_OpenAudio takes
               as its parameters the audio format we'd /like/ to have. */
               if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
-                  printf("Unable to open audio!\n");
+                  fprintf(stderr,"Unable to open audio!\n");
                   exit(1);
               }
               /* If we actually care about what we got, we can ask here.
@@ -3695,8 +3695,8 @@ void display() {
               Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
               sdlmusic=Mix_Init(flags);
               if(sdlmusic&flags != flags) {
-                  printf("Mix_Init: Failed to init required ogg,mp3,flac support!\n");
-                  printf("Mix_Init: %s\n", Mix_GetError());
+                  fprintf(stderr,"Mix_Init: Failed to init required ogg,mp3,flac support!\n");
+                  fprintf(stderr,"Mix_Init: %s\n", Mix_GetError());
                   // handle error
               }
           }
@@ -3729,7 +3729,7 @@ void display() {
             sdlmusicplayer=Mix_LoadMUS(aktivplay_music_path);
             Mix_PlayMusic(sdlmusicplayer, 0);
             if (!(sdlmusicplayer)) {
-              printf("Error load music. %s\n",aktivplay_music_path);
+              fprintf(stderr,"Error load music. %s\n",aktivplay_music_path);
               ERRCHECK_SDL(Mix_GetError(),rknapnr);
             }
             if (sdlmusicplayer) {
@@ -3782,10 +3782,10 @@ void display() {
                 }
                 //printf("%s=%s string length= (%d bytes) \n",tag.name, (char *) tag.data, tag.datalen);
               } else if ((FMOD_TAGTYPE) tag.datatype==FMOD_TAGTYPE_SHOUTCAST) {
-                printf("FMOD_TAGTYPE_SHOUTCAST\n");
+                fprintf(stderr,"FMOD_TAGTYPE_SHOUTCAST\n");
                 //printf("%s = <binary> (%d bytes)\n", tag.name, tag.datalen);
               } else if ((FMOD_TAGTYPE) tag.datatype==FMOD_TAGTYPE_ID3V1) {
-                printf("FMOD_TAGTYPE_ID3V1\n");
+                fprintf(stderr,"FMOD_TAGTYPE_ID3V1\n");
               }
             }
           }
@@ -3800,7 +3800,7 @@ void display() {
         pthread_t loaderthread;           // check radio status thread
         int rc=pthread_create(&loaderthread,NULL,radio_check_statusloader,NULL);
         if (rc) {
-          printf("ERROR; return code from pthread_create() is %d\n", rc);
+          fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
           exit(-1);
         }
       }
@@ -3849,7 +3849,7 @@ void display() {
           if (musicoversigt[mknapnr-1].oversigttype==-1) {
             if (debugmode & 2) fprintf(stderr,"Loading song from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);
             if (hent_mythtv_playlist(musicoversigt[mknapnr-1].directory_id)==0) {		// tilføj musik valgte til playliste + load af covers
-              printf("**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt[mknapnr-1].directory_id);
+              fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt[mknapnr-1].directory_id);
               exit(2);
             }
             do_play_music_aktiv_table_nr = 1;						// sæt start play aktiv nr
@@ -4949,10 +4949,10 @@ void display() {
           spectrum_right[zz] = 0.0f;                                            // used for spectium
           uvmax_values[zz] = 0.0f;                                              // used for spectium
         }
-        printf("Create table\n");
+        fprintf(stderr,"Create table\n");
         for (int i=0;i<13;i++) {
           frequencyOctaves[i]=(int) (44100/2)/(float) pow(2,12-i);
-          printf("%d \n",frequencyOctaves[i]);
+          fprintf(stderr,"%d \n",frequencyOctaves[i]);
         }
       }
       FMOD::ChannelGroup *mastergroup;
@@ -4966,7 +4966,7 @@ void display() {
         dsp->setActive(true);
       }
       result=dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
-      if (result!=FMOD_OK) printf("Error DSP %s\n",FMOD_ErrorString(result));
+      if (result!=FMOD_OK) fprintf(stderr,"Error DSP %s\n",FMOD_ErrorString(result));
       #endif
       int length = fft->length/2;
       int numChannels = fft->numchannels;
@@ -5204,8 +5204,8 @@ void display() {
     if (do_save_config) {
       do_save_config = false;
       if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
-        printf("Error saving config file mythtv-controller.conf\n");
-      } else printf("Saving config ok.\n");
+        fprintf(stderr,"Error saving config file mythtv-controller.conf\n");
+      } else fprintf(stderr,"Saving config ok.\n");
       // crash crash
       //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
@@ -5215,7 +5215,7 @@ void display() {
     }
     // update rss db
     if (do_save_setup_rss) {
-      if (debugmode) printf("Saving rssdb to mysql\n");
+      if (debugmode) fprintf(stderr,"Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
       streamoversigt.loadrssfile(1);                                            // download rss files (())
       do_save_setup_rss=false;
@@ -5260,7 +5260,7 @@ void display() {
         do_play_music_aktiv_table_nr=1;			// reset play start nr
         if (debugmode & 16) fprintf(stderr,"Stop playing media/wideo if any \n");
         if (film_oversigt.film_is_playing) {
-          if (debugmode) printf("Stop playing last movie before start new\n");
+          if (debugmode) fprintf(stderr,"Stop playing last movie before start new\n");
           // stop playing (active movie)
           film_oversigt.softstopmovie();
         }
@@ -5296,7 +5296,7 @@ void display() {
         stream_playing_icon=streamoversigt.get_texture(stream_playnr-1);
       }
       if (strcmp("default",configdefaultplayer)!=0)  {
-        printf("Start stream nr %d Player is firefox \n",sknapnr);
+        fprintf(stderr,"Start stream nr %d Player is firefox \n",sknapnr);
         strcpy(systemcommand,"/bin/sh /usr/bin/firefox ");
         strcat(systemcommand,"'");
         if (sknapnr>0) {
@@ -5313,8 +5313,8 @@ void display() {
       } else {
         // start play stream or show rss page
         if (debugmode & 4) {
-          printf("Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
-          printf("Start stream. Player is internal \n");
+          fprintf(stderr,"Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
+          fprintf(stderr,"Start stream. Player is internal \n");
         }
         // stop playing stream
         if (streamoversigt.stream_is_playing) {
@@ -5366,7 +5366,7 @@ void display() {
         strcpy(stream_playing_desc,"");
         stream_playing_icon = 0;
         if (streamoversigt.stream_is_playing) {
-          if (debugmode) printf("Stop playing stream\n");
+          if (debugmode) fprintf(stderr,"Stop playing stream\n");
           // stop playing (active movie)
           //film_oversigt.softstopmovie();
         }
@@ -5385,7 +5385,7 @@ void display() {
         recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
         //strcat(systemcommand,configrecordpath);
         strcat(systemcommand,temptxt);
-        if (debugmode & 64) printf("Start command :%s \n",systemcommand);
+        if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
         system(systemcommand);
         do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
       } else {
@@ -5941,7 +5941,7 @@ void display() {
     }
 
     if (do_update_spotify) {
-      printf("Start phread spotify update loader \n");
+      fprintf(stderr,"Start phread spotify update loader \n");
       update_spotify_phread_loader();                                           //
       update_webserver_phread_loader();                                         //
       do_update_spotify = false;
@@ -6170,7 +6170,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         if ((GLubyte) names[i*4+3]==45) {
           fundet = true;
-          printf("45 Button pressed \n");
+          fprintf(stderr,"45 Button pressed \n");
         }
       }
       // main menu
@@ -6190,7 +6190,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // test for menu select music
         if ((GLubyte) names[i*4+3]==2) {
-          if (debugmode) printf("Select vis_radio_and_music \n");
+          if (debugmode) fprintf(stderr,"Select vis_radio_and_music \n");
           vis_radio_or_music_oversigt=!vis_radio_or_music_oversigt;
           //vis_radio_oversigt=!vis_radio_oversigt;
           //vis_music_oversigt=!vis_music_oversigt;
@@ -6276,17 +6276,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (!(fundet)) {
           // we have a select mouse/touch element dirid
           if ((GLubyte) names[i*4+3]==23) {
-            if (debugmode & 4) printf("scroll down\n");
+            if (debugmode & 4) fprintf(stderr,"scroll down\n");
             returnfunc = 1;
             fundet = true;
           }
           if ((GLubyte) names[i*4+3]==24) {
-            if (debugmode & 4) printf("scroll up\n");
+            if (debugmode & 4) fprintf(stderr,"scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
           if ((GLubyte) names[i*4+3]==27) {
-            printf("Close stream info\n");
+            fprintf(stderr,"Close stream info\n");
             returnfunc = 2;
             do_zoom_stream_cover = false;
             do_stop_stream = true;                                            // flag to stop play
@@ -6304,19 +6304,19 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // we have a select mouse/touch element dirid
           // scroll down
           if ((GLubyte) names[i*4+3]==23) {
-            if (debugmode & 8) printf("scroll down\n");
+            if (debugmode & 8) fprintf(stderr,"scroll down\n");
             returnfunc = 1;
             fundet = true;
           }
           // scroll up
           if ((GLubyte) names[i*4+3]==24) {
-            printf("scroll up\n");
+            fprintf(stderr,"scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
           // close window
           if ((GLubyte) names[i*4+3]==27) {
-            printf("Close movie info\n");
+            fprintf(stderr,"Close movie info\n");
             returnfunc = 2;
             do_zoom_film_cover = false;
             fundet = true;
@@ -6758,7 +6758,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // we have a select mouse/touch
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
           fknapnr=(GLuint) names[i*4+3]-99;			                                // get movie id
-          printf("Film selected=%d\n",fknapnr);                                 //
+          fprintf(stderr,"Film selected=%d\n",fknapnr);                                 //
           fundet = true;
         }
       }
@@ -6776,7 +6776,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
           fknapnr=(GLuint) names[i*4+3]-99;                       // hent filmknap nr
-          printf("Film new selected=%d\n",fknapnr);
+          fprintf(stderr,"Film new selected=%d\n",fknapnr);
           fundet = true;
         }
       }
@@ -7058,9 +7058,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 // set flag to update
                 if ((do_show_tvgraber) && (retfunc==0)) {
-                  printf("* Delete old tvguide *\n");
+                  fprintf(stderr,"* Delete old tvguide *\n");
                   unlink("~/tvguide_channels.dat");
-                  printf("* Update new tvguide *\n");
+                  fprintf(stderr,"* Update new tvguide *\n");
                   hent_tv_channels=false;
                 }
               }
@@ -7093,7 +7093,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
               // close vis stream play
               if ((vis_stream_oversigt) && (state==GLUT_UP)) {
-                if (debugmode & 4) printf("sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
+                if (debugmode & 4) fprintf(stderr,"sknapnr %d stream_playnr %d \n",sknapnr,stream_playnr);                                      // show last selected no stream is playing (stream_playnr=0)
                 if ((sknapnr>0) && (stream_playnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
               }
               //
@@ -7212,19 +7212,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // open spotify playlist
           if (((retfunc==3) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            printf("Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
+            fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
           }
           // play spotify playlist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
-            printf("play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            fprintf(stderr,"play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               // try load and start playing playlist
               spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               //do_select_device_to_play=false;
-              if (spotify_player_start_status==0) printf("spotify start play return ok.\n");
-                else printf("spotify start play return value %d \n ",spotify_player_start_status);
+              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
+                else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
                 strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
                 do_play_spotify_cover=true;
@@ -7234,11 +7234,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // play song not playlist
           if ((retfunc==5) || (button==3)) {
-            printf("play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            //fprintf(stderr,"play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-              if (spotify_player_start_status==0) printf("spotify start play return ok.\n");
-                else printf("spotify start play return value %d \n ",spotify_player_start_status);
+              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
+                else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
@@ -7319,7 +7319,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //
             strncpy(temptxt,streamoversigt.get_stream_name(sknapnr-1),200);
             streamoversigt.clean_stream_oversigt();
-            printf("stream nr %d name %s \n ",sknapnr-1,temptxt);
+            fprintf(stderr,"stream nr %d name %s \n ",sknapnr-1,temptxt);
             streamoversigt.opdatere_stream_oversigt(temptxt,(char *)"");
             do_play_stream=false;
           } else if ((sknapnr-1>0) && (streamoversigt.type!=1)) {
@@ -7352,7 +7352,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (streamoversigt.get_stream_url(sknapnr-1)) startstream=true;
               do_zoom_stream=true;                    // set show player
             }
-            printf("Set show playing stream\n ");
+            fprintf(stderr,"Set show playing stream\n ");
           }
           //sknapnr=0;
           stream_key_selected = 1;
@@ -7421,7 +7421,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
         case 2:
                 // F2 exit app key
-                printf("Close down now exit(2)\n");
+                fprintf(stderr,"Close down now exit(2)\n");
                 remove("mythtv-controller.lock");
                 exit(2);
                 break;
@@ -8227,7 +8227,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
-      if (show_setup_rss) printf("Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
+      if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
       if (vis_spotify_oversigt) fprintf(stderr,"Spotify_key_selected = %d  spotify_select_iconnr = %d spotifyoversigt_antal= \n ",spotify_key_selected,spotify_select_iconnr);
     }
 }
@@ -8464,7 +8464,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';       // else input key text in buffer
                 }
-                fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               }
             }
 
@@ -8657,7 +8657,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                     keybuffer[keybufferindex] = key;
                     keybufferindex++;
                     keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                    if (debugmode) printf("Keybuffer=%s\n",keybuffer);
+                    //if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
                   }
                 }
                 // video player screen mode
@@ -9098,7 +9098,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // load tv guide
               if (vis_tv_oversigt) {
                 // load tv guide
-                if (debugmode) printf("Loading tvguidedb file\n");
+                if (debugmode) fprintf(stderr,"Loading tvguidedb file\n");
                 aktiv_tv_oversigt.loadparsexmltvdb();
               }
               break;
@@ -9120,7 +9120,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // do save playlist
               if (vis_music_oversigt) {
                 // save playlist
-                printf("Ask save playlist\n");
+                fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
               }
               break;
@@ -9134,7 +9134,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((vis_tv_oversigt) && (loading_tv_guide==false)) {
                 // u key
                 // Update tv guide
-                printf("Update tv guide\n");
+                fprintf(stderr,"Update tv guide\n");
                 tv_guide_firsttime_update = true;
                 // set flag for show update
                 do_update_xmltv_show = true;
@@ -9168,18 +9168,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 pthread_t loaderthread1;                                          // loader thread
                 // start multi thread and update movie overview
                 // movie loader
-                if (debugmode) printf("Update movie db.\n");
+                if (debugmode) fprintf(stderr,"Update movie db.\n");
                 if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
                   int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
                   if (rc1) {
-                    printf("ERROR; return code from pthread_create() is %d\n", rc1);
+                    fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
                     exit(-1);
                   }
                 } else {
                   if (configmythtvver>=0) {
                     int rc1=pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
                     if (rc1) {
-                      printf("ERROR; return code from pthread_create() is %d\n", rc1);
+                      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
                       exit(-1);
                     }
                   }
@@ -9353,7 +9353,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_tv_oversigt) {
                 // hvis der trykkes enter på default ask_tv_record (yes)
                 // blivere den sat til record mode (create mysql data in record table)
-                printf("Ask om vi skal optage program \n");
+                fprintf(stderr,"Ask om vi skal optage program \n");
                 if ((ask_tv_record) && (do_zoom_tvprg_aktiv_nr>0)) {
                   // do it
                   // set start record tv prgoram
@@ -9430,14 +9430,14 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_spotify_oversigt) {
                 if (do_select_device_to_play) {
                   // select device to play on
-                  if (debugmode) printf("Send play command to spotify device \n");
+                  if (debugmode) fprintf(stderr,"Send play command to spotify device \n");
                   spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( (spotifyknapnr+spotify_selected_startofset)-1 ) ,1);
                   // close window again
                   do_select_device_to_play=false;
                 }
                 // search func
                 if (!(do_select_device_to_play)) {
-                  if (debugmode) printf("Start search spotify \n");
+                  if (debugmode) fprintf(stderr,"Start search spotify \n");
                 }
               }
 
@@ -9447,8 +9447,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (strcmp(configbackend_tvgraber_old,configbackend_tvgraber)!=0) {
                   // clean all tv guide data and reload
                   // remove config dat file
-                  printf("* Delete old tvguide *\n");
-                  printf("* Update new tvguide *\n");
+                  fprintf(stderr,"* Delete old tvguide *\n");
+                  fprintf(stderr,"* Update new tvguide *\n");
                   getuserhomedir(path);
                   strcat(path,"/tvguide_channels.dat");
                   unlink(path);
@@ -11936,7 +11936,7 @@ void update(int value) {
                       tvknapnr=tvsubvalgtrecordnr;
                       do_zoom_tvprg_aktiv_nr=tvknapnr;
                       ask_tv_record=!ask_tv_record;
-                      if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else printf("lirc Hide tvprogram info.\n");
+                      if (ask_tv_record) fprintf(stderr,"lirc Show tvprogram info.\n"); else fprintf(stderr,"lirc Hide tvprogram info.\n");
                     }
                     // start play radio
                     if ((vis_radio_oversigt) && (!(show_radio_options))) {
@@ -12023,20 +12023,20 @@ int init_sound_system(int devicenr) {
     unsigned int handle=0;
     char name[256];
     #if defined USE_FMOD_MIXER
-    printf("Setup FMOD soundsystem\n");
+    fprintf(stderr,"Setup FMOD soundsystem\n");
     result = FMOD::System_Create(&sndsystem);
     ERRCHECK(result,0);
     result = sndsystem->getVersion(&fmodversion);
     ERRCHECK(result,0);
     if (fmodversion < FMOD_VERSION) {
-       printf("Error!  You are using an old version of FMOD %08x.  This program requires %08x\n", fmodversion, FMOD_VERSION);
+       fprintf(stderr,"Error!  You are using an old version of FMOD %08x.  This program requires %08x\n", fmodversion, FMOD_VERSION);
        exit(0);
     }
     //result = sndsystem->getDriverCaps(0, &caps, 0, 0, &speakermode);
     //ERRCHECK(result,0);
     for(int n=0;n<9;n++) strcpy(avalible_device[n],"");
-    printf("\nSound cards \n");
-    printf("-----------\n");
+    fprintf(stderr,"\nSound cards \n");
+    fprintf(stderr,"-----------\n");
     int numdrivers;
     result = sndsystem->getNumDrivers(&numdrivers);
     ERRCHECK(result,0);
@@ -12046,13 +12046,13 @@ int init_sound_system(int devicenr) {
        result = sndsystem->getDriverInfo(count, name, sizeof(name), 0,0,0,0);
        ERRCHECK(result,0);
        strcpy(avalible_device[count],name);			// save device name to list
-       printf(" %d - %s\n", count , name);
+       fprintf(stderr," %d - %s\n", count , name);
     }
     if (devicenr>numdrivers) devicenr=0;			// hvis der er valgt et soundcard i config filen som ikke findes vælg default
     // setlect default soundcard=0
     result = sndsystem->getDriverInfo(devicenr, fmoddrivername, sizeof(name),0,0,0,0);
     ERRCHECK(result,0);
-    printf("\nUse FMOD Driver :%s\n",fmoddrivername);
+    fprintf(stderr,"\nUse FMOD Driver :%s\n",fmoddrivername);
     result = sndsystem->getNumPlugins(FMOD_PLUGINTYPE_CODEC, &num);
     ERRCHECK(result,0);
     for (count = 0; count < num; count++) {
@@ -12085,14 +12085,14 @@ int init_sound_system(int devicenr) {
     strcpy(configmythsoundsystem,avalible_device[0]);
     #endif
     #if defined USE_SDL_MIXER
-    printf("Setup SDL_MIXER soundsystem\n");
+    fprintf(stderr,"Setup SDL_MIXER soundsystem\n");
     // load support for the OGG and MOD sample/music formats
     int flags=MIX_INIT_OGG|MIX_INIT_MP3|MIX_INIT_FLAC;
     SDL_Init(SDL_INIT_AUDIO);
     /* This is where we open up our audio device.  Mix_OpenAudio takes
     as its parameters the audio format we'd /like/ to have. */
     if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers)) {
-        printf("Unable to open audio!\n");
+        fprintf(stderr,"Unable to open audio!\n");
         exit(1);
     }
     /* If we actually care about what we got, we can ask here.
@@ -12100,8 +12100,8 @@ int init_sound_system(int devicenr) {
     Mix_QuerySpec(&audio_rate, &audio_format, &audio_channels);
     sdlmusic=Mix_Init(flags);
     if(sdlmusic&flags != flags) {
-      printf("Mix_Init: Failed to init required ogg,mp3,flac support!\n");
-      printf("Mix_Init: %s\n", Mix_GetError());
+      fprintf(stderr,"Mix_Init: Failed to init required ogg,mp3,flac support!\n");
+      fprintf(stderr,"Mix_Init: %s\n", Mix_GetError());
       // handle error
     }
     #endif
@@ -12119,7 +12119,7 @@ int init_sound_system(int devicenr) {
 void *radio_check_statusloader(void *data) {
   bool notdone=false;
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting - Start checkling radio status's thread\n");
+  fprintf(stderr,"loader thread starting - Start checkling radio status's thread\n");
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
     do {
@@ -12131,7 +12131,7 @@ void *radio_check_statusloader(void *data) {
       notdone=radiooversigt.check_radio_online(0);
     } while (notdone);
   }
-  printf("radio thread done\n");
+  fprintf(stderr,"radio thread done\n");
   pthread_exit(NULL);
 }
 
@@ -12144,19 +12144,19 @@ void *radio_check_statusloader(void *data) {
 
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode % 1) printf("loader thread starting - Loading music info.\n");
+  if (debugmode % 1) fprintf(stderr,"loader thread starting - Loading music info.\n");
   if (strcmp(configbackend,"mythtv")==0) {
     // opdatere music oversigt
     // hent alt music info fra database
     // check if internal music db exist if yes do set global use it
     if (global_use_internal_music_loader_system_exist() == true) {
-      if (debugmode % 2) printf("******** Use global music database ********\n");
+      if (debugmode % 2) fprintf(stderr,"******** Use global music database ********\n");
       global_use_internal_music_loader_system = true;
     } else {
-      if (debugmode & 2) printf("Search for music in :%s\n",configdefaultmusicpath);
+      if (debugmode & 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
       // build new db (internal db loader)
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
-      if (debugmode & 2) printf("Done update db from datasource.\n");
+      if (debugmode & 2) fprintf(stderr,"Done update db from datasource.\n");
       global_use_internal_music_loader_system = true;
     }
     // update music db from disk
@@ -12169,18 +12169,18 @@ void *datainfoloader_music(void *data) {
     // load music db created by opdatere_music_oversigt_nodb function
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
       //opdatere_music_oversigt_icons(); 					// load gfx icons
-      if (debugmode & 2) printf("Nusic db loaded.\n");
+      if (debugmode & 2) fprintf(stderr,"Nusic db loaded.\n");
     }
   } else {
-    if (debugmode % 2) printf("Search for music in :%s\n",configdefaultmusicpath);
+    if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
     // update music db from disk
     if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
-      if (debugmode & 2) printf("No music db loaded\n");
+      if (debugmode & 2) fprintf(stderr,"No music db loaded\n");
     }
     opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
-  if (debugmode & 1) printf("loader thread done loaded music info\n");
+  if (debugmode & 1) fprintf(stderr,"loader thread done loaded music info\n");
   pthread_exit(NULL);
 }
 
@@ -12196,13 +12196,13 @@ void *datainfoloader_movie(void *data) {
 
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
-    if (debugmode & 16) printf("loader thread starting - Loading movie info from mythtv.\n");
+    if (debugmode & 16) fprintf(stderr,"loader thread starting - Loading movie info from mythtv.\n");
     film_oversigt.opdatere_film_oversigt();     	              // gen covers 3d hvis de ikke findes.
     do_update_moviedb=false;                                    // set done
   } else {
-    if (debugmode & 16) printf("Load movie from xbmc/kodi\n");
+    if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
   }
-  if (debugmode & 16) printf("loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  if (debugmode & 16) fprintf(stderr,"loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
   pthread_exit(NULL);
 }
 
@@ -12213,10 +12213,10 @@ void *datainfoloader_movie(void *data) {
 //
 
 void *datainfoloader_stream(void *data) {
-  if (debugmode & 4) printf("loader thread starting - Loading stream info from rss feed.\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading stream info from rss feed.\n");
   streamoversigt.loadrssfile(0);                                              // download rss files (())
   streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-  if (debugmode & 4) printf("loader thread done loaded stream stations \n");
+  if (debugmode & 4) fprintf(stderr,"loader thread done loaded stream stations \n");
   do_update_rss_show=false;
   pthread_exit(NULL);
 }
@@ -12227,9 +12227,9 @@ void *datainfoloader_stream(void *data) {
 //
 
 void *datainfoloader_spotify(void *data) {
-  if (debugmode & 4) printf("loader thread starting - Loading spotify info from db.\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);
-  if (debugmode & 4) printf("loader thread done loaded spotify\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
   pthread_exit(NULL);
 }
 
@@ -12250,7 +12250,7 @@ void *datainfoloader_webserver(void *data) {
     // run time server to update spotify token
     if (difftime(nowdate, lasttime)>3500) {
       time(&lasttime);
-      printf("update spotify token\n");
+      fprintf(stderr,"update spotify token\n");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
         spotify_oversigt.spotify_refresh_token();
       }
@@ -12268,7 +12268,7 @@ void *datainfoloader_webserver(void *data) {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode & 256) printf("Thread xmltv file parser starting....\n");
+  if (debugmode & 256) fprintf(stderr,"Thread xmltv file parser starting....\n");
   //
   // multi thread
   // load xmltvguide from web
@@ -12279,12 +12279,12 @@ void *datainfoloader_xmltv(void *data) {
       //save array to disk
       aktiv_tv_oversigt.saveparsexmltvdb();
     } else {
-      if (debugmode & 256) printf("Parse xmltv error (mysql connection error)\n");
+      if (debugmode & 256) fprintf(stderr,"Parse xmltv error (mysql connection error)\n");
     }
   }
     // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  if (debugmode & 256) printf("parser xmltv guide done.\n");
+  if (debugmode & 256) fprintf(stderr,"parser xmltv guide done.\n");
   // set update flag for done
   do_update_xmltv_show=false;
   //pthread_mutex_unlock(&count_mutex);
@@ -12301,7 +12301,7 @@ void *update_xmltv_phread_loader() {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_xmltv,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
   }
@@ -12317,7 +12317,7 @@ void *update_rss_phread_loader() {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
   }
@@ -12333,7 +12333,7 @@ void *update_music_phread_loader() {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_music,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
   }
@@ -12349,7 +12349,7 @@ void *update_spotify_phread_loader() {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_spotify,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
   }
@@ -12365,7 +12365,7 @@ void *update_webserver_phread_loader() {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_webserver,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() webserver is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() webserver is %d\n", rc2);
       exit(-1);
     }
   }
@@ -12378,7 +12378,7 @@ void *update_webserver_phread_loader() {
 
 void *datainfoloader(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting\nLoading data from mythtv.\n");
+  fprintf(stderr,"loader thread starting\nLoading data from mythtv.\n");
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
       // Opdatere tv oversigt fra mythtv db
@@ -12397,7 +12397,7 @@ void *datainfoloader(void *data) {
       //create_radio_oversigt();										                          // Create radio mysql database if not exist
       //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
   }
-  printf("loader thread done loaded %d radio stations \n",radiooversigt_antal);
+  fprintf(stderr,"loader thread done loaded %d radio stations \n",radiooversigt_antal);
   pthread_exit(NULL);
 }
 
@@ -12430,7 +12430,7 @@ void *xbmcdatainfoloader(void *data) {
   bool allokay=false;
 
   //pthread_mutex_lock(&count_mutex);
-  printf("loader thread starting - Loading music from xbmc/kodi).\n");
+  fprintf(stderr,"loader thread starting - Loading music from xbmc/kodi).\n");
   //pthread_mutex_unlock(&count_mutex);
 
   conn=mysql_init(NULL);
@@ -12469,14 +12469,14 @@ void *xbmcdatainfoloader(void *data) {
 
 
   if ((allokay) && (strcmp(configbackend,"xbmc")==0) && (!(dbexist))) {
-    if (debugmode & 2) printf("XBMC - Loader starting.....\n");
+    if (debugmode & 2) fprintf(stderr,"XBMC - Loader starting.....\n");
 
     // get user homedir
     getuserhomedir(userhomedir);
     strcat(userhomedir,"/.kodi/userdata/Database/");
     dirp=opendir(userhomedir);                                // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
-        if (debugmode & 2) printf("No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
+        if (debugmode & 2) fprintf(stderr,"No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
         exit(0);
     }
     // loop dir and update music songs db
@@ -12487,27 +12487,27 @@ void *xbmcdatainfoloader(void *data) {
         if ((strncmp(filename,"MyMusic",7)==0) && (!(kodiverfound))) {
           if (strcmp(filename,kodiver[0])==0) {
             kodiverfound=16;
-            if (debugmode & 2) printf("Kodi version 16 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 16 is found \n");
           }
           if (strcmp(filename,kodiver[1])==0) {
             kodiverfound=15;
-            if (debugmode & 2) printf("Kodi version 15 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 15 is found \n");
           }
           if (strcmp(filename,kodiver[2])==0) {
             kodiverfound=14;
-            if (debugmode & 2) printf("Kodi version 14 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 14 is found \n");
           }
           if (strcmp(filename,kodiver[3])==0) {
             kodiverfound=13;
-            if (debugmode & 2) printf("Kodi version 13 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 13 is found \n");
           }
           if (strcmp(filename,kodiver[4])==0) {
             kodiverfound=12;
-            if (debugmode & 2) printf("Kodi version 12 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 12 is found \n");
           }
           if (strcmp(filename,kodiver[5])==0) {
             kodiverfound=11;
-            if (debugmode & 2) printf("Kodi version 11 is found \n");
+            if (debugmode & 2) fprintf(stderr,"Kodi version 11 is found \n");
           }
         }
       }
@@ -12543,26 +12543,26 @@ void *xbmcdatainfoloader(void *data) {
 //    xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
     if (xbmcSQL) {
         xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
-        printf("XBMC - Load running\n");
+        fprintf(stderr,"XBMC - Load running\n");
         //xbmcclient->SendNOTIFICATION("test", "message", 0);
 
         // load xbmc movie db
         //xbmcSQL->xbmc_readmoviedb();   // IN use
         xbmcSQL->xbmc_readmusicdb();     // IN use
-        printf("XBMC - loader done.\n");
+        fprintf(stderr,"XBMC - loader done.\n");
         //create_radio_oversigt();									// Create radio mysql database if not exist
         //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
     } else {
-      if (debugmode & 2) printf("Error loading kodi db\n");
+      if (debugmode & 2) fprintf(stderr,"Error loading kodi db\n");
       exit(1);
     }
-    if (debugmode & 2) printf("loader thread done loaded kodi \n");
+    if (debugmode & 2) fprintf(stderr,"loader thread done loaded kodi \n");
   }
   // set use internal db for music
   global_use_internal_music_loader_system = true;
   // load db
-  if (debugmode & 2) printf("Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
-  if (debugmode & 2) printf("Nusic db loaded.\n");
+  if (debugmode & 2) fprintf(stderr,"Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
+  if (debugmode & 2) fprintf(stderr,"Nusic db loaded.\n");
   pthread_exit(NULL);
 }
 
@@ -12662,7 +12662,7 @@ void *xbmcdatainfoloader_movie(void *data) {
     strcat(userhomedir,"/.kodi/userdata/Database");
     dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
-      printf("No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
+      fprintf(stderr,"No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
       exit(0);
     }
     // loop dir and update music songs db
@@ -12674,27 +12674,27 @@ void *xbmcdatainfoloader_movie(void *data) {
         if ((strncmp(filename,"MyVideos",8)==0) && (!(kodiverfound))) {
           if (strcmp(filename,kodivermovie[0])==0) {
             kodiverfound = 17;
-            printf("Kodi version 17 is found \n");
+            fprintf(stderr,"Kodi version 17 is found \n");
           }
           if (strcmp(filename,kodivermovie[1])==0) {
             kodiverfound = 15;
-            printf("Kodi version 15 is found \n");
+            fprintf(stderr,"Kodi version 15 is found \n");
           }
           if (strcmp(filename,kodivermovie[2])==0) {
             kodiverfound = 14;
-            printf("Kodi version 14 is found \n");
+            fprintf(stderr,"Kodi version 14 is found \n");
           }
           if (strcmp(filename,kodivermovie[3])==0) {
             kodiverfound = 13;
-            printf("Kodi version 13 is found \n");
+            fprintf(stderr,"Kodi version 13 is found \n");
           }
           if (strcmp(filename,kodivermovie[4])==0) {
             kodiverfound = 12;
-            printf("Kodi version 12 is found \n");
+            fprintf(stderr,"Kodi version 12 is found \n");
           }
           if (strcmp(filename,kodivermovie[5])==0) {
             kodiverfound = 11;
-            printf("Kodi version 11 is found \n");
+            fprintf(stderr,"Kodi version 11 is found \n");
           }
         }
       }
@@ -12723,24 +12723,24 @@ void *xbmcdatainfoloader_movie(void *data) {
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
                 break;
     }
-    if (debugmode & 16) printf("loader thread starting - Loading movies from xbmc/kodi.\n");
+    if (debugmode & 16) fprintf(stderr,"loader thread starting - Loading movies from xbmc/kodi.\n");
     xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
     //xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
     if (xbmcSQL) {
       xbmcSQL->xbmcloadversion();									// get version number from mxbc db
-      if (debugmode & 16) printf("XBMC - Load running\n");
+      if (debugmode & 16) fprintf(stderr,"XBMC - Load running\n");
       // load xbmc movie db
       xbmcSQL->xbmc_readmoviedb();                // load movies from kodi db to internal db
       // set use internal db for movies
       global_use_internal_music_loader_system = true;
       //xbmcSQL->xbmc_readmusicdb();     // IN use
-      if (debugmode & 16) printf("XBMC - loader done.\n");
+      if (debugmode & 16) fprintf(stderr,"XBMC - loader done.\n");
       // load movies in from db
       xbmcSQL->getxmlfilepath();                   // get path info from xml file
       film_oversigt.opdatere_film_oversigt();     // gen covers 3d hvis de ikke findes.
     }
   }
-  if (debugmode & 16) printf("loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
+  if (debugmode & 16) fprintf(stderr,"loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
   do_update_moviedb = false;
   pthread_exit(NULL);
 }
@@ -12770,7 +12770,7 @@ GLuint loadgfxfile(char *temapath,char *dir,char *file) {
         if (file_exists(fileload)) gl_img = loadTexture ((char *) fileload);
         else gl_img = 0;
     }
-    if (gl_img == 0) printf("GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
+    if (gl_img == 0) fprintf(stderr,"GFXFILE %s in dir %s NOT FOUND \n",fileload,dir);
     return(gl_img);
 }
 
@@ -13131,7 +13131,7 @@ void load_lande_flags() {
     i = 0;
     strcpy(path2,"");
     while(i < 69) {
-      printf("load flag %d %s \n",i,lande[i]);
+      fprintf(stderr,"load flag %d %s \n",i,lande[i]);
       strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
       strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
       strcpy(path,"/usr/share/mythtv-controller/images/");
@@ -13248,30 +13248,30 @@ int main(int argc, char** argv) {
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
-      printf("mythtv - Backend\n");
-      printf("Mythtv database version %d\n",configmythtvver);
-      printf("configmysqluser   =%s \n",configmysqluser);
-      printf("configmysqlhost   =%s \n",configmysqlhost);
-      printf("config movie path =%s \n",configmoviepath);
-      printf("config music path =%s \n",configmusicpath);
-      printf("config record path=%s \n",configrecordpath);
-      printf("config hostname   =%s \n",confighostname);
-      printf("config fontname   =%s \n",configfontname);
-      printf("Sound interface   =%s \n",configsoundoutport);
-      printf("Default player    =%s \n",configdefaultplayer);
+      fprintf(stderr,"mythtv - Backend\n");
+      fprintf(stderr,"Mythtv database version %d\n",configmythtvver);
+      fprintf(stderr,"configmysqluser   =%s \n",configmysqluser);
+      fprintf(stderr,"configmysqlhost   =%s \n",configmysqlhost);
+      fprintf(stderr,"config movie path =%s \n",configmoviepath);
+      fprintf(stderr,"config music path =%s \n",configmusicpath);
+      fprintf(stderr,"config record path=%s \n",configrecordpath);
+      fprintf(stderr,"config hostname   =%s \n",confighostname);
+      fprintf(stderr,"config fontname   =%s \n",configfontname);
+      fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
+      fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (strncmp(configbackend,"xbmc",4)==0) {
-      printf("XBMC - Backend\n");
-      printf("sqluser           =%s \n",configmysqluser);
+      fprintf(stderr,"XBMC - Backend\n");
+      fprintf(stderr,"sqluser           =%s \n",configmysqluser);
       //printf("sqlpass           =%s \n",configmysqlpass);
-      printf("host              =%s \n",configmysqlhost);
-      printf("config movie path =%s \n",configmoviepath);
-      printf("config music path =%s \n",configmusicpath);
-      printf("config record path=%s \n",configrecordpath);
-      printf("config hostname   =%s \n",confighostname);
-      printf("config fontname   =%s \n",configfontname);
-      printf("Sound interface   =%s \n",configsoundoutport);
-      printf("Default player    =%s \n",configdefaultplayer);
+      fprintf(stderr,"host              =%s \n",configmysqlhost);
+      fprintf(stderr,"config movie path =%s \n",configmoviepath);
+      fprintf(stderr,"config music path =%s \n",configmusicpath);
+      fprintf(stderr,"config record path=%s \n",configrecordpath);
+      fprintf(stderr,"config hostname   =%s \n",confighostname);
+      fprintf(stderr,"config fontname   =%s \n",configfontname);
+      fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
+      fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (debugmode) {
       fprintf(stderr,"Debug mode selected ");
@@ -13308,14 +13308,14 @@ int main(int argc, char** argv) {
       pthread_t loaderthread;           // the load
       int rc=pthread_create(&loaderthread,NULL,xbmcdatainfoloader,NULL);
       if (rc) {
-        printf("ERROR; return code from pthread_create() is %d\n", rc);
+        fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
         exit(-1);
       }
       // movie loader
       pthread_t loaderthread1;           // the load
       int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
       if (rc1) {
-        printf("ERROR; return code from pthread_create() is %d\n", rc1);
+        fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
         exit(-1);
       }
     }
@@ -13325,7 +13325,7 @@ int main(int argc, char** argv) {
         pthread_t loaderthread;
         int rc = pthread_create(&loaderthread,NULL,datainfoloader_music,NULL);
         if (rc) {
-         printf("ERROR; return code from pthread_create() is %d\n", rc);
+         fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
          exit(-1);
         }
       }
@@ -13334,7 +13334,7 @@ int main(int argc, char** argv) {
         pthread_t loaderthread1;           // the load
         int rc1 = pthread_create(&loaderthread1,NULL,datainfoloader_movie,NULL);
         if (rc1) {
-          printf("ERROR; return code from pthread_create() is %d\n", rc1);
+          fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
           exit(-1);
         }
       }
@@ -13343,7 +13343,7 @@ int main(int argc, char** argv) {
     pthread_t loaderthread2;           // the load
     int rc2 = pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
     if (rc2) {
-      printf("ERROR; return code from pthread_create() is %d\n", rc2);
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
     // Load the VLC engine
@@ -13371,11 +13371,11 @@ int main(int argc, char** argv) {
     orgwinsizey=glutGet(GLUT_SCREEN_HEIGHT);
     if (orgwinsizex==1366) screen_size=4;
     if (orgwinsizex==1920) screen_size=3;
-    printf("Real size %dx%d\n",orgwinsizex,orgwinsizey);
+    fprintf(stderr,"Real size %dx%d\n",orgwinsizex,orgwinsizey);
     if (orgwinsizex>1920) orgwinsizex=1920;
     if (orgwinsizey>1080) orgwinsizey=1080;
-    printf("Screen size %dx%d\n",orgwinsizex,orgwinsizey);
-    printf("Screen mode %d\n",screen_size);
+    fprintf(stderr,"Screen size %dx%d\n",orgwinsizex,orgwinsizey);
+    fprintf(stderr,"Screen mode %d\n",screen_size);
     // get first monitor screen size (pixel)
     dpy = XOpenDisplay(":1");
     if (dpy) {
