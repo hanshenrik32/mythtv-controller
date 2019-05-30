@@ -11,17 +11,19 @@
 #include "mongoose-master/mongoose.h"
 
 
+//
 // device struct
+//
 
 class spotify_device_def {
   public:
-    char        id[41];
-    bool        is_active;
-    bool        is_private_session;
-    bool        is_restricted;
-    char        name[256];
-    char        devtype[30];
-    int         devvolume;
+    char        id[41];                     // spotify id
+    bool        is_active;                  // is it working
+    bool        is_private_session;         //
+    bool        is_restricted;              // is private
+    char        name[256];                  // dev name
+    char        devtype[30];                // dev type
+    int         devvolume;                  // play volume
     spotify_device_def();
 };
 
@@ -89,6 +91,8 @@ class spotify_class : vlc_controller {
         char spotifytoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
+        bool spotify_is_playing;                                                // do we play ?
+        bool spotify_is_pause;                                                   // do we pause        
     public:
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
@@ -124,8 +128,6 @@ class spotify_class : vlc_controller {
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
-        bool stream_is_playing;                                                 // do we play ?
-        bool stream_is_pause;                                                   // do we pause
         int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
         int type;                                                               //
         bool gfx_loaded;					                                              //
@@ -157,10 +159,10 @@ class spotify_class : vlc_controller {
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
-        int opdatere_spotify_oversigt(char *refid);
         void select_device_to_play();                                           // show device list to play on
         void set_default_device_to_play(int nr);                                // show device list to play on
         void show_setup_spotify();                                              //
+        int opdatere_spotify_oversigt(char *refid);
         int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
