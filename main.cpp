@@ -6515,8 +6515,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((GLubyte) names[i*4+3]==24) {
           fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
           // move playlists down
-          if (spotify_selected_startofset+40<spotify_oversigt.streamantal())
-          spotify_selected_startofset+=8;
+          if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
           returnfunc = 1;
           fundet = true;
         }
@@ -6926,7 +6925,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     strcpy(temptxt,"");
     saver_irq=true;					// stop screen saver
     if (visur==false) {
-      switch(button) {
+      switch(button) {                                                            //
           case GLUT_LEFT_BUTTON:
               if (state==GLUT_UP) {
                 retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
@@ -7182,27 +7181,22 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
       }
-
       // scroll spotify up/down
       // and open / play / stop / next / last play control
       if (vis_spotify_oversigt) {
-        if (do_zoom_spotify_cover) {
+        if (!(do_zoom_spotify_cover)) {
           if ((retfunc==2) || (button==4)) {
-            if (spotify_key_selected<spotify_oversigt.antal_spotify_streams()+1) {
-              spotifyknapnr++;
-              spotify_key_selected++;
-              spotify_select_iconnr++;
-            }
+            if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
+            button=0;
           }
           // scroll up
           if ((retfunc==1) || (button==3)) {
-            if (spotify_key_selected>0) {
-              spotifyknapnr--;
-              spotify_key_selected--;
-              spotify_select_iconnr--;
-            }
+            if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
+            if (spotify_selected_startofset<0) spotify_selected_startofset=0;
+            button=0;
           }
-
+        }
+        if (do_zoom_spotify_cover) {
           // pause/stop spotify music
           if ((retfunc==5) || (button==3)) {
             if (do_play_spotify_cover==false) spotify_oversigt.spotify_resume_play();
