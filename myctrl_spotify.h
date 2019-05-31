@@ -92,7 +92,7 @@ class spotify_class : vlc_controller {
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
         bool spotify_is_playing;                                                // do we play ?
-        bool spotify_is_pause;                                                   // do we pause        
+        bool spotify_is_pause;                                                   // do we pause
     public:
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
@@ -128,7 +128,7 @@ class spotify_class : vlc_controller {
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
-        int loadweb_stream_iconoversigt();			                                // load web gfx in to cache dir
+        int load_spotify_iconoversigt();			                                // load web gfx in to cache dir
         int type;                                                               //
         bool gfx_loaded;					                                              //
         int get_spotify_intnr(int nr);                                          //

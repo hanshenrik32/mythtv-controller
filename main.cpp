@@ -3160,6 +3160,7 @@ void display() {
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);	// find det som der søges kunster
           else
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);        // find det som der søges efter sange navn
+          spotify_oversigt.load_spotify_iconoversigt();
           //opdatere_spotify_oversigt_icons(); 					// load gfx icons
           keybuffer[0] = 0;
           keybufferindex = 0;
@@ -6470,6 +6471,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((spotifyknapnr==1) && (spotify_oversigt.type==1)) {
           // update
           spotify_oversigt.opdatere_spotify_oversigt(0);
+          spotify_oversigt.load_spotify_iconoversigt();
+
+
           ask_open_dir_or_play_spotify=false;
           fundet = true;
         }
@@ -7214,6 +7218,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
+            spotify_oversigt.load_spotify_iconoversigt();
           }
           // play spotify playlist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
@@ -9062,6 +9067,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_spotify_oversigt=false;
                 keybufferopenwin=false;
                 spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+                spotify_oversigt.load_spotify_iconoversigt();
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
@@ -12238,6 +12244,7 @@ void *datainfoloader_stream(void *data) {
 void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);
+  spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
   pthread_exit(NULL);
 }

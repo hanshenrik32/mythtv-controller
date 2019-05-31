@@ -122,7 +122,9 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   char token_string[512];
   char token_refresh[512];
   unsigned int codel;
-  strcpy(data,"05b40c70078a429fa40ab0f9ccb485de:e50c411d2d2f4faf85ddff16f587fea1");
+  strcpy(data,spotify_oversigt.spotify_client_id);
+  strcat(data,":");
+  strcat(data,spotify_oversigt.spotify_secret_id);
   char sed[]="cat spotify_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
@@ -516,6 +518,10 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 //
 
 void spotify_class::playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) {
+
+    char filename[512];
+    char downloadfilenamelong[2048];
+
     MYSQL_RES *res;
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
@@ -560,7 +566,15 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
         }
         if (playlist_process_url) {
           if (debug_json) printf("gfx icon found = %s \n", value->u.string.ptr);
-          strcpy(playlistgfx,value->u.string.ptr);
+          get_webfilenamelong(filename,value->u.string.ptr);
+          strcpy(downloadfilenamelong,value->u.string.ptr);
+          if (strcmp(filename,"")!=0) {
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+            strcat(downloadfilenamelong,filename);
+            strcat(downloadfilenamelong,".jpg");
+          }
+          strcpy(playlistgfx,downloadfilenamelong);
           playlist_process_url=false;
         }
         if (playlist_process_name) {
@@ -981,17 +995,23 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
       //
       // create db if not exist
       res = mysql_store_result(conn);
-      // create db spotify playlist
+      // create db spotify playlist process data
       // insert all record in db
       tt = 0;
       while(tt<antalplaylists) {
         if (stack[tt]) {
-          //printf("#%2d  Name %40s url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl);
+          printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
           get_webfilename(filename,stack[tt]->feed_gfx_url);
-          getuserhomedir(downloadfilenamelong);
-          strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
-          strcat(downloadfilenamelong,filename);
-          strcat(downloadfilenamelong,".jpg");
+          if (strcmp(filename,"")) {
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+            strcat(downloadfilenamelong,filename);
+            strcat(downloadfilenamelong,".jpg");
+            if (!(file_exists(downloadfilenamelong))) {
+              // download icon image
+              get_webfile2(stack[tt]->feed_gfx_url,downloadfilenamelong);
+            }
+          }
           // check if playlist exist
           playlistexist=false;
           refid = 0;
@@ -1030,7 +1050,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               }
             }
             //
-            // insert record created if not exist
+            // insert record created if not exist ( song name )
             //
             if (playlistexist==false) {
               sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
@@ -1547,7 +1567,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by playlistname");
       getart = 0;
     } else {
-      sprintf(sqlselect,"select name,paththumb,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
+      sprintf(sqlselect,"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
@@ -1583,28 +1603,9 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               if (getart == 0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
+                strncpy(stack[antal]->feed_gfx_url,row[1],2048);
                 strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
 
-                strcpy(downloadfilename,"");
-                strcpy(downloadfilenamelong,"");
-                get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-                getuserhomedir(downloadfilenamelong);
-                strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
-                strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
-                strcat(downloadfilenamelong,".jpg");
-                /*
-                if (!(file_exists(downloadfilenamelong))) {
-                  // download file
-                  get_webfile2(stack[antal]->feed_gfx_url,downloadfilenamelong);
-                }
-                */
-                if (file_exists(downloadfilenamelong)) {
-                  if (check_zerro_bytes_file(downloadfilenamelong)==false) {
-                    //stack[antal]->textureId=loadTexture ((char *) downloadfilenamelong);
-                    fprintf(stderr,"Set teture  %s *************************** \n",downloadfilenamelong);
-                  }
-                }
                 /*
                 strncpy(downloadfilenamelong,row[2],spotify_pathlength);
                 //if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
@@ -1774,7 +1775,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
               strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
               stack[antal]->intnr=atoi(row[3]);
-
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
@@ -1788,8 +1788,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
                   fprintf(stderr,"Set teture  %s *************************** \n",downloadfilenamelong);
                 }
               }
-
-
               antal++;
             }
             if (getart == 1) {
@@ -1832,60 +1830,23 @@ void *load_spotify_web(void *data) {
 
 
 // in use
-// downloading all rss podcast icon gfx
+// loading spotify songs in array icon gfx
 
-int spotify_class::loadweb_stream_iconoversigt() {
-  int antal;
+int spotify_class::load_spotify_iconoversigt() {
+  GLuint texture;
   int nr=0;
   int loadstatus;
   char tmpfilename[2000];
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
   char homedir[200];
-  antal=this->streamantal();
   this->gfx_loaded=false;
-  if (debugmode & 4) printf("rss stream gfx download start \n");
-  while(nr<antal) {
-    if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
-      loadstatus=0;
-      // return downloadfilename from stack[nr]->feed_gfx_mythtv
-      strcpy(tmpfilename,stack[nr]->feed_gfx_mythtv);
-      if (strncmp(tmpfilename,"http://",7)==0) {
-        // download file from web
-        // return dowloadfilebame = file downloaded name no path
-        get_webfilename(downloadfilename,tmpfilename);
-        // add download path
-        // add download filename to class opbject
-        getuserhomedir(downloadfilenamelong);
-        strcat(downloadfilenamelong,"/spotify/images/");
-        strcat(downloadfilenamelong,downloadfilename);
-        if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
-          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-        } else {
-          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-            //printf("File exist %s then set filename \n",downloadfilenamelong);
-        }
-      } else if (strncmp(tmpfilename,"https://",8)==0) {
-        //strcpy(lastfile,downloadfilename);
-        get_webfilename(downloadfilename,tmpfilename);
-        getuserhomedir(downloadfilenamelong);
-        // build path
-        strcat(downloadfilenamelong,"/spotify/images/");
-        strcat(downloadfilenamelong,downloadfilename);
-        if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
-          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-        } else {
-          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-        }
-      }
-      // set recordnr loaded info to update users view
-      this->spotify_oversigt_nowloading=nr;
+  if (debugmode & 4) printf("spotify icon loader.\n");
+  while(nr<streamantal()) {
+    printf("Loading texture %d \n",nr);
+    if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
+      //texture=loadTexture("/usr/share/mythtv-controller/tema1/images/open.png");
+      //stack[nr]->textureId=loadTexture(stack[nr]->feed_gfx_url);
     }
     nr++;
   }
