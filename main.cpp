@@ -6427,20 +6427,24 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // back icon to main playlist overview
         // do update from root
-        if ((spotifyknapnr==1) && (spotify_oversigt.type==1)) {
-          // update
-          spotify_oversigt.opdatere_spotify_oversigt(0);
-          spotify_oversigt.load_spotify_iconoversigt();
-          ask_open_dir_or_play_spotify=false;
-          fundet = true;
-        }
-        // back icon to main playlist search overview
-        // do update from root
-        if ((spotifyknapnr==1) && (spotify_oversigt.type==0) && (strcmp(spotify_oversigt.get_spotify_feed_showtxt(0),"Back")==0)) {
-          spotify_oversigt.opdatere_spotify_oversigt(0);
-          spotify_oversigt.load_spotify_iconoversigt();
-          ask_open_dir_or_play_spotify=false;
-          fundet = true;
+        if ((spotifyknapnr==1) && (spotify_oversigt.get_spotify_intnr(0))) {
+          if ((spotify_oversigt.type==1) && (fundet==false)) {
+            // update
+            spotify_oversigt.opdatere_spotify_oversigt(0);
+            spotify_oversigt.load_spotify_iconoversigt();
+            ask_open_dir_or_play_spotify = false;
+            fundet = true;
+          }
+/*
+          // back icon to main playlist search overview
+          // do update from root
+          if ((spotify_oversigt.type==0) && (fundet==false)) {
+            spotify_oversigt.opdatere_spotify_oversigt(0);
+            spotify_oversigt.load_spotify_iconoversigt();
+            ask_open_dir_or_play_spotify=false;
+            fundet = true;
+          }
+*/
         }
         // play playlist icon select (20) type 0
         if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
