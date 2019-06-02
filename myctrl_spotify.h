@@ -123,7 +123,6 @@ class spotify_class : vlc_controller {
         bool spotify_oversigt_loaded;                                           //
         int spotify_oversigt_loaded_nr;                                         //
         int spotify_oversigt_nowloading;				                                // denne tæller op når der loades gfx
-        int spotify_rssparse_nowloading;				                                // denne tæller op når der loades rss
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used my webserver
         struct mg_mgr mgr;                                                      // web server
@@ -137,7 +136,6 @@ class spotify_class : vlc_controller {
         char *get_spotify_name(int nr);                                         // get name
         char *get_spotify_desc(int nr);                                         // get desc
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
-        char *get_spotify_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };
         spotify_class();
