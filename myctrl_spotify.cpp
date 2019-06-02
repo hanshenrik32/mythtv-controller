@@ -564,13 +564,14 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
         if (( playlist_process_image ) && ( depth == 8 ) && ( x == 1 )) {
           playlist_process_image=false;
         }
+        // works for songs not playlist
         if (playlist_process_url) {
-          if (debug_json) printf("gfx icon found = %s \n", value->u.string.ptr);
+          printf("gfx icon found = %s \n", value->u.string.ptr);
+          strcpy(filename,"");
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
           if (strcmp(filename,"")!=0) {
-            getuserhomedir(downloadfilenamelong);
-            strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+            strcpy(downloadfilenamelong,"tmp/");
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
           }
@@ -584,7 +585,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
         // get playlist name
         // and create datdabase record playlist info
         if ((playlist_process_name) && (depth==5) && (x==5)) {
-          if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
+          //if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
           strcpy(playlistname,value->u.string.ptr);
           playlistexist=false;
           sprintf(sql,"select id from mythtvcontroller.spotifycontentplaylist where playlistname like '%s' limit 1", playlistname );
@@ -1003,8 +1004,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            getuserhomedir(downloadfilenamelong);
-            strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+            strcpy(downloadfilenamelong,"tmp/");
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
             if (!(file_exists(downloadfilenamelong))) {
@@ -1778,8 +1778,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              getuserhomedir(downloadfilenamelong);
-              strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+              strcpy(downloadfilenamelong,"tmp/");
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
               strcat(downloadfilenamelong,".jpg");
               if (file_exists(downloadfilenamelong)) {
@@ -1829,11 +1828,32 @@ void *load_spotify_web(void *data) {
 }
 
 
-// in use
-// loading spotify songs in array icon gfx
+
+//
+//
+//
+
+int LoadImage(char *filename) {
+    ILuint    image;
+    ILboolean success;
+    ilGenImages(1, &image);    /* Generation of one image name */
+    ilBindImage(image);        /* Binding of image name */
+    /* Loading of the image filename by DevIL */
+    if ( success = ilLoadImage(filename) ) {
+      success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+      if (!success) return -1;
+    } else return -1;
+    return image;
+}
+
+
+
+//
+// loading spotify songs gfx in array.
+//
 
 int spotify_class::load_spotify_iconoversigt() {
-  GLuint texture;
+  int texture;
   int nr=0;
   int loadstatus;
   char tmpfilename[2000];
@@ -1843,10 +1863,10 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    printf("Loading texture %d \n",nr);
+    printf("Loading texture %d %s \n",nr,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
-      //texture=loadTexture("/usr/share/mythtv-controller/tema1/images/open.png");
-      //stack[nr]->textureId=loadTexture(stack[nr]->feed_gfx_url);
+      //texture=LoadImage(stack[nr]->feed_gfx_url);
+      //if (texture!=-1) stack[nr]->textureId=texture;
     }
     nr++;
   }
