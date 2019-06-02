@@ -6426,8 +6426,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
         // back icon to main playlist overview
+        // do update from root
         if ((spotifyknapnr==1) && (spotify_oversigt.type==1)) {
           // update
+          spotify_oversigt.opdatere_spotify_oversigt(0);
+          spotify_oversigt.load_spotify_iconoversigt();
+          ask_open_dir_or_play_spotify=false;
+          fundet = true;
+        }
+        // back icon to main playlist search overview
+        // do update from root
+        if ((spotifyknapnr==1) && (spotify_oversigt.type==0) && (strcmp(spotify_oversigt.get_spotify_feed_showtxt(0),"Back")==0)) {
           spotify_oversigt.opdatere_spotify_oversigt(0);
           spotify_oversigt.load_spotify_iconoversigt();
           ask_open_dir_or_play_spotify=false;
@@ -8397,7 +8406,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             // show/select device to play on
             if ((vis_spotify_oversigt) && (keybufferindex==0)) {
-              if (key=='d') {
+              if (key=='D') {
                 do_select_device_to_play=true;
               }
             }
