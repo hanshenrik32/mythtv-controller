@@ -137,6 +137,7 @@ class spotify_class : vlc_controller {
         char *get_spotify_name(int nr);                                         // get name
         char *get_spotify_desc(int nr);                                         // get desc
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        char *get_spotify_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };
         spotify_class();

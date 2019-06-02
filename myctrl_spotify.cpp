@@ -2406,9 +2406,9 @@ void spotify_class::show_setup_spotify() {
       ypos=-10;
     } else {
       winsizx=100;
-      winsizy=10;
+      winsizy=100;
       xpos=310;
-      ypos=-10;
+      ypos=-70;
     }
     glLoadName(40);
     glBegin(GL_QUADS);
