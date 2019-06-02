@@ -310,6 +310,7 @@ spotify_class::spotify_class() : antal(0) {
     spotify_is_playing=false;                                                   // is we playing any media
     spotify_is_pause=false;                                                     // is player on pause
     antalplaylists=0;                                                           // antal playlists
+    search_playlist_song=0;
     int port_cnt, n;
     int err = 0;
     strcpy(spotify_aktiv_song[0].release_date,"");
@@ -2103,7 +2104,6 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
-
         glPushMatrix();
         // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
@@ -2144,10 +2144,10 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         // indsite draw radio station icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
-        if (type==0) glBindTexture(GL_TEXTURE_2D,normal_icon);
-        // else back icon
-        else if ((type==1) && ((i+sofset)==0)) glBindTexture(GL_TEXTURE_2D,backicon);
-        else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
+          else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);

@@ -76,8 +76,8 @@ class spotify_class : vlc_controller {
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
-        int spotify_device_antal;                                              // antal device found
-        spotify_active_play_info_type spotify_aktiv_song[1];                   //
+        int spotify_device_antal;                                               // antal device found
+        spotify_active_play_info_type spotify_aktiv_song[1];                    //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         void print_depth_shift(int);
         void process_value(json_value*, int,int x);
@@ -94,6 +94,7 @@ class spotify_class : vlc_controller {
         bool spotify_is_playing;                                                // do we play ?
         bool spotify_is_pause;                                                   // do we pause
     public:
+        bool search_playlist_song;                                              // search type 1 for song 0 for playlist
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
         GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
@@ -128,8 +129,8 @@ class spotify_class : vlc_controller {
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
-        int load_spotify_iconoversigt();			                                // load web gfx in to cache dir
-        int type;                                                               //
+        int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
+        int type;                                                               // 0 = playlist 1 = songs
         bool gfx_loaded;					                                              //
         int get_spotify_intnr(int nr);                                          //
         char *get_spotify_playlistid(int nr);                                   // get id to play
