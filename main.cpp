@@ -7101,18 +7101,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if ((vis_nyefilm_oversigt) && (state==GLUT_UP)) {
                 vis_nyefilm_oversigt=!vis_nyefilm_oversigt;
               }
-              // close ask play window again
-              if ((vis_spotify_oversigt) && (ask_open_dir_or_play_spotify) && (state==GLUT_UP)) {
-                ask_open_dir_or_play_spotify=false;
-              }
-              // close play info window again
-              if ((vis_spotify_oversigt) && (ask_open_dir_or_play_spotify) && (state==GLUT_UP)) {
-                ask_open_dir_or_play_spotify=false;
-              }
-              // show what we play or not show what we play
-              if ((vis_spotify_oversigt) && (ask_open_dir_or_play_spotify==false) && (state==GLUT_UP)) {
-                do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
-                do_select_device_to_play=false;                                                           // close window
+              if (vis_spotify_oversigt) {
+                // close ask play window again no selected icon right click
+                if ((ask_open_dir_or_play_spotify) && (state==GLUT_UP)) {
+                  ask_open_dir_or_play_spotify=false;
+                  do_zoom_spotify_cover=false;
+                } else if ((ask_open_dir_or_play_spotify==false) && (state==GLUT_UP)) {
+                  // show what we play or not show what we play
+                  do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
+                  do_select_device_to_play=false;                                                           // close window
+                }
               }
               break;
       }
