@@ -1001,7 +1001,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
       tt = 0;
       while(tt<antalplaylists) {
         if (stack[tt]) {
-          printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
+          if (debugmode & 4) printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
             strcpy(downloadfilenamelong,"tmp/");
