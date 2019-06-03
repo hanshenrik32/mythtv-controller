@@ -3117,24 +3117,23 @@ void display() {
           keybufferindex = 0;
           _angley = 0.0f;
           rknapnr = 0;
-          radio_key_selected = 1;   						        // reset cursor position
-          do_play_radio = false;							// Do not play station
+          radio_key_selected = 1;   						                                // reset cursor position
+          do_play_radio = false;							                                  // Do not play station
         }
       }
     }
-    // search func for music
+    // search func for music after enter is pressed
     if ((vis_music_oversigt) && (!(visur)) && (!(ask_save_playlist)))  {
       if (keybufferindex>0) {						// er der kommet noget i keyboard buffer
         keybufferopenwin=true;					// yes open filename window
         // hent søgte sange oversigt
-        if ((keybufferopenwin) && (hent_music_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
+        if ((keybufferopenwin) && (hent_music_search)) {				                // vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_music_search=false;
-          if (debugmode & 2) fprintf(stderr,"Search string: %s \n ",keybuffer);
           if (findtype==0)
            opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
           else
-           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );        // find det som der søges efter sange navn
-          opdatere_music_oversigt_icons(); 					// load gfx icons
+           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
+          opdatere_music_oversigt_icons(); 					                            // load gfx icons
           keybuffer[0] = 0;
           keybufferindex = 0;
           _angley = 0.0f;
@@ -3148,13 +3147,13 @@ void display() {
         }
       }
     }
-
     // spotify do the search after enter is pressed
     if (vis_spotify_oversigt) {
       if ((keybufferopenwin) && (hent_spotify_search)) {
         hent_spotify_search=false;
+        spotify_selected_startofset=0;                                          // icon show start ofset
+        spotifyknapnr=1;                                                        // reset pos
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
-          if (debugmode) fprintf(stderr,"Search string: %s \n ",keybuffer);
           if (spotify_oversigt.search_playlist_song==0)
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist
           else
@@ -3165,7 +3164,6 @@ void display() {
         }
       }
     }
-
     if (!(visur)) {
       // music view
       std::clock_t start;
@@ -3194,7 +3192,7 @@ void display() {
       } else if (vis_spotify_oversigt) {
         static bool startwebbrowser=true;
 
-//        printf("spotifyknapnr %d offset=%d antal = %d \n",spotifyknapnr,spotify_selected_startofset,spotify_oversigt.streamantal());
+        //printf("spotifyknapnr %d offset=%d antal = %d show_search_result %d \n",spotifyknapnr,spotify_selected_startofset,spotify_oversigt.streamantal(),spotify_oversigt.show_search_result);
 
         spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ); // _textureId28
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
@@ -6414,37 +6412,33 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((GLuint) names[i*4+3]>=100) {
           spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
           spotify_select_iconnr=spotifyknapnr;
-          fprintf(stderr,"spotify selected=%d  spotify_oversigt.type %d \n",spotify_select_iconnr,spotify_oversigt.type);
           fundet = true;
+          do_zoom_spotify_cover = false;                                        // close player status to ask about play other selected playlist/song
           if (spotify_oversigt.type==0) {
             ask_open_dir_or_play_spotify=true;
           } else if (spotify_oversigt.type==1) {
-            //ask_open_dir_or_play_spotify=false;
             ask_open_dir_or_play_spotify=true;
-            // update
-            // spotify_oversigt.opdatere_spotify_oversigt(0);
           }
         }
         // back icon to main playlist overview
         // do update from root
-        if ((spotifyknapnr==1) && (spotify_oversigt.get_spotify_intnr(0))) {
-          if ((spotify_oversigt.type==1) && (fundet==false)) {
+        if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
+          if (spotify_oversigt.type==1) {
             // update
+            spotify_selected_startofset=0;
             spotify_oversigt.opdatere_spotify_oversigt(0);
             spotify_oversigt.load_spotify_iconoversigt();
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
-/*
-          // back icon to main playlist search overview
-          // do update from root
-          if ((spotify_oversigt.type==0) && (fundet==false)) {
+          if (spotify_oversigt.type==0) {
+            // update
+            spotify_selected_startofset=0;
             spotify_oversigt.opdatere_spotify_oversigt(0);
             spotify_oversigt.load_spotify_iconoversigt();
-            ask_open_dir_or_play_spotify=false;
+            ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
-*/
         }
         // play playlist icon select (20) type 0
         if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
