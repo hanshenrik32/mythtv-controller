@@ -94,6 +94,7 @@ class spotify_class : vlc_controller {
         bool spotify_is_playing;                                                // do we play ?
         bool spotify_is_pause;                                                   // do we pause
     public:
+        bool show_search_result;                                                // search type 1 for song 0 for playlist      
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id

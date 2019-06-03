@@ -309,6 +309,7 @@ spotify_class::spotify_class() : antal(0) {
     gfx_loaded=false;			                                                      // gfx loaded
     spotify_is_playing=false;                                                   // is we playing any media
     spotify_is_pause=false;                                                     // is player on pause
+    show_search_result=false;                                                   // are we showing search result in view
     antalplaylists=0;                                                           // antal playlists
     search_playlist_song=0;
     int port_cnt, n;
@@ -1564,10 +1565,11 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     }
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
-      //sprintf(sqlselect,"select name,paththumb,playid,id from spotifycontent order by name");
+      show_search_result=false;
       sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by playlistname");
       getart = 0;
     } else {
+      show_search_result=true;
       sprintf(sqlselect,"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
       getart = 1;
     }
@@ -1812,6 +1814,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
     }
     mysql_close(conn);
   }
+  show_search_result=true;
   return(antal);
 }
 
