@@ -78,7 +78,7 @@ binary:
 	chmod 644 debian/mythtv-controller/usr/share/mythtv-controller/mongoose-master.zip
 	chmod -R 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
 	tar -C debian/mythtv-controller/usr/share/mythtv-controller/ -zxf fmodstudioapi11011linux.tar.gz fmodstudioapi11011linux/api/
-	#unzip -n mongoose-master -d debian/mythtv-controller/usr/share/mythtv-controller/
+	unzip -n mongoose-master -d debian/mythtv-controller/usr/share/mythtv-controller/
 	if [ -L debian/mythtv-controller/usr/lib/libfmod.so.10 ]; then rm debian/mythtv-controller/usr/lib/libfmod.so.10; fi
 	ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 debian/mythtv-controller/usr/lib/libfmod.so.10
 	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*

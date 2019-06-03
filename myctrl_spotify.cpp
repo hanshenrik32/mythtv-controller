@@ -1385,7 +1385,7 @@ int spotify_class::spotify_get_available_devices() {
               }
               // create if not exist
               if (dbexist==false) {
-                sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id,spotify_device[t].id);
+                sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
                 mysql_query(conn,sql);
                 res = mysql_store_result(conn);
               }
@@ -1434,10 +1434,10 @@ int spotify_class::spotify_get_access_token2() {
   myfile = fopen("spotify_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
-    //strcpy(spotify_authorize_token,data+17);      // and get/save token in struct to later use
     fclose(myfile);
     //remove("spotify_access_token.txt");           // remove file again
   }
+  return(1);
 }
 
 
@@ -1447,7 +1447,7 @@ int spotify_class::spotify_get_access_token2() {
 
 // return the intnr
 int spotify_class::get_spotify_intnr(int nr) {
-  if (nr < antal) return (stack[nr]->intnr); else return (NULL);
+  if (nr < antal) return (stack[nr]->intnr); else return (0);
 }
 
 
