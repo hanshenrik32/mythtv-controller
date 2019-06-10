@@ -2034,7 +2034,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     searchstring[ii]='\0';
     i++;
   }
-
   switch(type) {
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
@@ -2052,7 +2051,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     //printf("call= %s \n",call);
     return 1;
   }
-
   stat("spotify_search_result.json", &filestatus);                              // get file info
   file_size = filestatus.st_size;                                               // get filesize
   file_contents = (char*) malloc(filestatus.st_size);
