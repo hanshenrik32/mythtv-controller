@@ -83,6 +83,11 @@ class spotify_class : vlc_controller {
         void process_value(json_value*, int,int x);
         void process_object(json_value*, int);
         void process_array(json_value*, int);
+        // spotify search online
+        void search_process_value(json_value*, int,int x);
+        void search_process_object(json_value*, int);
+        void search_process_array(json_value*, int);
+        // end spotify search online
         void playlist_print_depth_shift(int depth);
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
@@ -165,8 +170,10 @@ class spotify_class : vlc_controller {
         void show_setup_spotify();                                              //
         int opdatere_spotify_oversigt(char *refid);
         int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);
+        int opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type);
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+        void show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 };
 
 

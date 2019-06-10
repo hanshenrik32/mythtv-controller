@@ -51,7 +51,10 @@ extern int spotify_select_iconnr;
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
 
+extern GLuint big_search_bar;
+
 extern char *keybuffer;
+extern int keybufferindex;
 
 extern bool do_select_device_to_play;
 
@@ -1818,6 +1821,264 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
   return(antal);
 }
 
+// json_parser search process result
+// *******************************************************************************************
+//
+
+// json parser used to parse the return files from spotify api
+//
+//
+
+//
+// static void spotify_class::process_value(json_value* value, int depth);
+//
+
+bool search_process_tracks=false;
+bool search_process_uri=false;
+bool search_process_songs=false;
+bool search_process_href=false;
+bool search_process_description=false;
+bool search_process_image=false;
+bool search_process_name=false;
+bool search_process_items=false;
+bool search_process_track_nr=false;
+
+//
+// process types in file for process playlist files (songs)
+//
+
+void spotify_class::search_process_object(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.object.length;
+  for (x = 0; x < length; x++) {
+    print_depth_shift(depth);
+    //if (strcmp(value->u.object.values[x].name,"name")==0)
+    printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
+    if (strcmp(value->u.object.values[x].name,"tracks")==0) {
+      search_process_tracks=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "href" )==0) {
+      search_process_href=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "uri" )==0) {
+      search_process_uri=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "description" )==0) {
+      search_process_description=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "images" )==0) {
+      search_process_image=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "name" )==0) {
+      search_process_name=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
+      search_process_track_nr=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "items" )==0) {
+      search_process_items=true;
+    }
+    search_process_value(value->u.object.values[x].value, depth+1,x);
+  }
+}
+
+
+void spotify_class::search_process_array(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.array.length;
+  if (debug_json) printf("array\n");
+  for (x = 0; x < length; x++) {
+    search_process_value(value->u.array.values[x], depth,x);
+  }
+}
+
+
+//
+// json parser start call function for process playlist
+// do the data progcessing from json
+
+void spotify_class::search_process_value(json_value* value, int depth,int x) {
+    int j;
+    if (value == NULL) return;
+    if (value->type != json_object) {
+      print_depth_shift(depth);
+    }
+    switch (value->type) {
+      case json_none:
+        printf("none\n");
+        break;
+      case json_object:
+        search_process_object(value, depth+1);
+        break;
+      case json_array:
+        search_process_array(value, depth+1);
+        break;
+      case json_integer:
+        printf("int: %10" PRId64 "\n", value->u.integer);
+        break;
+      case json_double:
+        printf("double: %f\n", value->u.dbl);
+        break;
+      case json_string:
+        printf("antal %d x = %2d deep=%2d ",antal,x,depth);
+        printf("string: %s\n", value->u.string.ptr);
+        if (search_process_items) {
+          // set start of items in list
+          search_process_items=false;
+        }
+        if (search_process_tracks) {
+          // playlist id from spotify
+          if (stack[antal]) {
+            //strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
+          }
+          search_process_tracks=false;
+        }
+        if (( search_process_image ) && ( depth == 14 ) && ( x == 1 )) {
+          if (stack[antal]) {
+          //  strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+          }
+          search_process_image=false;
+        }
+        if ((search_process_href) && (depth==9) && (x==9)) {
+          if (stack[antal]) {
+          //  strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
+          }
+          search_process_href=false;
+        }
+        if ((search_process_uri) && (depth==7) && (x==9)) {
+          //printf("URI=%s\n",value->u.string.ptr);
+          //if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
+          //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
+          search_process_uri=false;
+        }
+        // get Song name
+        if ((search_process_name) && (depth==7) && (x==6)) {
+          if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
+          if (antal<maxantal) {
+            if (stack[antal]) {
+              strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              strcpy(stack[antal]->feed_showtxt,value->u.string.ptr);
+            }
+            antal++;
+            antalplaylists++;
+          }
+          // next record
+          search_process_name=false;
+        }
+
+        // get tracknr
+        if (search_process_track_nr) {
+          search_process_track_nr=false;
+          //printf(" text %s \n",value->u.string.ptr);
+          // if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+        }
+
+        break;
+      case json_boolean:
+        if (debug_json) printf("bool: %d\n", value->u.boolean);
+        break;
+    }
+}
+
+
+
+
+
+
+//
+// search for playlist or song
+//
+
+
+int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type) {
+  char sqlselect[2048];
+  char homedir[1024];
+  char call[4096];
+  char searchstring[4096];
+  bool rss_update=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char *database = (char *) "mythtvcontroller";
+  bool online;
+  int getart=0;
+  int curl_error;
+  bool loadstatus=true;
+  bool dbexist=false;
+  GLuint texture;
+  json_char* json;
+  json_value* value;
+  FILE *json_file;
+  char *jons_string;
+  struct stat filestatus;
+  int file_size;
+  char *file_contents=NULL;
+  antal=0;
+  int i=0;
+  int ii=0;
+  strcpy(searchstring,"");
+  while(i<strlen(keybuffer)) {
+    if (keybuffer[i]!=32) {
+      *(searchstring+ii)=*(keybuffer+i);
+      ii++;
+    } else {
+      strcat(searchstring,"\%20");
+      ii+=3;
+    }
+    searchstring[ii]='\0';
+    i++;
+  }
+
+  switch(type) {
+    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            break;
+    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            break;
+    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            break;
+    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            break;
+    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+  }
+  curl_error=system(call);
+  printf("***** searchstring = %s ****************\n",searchstring);
+  printf("call= %s \n",call);
+  if (curl_error!=0) {
+    fprintf(stderr,"curl_error %d \n",curl_error);
+    //printf("call= %s \n",call);
+    return 1;
+  }
+
+  stat("spotify_search_result.json", &filestatus);                              // get file info
+  file_size = filestatus.st_size;                                               // get filesize
+  file_contents = (char*) malloc(filestatus.st_size);
+  json_file = fopen("spotify_search_result.json", "rt");
+  if (json_file == NULL) {
+    fprintf(stderr, "Unable to open spotify_search_result.json\n");
+    free(file_contents);                                                        //
+    return 1;
+  }
+  if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
+    fprintf(stderr, "Unable to read spotify spotify_search_result content of spotify_search_result.json\n");
+    fclose(json_file);
+    free(file_contents);                                                        //
+    return 1;
+  }
+  fclose(json_file);
+  json = (json_char*) file_contents;
+  value = json_parse(json,file_size);                                           // parser
+  // parse from root
+  search_process_value(value, 0,0);                                             // fill stack array
+  json_value_free(value);                                                       // json clean up
+  free(file_contents);                                                          //
+  return(antal);
+}
 
 
 
@@ -2047,40 +2308,6 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     int pline=0;
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-    //if ((this->streamantal()) && (spotify_oversigt_loaded==false) && (this->spotify_oversigt_loaded_nr<this->streamantal())) {
-/*
-    if ((this->streamantal()) && (spotify_oversigt_loaded==false)) {
-      if (stack[spotify_oversigt_loaded_nr]) strcpy(gfxfilename,stack[spotify_oversigt_loaded_nr]->feed_gfx_url);
-      else strcpy(gfxfilename,"");
-      // load texture if none loaded
-      // get_texture return 0 if not loaded
-      if (get_texture(spotify_oversigt_loaded_nr)==0) {
-        if (strcmp(gfxfilename,"")!=0) {
-          // check om der findes en downloaded icon
-          if (file_exists(gfxfilename)) {
-            texture=loadTexture ((char *) gfxfilename);
-            if (texture) set_texture(spotify_oversigt_loaded_nr,texture);
-            last_texture=texture;
-            antal_loaded+=1;
-          } else if (file_exists(downloadfilenamelong)) {
-            // er det ikke samme texture som sidst loaded så load it
-            // else set last used
-            texture=loadTexture ((char *) downloadfilenamelong);
-            if (texture) set_texture(spotify_oversigt_loaded_nr,texture);
-            last_texture=texture;
-            antal_loaded+=1;
-          } else texture=0;
-        }
-      }
-      // down loading ?
-      if (spotify_oversigt_loaded_nr==this->streamantal()) {
-        spotify_oversigt_loaded=true;
-        stream_oversigt_loaded_done=true;
-      } else spotify_oversigt_loaded_nr++;
-    }
-*/
-    // calc start pos (ofset)
-    //  printf("spotifyknapnr = %d spotify_select_iconnr = %d antal %d sofset = %d \n",spotifyknapnr,spotify_select_iconnr,antalplaylists,sofset);
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -2263,6 +2490,258 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glPopMatrix();
     }
 }
+
+
+
+
+
+//
+// show search/create playlist spotify overview
+//
+
+void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring)
+
+{
+    int j,ii,k,pos;
+    int buttonsize=200;                                                         // button size
+    float buttonsizey=180.0f;                                                   // button size
+    float yof=orgwinsizey-(buttonsizey*2.5);                                    // start ypos
+    float xof=0.0f;
+    int lstreamoversigt_antal=8*5;
+    int i=0;                                                                    // data ofset in stack array
+    int bonline=8;                                                              // antal pr linie
+    float boffset;
+    char gfxfilename[200];
+    char downloadfilename[200];
+    char downloadfilenamelong[1024];
+    char *gfxshortnamepointer;
+    char gfxshortname[200];
+    char temptxt[200];
+    char word[200];
+    static char downloadfilename_last[1024];
+    int antal_loaded=0;
+    static int stream_oversigt_loaded_done=0;
+    GLuint texture;
+    static GLuint last_texture;
+    char *base,*right_margin;
+    int length,width;
+    int pline=0;
+    // last loaded filename
+    if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
+
+    // top search text box + cursor
+    float yof_top=orgwinsizey-(buttonsizey*1.25);                                    // start ypos
+    float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,big_search_bar);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
+    glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
+    glTexCoord2f(1, 1); glVertex3f( xof_top+1200-10, yof_top+buttonsizey-20 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
+    glEnd();
+    glTranslatef(xof_top+40,yof_top+50,0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(120, 120, 1.0);
+    glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    if (strcmp(searchstring,"")!=0) glcRenderString(searchstring);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glcRenderString("_");
+    glPopMatrix();
+    // cursor
+
+    glPopMatrix();
+    // draw icons
+    while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
+      if (((i % bonline)==0) && (i>0)) {
+        yof=yof-(buttonsizey+20);
+        xof=0;
+      }
+      if (i+1==(int) stream_key_selected) {
+        buttonsizey=200.0f;
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      } else {
+        buttonsizey=180.0f;
+        glColor4f(0.8f, 0.8f, 0.8f,1.0f);
+      }
+      if (stack[i+sofset]->textureId) {
+        // stream icon
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
+        glEnd();
+        glPushMatrix();
+        // indsite draw icon rss gfx
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        if (tema==5) {
+          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
+        } else {
+          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+        }
+        glEnd();
+        // show nyt icon note
+        if (stack[i+sofset]->nyt) {
+          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+          glEnd();
+        }
+        glPopMatrix();
+      } else {
+        // no draw default icon
+        glPushMatrix();
+        // indsite draw radio station icon
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        if ((i+sofset)==0) {
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
+          else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
+        glEnd();
+        // show nyt icon note
+        if (stack[i+sofset]->nyt) {
+          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+          glEnd();
+        }
+        glPopMatrix();
+      }
+      // draw numbers in group
+      if (stack[i+sofset]->feed_group_antal>1) {
+        // show numbers in group
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        //glBlendFunc(GL_ONE, GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glTranslatef(xof+22,yof+14,0);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
+        glcRenderString(temptxt);
+        glPopMatrix();
+      }
+      // show text of element
+      glPushMatrix();
+      pline=0;
+      glTranslatef(xof+20,yof-10,0);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      base=temptxt;
+      length=strlen(temptxt);
+      width = 19;
+      bool stop=false;
+      while(*base) {
+        // if text can be on line
+        if(length <= width) {
+          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+          glcRenderString(base);
+          pline++;
+          break;
+        }
+        right_margin = base+width;
+        while((!isspace(*right_margin)) && (stop==false)) {
+          right_margin--;
+          if (right_margin == base) {
+            right_margin += width;
+            while(!isspace(*right_margin)) {
+              if (*right_margin == '\0') break;
+              else stop=true;
+              right_margin++;
+            }
+          }
+        }
+        if (stop) *(base+width)='\0';
+        *right_margin = '\0';
+        glcRenderString(base);
+        pline++;
+        glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
+        length -= right_margin-base+1;                         // +1 for the space
+        base = right_margin+1;
+        if (pline>=2) break;
+      }
+      glPopMatrix();
+      // next button
+      i++;
+      xof+=(buttonsize+10);
+    }
+
+    // no records loaded error
+    if ((i==0) && (antal_spotify_streams()==0)) {
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
+      glEnd();
+      glPushMatrix();
+      xof=700;
+      yof=260;
+      glTranslatef(xof, yof ,0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(22.0, 22.0, 1.0);
+      glcRenderString("   No data ...");
+      glEnable(GL_TEXTURE_2D);
+      glPopMatrix();
+    }
+}
+
+
+
+
+
 
 
 

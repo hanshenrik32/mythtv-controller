@@ -267,7 +267,12 @@ char aktivplay_music_path[1024];                          //
 bool hent_radio_search = false;                           // skal vi søge efter music
 bool hent_film_search = false;                            // skal vi søge efter film title
 bool hent_stream_search = false;                          // skal vi søge efter stream
-bool hent_spotify_search = false;                          // skal vi søge efter spotify stuf
+bool hent_spotify_search = false;                          // skal vi søge efter spotify stuf in local db
+
+bool do_show_spotify_search_oversigt=false;
+bool hent_spotify_search_online=false;                    // skal vi starte search online
+bool do_hent_spotify_search_online=false;                 // skal vi starte search online (do it)
+bool search_spotify_string_changed=false;
 
 int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
 
@@ -676,6 +681,7 @@ GLuint _textureIdback; 	                  //
 GLuint _errorbox;	                        //
 GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
+GLuint big_search_bar;                    // big search bar used by sporify search
 
 // radio view icons
 GLuint onlineradio;                       //
@@ -3164,6 +3170,36 @@ void display() {
         }
       }
     }
+
+
+
+
+    //
+    // auto search spotify
+    //
+    struct tm* t1;
+    static time_t lasttime1=0;
+    static time_t nowdate1;
+    time(&nowdate1);
+    if (do_show_spotify_search_oversigt) {
+      if ((search_spotify_string_changed) && (difftime(nowdate1, lasttime1)>2)) {
+        time(&lasttime1);
+        hent_spotify_search_online=true;
+        search_spotify_string_changed=false;
+      }
+      if (hent_spotify_search_online) {
+        hent_spotify_search_online=false;
+        if (keybufferindex>2) {
+          // start the search online
+          do_hent_spotify_search_online=true;
+          //keybufferindex=1;
+        }
+      }
+    }
+
+
+
+
     if (!(visur)) {
       // music view
       std::clock_t start;
@@ -3194,7 +3230,13 @@ void display() {
 
         //printf("spotifyknapnr %d offset=%d antal = %d show_search_result %d \n",spotifyknapnr,spotify_selected_startofset,spotify_oversigt.streamantal(),spotify_oversigt.show_search_result);
 
-        spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ); // _textureId28
+        do_show_spotify_search_oversigt=true;
+
+        if (do_show_spotify_search_oversigt==false)
+          spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        else
+          spotify_oversigt.show_spotify_search_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
@@ -8402,14 +8444,16 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
+
             // show/select device to play on
             if ((vis_spotify_oversigt) && (keybufferindex==0)) {
               if (key=='D') {
                 do_select_device_to_play=true;
               }
             }
+
             // søg efter spotify fill buffer from keyboard
-            if (vis_spotify_oversigt) {
+            if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
                 //do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
                 if (key!=13) {
@@ -8420,6 +8464,18 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
+
+            // do show search spodify oversigt online
+            if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+                search_spotify_string_changed=true;
+              }
+            }
+
             // søg efter radio station navn fill buffer from keyboard
             if ((vis_radio_oversigt) && (!(show_radio_options))) {
               if (key!=13) {
@@ -12213,6 +12269,11 @@ void *datainfoloader_webserver(void *data) {
       }
     }
     time(&nowdate);
+    if (do_hent_spotify_search_online) {
+      do_hent_spotify_search_online=false;
+      spotify_oversigt.clean_spotify_oversigt();
+      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+    }
   }
   pthread_exit(NULL);
 }
@@ -12873,6 +12934,7 @@ void loadgfx() {
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
+    big_search_bar        = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar");
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -13030,6 +13092,7 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
+    glDeleteTextures( 1, &big_search_bar);          //
     glDeleteTextures( 1, &radiooptions);            //
     glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			      // lande mask
