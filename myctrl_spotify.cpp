@@ -2047,8 +2047,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
   }
   curl_error=system(call);
-  printf("***** searchstring = %s ****************\n",searchstring);
-  printf("call= %s \n",call);
   if (curl_error!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
     //printf("call= %s \n",call);
