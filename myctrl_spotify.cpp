@@ -2200,7 +2200,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
       length=strlen(temptxt);
-      width = 20;
+      width = 19;
       bool stop=false;
       while(*base) {
         // if text can be on line
@@ -2226,7 +2226,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
-        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
+        glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
         length -= right_margin-base+1;                         // +1 for the space
         base = right_margin+1;
         if (pline>=2) break;
