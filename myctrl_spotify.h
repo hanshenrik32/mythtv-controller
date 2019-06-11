@@ -137,10 +137,6 @@ class spotify_class : vlc_controller {
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
         int type;                                                               // 0 = playlist 1 = songs
         bool gfx_loaded;			        // get artis
-        if ((search_process_name) && (depth==7) && (x==6)) {
-          if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
-        }
-		                                              //
         int get_spotify_intnr(int nr);                                          //
         char *get_spotify_playlistid(int nr);                                   // get id to play
         char *get_spotify_name(int nr);                                         // get name
