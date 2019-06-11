@@ -3154,7 +3154,7 @@ void display() {
       }
     }
     // spotify do the search after enter is pressed
-    if (vis_spotify_oversigt) {
+    if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
       if ((keybufferopenwin) && (hent_spotify_search)) {
         hent_spotify_search=false;
         spotify_selected_startofset=0;                                          // icon show start ofset
@@ -3172,10 +3172,8 @@ void display() {
     }
 
 
-
-
     //
-    // auto search spotify
+    // auto search spotify online
     //
     struct tm* t1;
     static time_t lasttime1=0;
@@ -6448,101 +6446,122 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       }
 
       //
-      // spotify stuf
+      // spotify stuf offline search (only in local db)
       //
-      if ((vis_spotify_oversigt) && (!(do_show_setup_spotify))  && (!(fundet))) {
-        if ((GLuint) names[i*4+3]>=100) {
-          spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
-          spotify_select_iconnr=spotifyknapnr;
-          fundet = true;
-          do_zoom_spotify_cover = false;                                        // close player status to ask about play other selected playlist/song
-          if (spotify_oversigt.type==0) {
-            ask_open_dir_or_play_spotify=true;
-          } else if (spotify_oversigt.type==1) {
-            ask_open_dir_or_play_spotify=true;
+      if (do_show_spotify_search_oversigt==false) {
+        if ((vis_spotify_oversigt) && (!(do_show_setup_spotify))  && (!(fundet))) {
+          if ((GLuint) names[i*4+3]>=100) {
+            spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
+            spotify_select_iconnr=spotifyknapnr;
+            fundet = true;
+            do_zoom_spotify_cover = false;                                        // close player status to ask about play other selected playlist/song
+            if (spotify_oversigt.type==0) {
+              ask_open_dir_or_play_spotify=true;
+            } else if (spotify_oversigt.type==1) {
+              ask_open_dir_or_play_spotify=true;
+            }
           }
-        }
-        // back icon to main playlist overview
-        // do update from root
-        if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
-          if (spotify_oversigt.type==1) {
-            // update
-            spotify_selected_startofset=0;
-            spotify_oversigt.opdatere_spotify_oversigt(0);
-            spotify_oversigt.load_spotify_iconoversigt();
-            ask_open_dir_or_play_spotify = false;
+          // back icon to main playlist overview
+          // do update from root
+          if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
+            if (spotify_oversigt.type==1) {
+              // update
+              spotify_selected_startofset=0;
+              spotify_oversigt.opdatere_spotify_oversigt(0);
+              spotify_oversigt.load_spotify_iconoversigt();
+              ask_open_dir_or_play_spotify = false;
+              fundet = true;
+            }
+            if (spotify_oversigt.type==0) {
+              // update
+              spotify_selected_startofset=0;
+              spotify_oversigt.opdatere_spotify_oversigt(0);
+              spotify_oversigt.load_spotify_iconoversigt();
+              ask_open_dir_or_play_spotify = false;
+              fundet = true;
+            }
+          }
+
+          // play playlist icon select (20) type 0
+          if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
+            fprintf(stderr,"play spotify playlist.\n");
+            do_select_device_to_play=true;
+            returnfunc = 4;
             fundet = true;
           }
-          if (spotify_oversigt.type==0) {
-            // update
-            spotify_selected_startofset=0;
-            spotify_oversigt.opdatere_spotify_oversigt(0);
-            spotify_oversigt.load_spotify_iconoversigt();
-            ask_open_dir_or_play_spotify = false;
+          // play song icon select (20) type 1
+          if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
+            fprintf(stderr,"play spotify song.\n");
+            do_select_device_to_play=true;
+            returnfunc = 5;
+            fundet = true;
+          }
+          // open
+          if ((GLubyte) names[i*4+3]==21) {
+            fprintf(stderr,"open spotify playlist\n");
+            returnfunc = 3;
+            fundet = true;
+          }
+          // Stop play
+          if ((GLubyte) names[i*4+3]==9) {
+            fprintf(stderr,"(Spotify) Stop play\n");
+            returnfunc = 5;                                                       //
+            fundet = true;
+          }
+          // Next
+          if ((GLubyte) names[i*4+3]==11) {
+            fprintf(stderr,"(Spotify) Next song\n");
+            returnfunc = 6;                                                       //
+            fundet = true;
+          }
+          // last
+          if ((GLubyte) names[i*4+3]==10) {
+            fprintf(stderr,"(Spotify) last song\n");
+            returnfunc = 7;                                                       //
+            fundet = true;
+          }
+          //  scroll down
+          if ((GLubyte) names[i*4+3]==24) {
+            fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+            // move playlists down
+            if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
+            returnfunc = 1;
+            fundet = true;
+          }
+          // scroll up
+          if ((GLubyte) names[i*4+3]==23) {
+            fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+            // move playlists up
+            if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
+            if (spotify_selected_startofset<0) spotify_selected_startofset=0;
+            returnfunc = 2;
+            fundet = true;
+          }
+          // show close spotify info (27 need to move) 27 now is global exit
+          if ((GLubyte) names[i*4+3]==27) {
+            if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
+            do_zoom_spotify_cover =! do_zoom_spotify_cover;
             fundet = true;
           }
         }
-        // play playlist icon select (20) type 0
-        if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
-          fprintf(stderr,"play spotify playlist.\n");
-          do_select_device_to_play=true;
-          returnfunc = 4;
-          fundet = true;
+      }
+      // ask open dir or play spotify online search
+      if (do_show_spotify_search_oversigt) {
+        if ((!(do_show_setup_spotify))  && (!(fundet))) {
+          if ((GLuint) names[i*4+3]>=100) {
+            spotifyknapnr = (GLuint) names[i*4+3]-99;				                     // hent music knap nr
+            spotify_select_iconnr=spotifyknapnr;
+            fundet = true;
+            do_zoom_spotify_cover = false;                                       // close player status to ask about play other selected playlist/song
+            if (spotify_oversigt.type==0) {
+              ask_open_dir_or_play_spotify=true;
+            } else if (spotify_oversigt.type==1) {
+              ask_open_dir_or_play_spotify=true;
+            }
+          }
         }
-        // play song icon select (20) type 1
-        if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
-          fprintf(stderr,"play spotify song.\n");
-          do_select_device_to_play=true;
-          returnfunc = 5;
-          fundet = true;
-        }
-        // open
-        if ((GLubyte) names[i*4+3]==21) {
-          fprintf(stderr,"open spotify playlist\n");
-          returnfunc = 3;
-          fundet = true;
-        }
-        // Stop play
-        if ((GLubyte) names[i*4+3]==9) {
-          fprintf(stderr,"(Spotify) Stop play\n");
-          returnfunc = 5;                                                       //
-          fundet = true;
-        }
-        // Next
-        if ((GLubyte) names[i*4+3]==11) {
-          fprintf(stderr,"(Spotify) Next song\n");
-          returnfunc = 6;                                                       //
-          fundet = true;
-        }
-        // last
-        if ((GLubyte) names[i*4+3]==10) {
-          fprintf(stderr,"(Spotify) last song\n");
-          returnfunc = 7;                                                       //
-          fundet = true;
-        }
-        //  scroll down
-        if ((GLubyte) names[i*4+3]==24) {
-          fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
-          // move playlists down
-          if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
-          returnfunc = 1;
-          fundet = true;
-        }
-        // scroll up
-        if ((GLubyte) names[i*4+3]==23) {
-          fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
-          // move playlists up
-          if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
-          if (spotify_selected_startofset<0) spotify_selected_startofset=0;
-          returnfunc = 2;
-          fundet = true;
-        }
-        // show close spotify info (27 need to move) 27 now is global exit
-        if ((GLubyte) names[i*4+3]==27) {
-          if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
-          do_zoom_spotify_cover =! do_zoom_spotify_cover;
-          fundet = true;
-        }
+
+
       }
       //
       // spotify stuf
@@ -12269,11 +12288,14 @@ void *datainfoloader_webserver(void *data) {
       }
     }
     time(&nowdate);
+
     if (do_hent_spotify_search_online) {
+      printf("Update \n");
       do_hent_spotify_search_online=false;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
     }
+
   }
   pthread_exit(NULL);
 }

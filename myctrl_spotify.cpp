@@ -1927,8 +1927,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         //printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        //printf("antal %d x = %2d deep=%2d ",antal,x,depth);
-        //printf("string: %s\n", value->u.string.ptr);
+        printf("x = %2d deep=%2d ",x,depth);
+        printf("string: %s\n", value->u.string.ptr);
         if (search_process_items) {
           // set start of items in list
           search_process_items=false;
@@ -1946,16 +1946,12 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         if ((search_process_name) && (depth==7) && (x==6)) {
           if (antal==0) {
             stack[antal]=new (spotify_oversigt_type);
-          } else {
-            // new record
-            //antal++;
-            //antalplaylists++;
           }
           if (antalplaylists<maxantal) {
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("Antal %d Title : %s \n",antal,value->u.string.ptr);
+            printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -1967,13 +1963,9 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         }
         if ((search_process_uri) && (depth==7) && (x==9)) {
           //printf("URI=%s\n",value->u.string.ptr);
-          //if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
-          //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
-          if (antal==0) antal++;
+          if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
           search_process_uri=false;
         }
-
-
         // get tracknr
         if (search_process_track_nr) {
           search_process_track_nr=false;
@@ -2034,15 +2026,15 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     i++;
   }
   switch(type) {
-    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
-    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
-    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
-    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
-    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
   }
   curl_error=system(call);
   if (curl_error!=0) {
