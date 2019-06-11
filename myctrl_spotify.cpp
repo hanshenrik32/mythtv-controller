@@ -1478,6 +1478,7 @@ void spotify_class::clean_spotify_oversigt() {
         if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         delete stack[i];
       }
+      stack[i]=NULL;
     }
     antal=0;
     antalplaylists=0;
@@ -1856,7 +1857,7 @@ void spotify_class::search_process_object(json_value* value, int depth) {
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
     //if (strcmp(value->u.object.values[x].name,"name")==0)
-    printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
+    //printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       search_process_tracks=true;
     }
@@ -1920,65 +1921,63 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         search_process_array(value, depth+1);
         break;
       case json_integer:
-        printf("int: %10" PRId64 "\n", value->u.integer);
+        //printf("int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
-        printf("double: %f\n", value->u.dbl);
+        //printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        printf("antal %d x = %2d deep=%2d ",antal,x,depth);
-        printf("string: %s\n", value->u.string.ptr);
+        //printf("antal %d x = %2d deep=%2d ",antal,x,depth);
+        //printf("string: %s\n", value->u.string.ptr);
         if (search_process_items) {
           // set start of items in list
           search_process_items=false;
         }
         if (search_process_tracks) {
-          // playlist id from spotify
-          if (stack[antal]) {
-            //strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
-          }
           search_process_tracks=false;
         }
         if (( search_process_image ) && ( depth == 14 ) && ( x == 1 )) {
-          if (stack[antal]) {
-          //  strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
-          }
           search_process_image=false;
         }
         if ((search_process_href) && (depth==9) && (x==9)) {
-          if (stack[antal]) {
-          //  strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
-          }
           search_process_href=false;
+        }
+        // get Song name
+        if ((search_process_name) && (depth==7) && (x==6)) {
+          if (antal==0) {
+            stack[antal]=new (spotify_oversigt_type);
+          } else {
+            // new record
+            //antal++;
+            //antalplaylists++;
+          }
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) {
+              stack[antal]=new (spotify_oversigt_type);
+            }
+            printf("Antal %d Title : %s \n",antal,value->u.string.ptr);
+            if (stack[antal]) {
+              strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
+              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
+            }
+            antal++;
+            antalplaylists++;
+          }
+          search_process_name=false;
         }
         if ((search_process_uri) && (depth==7) && (x==9)) {
           //printf("URI=%s\n",value->u.string.ptr);
           //if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
           //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
+          if (antal==0) antal++;
           search_process_uri=false;
         }
-        // get Song name
-        if ((search_process_name) && (depth==7) && (x==6)) {
-          if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
-          if (antal<maxantal) {
-            if (stack[antal]) {
-              strcpy(stack[antal]->feed_name,value->u.string.ptr);
-              strcpy(stack[antal]->feed_showtxt,value->u.string.ptr);
-            }
-            antal++;
-            antalplaylists++;
-          }
-          // next record
-          search_process_name=false;
-        }
+
 
         // get tracknr
         if (search_process_track_nr) {
           search_process_track_nr=false;
-          //printf(" text %s \n",value->u.string.ptr);
-          // if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
         }
-
         break;
       case json_boolean:
         if (debug_json) printf("bool: %d\n", value->u.boolean);
