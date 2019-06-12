@@ -84,9 +84,9 @@ class spotify_class : vlc_controller {
         void process_object(json_value*, int);
         void process_array(json_value*, int);
         // spotify search online
-        void search_process_value(json_value*, int,int x);
-        void search_process_object(json_value*, int);
-        void search_process_array(json_value*, int);
+        void search_process_value(json_value*, int,int x,int art);
+        void search_process_object(json_value*, int,int art);
+        void search_process_array(json_value*, int,int art);
         // end spotify search online
         void playlist_print_depth_shift(int depth);
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
@@ -135,7 +135,7 @@ class spotify_class : vlc_controller {
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
-        int type;                                                               // 0 = playlist 1 = songs
+        int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
         bool gfx_loaded;			        // get artis
         int get_spotify_intnr(int nr);                                          //
         char *get_spotify_playlistid(int nr);                                   // get id to play
@@ -158,6 +158,8 @@ class spotify_class : vlc_controller {
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);                     // play playlist
         int spotify_play_now_song(char *playlist_song,bool now);                // play song
+        int spotify_play_now_artist(char *playlist_song,bool now);         // play
+        int spotify_play_now_album(char *playlist_song,bool now);
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now

@@ -1281,11 +1281,73 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
   return(curl_error);
 }
 
+// work
+// play artist
+// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// error codes
+
+// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
+// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
+// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
+// 429	Too Many Requests - Rate limiting has been applied.
 
 
+int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
+  int curl_error;
+  char call[4096];
+  char temptxt[2048];
+  char *devid=spotify_oversigt.get_active_device_id();
+  devid[40]='\0';
+  printf("Devid *%s*\n",devid);
+  strcpy(temptxt,playlist_song);
+  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
+  if (strlen(temptxt)>34) {
+    strcpy(temptxt,playlist_song+34);
+  }
+  printf("Go play atrist id %s \n",temptxt);
+//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:artist:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  curl_error=system(call);
+  if (WEXITSTATUS(curl_error)!=0) {
+    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
+    fprintf(stderr,"sql=%s\n",call);
+  }
+  return(curl_error);
+}
+
+// work
+// play album
+// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// error codes
+
+// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
+// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
+// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
+// 429	Too Many Requests - Rate limiting has been applied.
 
 
-
+int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
+  int curl_error;
+  char call[4096];
+  char temptxt[2048];
+  char *devid=spotify_oversigt.get_active_device_id();
+  devid[40]='\0';
+  printf("Devid *%s*\n",devid);
+  strcpy(temptxt,playlist_song);
+  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
+  if (strlen(temptxt)>34) {
+    strcpy(temptxt,playlist_song+34);
+  }
+  printf("Go play album id %s \n",temptxt);
+//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  curl_error=system(call);
+  if (WEXITSTATUS(curl_error)!=0) {
+    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
+    fprintf(stderr,"sql=%s\n",call);
+  }
+  return(curl_error);
+}
 
 
 
@@ -1848,7 +1910,7 @@ bool search_process_track_nr=false;
 // process types in file for process playlist files (songs)
 //
 
-void spotify_class::search_process_object(json_value* value, int depth) {
+void spotify_class::search_process_object(json_value* value, int depth,int art) {
   int length, x;
   if (value == NULL) {
     return;
@@ -1882,12 +1944,12 @@ void spotify_class::search_process_object(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       search_process_items=true;
     }
-    search_process_value(value->u.object.values[x].value, depth+1,x);
+    search_process_value(value->u.object.values[x].value, depth+1,x,art);
   }
 }
 
 
-void spotify_class::search_process_array(json_value* value, int depth) {
+void spotify_class::search_process_array(json_value* value, int depth,int art) {
   int length, x;
   if (value == NULL) {
     return;
@@ -1895,7 +1957,7 @@ void spotify_class::search_process_array(json_value* value, int depth) {
   length = value->u.array.length;
   if (debug_json) printf("array\n");
   for (x = 0; x < length; x++) {
-    search_process_value(value->u.array.values[x], depth,x);
+    search_process_value(value->u.array.values[x], depth,x,art);
   }
 }
 
@@ -1904,7 +1966,7 @@ void spotify_class::search_process_array(json_value* value, int depth) {
 // json parser start call function for process playlist
 // do the data progcessing from json
 
-void spotify_class::search_process_value(json_value* value, int depth,int x) {
+void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -1915,10 +1977,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         printf("none\n");
         break;
       case json_object:
-        search_process_object(value, depth+1);
+        search_process_object(value, depth+1,art);
         break;
       case json_array:
-        search_process_array(value, depth+1);
+        search_process_array(value, depth+1,art);
         break;
       case json_integer:
         //printf("int: %10" PRId64 "\n", value->u.integer);
@@ -1942,28 +2004,55 @@ void spotify_class::search_process_value(json_value* value, int depth,int x) {
         if ((search_process_href) && (depth==9) && (x==9)) {
           search_process_href=false;
         }
-        // get Song name
-        if ((search_process_name) && (depth==7) && (x==6)) {
-          if (antal==0) {
-            stack[antal]=new (spotify_oversigt_type);
-          }
-          if (antalplaylists<maxantal) {
-            if (!(stack[antal])) {
+        if ((art==0) || (art==1)) {
+          // get Song name
+          if ((search_process_name) && (depth==7) && (x==6)) {
+            if (antal==0) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
-            if (stack[antal]) {
-              strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
-              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
+            if (antalplaylists<maxantal) {
+              if (!(stack[antal])) {
+                stack[antal]=new (spotify_oversigt_type);
+              }
+              printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+              if (stack[antal]) {
+                strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
+                strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
+              }
+              antal++;
+              antalplaylists++;
             }
-            antal++;
-            antalplaylists++;
           }
-          search_process_name=false;
         }
+        if (art==2) {
+          if ((search_process_name) && (depth==9) && (x==7)) {
+            if (antal==0) {
+              // first record back
+              stack[antal]=new (spotify_oversigt_type);
+              strcpy(stack[antal]->feed_name,"Back");
+              strcpy(stack[antal]->feed_showtxt,"Back");
+              stack[antal]->textureId=0;
+              stack[antal]->intnr=0;                                            // back button
+              antal++;
+            }
+            if (antalplaylists<maxantal) {
+              if (!(stack[antal])) {
+                stack[antal]=new (spotify_oversigt_type);
+              }
+              printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+              if (stack[antal]) {
+                strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
+                strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
+              }
+              antal++;
+              antalplaylists++;
+            }
+          }
+        }
+        search_process_name=false;
         if ((search_process_uri) && (depth==7) && (x==9)) {
           //printf("URI=%s\n",value->u.string.ptr);
-          if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
+          //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
           search_process_uri=false;
         }
         // get tracknr
@@ -2060,8 +2149,13 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   fclose(json_file);
   json = (json_char*) file_contents;
   value = json_parse(json,file_size);                                           // parser
+
   // parse from root
-  search_process_value(value, 0,0);                                             // fill stack array
+  if (type==0) search_process_value(value, 0,0,type);                                     // fill stack array
+  if (type==1) search_process_value(value, 0,0,type);                                     // fill stack array
+  if (type==2) search_process_value(value, 0,0,type);                                     // fill stack array
+  if (type==3) search_process_value(value, 0,0,2);                                        // fill stack array
+
   json_value_free(value);                                                       // json clean up
   free(file_contents);                                                          //
   return(antal);
@@ -2486,9 +2580,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
 // show search/create playlist spotify overview
 //
 
-void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring)
-
-{
+void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
