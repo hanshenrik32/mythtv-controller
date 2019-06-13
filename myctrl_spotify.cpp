@@ -1304,9 +1304,9 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
   if (strlen(temptxt)>34) {
     strcpy(temptxt,playlist_song+34);
   }
-  printf("Go play atrist id %s \n",temptxt);
-//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:artist:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  fprintf(stderr,"Go play Artist id %s \n",temptxt);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:artist:%s\\\"}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  //fprintf(stderr,"sql=%s\n",call);
   curl_error=system(call);
   if (WEXITSTATUS(curl_error)!=0) {
     fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
@@ -1967,6 +1967,7 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
 // do the data progcessing from json
 
 void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
+    char artisid[1024];
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -1989,7 +1990,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         //printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        printf("x = %2d deep=%2d ",x,depth);
+        printf("x = %2d deep=%2d art %2d ",x,depth,art);
         printf("string: %s\n", value->u.string.ptr);
         if (search_process_items) {
           // set start of items in list
@@ -1998,14 +1999,24 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         if (search_process_tracks) {
           search_process_tracks=false;
         }
-        if (( search_process_image ) && ( depth == 14 ) && ( x == 1 )) {
+        if ( search_process_image ) {
+          // get playid
           search_process_image=false;
         }
-        if ((search_process_href) && (depth==9) && (x==9)) {
+        if (search_process_href) {
           search_process_href=false;
         }
+
+        if ((depth==7) && (x==9)) {
+          // get artist id
+          if (strlen(value->u.string.ptr)>16) {
+            strcpy(artisid,value->u.string.ptr+15);
+            strcpy(stack[antal-1]->playlistid,artisid);
+          }
+        }
+
         if ((art==0) || (art==1)) {
-          // get Song name
+          // get name
           if ((search_process_name) && (depth==7) && (x==6)) {
             if (antal==0) {
               stack[antal]=new (spotify_oversigt_type);
@@ -2014,7 +2025,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
               if (!(stack[antal])) {
                 stack[antal]=new (spotify_oversigt_type);
               }
-              printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+              //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
               if (stack[antal]) {
                 strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
                 strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2024,6 +2035,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             }
           }
         }
+        // spotify online type for en kunsner udgivelser (i potify db)
         if (art==2) {
           if ((search_process_name) && (depth==9) && (x==7)) {
             if (antal==0) {
@@ -2039,7 +2051,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
               if (!(stack[antal])) {
                 stack[antal]=new (spotify_oversigt_type);
               }
-              printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+              //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
               if (stack[antal]) {
                 strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
                 strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2209,7 +2221,7 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    printf("Loading texture %d %s \n",nr,stack[nr]->feed_gfx_url);
+    //printf("Loading texture %d %s \n",nr,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       //texture=LoadImage(stack[nr]->feed_gfx_url);
       //if (texture!=-1) stack[nr]->textureId=texture;
