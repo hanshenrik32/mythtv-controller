@@ -2578,7 +2578,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString("   No data ...");
+      glcRenderString("   Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
@@ -2823,7 +2823,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString("   No data ...");
+      glcRenderString("   Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }

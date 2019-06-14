@@ -6545,7 +6545,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       }
       // ask open dir or play spotify online search
       if (do_show_spotify_search_oversigt) {
-        if ((!(do_show_setup_spotify))  && (!(fundet))) {
+        if ((vis_spotify_oversigt) && (!(do_show_setup_spotify))  && (!(fundet))) {
           if ((GLuint) names[i*4+3]>=100) {
             spotifyknapnr = (GLuint) names[i*4+3]-99;				                    // hent spotify knap nr
             spotify_select_iconnr=spotifyknapnr;
@@ -6621,6 +6621,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           returnfunc = 6;
           fundet = true;
         }
+        // Stop play
+        if ((GLubyte) names[i*4+3]==9) {
+          fprintf(stderr,"(Spotify) Stop play\n");
+          returnfunc = 5;                                                       //
+          fundet = true;
+        }
+        if ((GLubyte) names[i*4+3]==11) {
+          fprintf(stderr,"(Spotify) Next song\n");
+          returnfunc = 7;                                                       //
+          fundet = true;
+        }
       }
       //
       // spotify stuf
@@ -6629,49 +6640,49 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((do_show_setup_spotify)  && (!(fundet))) {
         // select default play device
         if ((GLubyte) names[i*4+3]==10) {
-          fprintf(stderr,"slected first devce\n");
+          fprintf(stderr,"selected first device\n");
           spotify_oversigt.set_default_device_to_play(0);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==11) {
-          fprintf(stderr,"slected 2 devce\n");
+          fprintf(stderr,"selected 2 device\n");
           spotify_oversigt.set_default_device_to_play(1);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==12) {
-          fprintf(stderr,"slected 3 devce\n");
+          fprintf(stderr,"selected 3 device\n");
           spotify_oversigt.set_default_device_to_play(2);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==13) {
-          fprintf(stderr,"slected 4 devce\n");
+          fprintf(stderr,"selected 4 device\n");
           spotify_oversigt.set_default_device_to_play(3);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==14) {
-          fprintf(stderr,"slected 5 devce\n");
+          fprintf(stderr,"selected 5 device\n");
           spotify_oversigt.set_default_device_to_play(4);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==15) {
-          fprintf(stderr,"slected 6 devce\n");
+          fprintf(stderr,"selected 6 device\n");
           spotify_oversigt.set_default_device_to_play(5);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==16) {
-          fprintf(stderr,"slected 7 devce\n");
+          fprintf(stderr,"selected 7 device\n");
           spotify_oversigt.set_default_device_to_play(6);
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==17) {
-          fprintf(stderr,"slected 8 devce\n");
+          fprintf(stderr,"selected 8 device\n");
           spotify_oversigt.set_default_device_to_play(7);
           returnfunc = 0;
           fundet = true;
@@ -7135,22 +7146,22 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       fprintf(stderr,"Open spotify flag spotifyknapnr=%d \n",spotifyknapnr);
                     }
                   }
-                  // stop play
-                  if (retfunc==2) {
+                  // stop play online
+                  if (retfunc==5) {
                     if (spotifyknapnr==9) {
                       do_play_spotify=0;
                       do_open_spotifyplaylist=0;
                       fprintf(stderr,"Set stop play spotify flag\n");
                     }
                   }
-                  // next play
+                  // next play  online
                   if (retfunc==7) {
                     do_play_spotify=0;
                     do_open_spotifyplaylist=1;
                     fprintf(stderr,"Set next play spotify flag\n");
                     spotify_oversigt.spotify_next_play();
                   }
-                  // last play
+                  // last play online
                   if (retfunc==8) {
                     do_play_spotify=0;
                     do_open_spotifyplaylist=1;
@@ -7404,7 +7415,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotifyknapnr=0;
           }
         } else {
-          // open spotify playlist
+          // open spotify artist
           if (((retfunc==6) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             fprintf(stderr,"Open spotify artist %s \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1));
@@ -7416,46 +7427,29 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
             //spotify_oversigt.load_spotify_iconoversigt();
           }
-
+          // back
           if ((button==3) && (spotifyknapnr==1)) {
             if (strcmp(huskname,"")!=0) {
               spotify_oversigt.clean_spotify_oversigt();
               spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
             }
           }
-
-          // play spotify play artist
+          // spotify play artist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
             //fprintf(stderr,"play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             ask_open_dir_or_play_spotify=false;                                                               // close widow
-            fprintf(stderr,"play nr %d spotify artist playlistid %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            fprintf(stderr,"play Spotify artist %s \n",spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             // get play id
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
               if (spotify_player_start_status==0) fprintf(stderr,"spotify start play artist return ok.\n");
                 else fprintf(stderr,"spotify start play artist return value %d \n ",spotify_player_start_status);
-
               if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
               }
             }
-
-            /*
-            if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
-              // try load and start playing playlist
-              spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-              //do_select_device_to_play=false;
-              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
-                else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
-              if (spotify_player_start_status == 0) {
-                strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
-                do_play_spotify_cover=true;
-                do_zoom_spotify_cover=true;                                       // show we play
-              }
-            }
-            */
           }
           // play artist not playlist not song
           if ((retfunc==5) || (button==3)) {
