@@ -1967,115 +1967,115 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
 // do the data progcessing from json
 
 void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
-    char artisid[1024];
-    int j;
-    if (value == NULL) return;
-    if (value->type != json_object) {
-      print_depth_shift(depth);
-    }
-    switch (value->type) {
-      case json_none:
-        printf("none\n");
-        break;
-      case json_object:
-        search_process_object(value, depth+1,art);
-        break;
-      case json_array:
-        search_process_array(value, depth+1,art);
-        break;
-      case json_integer:
-        //printf("int: %10" PRId64 "\n", value->u.integer);
-        break;
-      case json_double:
-        //printf("double: %f\n", value->u.dbl);
-        break;
-      case json_string:
-        printf("x = %2d deep=%2d art %2d ",x,depth,art);
-        printf("string: %s\n", value->u.string.ptr);
-        if (search_process_items) {
-          // set start of items in list
-          search_process_items=false;
-        }
-        if (search_process_tracks) {
-          search_process_tracks=false;
-        }
-        if ( search_process_image ) {
-          // get playid
-          search_process_image=false;
-        }
-        if (search_process_href) {
-          search_process_href=false;
-        }
+  char artisid[1024];
+  int j;
+  if (value == NULL) return;
+  if (value->type != json_object) {
+    print_depth_shift(depth);
+  }
+  switch (value->type) {
+    case json_none:
+      printf("none\n");
+      break;
+    case json_object:
+      search_process_object(value, depth+1,art);
+      break;
+    case json_array:
+      search_process_array(value, depth+1,art);
+      break;
+    case json_integer:
+      //printf("int: %10" PRId64 "\n", value->u.integer);
+      break;
+    case json_double:
+      //printf("double: %f\n", value->u.dbl);
+      break;
+    case json_string:
+      printf("x = %2d deep = %2d art = %2d ",x,depth,art);
+      printf("string: %s\n", value->u.string.ptr);
+      if (search_process_items) {
+        // set start of items in list
+        search_process_items=false;
+      }
+      if (search_process_tracks) {
+        search_process_tracks=false;
+      }
+      if ( search_process_image ) {
+        // get playid
+        search_process_image=false;
+      }
+      if (search_process_href) {
+        search_process_href=false;
+      }
 
-        if ((depth==7) && (x==9)) {
-          // get artist id
-          if (strlen(value->u.string.ptr)>16) {
-            strcpy(artisid,value->u.string.ptr+15);
-            strcpy(stack[antal-1]->playlistid,artisid);
+      if ((depth==7) && (x==9)) {
+        // get artist id
+        if (strlen(value->u.string.ptr)>16) {
+          strcpy(artisid,value->u.string.ptr+15);
+          strcpy(stack[antal-1]->playlistid,artisid);
+        }
+      }
+
+      if ((art==0) || (art==1)) {
+        // get name
+        if ((search_process_name) && (depth==7) && (x==6)) {
+          if (antal==0) {
+            stack[antal]=new (spotify_oversigt_type);
           }
-        }
-
-        if ((art==0) || (art==1)) {
-          // get name
-          if ((search_process_name) && (depth==7) && (x==6)) {
-            if (antal==0) {
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            if (antalplaylists<maxantal) {
-              if (!(stack[antal])) {
-                stack[antal]=new (spotify_oversigt_type);
-              }
-              //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
-              if (stack[antal]) {
-                strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
-                strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
-              }
-              antal++;
-              antalplaylists++;
+            //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+            if (stack[antal]) {
+              strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
+              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+            antal++;
+            antalplaylists++;
           }
         }
-        // spotify online type for en kunsner udgivelser (i potify db)
-        if (art==2) {
-          if ((search_process_name) && (depth==9) && (x==7)) {
-            if (antal==0) {
-              // first record back
+      }
+      // spotify online type for en kunsner udgivelser (i potify db)
+      if (art==2) {
+        if ((search_process_name) && (depth==9) && (x==7)) {
+          if (antal==0) {
+            // first record back
+            stack[antal]=new (spotify_oversigt_type);
+            strcpy(stack[antal]->feed_name,"Back");
+            strcpy(stack[antal]->feed_showtxt,"Back");
+            stack[antal]->textureId=0;
+            stack[antal]->intnr=0;                                            // back button
+            antal++;
+          }
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
-              strcpy(stack[antal]->feed_name,"Back");
-              strcpy(stack[antal]->feed_showtxt,"Back");
-              stack[antal]->textureId=0;
-              stack[antal]->intnr=0;                                            // back button
-              antal++;
             }
-            if (antalplaylists<maxantal) {
-              if (!(stack[antal])) {
-                stack[antal]=new (spotify_oversigt_type);
-              }
-              //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
-              if (stack[antal]) {
-                strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
-                strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
-              }
-              antal++;
-              antalplaylists++;
+            //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+            if (stack[antal]) {
+              strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
+              strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+            antal++;
+            antalplaylists++;
           }
         }
-        search_process_name=false;
-        if ((search_process_uri) && (depth==7) && (x==9)) {
-          //printf("URI=%s\n",value->u.string.ptr);
-          //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
-          search_process_uri=false;
-        }
-        // get tracknr
-        if (search_process_track_nr) {
-          search_process_track_nr=false;
-        }
-        break;
-      case json_boolean:
-        if (debug_json) printf("bool: %d\n", value->u.boolean);
-        break;
-    }
+      }
+      search_process_name=false;
+      if ((search_process_uri) && (depth==7) && (x==9)) {
+        //printf("URI=%s\n",value->u.string.ptr);
+        //if (stack[antal]) strcpy(stack[antal]->playlisturl,value->u.string.ptr);
+        search_process_uri=false;
+      }
+      // get track nr
+      if (search_process_track_nr) {
+        search_process_track_nr=false;
+      }
+      break;
+    case json_boolean:
+      if (debug_json) printf("bool: %d\n", value->u.boolean);
+      break;
+  }
 }
 
 
@@ -2127,20 +2127,25 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     i++;
   }
   switch(type) {
+            // search artist name
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
+            // search album name
     case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
+            // search playlist name
     case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
+            // search track name
     case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
+            // default search artist name
     default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
   }
   curl_error=system(call);
   if (curl_error!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
-    //printf("call= %s \n",call);
+    printf("call= %s \n",call);
     return 1;
   }
   stat("spotify_search_result.json", &filestatus);                              // get file info
@@ -2619,7 +2624,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
     int pline=0;
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-
     // top search text box + cursor
     float yof_top=orgwinsizey-(buttonsizey*1.25);                                    // start ypos
     float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
