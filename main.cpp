@@ -2314,13 +2314,14 @@ static bool do_update_spotify = true;                            // set true to 
 
 void display() {
     // used by xmltv updater func
+    static bool startwebbrowser=true;                                           // start web browser to enable login to spotify
     static bool getstarttidintvguidefromarray = true;
     static time_t today=0;
     static time_t lasttoday=0;
     static bool do_update_xmltv = false;
-    static bool firsttime_rssupdate = false;                          // only used first time
-    static int starttimer=0;                                     // show logo timeout
-    bool do_play_music_aktiv_nr_select_array[1000];             // array til at fortælle om sange i playlist askopendir er aktiv
+    static bool firsttime_rssupdate = false;                                    // only used first time
+    static int starttimer=0;                                                    // show logo timeout
+    bool do_play_music_aktiv_nr_select_array[1000];                             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
     char temprgtxt[2000];
     int i;
@@ -3202,7 +3203,7 @@ void display() {
       }
       if (hent_spotify_search_online) {
         hent_spotify_search_online=false;
-        if (keybufferindex>2) {
+        if (keybufferindex>=2) {
           // start the search online
           do_hent_spotify_search_online=true;
           //keybufferindex=1;
@@ -3237,16 +3238,11 @@ void display() {
           radiooversigt.show_radio_options();
         }
       } else if (vis_spotify_oversigt) {
-        // start web browser to enable login to spotify
-        static bool startwebbrowser=true;
-        //printf("spotifyknapnr %d offset=%d antal = %d show_search_result %d \n",spotifyknapnr,spotify_selected_startofset,spotify_oversigt.streamantal(),spotify_oversigt.show_search_result);
-
-//        do_show_spotify_search_oversigt=false;
-
-        if (do_show_spotify_search_oversigt==false)
+        if (do_show_spotify_search_oversigt==false) {
           spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
-        else
+        } else {
           spotify_oversigt.show_spotify_search_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+        }
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
@@ -6281,10 +6277,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
 
+      // start/stop spotify online search view
       if (vis_spotify_oversigt) {
         if ((GLubyte) names[i*4+3]==5) {
+          strcpy(keybuffer,"");                                                 // reset text buffer
+          keybufferindex=0;                                                     //
+          spotify_selected_startofset=0;
+          ask_open_dir_or_play_spotify = false;
           if (do_show_spotify_search_oversigt==true) {
             do_show_spotify_search_oversigt=false;
+            spotify_oversigt.opdatere_spotify_oversigt(0);
+            spotify_oversigt.load_spotify_iconoversigt();
           } else {
             do_show_spotify_search_oversigt=true;
           }
@@ -12515,7 +12518,6 @@ void *datainfoloader_webserver(void *data) {
       }
     }
     time(&nowdate);
-
     if (do_hent_spotify_search_online) {
       printf("Update \n");
       do_hent_spotify_search_online=false;
