@@ -7998,7 +7998,7 @@ void handlespeckeypress(int key,int x,int y) {
                   } else {
                     // move coursor
                     if ((spotifyknapnr+spotify_selected_startofset+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()+1) {
-                      if ((spotifyknapnr+snumbersoficonline)>40) {
+                      if ((((spotifyknapnr+snumbersoficonline)>40) && (do_show_spotify_search_oversigt==false)) || (((spotifyknapnr+snumbersoficonline)>32) && (do_show_spotify_search_oversigt==true))) {
                         if ((spotifyknapnr+snumbersoficonline)<spotify_oversigt.antal_spotify_streams()) {
                           spotify_selected_startofset+=8;
                         } else {
