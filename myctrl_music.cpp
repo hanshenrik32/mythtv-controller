@@ -943,7 +943,6 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
 // denne som bruges **************************
 // this in use in main
 
-
 void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected) {
     int buttonsize=180;
     int buttonsizey=180;
@@ -1072,7 +1071,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       // show error message
       glEnable(GL_TEXTURE_2D);
       //glBlendFunc(GL_ONE, GL_ONE);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);      
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
