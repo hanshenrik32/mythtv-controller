@@ -8716,7 +8716,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_select_device_to_play=true;
               }
             }
-
             // søg efter spotify fill buffer from keyboard
             if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
@@ -8729,10 +8728,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
-
             // do show search spodify oversigt online
             if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-              if (key!=13) {
+              if ((key!=13) && (keybufferindex<12)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -8740,7 +8738,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 search_spotify_string_changed=true;
               }
             }
-
             // søg efter radio station navn fill buffer from keyboard
             if ((vis_radio_oversigt) && (!(show_radio_options))) {
               if (key!=13) {

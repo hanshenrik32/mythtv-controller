@@ -80,9 +80,9 @@ class spotify_class : vlc_controller {
         spotify_active_play_info_type spotify_aktiv_song[1];                    //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         void print_depth_shift(int);
-        void process_value(json_value*, int,int x);
-        void process_object(json_value*, int);
-        void process_array(json_value*, int);
+        void process_value_playlist(json_value*, int,int x);
+        void process_object_playlist(json_value*, int);
+        void process_array_playlist(json_value*, int);
         // spotify search online
         void search_process_value(json_value*, int,int x,int art);
         void search_process_object(json_value*, int,int art);
