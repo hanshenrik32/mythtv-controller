@@ -2025,7 +2025,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+            printf("Antal %d Title : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2045,6 +2045,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(stack[antal]->feed_showtxt,"Back");
             stack[antal]->textureId=0;
             stack[antal]->intnr=0;                                            // back button
+            strcpy(playlistid,"");                                            // no play id
             antal++;
           }
           if (antalplaylists<maxantal) {
@@ -2741,6 +2742,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         // show nyt icon note
+        /*
         if (stack[i+sofset]->nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
           glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -2751,6 +2753,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
           glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
           glEnd();
         }
+        */
         glPopMatrix();
       }
       // draw numbers in group
