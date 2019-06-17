@@ -471,7 +471,7 @@ char playlistgfx[2048];
 
 //
 // process types in file playlist
-//
+// parse user playlist
 
 void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
@@ -503,6 +503,10 @@ void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *
 }
 
 
+//
+// parse user playlist
+//
+
 
 void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
@@ -520,13 +524,12 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 
 //
 // json parser start call function playlist db update
+// parse user playlist
 //
 
 void spotify_class::playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) {
-
     char filename[512];
     char downloadfilenamelong[2048];
-
     MYSQL_RES *res;
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
@@ -601,6 +604,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
               playlistexist=true;
             }
           }
+          // if not exist create playlist
           if (!(playlistexist)) {
             sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
             mysql_query(conn,sql);
@@ -621,7 +625,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 //
 // get users play lists
 // write to spotify_users_playlist.json
-//
+// parse user playlist
 
 int spotify_class::spotify_get_user_playlists(bool force) {
   MYSQL *conn;
@@ -745,7 +749,7 @@ void spotify_class::print_depth_shift(int depth)
 
 //
 // static void spotify_class::process_value(json_value* value, int depth);
-//
+// used to parse search result
 
 bool process_tracks=false;
 bool process_playlist=false;
@@ -761,7 +765,7 @@ bool process_track_nr=false;
 // process types in file for process playlist files (songs)
 //
 
-void spotify_class::process_object(json_value* value, int depth) {
+void spotify_class::process_object_playlist(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
@@ -795,12 +799,12 @@ void spotify_class::process_object(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
     }
-    process_value(value->u.object.values[x].value, depth+1,x);
+    process_value_playlist(value->u.object.values[x].value, depth+1,x);
   }
 }
 
 
-void spotify_class::process_array(json_value* value, int depth) {
+void spotify_class::process_array_playlist(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
@@ -808,7 +812,7 @@ void spotify_class::process_array(json_value* value, int depth) {
   length = value->u.array.length;
   if (debug_json) printf("array\n");
   for (x = 0; x < length; x++) {
-    process_value(value->u.array.values[x], depth,x);
+    process_value_playlist(value->u.array.values[x], depth,x);
   }
 }
 
@@ -817,7 +821,7 @@ void spotify_class::process_array(json_value* value, int depth) {
 // json parser start call function for process playlist
 // do the data progcessing from json
 
-void spotify_class::process_value(json_value* value, int depth,int x) {
+void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -828,10 +832,10 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
         if (debug_json) printf("none\n");
         break;
       case json_object:
-        process_object(value, depth+1);
+        process_object_playlist(value, depth+1);
         break;
       case json_array:
-        process_array(value, depth+1);
+        process_array_playlist(value, depth+1);
         break;
       case json_integer:
         if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
@@ -860,6 +864,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
           }
           process_tracks=false;
         }
+        // gfx url
         if (( process_image ) && ( depth == 14 ) && ( x == 1 )) {
           if (stack[antal]) {
             strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
@@ -876,6 +881,19 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
         if ((process_name) && (depth==2) && (x==7)) {
           strcpy(spotify_playlistname , value->u.string.ptr);
         }
+
+        // type album
+        if ((process_name) && (depth==9) && (x==0)) {
+        }
+
+        // get type (album)
+        if ((process_name) && (depth==9) && (x==11)) {
+        }
+
+        // artist
+        if ((process_name) && (depth==12) && (x==4)) {
+        }
+
         // get Song name
         if ((process_name) && (depth==9) && (x==12)) {
           if (antal==0) {
@@ -930,7 +948,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   MYSQL_RES *res;
   MYSQL_ROW row;
   char *database = (char *) "mythtvcontroller";
-  char playlistfilename[1024];
+  char playlistfilename[2048];
   strcpy(playlistfilename,"spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
@@ -975,7 +993,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
     json = (json_char*) file_contents;
     value = json_parse(json,file_size);                                           // parser
     // parse from root
-    process_value(value, 0,0);                                                    // fill stack array
+    process_value_playlist(value, 0,0);                                                    // fill stack array
     json_value_free(value);                                                       // json clean up
     free(file_contents);                                                          //
     // save data to mysql db
@@ -1472,6 +1490,7 @@ int spotify_class::spotify_get_available_devices() {
 
 
 
+//
 // get user access token
 // write to spotify_access_token
 //
@@ -1504,7 +1523,6 @@ int spotify_class::spotify_get_access_token2() {
   }
   return(1);
 }
-
 
 
 
@@ -1759,7 +1777,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
 
 
 //
-// search for playlist or song
+// search for playlist or song in db (from users playlist data in db)
 //
 
 
@@ -2015,6 +2033,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         }
       }
 
+      // art 0 = artist / art 1 = songs
       if ((art==0) || (art==1)) {
         // get name
         if ((search_process_name) && (depth==7) && (x==6)) {
@@ -2035,7 +2054,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           }
         }
       }
-      // spotify online type for en kunsner udgivelser (i potify db)
+      // spotify online type for en kunsner udgivelser (i potify db) (album)
       if (art==2) {
         if ((search_process_name) && (depth==9) && (x==7)) {
           if (antal==0) {
@@ -2060,6 +2079,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             antal++;
             antalplaylists++;
           }
+        }
+        // artist name
+        if ((search_process_name) && (depth==10) && (x==3)) {
+          strcpy(stack[antal-1]->feed_artist,value->u.string.ptr);
         }
       }
       search_process_name=false;
@@ -2643,6 +2666,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
     glBindTexture(GL_TEXTURE_2D,big_search_bar);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
     glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
