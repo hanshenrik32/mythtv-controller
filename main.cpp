@@ -6568,7 +6568,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
-              do_zoom_spotify_cover =! do_zoom_spotify_cover;
+              if (ask_open_dir_or_play_spotify==false) do_zoom_spotify_cover =! do_zoom_spotify_cover;
+              if (ask_open_dir_or_play_spotify) ask_open_dir_or_play_spotify=false;
               fundet = true;
             }
           }
@@ -7895,16 +7896,31 @@ void handlespeckeypress(int key,int x,int y) {
                   }
                   music_key_selected++;
                 }
-                // spotify
+                // spotify normal
                 if ((vis_spotify_oversigt) && (!(ask_open_dir_or_play_spotify))) {
-                  if ((spotifyknapnr+spotify_selected_startofset)<spotify_oversigt.streamantal()+1) {
-                    if (spotifyknapnr+1>40) {
-                      spotify_selected_startofset+=8;
-                      spotifyknapnr-=(spotify_selected_startofset-1);
-                    } else {
-                      spotifyknapnr++;
-                      spotify_key_selected++;
-                      spotify_select_iconnr++;
+                  if (do_show_spotify_search_oversigt==false) {
+                    if ((spotifyknapnr+spotify_selected_startofset)<spotify_oversigt.streamantal()+1) {
+                      if (spotifyknapnr+1>40) {
+                        spotify_selected_startofset+=8;
+                        spotifyknapnr-=(spotify_selected_startofset-1);
+                      } else {
+                        spotifyknapnr++;
+                        spotify_key_selected++;
+                        spotify_select_iconnr++;
+                      }
+                    }
+                  }
+                  // spotify online search
+                  if (do_show_spotify_search_oversigt) {
+                    if ((spotifyknapnr+spotify_selected_startofset)<spotify_oversigt.streamantal()+1) {
+                      if (spotifyknapnr+1>32) {
+                        spotify_selected_startofset+=8;
+                        spotifyknapnr-=(spotify_selected_startofset-1);
+                      } else {
+                        spotifyknapnr++;
+                        spotify_key_selected++;
+                        spotify_select_iconnr++;
+                      }
                     }
                   }
                 }
