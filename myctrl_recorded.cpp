@@ -29,7 +29,6 @@ extern storagedef configstoragerecord[];      // storage array (for recorded pro
 extern GLuint _textureId22;    // movie open info box1
 extern GLuint _textureId23;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
-extern GLuint _textureId25;    // recored picture mask
 extern int screen_size;
 
 // constructor
@@ -429,7 +428,7 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
       glDisable(GL_DEPTH_TEST);
       glBlendFunc(GL_DST_COLOR, GL_ZERO);
       glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, _textureId25);
+      //glBindTexture(GL_TEXTURE_2D, _textureId25);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS); //Begin quadrilateral coordinates

@@ -1,9 +1,17 @@
 # mythtv-controller 
-# packs to install to compile on Ubuntu 10/12/14/16.xx
-# Updated 02/23/2017
+# packs to install to compile on Ubuntu 10/12/14/16/18.xx
+# Updated 06/15/2019
 #
 
 Version.
+
+mythtv-controller ver 37.0
+
+Spotify playlist is now avable to play. And you can search for music on spotify and play it.
+just login on the popup browser and close it again. You have to have a Spotify account to get it to work.
+
+In the setup menu you can select the default player.
+
 
 mythtv-controller ver 0.36.3
 

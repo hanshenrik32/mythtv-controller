@@ -15,7 +15,6 @@
 #include <ctype.h>
 #include <ical.h>
 #include <libxml/parser.h>
-//#include "text3d.h"
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
@@ -47,7 +46,6 @@ extern GLuint _texturemovieinfobox;
 extern GLuint _tvrecordcancelbutton;
 extern GLuint _tvoldprgrecordedbutton;
 extern GLuint _tvnewprgrecordedbutton;
-extern GLuint _tvmaskprgrecordedbutton;
 extern GLuint _tvoverskrift;
 extern fontctrl aktivfont;
 extern int orgwinsizex,orgwinsizey;
@@ -88,7 +86,7 @@ void myglprinttv(char *string) {
 
 
 //
-// ceck if process is running
+// check if process is running
 //
 
 bool check_tvguide_process_running(char *processname) {
@@ -129,6 +127,9 @@ int get_tvguide_fromweb() {
 }
 
 
+//
+// hash func
+//
 
 unsigned int ELFHash(const char *s) {
     /* ELF hash uses unsigned chars and unsigned arithmetic for portability */

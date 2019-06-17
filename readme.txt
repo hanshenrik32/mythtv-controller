@@ -1,5 +1,7 @@
 husk imageconvert 
 
+if ypu wants to make the deb file you have to install debhelper
+
 https://www.imagemagick.org/Usage/thumbnails/#cut
 
 # mythtv-controller 

@@ -943,7 +943,6 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
 // denne som bruges **************************
 // this in use in main
 
-
 void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected) {
     int buttonsize=180;
     int buttonsizey=180;
@@ -971,7 +970,8 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       }
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       // show back or opem playlist list
       if (i==0) {
         if (musicoversigt[i+sofset].oversigttype!=-1) {
@@ -1012,6 +1012,7 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
       glEnable(GL_TEXTURE_2D);
       //glBlendFunc(GL_ONE, GL_ONE);
       //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(100+i);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f( xof,yof , 0.0);
@@ -1069,7 +1070,8 @@ void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,G
     if (i==0) {
       // show error message
       glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
       glBindTexture(GL_TEXTURE_2D,_textureIdloading);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

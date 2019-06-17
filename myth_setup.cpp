@@ -92,6 +92,7 @@ extern GLuint _texturetemasetup;
 extern GLuint _texturesetupfont;
 extern GLuint _texturekeyssetup;
 extern GLuint _texturekeysrss;
+extern GLuint _texturespotify;
 extern GLuint _texturelock;			                  // en hænge lås
 extern GLuint setupkeysbar1;
 extern GLuint setupkeysbar2;
@@ -3449,8 +3450,9 @@ int order_channel_list_in_tvguide_db() {
 
 
 //
-// ********************* show setup tv graber ************************************************************************
+// tv guide
 //
+
 
 void show_setup_tv_graber(int startofset) {
     const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
@@ -3476,7 +3478,7 @@ void show_setup_tv_graber(int startofset) {
         printf("Create config file for xmltv first time.\n");
         if (txmltvgraber_createconfig()==0) {
           printf("\nError xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
-          exit(0);
+          //exit(0);
         }
         //
         // load all channels name from tv_graber
@@ -3873,6 +3875,23 @@ void show_setup_interface() {
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
+
+    // setup spotify
+    xpos=800;
+    ypos=100;
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D,_texturespotify);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(43);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
+    glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
+    glEnd();
+
+
     // close button
     xpos=200;
     ypos=100;

@@ -36,6 +36,7 @@ int xbmcsqlite::getxmlfilepath() {
     fprintf(stdout, "...\n");
     xmlFreeDoc(document);
   }
+  return(1);
 }
 
 
