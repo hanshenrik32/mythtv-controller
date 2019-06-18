@@ -7389,6 +7389,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             spotify_oversigt.load_spotify_iconoversigt();
+            spotifyknapnr=0;
+            spotify_selected_startofset=0;
           }
           // play spotify playlist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
@@ -7461,6 +7463,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
+            // reset select in spotify view
+            spotifyknapnr=0;
+            spotify_selected_startofset=0;
             //spotify_oversigt.load_spotify_iconoversigt();
           }
           // back
@@ -8730,7 +8735,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             // do show search spodify oversigt online
             if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-              if ((key!=13) && (keybufferindex<12)) {
+              if ((key!=13) && (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -11069,9 +11074,9 @@ void update(int value) {
                     // lirc move down
                     if (strcmp(c,"Key-nav-down")==0) {
                         if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-                            if ((unsigned int) do_show_play_open_select_line+do_show_play_open_select_line_ofset<(unsigned int) dirmusic.numbersinlist()-1) {
-                                if ((int) do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
-                            }
+                          if ((unsigned int) do_show_play_open_select_line+do_show_play_open_select_line_ofset<(unsigned int) dirmusic.numbersinlist()-1) {
+                            if ((int) do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
+                          }
                         }
                         if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
                             if (((int) music_key_selected<(int) musicoversigt_antal-4) && (music_icon_anim_icon_ofset==0)) {
