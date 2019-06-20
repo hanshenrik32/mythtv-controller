@@ -949,7 +949,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   MYSQL_ROW row;
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
-  strcpy(playlistfilename,"spotify_playlist_");                                 // create playlist file name
+  strcpy(playlistfilename,"json/spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
   char sql[8594];
@@ -964,6 +964,9 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   char* file_contents;
   json_char* json;
   json_value* value;
+  if (!(file_exists("json"))) {
+    system("/bin/mkdir json");
+  }
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
       sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
@@ -2150,21 +2153,24 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     searchstring[ii]='\0';
     i++;
   }
+  if (!(file_exists("json"))) {
+    system("/bin/mkdir json");
+  }
   switch(type) {
             // search artist name
-    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > json/spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search album name
-    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > json/spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search playlist name
-    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > json/spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search track name
-    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > json/spotify_search_result.json",searchstring,spotifytoken);
             break;
             // default search artist name
-    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > json/spotify_search_result.json",searchstring,spotifytoken);
   }
   curl_error=system(call);
   if (curl_error!=0) {
@@ -2172,10 +2178,10 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     printf("call= %s \n",call);
     return 1;
   }
-  stat("spotify_search_result.json", &filestatus);                              // get file info
+  stat("json/spotify_search_result.json", &filestatus);                              // get file info
   file_size = filestatus.st_size;                                               // get filesize
   file_contents = (char*) malloc(filestatus.st_size);
-  json_file = fopen("spotify_search_result.json", "rt");
+  json_file = fopen("json/spotify_search_result.json", "rt");
   if (json_file == NULL) {
     fprintf(stderr, "Unable to open spotify_search_result.json\n");
     free(file_contents);                                                        //
