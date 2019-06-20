@@ -32,6 +32,8 @@
 extern char   __BUILD_DATE;
 extern char   __BUILD_NUMBER;
 
+static bool runwebserver=true;
+
 bool do_open_spotifyplaylist=false;
 bool do_select_device_to_play=false;
 bool ask_save_playlist = false;
@@ -3676,6 +3678,7 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
       glEnd();
       glPopMatrix();
+      // if playlist
       if (spotify_oversigt.type==0) {
         // ***************************************************************** open icon
         xof=550;
@@ -6257,7 +6260,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_spotify = false;
           fundet = true;
         }
-        // test for exit selected
+        // test for exit selected                                               // exit program
         if ((GLubyte) names[i*4+3]==6) {
           vis_music_oversigt = false;
           vis_film_oversigt = false;
@@ -6270,6 +6273,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_tvgraber = false;
           fundet = true;
           remove("mythtv-controller.lock");
+          runwebserver=false;
           order_channel_list();                                               // order tv channel list
           save_channel_list();                                                //
           txmltvgraber_createconfig();                                        //
@@ -6493,7 +6497,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // back icon to main playlist overview
             // do update from root
             if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
-              if (spotify_oversigt.type==1) {
+              if (spotify_oversigt.type==0) {
                 // update
                 spotify_selected_startofset=0;
                 spotify_oversigt.opdatere_spotify_oversigt(0);
@@ -6501,7 +6505,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 ask_open_dir_or_play_spotify = false;
                 fundet = true;
               }
-              if (spotify_oversigt.type==0) {
+              if (spotify_oversigt.type==1) {
                 // update
                 spotify_selected_startofset=0;
                 spotify_oversigt.opdatere_spotify_oversigt(0);
@@ -6592,7 +6596,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           printf("spotifyknapnr %d type=%d \n",spotifyknapnr,spotify_oversigt.type);
           // back button
-          if ((fundet ==false) && (spotifyknapnr==1) && (ask_open_dir_or_play_spotify==false) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
+          if (( fundet == false) && ( spotifyknapnr == 1 ) && ( ask_open_dir_or_play_spotify == false ) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back") == 0)) {
             if (spotify_oversigt.type==0) {
               // update
               spotify_selected_startofset=0;
@@ -7047,7 +7051,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
     //static char huskname[1024];
     char tmp[80];
     char temptxt[200];
-    int retfunc;
+    int retfunc=0;
     int spotify_player_start_status;
     int numbers_cd_covers_on_line;
     int numbers_film_covers_on_line;
@@ -7380,17 +7384,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             do_play_spotify_cover=false;
             do_select_device_to_play=false;                                     // stop show device
             spotifyknapnr=0;
+            spotify_selected_startofset=0;                                      //
           }
         } else {
           // open spotify playlist
+          printf("                      retfunc= %d \n",retfunc);
           if (((retfunc==3) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             spotify_oversigt.load_spotify_iconoversigt();
-            spotifyknapnr=0;
-            spotify_selected_startofset=0;
+            spotifyknapnr=0;                                                    // reset select
+            spotify_selected_startofset=0;                                      //
           }
           // play spotify playlist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
@@ -7411,7 +7417,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // play song not playlist
           if ((retfunc==5) || (button==3)) {
-            //fprintf(stderr,"play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            fprintf(stderr,"play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
@@ -7456,7 +7462,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // open spotify artist
           if (((retfunc==6) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            fprintf(stderr,"Open spotify artist %s \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            fprintf(stderr,"Open spotify artist %s type %d \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
             // update from web
             // clear old first
             //static char huskname[1024];
@@ -7464,7 +7470,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
             // reset select in spotify view
-            spotifyknapnr=0;
+            spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
             //spotify_oversigt.load_spotify_iconoversigt();
           }
@@ -7473,17 +7479,21 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (strcmp(huskname,"")!=0) {
               spotify_oversigt.clean_spotify_oversigt();
               spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
+              spotifyknapnr=0;                                                  // reset selected
+              spotify_selected_startofset=0;
             }
           }
-          // spotify play artist
+          // spotify play artist/or playlist
           if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
             //fprintf(stderr,"play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             ask_open_dir_or_play_spotify=false;                                                               // close widow
-            fprintf(stderr,"play Spotify artist %s \n",spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            fprintf(stderr,"play Spotify artist %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             // get play id
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
-              spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
+              if (spotify_oversigt.type==0) spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
+              //if (spotify_oversigt.type==0) spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              else if (spotify_oversigt.type==1) spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
               if (spotify_player_start_status==0) fprintf(stderr,"spotify start play artist return ok.\n");
                 else fprintf(stderr,"spotify start play artist return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
@@ -9343,6 +9353,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
+                runwebserver=false;
                 order_channel_list();
                 save_channel_list();
                 exit(0);                                                        //  exit program
@@ -12309,6 +12320,7 @@ int init_sound_system(int devicenr) {
     ERRCHECK(result,0);
     if (fmodversion < FMOD_VERSION) {
        fprintf(stderr,"Error!  You are using an old version of FMOD %08x.  This program requires %08x\n", fmodversion, FMOD_VERSION);
+       runwebserver=false;
        exit(0);
     }
     //result = sndsystem->getDriverCaps(0, &caps, 0, 0, &speakermode);
@@ -12524,7 +12536,7 @@ void *datainfoloader_webserver(void *data) {
   static time_t nowdate;
   time(&lasttime);
   time(&nowdate);
-  while(true) {
+  while((true) && (runwebserver)) {
     // run the webserver
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     // run time server to update spotify token
@@ -12757,6 +12769,7 @@ void *xbmcdatainfoloader(void *data) {
     dirp=opendir(userhomedir);                                // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
         if (debugmode & 2) fprintf(stderr,"No xbmc/kodi db found\nOpen dir error %s \n","~/.kodi/userdata/Database/");
+        runwebserver=false;
         exit(0);
     }
     // loop dir and update music songs db
@@ -12938,6 +12951,7 @@ void *xbmcdatainfoloader_movie(void *data) {
     dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
       fprintf(stderr,"No xbmc/kodi db found\nOpen dir error %s \n",userhomedir);
+      runwebserver=false;
       exit(0);
     }
     // loop dir and update music songs db
