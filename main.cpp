@@ -123,7 +123,7 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;          // do it first time
+static bool do_update_spotify_playlist = false;           // do it first time
 
 
 // struct used by keyboard config of functions keys
@@ -150,7 +150,7 @@ bool do_save_config = false;                              // flag to save config
 channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
 channel_configfile  xmltv_configcontrol;                //
 
-bool firsttime_xmltvupdate = true;                        // update tvguide xml files first start (force)
+bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
 char playlistfilename[80];                              // name to use thewn save playlist
 char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
@@ -7359,9 +7359,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
       }
-      // scroll spotify up/down
-      // and open / play / stop / next / last play control // open playlist
+
+      printf("spotify playlist nr %d type = %d \n ",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
+
       if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
+        // scroll spotify up/down
+        // and open / play / stop / next / last play control // open playlist
         if (!(do_zoom_spotify_cover)) {
           if ((retfunc==2) || (button==4)) {
             if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
@@ -7388,7 +7391,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         } else {
           // open spotify playlist
-          printf("                      retfunc= %d \n",retfunc);
           if (((retfunc==3) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
@@ -7398,32 +7400,32 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotifyknapnr=0;                                                    // reset select
             spotify_selected_startofset=0;                                      //
           }
-          // play spotify playlist
-          if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
-            //fprintf(stderr,"play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+          // play spotify playlist or song
+          if (((retfunc==4) || (retfunc==5)) && (spotifyknapnr>0)) {
+            switch(spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
+              case 0: fprintf(stderr,"play nr %d spotify playliste id %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+                      break;
+              case 1: fprintf(stderr,"play nr %d spotify song id %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+                      break;
+              default: fprintf(stderr,"Error in type. Type found %d  \n",spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                      break;
+
+            }
+            //
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               // try load and start playing playlist
-              spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==0) {
+                spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              }
+              if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==1) {
+                spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+              }
               //do_select_device_to_play=false;
               if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
                 else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
                 strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
-                do_play_spotify_cover=true;
-                do_zoom_spotify_cover=true;                                       // show we play
-              }
-            }
-          }
-          // play song not playlist
-          if ((retfunc==5) || (button==3)) {
-            fprintf(stderr,"play nr %d spotify song %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
-            ask_open_dir_or_play_spotify=false;                                                               // close widow
-            if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
-              spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
-                else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
-              if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
               }
@@ -7483,34 +7485,36 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               spotify_selected_startofset=0;
             }
           }
-          // spotify play artist/or playlist
-          if (((retfunc==4) || (button==3)) && (spotifyknapnr>0)) {
+          // spotify play artist/or playlist / or cd
+          if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (spotifyknapnr>0)) {
             //fprintf(stderr,"play nr %d spotify playliste %s named %s \n",spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             fprintf(stderr,"play Spotify artist %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             // get play id
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
-              if (spotify_oversigt.type==0) spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
-              //if (spotify_oversigt.type==0) spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
-              else if (spotify_oversigt.type==1) spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
-              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play artist return ok.\n");
-                else fprintf(stderr,"spotify start play artist return value %d \n ",spotify_player_start_status);
-              if (spotify_player_start_status == 0) {
-                do_play_spotify_cover=true;
-                do_zoom_spotify_cover=true;                                       // show we play
+              switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
+                case 0: spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+                        break;
+                case 1:
+                        break;
+                case 2: spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
+                        break;
+                case 3:
+                        break;
               }
-            }
-          }
-          // play artist not playlist not song
-          if ((retfunc==5) || (button==3)) {
-            fprintf(stderr,"play nr %d spotify artist playlistid %s named %s \n", spotifyknapnr-1, spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),spotify_oversigt.get_spotify_name(spotifyknapnr-1));
-            ask_open_dir_or_play_spotify=false;                                                               // close widow
-            // get play id
-            if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
-              spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
-              if (spotify_player_start_status==0) fprintf(stderr,"spotify start play artist return ok.\n");
-                else fprintf(stderr,"spotify start play artist return value %d \n ",spotify_player_start_status);
+              if (spotify_player_start_status==0) {
+                switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
+                  case 0: fprintf(stderr,"spotify start play playlist return ok.\n");
+                          break;
+                  case 1: fprintf(stderr,"spotify start play song return ok.\n");
+                          break;
+                  case 2: fprintf(stderr,"spotify start play artist return ok.\n");
+                          break;
+                  case 3: fprintf(stderr,"spotify start play cd return ok.\n");
+                          break;
+                }
+              } else fprintf(stderr,"spotify start play artist return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
