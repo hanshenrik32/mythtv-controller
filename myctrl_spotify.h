@@ -47,6 +47,7 @@ class spotify_oversigt_type {
     bool        nyt;                              //
     GLuint      textureId;                        // gfx icon loaded
     long        intnr;
+    char        type;
     spotify_oversigt_type();                      // constructor
 };
 
@@ -142,6 +143,7 @@ class spotify_class : vlc_controller {
         char *get_spotify_name(int nr);                                         // get record name
         char *get_spotify_desc(int nr);                                         // get record desc
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        int get_spotify_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };
         spotify_class();
