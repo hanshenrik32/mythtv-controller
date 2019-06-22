@@ -3128,7 +3128,7 @@ int killrunninggraber() {
   char processname[1024];
   sprintf(processname,"killall -9 %s",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   sysresult=system(processname);
-  if (sysresult) return(sysresult);
+  if (sysresult) return(sysresult); else return(0);
 }
 
 

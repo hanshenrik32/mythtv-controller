@@ -100,6 +100,7 @@ class spotify_class : vlc_controller {
         bool spotify_is_playing;                                                // do we play ?
         bool spotify_is_pause;                                                   // do we pause
     public:
+        bool search_spotify_online_done;
         bool show_search_result;                                                // are ew showing search result in spotify view ?
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
         char spotify_client_id[255];                                            // Client id
@@ -143,6 +144,7 @@ class spotify_class : vlc_controller {
         char *get_spotify_name(int nr);                                         // get record name
         char *get_spotify_desc(int nr);                                         // get record desc
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        char *get_spotify_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
         int get_spotify_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };

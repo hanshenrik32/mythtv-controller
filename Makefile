@@ -63,7 +63,7 @@ else
 endif
 
 all:
-	@echo "mythtv-controller ver 0.37.4 \nPossible targets:"
+	@echo "mythtv-controller ver 0.38.1 \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
 	@echo "'make compile'             - Compile mythtv-controller"
@@ -118,7 +118,7 @@ installsound:
 
 
 install:
-	@echo "Installing mythtv-controller ver 0.37.x in /usr/share/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.38.x in /usr/share/mythtv-controller."
 	@mkdir -p /usr/share/mythtv-controller/images/radiostations
 	@mkdir -p /usr/share/mythtv-controller/convert/hires
 	@cp charset $(DESTDIR)
