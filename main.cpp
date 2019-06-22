@@ -3678,8 +3678,8 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
       glEnd();
       glPopMatrix();
-      // if playlist
-      if (spotify_oversigt.type==0) {
+      // if playlist or artist you can open it else only show play
+      if ((spotify_oversigt.get_spotify_type(spotifyknapnr)==0) || (spotify_oversigt.get_spotify_type(spotifyknapnr)==2)) {
         // ***************************************************************** open icon
         xof=550;
         yof=200;
@@ -6497,15 +6497,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // back icon to main playlist overview
             // do update from root
             if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
-              if (spotify_oversigt.type==0) {
-                // update
-                spotify_selected_startofset=0;
-                spotify_oversigt.opdatere_spotify_oversigt(0);
-                spotify_oversigt.load_spotify_iconoversigt();
-                ask_open_dir_or_play_spotify = false;
-                fundet = true;
-              }
-              if (spotify_oversigt.type==1) {
+              if ((spotify_oversigt.type==0) || (spotify_oversigt.type==1)) {
                 // update
                 spotify_selected_startofset=0;
                 spotify_oversigt.opdatere_spotify_oversigt(0);
@@ -6594,11 +6586,25 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               }
             }
           }
-          printf("spotifyknapnr %d type=%d \n",spotifyknapnr,spotify_oversigt.type);
+          printf("spotifyknapnr %d type=%d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
           // back button
+
+          // works ok
+          // back icon to main playlist overview
+          // do update from root
+          if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
+            // update
+            spotify_selected_startofset=0;
+            spotify_oversigt.opdatere_spotify_oversigt(0);
+            spotify_oversigt.load_spotify_iconoversigt();
+            ask_open_dir_or_play_spotify = false;
+            fundet = true;
+          }
+
+          /*
           if (( fundet == false) && ( spotifyknapnr == 1 ) && ( ask_open_dir_or_play_spotify == false ) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back") == 0)) {
+            // update
             if (spotify_oversigt.type==0) {
-              // update
               spotify_selected_startofset=0;
               spotify_oversigt.opdatere_spotify_oversigt(0);
               //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
@@ -6624,7 +6630,17 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               ask_open_dir_or_play_spotify = false;
               fundet = true;
             }
+            if (spotify_oversigt.get_spotify_type(spotifyknapnr)==3) {
+              // update
+              spotify_selected_startofset=0;
+              spotify_oversigt.opdatere_spotify_oversigt(0);
+              //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
+              spotify_oversigt.load_spotify_iconoversigt();
+              ask_open_dir_or_play_spotify = false;
+              fundet = true;
+            }
           }
+          */
 
           // play playlist icon select (20) type 0
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
@@ -7139,6 +7155,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 // normal spotify stuf
                 if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
                   // spotify stuf
+                  // play
                   if (retfunc==3) {
                     if (spotifyknapnr>0) {
                       do_play_spotify=1;
@@ -7360,7 +7377,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
       }
-      printf("spotify playlist nr %d type = %d \n ",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
+
+      //printf("spotify playlist nr %d type = %d \n ",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
       if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
         // scroll spotify up/down
         // and open / play / stop / next / last play control // open playlist
@@ -7447,6 +7465,17 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (spotify_selected_startofset<0) spotify_selected_startofset=0;
             button=0;
           }
+          // back
+          if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
+            spotify_oversigt.clean_spotify_oversigt();
+
+            //printf("huskname %s \n",huskname  );
+
+            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
+            //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+            spotifyknapnr=0;                                                  // reset selected
+            spotify_selected_startofset=0;
+          }
         }
         if (do_zoom_spotify_cover) {
           // pause/stop spotify music
@@ -7474,15 +7503,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
             //spotify_oversigt.load_spotify_iconoversigt();
-          }
-          // back
-          if ((button==3) && (spotifyknapnr==1)) {
-            if (strcmp(huskname,"")!=0) {
-              spotify_oversigt.clean_spotify_oversigt();
-              spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
-              spotifyknapnr=0;                                                  // reset selected
-              spotify_selected_startofset=0;
-            }
           }
           // spotify play artist/or playlist / or cd
           if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (spotifyknapnr>0)) {
@@ -12550,13 +12570,14 @@ void *datainfoloader_webserver(void *data) {
     }
     time(&nowdate);
     if (do_hent_spotify_search_online) {
+      spotify_oversigt.search_spotify_online_done=false;
       printf("Update \n");
       do_hent_spotify_search_online=false;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+      spotify_oversigt.search_spotify_online_done=true;
       //spotify_oversigt.type=2;
     }
-
   }
   pthread_exit(NULL);
 }

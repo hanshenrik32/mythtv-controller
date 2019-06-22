@@ -2016,8 +2016,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       //printf("double: %f\n", value->u.dbl);
       break;
     case json_string:
-      printf("x = %2d deep = %2d art = %2d ",x,depth,art);
-      printf("string: %s\n", value->u.string.ptr);
+      //printf("x = %2d deep = %2d art = %2d ",x,depth,art);
+      //printf("string: %s\n", value->u.string.ptr);
       if (search_process_items) {
         // set start of items in list
         search_process_items=false;
@@ -2615,7 +2615,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString("   Loading ...");
+      if (spotify_oversigt.search_spotify_online_done) glcRenderString("   Loading ..."); else glcRenderString("   Not found ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
