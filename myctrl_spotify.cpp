@@ -61,6 +61,7 @@ extern bool do_select_device_to_play;
 extern GLuint mobileplayer_icon;
 extern GLuint pcplayer_icon;
 extern GLuint unknownplayer_icon;
+extern GLuint spotify_pil;
 
 extern float configdefaultstreamfontsize;
 extern int tema;
@@ -336,6 +337,8 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
     strcpy(active_default_play_device_name,"");
+    strcpy(overview_show_band_name,"");                                         //
+    strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
 }
 
@@ -2876,6 +2879,38 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
       glcRenderString("   Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
+    }
+    bool vis_band_name=true;
+    if (vis_band_name) {
+      if (strcmp(overview_show_band_name,"")!=0) {
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,spotify_pil);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-60), 14 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-60), 14+46, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-60)+60, 14+46 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-60)+60, 14 , 0.0);
+        glEnd();
+        glPopMatrix();
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glTranslatef((orgwinsizex/2)-(130+(strlen(overview_show_band_name)*10)), 30 ,0.0f);
+        glScalef(22.0, 22.0, 1.0);
+        glcRenderString(overview_show_band_name);
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(((orgwinsizex/2)+30), 30 ,0.0f);
+        glDisable(GL_TEXTURE_2D);
+        glScalef(22.0, 22.0, 1.0);
+        glcRenderString("Collection");
+        glPopMatrix();
+
+      }
     }
 }
 

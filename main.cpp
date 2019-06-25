@@ -697,6 +697,7 @@ GLuint spotify_askplay;                   //
 GLuint spotify_askopen;                   //
 GLuint spotify_search;                    //
 GLuint spotify_ecover;                    //
+GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
 GLuint onlinestream;                      // stream default icon
@@ -776,6 +777,7 @@ GLuint _texturemstop;
 GLuint _texturemnext;
 GLuint _textureIdradiosearch;
 GLuint _textureIdplayinfo;
+GLuint _textureIdpil;
 GLuint _textureIdmusicsearch1;
 GLuint _textureIdmusicsearch;
 GLuint _textureIdmoviesearch;
@@ -6288,6 +6290,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           keybufferindex=0;                                                     //
           spotify_selected_startofset=0;
           ask_open_dir_or_play_spotify = false;
+          strcpy(spotify_oversigt.overview_show_band_name,"");
           if (do_show_spotify_search_oversigt==true) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt.opdatere_spotify_oversigt(0);
@@ -7416,6 +7419,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.load_spotify_iconoversigt();
             spotifyknapnr=0;                                                    // reset select
             spotify_selected_startofset=0;                                      //
+            strcpy(spotify_oversigt.overview_show_band_name,"");
           }
           // play spotify playlist or song
           if (((retfunc==4) || (retfunc==5)) && (spotifyknapnr>0)) {
@@ -7468,13 +7472,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // back
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
             spotify_oversigt.clean_spotify_oversigt();
-
             //printf("huskname %s \n",huskname  );
-
             spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
             //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
+            strcpy(spotify_oversigt.overview_show_band_name,"");
           }
         }
         if (do_zoom_spotify_cover) {
@@ -7497,6 +7500,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             // clear old first
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+            strcpy(spotify_oversigt.overview_show_band_name,huskname);
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
             // reset select in spotify view
@@ -13241,6 +13245,7 @@ void loadgfx() {
     spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
+    spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar        = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar");
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
@@ -13396,10 +13401,11 @@ void freegfx() {
     glDeleteTextures( 1, &onlinestream_empty1);     // stream default icons
     glDeleteTextures( 1, &musicbutton);             //
     glDeleteTextures( 1, &spotify_askopen);         //
-    glDeleteTextures( 1, &spotify_search);         //
+    glDeleteTextures( 1, &spotify_search);          //
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
+    glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar);          //
     glDeleteTextures( 1, &radiooptions);            //
     glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
