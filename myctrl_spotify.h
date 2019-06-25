@@ -98,8 +98,11 @@ class spotify_class : vlc_controller {
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal
         bool spotify_is_playing;                                                // do we play ?
-        bool spotify_is_pause;                                                   // do we pause
+        bool spotify_is_pause;                                                  // do we pause
+        //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
     public:
+        char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
+        char overview_show_cd_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         bool search_spotify_online_done;
         bool show_search_result;                                                // are ew showing search result in spotify view ?
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
@@ -109,13 +112,13 @@ class spotify_class : vlc_controller {
         void spotify_set_token(char *token,char *refresh);
         char *spotify_get_token() { return(spotifytoken); };
         int spotify_refresh_token();                                            // refresh token on postify api
-        int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };
-        int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };
-        char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };
-        char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };
-        char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };
+        int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
+        int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
+        char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };                       //
+        char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
+        char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };            //
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
-        char *get_active_spotify_device_name();
+        char *get_active_spotify_device_name();                                 //
         char *get_device_id(int nr) { return(spotify_device[nr].id); };         // get active dev id
         char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int active_spotify_device;                                              // active device then get spotify devices or -1
@@ -162,8 +165,8 @@ class spotify_class : vlc_controller {
         int spotify_play_playlist(char *songarray);
         int spotify_play_now(char *playlist_song,bool now);                     // play playlist
         int spotify_play_now_song(char *playlist_song,bool now);                // play song
-        int spotify_play_now_artist(char *playlist_song,bool now);         // play
-        int spotify_play_now_album(char *playlist_song,bool now);
+        int spotify_play_now_artist(char *playlist_song,bool now);              // play artist
+        int spotify_play_now_album(char *playlist_song,bool now);               // play album
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
@@ -172,7 +175,7 @@ class spotify_class : vlc_controller {
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
         void select_device_to_play();                                           // show device list to play on
-        void set_default_device_to_play(int nr);                                // show device list to play on
+        void set_default_device_to_play(int nr);                                // set default device list to play on
         void show_setup_spotify();                                              //
         int opdatere_spotify_oversigt(char *refid);
         int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);
