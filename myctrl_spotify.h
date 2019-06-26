@@ -41,7 +41,7 @@ class spotify_oversigt_type {
     char        feed_gfx_url[4000+1];             //
     char        feed_gfx_mythtv[2000+1];				  //
     char        playlistid[100+1];                // playlist id
-    char        playlisturl[200+1];               // play list url + spotify command
+    char        playlisturl[1024+1];               // play list url + spotify command
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
     bool        nyt;                              //
