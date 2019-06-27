@@ -1792,7 +1792,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (songstrpointer) {
                   strcpy(temptxt2,row[2]+14);
                   strcpy(stack[antal]->playlistid,temptxt2);
-                } else strcpy(stack[antal]->playlistid,"row[2]");
+                } else strcpy(stack[antal]->playlistid,row[2]);
                 antal++;
               }
             }
