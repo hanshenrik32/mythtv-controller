@@ -778,7 +778,7 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
     //if (strcmp(value->u.object.values[x].name,"name")==0)
-    printf("x=%d depth=%d object[%d].name = %s  \n",x,depth, x, value->u.object.values[x].name);
+    //printf("x=%d depth=%d object[%d].name = %s  \n",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       process_tracks=true;
     }
@@ -814,7 +814,7 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
     return;
   }
   length = value->u.array.length;
-  printf("array\n");
+  printf("array found\n");
   for (x = 0; x < length; x++) {
     process_value_playlist(value->u.array.values[x], depth,x);
   }
@@ -848,7 +848,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         if (debug_json) printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        printf("string: %s\n", value->u.string.ptr);
+        //printf("string: %s\n", value->u.string.ptr);
         if ((process_description) && (depth==11) && (x==7)) {
           if (!(stack[antal])) {
             antal++;
@@ -876,6 +876,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           process_image=false;
         }
 
+        /*
         // process song spotify id
         if ((process_href) && (depth==9) && (x==9)) {
           if (stack[antal]) {
@@ -883,21 +884,24 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           }
           process_href=false;
         }
-
+        */
 
         // process song spotify id CHECKED
         if ((depth==9) && (x==18)) {
           if (stack[antal]) {
+            if (stack[antal]) {
+              strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
+            }
+            /*
             printf("**************************\n");
-            printf("Song name %s \n", stack[antal]->feed_artist);
-            printf("Song value->u.string.ptr=%s \n ",value->u.string.ptr);
+            //printf("Song name %s \n", stack[antal]->feed_artist);
+            printf("antal %d Song value->u.string.ptr=%s \n ",antal,value->u.string.ptr);
             printf("**************************\n");
+            */
             //strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
           }
           //process_href=false;
         }
-
-
 
         // get playlist name
         if ((process_name) && (depth==2) && (x==7)) {
@@ -1315,7 +1319,7 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
   }
   printf("Go play song id %s \n",temptxt);
 //sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:track:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"uris\\\":[\\\"spotify:track:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
   curl_error=system(call);
   printf("song play curl %s \n",call);
   if (WEXITSTATUS(curl_error)!=0) {
@@ -1782,12 +1786,13 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
                 strcpy(stack[antal]->playlisturl,row[2]);   // get trackid
                 stack[antal]->type=1;
-                songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
+                //songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
+                songstrpointer=strstr(row[2],"spotify:track:");
                 // get track id from string
                 if (songstrpointer) {
-                  strcpy(temptxt2,songstrpointer);
+                  strcpy(temptxt2,row[2]+14);
                   strcpy(stack[antal]->playlistid,temptxt2);
-                } else strcpy(stack[antal]->playlistid,"NO playlistID found");
+                } else strcpy(stack[antal]->playlistid,"row[2]");
                 antal++;
               }
             }
