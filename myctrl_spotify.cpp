@@ -2440,7 +2440,7 @@ void spotify_class::select_device_to_play() {
 // show spotify overview
 //
 
-void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
@@ -2536,7 +2536,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         if ((i+sofset)==0) {
           if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
           else glBindTexture(GL_TEXTURE_2D,normal_icon);
-        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -2658,7 +2660,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
 // show search/create playlist spotify overview
 //
 
-void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
+void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
@@ -2794,7 +2796,9 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
         if ((i+sofset)==0) {
           if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
           else glBindTexture(GL_TEXTURE_2D,normal_icon);
-        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);          
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
