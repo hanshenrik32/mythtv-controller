@@ -659,7 +659,8 @@ GLint cur_avail_mem_kb = 0;               // free nvidia memory (hvis 0 så ænd
 GLuint _textureutvbgmask;                 // background in tv guide programs
 GLuint _defaultdvdcover;                	// The id of the texture
 GLuint _texturemovieinfobox;	            //  movie image
-GLuint _textureId7; 	                    // folder image
+GLuint _textureId_dir; 	                    // folder image
+GLuint _textureId_song; 	                    // folder image
 GLuint _texturemusicplayer; 	            // music image		// show player
 GLuint _textureId9_askbox; 	              // askbox image
 GLuint _textureId9_2; 	                  // askbox music image
@@ -3222,7 +3223,7 @@ void display() {
       start = std::clock();
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
-        show_music_oversigt(musicoversigt,_textureId7,_textureIdback,_textureId28,0,_mangley,music_key_selected);
+        show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
@@ -3236,16 +3237,16 @@ void display() {
         glPopMatrix();
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       } else if (vis_radio_oversigt) {
-        radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId7 , 0 , _textureIdback , _textureId28 , _rangley);
+        radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
         // show radio options menu
         if ((show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
         }
       } else if (vis_spotify_oversigt) {
         if (do_show_spotify_search_oversigt==false) {
-          spotify_oversigt.show_spotify_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+          spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
         } else {
-          spotify_oversigt.show_spotify_search_oversigt( _textureId7 , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+          spotify_oversigt.show_spotify_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
         }
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
@@ -7450,6 +7451,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
               }
+            } else {
+              printf("Error playid i smissing.\n");
             }
           }
         }
@@ -13123,7 +13126,8 @@ void loadgfx() {
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox");   		// small screen 4/3
     else
     _texturemovieinfobox  = loadgfxfile(temapath,(char *) "images/",(char *) "movie-infobox3-4");		// big screen  16/9
-    _textureId7           = loadgfxfile(temapath,(char *) "images/",(char *) "dir1");
+    _textureId_dir       = loadgfxfile(temapath,(char *) "images/",(char *) "dir1");
+    _textureId_song      = loadgfxfile(temapath,(char *) "images/",(char *) "song1");
     _texturemusicplayer 	= loadgfxfile(temapath,(char *) "images/",(char *) "musicplayer-info");
     _textureId9_askbox   	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox");
     _textureId9_2        	= loadgfxfile(temapath,(char *) "images/",(char *) "askbox_cd_cover");
@@ -13293,7 +13297,8 @@ void freegfx() {
     glDeleteTextures( 1, &_textureutvbgmask);
     glDeleteTextures( 1, &_defaultdvdcover);		    // default dvd cover hvis der ikke er nogle at loade
     glDeleteTextures( 1, &_texturemovieinfobox);		// movie info box
-    glDeleteTextures( 1, &_textureId7);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
+    glDeleteTextures( 1, &_textureId_dir);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
+    glDeleteTextures( 1, &_textureId_song);				      // cd/dir icon in music oversigt (hvis ingen cd cover findes)
     glDeleteTextures( 1, &_texturemusicplayer);     // show music info player
     glDeleteTextures( 1, &_textureId9_askbox);			// ask box
     glDeleteTextures( 1, &_textureId9_2);			      // ask box
