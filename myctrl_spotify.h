@@ -163,7 +163,7 @@ class spotify_class : vlc_controller {
         int spotify_get_playlist(char *playlist,bool force);                    // get playlist + songs and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
-        int spotify_play_now(char *playlist_song,bool now);                     // play playlist
+        int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist
         int spotify_play_now_song(char *playlist_song,bool now);                // play song
         int spotify_play_now_artist(char *playlist_song,bool now);              // play artist
         int spotify_play_now_album(char *playlist_song,bool now);               // play album

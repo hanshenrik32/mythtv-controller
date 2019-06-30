@@ -7438,7 +7438,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (strcmp(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1),"")!=0) {
               // try load and start playing playlist
               if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==0) {
-                spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+                spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               }
               if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==1) {
                 spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
@@ -7447,9 +7447,15 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (spotify_player_start_status==0) fprintf(stderr,"spotify start play return ok.\n");
                 else fprintf(stderr,"spotify start play return value %d \n ",spotify_player_start_status);
               if (spotify_player_start_status == 0) {
-                strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+                if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==0) strcpy(spotify_oversigt.spotify_playlistname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
+                else strcpy(spotify_oversigt.spotify_playlistname,"None");
                 do_play_spotify_cover=true;
                 do_zoom_spotify_cover=true;                                       // show we play
+              } else {
+                printf("Error start plying spotify song \n");
+                do_play_spotify_cover=false;
+                do_zoom_spotify_cover=false;                                       // show we play
+                // error start playing
               }
             } else {
               printf("Error playid i smissing.\n");
@@ -7517,7 +7523,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
                 case 0: fprintf(stderr,"play Spotify playlist %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
-                        spotify_player_start_status = spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+                        spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
                         break;
                 case 1: fprintf(stderr,"play Spotify artist song %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
@@ -7526,6 +7532,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
                 case 3: fprintf(stderr,"play Spotify album %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                        // do not play the right album
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_album( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
               }
@@ -9754,7 +9761,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (do_select_device_to_play) {
                   // select device to play on
                   if (debugmode) fprintf(stderr,"Send play command to spotify device \n");
-                  spotify_oversigt.spotify_play_now( spotify_oversigt.get_spotify_playlistid( (spotifyknapnr+spotify_selected_startofset)-1 ) ,1);
+                  spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( (spotifyknapnr+spotify_selected_startofset)-1 ) ,1);
                   // close window again
                   do_select_device_to_play=false;
                 }

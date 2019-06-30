@@ -1278,7 +1278,7 @@ int spotify_class::spotify_next_play() {
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
-int spotify_class::spotify_play_now(char *playlist_song,bool now) {
+int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
   int curl_error;
   char call[4096];
   char *devid=spotify_oversigt.get_active_device_id();
@@ -1364,7 +1364,7 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
   return(curl_error);
 }
 
-// work
+// work noT
 // play album
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
@@ -1387,7 +1387,7 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
   if (strlen(temptxt)>34) {
     strcpy(temptxt,playlist_song+34);
   }
-  printf("Go play album id %s \n",temptxt);
+  printf("Go play album id %s \n",playlist_song);
 //sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
   curl_error=system(call);
@@ -2534,8 +2534,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
-          else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);
+          } else glBindTexture(GL_TEXTURE_2D,normal_icon);
         } else {
           if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
         }
@@ -2794,10 +2795,13 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
-          else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,backicon);
+          } else {
+            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          }
         } else {
-          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);          
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
