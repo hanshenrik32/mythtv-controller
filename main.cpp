@@ -4432,7 +4432,7 @@ void display() {
         glcRenderString("Album    : ");
         //sprintf(temptxt1,"%s",(char *) );
         //glcRenderString(temptxt1);
-      }      
+      }
       glPopMatrix();
       //
       glPushMatrix();
@@ -4475,9 +4475,12 @@ void display() {
       glColor3f(1.0f, 1.0f, 1.0f);
       int statuswxpos = 432;
       int statuswypos = 557;
-      float y = (float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/(spotify_oversigt.spotify_aktiv_song_mslength()/1000);
-      y=(float) (spotify_oversigt.spotify_aktiv_song_msplay()/1000)/100;
-      int xxx = (float) (y*18)/2;
+      float y=spotify_oversigt.spotify_aktiv_song_msplay()/1000;
+      float ll=spotify_oversigt.spotify_aktiv_song_mslength()/1000;
+      int xxx;
+      if ((y>0) && (ll>0)) {
+        xxx = ((y/ll)*16);
+      } else xxx=0;
       for(int x=0;x<xxx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
