@@ -817,7 +817,7 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
     return;
   }
   length = value->u.array.length;
-  printf("array found\n");
+  //printf("array found\n");
   for (x = 0; x < length; x++) {
     process_value_playlist(value->u.array.values[x], depth,x);
   }
@@ -2072,7 +2072,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("Antal %d Title : %s \n",antal,value->u.string.ptr);
+            printf("# %d Title : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2102,7 +2102,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             }
             // get album playid
             if (value->u.string.ptr) {
-              printf("antal %d  album playlistid is set to = %s \n",antal,value->u.string.ptr);
+              printf("# %d - album playlistid %s \n",antal,value->u.string.ptr);
               if (!(stack[antal])) {
                 printf("******************************************* NO STACK error.\n");
               }
