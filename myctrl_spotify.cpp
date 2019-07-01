@@ -461,6 +461,7 @@ void spotify_class::playlist_print_depth_shift(int depth) {
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 //
+
 bool playlist_process_playlist=false;
 bool playlist_process_songs=false;
 bool playlist_process_url=false;
@@ -739,6 +740,8 @@ int spotify_class::spotify_get_user_playlists(bool force) {
   }
 }
 
+//
+//
 // json parser used to parse the return files from spotify api
 //
 //
@@ -1388,10 +1391,10 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
     strcpy(temptxt,playlist_song+34);
   }
   printf("Go play album id %s \n",playlist_song);
-//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  //sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
+  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:album:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
   curl_error=system(call);
-  printf("album play curl %s \n",call);
+  //printf("album play %s \n",call);
   if (WEXITSTATUS(curl_error)!=0) {
     fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
     fprintf(stderr,"sql=%s\n",call);
@@ -2045,8 +2048,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       //printf("double: %f\n", value->u.dbl);
       break;
     case json_string:
-      //printf("x = %2d deep = %2d art = %2d ",x,depth,art);
-      //printf("string: %s\n", value->u.string.ptr);
+      if ((depth!=8) && (depth!=10)) {
+        printf("x = %2d deep = %2d art = %2d ",x,depth,art);
+        printf("string: %s\n", value->u.string.ptr);
+      }
       if (search_process_items) {
         // set start of items in list
         search_process_items=false;
@@ -2062,14 +2067,26 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         search_process_href=false;
       }
 
-      if ((depth==7) && (x==9)) {
-        // get artist playid
-        if (strlen(value->u.string.ptr)>16) {
-          strcpy(artisid,value->u.string.ptr+15);
-          strcpy(stack[antal-1]->playlistid,artisid);
+
+
+      // trackid
+      if (art==2) {
+        if ((depth==7) && (x==9)) {
+          // get artist playid
+          //printf("playlistid is set to = %s \n",value->u.string.ptr);
+          //strcpy(stack[antal-1]->playlistid,value->u.string.ptr);
         }
       }
 
+      if ((art==0) || (art==1)) {
+        if ((depth==7) && (x==9)) {
+          // get artist playid
+          if (strlen(value->u.string.ptr)>16) {
+            strcpy(artisid,value->u.string.ptr+15);
+            strcpy(stack[antal-1]->playlistid,artisid);
+          }
+        }
+      }
       // art 0 = artist / art 1 = songs
       if ((art==0) || (art==1)) {
         // get name
@@ -2092,9 +2109,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           }
         }
       }
-      // spotify online type for en kunsner udgivelser (i potify db) (album)
+
+      // albumid
       if (art==2) {
-        if ((search_process_name) && (depth==9) && (x==7)) {
+        if ((depth==9) && (x==5)) {
           if (antal==0) {
             // first record back
             stack[antal]=new (spotify_oversigt_type);
@@ -2109,7 +2127,27 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+            // get album playid
+            if (value->u.string.ptr) {
+              printf("antal %d  album playlistid is set to = %s \n",antal,value->u.string.ptr);
+              if (!(stack[antal])) {
+                printf("******************************************* NO STACK\n");
+                //stack[antal]=new (spotify_oversigt_type);
+              }
+              strcpy(stack[antal]->playlistid,value->u.string.ptr);
+            }
+          }
+        }
+        // track list (artist name)
+        if ((depth==9) && (x==7)) {
+          //strcpy(stack[antal-1]->feed_artist,value->u.string.ptr);
+        }
+      }
+
+      // spotify online type for en kunsner udgivelser (i potify db) (album)
+      if (art==2) {
+        if ((search_process_name) && (depth==9) && (x==7)) {
+          if (antalplaylists<maxantal) {
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2231,11 +2269,19 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   value = json_parse(json,file_size);                                           // parser
 
   // parse from root
-  if (type==0) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==1) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==2) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==3) search_process_value(value, 0,0,2);                                        // fill stack array
-
+  printf("type=%d\n",type);
+  if (type==0) {
+    search_process_value(value, 0,0,type);                                     // fill stack array playlist
+  }
+  if (type==1) {
+    search_process_value(value, 0,0,type);                                     // fill stack array songs
+  }
+  if (type==2) {
+    search_process_value(value, 0,0,type);                                     // fill stack array artist
+  }
+  if (type==3) {
+    search_process_value(value, 0,0,2);                                     // fill stack array songs
+  }
   json_value_free(value);                                                       // json clean up
   free(file_contents);                                                          //
   return(antal);
