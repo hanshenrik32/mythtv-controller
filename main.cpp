@@ -7522,16 +7522,16 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             ask_open_dir_or_play_spotify=false;                                                               // close widow
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
-                case 0: fprintf(stderr,"play Spotify playlist %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 0: fprintf(stderr,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
                         break;
-                case 1: fprintf(stderr,"play Spotify artist song %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
-                        spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
+                case 1: fprintf(stderr,"button nr %d play Spotify artist song %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-2),spotify_oversigt.get_spotify_type(spotifyknapnr-2));
+                        spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-2 ), 1);
                         break;
-                case 2: fprintf(stderr,"play Spotify artist name %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 2: fprintf(stderr,"button nr %d play Spotify artist name %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
-                case 3: fprintf(stderr,"play Spotify album %s type = %d\n",spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 3: fprintf(stderr,"button nr %d play Spotify album %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         // do not play the right album
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_album( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
