@@ -270,6 +270,7 @@ int film_oversigt_typem::playmovie(int nr) {
     film_is_playing=true;
     strcat(path,this->filmoversigt[nr].getfilmfilename());
     vlc_controller::playmedia(path);
+    return(1);
 }
 
 // pause movie
@@ -281,7 +282,7 @@ void film_oversigt_typem::pausemovie() {
 // get position
 
 float film_oversigt_typem::getmovieposition() {
-  vlc_controller::get_position();
+  return(vlc_controller::get_position());
 }
 
 void film_oversigt_typem::next_movie_chapther() {
@@ -1020,11 +1021,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
 
 
 
-
-
-
-
-
 // overloaded function in .h file
 // hent film oversigt
 // create if not exist (mythtv/internal)
@@ -1051,7 +1047,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test fpom musik table exist
-      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'",database);
+      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if (res) {

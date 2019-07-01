@@ -249,6 +249,7 @@ int rss_stream_class::load_rss_data() {
     }
     mysql_close(conn);
   }
+  return(1);
 }
 
 
@@ -343,6 +344,7 @@ int rss_stream_class::save_rss_data() {
     } //for next
     mysql_close(conn);
   }
+  return(1);
 }
 
 
@@ -350,6 +352,7 @@ int rss_stream_class::save_rss_data() {
 
 int rss_stream_class::set_stream_url(int nr,char *url) {
   strcpy(rss_source_feed[nr].stream_url,url);
+  return(1);
 }
 
 
@@ -357,6 +360,7 @@ int rss_stream_class::set_stream_url(int nr,char *url) {
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
   strcpy(rss_source_feed[nr].stream_name,name);
+  return(1);  
 }
 
 
