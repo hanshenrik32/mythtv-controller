@@ -257,11 +257,11 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
   DIR *dirp=NULL;
   DIR *dirp1=NULL;
   DIR *dirp2=NULL;
-  char sqlselect[1024];
-  char sqlselect1[1024];
-  char sqlselect2[1024];
-  char checkdir[1024];
-  char checkdir2[1024];
+  char sqlselect[4096];
+  char sqlselect1[4096];
+  char sqlselect2[4096];
+  char checkdir[4096];
+  char checkdir2[4096];
   MYSQL *conn;
   MYSQL *conn1;
   MYSQL *conn2;
@@ -729,7 +729,7 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *play
 
 
 int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
-
+  return(0);
 }
 
 

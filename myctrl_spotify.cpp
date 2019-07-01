@@ -293,7 +293,7 @@ spotify_oversigt_type::spotify_oversigt_type() {
   feed_path_antal=0;
   nyt=false;
   textureId=0;
-  type=0;                                 // 0 = playlist / 1 = songs / 2 = search artist / 3 = artist records/cd
+  type=0;                                 // 0 = playlist / 1 = songs / 2 = search artist / 3 = artist records/albums
   intnr=0;
 };
 
@@ -738,6 +738,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
     printf("process playlist done.. \n");
     mysql_close(conn);
   }
+  return(1);
 }
 
 //
@@ -746,8 +747,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
 //
 //
 
-void spotify_class::print_depth_shift(int depth)
-{
+void spotify_class::print_depth_shift(int depth) {
   int j;
   for (j=0; j < depth; j++) {
     if (debug_json) printf(" ");
@@ -879,31 +879,13 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           process_image=false;
         }
 
-        /*
-        // process song spotify id
-        if ((process_href) && (depth==9) && (x==9)) {
-          if (stack[antal]) {
-            strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
-          }
-          process_href=false;
-        }
-        */
-
         // process song spotify id CHECKED
         if ((depth==9) && (x==18)) {
           if (stack[antal]) {
             if (stack[antal]) {
               strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
             }
-            /*
-            printf("**************************\n");
-            //printf("Song name %s \n", stack[antal]->feed_artist);
-            printf("antal %d Song value->u.string.ptr=%s \n ",antal,value->u.string.ptr);
-            printf("**************************\n");
-            */
-            //strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
           }
-          //process_href=false;
         }
 
         // get playlist name
@@ -1070,7 +1052,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           // check if playlist exist
           playlistexist=false;
           refid = 0;
-          sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname , "", "" , 0 );
+          sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
           if (res) {
@@ -1084,7 +1066,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
             mysql_query(conn,sql);
             res=mysql_store_result(conn);
             if (refid==0) {
-              sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname , "", "" , 0 );
+              sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
               mysql_query(conn,sql);
               res=mysql_store_result(conn);
               if (res) {
@@ -1115,7 +1097,6 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           }
         }
         tt++;
-        //printf("tt=%d playlist id %s \n",tt,playlist);
       }
     }
     mysql_close(conn);
@@ -1410,8 +1391,6 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
 // get device list and have it in spotify class
 //
 
-// char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
-
 int spotify_class::spotify_get_available_devices() {
   int device_antal=0;
   int devicenr=0;
@@ -1479,39 +1458,39 @@ int spotify_class::spotify_get_available_devices() {
     if ( devicenr>0 ) {
       conn=mysql_init(NULL);
       if (conn) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-          mysql_query(conn,"set NAMES 'utf8'");
-          res = mysql_store_result(conn);
-          mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
-          res = mysql_store_result(conn);
-          fprintf(stderr,"Found devices : %d\n",devicenr);
-          for( int t = 0 ; t < devicenr ; t++ ) {
-            if ( strcmp(spotify_device[t].name,"") !=0 ) {
-              device_antal++;
-              fprintf(stderr,"Device name      : %s \n",spotify_device[t].name);
-              fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
-              fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
-              fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
-              sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
-              mysql_query(conn,sql);
-              res = mysql_store_result(conn);
-              dbexist=false;
-              if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                  dbexist=true;
-                }
-              }
-              // create if not exist
-              if (dbexist==false) {
-                sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
-                mysql_query(conn,sql);
-                res = mysql_store_result(conn);
+        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
+        res = mysql_store_result(conn);
+        fprintf(stderr,"Found devices : %d\n",devicenr);
+        for( int t = 0 ; t < devicenr ; t++ ) {
+          if ( strcmp(spotify_device[t].name,"") !=0 ) {
+            device_antal++;
+            fprintf(stderr,"Device name      : %s \n",spotify_device[t].name);
+            fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
+            fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
+            fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
+            sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
+            mysql_query(conn,sql);
+            res = mysql_store_result(conn);
+            dbexist=false;
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                dbexist=true;
               }
             }
+            // create if not exist
+            if (dbexist==false) {
+              sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+            }
           }
-          this->spotify_device_antal=device_antal;
-          if (conn) mysql_close(conn);
-          fprintf(stderr,"\n*****************\n");
+        }
+        this->spotify_device_antal=device_antal;
+        if (conn) mysql_close(conn);
+        fprintf(stderr,"\n*****************\n");
       }
     }
   }
@@ -1645,7 +1624,6 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     char temptxt1[2048];
     char temptxt2[2048];
     char *songstrpointer;
-
     char sqlselect[2048];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
@@ -1676,9 +1654,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          dbexist=true;
-        }
+        while ((row = mysql_fetch_row(res)) != NULL) dbexist=true;
       }
     }
     clean_spotify_oversigt();                                                   // clean old list
@@ -2048,9 +2024,11 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       //printf("double: %f\n", value->u.dbl);
       break;
     case json_string:
-      if ((depth!=8) && (depth!=10)) {
-        printf("x = %2d deep = %2d art = %2d ",x,depth,art);
-        printf("string: %s\n", value->u.string.ptr);
+      if (debugmode) {
+        if ((depth!=8) && (depth!=10)) {
+          printf("x = %2d deep = %2d art = %2d ",x,depth,art);
+          printf("string: %s\n", value->u.string.ptr);
+        }
       }
       if (search_process_items) {
         // set start of items in list
@@ -2066,9 +2044,6 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       if (search_process_href) {
         search_process_href=false;
       }
-
-
-
       // trackid
       if (art==2) {
         if ((depth==7) && (x==9)) {
@@ -2077,7 +2052,6 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           //strcpy(stack[antal-1]->playlistid,value->u.string.ptr);
         }
       }
-
       if ((art==0) || (art==1)) {
         if ((depth==7) && (x==9)) {
           // get artist playid
@@ -2109,7 +2083,6 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
           }
         }
       }
-
       // albumid
       if (art==2) {
         if ((depth==9) && (x==5)) {
@@ -2131,8 +2104,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (value->u.string.ptr) {
               printf("antal %d  album playlistid is set to = %s \n",antal,value->u.string.ptr);
               if (!(stack[antal])) {
-                printf("******************************************* NO STACK\n");
-                //stack[antal]=new (spotify_oversigt_type);
+                printf("******************************************* NO STACK error.\n");
               }
               strcpy(stack[antal]->playlistid,value->u.string.ptr);
             }
@@ -2267,7 +2239,6 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   fclose(json_file);
   json = (json_char*) file_contents;
   value = json_parse(json,file_size);                                           // parser
-
   // parse from root
   printf("type=%d\n",type);
   if (type==0) {
@@ -2989,7 +2960,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glScalef(22.0, 22.0, 1.0);
         glcRenderString("Collection");
         glPopMatrix();
-
       }
     }
 }
@@ -3551,7 +3521,12 @@ void spotify_class::show_setup_spotify() {
     }
 }
 
- void spotify_class::set_default_device_to_play(int nr) {
+
+//
+// set default play device
+//
+
+void spotify_class::set_default_device_to_play(int nr) {
    active_spotify_device=nr;
    active_default_play_device=nr;
- }
+}

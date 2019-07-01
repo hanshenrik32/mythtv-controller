@@ -344,11 +344,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
 }
 
 
-
-
-
-
+//
 // callback to fill music db in mythtv-controller
+//
 
 int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv, char **azColName) {
   MYSQL *conn;

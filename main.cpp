@@ -1997,7 +1997,7 @@ int init_ttf_fonts() {
     count = glcGeti(GLC_CATALOG_COUNT);
     // Print the path to the catalog
     for (ii = 0; ii < count; ii++) {
-      fprintf(stderr,"Font found in directory %s\n", glcGetListc(GLC_CATALOG_LIST, ii));
+      fprintf(stderr,"Font found in directory %s\n", (char *) glcGetListc(GLC_CATALOG_LIST, ii));
     }
     // note FROM quesoglc-doc-0.7.0 DOC.
     // If the rendering style of the text is not GLC_BITMAP, then you should use glTranslate() and
@@ -4409,7 +4409,7 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Songname : ");
-      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_name());
+      sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
       glcRenderString(temptxt1);
       glPopMatrix();
       // show artist
@@ -4420,7 +4420,7 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Artist   : ");
-      sprintf(temptxt1,spotify_oversigt.spotify_aktiv_artist_name());
+      sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_artist_name());
       glcRenderString(temptxt1);
       glPopMatrix();
       //
@@ -6357,7 +6357,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // reset movie search view
           // show all movies again
           if ((GLubyte) names[i*4+3]==28) {
-            film_oversigt.opdatere_film_oversigt("%");
+            film_oversigt.opdatere_film_oversigt((char *) "%");
             //  remove search flag again and show all movies
             film_oversigt.set_search_view(false);
           }
@@ -8559,8 +8559,6 @@ void handlespeckeypress(int key,int x,int y) {
 
 
 
-
-
 //
 // keyboard handler *******************************************************************************************************
 //
@@ -8568,7 +8566,7 @@ void handlespeckeypress(int key,int x,int y) {
 void handleKeypress(unsigned char key, int x, int y) {
     const char optionmenukey='O';
     char id[80];		// bruges af wlan setup
-    char tmptxt[80];
+    char tmptxt[1024];
     char temptxt[200];
     saver_irq=true;                                     // stop screen saver
     char path[1024];
@@ -13541,6 +13539,7 @@ int check_radio_stations_icons() {
       system(resl);
     }
   }
+  return(1);
 }
 
 
