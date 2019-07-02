@@ -13,6 +13,8 @@
 #include <curl/curl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <curl/curl.h>
+#include <string>
 #include "json-parser/json.h"
 #include "readjpg.h"
 #include "myctrl_readwebfile.h"
@@ -262,7 +264,7 @@ spotify_device_def::spotify_device_def() {
 //
 
 
-spotify_active_play_info_type::spotify_active_play_info_type() {                // sample data down here
+spotify_active_play_info_type::spotify_active_play_info_type() {
   progress_ms=0;
   duration_ms=0;
   strcpy(song_name,"");
@@ -1107,6 +1109,225 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
 
 // *********************************************************************************************************************************
 
+bool process_playinfo_tracks=false;
+bool process_playinfo_playlist=false;
+bool process_playinfo_songs=false;
+bool process_playinfo_href=false;
+bool process_playinfo_description=false;
+bool process_playinfo_image=false;
+bool process_playinfo_name=false;
+bool process_playinfo_items=false;
+bool process_playinfo_artist=false;
+bool process_playinfo_track_nr=false;
+bool process_playinfo_date=false;
+bool process_playinfo_progress_ms=false;
+bool process_playinfo_duration_ms=false;
+
+bool playinfo_json_debug=false;
+
+//
+// process types in file for process playlist files (songs)
+//
+
+void spotify_class::process_object_playinfo(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.object.length;
+  for (x = 0; x < length; x++) {
+    print_depth_shift(depth);
+    if (playinfo_json_debug) printf("x=%d depth=%d object[%d].name = %s \n",x,depth, x, value->u.object.values[x].name);
+    if (strcmp(value->u.object.values[x].name,"tracks")==0) {
+      process_playinfo_tracks=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "href" )==0) {
+      process_playinfo_href=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "artist" )==0) {
+      process_playinfo_artist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "process_playlist" )==0) {
+      process_playinfo_playlist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "description" )==0) {
+      process_playinfo_description=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "images" )==0) {
+      process_playinfo_image=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "name" )==0) {
+      process_playinfo_name=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
+      process_playinfo_track_nr=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "items" )==0) {
+      process_playinfo_items=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "release_date" )==0) {
+      process_playinfo_date=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "progress_ms" )==0) {
+      process_playinfo_progress_ms=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "duration_ms" )==0) {
+      process_playinfo_duration_ms=true;
+    }
+    process_value_playinfo(value->u.object.values[x].value, depth+1,x);
+  }
+}
+
+// *****************************************************************************************
+
+void spotify_class::process_array_playinfo(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.array.length;
+  //printf("array found\n");
+  for (x = 0; x < length; x++) {
+    process_value_playinfo(value->u.array.values[x], depth,x);
+  }
+}
+
+
+// ****************************************************************************************
+
+//
+// json parser start call function for process playinfo
+// do the data progcessing from json
+
+void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
+    int j;
+    if (value == NULL) return;
+    if (value->type != json_object) {
+      print_depth_shift(depth);
+    }
+    switch (value->type) {
+      case json_none:
+        if (debug_json) printf("none\n");
+        break;
+      case json_object:
+        process_object_playinfo(value, depth+1);
+        break;
+      case json_array:
+        process_array_playinfo(value, depth+1);
+        break;
+      case json_integer:
+        if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
+        break;
+      case json_double:
+        if (debug_json) printf("double: %f\n", value->u.dbl);
+        break;
+      case json_string:
+        //printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+        if (process_playinfo_items) {
+          process_playinfo_items=false;
+        }
+        if (process_playinfo_tracks) {
+          process_playinfo_tracks=false;
+        }
+        if (process_playinfo_image) {
+          printf("Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          strcpy(spotify_aktiv_song[0].cover_image_url,value->u.string.ptr);
+          process_playinfo_image=false;
+        }
+        if (process_playinfo_progress_ms) {
+          printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if ((depth==1) && (x==5)) spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          process_playinfo_progress_ms=false;
+        }
+        if (process_playinfo_duration_ms) {
+          printf("duration ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
+          process_playinfo_duration_ms=false;
+        }
+        // release date
+        if (process_playinfo_date) {
+          printf("date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          strcpy(spotify_aktiv_song[0].release_date,value->u.string.ptr);
+          process_playinfo_date=false;
+        }
+        // get playlist name
+        if (process_playinfo_name) {
+          printf("name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          // artist name
+          if ((depth==9) && (x==3)) {
+            strcpy(spotify_aktiv_song[0].artist_name,value->u.string.ptr);
+          }
+          // album name
+          if ((depth==6) && (x==7)) strcpy(spotify_aktiv_song[0].album_name,value->u.string.ptr);
+          // song name
+          if ((depth==4) && (x==11)) strcpy(spotify_aktiv_song[0].song_name,value->u.string.ptr);
+
+          if ((depth==1) && (x==5)) spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          process_playinfo_name=false;
+        }
+        if (process_playinfo_artist) {
+
+          process_playinfo_artist=false;
+        }
+        // get tracknr
+        if (process_playinfo_track_nr) {
+          process_playinfo_track_nr=false;
+        }
+        break;
+      case json_boolean:
+        if (debug_json) printf("bool: %d\n", value->u.boolean);
+        break;
+    }
+}
+
+
+// *********************************************************************************************************************************
+
+size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
+    data->append((char*) ptr, size * nmemb);
+    return size * nmemb;
+}
+
+//std::string *response_string;
+
+int spotify_class::spotify_do_we_play2() {
+  char auth_kode[1024];
+  std::string response_string;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+      //printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());                                           // parser
+      process_value_playinfo(value, 0,0);                                           // fill play info
+      json_value_free(value);                                                       // json clean up
+    }
+  }
+}
+
 
 //
 // work
@@ -1200,6 +1421,48 @@ int spotify_class::spotify_pause_play() {
   return 0;
 }
 
+
+
+//
+// work ( need testting )
+// pause play
+//
+
+int spotify_class::spotify_pause_play2() {
+  char auth_kode[1024];
+  std::string response_string;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/pause");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+    }
+  }
+}
+
+
+
 //
 // resume play
 //
@@ -1249,6 +1512,43 @@ int spotify_class::spotify_next_play() {
   return 0;
 }
 
+
+//
+// next play next song
+//
+
+int spotify_class::spotify_next_play2() {
+  char auth_kode[1024];
+  std::string response_string;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/next");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+    }
+  }
+}
 
 
 

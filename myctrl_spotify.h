@@ -93,6 +93,13 @@ class spotify_class : vlc_controller {
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
+        //
+
+        void process_object_playinfo(json_value* value, int depth);
+        void process_array_playinfo(json_value* value, int depth);
+        void process_value_playinfo(json_value* value, int depth,int x);
+
+
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
@@ -172,10 +179,13 @@ class spotify_class : vlc_controller {
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
+        int spotify_do_we_play2();                                               // Do we play song now
         int spotify_pause_play();                                               // Pause
+        int spotify_pause_play2();                                                // Pause
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
         int spotify_next_play();                                                // play next song
+        int spotify_next_play2();                                                // play next song
         void select_device_to_play();                                           // show device list to play on
         void set_default_device_to_play(int nr);                                // set default device list to play on
         void show_setup_spotify();                                              //
