@@ -4318,7 +4318,8 @@ void display() {
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
       static int do_we_play_check=0;
       if (do_we_play_check==0) {
-        spotify_oversigt.spotify_do_we_play();
+        spotify_oversigt.spotify_do_we_play2();
+        //spotify_oversigt.spotify_do_we_play();
       }
       do_we_play_check++;
       // check again ?
