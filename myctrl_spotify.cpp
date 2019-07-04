@@ -1660,27 +1660,28 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
   char post_playlist_data[4096];
   int httpCode;
   CURLcode res;
-  struct curl_slist *chunk = NULL;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/play?device_id=";
   url=url + devid;
+  // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if (curl) {
     /* Add a custom header */
-    chunk = curl_slist_append(chunk, "Accept: application/json");
-    chunk = curl_slist_append(chunk, "Content-Type: application/json");
-    chunk = curl_slist_append(chunk, "charsets: utf-8");
-    chunk = curl_slist_append(chunk, auth_kode.c_str());
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
