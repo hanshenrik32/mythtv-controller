@@ -2497,22 +2497,14 @@ void display() {
       firsttime_rssupdate=false;                                                // only used first time
     }
 
-
-    // run the webserver
-    //std::clock_t start;
-    //start = std::clock();
-    //mg_mgr_poll(&spotify_oversigt.mgr, 50);
-    //std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-
     // do the update from spotify
     if (do_update_spotify_playlist) {
-      //spotify_oversigt.spotify_get_user_id();                                   // get user id
-      //spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB");
-      spotify_oversigt.spotify_get_user_playlists(true);                                        // get all the playlist and update db (force update)
-      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+      if (spotify_oversigt.spotify_get_user_id()==200) {
+        spotify_oversigt.spotify_get_user_playlists(true);                        // get all the playlist and update db (force update)
+        spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+      }
       do_update_spotify_playlist=false;
     }
-
     glPushMatrix();
     // background picture
     if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tv_oversigt))) show_background();
@@ -4318,8 +4310,7 @@ void display() {
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
       static int do_we_play_check=0;
       if (do_we_play_check==0) {
-        spotify_oversigt.spotify_do_we_play2();
-        //spotify_oversigt.spotify_do_we_play();
+        spotify_oversigt.spotify_do_we_play();
       }
       do_we_play_check++;
       // check again ?
@@ -7720,6 +7711,8 @@ void handlespeckeypress(int key,int x,int y) {
     rnumbersoficonline=8;   // antal i radio oversigt
     snumbersoficonline=8;   // antal i stream/spotify oversigt
     MOVIE_CS=46.0f;					// movie dvd cover side
+    MOVIE_CS=46.0f;					// movie dvd cover side
+    MOVIE_CS=46.0f;					// movie dvd cover side
     MUSIC_CS=41.0;					// music cd cover side
     RADIO_CS=41.0;					// radio cd cover side
     switch(key) {
@@ -8559,6 +8552,10 @@ void handlespeckeypress(int key,int x,int y) {
                     if (configrss_ofset>8) configrss_ofset-=8;
                   }
                 }
+                break;
+        case 114:
+        case 115:
+                printf("CTRL key pressed \n");
                 break;
     }
     if (debugmode) {
@@ -13783,6 +13780,7 @@ int main(int argc, char** argv) {
     printf("\nHardware           %s\n",(char *)glGetString(GL_RENDERER));                         // Display Renderer
     printf("OpenGL Render      %s\n",(char *)glGetString(GL_VENDOR));                           // Display Vendor Name
     printf("Version            %s\n",(char *)glGetString(GL_VERSION));
+    // start main loop now
     // start main loop now
     glutMainLoop();
     #if defined USE_FMOD_MIXER

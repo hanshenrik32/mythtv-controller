@@ -15,13 +15,22 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <string>
+// json parser
 #include "json-parser/json.h"
-#include "readjpg.h"
-#include "myctrl_readwebfile.h"
+// global def
 #include "myth_setup.h"
-
 // web server stuf
 #include "mongoose-master/mongoose.h"
+#include "utility.h"
+#include "myth_ttffont.h"
+#include "utility.h"
+// jpg/png file reader
+#include "readjpg.h"
+#include "loadpng.h"
+// web file loader
+#include "myctrl_readwebfile.h"
+#include "myctrl_spotify.h"
+
 
 static const char *s_http_port = "8000";
 static struct mg_serve_http_opts s_http_server_opts;
@@ -29,42 +38,24 @@ static struct mg_serve_http_opts s_http_server_opts;
 const int spotify_pathlength=80;
 const int spotify_namelength=80;
 const int spotify_desclength=2000;
-
 const int feed_url=2000;
-
-#include "utility.h"
-#include "myth_ttffont.h"
-#include "utility.h"
-#include "readjpg.h"
-#include "loadpng.h"
-// web file loader
-#include "myctrl_readwebfile.h"
-#include "myctrl_spotify.h"
 
 //
 // text render is glcRenderString for freetype font support
 //
 
-
-
 extern int spotifyknapnr;
 extern int spotify_select_iconnr;
-
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
-
 extern GLuint big_search_bar;
-
 extern char *keybuffer;
 extern int keybufferindex;
-
 extern bool do_select_device_to_play;
-
 extern GLuint mobileplayer_icon;
 extern GLuint pcplayer_icon;
 extern GLuint unknownplayer_icon;
 extern GLuint spotify_pil;
-
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -78,11 +69,9 @@ extern int screensizey;
 extern int screeny;
 extern GLuint spotify_askplay;                                  // ask open icon
 extern GLuint spotify_askopen;                                  // ask play icon
-
 extern GLuint setuprssback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
-
 extern int debugmode;
 extern unsigned int musicoversigt_antal;                        //
 extern int do_stream_icon_anim_icon_ofset;                      //
@@ -94,11 +83,7 @@ extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
 extern int _sangley;
 extern int do_show_setup_select_linie;
-
 extern GLuint _textureIdloading,_textureIdloading1;
-//extern GLuint _textureIdloading_mask;
-
-
 // stream mask
 extern GLuint onlinestreammask;
 extern GLuint onlinestreammaskicon;		// icon mask on web icon
@@ -108,7 +93,7 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 
-// server handler
+// web server handler
 
 static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
@@ -153,7 +138,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           }
           user_token[codel-4]='\0';
         }
-        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
         sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
@@ -169,8 +153,8 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           error=getline(&file_contents,&len,tokenfile);
           strcpy(token_refresh,file_contents);
           token_refresh[strlen(token_refresh)-1]='\0';
-          printf("token     %s\n",token_string);
-          printf("ref token %s\n",token_refresh);
+//          printf("token     %s\n",token_string);
+//          printf("ref token %s\n",token_refresh);
           spotify_oversigt.spotify_set_token(token_string,token_refresh);
           fclose(tokenfile);
           free(file_contents);
@@ -204,7 +188,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       printf("Server closed connection\n");
   }
 }
-
 
 
 // client handler
@@ -400,23 +383,6 @@ int spotify_class::spotify_refresh_token() {
 }
 
 
-
-//
-// Spotify Get user id
-//
-
-int spotify_class::spotify_get_user_id() {
-  int curl_error;
-  char doget[2048];
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
-    printf("curl = %s \n",doget);
-    curl_error=system(doget);
-    if (WEXITSTATUS(curl_error)==0) {
-    }
-  }
-  return 1;
-}
 
 
 //
@@ -1009,7 +975,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
     json = (json_char*) file_contents;
     value = json_parse(json,file_size);                                           // parser
     // parse from root
-    process_value_playlist(value, 0,0);                                                    // fill stack array
+    process_value_playlist(value, 0,0);                                           // fill stack array
     json_value_free(value);                                                       // json clean up
     free(file_contents);                                                          //
     // save data to mysql db
@@ -1230,39 +1196,40 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
           process_playinfo_tracks=false;
         }
         if (process_playinfo_image) {
-          printf("Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if (debug_json) printf("Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           strcpy(spotify_aktiv_song[0].cover_image_url,value->u.string.ptr);
           process_playinfo_image=false;
         }
         if (process_playinfo_progress_ms) {
-          printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          //printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           if ((depth==1) && (x==5)) spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
           process_playinfo_progress_ms=false;
         }
         if (process_playinfo_duration_ms) {
-          printf("duration ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          //printf("duration ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
           process_playinfo_duration_ms=false;
         }
         // release date
         if (process_playinfo_date) {
-          printf("date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if (debug_json) printf("date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           strcpy(spotify_aktiv_song[0].release_date,value->u.string.ptr);
           process_playinfo_date=false;
         }
         // get playlist name
         if (process_playinfo_name) {
-          printf("name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if (debug_json) printf("name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           // artist name
-          if ((depth==9) && (x==3)) {
-            strcpy(spotify_aktiv_song[0].artist_name,value->u.string.ptr);
-          }
+          if ((depth==9) && (x==3)) strcpy(spotify_aktiv_song[0].artist_name,value->u.string.ptr);
           // album name
           if ((depth==6) && (x==7)) strcpy(spotify_aktiv_song[0].album_name,value->u.string.ptr);
           // song name
           if ((depth==4) && (x==11)) strcpy(spotify_aktiv_song[0].song_name,value->u.string.ptr);
-
-          if ((depth==1) && (x==5)) spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          //
+          if ((depth==1) && (x==5)) {
+            printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+            spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          }
           process_playinfo_name=false;
         }
         if (process_playinfo_artist) {
@@ -1288,10 +1255,11 @@ size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* dat
     return size * nmemb;
 }
 
-// in use
+//
+// Work in use
 // ********************************************************************************************
 
-int spotify_class::spotify_do_we_play2() {
+int spotify_class::spotify_do_we_play() {
   char auth_kode[1024];
   std::string response_string;
   int httpCode;
@@ -1321,23 +1289,23 @@ int spotify_class::spotify_do_we_play2() {
     curl_easy_cleanup(curl);
     if (httpCode == 200) {
       //printf("%s \n", response_string.c_str());
-      printf("resp length %d \n",response_string.length());
-      value = json_parse((char *) response_string.c_str(),response_string.length());                                           // parser
-      process_value_playinfo(value, 0,0);                                           // fill play info
-      json_value_free(value);                                                       // json clean up
+      //printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      process_value_playinfo(value, 0,0);                                                     // fill play info
+      json_value_free(value);                                                                 // json clean up
     }
   }
 }
 
 
-// NOT in use
 
-//
+
+// No IN USE
 // work
 // get active song playing
 //
 
-int spotify_class::spotify_do_we_play() {
+int spotify_class::spotify_do_we_play2() {
   bool find_length=true;
   bool find_progress=true;
   char call[4096];
@@ -1465,12 +1433,11 @@ int spotify_class::spotify_pause_play2() {
 }
 
 
-
 //
 // resume play
 //
-
-int spotify_class::spotify_resume_play() {
+/*
+int spotify_class::spotify_resume_play2() {
   int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
@@ -1480,10 +1447,62 @@ int spotify_class::spotify_resume_play() {
   }
   return 0;
 }
+*/
+
+//
+// in use
+//
+
+int spotify_class::spotify_resume_play() {
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
 
 
 //
-// last play
+// last play do not work
 //
 
 int spotify_class::spotify_last_play() {
@@ -1497,6 +1516,8 @@ int spotify_class::spotify_last_play() {
   }
   return 0;
 }
+
+
 
 //
 // work
@@ -1521,26 +1542,40 @@ int spotify_class::spotify_next_play() {
 //
 
 int spotify_class::spotify_next_play2() {
-  char auth_kode[1024];
+  std::string auth_kode;
   std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
   int httpCode;
   CURLcode res;
-  struct curl_slist *chunk = NULL;
-  strcpy(auth_kode,"Authorization: Bearer ");
-  strcat(auth_kode,spotifytoken);
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/next";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/next");
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
-    /* Add a custom header */
-    chunk = curl_slist_append(chunk, "Accept: application/json");
-    chunk = curl_slist_append(chunk, "Content-Type: application/json");
-    chunk = curl_slist_append(chunk, auth_kode);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-    /* Now specify we want to POST data */
-    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); /* !!! */
+    //sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {
@@ -1548,39 +1583,19 @@ int spotify_class::spotify_next_play2() {
     }
     // always cleanup
     curl_easy_cleanup(curl);
+    curl_global_cleanup();
     if (httpCode == 200) {
+      return(httpCode);
     }
   }
+  return(0);
 }
 
 
 
-// work
-// play song/playlist
-// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
-// error codes
-
-// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
-// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
-// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
-// 429	Too Many Requests - Rate limiting has been applied.
-
-int spotify_class::spotify_play_now_playlist2(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  printf("Devid *%s*\n",devid);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-  }
-  return(curl_error);
-}
-
-
-// ************** DEBUG CODE **********************
+// ************** DEBUG CODE start ****************************************
+// enable it on earch start play type (func) to get the libcurl debug code
+// ************************************************************************
 
 
 int debug_callback(CURL *handle,curl_infotype type,char *data,size_t size,void *userptr);
@@ -1650,7 +1665,16 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
   return 0;
 }
 
-// **********************************************************************************
+// Upper is debug code *******************************************************************
+
+// Works
+// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// error codes
+
+// 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
+// 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
+// 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
+// 429	Too Many Requests - Rate limiting has been applied.
 
 
 int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
@@ -1720,30 +1744,54 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
 // 429	Too Many Requests - Rate limiting has been applied.
 
 int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  printf("Go play song id %s \n",temptxt);
-//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"uris\\\":[\\\"spotify:track:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  curl_error=system(call);
-  printf("song play curl %s \n",call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
-  }
-  return(curl_error);
+  return(0);
 }
-
-
 
 // work
 // play artist
@@ -1757,30 +1805,60 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
 
 
 int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:artist:%s\"}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  fprintf(stderr,"Go play Artist id %s \n",temptxt);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:artist:%s\\\"}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  //fprintf(stderr,"sql=%s\n",call);
-  curl_error=system(call);
-  printf("artist play curl %s \n",call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
-  }
-  return(curl_error);
+  return(0);
 }
 
-// work noT
+
+
+
+
+// work
 // play album
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
@@ -1790,29 +1868,144 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
-
 int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:album:%s\"}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  printf("Go play album id %s \n",playlist_song);
-  //sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:album:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  curl_error=system(call);
-  //printf("album play %s \n",call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
+  return(0);
+}
+
+
+
+
+//
+// Spotify Get user id
+// OLD version
+
+/*
+int spotify_class::spotify_get_user_id2() {
+  int curl_error;
+  char doget[2048];
+  if (strcmp(spotifytoken,"")!=0) {
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
+    curl_error=system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+      return 200;
+    }
   }
-  return(curl_error);
+  return curl_error;
+}
+*/
+
+// file writer
+
+static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+  return written;
+}
+
+
+// Do now work now
+// get user id from spotify api
+//
+
+int spotify_class::spotify_get_user_id() {
+  static const char *userfilename = "spotify_user_id.txt";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me";
+  url=url + devid;
+  printf("Get user info.\n");
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+    userfile=fopen(userfilename,"w");
+    if (userfile) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(200);
+    }
+  }
+  return(httpCode);
 }
 
 
@@ -2504,7 +2697,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("# %d Title : %s \n",antal,value->u.string.ptr);
+            printf("# %d Artist name found : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
@@ -2585,6 +2778,86 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
 
 
 
+
+//
+// download file from search result
+//
+
+int spotify_class::get_search_result_online(char *searchstring,int type) {
+  static const char *userfilename = "spotify_search_result.json";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string url;
+  std::string response_string;
+  std::string searchstring_do;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;                                             // q=%s&type=artist&limit=50
+  std::string post;
+  post="q=";
+  post=post + searchstring;
+  switch(type) {
+    case 0: post=post + "&type=artist&limit=50";
+            break;
+    case 1: post=post + "&type=album&limit=50";
+            break;
+    case 2: post=post + "&type=playlist&limit=50";
+            break;
+    case 3: post=post + "&type=track&limit=50";
+            break;
+    default: post=post + "&type=artist&limit=50";
+            break;
+  };
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/search";
+  printf("Get search result info.\n");
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
+    // set type post/put/get
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+
+    userfile=fopen(userfilename,"w");
+    if (userfile) {
+      //curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
+
+
+
 //
 // search for playlist or song
 //
@@ -2617,6 +2890,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   int i=0;
   int ii=0;
   strcpy(searchstring,"");
+  // swap space to %20
   while(i<strlen(keybuffer)) {
     if (keybuffer[i]!=32) {
       *(searchstring+ii)=*(keybuffer+i);
@@ -2628,26 +2902,29 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     searchstring[ii]='\0';
     i++;
   }
-//  if (!(file_exists("json"))) {
-//    system("/bin/mkdir json");
-//  }
+  curl_error=0;
   switch(type) {
             // search artist name
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            curl_error=system(call);
+            //get_search_result_online(searchstring,0);
             break;
             // search album name
     case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            curl_error=system(call);
             break;
             // search playlist name
     case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            curl_error=system(call);
             break;
             // search track name
     case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            curl_error=system(call);
             break;
             // default search artist name
-    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default:sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            curl_error=system(call);
   }
-  curl_error=system(call);
   if (curl_error!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
     printf("call= %s \n",call);

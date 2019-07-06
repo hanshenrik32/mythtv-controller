@@ -107,6 +107,7 @@ class spotify_class : vlc_controller {
         bool spotify_is_playing;                                                // do we play ?
         bool spotify_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
+        int get_search_result_online(char *searchstring,int type);
     public:
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         char overview_show_cd_name[81];                                       // name of the band show in overview then you search on band and play songs from it
