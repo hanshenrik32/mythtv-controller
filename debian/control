@@ -2,7 +2,7 @@ Source: mythtv-controller
 Section: unknown
 Priority: optional
 Maintainer: Hans-Henrik Grüner-Pedersen <hanshenrik32@gmail.com>
-Build-Depends: libcurl-ocaml-dev,libdevil-dev,libsdl1.2-dev,libvlc5,libmysqlclient20,libvlccore9,libproxy-tools,libglc0,freeglut3,libdevil1c2,libical-dev,liblircclient-dev,lirc
+Build-Depends: libcurl-ocaml-dev,libdevil-dev,libsdl1.2-dev,libvlc5,libmysqlclient20,libvlccore9,libproxy-tools,libglc0,freeglut3,libdevil1c2,libical-dev,liblircclient-dev,libcurl4
 Homepage: http://www.hjemmebioklubben.dk
 #Vcs-Git: git://anonscm.debian.org/collab-maint/mythtv-controller.git
 #Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/mythtv-controller.git
@@ -10,7 +10,7 @@ Homepage: http://www.hjemmebioklubben.dk
 Package: mythtv-controller
 Architecture: amd64
 Section: unknown
-Depends: ${shlibs:Depends},libvlccore9,libvlc-bin,libvlc5,libglewmx1.13,libglc0,freeglut3,libsdl-image1.2,libdevil1c2,libmysqlclient20,lirc,liballegro4.4,libftdi1-2,libmng2,libportaudio2,libproxy-tools,libsdl1.2debian,libusb-0.1-4,mysql-common,xmltv
+Depends: ${shlibs:Depends},libvlccore9,libvlc-bin,libvlc5,libglewmx1.13,libglc0,freeglut3,libsdl-image1.2,libdevil1c2,libmysqlclient20,lirc,liballegro4.4,libftdi1-2,libmng2,libportaudio2,libproxy-tools,libsdl1.2debian,libusb-0.1-4,mysql-common,xmltv,libcurl4
 Installed-Size: 30000
 Description: Touch screen mediacenter.
  mythtv/kodi support. Tv guide by xmltv graber.
