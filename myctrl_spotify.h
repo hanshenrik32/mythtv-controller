@@ -186,6 +186,7 @@ class spotify_class : vlc_controller {
         int spotify_pause_play2();                                                // Pause
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
+        int spotify_last_play2();                                                // new play last song
         int spotify_next_play();                                                // play next song
         int spotify_next_play2();                                                // play next song
         void select_device_to_play();                                           // show device list to play on
