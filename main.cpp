@@ -12572,6 +12572,9 @@ void *datainfoloader_stream(void *data) {
 void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);
+
+  //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);     //
+
   spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
   pthread_exit(NULL);
