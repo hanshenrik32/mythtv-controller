@@ -6485,7 +6485,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
         }
       }
-
       //
       // spotify stuf offline search (only in local db)
       //
@@ -6580,6 +6579,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
         }
+        // online spotify stuf
         if (do_show_spotify_search_oversigt==true) {
           if ((!(do_show_setup_spotify))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
@@ -6595,8 +6595,15 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 ask_open_dir_or_play_spotify=true;
               }
             }
+            if ((GLuint) names[i*4+3]==27) {
+              spotifyknapnr=(GLuint) names[i*4+3];
+              if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
+              if (ask_open_dir_or_play_spotify==false) do_zoom_spotify_cover =! do_zoom_spotify_cover;
+              if (ask_open_dir_or_play_spotify) ask_open_dir_or_play_spotify=false;
+              fundet = true;
+            }
           }
-          printf("spotifyknapnr %d type=%d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
+          printf("spotifyknapnr %d type=%d fundet %d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr),fundet);
           // back button
 
           // works ok

@@ -1518,6 +1518,54 @@ int spotify_class::spotify_last_play() {
 }
 
 
+int spotify_class::spotify_last_play2() {
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/last";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
+
+
 
 //
 // work
@@ -1570,12 +1618,9 @@ int spotify_class::spotify_next_play2() {
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
     // set type post/put
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); /* !!! */
-    //sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
-    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
-    //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
     res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {
@@ -1726,9 +1771,6 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
   }
   return(0);
 }
-
-
-
 
 
 
