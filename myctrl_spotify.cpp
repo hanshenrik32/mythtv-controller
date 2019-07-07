@@ -1103,7 +1103,7 @@ void spotify_class::process_object_playinfo(json_value* value, int depth) {
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     print_depth_shift(depth);
-    if (playinfo_json_debug) printf("x=%d depth=%d object[%d].name = %s \n",x,depth, x, value->u.object.values[x].name);
+    //printf("x=%d depth=%d object[%d].name = %s  \n",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       process_playinfo_tracks=true;
     }
@@ -1182,7 +1182,15 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
         process_array_playinfo(value, depth+1);
         break;
       case json_integer:
-        if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
+        if (process_playinfo_duration_ms) {
+          spotify_aktiv_song[0].duration_ms=value->u.integer;
+          process_playinfo_duration_ms=false;
+        }
+        if (process_playinfo_progress_ms) {
+          spotify_aktiv_song[0].progress_ms=value->u.integer;
+          process_playinfo_progress_ms=false;
+        }
+        //printf("int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
         if (debug_json) printf("double: %f\n", value->u.dbl);
@@ -1206,8 +1214,8 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
           process_playinfo_progress_ms=false;
         }
         if (process_playinfo_duration_ms) {
-          //printf("duration ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
-          if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
+          printf("Value found = %s \n ",value->u.string.ptr);
+          //if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
           process_playinfo_duration_ms=false;
         }
         // release date
@@ -1260,8 +1268,10 @@ size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* dat
 // ********************************************************************************************
 
 int spotify_class::spotify_do_we_play() {
+  std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
+  std::string response_val;
   int httpCode;
   CURLcode res;
   json_char *json;
@@ -1293,6 +1303,15 @@ int spotify_class::spotify_do_we_play() {
       value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
       process_value_playinfo(value, 0,0);                                                     // fill play info
       json_value_free(value);                                                                 // json clean up
+      //foundpos=response_string.find("duration_ms=");
+        //spotify_aktiv_song[spotify_aktiv_song_antal].duration_ms=atol(response_string.c_str());
+/*
+      foundpos=response_string.find("progress_ms");
+      if (foundpos) {
+        response_val=response_string.substr(foundpos);
+        //spotify_aktiv_song[spotify_aktiv_song_antal].progress_ms=atol(response_string.c_str());
+      }
+*/
     }
   }
 }
@@ -2821,7 +2840,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
 
 
 
-//
+// NOt working not in use
 // download file from search result
 //
 
@@ -2876,14 +2895,12 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
     // set type post/put/get
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
-
     userfile=fopen(userfilename,"w");
     if (userfile) {
       //curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
       res = curl_easy_perform(curl);
       fclose(userfile);
     }
-
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
