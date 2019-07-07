@@ -1303,17 +1303,9 @@ int spotify_class::spotify_do_we_play() {
       value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
       process_value_playinfo(value, 0,0);                                                     // fill play info
       json_value_free(value);                                                                 // json clean up
-      //foundpos=response_string.find("duration_ms=");
-        //spotify_aktiv_song[spotify_aktiv_song_antal].duration_ms=atol(response_string.c_str());
-/*
-      foundpos=response_string.find("progress_ms");
-      if (foundpos) {
-        response_val=response_string.substr(foundpos);
-        //spotify_aktiv_song[spotify_aktiv_song_antal].progress_ms=atol(response_string.c_str());
-      }
-*/
     }
   }
+  return(httpCode);
 }
 
 
