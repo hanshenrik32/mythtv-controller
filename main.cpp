@@ -2499,9 +2499,14 @@ void display() {
 
     // do the update from spotify
     if (do_update_spotify_playlist) {
-      if (spotify_oversigt.spotify_get_user_id()==200) {
+      if (spotify_oversigt.spotify_get_user_id()) {
+        // add default playlists from spotify
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1);
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1);
         spotify_oversigt.spotify_get_user_playlists(true);                        // get all the playlist and update db (force update)
         spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+        spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview
       }
       do_update_spotify_playlist=false;
     }
