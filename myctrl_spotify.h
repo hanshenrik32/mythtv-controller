@@ -39,7 +39,7 @@ class spotify_oversigt_type {
     char        feed_artist[80+1];                // artist
     char        feed_desc[80+1];				          // desc
     char        feed_gfx_url[4000+1];             //
-    char        feed_gfx_mythtv[2000+1];				  //
+    char        feed_release_date[40+1];				  //
     char        playlistid[100+1];                // playlist id
     char        playlisturl[1024+1];               // play list url + spotify command
     unsigned int feed_group_antal;
