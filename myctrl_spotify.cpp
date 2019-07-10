@@ -718,7 +718,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
 void spotify_class::print_depth_shift(int depth) {
   int j;
   for (j=0; j < depth; j++) {
-    printf(" ");
+    printf("\t");
   }
 }
 
@@ -736,6 +736,7 @@ bool process_name=false;
 bool process_items=false;
 bool process_track_nr=false;
 bool process_release_date=false;
+bool process_uri=false;
 
 //
 // process types in file for process playlist files (songs)
@@ -748,7 +749,7 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
   }
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
-    print_depth_shift(depth);
+    //print_depth_shift(depth);
     printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       process_tracks=true;
@@ -777,8 +778,16 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
     }
+    if (strcmp(value->u.object.values[x].name , "uri" )==0) {
+      process_uri=true;
+    }
+
     process_value_playlist(value->u.object.values[x].value, depth+1,x);
   }
+
+  printf("Next record ****************************************************************************\n");
+
+
 }
 
 
@@ -804,7 +813,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
-      print_depth_shift(depth);
+      //print_depth_shift(depth);
     }
     switch (value->type) {
       case json_none:
@@ -823,7 +832,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         if (debug_json) printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        printf("string: %s\n", value->u.string.ptr);
+        //printf("string: %s\n", value->u.string.ptr);
         if ((process_description) && (depth==11) && (x==7)) {
           if (!(stack[antal])) {
             antal++;
@@ -833,13 +842,18 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           process_description=false;
         }
         if (process_release_date) {
-          printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
+//          printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
           strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
           process_release_date=false;
         }
         if (process_items) {
           // set start of items in list
           process_items=false;
+        }
+        if (process_uri) {
+          // get play link
+          if (( depth == 9 ) && ( x == 18 )) printf("uri = %s     depth = %d    x = %d \n", value->u.string.ptr,depth,x);
+          process_uri=false;
         }
         if (process_tracks) {
           // playlist id from spotify
@@ -850,34 +864,28 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         // gfx url
         if (( process_image ) && ( depth == 14 ) && ( x == 1 )) {
           if (stack[antal]) {
+//            printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
             strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
           }
           process_image=false;
         }
         // process song spotify id CHECKED
         if ((depth==9) && (x==18)) {
-          printf("antal %d process_spotifyid %s \n",antal,value->u.string.ptr);
+//          printf("antal %d process_spotifyid %s \n",antal,value->u.string.ptr);
           if (stack[antal]) {
             if (stack[antal]) {
               strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
             }
           }
         }
-
         // get playlist name
         if ((process_name) && (depth==2) && (x==7)) {
           strcpy(spotify_playlistname , value->u.string.ptr);
         }
-        // type album
-        if ((process_name) && (depth==9) && (x==0)) {
-        }
-        // get type (album)
-        if ((process_name) && (depth==9) && (x==11)) {
-        }
         // get artis
         if ((process_name) && (depth==13) && (x==3)) {
           if (stack[antal]) {
-            printf("antal %d process_artist name %s \n",antal,value->u.string.ptr);
+//            printf("antal %d process_artist name %s \n",antal,value->u.string.ptr);
             strcpy( stack[antal]->feed_artist , value->u.string.ptr );
           }
         }
@@ -895,20 +903,18 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
               stack[antal]=new (spotify_oversigt_type);
             }
             if (stack[antal]) {
-              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
+//              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
               strcpy(stack[antal]->feed_name,value->u.string.ptr);
             }
           }
           process_name=false;
         }
-
         // get tracknr
         if (process_track_nr) {
           process_track_nr=false;
           //printf(" text %s \n",value->u.string.ptr);
           // if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
         }
-
         break;
       case json_boolean:
         if (debug_json) printf("bool: %d\n", value->u.boolean);
