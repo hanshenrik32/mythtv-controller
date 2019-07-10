@@ -600,7 +600,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 // write to spotify_users_playlist.json
 // parse user playlist
 
-int spotify_class::spotify_get_user_playlists(bool force) {
+int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -661,8 +661,9 @@ int spotify_class::spotify_get_user_playlists(bool force) {
     }
     // download all playlist (name + id) in one big file NOT songs
     if (strcmp(spotifytoken,"")!=0) {
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotifytoken);
-      printf("doget = %s \n",doget);
+      // 50 is the max
+      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
+      //printf("doget = %s \n",doget);
       curl_error=system(doget);
       if (curl_error!=0) {
         fprintf(stderr,"Curl error get user playlists\n");
@@ -698,7 +699,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
-        if (spotify_oversigt.spotify_get_playlist(row[1],force)==1) {
+        if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
           printf("Error create playlist %s \n",row[1]);
         }
       }
@@ -711,7 +712,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
 
 //
 //
-// json parser used to parse the return files from spotify api
+// json parser used to parse the return files from spotify api (playlist files (songs))
 //
 //
 
@@ -737,6 +738,7 @@ bool process_items=false;
 bool process_track_nr=false;
 bool process_release_date=false;
 bool process_uri=false;
+bool process_id=false;
 
 //
 // process types in file for process playlist files (songs)
@@ -772,6 +774,9 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
       process_name=true;
     }
+    if (strcmp(value->u.object.values[x].name , "id" )==0) {
+      process_id=true;
+    }
     if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
       process_track_nr=true;
     }
@@ -784,11 +789,14 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
 
     process_value_playlist(value->u.object.values[x].value, depth+1,x);
   }
-
   printf("Next record ****************************************************************************\n");
-
-
 }
+
+
+
+//
+// json
+//
 
 
 void spotify_class::process_array_playlist(json_value* value, int depth) {
@@ -802,6 +810,7 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
     process_value_playlist(value->u.array.values[x], depth,x);
   }
 }
+
 
 
 //
@@ -841,73 +850,94 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           //strcpy(stack[antal]->feed_desc,value->u.string.ptr);                           // desc
           process_description=false;
         }
-        if (process_release_date) {
-//          printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
+        if ( process_release_date ) {
+          printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
           strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
           process_release_date=false;
         }
-        if (process_items) {
+        if ( process_items ) {
           // set start of items in list
           process_items=false;
         }
-        if (process_uri) {
-          // get play link
-          if (( depth == 9 ) && ( x == 18 )) printf("uri = %s     depth = %d    x = %d \n", value->u.string.ptr,depth,x);
-          process_uri=false;
-        }
-        if (process_tracks) {
+        if ( process_tracks ) {
           // playlist id from spotify
           if (stack[antal]) {
           }
           process_tracks=false;
         }
         // gfx url
-        if (( process_image ) && ( depth == 14 ) && ( x == 1 )) {
-          if (stack[antal]) {
-//            printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
-            strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+        if ( process_image ) {
+          if (( depth == 14 ) && ( x == 1 )) {
+            if (stack[antal]) {
+              printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
+              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+            }
           }
           process_image=false;
         }
-        // process song spotify id CHECKED
-        if ((depth==9) && (x==18)) {
-//          printf("antal %d process_spotifyid %s \n",antal,value->u.string.ptr);
-          if (stack[antal]) {
+        // get play link
+        // process song spotify id CHECKED OK
+        if ( process_uri ) {
+          if ((depth==9) && (x==18)) {
+            printf("uri = %s     depth = %d    x = %d \n", value->u.string.ptr,depth,x);
             if (stack[antal]) {
-              strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
+              if (stack[antal]) {
+                strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
+              }
             }
           }
+          process_uri=false;
         }
-        // get playlist name
-        if ((process_name) && (depth==2) && (x==7)) {
-          strcpy(spotify_playlistname , value->u.string.ptr);
-        }
-        // get artis
-        if ((process_name) && (depth==13) && (x==3)) {
-          if (stack[antal]) {
-//            printf("antal %d process_artist name %s \n",antal,value->u.string.ptr);
-            strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+        if (process_id) {
+          // get playlist id
+          if ((depth==2) && (x==5)) {
+            printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
+            printf("playlist id %s \n",value->u.string.ptr);
+            strcpy(spotify_playlistid , value->u.string.ptr);
           }
+          process_id=false;
         }
-        // get Song name
-        if ((process_name) && (depth==9) && (x==12)) {
-          if (antal==0) {
-            stack[antal]=new (spotify_oversigt_type);
-          } else {
-            // new record
-            antal++;
-            antalplaylists++;
+        if (process_name) {
+          // get playlist name OK
+          if ((depth==2) && (x==7)) {
+            printf("playlist name %s \n",value->u.string.ptr);
+            strcpy(spotify_playlistname , value->u.string.ptr);
           }
-          if (antalplaylists<maxantal) {
-            if (!(stack[antal]))  {
+
+          // get playlist id
+          if ((depth==2) && (x==5)) {
+            printf("playlist id %s \n",value->u.string.ptr);
+            strcpy(spotify_playlistid , value->u.string.ptr);
+          }
+
+
+          // get artis
+          if ((depth==13) && (x==3)) {
+            if (stack[antal]) {
+  //            printf("antal %d process_artist name %s \n",antal,value->u.string.ptr);
+              //strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+            }
+          }
+          // get Song name OK
+          if ((depth==9) && (x==12)) {
+            if (antal==0) {
               stack[antal]=new (spotify_oversigt_type);
+            } else {
+              // new record
+              antal++;
+              antalplaylists++;
             }
-            if (stack[antal]) {
-//              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
-              strcpy(stack[antal]->feed_name,value->u.string.ptr);
+            if (antalplaylists<maxantal) {
+              if (!(stack[antal]))  {
+                stack[antal]=new (spotify_oversigt_type);
+              }
+              if (stack[antal]) {
+  //              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
+                strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              }
             }
+            process_name=false;
           }
-          process_name=false;
         }
         // get tracknr
         if (process_track_nr) {
@@ -929,7 +959,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 // write to spotify_playlist_{spotifyid}.json
 // and update db from that file
 
-int spotify_class::spotify_get_playlist(char *playlist,bool force) {
+int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_playlistdb) {
   int tt;
   bool dbexist=false;
   int refid;
@@ -1027,13 +1057,14 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
             printf("mysql create table error.\n");
             printf("SQL : %s\n",sql);
           }
+          // create db if not exist
           res = mysql_store_result(conn);
         }
         //printf("mysql db create error. mythtvcontroller\n");
       }
       //
       // create db if not exist
-      res = mysql_store_result(conn);
+      //res = mysql_store_result(conn);
       // create db spotify playlist process data
       // insert all record in db
       tt = 0;
@@ -1084,7 +1115,6 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               }
             }
           }
-
           if (stack[tt+1]) {                                                    // if (stack[tt+1]) {
             playlistexist=false;
             sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
@@ -1098,7 +1128,6 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
             //
             // insert record created if not exist ( song name )
             //
-
             if (playlistexist==false) {
               sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
               mysql_query(conn,sql);
@@ -1108,6 +1137,15 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
         }
         tt++;
       }
+
+
+      // create playlist if needed
+      if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
+        sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx,spotify_playlistid);
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+      }
+
     }
     mysql_close(conn);
   }

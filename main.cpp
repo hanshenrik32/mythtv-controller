@@ -2496,14 +2496,19 @@ void display() {
       do_update_rss_show = true;                                                  // show we are updating rss
       firsttime_rssupdate=false;                                                // only used first time
     }
-
     // do the update from spotify
     if (do_update_spotify_playlist) {
       if (spotify_oversigt.spotify_get_user_id()) {
         // add default playlists from spotify
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1);
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1);
-        spotify_oversigt.spotify_get_user_playlists(true);                        // get all the playlist and update db (force update)
+        spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
+
+        spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
+//        spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
+
         spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview
