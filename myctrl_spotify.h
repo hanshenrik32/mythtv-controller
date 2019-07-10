@@ -133,6 +133,7 @@ class spotify_class : vlc_controller {
         int active_default_play_device;                                         // active device or -1
         char active_default_play_device_name[256];                              // active device name
         char spotify_playlistname[256];
+        char spotify_playlistid[256];
         char client_id[120];                                                    // spotify client id
         char client_secret[120];                                                // spotify client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
@@ -169,8 +170,8 @@ class spotify_class : vlc_controller {
         // spotify_get_list_of_users_playlists NOT in use
         int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
         // in use
-        int spotify_get_user_playlists(bool force);                             // get user playlist (list of playlist)
-        int spotify_get_playlist(char *playlist,bool force);                    // get playlist + songs and update db
+        int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
+        int spotify_get_playlist(char *playlist,bool force,bool create_playlistdb);             // get playlist + songs and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist
