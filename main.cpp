@@ -2507,11 +2507,11 @@ void display() {
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
 
-        //spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
-        spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
-
-        spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+        spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+        spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
+        spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
         spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview
       }
       do_update_spotify_playlist=false;

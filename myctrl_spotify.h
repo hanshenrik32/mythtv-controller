@@ -21,7 +21,7 @@ class spotify_device_def {
     bool        is_active;                  // is it working
     bool        is_private_session;         //
     bool        is_restricted;              // is private
-    char        name[256];                  // dev name
+    char        name[200];                  // dev name
     char        devtype[30];                // dev type
     int         devvolume;                  // play volume
     spotify_device_def();
@@ -38,7 +38,7 @@ class spotify_oversigt_type {
     char        feed_name[80+1];				          // playlist/song name
     char        feed_artist[80+1];                // artist
     char        feed_desc[80+1];				          // desc
-    char        feed_gfx_url[4000+1];             //
+    char        feed_gfx_url[1024+1];             //
     char        feed_release_date[40+1];				  //
     char        playlistid[100+1];                // playlist id
     char        playlisturl[1024+1];               // play list url + spotify command
@@ -60,11 +60,11 @@ class spotify_active_play_info_type {                // sample data down here
     spotify_active_play_info_type();
     long progress_ms;                                   // 27834
     long duration_ms;                                   // 245119
-    char song_name[256];                              // Joe Bonamassa
-    char artist_name[256];                              // Joe Bonamassa
+    char song_name[200];                              // Joe Bonamassa
+    char artist_name[200];                              // Joe Bonamassa
     char cover_image_url[256];                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
     GLuint cover_image;
-    char album_name[256];                               // (British Blues Explosion Live)
+    char album_name[200];                               // (British Blues Explosion Live)
     char release_date[24];                              //
     long popularity;                                    // (27)
     bool is_playing;                                    // (true)
@@ -74,7 +74,7 @@ class spotify_active_play_info_type {                // sample data down here
 
 class spotify_class : vlc_controller {
     private:
-        enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
+        enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
         spotify_oversigt_type *stack[maxantal];			                            // spotify playlist stack
         spotify_device_def spotify_device[10];
         int spotify_device_antal;                                               // antal device found
