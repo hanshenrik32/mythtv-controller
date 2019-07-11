@@ -1097,7 +1097,6 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_pl
             sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
             res=mysql_store_result(conn);
-
             /*
             sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
@@ -1137,13 +1136,22 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_pl
         }
         tt++;
       }
-
-
       // create playlist if needed
       if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
-        sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx,spotify_playlistid);
+        sprintf(sql,"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
         mysql_query(conn,sql);
         res = mysql_store_result(conn);
+        playlistexist=false;
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            playlistexist=true;
+          }
+        }
+        if (!(playlistexist)) {
+          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx,spotify_playlistid);
+          mysql_query(conn,sql);
+          res = mysql_store_result(conn);
+        }
       }
 
     }
@@ -1153,7 +1161,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_pl
 }
 
 
-// *********************************************************************************************************************************
+// *****  ****************************************************************************************************************************
 
 bool process_playinfo_tracks=false;
 bool process_playinfo_playlist=false;
