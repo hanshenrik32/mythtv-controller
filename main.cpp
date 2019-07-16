@@ -2500,6 +2500,7 @@ void display() {
     if (do_update_spotify_playlist) {
       if (spotify_oversigt.spotify_get_user_id()) {
         // add default playlists from spotify
+        spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
