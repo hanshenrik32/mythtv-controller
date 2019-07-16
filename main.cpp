@@ -59,8 +59,8 @@ bool stream_jump = false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/inc/fmod_errors.h"
+#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
+#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"

@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m32 -Wformat-overflow -std=c++11
+CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
 
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
@@ -12,7 +12,7 @@ DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi11011linux.tar.gz
+FMODFILE   = fmodstudioapi11014linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -27,14 +27,14 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
 
 #	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10605linux/api/lowlevel/lib/x86_64/libfmod.so
 
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -111,8 +111,7 @@ installsound:
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
-	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
-	@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 /usr/lib/libfmod.so.10
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
