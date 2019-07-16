@@ -880,7 +880,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         // process song spotify id CHECKED OK
         if ( process_uri ) {
           if ((depth==9) && (x==18)) {
-            printf("%s\n", value->u.string.ptr);
+            //if (playinfo_json_debug) printf("%s\n", value->u.string.ptr);
             if (stack[antal]) {
               if (stack[antal]) {
                 strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
@@ -901,7 +901,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         if (process_name) {
           // get playlist name OK
           if ((depth==2) && (x==7)) {
-            printf("playlist name %s \n",value->u.string.ptr);
+            //printf("playlist name %-30s \n",value->u.string.ptr);
             strcpy(spotify_playlistname , value->u.string.ptr);
           }
           // get playlist id
@@ -952,6 +952,12 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 
 
 
+size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
+    data->append((char*) ptr, size * nmemb);
+    return size * nmemb;
+}
+
+
 // work
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
@@ -967,9 +973,12 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_pl
   MYSQL_ROW row;
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
+  char auth_kode[1024];
   strcpy(playlistfilename,"json/spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
   char sql[8594];
   char doget[4096];
   char filename[4096];
@@ -982,17 +991,59 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_pl
   char* file_contents;
   json_char* json;
   json_value* value;
+  // curl stuf
+  CURL *curl;
+  std::string response_string;
+  int httpCode;
+  CURLcode curl_res;
+  struct curl_slist *chunk = NULL;
+  FILE *out_file;
+  bool do_curl=true;
   if (!(file_exists("json"))) {
     system("/bin/mkdir json");
   }
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
-      sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
-      curl_error=system(doget);
-      if (curl_error==0) {
-        fprintf(stderr,"Curl error get playlist \n");
-        fprintf(stderr,"Curl error %s \n",doget);
-        //return 1;
+      if (do_curl) {
+        curl = curl_easy_init();
+        sprintf(doget,"https://api.spotify.com/v1/playlists/%s",playlist);
+        if (curl) {
+          curl_easy_setopt(curl, CURLOPT_URL, doget);
+          curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+          curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+          /* Add a custom header */
+          chunk = curl_slist_append(chunk, "Accept: application/json");
+          chunk = curl_slist_append(chunk, "Content-Type: application/json");
+          chunk = curl_slist_append(chunk, auth_kode);
+          out_file = fopen(playlistfilename, "wb");
+          if (out_file) {
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+            //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
+            // set type post/put
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+            curl_res = curl_easy_perform(curl);
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            fputs(response_string.c_str(),out_file);
+            if (curl_res != CURLE_OK) {
+              fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
+            }
+            // always cleanup
+            curl_easy_cleanup(curl);
+            fclose(out_file);
+            if (httpCode == 200) {
+              //all ok
+            }
+          }
+        }
+      } else {
+        sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
+        curl_error=system(doget);
+        if (curl_error!=0) {
+          fprintf(stderr,"Curl error get playlist \n");
+          fprintf(stderr,"Curl error %s \n",doget);
+          //return 1;
+        }
       }
     }
     stat(playlistfilename, &filestatus);                                          // get file info
@@ -1341,10 +1392,6 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
 
 // *********************************************************************************************************************************
 
-size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
-    data->append((char*) ptr, size * nmemb);
-    return size * nmemb;
-}
 
 //
 // Work in use

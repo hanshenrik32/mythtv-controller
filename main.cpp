@@ -2501,12 +2501,17 @@ void display() {
       if (spotify_oversigt.spotify_get_user_id()) {
         // add default playlists from spotify
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
-
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
