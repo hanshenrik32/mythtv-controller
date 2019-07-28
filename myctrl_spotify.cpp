@@ -3924,6 +3924,25 @@ void spotify_class::show_setup_spotify() {
     MYSQL_ROW row;
     int dev_nr=0;
     char temptxt[200];
+    // ICON TEXT pos
+    const int icon_text_posx1=510;
+    const int icon_text_posy1=320;
+    const int icon_text_posx2=510+120;
+    const int icon_text_posy2=320;
+    const int icon_text_posx3=510+120+120;
+    const int icon_text_posy3=320;
+    const int icon_text_posx4=510+120+120+120;
+    const int icon_text_posy4=320;
+    const int icon_text_posx5=510;
+    const int icon_text_posy5=180;
+    const int icon_text_posx6=510+120;
+    const int icon_text_posy6=180;
+    const int icon_text_posx7=510+120+120;
+    const int icon_text_posy7=180;
+    const int icon_text_posx8=510+120+120+120;
+    const int icon_text_posy8=180;
+    std::string devname;
+    //
     static int spotify_device_antal=0;
     static bool first_time_update=true;
     char *database = (char *) "mythtvcontroller";
@@ -4128,11 +4147,14 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510, 310, 0.0f);
+      glTranslatef(icon_text_posx1, icon_text_posy1, 0.0f);
+      //glTranslatef(510, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[0].name);
+      devname=spotify_device[0].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[1].name,"")!=0) {
@@ -4162,11 +4184,13 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120, 310, 0.0f);
+      glTranslatef(icon_text_posx2, icon_text_posy2, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[1].name);
+      devname=spotify_device[1].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[2].name,"")!=0) {
@@ -4196,11 +4220,14 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120, 310, 0.0f);
+      glTranslatef(icon_text_posx3, icon_text_posy3, 0.0f);
+      //glTranslatef(510+120+120, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[2].name);
+      devname=spotify_device[2].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[3].name,"")!=0) {
@@ -4230,17 +4257,20 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120, 310, 0.0f);
+      glTranslatef(icon_text_posx4, icon_text_posy4, 0.0f);
+      //glTranslatef(510+120+120+120, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[3].name);
+      devname=spotify_device[3].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
 
     // row 2
     if (strcmp(spotify_device[4].name,"")!=0) {
-      // playerid 1
+      // playerid 5
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -4266,15 +4296,18 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510, 180, 0.0f);
+      glTranslatef(icon_text_posx5, icon_text_posy5, 0.0f);
+      //glTranslatef(510, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[4].name);
+      devname=spotify_device[4].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[4].name,"")!=0) {
-      // playerid 1
+    if (strcmp(spotify_device[5].name,"")!=0) {
+      // playerid 6
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -4300,15 +4333,19 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120, 180, 0.0f);
+      glTranslatef(icon_text_posx6, icon_text_posy6, 0.0f);
+      //glTranslatef(510+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[4].name);
+      devname=spotify_device[5].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[5].name,"")!=0) {
-      // playerid 1
+
+    if (strcmp(spotify_device[6].name,"")!=0) {
+      // playerid 7
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -4334,15 +4371,18 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120, 180, 0.0f);
+      glTranslatef(icon_text_posx7, icon_text_posy7, 0.0f);
+      //glTranslatef(510+120+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[5].name);
+      devname=spotify_device[6].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[6].name,"")!=0) {
-      // playerid 1
+    if (strcmp(spotify_device[7].name,"")!=0) {
+      // playerid 8
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -4368,45 +4408,14 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120, 180, 0.0f);
+      glTranslatef(icon_text_posx8, icon_text_posy8, 0.0f);
+      //glTranslatef(510+120+120+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[6].name);
-      glPopMatrix();
-    }
-    if (strcmp(spotify_device[7].name,"")!=0) {
-      // playerid 1
-      glPushMatrix();
-      winsizx=100;
-      winsizy=100;
-      xpos=270+120+120+120;
-      ypos=70;
-      glEnable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(0.0f, 0.0f, 0.0f);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-      if (strcmp(spotify_device[7].devtype,"Unknown")==0) glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      else if (strcmp(spotify_device[7].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
-      else if (strcmp(spotify_device[7].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
-      else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(18);                                                             // update button name
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glEnd();
-      glPopMatrix();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120+120, 180, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[7].name);
+      devname=spotify_device[7].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
 }
