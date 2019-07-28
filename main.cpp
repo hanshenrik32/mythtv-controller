@@ -1050,7 +1050,7 @@ int parse_config(char *filename) {
               command = true;
               command_nr=moviefontsize;
               commandlength=12;
-            } else if (strncmp(buffer+n,"spotifydefaultdevice=",20)==0) {
+            } else if (strncmp(buffer+n,"spotifydefaultdevice",19)==0) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
