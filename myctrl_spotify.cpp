@@ -3964,15 +3964,29 @@ void spotify_class::show_setup_spotify() {
               spotify_device[dev_nr].is_active=false;
             }
             strcpy(spotify_device[dev_nr].devtype,row[2]);
-            /// set active device
-            if ((active_default_play_device!=-1) && (spotify_device[dev_nr].is_active)) {
+            // is one the default device set in config
+            // and exist in db
+            if ((strcmp(active_default_play_device_name,"")!=0) && (strcmp(active_default_play_device_name,row[0])==0)) {
               active_default_play_device=dev_nr;
+              //spotify_device[0].is_active=true;
+              //strcpy(spotify_device[0].name,active_default_play_device_name);
+            } else {
+              /// set active device
+              if ((active_default_play_device!=-1) && (spotify_device[dev_nr].is_active)) {
+                // is default defined in config set it active
+                if (strcmp(active_default_play_device_name,"")!=0) {
+                  if (strcmp(active_default_play_device_name,row[1])==0) active_default_play_device=dev_nr;
+                } else {
+                  active_default_play_device=dev_nr;
+                }
+              }
             }
             dev_nr++;
             spotify_device_antal++;
           }
         }
       }
+
     }
     // spotify setup
     // background
@@ -4148,7 +4162,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx1, icon_text_posy1, 0.0f);
-      //glTranslatef(510, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4221,7 +4234,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx3, icon_text_posy3, 0.0f);
-      //glTranslatef(510+120+120, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4258,7 +4270,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx4, icon_text_posy4, 0.0f);
-      //glTranslatef(510+120+120+120, 310, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4267,7 +4278,6 @@ void spotify_class::show_setup_spotify() {
       glcRenderString(devname.c_str());
       glPopMatrix();
     }
-
     // row 2
     if (strcmp(spotify_device[4].name,"")!=0) {
       // playerid 5
@@ -4297,7 +4307,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx5, icon_text_posy5, 0.0f);
-      //glTranslatef(510, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4334,7 +4343,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx6, icon_text_posy6, 0.0f);
-      //glTranslatef(510+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4372,7 +4380,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx7, icon_text_posy7, 0.0f);
-      //glTranslatef(510+120+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
@@ -4409,7 +4416,6 @@ void spotify_class::show_setup_spotify() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(icon_text_posx8, icon_text_posy8, 0.0f);
-      //glTranslatef(510+120+120+120, 180, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);

@@ -1051,6 +1051,7 @@ int parse_config(char *filename) {
               command_nr=moviefontsize;
               commandlength=12;
             } else if (strncmp(buffer+n,"spotifydefaultdevice",19)==0) {
+              printf("Set command to set default spotify play device\n");
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
@@ -1218,6 +1219,7 @@ int parse_config(char *filename) {
             } else if (command_nr==moviefontsize) {
               configdefaultmoviefontsize=atof(value);                           // set movie font size
             } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
+              printf("Set default spotify play device to %s\n",value);
               strcpy(spotify_oversigt.active_default_play_device_name,value);   //
             }
           }
@@ -1586,10 +1588,11 @@ void load_config(char * filename) {
       if (res) {
         spotify_oversigt.active_default_play_device=atoi(row[1]);
         spotify_oversigt.active_spotify_device=atoi(row[1]);
-        fprintf(stderr,"Set Default spotify device.\n");
-        fprintf(stderr,"Default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+        fprintf(stderr,"Set Default spotify device as %s device # %d\n",spotify_oversigt.active_default_play_device_name,spotify_oversigt.active_default_play_device);
       } else {
-        fprintf(stderr,"No default spotify device found %s\n",spotify_oversigt.active_default_play_device_name);
+        fprintf(stderr,"No default spotify device found \n");
+        spotify_oversigt.active_default_play_device=-1;
+        spotify_oversigt.active_default_play_device=-1;
       }
     }
     if (conn) mysql_close(conn);
