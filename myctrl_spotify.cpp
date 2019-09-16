@@ -2514,7 +2514,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               if (getart == 0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                strncpy(stack[antal]->feed_gfx_url,row[1],2048);
+                strncpy(stack[antal]->feed_gfx_url,row[1],1024);
                 strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
 
                 /*
