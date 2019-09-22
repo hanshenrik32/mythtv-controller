@@ -20,10 +20,16 @@ set -e
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-db_get mythtv-controller/username
+# db_input medium mythtv-controller/username || true
+# db_go || true
+
+# db_get mythtv-controller/username
 
 case "$1" in
     configure)
+    #db_input medium mythtv-controller/username || true
+    #db_go || true
+    #db_get mythtv-controller/username
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
