@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_fset mythtv-controller/mariadb seen false
+db_fset mythtv-controller/username seen false
+db_fset mythtv-controller/password seen false
+
+db_input high mythtv-controller/mariadb || true
+db_go
+db_get mythtv-controller/mariadb
+if [ "$RET" = "true" ]; then
+    db_input high mythtv-controller/username || true
+    db_input high mythtv-controller/password || true
+    db_go
+fi
+
