@@ -1,0 +1,20 @@
+Template: mythtv-controller/username
+Type: string
+Default: [root]
+Description: mysql/mariadb user name:
+ The user name used to connect to mysql/mariadb db
+ in mythtv-controller.
+
+Template: mythtv-controller/password
+Type: password
+Default: [password]
+Description: mysql/mariadb user password:
+ The user password used to connect to mysql/mariadb db
+ in mythtv-controller.
+
+Template: mythtv-controller/mariadb
+Type: boolean
+Description: Install mariadb:
+ Install mariadb backend for mythtv-controller.
+ If you do not now what to answer say yes.
+
