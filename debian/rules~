@@ -81,8 +81,8 @@ binary:
 	unzip -n mongoose-master -d debian/mythtv-controller/usr/share/mythtv-controller/
 	tar -zxvf json-parser.tar.gz -C debian/mythtv-controller/usr/share/mythtv-controller/
 	if [ -L debian/mythtv-controller/usr/lib/libfmod.so.10 ]; then rm debian/mythtv-controller/usr/lib/libfmod.so.10; fi
-	ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 debian/mythtv-controller/usr/lib/libfmod.so.10
-	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11011linux/*
+	ln -s /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 debian/mythtv-controller/usr/lib/libfmod.so.10
+	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11014linux/*
 	dh_gencontrol
 	dh_installdeb
 	dh_builddeb

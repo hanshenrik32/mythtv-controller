@@ -13673,9 +13673,13 @@ int main(int argc, char** argv) {
       }
     }
     if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
-    create_radio_oversigt();										                          // Create radio mysql database if not exist
-    radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-    strcpy(configbackend_tvgraber_old,"");
+    // Create radio mysql database if not exist
+    if (create_radio_oversigt()) {
+      radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
+      strcpy(configbackend_tvgraber_old,"");
+    } else {
+      exit(1);
+    }
     // if kodi
     if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
       // music loader
