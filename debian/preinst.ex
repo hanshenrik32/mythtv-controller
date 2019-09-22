@@ -5,6 +5,9 @@
 
 set -e
 
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
 # summary of how this script can be called:
 #        * <new-preinst> `install'
 #        * <new-preinst> `install' <old-version>
@@ -15,7 +18,8 @@ set -e
 
 
 case "$1" in
-    install|upgrade)
+    install|upgrade)    
+    ldconfig    
     ;;
 
     abort-upgrade)

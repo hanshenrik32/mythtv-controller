@@ -5,6 +5,9 @@
 
 set -e
 
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
 # summary of how this script can be called:
 #        * <postrm> `remove'
 #        * <postrm> `purge'
@@ -21,6 +24,10 @@ set -e
 
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    # remove ref to db
+    db_fset mythtv-controller/mariadb seen false
+    db_fset mythtv-controller/username seen false
+    db_fset mythtv-controller/password seen false
     rm /usr/lib/libfmod.so.10
     rm -r /usr/share/mythtv-controller
     rm /etc/mythtv-controller.conf

@@ -66,7 +66,7 @@ binary:
 	mkdir -p debian/mythtv-controller/usr/lib
 	chmod 755 debian/mythtv-controller/usr/lib
 	mkdir -p debian/mythtv-controller/usr/share/mythtv-controller/images/radiostations
-	cp mythtv-controller debian/mythtv-controller/usr/local/bin
+	cp mythtv-controller debian/mythtv-controller/usr/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/usr/share/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/usr/share/mythtv-controller/
 	# icon
@@ -79,7 +79,7 @@ binary:
 	chmod -R 644 debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11014linux/*
 	tar -C debian/mythtv-controller/usr/share/mythtv-controller/ -zxf fmodstudioapi11014linux.tar.gz fmodstudioapi11014linux/api/
 	unzip -n mongoose-master -d debian/mythtv-controller/usr/share/mythtv-controller/
-	tar -zxvf json-parser.tar.gz -C debian/mythtv-controller/usr/share/mythtv-controller/
+	tar -zxvf json-parser.tar.gz -C debian/mythtv-controller/usr/share/mythtv-controller/ --wildcards --no-anchored 'json.*'
 	if [ -L debian/mythtv-controller/usr/lib/libfmod.so.10 ]; then rm debian/mythtv-controller/usr/lib/libfmod.so.10; fi
 	ln -s /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 debian/mythtv-controller/usr/lib/libfmod.so.10
 	chown root:root -R debian/mythtv-controller/usr/share/mythtv-controller/fmodstudioapi11014linux/*
