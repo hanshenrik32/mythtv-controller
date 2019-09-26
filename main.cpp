@@ -84,6 +84,7 @@ int music_oversigt_loaded_nr=0;                                                 
 int movie_oversigt_loaded_nr=0;                                                  //
 bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
+bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
 
 FMOD::DSP* dsp = 0;                   // fmod Sound device
 
@@ -2501,6 +2502,7 @@ void display() {
     }
     // do the update from spotify
     if (do_update_spotify_playlist) {
+      spotify_oversigt_loaded_begin=true;
       if (spotify_oversigt.spotify_get_user_id()) {
         // add default playlists from spotify
         spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
@@ -2523,6 +2525,7 @@ void display() {
         spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
         spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview
       }
+      spotify_oversigt_loaded_begin=false;
       do_update_spotify_playlist=false;
     }
     glPushMatrix();
@@ -3192,6 +3195,7 @@ void display() {
         hent_spotify_search=false;
         spotify_selected_startofset=0;                                          // icon show start ofset
         spotifyknapnr=1;                                                        // reset pos
+        spotify_oversigt_loaded_begin=true;
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
           if (spotify_oversigt.search_playlist_song==0)
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist
@@ -3201,6 +3205,7 @@ void display() {
           keybuffer[0] = 0;
           keybufferindex = 0;
         }
+        spotify_oversigt_loaded_begin=false;
       }
     }
 
@@ -5712,22 +5717,33 @@ void display() {
           if (y>0.0f) valgtnr = 2;
         }
       }
+
+      // spotify
+      if (valgtnr==0) {
+        if (spotify_oversigt_loaded_begin) {
+          y = (float) spotify_oversigt.antal_spotify_streams();
+          xx = (float) y*6;
+          if (y>0.0f) valgtnr=6;
+        }
+      }
+
       // show stream loader status
       if (valgtnr==0) {
         if (streamoversigt.streams_rss_loaded()) {
-          y = (float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
-          y = (float) streamoversigt.streams_rss_loaded()/88;
-          xx = (float) y*18;
+          //y = (float) streamoversigt.streams_rss_loaded()/streamoversigt.antal_rss_streams();
+          y = (float) streamoversigt.streams_rss_loaded()/88;                       // 88
+          //xx = (float) y*18;
+          xx = (float) y*6;
           if (y>0.0f) valgtnr=3;
         }
       }
+
       // show movie loader status
       if (valgtnr==0) {
         y = (float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
         xx = (float) y*18;
         if (y > 0.0f) valgtnr = 4;
       } else y=0;
-
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
@@ -5742,15 +5758,17 @@ void display() {
       glScalef(24.0, 24.0, 1.0);
       glColor3f(0.6f, 0.6f, 0.6f);
       switch(valgtnr) {
-        case 1: glcRenderString("Updating Radio");
+        case 1: glcRenderString("Update Radio");
                 break;
-        case 2: glcRenderString(" Updating Music");
+        case 2: glcRenderString(" Update Music");
                 break;
-        case 3: glcRenderString("Updating Stream");
+        case 3: glcRenderString("Update Stream");
                 break;
-        case 4: glcRenderString(" Updating Movie");
+        case 4: glcRenderString(" Update Movie");
                 break;
         case 5: glcRenderString("     Other");
+                break;
+        case 6: glcRenderString("Update Spotify");
                 break;
       }
       glPopMatrix();
@@ -6320,8 +6338,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           strcpy(spotify_oversigt.overview_show_band_name,"");
           if (do_show_spotify_search_oversigt==true) {
             do_show_spotify_search_oversigt=false;
+            spotify_oversigt_loaded_begin=true;
             spotify_oversigt.opdatere_spotify_oversigt(0);
             spotify_oversigt.load_spotify_iconoversigt();
+            spotify_oversigt_loaded_begin=false;
           } else {
             do_show_spotify_search_oversigt=true;
           }
@@ -12590,13 +12610,13 @@ void *datainfoloader_stream(void *data) {
 //
 
 void *datainfoloader_spotify(void *data) {
+  spotify_oversigt_loaded_begin=true;
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);
-
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);     //
-
   spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
+  spotify_oversigt_loaded_begin=false;
   pthread_exit(NULL);
 }
 
@@ -12627,9 +12647,11 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt.search_spotify_online_done=false;
       printf("Update \n");
       do_hent_spotify_search_online=false;
+      spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
       spotify_oversigt.search_spotify_online_done=true;
+      spotify_oversigt_loaded_begin=false;
       //spotify_oversigt.type=2;
     }
   }

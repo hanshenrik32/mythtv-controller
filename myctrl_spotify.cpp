@@ -92,6 +92,7 @@ extern GLint cur_avail_mem_kb;
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
+extern bool spotify_oversigt_loaded_begin;
 
 // web server handler
 
@@ -1441,7 +1442,7 @@ int spotify_class::spotify_do_we_play() {
 
 
 
-// No IN USE
+// Not IN USE
 // work
 // get active song playing
 //
@@ -2319,6 +2320,7 @@ int spotify_class::spotify_get_available_devices() {
 
 int spotify_class::spotify_get_access_token2() {
   struct mg_connection *nc;
+  // works
   mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
   nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "https://accounts.spotify.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
   mg_set_protocol_http_websocket(nc);
