@@ -2500,7 +2500,9 @@ void display() {
       do_update_rss_show = true;                                                  // show we are updating rss
       firsttime_rssupdate=false;                                                // only used first time
     }
+    //
     // do the update from spotify
+    //
     if (do_update_spotify_playlist) {
       spotify_oversigt_loaded_begin=true;
       if (spotify_oversigt.spotify_get_user_id()) {
@@ -2523,7 +2525,7 @@ void display() {
         spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
         spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
-        spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview
+        spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
       }
       spotify_oversigt_loaded_begin=false;
       do_update_spotify_playlist=false;
@@ -4330,7 +4332,7 @@ void display() {
       }
     }
     //
-    // *************** Spotify play stuf **********************************************************
+    // *************** Spotify show play stuf **********************************************************
     //
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
       static int do_we_play_check=0;
@@ -4416,11 +4418,15 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        glcRenderString("playlist : ");
-        glcRenderString(spotify_oversigt.spotify_playlistname);
+        strcpy(temptxt1,"playlist : ");
+        strcat(temptxt1,spotify_oversigt.spotify_playlistname);
+        *(temptxt1+46)=0;
+        glcRenderString(temptxt1);
       } else {
-        glcRenderString("Artist   : ");
-        glcRenderString(spotify_oversigt.get_spotify_artistname(spotifyknapnr));
+        strcpy(temptxt,"Artist   : ");
+        strcat(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
+        *(temptxt+46)=0;
+        glcRenderString(temptxt);
       }
       glPopMatrix();
       // show songname
@@ -4432,6 +4438,7 @@ void display() {
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Songname : ");
       sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
+      *(temptxt1+35)=0;
       glcRenderString(temptxt1);
       glPopMatrix();
       // show artist
@@ -4457,7 +4464,8 @@ void display() {
       glColor3f(1.0f, 1.0f, 1.0f);
       glTranslatef(520.0f, 580.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glScalef(20.5, 20.5, 1.0);
+      // show active play device
       glcRenderString("Player   : ");
       if (spotify_oversigt.active_spotify_device>-1) {
         glcRenderString(spotify_oversigt.get_active_spotify_device_name());

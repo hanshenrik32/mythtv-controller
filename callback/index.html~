@@ -12,7 +12,7 @@ function closeWindow() {
 <center>get token back ok.</center>
 You can now close the browser again.
 <br><br>
-
+<meta http-equiv="refresh" content="4; URL='http://localhost:8000'" />
 Thanks.
 </html>
 
