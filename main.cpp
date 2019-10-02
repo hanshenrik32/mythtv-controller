@@ -2446,6 +2446,7 @@ void display() {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     static int xrand=0;
     static int yrand=0;
+    static int do_we_play_check=0;
     //glLoadIdentity();
     rawtime=time(NULL);                                 // hent now time
     int savertimeout=atoi(configscreensavertimeout);
@@ -2507,7 +2508,10 @@ void display() {
       spotify_oversigt_loaded_begin=true;
       if (spotify_oversigt.spotify_get_user_id()) {
         // add default playlists from spotify
+        spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
+        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
         spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
         spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
@@ -4124,7 +4128,7 @@ void display() {
         glColor3f(0.5f, 0.5f, 0.5f);
         glTranslatef(520.0f, 650.0f, 0.0f);
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glcRenderString(music_artist[configland]);
         glPopMatrix();
         // show artist name
@@ -4135,7 +4139,7 @@ void display() {
         aktiv_playlist.get_artistname(temptxt,do_play_music_aktiv_table_nr-1);
         temptxt[40]=0;
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glcRenderString(temptxt);
         glPopMatrix();
         // show cd album name
@@ -4145,7 +4149,7 @@ void display() {
         strcpy(temptxt,music_album[configland]);                // music album text
         temptxt[50]=0;
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glcRenderString(temptxt);
         glPopMatrix();
         // show album name
@@ -4155,7 +4159,7 @@ void display() {
         glRasterPos2f(0.0f, 0.0f);
         aktiv_playlist.get_albumname(temptxt,do_play_music_aktiv_table_nr-1);
         temptxt[40]=0;
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glcRenderString(temptxt);
         glPopMatrix();
         // show song name
@@ -4164,7 +4168,7 @@ void display() {
         glTranslatef(520.0f, 610.0f, 0.0f);
         strcpy(temptxt,music_songname[configland]);
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glcRenderString(temptxt);
         glPopMatrix();
         char *pos;
@@ -4184,7 +4188,7 @@ void display() {
         }
         temptxt[40]=0;
         glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glScalef(20.5, 20.5, 1.0);
         glColor3f(0.6f, 0.6f, 0.6f);
         glcRenderString(temptxt);
         glPopMatrix();
@@ -4335,7 +4339,7 @@ void display() {
     // *************** Spotify show play stuf **********************************************************
     //
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
-      static int do_we_play_check=0;
+      do_we_play_check=0;
       if (do_we_play_check==0) {
         spotify_oversigt.spotify_do_we_play();
       }
@@ -4486,7 +4490,7 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555 , 0.0);
       glEnd();
       glPopMatrix();
-      // playtime
+      // show playtime
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
@@ -11174,13 +11178,13 @@ void update(int value) {
                     }
                     // Pause music player
                     if (strcmp(c,"P")==0) {
-                        #if defined USE_FMOD_MIXER
-                        if (channel) {
-                            //channel->setMute(true);
-                            channel->setVolume(0.0);
-                            ERRCHECK(result,0);
-                        }
-                        #endif
+                      #if defined USE_FMOD_MIXER
+                      if (channel) {
+                        //channel->setMute(true);
+                        channel->setVolume(0.0);
+                        ERRCHECK(result,0);
+                      }
+                      #endif
                     }
                     // lirc move down
                     if (strcmp(c,"Key-nav-down")==0) {

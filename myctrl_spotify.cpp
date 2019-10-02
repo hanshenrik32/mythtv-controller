@@ -669,9 +669,9 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (curl_error!=0) {
         fprintf(stderr,"Curl error get user playlists\n");
       }
-      stat("spotify_users_playlist.json", &filestatus);                              // get file info
+      stat("spotify_users_playlist.json", &filestatus);                             // get file info
       file_size = filestatus.st_size;                                               // get filesize
-      file_contents = (char*) malloc(filestatus.st_size);
+      file_contents = (char*) malloc(filestatus.st_size);                           // get work men
       json_file = fopen( "spotify_users_playlist.json", "rt");
         if (json_file == NULL) {
         fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
@@ -686,7 +686,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       }
       fclose(json_file);
       json = (json_char*) file_contents;
-      value = json_parse(json,file_size);                                           // parse playlist file
+      value = json_parse(json,file_size);                                           // json parse playlist file
       // parse from root and inster in db (playlist table)
       playlist_process_value(value, 0,0,conn);                                      // fill stack array
       json_value_free(value);                                                       // json clean up
@@ -1537,7 +1537,7 @@ int spotify_class::spotify_pause_play() {
 
 
 //
-// work ( need testting )
+// work ( need testing )
 // pause play
 //
 
@@ -3497,9 +3497,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glDisable(GL_TEXTURE_2D);
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
-      length=strlen(temptxt);
-      width = 19;
-      bool stop=false;
+      length=strlen(temptxt);                               // get length
+      width = 19;                                           // max length to show
+      bool stop=false;                                      // done
       while(*base) {
         // if text can be on line
         if(length <= width) {
@@ -3524,7 +3524,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
-        glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
+        glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
+        //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
         length -= right_margin-base+1;                         // +1 for the space
         base = right_margin+1;
         if (pline>=2) break;
@@ -3855,12 +3856,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       }
     }
 }
-
-
-
-
-
-
 
 
 const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
