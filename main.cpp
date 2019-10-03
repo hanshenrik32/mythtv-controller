@@ -812,6 +812,9 @@ const int TEMA_ANTAL=10;                                                        
 void *update_music_phread_loader();
 void *update_spotify_phread_loader();
 void *update_webserver_phread_loader();
+void *update_spotifyonline_phread_loader();
+void *webupdate_loader_spotify(void *data);
+bool spotify_update_loaded_begin=false;
 
 // hent mythtv version and return it
 
@@ -2506,31 +2509,7 @@ void display() {
     //
     if (do_update_spotify_playlist) {
       spotify_oversigt_loaded_begin=true;
-      if (spotify_oversigt.spotify_get_user_id()) {
-        // add default playlists from spotify
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-        spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
-        spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
-        spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
-        spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
-      }
+      update_spotifyonline_phread_loader();                                     // start thread loader
       spotify_oversigt_loaded_begin=false;
       do_update_spotify_playlist=false;
     }
@@ -5696,7 +5675,7 @@ void display() {
     //
     // show status of all the thread loaders
     //
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt_loaded_begin) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       show_status_update=true;
       // show loader status
       int statuswxpos = 1470;
@@ -5765,6 +5744,22 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), 125 , 0.0);
         glEnd();
       }
+
+      if (spotify_update_loaded_begin) {
+        y = (float) 1.0f;
+        xx = (float) y*6;
+        for(int x=0;x<xx;x++) {
+          glDisable(GL_TEXTURE_2D);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), 125 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), 125+(25), 0.0);
+          glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), 125+(25) , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), 125 , 0.0);
+          glEnd();
+        }
+        valgtnr=6;
+      }
+
       glDisable(GL_TEXTURE_2D);
       glTranslatef(statuswxpos+220+20,95,0);
       glScalef(24.0, 24.0, 1.0);
@@ -5780,8 +5775,9 @@ void display() {
                 break;
         case 5: glcRenderString("     Other");
                 break;
-        case 6: glcRenderString("Update Spotify");
+        case 6: glcRenderString("   Spotify");
                 break;
+        default: glcRenderString("    Other");
       }
       glPopMatrix();
     } else show_status_update=false;
@@ -6015,8 +6011,8 @@ void display() {
     }
 
     if (do_update_spotify) {
-      fprintf(stderr,"Start phread spotify update loader \n");
-      update_spotify_phread_loader();                                           //
+      fprintf(stderr,"Start phread spotify and web server.\n");
+      update_spotify_phread_loader();                                           // update spotify view (load it)
       update_webserver_phread_loader();                                         //
       do_update_spotify = false;
     }
@@ -12624,13 +12620,54 @@ void *datainfoloader_stream(void *data) {
 void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
-  spotify_oversigt.opdatere_spotify_oversigt(0);
-  //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);     //
-  spotify_oversigt.load_spotify_iconoversigt();
+  spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
+  //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
+  //spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
   spotify_oversigt_loaded_begin=false;
   pthread_exit(NULL);
 }
+
+
+//
+// phread datadb update from spotify (online)
+//
+
+void *webupdate_loader_spotify(void *data) {
+  spotify_update_loaded_begin=true;
+  if (spotify_oversigt.spotify_get_user_id()) {
+    // add default playlists from spotify
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
+    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
+    spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+    // update view from db
+    spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
+  }
+
+  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
+  spotify_update_loaded_begin=false;
+  pthread_exit(NULL);
+}
+
 
 
 //
@@ -12751,15 +12788,31 @@ void *update_music_phread_loader() {
 
 
 //
-// rss loader start from main loop then trigged by date
+// spotify db loader.
 //
 
 void *update_spotify_phread_loader() {
   if (true) {
-    pthread_t loaderthread2;           // load tvguide xml file in to db
+    pthread_t loaderthread2;           // load spotify into db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_spotify,NULL);
     if (rc2) {
       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+  }
+}
+
+
+//
+// Spotify db update online from spotify (by userid(token))
+//
+
+void *update_spotifyonline_phread_loader() {
+  if (true) {
+    pthread_t loaderthread2;           // load spotify into db
+    int rc2=pthread_create(&loaderthread2,NULL,webupdate_loader_spotify,NULL);
+    if (rc2) {
+      fprintf(stderr,"ERROR webupdate_loader_spotify function\nreturn code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
   }
