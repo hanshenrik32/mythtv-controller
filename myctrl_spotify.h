@@ -103,7 +103,7 @@ class spotify_class : vlc_controller {
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
-        int antalplaylists;                                                     // antal
+        int antalplaylists;                                                     // antal playlist in view
         bool spotify_is_playing;                                                // do we play ?
         bool spotify_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
@@ -171,7 +171,7 @@ class spotify_class : vlc_controller {
         int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
         // in use
         int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
-        int spotify_get_playlist(char *playlist,bool force,bool create_playlistdb);             // get playlist + songs and update db
+        int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);             // get playlist + songs and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist

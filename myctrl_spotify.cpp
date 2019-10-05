@@ -964,7 +964,7 @@ size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* dat
 // write to spotify_playlist_{spotifyid}.json
 // and update db from that file
 
-int spotify_class::spotify_get_playlist(char *playlist,bool force,bool create_playlistdb) {
+int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
   int tt;
   bool dbexist=false;
   int refid;

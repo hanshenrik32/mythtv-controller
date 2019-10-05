@@ -360,7 +360,7 @@ int rss_stream_class::set_stream_url(int nr,char *url) {
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
   strcpy(rss_source_feed[nr].stream_name,name);
-  return(1);  
+  return(1);
 }
 
 
@@ -1064,11 +1064,11 @@ void show_setup_font(int startofset) {
     glEnd();
     glPopMatrix();
     for (i=0;i<8;i++) {
-      if (i==4) {
+      if (i==2) {
         winsizx=600;
         winsizy=20;
         xpos=180;
-        ypos=360;
+        ypos=360+40;
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
@@ -1088,10 +1088,10 @@ void show_setup_font(int startofset) {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(25.0f, 25.0f, 1.00f);
       if ((i+startofset)-3>=0) strcpy(temptxt,(char *) aktivfont.typeinfo[(i+startofset)-3].fontname);
-      else sprintf(temptxt,"                                        ");
-      //sprintf(temptxt,"Tema:%d ",tema);
+      else sprintf(temptxt,"                                     ");
+      aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
       glcRenderString(temptxt);
-        glEnable(GL_TEXTURE_2D);
+      glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
 /*

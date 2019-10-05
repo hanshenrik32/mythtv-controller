@@ -1993,8 +1993,7 @@ int init_ttf_fonts() {
     // add dir for fonts
     glcAppendCatalog("/usr/share/fonts/truetype");
     myFont = glcGenFontID();
-    //glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
-    glcNewFontFromFamily(myFont, "Uroob");                                       // Droid Serif,UbuntumFreeMono
+    glcNewFontFromFamily(myFont, configfontname);                                       // Droid Serif,UbuntumFreeMono
     glcFontFace(myFont, "Bold");
     glcFont(myFont);
     aktivfont.updatefontlist();                                                          // update font list
@@ -2508,9 +2507,7 @@ void display() {
     // do the update from spotify
     //
     if (do_update_spotify_playlist) {
-      spotify_oversigt_loaded_begin=true;
       update_spotifyonline_phread_loader();                                     // start thread loader
-      spotify_oversigt_loaded_begin=false;
       do_update_spotify_playlist=false;
     }
     glPushMatrix();
@@ -5745,8 +5742,12 @@ void display() {
         glEnd();
       }
 
+      //static int spotify_oversigt_loaded=0;
+      //spotify_oversigt_loaded++;
+
       if (spotify_update_loaded_begin) {
-        y = (float) 1.0f;
+        // antalplaylists                                                       // anta in playlist
+        y = (float) 1.0f;                                                   // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
         xx = (float) y*6;
         for(int x=0;x<xx;x++) {
           glDisable(GL_TEXTURE_2D);
@@ -9460,7 +9461,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               } else key=0;
               break;
             case '*':
-              do_update_spotify_playlist=true;                                  // set update flag
+              if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;                                  // set update flag
               if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover; // show/hide music info
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;             // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
@@ -12634,6 +12635,7 @@ void *datainfoloader_spotify(void *data) {
 //
 
 void *webupdate_loader_spotify(void *data) {
+  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web to db.\n");
   spotify_update_loaded_begin=true;
   if (spotify_oversigt.spotify_get_user_id()) {
     // add default playlists from spotify
@@ -12661,9 +12663,7 @@ void *webupdate_loader_spotify(void *data) {
     // update view from db
     spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
   }
-
-  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
-  if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;
   pthread_exit(NULL);
 }
