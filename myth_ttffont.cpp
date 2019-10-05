@@ -17,7 +17,7 @@ extern int debugmode;                   // debugmode
 fontctrl::fontctrl() {
     int n;
     mastercount=0;
-    for (n=0;n<TYPE_MAX;n++) {
+    for (n=0;n<FONT_TYPE_MAX;n++) {
         strcpy(typeinfo[n].fontname,"");
     }
 }
@@ -27,6 +27,42 @@ fontctrl::fontctrl() {
 
 
 int fontctrl::updatefontlist()
+{
+    static GLint glc_font_id;
+    GLint  master;
+    GLint face_count;
+    int i;
+    size_t flen=0;
+    GLint count;
+    FILE *fil;
+    char *sysc="fc-list | awk -F\":\" '{print $2}' > fontlist.txt";
+    int ret=system(sysc);
+    glc_font_id = glcGenFontID();
+    glcContext(glc_font_id);
+    glcAppendCatalog("/usr/share/fonts/truetype/");
+    glcAppendCatalog("/usr/share/fonts/type1/");
+    /* Choose a master and a face. */
+    mastercount=glcGeti(GLC_MASTER_COUNT);		// gem antal af fonte
+    if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
+    master = 0;
+    i=0;
+    fil=fopen("fontlist.txt","r");
+    if (fil) {
+      while((!(feof(fil))) && (i<FONT_TYPE_MAX-1)) {
+        fgets(typeinfo[i].fontname,sizeof(typeinfo[i].fontname),fil);
+        if (debugmode & 128) printf("Font name found %s",typeinfo[i].fontname);
+        i++;
+      }
+      fclose(fil);
+    }
+    return(1);
+}
+
+
+
+
+
+int fontctrl::updatefontlist_old()
 {
     static GLint glc_font_id;
     GLint  master;
@@ -54,11 +90,11 @@ int fontctrl::updatefontlist()
     }
     // load font list
     i=0;
-    while((i < (int) mastercount) && (i<TYPE_MAX)) {
+    while((i < (int) mastercount) && (i<FONT_TYPE_MAX)) {
         if (glcGetMasterc(i, GLC_FAMILY)) {
           const GLCchar *font = glcGetMasterc(i, GLC_FAMILY );
           strcpy(typeinfo[i].fontname,(char *) glcGetMasterc(i, GLC_FAMILY));
-          //if (debugmode & 128) printf("Font named %10s found \n",typeinfo[i].fontname);
+          if (debugmode & 16) printf("Font named %10s found \n",typeinfo[i].fontname);
           face_count = glcGetMasteri(i, GLC_FACE_COUNT);
           for (j = 0; j < face_count; j++) {
               //if (debugmode & 128) printf(" Face types %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));
@@ -71,6 +107,16 @@ int fontctrl::updatefontlist()
     }
     return(1);
 }
+
+
+
+
+
+
+
+
+
+
 
 // select font
 
