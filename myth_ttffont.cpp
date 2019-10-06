@@ -35,8 +35,8 @@ int fontctrl::updatefontlist()
     size_t flen=0;
     GLint count;
     FILE *fil;
-    char *sysc="fc-list | awk -F\":\" '{print $2}' > fontlist.txt";
-    int ret=system(sysc);
+    char *sysc="fc-list | awk -F\":\" '{print $2}' | sed 's/ //' | sort -u > fontlist.txt";
+    int ret=system(sysc);                                                       // get font name by fc-list command
     glc_font_id = glcGenFontID();
     glcContext(glc_font_id);
     glcAppendCatalog("/usr/share/fonts/truetype/");
@@ -53,9 +53,10 @@ int fontctrl::updatefontlist()
         if (debugmode & 128) printf("Font name found %s",typeinfo[i].fontname);
         i++;
       }
+      mastercount=i;
       fclose(fil);
     }
-    return(1);
+    return(i);
 }
 
 
@@ -110,14 +111,6 @@ int fontctrl::updatefontlist_old()
 
 
 
-
-
-
-
-
-
-
-
 // select font
 
 int fontctrl::selectfont(char *fontname)
@@ -126,9 +119,8 @@ int fontctrl::selectfont(char *fontname)
     glcFont(myFont);
     if (glcFontFace(myFont, "Bold")==GL_TRUE) {
       //glcFontFace(myFont, "Bold"); // Select the face of my font
-    } else if (debugmode) printf("Not a face type font (select error).\n");  // Regular
+    } else if (debugmode) printf("Not a face type font (select error) font name : %s.\n",fontname);
     return(1);
 }
-
 
 // *******************************************************************************

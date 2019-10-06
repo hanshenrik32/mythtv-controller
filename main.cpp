@@ -3272,7 +3272,7 @@ void display() {
           glPushMatrix();
           // show info om program selected
           //aktivfont.selectfont("FreeMono");
-          aktivfont.selectfont(configfontname);
+          //aktivfont.selectfont(configfontname);
           aktiv_tv_oversigt.showandsetprginfo( tvvalgtrecordnr , tvsubvalgtrecordnr );
           glPopMatrix();
           //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
@@ -4967,24 +4967,22 @@ void display() {
           // reset color to nomal after uv
           glColor4f(1.0,1.0,1.0,1.0);
           show_setup_interface();                                             // show setup interface
-          if (do_show_setup_sound) show_setup_sound();                        //
+          if (do_show_setup_sound) show_setup_sound();                        // sound device
           if (do_show_setup_screen) show_setup_screen();                      //
           if (do_show_videoplayer) show_setup_video();                        //
           if (do_show_setup_sql) show_setup_sql();                            //
-          if (do_show_setup_tema) show_setup_tema();                          //
+          if (do_show_setup_tema) show_setup_tema();                          // select tema
           if (do_show_setup_network) {                                        //
             show_setup_network();
             if (show_wlan_select) {
               show_wlan_networks((int) setupwlanselectofset);                         // show wlan list in opengl
             }
           }
-          if (do_show_setup_font) show_setup_font(setupfontselectofset);      //
+          if (do_show_setup_font) show_setup_font(setupfontselectofset);      // show setup font
           if (do_show_setup_keys) show_setup_keys();                          // Function keys
-          if (do_show_tvgraber) {
-            show_setup_tv_graber(tvchannel_startofset);   //
-          }
-          if (do_show_setup_rss) show_setup_rss(configrss_ofset);             //
-          if (do_show_setup_spotify) spotify_oversigt.show_setup_spotify();             //
+          if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   // tv graber
+          if (do_show_setup_rss) show_setup_rss(configrss_ofset);             // podcast rss feeds source
+          if (do_show_setup_spotify) spotify_oversigt.show_setup_spotify();   // spotify
         }
         glPopMatrix();
     }
@@ -6183,17 +6181,22 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_sql = false;
           do_show_setup_network = false;
           do_show_setup_tema = false;
-          do_show_setup_font = false;
           do_show_setup_keys = false;
           do_show_videoplayer = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
+          if (do_show_setup_font) {
+            fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
+            strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
+            aktivfont.selectfont(aktivfont.typeinfo[setupfontselectofset].fontname);
+            do_show_setup_font = false;
+          }
           if (do_show_tvgraber) {
             // hent/update tv guide from db
             // efter den er saved i db fra setup tvguide function som saver data.
             aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+            do_show_tvgraber = false;
           }
-          do_show_tvgraber = false;
           fundet = true;
         }
         // test for tema setup/info
@@ -9737,7 +9740,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if (do_show_setup) {
                 if (do_show_setup_font) {
-                  if (debugmode & 4) fprintf(stderr,"Set aktiv font to %s \n",aktivfont.typeinfo[setupfontselectofset].fontname);
+                  fprintf(stderr,"Set aktiv font to %s \n",aktivfont.typeinfo[setupfontselectofset].fontname);
                   strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
                   aktivfont.selectfont(configfontname);
                 }
@@ -13894,8 +13897,6 @@ int main(int argc, char** argv) {
     if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
     if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
     if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
-    //aktivfont.updatefontlist();
-    //aktivfont.selectfont((char *) "Tlwg Mono");
     // select font from configfile (/etc/mythtv-controller.conf)
     aktivfont.selectfont(configfontname);
     printf("\nHardware           %s\n",(char *)glGetString(GL_RENDERER));                         // Display Renderer
