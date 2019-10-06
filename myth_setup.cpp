@@ -1089,11 +1089,25 @@ void show_setup_font(int startofset) {
       glScalef(25.0f, 25.0f, 1.00f);
       if ((i+startofset)-3>=0) strcpy(temptxt,(char *) aktivfont.typeinfo[(i+startofset)-3].fontname);
       else sprintf(temptxt,"                                     ");
-      aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
+      //aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
       glcRenderString(temptxt);
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+    // show sample
+    glPushMatrix();
+    glTranslatef(540 , 400 , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(25.0f, 25.0f, 1.00f);
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    //aktivfont.selectfont(aktivfont.typeinfo[2].fontname);
+    //aktivfont.selectfont("ani");
+    //aktivfont.selectfont((char *) "Courier 10 Pitch");
+    glcRenderString("Sample string...");
+    aktivfont.selectfont(configfontname);
+    glPopMatrix();
+
 /*
     // select selected font
     if ((startofset>0) && (fontselected==false)) {
