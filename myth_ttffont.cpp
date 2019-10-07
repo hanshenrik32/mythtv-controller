@@ -115,11 +115,11 @@ int fontctrl::updatefontlist_old()
 
 int fontctrl::selectfont(char *fontname)
 {
+    bool glresl;
     glcNewFontFromFamily(myFont, fontname);               // Droid Serif,Ubuntu
-    glcFont(myFont);
-    if (glcFontFace(myFont, "Bold")==GL_TRUE) {
-      //glcFontFace(myFont, "Bold"); // Select the face of my font
-    } else if (debugmode) printf("Not a face type font (select error) font name : %s.\n",fontname);
+    //glcFont(myFont);                                      // clear
+    glcFontFace(myFont, "Bold");
+    glcFont(myFont);                                      // clear
     return(1);
 }
 

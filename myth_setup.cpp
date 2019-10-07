@@ -1069,7 +1069,7 @@ void show_setup_font(int startofset) {
         winsizy=20;
         xpos=180;
         ypos=360+40;
-        glDisable(GL_BLEND);
+        glDisable(GL_BLEND);//aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1103,7 +1103,7 @@ void show_setup_font(int startofset) {
     glColor3f(1.0f, 1.0f, 1.0f);
     //aktivfont.selectfont(aktivfont.typeinfo[2].fontname);
     //aktivfont.selectfont("ani");
-    //aktivfont.selectfont((char *) "Courier 10 Pitch");
+    aktivfont.selectfont((char *) aktivfont.typeinfo[(i+startofset)-3].fontname);
     glcRenderString("Sample string...");
     aktivfont.selectfont(configfontname);
     glPopMatrix();
