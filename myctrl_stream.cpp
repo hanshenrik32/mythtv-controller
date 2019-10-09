@@ -2118,17 +2118,67 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Godnathistorien',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Kid-N-Drag Gaming.\n");
-        }
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Godnathistorien.\n");
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Godnathistorien',NULL,NULL,'Godnathistorien','https://rss.podplaystudio.com/1060.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Kid-N-Drag Gaming.\n");
-        }
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Godnathistorien.\n");
         rss_update=true;
       }
+
+      // Beslutningen
+      if (check_rss_feed_exist(conn,(char *) "Beslutningen")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Beslutningen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Beslutningen.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Beslutningen',NULL,NULL,'Beslutningen','https://rss.podplaystudio.com/1052.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Beslutningen.\n");
+        rss_update=true;
+      }
+
+      // NextM Podcast
+      if (check_rss_feed_exist(conn,(char *) "NextM Podcast")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('NextM Podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error NextM Podcast.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('NextM Podcast',NULL,NULL,'NextM Podcast','https://rss.podplaystudio.com/1040.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error NextM Podcast.\n");
+        rss_update=true;
+      }
+
+      // Det er bare en overgang
+      if (check_rss_feed_exist(conn,(char *) "Det er bare en overgang")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Det er bare en overgang',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Det er bare en overgang.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Det er bare en overgang',NULL,NULL,'Det er bare en overgang','https://rss.podplaystudio.com/1069.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Det er bare en overgang.\n");
+        rss_update=true;
+      }
+
+      // Sex om Dagen
+      if (check_rss_feed_exist(conn,(char *) "Sex om Dagen")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Sex om Dagen',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Det er bare en overgang.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Sex om Dagen',NULL,NULL,'Sex om Dagen','https://rss.podplaystudio.com/1075.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Det er bare en overgang.\n");
+        rss_update=true;
+      }
+
+
 
       // close mysql
       if (conn) mysql_close(conn);
