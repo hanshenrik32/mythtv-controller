@@ -2130,10 +2130,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-
-https://rss.podplaystudio.com/1060.xml
-
-
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
