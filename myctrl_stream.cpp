@@ -2192,6 +2192,19 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
+      // The Heart
+      if (check_rss_feed_exist(conn,(char *) "The Heart")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Heart',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Heart.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('The Heart',NULL,NULL,'The Heart','http://feeds.theheartradio.org/TheHeartRadio',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Heart.\n");
+        rss_update=true;
+      }
+
 
 
       // close mysql
