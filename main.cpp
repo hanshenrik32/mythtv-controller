@@ -13680,14 +13680,15 @@ int check_radio_stations_icons() {
 // main
 //
 
+extern char   __BUILD_NUMBER;
+
 int main(int argc, char** argv) {
     Display *dpy = NULL;
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
-    //printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
-    printf("Build date  : %s\n",__DATE__);
-    //printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
+    printf("Build date  : %lu\n", (unsigned long) &__BUILD_DATE);
+    printf("Build number: %lu\n", (unsigned long) &__BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
     printf("%s",SHOWVER);
     printf("\n");
