@@ -8,4 +8,4 @@ BUILD_NUMBER_LDFLAGS += -Xlinker --defsym -Xlinker __BUILD_NUMBER=$$(cat $(BUILD
 # Build number file.  Increment if any object file changes.
 $(BUILD_NUMBER_FILE): $(OBJECTS)
 	@if ! test -f build-number.txt; then echo 0 > build-number.txt; fi
-	@echo $(($(cat build-number.txt) + 1)) > build-number.txt
+	@echo $$(($$(cat $(BUILD_NUMBER_FILE)) + 1)) > build-number.txt
