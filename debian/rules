@@ -54,7 +54,7 @@ build:
         	mkdir  ~/.config/lirc/; \
                 cp lirc/* ~/.config/lirc/; \
         fi
-	gcc -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11 $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
+	gcc -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 	@# Do nothning
 
 binary:

@@ -13915,7 +13915,7 @@ int main(int argc, char** argv) {
     char overskrift[200];
     char overskrift1[200];
     strcpy(overskrift,"mythtv-controller ");
-    sprintf(overskrift1,"%d",(unsigned long) & __BUILD_NUMBER);
+    sprintf(overskrift1,"%l",(long unsigned int) & __BUILD_NUMBER);
     strcat(overskrift,overskrift1);
     glutCreateWindow (overskrift);
     init();
