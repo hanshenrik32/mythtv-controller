@@ -28,19 +28,14 @@
 #include <sys/timeb.h>
 // file io
 #include <iostream>
-
-extern char   __BUILD_DATE;
-extern char   __BUILD_NUMBER;
-
+#include <pthread.h>                      // multi thread support
+// web server
 static bool runwebserver=true;
-
 bool do_open_spotifyplaylist=false;
 bool do_select_device_to_play=false;
 bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
-
 bool stream_jump = false;
-
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -55,7 +50,7 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-#include <pthread.h>                   // multi thread support
+
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
@@ -13718,8 +13713,6 @@ int check_radio_stations_icons() {
 //
 // main
 //
-
-//extern char __BUILD_NUMBER;
 
 int main(int argc, char** argv) {
     Display *dpy = NULL;
