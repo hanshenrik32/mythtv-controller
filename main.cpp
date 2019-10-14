@@ -3049,7 +3049,7 @@ void display() {
       glPopMatrix();
     }
 
-    if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
+    //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
     // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
