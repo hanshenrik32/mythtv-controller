@@ -271,42 +271,30 @@ bool do_show_spotify_search_oversigt=false;
 bool hent_spotify_search_online=false;                    // skal vi starte search online
 bool do_hent_spotify_search_online=false;                 // skal vi starte search online (do it)
 bool search_spotify_string_changed=false;
-
 int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
-
 int sinusofset=0;      					                          // bruges af show_music_oversigt
-
 int setupsinofset=0;
-
 bool show_volume_info = false;                        	  // show vol info
 int show_volume_info_timeout=0;                   		    // time out to close vol info again
-
 bool stream_loadergfx_started = false;                	  // thread stream gfx loader running ?
 bool stream_loadergfx_started_done = false;            	  // thread stream gfx loader running ?
 bool stream_loadergfx_started_break = false;
-
 bool vis_music_oversigt = false;                          // vis music player
 bool vis_film_oversigt = false;				                    // vis film oversigt
 bool vis_recorded_oversigt = false;                       // vis recorded oversigt
 bool vis_tv_oversigt = false;                             // vis tv oversigt
 bool vis_radio_oversigt = false;                          // vis radio player
 bool vis_spotify_oversigt = false;                          // vis radio player
-
 bool vis_old_recorded = false;                            //
 bool vis_tvrec_list = false;                              //
-
 bool saver_irq = false;                                   // er screen saver aktiv
-
 bool radio_oversigt_loaded = false;                       //
 bool radio_oversigt_loaded_done=0;                        //
-
 unsigned int do_show_play_open_select_line=0;             // bruges til at vælge hvilken music filer som skal spilles
 unsigned int do_show_play_open_select_line_ofset=0;       // bruges til at vælge hvilken music filer som skal spilles (start ofset)
-
 bool show_radio_options = false;                          //
 int radio_select_iconnr=0;                                //
 float _rangley;                                           //
-
 bool do_show_setup = false;                               // show setup menu
 bool do_show_setup_sound = false;                         //
 bool do_show_setup_screen = false;                        //
