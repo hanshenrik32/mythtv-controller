@@ -2694,7 +2694,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-      // PARADOXICA
+      // Do not work PARADOXICA
       if (check_rss_feed_exist(conn,(char *) "PARADOXICA")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('PARADOXICA',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
@@ -2711,7 +2711,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-      // StarTripper!!
+      // OK StarTripper!!
       if (check_rss_feed_exist(conn,(char *) "StarTripper!!")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('StarTripper!!',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
@@ -2727,7 +2727,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // The Big Loop
+      // OK The Big Loop
       if (check_rss_feed_exist(conn,(char *) "The Big Loop")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('The Big Loop',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
@@ -2743,7 +2743,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // Janus Descending
+      // OK Janus Descending
       if (check_rss_feed_exist(conn,(char *) "Janus Descending")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Janus Descending',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
@@ -2759,7 +2759,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // Wolf 359
+      // OK Wolf 359
       if (check_rss_feed_exist(conn,(char *) "Wolf 359")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Wolf 359',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
