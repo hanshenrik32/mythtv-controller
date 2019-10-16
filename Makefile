@@ -1,5 +1,3 @@
-include buildnumber.mak
-
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
@@ -77,10 +75,10 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt	
+	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
-	$(CC) $(CFLAGS) -march=native -O0 $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 

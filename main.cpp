@@ -13707,8 +13707,8 @@ int main(int argc, char** argv) {
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
-    printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
-    printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
+    //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
+    //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
     printf("\n\nMythtv-controller Version ");
     printf("%s",SHOWVER);
     printf("\n");
@@ -13903,11 +13903,11 @@ int main(int argc, char** argv) {
     char overskrift[200];
     char overskrift1[200];
     strcpy(overskrift,"mythtv-controller ");
-    sprintf(overskrift1,"%l",(long unsigned int) & __BUILD_NUMBER);
-    strcat(overskrift,overskrift1);
+    //sprintf(overskrift1,"%l",(long unsigned int) & __BUILD_NUMBER);
+    //strcat(overskrift,overskrift1);
     glutCreateWindow (overskrift);
-    init();
-    loadgfx();
+    init();                                           // init gopengl
+    loadgfx();                                        // load gfx stuf
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
