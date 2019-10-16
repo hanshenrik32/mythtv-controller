@@ -5,6 +5,11 @@
 
 Version.
 
+mythtv-controller ver 38.1
+
+Spotify can now search for artist.
+
+
 mythtv-controller ver 37.0
 
 Spotify playlist is now avable to play. And you can search for music on spotify and play it.
