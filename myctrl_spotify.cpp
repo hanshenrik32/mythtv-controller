@@ -19,7 +19,7 @@
 #include "json-parser/json.h"
 // global def
 #include "myth_setup.h"
-// web server stuf
+// web server stuf used to get token
 #include "mongoose-master/mongoose.h"
 #include "utility.h"
 #include "myth_ttffont.h"
@@ -31,7 +31,7 @@
 #include "myctrl_readwebfile.h"
 #include "myctrl_spotify.h"
 
-
+// web port
 static const char *s_http_port = "8000";
 static struct mg_serve_http_opts s_http_server_opts;
 
@@ -40,9 +40,11 @@ const int spotify_namelength=80;
 const int spotify_desclength=2000;
 const int feed_url=2000;
 
+// ****************************************************************************************
 //
 // text render is glcRenderString for freetype font support
 //
+// ****************************************************************************************
 
 extern int spotifyknapnr;
 extern int spotify_select_iconnr;
@@ -94,7 +96,12 @@ extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 extern bool spotify_oversigt_loaded_begin;
 
+
+// ****************************************************************************************
+//
 // web server handler
+//
+// ****************************************************************************************
 
 static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
@@ -191,8 +198,12 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 }
 
 
+// ****************************************************************************************
+//
 // client handler
 // get JSON return from spotify
+//
+// ****************************************************************************************
 
 static int s_exit_flag = 0;
 bool debug_json=false;
@@ -228,10 +239,11 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 }
 
 
-
+// ****************************************************************************************
 //
 // constructor spotify devices
 //
+// ****************************************************************************************
 
 spotify_device_def::spotify_device_def() {
   strcpy(id,"");
@@ -243,10 +255,11 @@ spotify_device_def::spotify_device_def() {
   devvolume=0;
 }
 
+// ****************************************************************************************
 //
 // constructor spotify active player
 //
-
+// ****************************************************************************************
 
 spotify_active_play_info_type::spotify_active_play_info_type() {
   progress_ms=0;
@@ -262,10 +275,11 @@ spotify_active_play_info_type::spotify_active_play_info_type() {
 };
 
 
-
+// ****************************************************************************************
 //
 // constructor spotify oversigt type
 //
+// ****************************************************************************************
 
 spotify_oversigt_type::spotify_oversigt_type() {
   strcpy(feed_showtxt,"");
@@ -286,9 +300,11 @@ spotify_oversigt_type::spotify_oversigt_type() {
 
 
 
+// ****************************************************************************************
 //
 // constructor
 //
+// ****************************************************************************************
 
 spotify_class::spotify_class() : antal(0) {
     for(int i=0;i<maxantal;i++) stack[i]=0;
@@ -328,10 +344,12 @@ spotify_class::spotify_class() : antal(0) {
     spotify_device_antal=0;
 }
 
-
+// ****************************************************************************************
 //
 // destructor
 //
+// ****************************************************************************************
+
 spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
     mg_mgr_free(&client_mgr);
@@ -339,9 +357,11 @@ spotify_class::~spotify_class() {
 }
 
 
+// ****************************************************************************************
 //
 // refresh token
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_refresh_token() {
   int curl_error;
@@ -386,19 +406,23 @@ int spotify_class::spotify_refresh_token() {
 
 
 
+// ****************************************************************************************
 //
 // save the token in used
 //
+// ****************************************************************************************
 
 void spotify_class::spotify_set_token(char *token,char *refresh) {
   strcpy(spotifytoken,token);
   strcpy(spotifytoken_refresh,refresh);
 }
 
+// ****************************************************************************************
 //
 // Get a List of a User's Playlists
 // get only the id of playlists (not songs)
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
   int curl_error;
@@ -413,11 +437,11 @@ int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
 }
 
 
-
+// ****************************************************************************************
 //
 //  json parser used to parse the return files from spotify api
 //
-
+// ****************************************************************************************
 
 void spotify_class::playlist_print_depth_shift(int depth) {
   bool debug_json=false;
@@ -427,9 +451,11 @@ void spotify_class::playlist_print_depth_shift(int depth) {
   }
 }
 
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 //
+// ****************************************************************************************
 
 bool playlist_process_playlist=false;
 bool playlist_process_songs=false;
@@ -496,10 +522,12 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 }
 
 
+// ****************************************************************************************
 //
 // json parser start call function playlist db update
 // parse user playlist
 //
+// ****************************************************************************************
 
 void spotify_class::playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) {
     char filename[512];
@@ -594,12 +622,15 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 }
 
 
-
+// ****************************************************************************************
+//
 // Get a List of Current User's Playlists
 //
 // get users play lists
 // write to spotify_users_playlist.json
 // parse user playlist
+//
+// ****************************************************************************************
 
 int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   MYSQL *conn;
@@ -711,11 +742,11 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   return(1);
 }
 
-//
+// ****************************************************************************************
 //
 // json parser used to parse the return files from spotify api (playlist files (songs))
 //
-//
+// ****************************************************************************************
 
 void spotify_class::print_depth_shift(int depth) {
   int j;
@@ -724,9 +755,11 @@ void spotify_class::print_depth_shift(int depth) {
   }
 }
 
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 // used to parse search result
+// ****************************************************************************************
 
 bool process_tracks=false;
 bool process_playlist=false;
@@ -741,9 +774,11 @@ bool process_release_date=false;
 bool process_uri=false;
 bool process_id=false;
 
+// ****************************************************************************************
 //
 // process types in file for process playlist files (songs)
 //
+// ****************************************************************************************
 
 void spotify_class::process_object_playlist(json_value* value, int depth) {
   int length, x;
@@ -813,10 +848,12 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
 }
 
 
-
+// ****************************************************************************************
 //
 // json parser start call function for process playlist
 // do the data progcessing from json
+//
+// ****************************************************************************************
 
 void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
     std::string artist="";
@@ -958,11 +995,14 @@ size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* dat
     return size * nmemb;
 }
 
-
+// ****************************************************************************************
+//
 // work
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
 // and update db from that file
+//
+// ****************************************************************************************
 
 int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
   int tt;
@@ -1223,12 +1263,14 @@ bool process_playinfo_track_nr=false;
 bool process_playinfo_date=false;
 bool process_playinfo_progress_ms=false;
 bool process_playinfo_duration_ms=false;
-
 bool playinfo_json_debug=false;
 
+
+// ****************************************************************************************
 //
 // process types in file for process playlist files (songs)
 //
+// ****************************************************************************************
 
 void spotify_class::process_object_playinfo(json_value* value, int depth) {
   int length, x;
@@ -1280,6 +1322,8 @@ void spotify_class::process_object_playinfo(json_value* value, int depth) {
 }
 
 // *****************************************************************************************
+//
+// ****************************************************************************************
 
 void spotify_class::process_array_playinfo(json_value* value, int depth) {
   int length, x;
@@ -1295,10 +1339,11 @@ void spotify_class::process_array_playinfo(json_value* value, int depth) {
 
 
 // ****************************************************************************************
-
 //
 // json parser start call function for process playinfo
 // do the data progcessing from json
+//
+// ****************************************************************************************
 
 void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
     int j;
@@ -1392,9 +1437,8 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
 
 
 // *********************************************************************************************************************************
-
-
-//
+// do we play ?
+// return http code
 // Work in use
 // ********************************************************************************************
 
@@ -1441,11 +1485,12 @@ int spotify_class::spotify_do_we_play() {
 
 
 
-
+// ****************************************************************************************
 // Not IN USE
 // work
 // get active song playing
-//
+// use curl + system
+// ****************************************************************************************
 
 int spotify_class::spotify_do_we_play2() {
   bool find_length=true;
@@ -1517,11 +1562,11 @@ int spotify_class::spotify_do_we_play2() {
 
 
 // *******************************************************************************************************
-
 //
 // work
 // pause play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_pause_play() {
   int curl_error;
@@ -1591,9 +1636,11 @@ int spotify_class::spotify_resume_play2() {
 }
 */
 
+// ****************************************************************************************
 //
-// in use
+// in use resume play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_resume_play() {
   std::string auth_kode;
@@ -1643,9 +1690,11 @@ int spotify_class::spotify_resume_play() {
 }
 
 
+// ****************************************************************************************
 //
 // last play do not work
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_last_play() {
   int curl_error;
@@ -1709,10 +1758,12 @@ int spotify_class::spotify_last_play2() {
 
 
 
+// ****************************************************************************************
 //
 // work
 // next play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_next_play() {
   int curl_error;
@@ -1727,9 +1778,11 @@ int spotify_class::spotify_next_play() {
 }
 
 
+// ****************************************************************************************
 // DO not work for now
 // next play next song need testing
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_next_play2() {
   std::string auth_kode;
@@ -1852,11 +1905,15 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
   return 0;
 }
 
+// ****************************************************************************************
 // Upper is debug code *******************************************************************
+// ****************************************************************************************
 
+// ****************************************************************************************
 // Works
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+// ****************************************************************************************
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -1917,10 +1974,15 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
 
 
 
+// ****************************************************************************************
+//
 // work
 // play song
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
+
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -1977,10 +2039,15 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
   return(0);
 }
 
+// ****************************************************************************************
+//
 // work
 // play artist
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
+
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -2042,10 +2109,14 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
 
 
 
+// ****************************************************************************************
+//
 // work
 // play album
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -2124,7 +2195,9 @@ int spotify_class::spotify_get_user_id2() {
 }
 */
 
+// ****************************************************************************************
 // file writer
+// ****************************************************************************************
 
 static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -2132,9 +2205,11 @@ static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream
 }
 
 
+// ****************************************************************************************
 // Do now work now
 // get user id from spotify api
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_get_user_id() {
   static const char *userfilename = "spotify_user_id.txt";
@@ -2195,10 +2270,12 @@ int spotify_class::spotify_get_user_id() {
 
 
 
+// ****************************************************************************************
 //
 // Works
 // get device list and have it in spotify class
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_get_available_devices() {
   int device_antal=0;
@@ -2312,11 +2389,12 @@ int spotify_class::spotify_get_available_devices() {
 }
 
 
-
+// ****************************************************************************************
 //
 // get user access token
 // write to spotify_access_token
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_get_access_token2() {
   struct mg_connection *nc;
@@ -2352,24 +2430,42 @@ int spotify_class::spotify_get_access_token2() {
 
 
 
+// ****************************************************************************************
+//
 // return the intnr
+//
+// ****************************************************************************************
+
 int spotify_class::get_spotify_intnr(int nr) {
   if (nr < antal) return (stack[nr]->intnr); else return (0);
 }
 
-
+// ****************************************************************************************
+//
 // return the playlist/song name
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_name(int nr) {
   if (nr < antal) return (stack[nr]->feed_name); else return (NULL);
 }
 
+// ****************************************************************************************
+//
 // return the spotify playlist id
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_playlistid(int nr) {
   if (nr < antal) return (stack[nr]->playlistid); else return (NULL);
 }
 
-
+// ****************************************************************************************
+//
 // return the description
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_desc(int nr) {
   if (nr < antal) return (stack[nr]->feed_desc); else return (NULL);
 }
@@ -2392,17 +2488,21 @@ void spotify_class::clean_spotify_oversigt() {
 }
 
 
+// ****************************************************************************************
 //
 // set spotify icon image
 //
+// ****************************************************************************************
+
 void spotify_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
-
+// ****************************************************************************************
 //
 // get nr of spotify playlists
 //
+// ****************************************************************************************
 
 int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   int antalrss_feeds=0;
@@ -2421,11 +2521,12 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 }
 
 
-
+// ****************************************************************************************
 //
 // opdate show liste in view (det vi ser)
 //
-
+// ****************************************************************************************
+//
 // load felt 7 = mythtv gfx icon
 // fpath=stream path
 // atr = stream name
@@ -2600,9 +2701,11 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
 
 
 
+// ****************************************************************************************
 //
 // search for playlist or song in db (from users playlist data in db)
 //
+// ****************************************************************************************
 
 
 int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type) {
@@ -2731,14 +2834,16 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
 // json_parser search process result
 // *******************************************************************************************
 //
-
 // json parser used to parse the return files from spotify api
 //
-//
+// ****************************************************************************************
 
+
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 //
+// ****************************************************************************************
 
 bool search_process_tracks=false;
 bool search_process_uri=false;
@@ -2750,9 +2855,12 @@ bool search_process_name=false;
 bool search_process_items=false;
 bool search_process_track_nr=false;
 
+
+// ****************************************************************************************
 //
 // process types in file for process playlist files (songs)
 //
+// ****************************************************************************************
 
 void spotify_class::search_process_object(json_value* value, int depth,int art) {
   int length, x;
@@ -2805,10 +2913,11 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
   }
 }
 
-
+// ****************************************************************************************
 //
 // json parser start call function for process playlist
 // do the data progcessing from json
+// ****************************************************************************************
 
 void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
   char artisid[1024];
@@ -2963,10 +3072,11 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
 
 
 
-
+// ****************************************************************************************
 // NOt working not in use
 // download file from search result
 //
+// ****************************************************************************************
 
 int spotify_class::get_search_result_online(char *searchstring,int type) {
   static const char *userfilename = "spotify_search_result.json";
@@ -3041,9 +3151,11 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 
 
 
+// ****************************************************************************************
 //
 // search for playlist or song
 //
+// ****************************************************************************************
 
 
 int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type) {
@@ -3152,9 +3264,11 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 
 
 
+// ****************************************************************************************
 //
 // thread web loader (loading all icons)
 //
+// ****************************************************************************************
 
 void *load_spotify_web(void *data) {
   if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
@@ -3164,9 +3278,11 @@ void *load_spotify_web(void *data) {
 
 
 
+// ****************************************************************************************
 //
+// load image
 //
-//
+// ****************************************************************************************
 
 int LoadImage(char *filename) {
     ILuint    image;
@@ -3183,9 +3299,11 @@ int LoadImage(char *filename) {
 
 
 
+// ****************************************************************************************
 //
 // loading spotify songs gfx in array.
 //
+// ****************************************************************************************
 
 int spotify_class::load_spotify_iconoversigt() {
   int texture;
@@ -3214,18 +3332,22 @@ int spotify_class::load_spotify_iconoversigt() {
 }
 
 
+// ****************************************************************************************
 //
 // get active play device name
 //
+// ****************************************************************************************
 
 char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
 
 
+// ****************************************************************************************
 //
 //
-//
+// ****************************************************************************************
+
 
 void spotify_class::select_device_to_play() {
   static float select_device_to_playfader=1.0;
@@ -3345,9 +3467,11 @@ void spotify_class::select_device_to_play() {
 
 
 
+// ****************************************************************************************
 //
 // show spotify overview
 //
+// ****************************************************************************************
 
 void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
     int j,ii,k,pos;
@@ -3566,10 +3690,11 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
 
 
 
-
+// ****************************************************************************************
 //
 // show search/create playlist spotify overview
 //
+// ****************************************************************************************
 
 void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
     int j,ii,k,pos;
@@ -3871,6 +3996,13 @@ size_t b64_encoded_size(size_t inlen) {
 }
 
 
+// ****************************************************************************************
+//
+// 64bits incoder
+//
+// ****************************************************************************************
+
+
 char *b64_encode(const unsigned char *in, size_t len) {
 	char   *out;
 	size_t  elen;
@@ -3903,10 +4035,11 @@ char *b64_encode(const unsigned char *in, size_t len) {
 }
 
 
-
+// ****************************************************************************************
 //
-// ********************* show setup spotify stuf like dev and clientid/secrect ***************************
+// ********************* show setup spotify stuf like dev and clientid/secrect ************
 //
+// ****************************************************************************************
 
 void spotify_class::show_setup_spotify() {
     int i;
@@ -4423,10 +4556,11 @@ void spotify_class::show_setup_spotify() {
     }
 }
 
-
+// ****************************************************************************************
 //
 // set default play device
 //
+// ****************************************************************************************
 
 void spotify_class::set_default_device_to_play(int nr) {
    active_spotify_device=nr;

@@ -12680,9 +12680,9 @@ void *webupdate_loader_spotify(void *data) {
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-    spotify_oversigt.spotify_get_user_playlists(true,0);                      // get all the playlist and update db (force update)
+    spotify_oversigt.spotify_get_user_playlists(true,0);                      // get 50 first playlist and update db (force update)
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-    spotify_oversigt.spotify_get_user_playlists(true,50);                     // get all the playlist and update db (force update)
+    spotify_oversigt.spotify_get_user_playlists(true,50);                     // get next 50 playlists and update db (force update)
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
     spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
     // update view from db
