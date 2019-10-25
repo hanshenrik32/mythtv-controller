@@ -35,7 +35,7 @@ int fontctrl::updatefontlist()
     size_t flen=0;
     GLint count;
     FILE *fil;
-    char *sysc="fc-list | awk -F\":\" '{print $2}' | sed 's/ //' | sort -u > fontlist.txt";
+    static const char *sysc="fc-list | awk -F\":\" '{print $2}' | sed 's/ //' | sort -u > fontlist.txt";
     int ret=system(sysc);                                                       // get font name by fc-list command
     glc_font_id = glcGenFontID();
     glcContext(glc_font_id);

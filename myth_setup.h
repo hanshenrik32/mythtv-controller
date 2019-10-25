@@ -6,7 +6,6 @@
 #include <GL/glu.h>
 
 const int MAXPRGLIST_ANTAL=200;
-
 const int MAXCHANNEL_ANTAL=400;
 
 struct tv_graber_config {
@@ -40,15 +39,13 @@ struct channel_list_struct {
 
 class channel_configfile {
   private:
-    int maxconfigfilesize=400;                                                  // config for xmltv
+    static const int maxconfigfilesize=400;                                                  // config for xmltv
     int configfilesize=0;                                                       // real size
     char configtext[400][80];                                                   // config settings
   public:
     channel_configfile();
     ~channel_configfile();
     int readgraber_configfile();                                                // read graber file
-    //int writegraber_configfile();                                               // read graber file
-    //int graber_configbuild();                                                   // build xmltv config file
 };
 
 
@@ -67,9 +64,9 @@ class rss_stream_class {
   private:
     rss_stream_struct rss_source_feed[100];
     unsigned int antal;
-    const int maxantal=100;                                                           // # of records do create
-    const int namemaxlength=80;                                                       // max length
-    const int urlmaxlength=2048;                                                       // max length
+    static const int maxantal=100;                                                           // # of records do create
+    static const int namemaxlength=80;                                                       // max length
+    static const int urlmaxlength=2048;                                                       // max length
   public:
     int load_rss_data();                              // loaddb
     int save_rss_data();                              // update db
