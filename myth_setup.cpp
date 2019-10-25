@@ -326,7 +326,7 @@ int rss_stream_class::save_rss_data() {
               sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
-              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
+              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
@@ -336,7 +336,7 @@ int rss_stream_class::save_rss_data() {
           sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
-          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
+          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
         }
