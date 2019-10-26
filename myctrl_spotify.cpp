@@ -99,7 +99,7 @@ extern bool spotify_oversigt_loaded_begin;
 
 // ****************************************************************************************
 //
-// web server handler
+// web server handler (internal function)
 //
 // ****************************************************************************************
 
@@ -241,7 +241,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 
 // ****************************************************************************************
 //
-// constructor spotify devices
+// Constructor spotify devices
 //
 // ****************************************************************************************
 
@@ -257,7 +257,7 @@ spotify_device_def::spotify_device_def() {
 
 // ****************************************************************************************
 //
-// constructor spotify active player
+// Constructor spotify active player
 //
 // ****************************************************************************************
 
@@ -277,7 +277,7 @@ spotify_active_play_info_type::spotify_active_play_info_type() {
 
 // ****************************************************************************************
 //
-// constructor spotify oversigt type
+// Constructor spotify oversigt type
 //
 // ****************************************************************************************
 
@@ -359,7 +359,7 @@ spotify_class::~spotify_class() {
 
 // ****************************************************************************************
 //
-// refresh token
+// Spotify refresh token
 //
 // ****************************************************************************************
 
@@ -417,8 +417,9 @@ void spotify_class::spotify_set_token(char *token,char *refresh) {
   strcpy(spotifytoken_refresh,refresh);
 }
 
+
 // ****************************************************************************************
-//
+// NOT in use
 // Get a List of a User's Playlists
 // get only the id of playlists (not songs)
 //
@@ -438,7 +439,7 @@ int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
 
 
 // ****************************************************************************************
-//
+// DEBUG code
 //  json parser used to parse the return files from spotify api
 //
 // ****************************************************************************************
@@ -469,9 +470,14 @@ char playlistname[256];
 char playlistid[256];
 char playlistgfx[2048];
 
-//
+// ****************************************************************************************
+// INTERNAL
 // process types in file playlist
 // parse user playlist
+//
+// Set process flags for  playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) function
+//
+// ****************************************************************************************
 
 void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
@@ -503,10 +509,12 @@ void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *
 }
 
 
+
+// ****************************************************************************************
 //
 // parse user playlist
 //
-
+// ****************************************************************************************
 
 void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
@@ -523,7 +531,7 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 
 
 // ****************************************************************************************
-//
+// INTERNAL lolevel func
 // json parser start call function playlist db update
 // parse user playlist
 //
@@ -593,7 +601,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           //printf(" string = %10s \n ",value->u.string.ptr);
         }
         // get playlist name
-        // and create datdabase record playlist info
+        // and create datdabase record playlist info record
         if ((playlist_process_name) && (depth==5) && (x==5)) {
           //if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
           strcpy(playlistname,value->u.string.ptr);
@@ -625,7 +633,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 // ****************************************************************************************
 //
 // Get a List of Current User's Playlists
-//
+// IN use
 // get users play lists
 // write to spotify_users_playlist.json
 // parse user playlist
@@ -1580,11 +1588,12 @@ int spotify_class::spotify_pause_play() {
 }
 
 
-
+// ****************************************************************************************
 //
 // work ( need testing )
 // pause play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_pause_play2() {
   char auth_kode[1024];
@@ -1707,6 +1716,13 @@ int spotify_class::spotify_last_play() {
   }
   return 0;
 }
+
+
+// ****************************************************************************************
+//
+// last play
+//
+// ****************************************************************************************
 
 
 int spotify_class::spotify_last_play2() {
@@ -3983,7 +3999,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
 }
 
 
-const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 size_t b64_encoded_size(size_t inlen) {
 	size_t ret;
@@ -4004,6 +4019,7 @@ size_t b64_encoded_size(size_t inlen) {
 
 
 char *b64_encode(const unsigned char *in, size_t len) {
+  const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	char   *out;
 	size_t  elen;
 	size_t  i;

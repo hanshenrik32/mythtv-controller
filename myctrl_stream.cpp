@@ -133,7 +133,11 @@ void stream_class::stopstream() {
   stream_is_playing=false;
 }
 
+// ****************************************************************************************
+//
 // vlc stop player
+//
+// ****************************************************************************************
 
 void stream_class::softstopstream() {
   if ((vlc_in_playing()) && (stream_is_playing)) vlc_controller::stopmedia();
@@ -142,6 +146,8 @@ void stream_class::softstopstream() {
 
 
 // get length on stream
+//
+// ****************************************************************************************
 
 unsigned long stream_class::get_length_in_ms() {
   vlc_controller::get_length_in_ms();
@@ -149,6 +155,8 @@ unsigned long stream_class::get_length_in_ms() {
 
 
 // jump in player
+//
+// ****************************************************************************************
 
 float stream_class::jump_position(float ofset) {
     ofset=vlc_controller::jump_position(ofset);
@@ -160,6 +168,8 @@ float stream_class::jump_position(float ofset) {
 
 
 // pause stream
+//
+// ****************************************************************************************
 
 int stream_class::pausestream(int pause) {
     //stream_is_playing=true;
@@ -170,7 +180,10 @@ int stream_class::pausestream(int pause) {
 
 
 
+// ****************************************************************************************
 // start playing movie by vlclib
+//
+// ****************************************************************************************
 
 int stream_class::playstream(int nr) {
     char path[PATH_MAX];                                  // max path length from os
@@ -181,6 +194,9 @@ int stream_class::playstream(int nr) {
     return(1);
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 int stream_class::playstream_url(char *path) {
     stream_is_playing=true;
@@ -188,13 +204,19 @@ int stream_class::playstream_url(char *path) {
     return(1);
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 float stream_class::getstream_pos() {
     return(vlc_controller::get_position());
 }
 
 
+// ****************************************************************************************
 // update nr of view
+//
+// ****************************************************************************************
 
 void stream_class::update_rss_nr_of_view(char *url) {
   // mysql vars
@@ -216,10 +238,14 @@ void stream_class::update_rss_nr_of_view(char *url) {
 }
 
 
+// ****************************************************************************************
 //
 // used to download rss file from web to db info (url is flag for master rss file (mediaURL IS NULL))
 // in db if mediaURL have url this is the rss feed loaded from rss file
 // updaterssfile bool is do it now (u key in overview)
+//
+// ****************************************************************************************
+
 
 int stream_class::loadrssfile(bool updaterssfile) {
   bool haveupdated=false;
@@ -345,6 +371,10 @@ int stream_class::loadrssfile(bool updaterssfile) {
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 
 char search_and_replace2(char *text) {
   int n=0;
@@ -367,9 +397,13 @@ char search_and_replace2(char *text) {
   strcpy(text,newtext);
 }
 
+
+// ****************************************************************************************
 //
 // xml parser
 //
+// ****************************************************************************************
+
 
 int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   xmlChar *tmpdat;
@@ -638,9 +672,12 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
 
 
 
+// ****************************************************************************************
 //
 // get nr of rss feed
 //
+// ****************************************************************************************
+
 
 int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   char sqlselect[4096];
@@ -665,7 +702,11 @@ int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 
 
 
+// ****************************************************************************************
+//
 // get antal podcast af type
+//
+// ****************************************************************************************
 
 int get_podcasttype_antal(char *typedata) {
   char sqlselect[4096];
@@ -698,7 +739,11 @@ int get_podcasttype_antal(char *typedata) {
 
 
 
+// ****************************************************************************************
+//
 // check if exist
+//
+// ****************************************************************************************
 
 int check_rss_feed_exist(MYSQL *conn,char *rssname) {
   bool recexist=false;
@@ -718,13 +763,18 @@ int check_rss_feed_exist(MYSQL *conn,char *rssname) {
   return(recexist);
 }
 
+
+
+// ****************************************************************************************
 //
 // opdate show liste in view (det vi ser)
 //
-
 // load felt 7 = mythtv gfx icon
 // fpath=stream path
 // atr = stream name
+//
+// ****************************************************************************************
+
 
 int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char sqlselect[2048];
@@ -3000,9 +3050,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 }
 
 
+
+// ****************************************************************************************
 //
 // thread web loader (loading all icons)
 //
+// ****************************************************************************************
+
 
 void *loadweb(void *data) {
   if (debugmode & 4) printf("Start web icon loader thread\n");
@@ -3011,8 +3065,12 @@ void *loadweb(void *data) {
 }
 
 
+
+// ****************************************************************************************
 // in use
 // downloading all rss podcast icon gfx
+//
+// ****************************************************************************************
 
 int stream_class::loadweb_stream_iconoversigt() {
   int antal;
@@ -3078,10 +3136,13 @@ int stream_class::loadweb_stream_iconoversigt() {
 }
 
 
+// ****************************************************************************************
 // load all streams gfx and save it
 // NOT IN USE
 // used as thread
 //
+// ****************************************************************************************
+
 
 void *load_all_stream_gfx(void *data) {
     // mysql vars
@@ -3178,13 +3239,22 @@ void *load_all_stream_gfx(void *data) {
 
 
 
+
+// ****************************************************************************************
 //
 // play stream by vlc
 //
+// ****************************************************************************************
+
 
 void stream_class::playstream(char *url) {
     vlc_controller::playmedia(url);
 }
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
