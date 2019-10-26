@@ -941,7 +941,14 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 
 // 700 -> 1000 is free on intnr
 
-// operet databaser/tables if now exist
+
+
+// ****************************************************************************************
+//
+// Create databaser/tables if now exist
+//
+// ****************************************************************************************
+
 int create_radio_oversigt() {
     // mysql vars
 //    int dbexist=0;

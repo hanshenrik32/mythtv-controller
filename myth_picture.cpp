@@ -15,9 +15,12 @@ extern int screen_size;
 extern GLuint screensaverbox_mask;
 
 
-int picture_saver::dir_loader(char *dirpath)
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
-{
+
+int picture_saver::dir_loader(char *dirpath) {
     int leng;
     static int picnr=0;
     DIR *dp;
@@ -79,7 +82,12 @@ picture_saver::picture_saver(void)
 }
 
 
+// ****************************************************************************************
+//
 // destructor
+//
+// ****************************************************************************************
+
 
 picture_saver::~picture_saver()
 
@@ -88,6 +96,11 @@ picture_saver::~picture_saver()
     if (screensaver_pic) glDeleteTextures( 1, &screensaver_pic);
 }
 
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 void picture_saver::show_pictures()

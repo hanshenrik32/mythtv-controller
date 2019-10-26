@@ -881,11 +881,13 @@ void ERRCHECK_SDL(char *text,unsigned int songnr)
 
 
 
-
+// ****************************************************************************************
 //
 // config file paser
 //
 // enum def commands
+//
+// ****************************************************************************************
 
 
 int parse_config(char *filename) {
@@ -1219,7 +1221,11 @@ int parse_config(char *filename) {
 }
 
 
+// ****************************************************************************************
+//
 // save config to file
+//
+// ****************************************************************************************
 
 int save_config(char * filename) {
     bool error = false;
@@ -1317,8 +1323,11 @@ int save_config(char * filename) {
 
 
 
-
+// ****************************************************************************************
+//
 // load all config from config file
+//
+// ****************************************************************************************
 
 void load_config(char * filename) {
     char sqlselect[512];
@@ -1586,10 +1595,11 @@ void load_config(char * filename) {
 }
 
 
-
+// ****************************************************************************************
 //
 // find sangs id og opdateret antal af afspilinger samt afspilings dato
 //
+// ****************************************************************************************
 
 int update_afspillinger_music_song(char *filename)
 
@@ -1623,9 +1633,12 @@ int update_afspillinger_music_song(char *filename)
 
 
 
-
+// ****************************************************************************************
+//
 // parameret til mysql er dirid = directory_id i database
 // retunere path og parent_id som bliver udfyldt fra mysql databasen
+//
+// ****************************************************************************************
 
 void hent_dir_id1(char *path,char *parent_id,char *dirid) {
     // mysql stuf
@@ -1655,9 +1668,13 @@ void hent_dir_id1(char *path,char *parent_id,char *dirid) {
 }
 
 
-
-// ************************************************************ music play list loader fra mythtv
+// ****************************************************************************************
+//
+// music play list loader fra mythtv
+//
 // load playlist til oversigt ask_open_dir_play
+//
+// ****************************************************************************************
 
 int hent_mythtv_playlist(int playlistnr) {
     GLuint texture; //The id of the texture
@@ -1753,10 +1770,13 @@ int hent_mythtv_playlist(int playlistnr) {
 
 
 
-
-// MUSIC stuf *****************************************************************************************
+// ****************************************************************************************
+//
+// MUSIC stuf
 //
 // load dir icons efter et update.
+//
+// ****************************************************************************************
 
 void opdatere_music_oversigt_icons() {
   unsigned int i;
@@ -1777,8 +1797,11 @@ void opdatere_music_oversigt_icons() {
   }
 }
 
-
+// ****************************************************************************************
+//
 // hent antal af songs fra mythtv playlist database og fyld music play array
+//
+// ****************************************************************************************
 
 unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     char sqlselect[512];
@@ -1844,8 +1867,11 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
 
 
 
-
+// ****************************************************************************************
+//
 // hent antal af songs i et dir (dirid) og fyld music play array fra dir path
+//
+// ****************************************************************************************
 
 unsigned int hent_antal_dir_songs(int dirid) {
     char tmpfilename[200];
@@ -1927,8 +1953,13 @@ unsigned int hent_antal_dir_songs(int dirid) {
 }
 
 
+
+// ****************************************************************************************
+//
 // init lirc
 // remove controler
+//
+// ****************************************************************************************
 
 int initlirc() {
   // LIRC SETUP
@@ -1960,8 +1991,11 @@ int initlirc() {
 
 
 
-
+// ****************************************************************************************
+//
 // Load/init ttf fonts list
+//
+// ****************************************************************************************
 
 int init_ttf_fonts() {
     // uni font config *****************************************************************************************
@@ -2002,9 +2036,11 @@ int init_ttf_fonts() {
 }
 
 
+// ****************************************************************************************
 //
 // save command to be exectued to script exec
 //
+// ****************************************************************************************
 
 int saveexitcommand(configkeytype command) {
   FILE *file;
@@ -2019,9 +2055,12 @@ int saveexitcommand(configkeytype command) {
   } else return(0);
 }
 
+
+// ****************************************************************************************
 //
 // do shell command from functions key pressed
 //
+// ****************************************************************************************
 
 void doexitcommand() {
   char command[1024];
@@ -2037,10 +2076,12 @@ void doexitcommand() {
   if (ok) system(command);
 }
 
+// ****************************************************************************************
 //
 // find sangs id til playlist opdatering/restore
 // returnere songid fra music_songstablen
 //
+// ****************************************************************************************
 
 long find_music_song_placering(char *filename,char *songname) {
     char sqlselect[1024];
@@ -2068,10 +2109,11 @@ long find_music_song_placering(char *filename,char *songname) {
     return(recnr);
 }
 
-
+// ****************************************************************************************
 //
 // restore database til mythtv music playlist datbase
 //
+// ****************************************************************************************
 
 unsigned int do_playlist_restore_playlist() {
 //    long playlistnr;
@@ -2158,10 +2200,12 @@ unsigned int do_playlist_restore_playlist() {
 }
 
 
+// ****************************************************************************************
 //
 // lav en backup af sange i playlister
 // til en table ved navn music_songs_tmp
 //
+// ****************************************************************************************
 
 unsigned int do_playlist_backup_playlist() {
     int playlistnr;
@@ -2243,8 +2287,11 @@ unsigned int do_playlist_backup_playlist() {
 }
 
 
-
+// ****************************************************************************************
+//
 // Bruges af ur pause display
+//
+// ****************************************************************************************
 
 void myglprint24(char *string) {
   int len,i;
@@ -2254,8 +2301,12 @@ void myglprint24(char *string) {
   }
 }
 
-
+// ****************************************************************************************
+//
 // show background picture
+//
+// ****************************************************************************************
+
 void show_background() {
   // make background
   glPushMatrix();
@@ -2282,9 +2333,13 @@ void show_background() {
 }
 
 
+
+
+// ****************************************************************************************
 //
-// *********************** MAIN LOOP *********************************************************************************
+// clock stuf
 //
+// ****************************************************************************************
 
 const float clockR=80.0f;
 
@@ -2305,6 +2360,11 @@ static bool do_update_spotify = true;                            // set true to 
 
 
 
+// ****************************************************************************************
+//
+// Main diskplay
+//
+// ****************************************************************************************
 
 void display() {
     // used by xmltv updater func
@@ -6007,10 +6067,13 @@ void display() {
 // end display()
 
 
-
+// ****************************************************************************************
+//
 // used by mouse stuf
 // to check mouse buttons
 // names is the array of gfx on screen as buttons
+//
+// ****************************************************************************************
 
 int list_hits(GLint hits, GLuint *names,int x,int y) {
     int i = hits;			// numbers of hits
@@ -7083,8 +7146,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
     return(returnfunc);
 }
 
-
+// ****************************************************************************************
+//
 // get selected icon
+//
+// ****************************************************************************************
 
 int gl_select(int x,int y) {
     GLuint buff[64] = {0};		// info buffer
@@ -7110,10 +7176,11 @@ int gl_select(int x,int y) {
     return(list_hits(hits, buff,x,y));	// return 1 = scroll up 2 = scroll down 0 = no scroll
 }
 
-
+// ****************************************************************************************
 //
 // ************* mouse handler ********************************************************************************************
 //
+// ****************************************************************************************
 
 void handleMouse(int button,int state,int mousex,int mousey) {
     //static char huskname[1024];
@@ -7732,11 +7799,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
 
 
-
+// ****************************************************************************************
 //
 // handle keys
 // like functions keys
 //
+// ****************************************************************************************
 
 void handlespeckeypress(int key,int x,int y) {
     float MOVIE_CS;
@@ -8651,10 +8719,11 @@ void handlespeckeypress(int key,int x,int y) {
 
 
 
-
+// ****************************************************************************************
 //
-// keyboard handler *******************************************************************************************************
+// Keyboard handler
 //
+// ****************************************************************************************
 
 void handleKeypress(unsigned char key, int x, int y) {
     const char optionmenukey='O';
@@ -9901,10 +9970,12 @@ void handleKeypress(unsigned char key, int x, int y) {
 }
 
 
+// ****************************************************************************************
 //
 // in use
 // lirc remove controller
 //
+// ****************************************************************************************
 
 void update2(int value) {
   char cmd[200];
@@ -11111,8 +11182,11 @@ void update2(int value) {
 
 
 
-
+// ****************************************************************************************
+//
 // in use
+//
+// ****************************************************************************************
 
 void update(int value) {
     float MOVIE_CS;		// movie dvd cover side
@@ -12408,8 +12482,11 @@ void update(int value) {
 }
 
 
-
+// ****************************************************************************************
+//
 // init screen setup
+//
+// ****************************************************************************************
 
 bool init(void) {
     #ifndef ALLOW_RUN_AS_ROOT
@@ -12429,8 +12506,12 @@ bool init(void) {
 
 
 
-
+// ****************************************************************************************
+//
 // setup sound system
+//
+// ****************************************************************************************
+
 
 int init_sound_system(int devicenr) {
     int num;
@@ -12528,10 +12609,11 @@ int init_sound_system(int devicenr) {
 
 
 
-
+// ****************************************************************************************
 //
-// phread dataload  check radio stations if it is online
+// phread dataload check radio stations if it is online
 //
+// ****************************************************************************************
 
 void *radio_check_statusloader(void *data) {
   bool notdone=false;
@@ -12554,10 +12636,11 @@ void *radio_check_statusloader(void *data) {
 
 
 
-
+// ****************************************************************************************
 //
 // phread dataload Music
 //
+// ****************************************************************************************
 
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
@@ -12602,11 +12685,11 @@ void *datainfoloader_music(void *data) {
 }
 
 
-
+// ****************************************************************************************
 //
 // phread dataload Film
 //
-
+// ****************************************************************************************
 
 void *datainfoloader_movie(void *data) {
   //pthread_mutex_lock(&count_mutex);
@@ -12624,10 +12707,11 @@ void *datainfoloader_movie(void *data) {
 }
 
 
-
+// ****************************************************************************************
 //
 // phread dataload stream
 //
+// ****************************************************************************************
 
 void *datainfoloader_stream(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading stream info from rss feed.\n");
@@ -12638,10 +12722,11 @@ void *datainfoloader_stream(void *data) {
   pthread_exit(NULL);
 }
 
-
+// ****************************************************************************************
 //
 // phread dataload spotify
 //
+// ****************************************************************************************
 
 void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
@@ -12654,10 +12739,12 @@ void *datainfoloader_spotify(void *data) {
   pthread_exit(NULL);
 }
 
-
+// ****************************************************************************************
 //
-// phread datadb update from spotify (online)
+// Phread datadb update from spotify (online)
+// add all the users play list to the system db to be show in spotifyoversigt
 //
+// ****************************************************************************************
 
 void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web to db.\n");
@@ -12694,10 +12781,11 @@ void *webupdate_loader_spotify(void *data) {
 }
 
 
-
+// ****************************************************************************************
 //
 // phread dataload webserver
 //
+// ****************************************************************************************
 
 void *datainfoloader_webserver(void *data) {
   struct tm* t;
@@ -12705,8 +12793,8 @@ void *datainfoloader_webserver(void *data) {
   static time_t nowdate;
   time(&lasttime);
   time(&nowdate);
+  // run the webserver
   while((true) && (runwebserver)) {
-    // run the webserver
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     // run time server to update spotify token
     if (difftime(nowdate, lasttime)>3500) {
@@ -12716,10 +12804,11 @@ void *datainfoloader_webserver(void *data) {
         spotify_oversigt.spotify_refresh_token();
       }
     }
+    // get time
     time(&nowdate);
     if (do_hent_spotify_search_online) {
       spotify_oversigt.search_spotify_online_done=false;
-      printf("Update \n");
+      printf("Update spotify search result.\n");
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
@@ -12732,10 +12821,11 @@ void *datainfoloader_webserver(void *data) {
   pthread_exit(NULL);
 }
 
-
+// ****************************************************************************************
 //
 // phread dataload xmltv
 //
+// ****************************************************************************************
 
 void *datainfoloader_xmltv(void *data) {
   int error;
@@ -12763,10 +12853,11 @@ void *datainfoloader_xmltv(void *data) {
   pthread_exit(NULL);
 }
 
-
+// ****************************************************************************************
 //
 // xmltv loader start from main loop then trigged by date
 //
+// ****************************************************************************************
 
 void *update_xmltv_phread_loader() {
   if (true) {
@@ -12780,9 +12871,11 @@ void *update_xmltv_phread_loader() {
 }
 
 
+// ****************************************************************************************
 //
 // rss loader start from main loop then trigged by date
 //
+// ****************************************************************************************
 
 void *update_rss_phread_loader() {
   if (true) {
@@ -12796,9 +12889,11 @@ void *update_rss_phread_loader() {
 }
 
 
+// ****************************************************************************************
 //
 // xmltv loader start from main loop then trigged by date
 //
+// ****************************************************************************************
 
 void *update_music_phread_loader() {
   if (true) {
@@ -12811,10 +12906,11 @@ void *update_music_phread_loader() {
   }
 }
 
-
+// ****************************************************************************************
 //
 // spotify db loader.
 //
+// ****************************************************************************************
 
 void *update_spotify_phread_loader() {
   if (true) {
@@ -12828,9 +12924,11 @@ void *update_spotify_phread_loader() {
 }
 
 
+// ****************************************************************************************
 //
 // Spotify db update online from spotify (by userid(token))
 //
+// ****************************************************************************************
 
 void *update_spotifyonline_phread_loader() {
   if (true) {
@@ -12843,10 +12941,11 @@ void *update_spotifyonline_phread_loader() {
   }
 }
 
-
+// ****************************************************************************************
 //
 // rss loader start from main loop start webserver
 //
+// ****************************************************************************************
 
 void *update_webserver_phread_loader() {
   if (true) {
@@ -12895,9 +12994,11 @@ int configxbmcver=1;
 xbmcsqlite *xbmcSQL=NULL;
 
 
+// ****************************************************************************************
 //
 // phread dataload xbmc/kodi music db
 //
+// ****************************************************************************************
 
 void *xbmcdatainfoloader(void *data) {
   char userhomedir[200];
@@ -13044,9 +13145,10 @@ void *xbmcdatainfoloader(void *data) {
 
 
 
-
+// ****************************************************************************************
 // load xbmc/kodi movies to db
 // create movie db if not exist
+// ****************************************************************************************
 
 void *xbmcdatainfoloader_movie(void *data) {
   char userhomedir[200];
@@ -13223,10 +13325,11 @@ void *xbmcdatainfoloader_movie(void *data) {
 }
 
 
-
+// ****************************************************************************************
 //
 // load img file
 //
+// ****************************************************************************************
 
 GLuint loadgfxfile(char *temapath,char *dir,char *file) {
     GLuint gl_img=0;
@@ -13253,7 +13356,11 @@ GLuint loadgfxfile(char *temapath,char *dir,char *file) {
 
 
 
-
+// ****************************************************************************************
+//
+// Load all gfx tema data
+//
+// ****************************************************************************************
 
 
 void loadgfx() {
@@ -13446,10 +13553,11 @@ void loadgfx() {
     printf ("Done loading init graphic.\n");
 }
 
-
+// ****************************************************************************************
 //
 // free loaded gfx
 //
+// ****************************************************************************************
 
 void freegfx() {
     int i;
@@ -13593,6 +13701,12 @@ void freegfx() {
 }
 
 
+// ****************************************************************************************
+//
+// Load contry flags
+//
+// ****************************************************************************************
+
 void load_lande_flags() {
     int i;
     char tmpfilename[1024];
@@ -13628,6 +13742,11 @@ void load_lande_flags() {
     }
 }
 
+// ****************************************************************************************
+//
+// Init tema path
+//
+// ****************************************************************************************
 
 
 void InitGL()              // We call this right after our OpenGL window is created.
@@ -13669,7 +13788,11 @@ void InitGL()              // We call this right after our OpenGL window is crea
 //    mybox.settexture(musicoversigt);
 }
 
+// ****************************************************************************************
+//
 // bruges til at checke_copy radio icons som virker til nyt dir
+//
+// ****************************************************************************************
 
 int check_radio_stations_icons() {
   MYSQL *conn;
@@ -13697,10 +13820,11 @@ int check_radio_stations_icons() {
 }
 
 
-
+// ****************************************************************************************
 //
 // main
 //
+// ****************************************************************************************
 
 int main(int argc, char** argv) {
     Display *dpy = NULL;
