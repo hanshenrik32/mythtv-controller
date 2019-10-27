@@ -12749,6 +12749,7 @@ void *datainfoloader_spotify(void *data) {
 void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web to db.\n");
   spotify_update_loaded_begin=true;
+  spotify_oversigt.set_spotify_update_flag(true);
   if (spotify_oversigt.spotify_get_user_id()) {
     // add default playlists from spotify
     spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
@@ -12777,6 +12778,7 @@ void *webupdate_loader_spotify(void *data) {
   }
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;
+  spotify_oversigt.set_spotify_update_flag(false);
   pthread_exit(NULL);
 }
 
@@ -12797,11 +12799,12 @@ void *datainfoloader_webserver(void *data) {
   while((true) && (runwebserver)) {
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     // run time server to update spotify token
-    if (difftime(nowdate, lasttime)>3500) {
+    if (difftime(nowdate, lasttime)>3500) {                                     // 3500
       time(&lasttime);
       fprintf(stderr,"update spotify token\n");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
         spotify_oversigt.spotify_refresh_token();
+        //spotify_oversigt.spotify_refresh_token2();
       }
     }
     // get time
