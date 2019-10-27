@@ -40,6 +40,14 @@ const int spotify_namelength=80;
 const int spotify_desclength=2000;
 const int feed_url=2000;
 
+
+size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
+    data->append((char*) ptr, size * nmemb);
+    return size * nmemb;
+}
+
+
+
 // ****************************************************************************************
 //
 // text render is glcRenderString for freetype font support
@@ -342,6 +350,7 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
+    spotify_update_loaded_begin=false;                                          // true then we are update the stack data
 }
 
 // ****************************************************************************************
@@ -354,6 +363,29 @@ spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
     mg_mgr_free(&client_mgr);
     clean_spotify_oversigt();
+}
+
+
+// ****************************************************************************************
+//
+// set loader flag
+//
+// ****************************************************************************************
+
+
+void spotify_class::set_spotify_update_flag(bool flag) {
+  spotify_update_loaded_begin=flag;
+}
+
+// ****************************************************************************************
+//
+// get loader flag
+//
+// ****************************************************************************************
+
+
+bool spotify_class::get_spotify_update_flag(bool flag) {
+  return(spotify_update_loaded_begin);
 }
 
 
@@ -402,6 +434,106 @@ int spotify_class::spotify_refresh_token() {
   }
   return 1;
 }
+
+
+
+
+// *********************************************************************************************************************************
+// Do NOT work
+// do we play ?
+// return http code
+//
+// ********************************************************************************************
+
+int spotify_class::spotify_refresh_token2() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+
+  strcpy(auth_kode,"Authorization: Basic ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  strcpy(data,spotify_client_id);
+  strcat(data,":");
+  strcat(data,spotify_secret_id);
+  strcpy(newtoken,"");
+  //calc base64
+  base64_code=b64_encode((const unsigned char *) data, 65);
+  *(base64_code+88)='\0';
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://accounts.spotify.com/api/token");
+    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    errbuf[0] = 0;
+    // set type post
+    //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s",spotifytoken_refresh);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    //
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+      printf("Ok Spotify new token. ");
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      //process_value_playinfo(value, 0,0);                                                     // fill play info
+      if (strncmp(response_string.c_str(),"{\"access_token\":",16)==0) {
+        strncpy(newtoken,data+17,180);
+        newtoken[181]='\0';
+        printf(" %s \n",newtoken);
+        strcpy(spotifytoken,newtoken);                                         // update spotify token
+      }
+      json_value_free(value);                                                                 // json clean up
+    } else {
+      printf("Error code httpCode %d \n. ",httpCode);
+      printf("error text : %s\n", curl_easy_strerror(res));
+    }
+  }
+  return(httpCode);
+}
+
+
+
 
 
 
@@ -998,11 +1130,6 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 
 
 
-size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
-    data->append((char*) ptr, size * nmemb);
-    return size * nmemb;
-}
-
 // ****************************************************************************************
 //
 // work
@@ -1048,6 +1175,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   struct curl_slist *chunk = NULL;
   FILE *out_file;
   bool do_curl=true;
+  // create dir for json files
   if (!(file_exists("json"))) {
     system("/bin/mkdir json");
   }
@@ -1080,8 +1208,9 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             // always cleanup
             curl_easy_cleanup(curl);
             fclose(out_file);
-            if (httpCode == 200) {
-              //all ok
+            if (httpCode != 200) {
+              printf("Spotify error %d \n",httpCode);
+              exit(1);
             }
           }
         }
@@ -1252,7 +1381,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
     }
     mysql_close(conn);
   }
-  return 0;
+  return tt;
 }
 
 

@@ -80,6 +80,9 @@ class spotify_class : vlc_controller {
         int spotify_device_antal;                                               // antal device found
         spotify_active_play_info_type spotify_aktiv_song[1];                    //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
+
+        bool spotify_update_loaded_begin;
+
         void print_depth_shift(int);
         void process_value_playlist(json_value*, int,int x);
         void process_object_playlist(json_value*, int);
@@ -109,6 +112,8 @@ class spotify_class : vlc_controller {
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         int get_search_result_online(char *searchstring,int type);
     public:
+        void set_spotify_update_flag(bool flag);
+        bool get_spotify_update_flag(bool flag);
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         char overview_show_cd_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         bool search_spotify_online_done;
@@ -120,6 +125,7 @@ class spotify_class : vlc_controller {
         void spotify_set_token(char *token,char *refresh);
         char *spotify_get_token() { return(spotifytoken); };
         int spotify_refresh_token();                                            // refresh token on postify api
+        int spotify_refresh_token2();                                            // refresh token on postify api 2
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
         char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };                       //
