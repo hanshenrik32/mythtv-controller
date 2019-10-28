@@ -12799,12 +12799,12 @@ void *datainfoloader_webserver(void *data) {
   while((true) && (runwebserver)) {
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     // run time server to update spotify token
-    if (difftime(nowdate, lasttime)>3500) {                                     // 3500
+    if (difftime(nowdate, lasttime)>500) {                                     // 3500
       time(&lasttime);
       fprintf(stderr,"update spotify token\n");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
-        spotify_oversigt.spotify_refresh_token();
-        //spotify_oversigt.spotify_refresh_token2();
+        //spotify_oversigt.spotify_refresh_token();       // old ver
+        spotify_oversigt.spotify_refresh_token2();        // new ver
       }
     }
     // get time
