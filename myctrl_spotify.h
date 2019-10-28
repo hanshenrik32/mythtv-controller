@@ -111,6 +111,7 @@ class spotify_class : vlc_controller {
         bool spotify_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         int get_search_result_online(char *searchstring,int type);
+        int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
     public:
         void set_spotify_update_flag(bool flag);
         bool get_spotify_update_flag(bool flag);
