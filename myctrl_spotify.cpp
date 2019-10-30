@@ -461,7 +461,7 @@ int spotify_class::spotify_refresh_token2() {
   char auth_kode[1024];
   std::string response_string;
   std::string response_val;
-  int httpCode;
+  int httpCode=0;
   CURLcode res;
   struct curl_slist *chunk = NULL;
   char doget[2048];
@@ -475,7 +475,7 @@ int spotify_class::spotify_refresh_token2() {
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
   curl = curl_easy_init();
-  if (curl) {
+  if ((curl) && (strcmp(spotifytoken_refresh,"")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
