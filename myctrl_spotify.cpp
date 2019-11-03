@@ -541,7 +541,7 @@ int spotify_class::spotify_refresh_token2() {
 
 // ****************************************************************************************
 //
-// save the token in used
+// save the refresh token in used
 //
 // ****************************************************************************************
 
@@ -2243,14 +2243,14 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
+// HAVE some errors
 
 int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
   std::string auth_kode;
-  std::string response_string;
+  char response_string[8192];
   std::string url;
-  std::string post_playlist_data;
-  //char post_playlist_data[4096];
-
+  //std::string post_playlist_data;
+  char post_playlist_data[4096];
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
@@ -2258,7 +2258,7 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/play?device_id=";
-  url=url + devid;
+  if (devid) url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
@@ -2278,9 +2278,9 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf((char *) post_playlist_data.c_str(),"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
+    sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data.c_str()));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {
@@ -3615,6 +3615,16 @@ int LoadImage(char *filename) {
 }
 
 
+// ****************************************************************************************
+//
+// loading spotify songs gfx in array.
+//
+// ****************************************************************************************
+
+void spotify_class::settextureidfile(int nr,char *filename) {
+    if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture ((char *) filename);
+}
+
 
 // ****************************************************************************************
 //
@@ -3623,7 +3633,6 @@ int LoadImage(char *filename) {
 // ****************************************************************************************
 
 int spotify_class::load_spotify_iconoversigt() {
-  int texture;
   int nr=0;
   int loadstatus;
   char tmpfilename[2000];
@@ -3633,10 +3642,10 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    //printf("Loading texture %d %s \n",nr,stack[nr]->feed_gfx_url);
+    printf("Loading texture nr %d for %s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
-      //texture=LoadImage(stack[nr]->feed_gfx_url);
-      //if (texture!=-1) stack[nr]->textureId=texture;
+      //stack[nr]->textureId=LoadImage(stack[nr]->feed_gfx_url);
+      settextureidfile(nr,stack[nr]->feed_gfx_url);
     }
     nr++;
   }
@@ -3834,7 +3843,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         // stream icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        //glBindTexture(GL_TEXTURE_2D,empty_icon);
+        //glBindTexture(GL_TEXTURE_2D,normal_icon);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -3844,7 +3855,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPushMatrix();
-        // indsite draw icon rss gfx
+        /*
+        // indsite draw icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
@@ -3876,6 +3888,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
           glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
           glEnd();
         }
+        */
         glPopMatrix();
       } else {
         // no draw default icon

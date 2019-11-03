@@ -80,9 +80,7 @@ class spotify_class : vlc_controller {
         int spotify_device_antal;                                               // antal device found
         spotify_active_play_info_type spotify_aktiv_song[1];                    //
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
-
         bool spotify_update_loaded_begin;
-
         void print_depth_shift(int);
         void process_value_playlist(json_value*, int,int x);
         void process_object_playlist(json_value*, int);
@@ -97,12 +95,10 @@ class spotify_class : vlc_controller {
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
         void playlist_process_value(json_value* value, int depth,int x,MYSQL *conn);
         //
-
         void process_object_playinfo(json_value* value, int depth);
         void process_array_playinfo(json_value* value, int depth);
         void process_value_playinfo(json_value* value, int depth,int x);
-
-
+        //
         char spotifytoken[512];                                                 // access_token
         char spotifytoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
@@ -113,6 +109,7 @@ class spotify_class : vlc_controller {
         int get_search_result_online(char *searchstring,int type);
         int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
     public:
+        void settextureidfile(int nr,char *filename);
         void set_spotify_update_flag(bool flag);
         bool get_spotify_update_flag(bool flag);
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
