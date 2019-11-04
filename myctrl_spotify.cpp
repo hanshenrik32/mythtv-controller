@@ -2941,7 +2941,19 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               if (getart == 0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                strncpy(stack[antal]->feed_gfx_url,row[1],1024);
+                if (row[1]) {
+                  if (strncmp(row[1],"http",4)==0) {
+                    get_webfilename(downloadfilename,row[1]);
+                    strcpy(downloadfilenamelong,"tmp/");
+                    strcat(downloadfilenamelong,downloadfilename);
+                    strcat(downloadfilenamelong,".jpg");
+                    // download file
+                    if (!(file_exists(downloadfilename))) {
+                      get_webfile2(row[1],downloadfilenamelong);                // download file
+                    } else strcpy(downloadfilenamelong,row[1]);                 // no file name
+                  } else strcpy(downloadfilenamelong,row[1]);
+                  strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                }
                 strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
 
                 /*
@@ -3329,7 +3341,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       // albumid
       if (art==2) {
         if ((depth==9) && (x==5)) {
-          if (antal==0) {
+          if (antal==0) {                                                       // first record
             // first record back
             stack[antal]=new (spotify_oversigt_type);
             strcpy(stack[antal]->feed_name,"Back");

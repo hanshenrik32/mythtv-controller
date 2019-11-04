@@ -241,7 +241,7 @@ bool check_filename_ext(const char *filename) {
 // ****************************************************************************************
 //
 // used to download images from web
-// more secure now
+// more secure now use wget
 //
 // ****************************************************************************************
 
