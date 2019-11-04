@@ -4382,12 +4382,12 @@ void display() {
       glEnd();
       // spotify play info icon
       glEnable(GL_BLEND);
-
       if (spotify_oversigt.get_texture(spotifyknapnr))
-        glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr));
+        if (spotifyknapnr-1>0) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr-1));                        // get playlist conver icon
       else
-        glBindTexture(GL_TEXTURE_2D,spotify_ecover);
-      if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);
+        glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                              // else default icon
+
+      if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);        // set active icon
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
