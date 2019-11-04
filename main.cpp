@@ -4382,11 +4382,13 @@ void display() {
       glEnd();
       // spotify play info icon
       glEnable(GL_BLEND);
+
       if (spotify_oversigt.get_texture(spotifyknapnr))
         glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr));
       else
         glBindTexture(GL_TEXTURE_2D,spotify_ecover);
       if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);
+
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
@@ -6397,8 +6399,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if (do_show_spotify_search_oversigt==true) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt_loaded_begin=true;
-            spotify_oversigt.opdatere_spotify_oversigt(0);
-            spotify_oversigt.load_spotify_iconoversigt();
+            spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
+            spotify_oversigt.load_spotify_iconoversigt();                       // update icons
             spotify_oversigt_loaded_begin=false;
           } else {
             do_show_spotify_search_oversigt=true;
@@ -6607,8 +6609,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               if ((spotify_oversigt.type==0) || (spotify_oversigt.type==1)) {
                 // update
                 spotify_selected_startofset=0;
-                spotify_oversigt.opdatere_spotify_oversigt(0);
-                spotify_oversigt.load_spotify_iconoversigt();
+                spotify_oversigt.opdatere_spotify_oversigt(0);                  // update view
+                spotify_oversigt.load_spotify_iconoversigt();                   // load icons
                 ask_open_dir_or_play_spotify = false;
                 fundet = true;
               }
@@ -6710,8 +6712,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
             // update
             spotify_selected_startofset=0;
-            spotify_oversigt.opdatere_spotify_oversigt(0);
-            spotify_oversigt.load_spotify_iconoversigt();
+            spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view
+            spotify_oversigt.load_spotify_iconoversigt();                       // load icons
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
@@ -7531,8 +7533,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             ask_open_dir_or_play_spotify=false;
             fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
-            spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
-            spotify_oversigt.load_spotify_iconoversigt();
+            spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
+            spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
             spotifyknapnr=0;                                                    // reset select
             spotify_selected_startofset=0;                                      //
             strcpy(spotify_oversigt.overview_show_band_name,"");
@@ -7555,6 +7557,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==0) {
                 spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               }
+              // try load and  play song
               if (spotify_oversigt.get_spotify_type(spotifyknapnr-1)==1) {
                 spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
               }
@@ -7578,7 +7581,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
       }
-
       // and open / play / stop / next / last play control // open playlist
       if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==true)) {
         if (!(do_zoom_spotify_cover)) {
@@ -7634,7 +7636,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // spotify play artist/or playlist / or cd
           if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (spotifyknapnr>0)) {
-            ask_open_dir_or_play_spotify=false;                                                               // close widow
+            ask_open_dir_or_play_spotify=false;                                                               // close widow again
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
                 case 0: fprintf(stderr,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
@@ -12732,6 +12734,8 @@ void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
+  //spotify_oversigt.load_spotify_iconoversigt();                                 // update icons
+
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   //spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
@@ -12775,6 +12779,7 @@ void *webupdate_loader_spotify(void *data) {
     spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
     // update view from db
     spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
+    spotify_oversigt.load_spotify_iconoversigt();                             // load icons
   }
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;

@@ -2269,9 +2269,9 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    ////curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
     curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
@@ -2787,7 +2787,14 @@ char *spotify_class::get_spotify_desc(int nr) {
   if (nr < antal) return (stack[nr]->feed_desc); else return (NULL);
 }
 
+
+
+// ****************************************************************************************
+//
 // clean up number of created
+//
+// ****************************************************************************************
+
 void spotify_class::clean_spotify_oversigt() {
     startup_loaded=false;
     for(int i=1;i<antal;i++) {
@@ -3642,10 +3649,9 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    printf("Loading texture nr %d for %s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    printf("Loading texture nr %-4d for %40s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
-      //stack[nr]->textureId=LoadImage(stack[nr]->feed_gfx_url);
-      settextureidfile(nr,stack[nr]->feed_gfx_url);
+      if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
     }
     nr++;
   }
@@ -3848,6 +3854,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
