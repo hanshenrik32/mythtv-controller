@@ -94,6 +94,8 @@ extern int orgwinsizey,orgwinsizex;
 extern int _sangley;
 extern int do_show_setup_select_linie;
 extern GLuint _textureIdloading,_textureIdloading1;
+
+extern GLuint spotify_icon_border;
 // stream mask
 extern GLuint onlinestreammask;
 extern GLuint onlinestreammaskicon;		// icon mask on web icon
@@ -712,8 +714,11 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           // set start of items in list
           playlist_process_items=false;
         }
-        if (( playlist_process_image ) && ( depth == 8 ) && ( x == 1 )) {
-          playlist_process_image=false;
+        if ( playlist_process_image ) {
+          printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+          if (( depth == 8 ) && ( x == 1 )) {
+            playlist_process_image=false;
+          }
         }
         // works for songs not playlist
         if (playlist_process_url) {
@@ -769,7 +774,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 // IN use
 // get users play lists
 // write to spotify_users_playlist.json
-// parse user playlist
+//
 //
 // ****************************************************************************************
 
@@ -1222,6 +1227,9 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         // gfx url
         if ( process_image ) {
+
+printf(" Process_image *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
               //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
@@ -1244,7 +1252,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           }
           process_uri=false;
         }
-        if (process_id) {
+        if ( process_id ) {
           // get playlist id
           if ((depth==2) && (x==5)) {
             //printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
@@ -1253,7 +1261,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           }
           process_id=false;
         }
-        if (process_name) {
+        if ( process_name ) {
           // get playlist name OK
           if ((depth==2) && (x==7)) {
             //printf("playlist name %-30s \n",value->u.string.ptr);
@@ -1280,7 +1288,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
               antal++;
               antalplaylists++;
             }
-            if (antalplaylists<maxantal) {
+            if ( antalplaylists<maxantal ) {
               if (!(stack[antal]))  {
                 stack[antal]=new (spotify_oversigt_type);
               }
@@ -3294,6 +3302,12 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       }
       if ( search_process_image ) {
         // get playid
+
+      printf("******************************************************************************* Image process %s \n",value->u.string.ptr);
+
+        if ((depth==1) && (x==1)) {
+          //strcpy(stack[antal-1]->feed_gfx_url,value->u.string.ptr);
+        }
         search_process_image=false;
       }
       if (search_process_href) {
@@ -3861,9 +3875,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         // stream icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBindTexture(GL_TEXTURE_2D,empty_icon);
-        //glBindTexture(GL_TEXTURE_2D,normal_icon);
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        // glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -3874,10 +3887,10 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPushMatrix();
-        /*
         // indsite draw icon
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3889,25 +3902,12 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
           glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+          glTexCoord2f(0, 0); glVertex3f( xof+12, yof+12, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+12,yof+buttonsizey-22, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-12, yof+buttonsizey-22 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-12, yof+12 , 0.0);
         }
         glEnd();
-        // show nyt icon note
-        if (stack[i+sofset]->nyt) {
-          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-          glEnd();
-        }
-        */
         glPopMatrix();
       } else {
         // no draw default icon
@@ -4124,11 +4124,10 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glColor4f(0.8f, 0.8f, 0.8f,1.0f);
       }
       if (stack[i+sofset]->textureId) {
-        // stream icon
+        // border icon
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -4140,7 +4139,8 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glPushMatrix();
         // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -4152,10 +4152,10 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
           glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+          glTexCoord2f(0, 0); glVertex3f( xof+12, yof+12, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+12,yof+buttonsizey-22, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-12, yof+buttonsizey-22 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-12, yof+12 , 0.0);
         }
         glEnd();
         // show nyt icon note
@@ -4182,10 +4182,10 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
           if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
             glBindTexture(GL_TEXTURE_2D,backicon);
           } else {
-            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,empty_icon);
           }
         } else {
-          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,empty_icon);
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

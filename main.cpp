@@ -724,6 +724,7 @@ GLuint _texturesetupfont;                   //
 GLuint _texturekeyssetup;                   //
 GLuint _texturekeysrss;                     //
 GLuint _texturespotify;
+GLuint spotify_icon_border;                 // spotify border icon for spotify icon
 GLuint _texturevideoplayersetup;            //
 GLuint _texturetvgrabersetup;               //
 
@@ -3288,7 +3289,7 @@ void display() {
         if (do_show_spotify_search_oversigt==false) {
           spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
         } else {
-          spotify_oversigt.show_spotify_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+          spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
         }
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
@@ -13511,6 +13512,8 @@ void loadgfx() {
     _tvbar1_1             = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar1_1");
     _tvbar3               = loadgfxfile(temapath,(char *) "images/",(char *) "tvbar3");
 // ************************ radio buttons *******************************
+    spotify_icon_border   = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_icon_border.png");
+
     onlineradio_empty     = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio_empty");
     onlineradio           = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio");
     onlineradio192        = loadgfxfile(temapath,(char *) "images/",(char *) "onlineradio192");
@@ -13671,6 +13674,7 @@ void freegfx() {
     glDeleteTextures( 1, &screenshot10);            // screen shots
     glDeleteTextures( 1, &_tvbar1);                 //
     glDeleteTextures( 1, &_tvbar3);                 //
+    glDeleteTextures( 1, &spotify_icon_border);     // spotify icon border
     glDeleteTextures( 1, &onlineradio_empty);       //
     glDeleteTextures( 1, &onlineradio);		          // radio icon
     glDeleteTextures( 1, &onlineradio192);			    // radio icon
