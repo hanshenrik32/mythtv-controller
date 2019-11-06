@@ -7601,6 +7601,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
             spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
+            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
             //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
@@ -7628,8 +7629,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
+
+
+printf("Loading view......\n");
+
+
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
+            spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+
+
+printf("Done Loading view......\n");
+
             // reset select in spotify view
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
@@ -12822,6 +12833,7 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+      //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       //spotify_oversigt.type=2;
