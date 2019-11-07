@@ -7635,8 +7635,8 @@ printf("Loading view......\n");
 
 
             spotify_oversigt.clean_spotify_oversigt();
-            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3); //type 3 = tracks ()
-            spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
+            spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
 
 
 printf("Done Loading view......\n");
@@ -12833,7 +12833,9 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+
       //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       //spotify_oversigt.type=2;

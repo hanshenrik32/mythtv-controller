@@ -3246,6 +3246,14 @@ void spotify_class::search_process_object(json_value* value, int depth,int art) 
 }
 
 
+
+// ****************************************************************************************
+//
+// json parser
+//
+// ****************************************************************************************
+
+
 void spotify_class::search_process_array(json_value* value, int depth,int art) {
   int length, x;
   if (value == NULL) {
@@ -3267,6 +3275,8 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
 
 void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
   char artisid[1024];
+  char filename[2048];
+  char downloadfilenamelong[2048];
   int j;
   if (value == NULL) return;
   if (value->type != json_object) {
@@ -3302,37 +3312,40 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       if (search_process_tracks) {
         search_process_tracks=false;
       }
-
       if ( search_process_image ) {
         // get playid
-        /*
-        char filename[2048];
-        char downloadfilenamelong[2048];
         if ((depth==10)  && (x==1)) {
-          //printf("******************************************************************************* Image process %s \n",value->u.string.ptr);
-          if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
-          strcpy(downloadfilenamelong,"");
-          // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
-          // get name from url
-          if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
-            strcpy(filename,value->u.string.ptr+24);
-            if (strcmp(value->u.string.ptr,"")) {
-              strcpy(downloadfilenamelong,"tmp/");
-              strcat(downloadfilenamelong,filename);
-              strcat(downloadfilenamelong,".jpg");
-              // save name to db to next time
-              strcpy(stack[antal]->feed_gfx_url,downloadfilenamelong);
-              if (!(file_exists(downloadfilenamelong))) {
-                // download icon image
-                get_webfile2(value->u.string.ptr,downloadfilenamelong);
+          //printf("antal = %d ******************************************************************************* Image process %s \n",antal,value->u.string.ptr);
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
+            stack[antal]->textureId=0;
+            strcpy(downloadfilenamelong,"");
+            // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
+            // get name from url
+            printf(" # %d url found  : %s ",antal,value->u.string.ptr);
+            if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
+              strcpy(filename,value->u.string.ptr+24);
+              if (strcmp(value->u.string.ptr,"")) {
+                strcpy(downloadfilenamelong,"tmp/");
+                strcat(downloadfilenamelong,filename);
+                strcat(downloadfilenamelong,".jpg");
+                // save name to db to next time
+                strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                if (!(file_exists(downloadfilenamelong))) {
+                  // download icon image
+                  get_webfile2(value->u.string.ptr,downloadfilenamelong);
+                }
               }
             }
+            printf(" gfx disk file %s  \n",stack[antal]->feed_gfx_url);
           }
         }
-        */
+
+        if ((depth==1) && (x==1)) {
+          //strcpy(stack[antal-1]->feed_gfx_url,value->u.string.ptr);
+        }
         search_process_image=false;
       }
-
       if (search_process_href) {
         search_process_href=false;
       }
@@ -3357,18 +3370,15 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       if ((art==0) || (art==1)) {
         // get name
         if ((search_process_name) && (depth==7) && (x==6)) {
-          if (antal==0) {
-            stack[antal]=new (spotify_oversigt_type);
-          }
           if (antalplaylists<maxantal) {
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("# %d Artist name found : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+            printf("# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
             stack[antal]->type=2;                                            // set type artist
             antal++;
             antalplaylists++;
@@ -3695,10 +3705,10 @@ int spotify_class::load_spotify_iconoversigt() {
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
   char homedir[200];
-  this->gfx_loaded=false;
-  if (debugmode & 4) printf(" start.\n");
+  this->gfx_loaded=false;                                                           // set loaded flag to false
+  if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    printf("Loading texture nr %-4d for %40s url = %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    if (debugmode & 4) printf("Loading texture nr %-4d for %40s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
     }
@@ -4146,6 +4156,9 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         buttonsizey=180.0f;
         glColor4f(0.8f, 0.8f, 0.8f,1.0f);
       }
+
+      //printf("nr %d feed gfx url : %s \n",i+sofset,stack[i+sofset]->feed_gfx_url);
+
       if (stack[i+sofset]->textureId) {
         // border icon
         glEnable(GL_TEXTURE_2D);
