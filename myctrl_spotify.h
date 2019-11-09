@@ -11,6 +11,9 @@
 #include "mongoose-master/mongoose.h"
 
 
+const int playlisttype=0;                         // playlist type
+const int songlisttype=1;                         // song list type
+
 //
 // device struct
 //
