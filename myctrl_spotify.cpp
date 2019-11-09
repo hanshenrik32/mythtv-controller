@@ -587,6 +587,10 @@ void spotify_class::playlist_print_depth_shift(int depth) {
   }
 }
 
+
+// * Default view ***********************************************************************************************************************************************
+
+
 // ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
@@ -715,14 +719,15 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           playlist_process_items=false;
         }
         if ( playlist_process_image ) {
-          printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+          //printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
           if (( depth == 8 ) && ( x == 1 )) {
-            playlist_process_image=false;
           }
+          playlist_process_image=false;
         }
         // works for songs not playlist
         if (playlist_process_url) {
-          printf("Song gfx icon found = %s \n", value->u.string.ptr);
+          //printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+          //printf("Song gfx icon found = %s \n", value->u.string.ptr);
           strcpy(filename,"");
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
@@ -733,10 +738,6 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           }
           strcpy(playlistgfx,downloadfilenamelong);
           playlist_process_url=false;
-        }
-        if (playlist_process_name) {
-          //printf("x = %2d deep=%2d ",x,depth);
-          //printf(" string = %10s \n ",value->u.string.ptr);
         }
         // get playlist name
         // and create datdabase record playlist info record
@@ -754,6 +755,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           }
           // if not exist create playlist
           if (!(playlistexist)) {
+            printf("Song name insert : %s \n", playlistname );
             sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
@@ -943,6 +945,7 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
 //
 // Get users playlist
 // IN use
+// The default view
 //
 // ****************************************************************************************
 
@@ -1008,18 +1011,12 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
     // download all playlist (name + id) in one big file NOT songs
     if (strcmp(spotifytoken,"")!=0) {
       // 50 is the max
-
-
       //download_user_playlist(spotifytoken,startoffset);
-
-
       sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
       curl_error=system(doget);
       if (curl_error!=0) {
         fprintf(stderr,"Curl error get user playlists\n");
       }
-
-
       // get info about file
       stat("spotify_users_playlist.json", &filestatus);                             // get file info
       file_size = filestatus.st_size;                                               // get filesize
@@ -1063,6 +1060,8 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   }
   return(1);
 }
+
+// songs ********************************************************************************************************************************
 
 
 // ****************************************************************************************
@@ -1482,6 +1481,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       while(tt<antalplaylists) {
         if (stack[tt]) {
           if (debugmode & 4) printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
+          // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
             strcpy(downloadfilenamelong,"tmp/");
@@ -2857,6 +2857,7 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 // ****************************************************************************************
 //
 // opdate show liste in view (det vi ser)
+// loaded from db
 //
 // ****************************************************************************************
 //
@@ -2901,7 +2902,8 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
         while ((row = mysql_fetch_row(res)) != NULL) dbexist=true;
       }
     }
-    clean_spotify_oversigt();                                                   // clean old list
+    // clear old view
+    clean_spotify_oversigt();
     strcpy(lasttmpfilename,"");
     if (debugmode & 4) {
       fprintf(stderr,"loading spotify data.\n");
@@ -2947,7 +2949,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               stack[antal]->nyt=false;
               stack[antal]->type=0;
               // top level (load playlist)
-              if (getart == 0) {
+              if (getart == playlisttype ) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
                 if (row[1]) {
@@ -2957,13 +2959,13 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                     strcat(downloadfilenamelong,downloadfilename);
                     strcat(downloadfilenamelong,".jpg");
                     // download file
-                    if (!(file_exists(downloadfilename))) {
+                    if (!(file_exists(downloadfilenamelong))) {
                       get_webfile2(row[1],downloadfilenamelong);                // download file
                     } else strcpy(downloadfilenamelong,row[1]);                 // no file name
                   } else strcpy(downloadfilenamelong,row[1]);
                   strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
                 }
-                strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
+                strncpy(stack[antal]->playlistid,row[2],spotify_namelength);    //
 
                 /*
                 strncpy(downloadfilenamelong,row[2],spotify_pathlength);
@@ -3007,7 +3009,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 antal++;
               }
               // load playlist songs
-              if (getart == 1) {
+              if (getart == songlisttype ) {
                 // First create the back button
                 if (antal == 0) {
                   strcpy(stack[antal]->feed_showtxt,"Back");
@@ -3090,7 +3092,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
     }
     clean_spotify_oversigt();                                                   // clean old list
     // find records after type (0 = root, else = refid)
-    if (type == 0) {
+    if (type == playlisttype ) {
       sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist where playlistname like '");
       strcat(sqlselect,"%");
       strcat(sqlselect,keybuffer);
@@ -3121,7 +3123,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
             stack[antal]->feed_path_antal=0;
             stack[antal]->textureId=0;
             stack[antal]->nyt=false;
-            if (getart == 0) {
+            if (getart == playlisttype ) {
               stack[antal]->type=0;
               if (antal == 0) {
                 strcpy(stack[antal]->feed_showtxt,"Back");
@@ -3149,7 +3151,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               }
               antal++;
             }
-            if (getart == 1) {
+            if (getart == songlisttype ) {
               stack[antal]->type=1;
               if (antal == 0) {
                 strcpy(stack[antal]->feed_showtxt,"Back");
@@ -3268,7 +3270,7 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
 
 // ****************************************************************************************
 //
-// json parser start call function for process playlist/song search
+// json parser start call function for process playlist songs
 // do the data progcessing from json
 //
 // ****************************************************************************************
@@ -3608,15 +3610,18 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     printf("call= %s \n",call);
     return 1;
   }
+  // get file info
   stat("spotify_search_result.json", &filestatus);                              // get file info
   file_size = filestatus.st_size;                                               // get filesize
   file_contents = (char*) malloc(filestatus.st_size);
   json_file = fopen("spotify_search_result.json", "rt");
+  // if filesize is 0 drop
   if (json_file == NULL) {
     fprintf(stderr, "Unable to open spotify_search_result.json\n");
     free(file_contents);                                                        //
     return 1;
   }
+  // if unable to read file
   if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
     fprintf(stderr, "Unable to read spotify spotify_search_result content of spotify_search_result.json\n");
     fclose(json_file);

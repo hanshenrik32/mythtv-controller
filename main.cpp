@@ -6399,10 +6399,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           strcpy(spotify_oversigt.overview_show_band_name,"");
           if (do_show_spotify_search_oversigt==true) {
             do_show_spotify_search_oversigt=false;
-            spotify_oversigt_loaded_begin=true;
+            spotify_oversigt_loaded_begin=true;                                 //
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
             spotify_oversigt.load_spotify_iconoversigt();                       // update icons
-            spotify_oversigt_loaded_begin=false;
+            spotify_oversigt_loaded_begin=false;                                //
           } else {
             do_show_spotify_search_oversigt=true;
           }
@@ -12768,6 +12768,7 @@ void *webupdate_loader_spotify(void *data) {
   spotify_oversigt.set_spotify_update_flag(true);
   if (spotify_oversigt.spotify_get_user_id()) {
     // add default playlists from spotify
+    /*
     spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
@@ -12783,6 +12784,7 @@ void *webupdate_loader_spotify(void *data) {
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
+    */
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
     spotify_oversigt.spotify_get_user_playlists(true,0);                      // get 50 first playlist and update db (force update)
     spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
