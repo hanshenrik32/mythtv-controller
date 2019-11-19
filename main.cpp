@@ -9570,11 +9570,11 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case '*':
               if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;                                  // set update flag
-              if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover; // show/hide music info
-              if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;             // show/hide music info
-              if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
-              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
-              if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
+              else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover; // show/hide music info
+              else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;             // show/hide music info
+              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;
+              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
+              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
@@ -12793,7 +12793,7 @@ void *webupdate_loader_spotify(void *data) {
     spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
     // update view from db
     spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
-    spotify_oversigt.load_spotify_iconoversigt();                             // load icons
+    //spotify_oversigt.load_spotify_iconoversigt();                             // load icons
   }
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;
@@ -12952,6 +12952,7 @@ void *update_spotify_phread_loader() {
 // ****************************************************************************************
 //
 // Spotify db update online from spotify (by userid(token))
+// used by first time update of * key
 //
 // ****************************************************************************************
 

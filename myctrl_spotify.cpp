@@ -553,24 +553,6 @@ void spotify_class::spotify_set_token(char *token,char *refresh) {
 }
 
 
-// ****************************************************************************************
-// NOT in use
-// Get a List of a User's Playlists
-// get only the id of playlists (not songs)
-//
-// ****************************************************************************************
-
-int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
-  int curl_error;
-  char doget[2048];
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotifytoken);
-    //printf("doget = %s \n",doget);
-    //system(doget);
-    if (WEXITSTATUS(curl_error)==0) {
-    }
-  }
-}
 
 
 // ****************************************************************************************
@@ -732,7 +714,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
           if (strcmp(filename,"")!=0) {
-            strcpy(downloadfilenamelong,"tmp/");
+            strcpy(downloadfilenamelong,"spotify_gfx/");
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
           }
@@ -1228,7 +1210,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         // gfx url
         if ( process_image ) {
 
-printf(" Process_image *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
 
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
@@ -1360,9 +1342,10 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   struct curl_slist *chunk = NULL;
   FILE *out_file;
   bool do_curl=true;
-  // create dir for json files
+  // create dir for json files and icon files downloaded
   if (!(file_exists("json"))) {
     system("/bin/mkdir json");
+    system("/bin/mkdir spotify_gfx");
   }
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
@@ -1484,7 +1467,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            strcpy(downloadfilenamelong,"tmp/");
+            strcpy(downloadfilenamelong,"spotify_gfx/");
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
             if (!(file_exists(downloadfilenamelong))) {
@@ -1865,8 +1848,8 @@ int spotify_class::spotify_do_we_play2() {
           if (aktiv_song_spotify_icon==0) {
             strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"https:");
             strcat(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,file_contents+10);
-            //get_webfile2(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"/tmp/gfx_icon.jpg");
-            //aktiv_song_spotify_icon=loadTexture("/tmp/gfx_icon.jpg");
+            //get_webfile2(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"/spotify_gfx/gfx_icon.jpg");
+            //aktiv_song_spotify_icon=loadTexture("/spotify_gfx/gfx_icon.jpg");
           }
         }
       }
@@ -2955,7 +2938,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (row[1]) {
                   if (strncmp(row[1],"http",4)==0) {
                     get_webfilename(downloadfilename,row[1]);
-                    strcpy(downloadfilenamelong,"tmp/");
+                    strcpy(downloadfilenamelong,"spotify_gfx/");
                     strcat(downloadfilenamelong,downloadfilename);
                     strcat(downloadfilenamelong,".jpg");
                     // download file
@@ -2981,7 +2964,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (row[1]) {
                   get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
                   getuserhomedir(downloadfilenamelong);
-                  strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+                  strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.38/spotify_gfx/");
                   strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
                   strcat(downloadfilenamelong,".jpg");
                   if (!(file_exists(downloadfilenamelong))) {
@@ -3140,7 +3123,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              strcpy(downloadfilenamelong,"tmp/");
+              strcpy(downloadfilenamelong,"spotify_gfx/");
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
               strcat(downloadfilenamelong,".jpg");
               if (file_exists(downloadfilenamelong)) {
@@ -3328,7 +3311,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
-                strcpy(downloadfilenamelong,"tmp/");
+                strcpy(downloadfilenamelong,"spotify_gfx/");
                 strcat(downloadfilenamelong,filename);
                 strcat(downloadfilenamelong,".jpg");
                 // save name to db to next time

@@ -123,19 +123,6 @@ class spotify_class : vlc_controller {
         char spotify_client_id[255];                                            // Client id
         char spotify_secret_id[255];                                            // Secret id
         GLuint aktiv_song_spotify_icon;                                         // loaded gfx info for playing
-        void spotify_set_token(char *token,char *refresh);
-        char *spotify_get_token() { return(spotifytoken); };
-        int spotify_refresh_token();                                            // refresh token on postify api
-        int spotify_refresh_token2();                                            // refresh token on postify api 2
-        int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
-        int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
-        char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };                       //
-        char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
-        char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };            //
-        char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
-        char *get_active_spotify_device_name();                                 //
-        char *get_device_id(int nr) { return(spotify_device[nr].id); };         // get active dev id
-        char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int active_spotify_device;                                              // active device then get spotify devices or -1
         int active_default_play_device;                                         // active device or -1
         char active_default_play_device_name[256];                              // active device name
@@ -158,6 +145,20 @@ class spotify_class : vlc_controller {
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
         int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
         bool gfx_loaded;			        // get artis
+        // in use
+        void spotify_set_token(char *token,char *refresh);
+        char *spotify_get_token() { return(spotifytoken); };
+        int spotify_refresh_token();                                            // refresh token on postify api
+        int spotify_refresh_token2();                                            // refresh token on postify api 2
+        int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
+        int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
+        char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };                       //
+        char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
+        char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };            //
+        char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };   // get active dev id
+        char *get_active_spotify_device_name();                                 //
+        char *get_device_id(int nr) { return(spotify_device[nr].id); };         // get active dev id
+        char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int get_spotify_intnr(int nr);                                          //
         char *get_spotify_playlistid(int nr);                                   // get id to play
         char *get_spotify_name(int nr);                                         // get record name
@@ -165,20 +166,16 @@ class spotify_class : vlc_controller {
         char *get_spotify_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
         char *get_spotify_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
         char *get_spotify_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
-        //char *get_spotify_albumname(int nr) { if ( nr < antal ) return(stack[nr]->album_name); else return(0); }
         int get_spotify_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_spotify_streams() { return antalplaylists; };
         spotify_class();
         ~spotify_class();
-        int streamantal() { return(antal-1); }
-        void clean_spotify_oversigt();
-        int spotify_req_playlist();
-        // spotify_get_list_of_users_playlists NOT in use
-        int spotify_get_list_of_users_playlists(char *client_id);               // Get a List of a User's Playlists
-        // in use
+        int streamantal() { return(antal-1); }                                  //
+        void clean_spotify_oversigt();                                          // clear list
+        int spotify_req_playlist();                                             //
         int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
-        int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);             // get playlist + songs and update db
+        int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist + songs and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist
@@ -189,20 +186,20 @@ class spotify_class : vlc_controller {
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
-        int spotify_do_we_play2();                                               // Do we play song now
+        int spotify_do_we_play2();                                              // Do we play song now
         int spotify_pause_play();                                               // Pause
-        int spotify_pause_play2();                                                // Pause
+        int spotify_pause_play2();                                              // Pause
         int spotify_resume_play();                                              // resume play
         int spotify_last_play();                                                // play last song
-        int spotify_last_play2();                                                // new play last song
+        int spotify_last_play2();                                               // new play last song
         int spotify_next_play();                                                // play next song
-        int spotify_next_play2();                                                // play next song
+        int spotify_next_play2();                                               // play next song
         void select_device_to_play();                                           // show device list to play on
         void set_default_device_to_play(int nr);                                // set default device list to play on
         void show_setup_spotify();                                              //
-        int opdatere_spotify_oversigt(char *refid);
-        int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);
-        int opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type);
+        int opdatere_spotify_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
+        int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);        // search in db
+        int opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type); // search online
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
