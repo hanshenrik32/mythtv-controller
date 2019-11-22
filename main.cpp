@@ -8047,6 +8047,9 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                   if (stream_select_iconnr>0) stream_select_iconnr--;
+
+                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
+
                 }
                 //printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
                 // if indside tv overoview
@@ -8134,15 +8137,24 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 // podcast
                 if ((vis_stream_oversigt)  && (stream_select_iconnr<streamoversigt.streamantal()-1)) {
+                  // er vi på første skærm ingen scroll
+                  // så scroll
                   if ((stream_key_selected % (snumbersoficonline*6)==0) || ((stream_select_iconnr==19) && (stream_key_selected % snumbersoficonline==0))) {
-                    _sangley+=RADIO_CS;
-                    stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
-                    stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
+                    // ikke max
+                    if ((stream_select_iconnr+1)<streamoversigt.streamantal()) {
+                      _sangley+=RADIO_CS;
+                      stream_key_selected-=snumbersoficonline;	// den viste på skærm af 1 til 20
+                      stream_select_iconnr++;			// den rigtige valgte af 1 til stream antal
+                    }
                   } else {
                     if (stream_select_iconnr<streamoversigt.streamantal()) stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
                   }
-                  if (stream_select_iconnr<streamoversigt.streamantal()) stream_key_selected++;
+                  if ((stream_select_iconnr)<streamoversigt.streamantal()) stream_key_selected++;
+
+                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
+
                 }
+
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   if (tvvisvalgtnrtype==1) {
@@ -8237,15 +8249,20 @@ void handlespeckeypress(int key,int x,int y) {
                 // show radio options
                 if ((vis_radio_oversigt) && (show_radio_options)) radiooversigt.nextradiooptselect();
                 // stream
+                // stream_select_iconnr = the real nr in the array
+                // stream_key_selected = the number on the screen
                 if ((vis_stream_oversigt) && (show_stream_options==false) && (stream_select_iconnr+snumbersoficonline<streamoversigt.streamantal())) {
                   if (stream_key_selected>=(snumbersoficonline*5)) {
                     if ((stream_key_selected+((_sangley/RADIO_CS)*snumbersoficonline))<streamoversigt.streamantal()) _sangley+=RADIO_CS;
                   } else {
-                    if ((stream_key_selected+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
+                    if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_key_selected+=snumbersoficonline;
                   }
-                  if (stream_select_iconnr>0) {
+                  if (stream_select_iconnr>=0) {
                     if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
                   }
+
+                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
+
                 }
                 // recorded tv
                 if (vis_recorded_oversigt) {
@@ -8433,6 +8450,9 @@ void handlespeckeypress(int key,int x,int y) {
                     if (snumbersoficonline<0) snumbersoficonline=0;
                     if (_sangley<0) _sangley=0;
                   }
+
+                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
+
                 }
                 //
                 if (vis_recorded_oversigt) {
