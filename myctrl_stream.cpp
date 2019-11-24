@@ -3226,15 +3226,15 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 if (row[0]) stack[antal]->feed_group_antal=get_podcasttype_antal(row[0]);        // get antal
                 else stack[antal]->feed_group_antal=0;
                 if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                if (row[7]) strncat(tmpfilename,row[7],20);                                     //
-                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		      // icon file
+                if (row[7]) strncat(tmpfilename,row[7],20);                                     // get image path
+                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		      // icon file URL
                 if (row[9]) strcpy(tmpfilename,row[9]);
-                get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                get_webfilenamelong(downloadfilename,tmpfilename);                              // get file name from url
                 // check filename
                 strcpy(downloadfilename1,downloadfilename);                 // back name before change
                 int mmm=0;
                 while(mmm<strlen(downloadfilename)) {
-                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
                   mmm++;
                 }
                 getuserhomedir(homedir);                                                  // get homedir
@@ -3242,8 +3242,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,"/rss/images/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
-                  if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   // download gfx file and use as icon
+                  if (debugmode & 4) printf("Loading1 image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
@@ -3311,7 +3311,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     strcpy(downloadfilename1,downloadfilename);                 // back name before change
                     int mmm=0;
                     while(mmm<strlen(downloadfilename)) {
-                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
                       mmm++;
                     }
                     strcpy(lasttmpfilename,tmpfilename);			              // husk file name
@@ -3321,7 +3321,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Loading image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                      if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
                       // download gfx file and use as icon
                       if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                         printf("Download error \n");
@@ -3507,7 +3507,7 @@ void *load_all_stream_gfx(void *data) {
                   if (strncmp(tmpfilename,"http://",7)==0) {
                     strcpy(lastfile,downloadfilename);
                     get_webfilename(downloadfilename,tmpfilename);
-                    getuserhomedir(homedir);
+                    getuserhomedir(homedir);                                                  // get home dir
                     strcpy(downloadfilenamelong,homedir);
                     strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
@@ -3525,7 +3525,7 @@ void *load_all_stream_gfx(void *data) {
                     strcpy(lastfile,downloadfilename);
                     get_webfilename(downloadfilename,tmpfilename);
                     getuserhomedir(homedir);
-                    strcpy(downloadfilenamelong,homedir);
+                    strcpy(downloadfilenamelong,homedir);                                   // get home dir
                     strcat(downloadfilenamelong,"/rss/images/");
                     strcat(downloadfilenamelong,downloadfilename);
                     filechange=strcmp(lastfile,downloadfilename);
