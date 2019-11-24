@@ -6235,7 +6235,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
           if (do_show_setup_font) {
-            fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
+            if (debugmode) fprintf(stderr,"Set aktiv font to '%s' \n",aktivfont.typeinfo[setupfontselectofset].fontname);
             strcpy(configfontname,aktivfont.typeinfo[setupfontselectofset].fontname);
             aktivfont.selectfont(aktivfont.typeinfo[setupfontselectofset].fontname);
             do_show_setup_font = false;
@@ -6254,7 +6254,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if (tema>TEMA_ANTAL) tema = 1;
           fundet = true;
         }
-        // test for rss
+        // test for rss setup
         if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
           do_show_setup_sound = false;
           do_show_setup_sql = false;
@@ -6271,7 +6271,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
 
-        // test for rss
+        // test for spotify setup
         if (((GLubyte) names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
           do_show_setup_sound = false;
           do_show_setup_sql = false;
@@ -6287,6 +6287,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_setup_spotify = true;
           fundet = true;
         }
+        //
         if ((GLubyte) names[i*4+3]==45) {
           fundet = true;
           fprintf(stderr,"45 Button pressed \n");
@@ -6450,13 +6451,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // scroll up
           if ((GLubyte) names[i*4+3]==24) {
-            fprintf(stderr,"scroll up\n");
+            if (debugmode & 8) fprintf(stderr,"scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
           // close window
           if ((GLubyte) names[i*4+3]==27) {
-            fprintf(stderr,"Close movie info\n");
+            if (debugmode & 8) fprintf(stderr,"Close movie info\n");
             returnfunc = 2;
             do_zoom_film_cover = false;
             fundet = true;
@@ -6618,45 +6619,45 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // play playlist icon select (20) type 0
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
-              fprintf(stderr,"play spotify playlist.\n");
+              if (debugmode) fprintf(stderr,"play spotify playlist.\n");
               do_select_device_to_play=true;
               returnfunc = 4;
               fundet = true;
             }
             // play song icon select (20) type 1
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
-              fprintf(stderr,"play spotify song.\n");
+              if (debugmode) fprintf(stderr,"play spotify song.\n");
               do_select_device_to_play=true;
               returnfunc = 5;
               fundet = true;
             }
             // open
             if ((GLubyte) names[i*4+3]==21) {
-              fprintf(stderr,"open spotify playlist\n");
+              if (debugmode) fprintf(stderr,"open spotify playlist\n");
               returnfunc = 3;
               fundet = true;
             }
             // Stop play
             if ((GLubyte) names[i*4+3]==9) {
-              fprintf(stderr,"(Spotify) Stop play\n");
+              if (debugmode) fprintf(stderr,"(Spotify) Stop play\n");
               returnfunc = 5;                                                       //
               fundet = true;
             }
             // Next
             if ((GLubyte) names[i*4+3]==11) {
-              fprintf(stderr,"(Spotify) Next song\n");
+              if (debugmode) fprintf(stderr,"(Spotify) Next song\n");
               returnfunc = 6;                                                       //
               fundet = true;
             }
             // last
             if ((GLubyte) names[i*4+3]==10) {
-              fprintf(stderr,"(Spotify) last song\n");
+              if (debugmode) fprintf(stderr,"(Spotify) last song\n");
               returnfunc = 7;                                                       //
               fundet = true;
             }
             //  scroll down
             if ((GLubyte) names[i*4+3]==24) {
-              fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+              if (debugmode) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
               // move playlists down
               if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
               returnfunc = 1;
@@ -6704,7 +6705,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
           }
-          printf("spotifyknapnr %d type=%d fundet %d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr),fundet);
+          if (debugmode) printf("spotifyknapnr %d type=%d fundet %d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr),fundet);
           // back button
 
           // works ok
@@ -7220,11 +7221,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (vis_spotify_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d\n",spotifyknapnr-1);
                 }
-                if (debugmode & 4) {
-                  if (vis_stream_oversigt) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
+                if (vis_stream_oversigt) {
+                  if (debugmode & 4) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
                 }
-                if (debugmode & 8) {
-                  if (vis_tv_oversigt) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
+                if (vis_tv_oversigt) {
+                  if (debugmode & 8) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
                 }
                 // any music buttons active
                 if ((mknapnr>0) && (vis_music_oversigt)) {
@@ -8047,11 +8048,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                   if (stream_select_iconnr>0) stream_select_iconnr--;
-
-                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
-
                 }
-                //printf("stream_select_iconnr=%d stream_key_selected=%d \n",stream_select_iconnr,stream_key_selected);
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   if ((tvvisvalgtnrtype==1) && (tvvalgtrecordnr>0)) {
@@ -8150,11 +8147,7 @@ void handlespeckeypress(int key,int x,int y) {
                     if (stream_select_iconnr<streamoversigt.streamantal()) stream_select_iconnr++;			// den rigtige valgte af 1 til cd antal
                   }
                   if ((stream_select_iconnr)<streamoversigt.streamantal()) stream_key_selected++;
-
-                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
-
                 }
-
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
                   if (tvvisvalgtnrtype==1) {
@@ -8260,9 +8253,6 @@ void handlespeckeypress(int key,int x,int y) {
                   if (stream_select_iconnr>=0) {
                     if ((stream_select_iconnr+snumbersoficonline)<streamoversigt.streamantal()) stream_select_iconnr+=snumbersoficonline;
                   }
-
-                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
-
                 }
                 // recorded tv
                 if (vis_recorded_oversigt) {
@@ -8450,9 +8440,6 @@ void handlespeckeypress(int key,int x,int y) {
                     if (snumbersoficonline<0) snumbersoficonline=0;
                     if (_sangley<0) _sangley=0;
                   }
-
-                  printf("antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
-
                 }
                 //
                 if (vis_recorded_oversigt) {
@@ -8748,6 +8735,7 @@ void handlespeckeypress(int key,int x,int y) {
       if (vis_tv_oversigt) fprintf(stderr,"tvvalgtrecordnr %2d tvsubvalgtrecordnr %2d antal kanler %2d kl %2d \n",tvvalgtrecordnr,tvsubvalgtrecordnr,aktiv_tv_oversigt.tv_kanal_antal(),aktiv_tv_oversigt.vistvguidekl);
       if (show_setup_rss) fprintf(stderr,"Antal %d realrssrecordnr %d \n ",streamoversigt.antalstreams(),realrssrecordnr);
       if (vis_spotify_oversigt) fprintf(stderr,"Spotify_key_selected = %d  spotify_select_iconnr = %d spotifyoversigt_antal= \n ",spotify_key_selected,spotify_select_iconnr);
+      if (vis_stream_oversigt) fprintf(stderr,"antal %d selected stream_select_iconnr %d stream_key_selected %d \n",streamoversigt.streamantal(),stream_select_iconnr ,stream_key_selected);
     }
 }
 
