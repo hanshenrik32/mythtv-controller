@@ -3152,7 +3152,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // Sonic Erotica.com &#8211; Free Erotic Audio &#187; Podcast Feed
+      // Sonic Erotica.com - Free Erotic Audio &#187; Podcast Feed
       if (check_rss_feed_exist(conn,(char *) "Sonic Erotica.com &#8211; Free Erotic Audio &#187; Podcast Feed")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Sonic Erotica.com &#8211; Free Erotic Audio &#187; Podcast Feed',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
