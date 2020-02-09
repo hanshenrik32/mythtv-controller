@@ -3251,6 +3251,7 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
   }
 }
 
+
 // ****************************************************************************************
 //
 // json parser start call function for process playlist songs
