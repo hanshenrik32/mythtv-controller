@@ -9585,7 +9585,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                    // show/hide music info
               else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;           // film
               else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
-              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                   // tv oversigt 
+              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                   // tv oversigt
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
@@ -12781,28 +12781,30 @@ void *webupdate_loader_spotify(void *data) {
   if (spotify_oversigt.spotify_get_user_id()) {
     // add default playlists from spotify
     spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX3vtL4IVzCCi",1,1);        //
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-    spotify_oversigt.spotify_get_user_playlists(true,0);                      // get 50 first playlist and update db (force update)
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf
-    spotify_oversigt.spotify_get_user_playlists(true,50);                     // get next 50 playlists and update db (force update)
-    spotify_oversigt.clean_spotify_oversigt();                                // clear old stuf again
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+    spotify_oversigt.spotify_get_user_playlists(true,0);                        // get 50 first playlist and update db (force update)
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+    spotify_oversigt.spotify_get_user_playlists(true,50);                       // get next 50 playlists and update db (force update)
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf again
+    spotify_oversigt.spotify_get_user_playlists(true,100);                      // get next 50 playlists and update db (force update)
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf again
     spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
     // update view from db
-    spotify_oversigt.opdatere_spotify_oversigt(0);                            // reset spotify overview to default
+    spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
     //spotify_oversigt.load_spotify_iconoversigt();                             // load icons
   }
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");

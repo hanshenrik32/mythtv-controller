@@ -1024,6 +1024,9 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       json_value_free(value);                                                       // json clean up
       free(file_contents);                                                          // free memory again
       // save data to mysql db
+    } else {
+        printf("Error downloading user playlist");
+        exit(0);
     }
     sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
     printf("process playlist ...... \n");
