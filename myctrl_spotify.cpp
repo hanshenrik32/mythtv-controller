@@ -998,6 +998,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       curl_error=system(doget);
       if (curl_error!=0) {
         fprintf(stderr,"Curl error get user playlists\n");
+        exit(0);
       }
       // get info about file
       stat("spotify_users_playlist.json", &filestatus);                             // get file info
@@ -1213,7 +1214,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         // gfx url
         if ( process_image ) {
 
-printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
+          //printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
 
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
@@ -1305,7 +1306,7 @@ printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  ***
 // work
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
-// and update db from that file
+// and update db from that file all the songs in playlist
 //
 // ****************************************************************************************
 
