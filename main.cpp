@@ -12788,6 +12788,8 @@ void *webupdate_loader_spotify(void *data) {
     spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("4azabxHM2cqBEhjUD3fVJB",1,1);        // abc playlist
     spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+    spotify_oversigt.spotify_get_playlist("aMMNtENrSYGiyzBnPkPv3A",1,1);        // abc2 playlist
+    spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DWVlLVXKTOAYa",1,1);        // Pop Right now playlist
     spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
     spotify_oversigt.spotify_get_playlist("37i9dQZF1DX4fVvlZqxV8x",1,1);        // Sommerhits
