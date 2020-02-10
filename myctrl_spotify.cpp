@@ -1349,6 +1349,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   // create dir for json files and icon files downloaded
   if (!(file_exists("json"))) {
     system("/bin/mkdir json");
+  }
+  if (!(file_exists("spotify_gfx"))) {
     system("/bin/mkdir spotify_gfx");
   }
   if ((!(file_exists(playlistfilename))) || (force))  {
@@ -1397,6 +1399,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         }
       }
     }
+    /*
     stat(playlistfilename, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
     file_contents = (char*) malloc(filestatus.st_size);
@@ -1419,7 +1422,23 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
     process_value_playlist(value, 0,0);                                           // fill stack array
     json_value_free(value);                                                       // json clean up
     free(file_contents);                                                          //
+    */
     // save data to mysql db
+
+    system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
+    stat("spotify_users_playlist.txt", &filestatus);                                          // get file info
+    file_size = filestatus.st_size;                                               // get filesize
+    file_contents = (char*) malloc(filestatus.st_size);
+    json_file = fopen("spotify_users_playlist.txt", "rt");
+    if (json_file) {
+      while(!(feof(json_file))) {
+        fscanf(json_file, "%[^\n]", file_contents);
+        spotify_oversigt.spotify_get_playlist(file_contents,1,1);
+        spotify_oversigt.clean_spotify_oversigt();
+      }
+      fclose(json_file);
+    }
+
     conn = mysql_init(NULL);
     // Connect to database
     if (conn) {
