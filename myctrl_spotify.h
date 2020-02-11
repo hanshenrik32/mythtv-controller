@@ -112,6 +112,7 @@ class spotify_class : vlc_controller {
         int get_search_result_online(char *searchstring,int type);
         int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
     public:
+        int loaded_antal;                                                       // antal loaded i loader
         void settextureidfile(int nr,char *filename);
         void set_spotify_update_flag(bool flag);
         bool get_spotify_update_flag();
