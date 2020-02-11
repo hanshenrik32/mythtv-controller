@@ -1032,20 +1032,20 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
       stat("spotify_users_playlist.txt", &filestatus);                              // get file info
       file_size = filestatus.st_size;                                               // get filesize
-      file_contents = (char*) malloc(filestatus.st_size);
-      json_file = fopen("spotify_users_playlist.txt", "r");
-      if (json_file) {
-        while(!(feof(json_file))) {
-          fscanf(json_file, "%s", file_contents);
-          spotify_oversigt.spotify_get_playlist(file_contents,1,1);
-          spotify_oversigt.clean_spotify_oversigt();
+      if (file_size>0) {
+        file_contents = (char*) malloc(filestatus.st_size);                           // get some work mem
+        json_file = fopen("spotify_users_playlist.txt", "r");
+        if (json_file) {
+          while(!(feof(json_file))) {
+            fscanf(json_file, "%s", file_contents);
+            spotify_oversigt.spotify_get_playlist(file_contents,1,1);
+            spotify_oversigt.clean_spotify_oversigt();
+          }
+          fclose(json_file);
         }
-        fclose(json_file);
+        if (file_contents) free(file_contents);                                                          // free memory again
       }
-      if (file_contents) free(file_contents);                                                          // free memory again
-
-
-
+      if (remove("spotify_users_playlist.txt")!=0) printf("Error remove user playlist file spotify_users_playlist.txt\n");
       // save data to mysql db
     } else {
         printf("Error downloading user playlist");
