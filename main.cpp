@@ -5777,6 +5777,16 @@ void display() {
         xx = (float) y*18;
         if (y > 0.0f) valgtnr = 4;
       } else y=0;
+
+      if (spotify_oversigt.get_spotify_update_flag()) {
+        printf("******************** spotify_oversigt.loaded_antal=%d                \n",spotify_oversigt.loaded_antal);
+        y = (float) spotify_oversigt.loaded_antal/50;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
+        xx = (float) y*17;
+        valgtnr=6;
+      } else y=0;
+
+      if (valgtnr==0) xx=0;
+
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
@@ -5790,21 +5800,6 @@ void display() {
       //static int spotify_oversigt_loaded=0;
       //spotify_oversigt_loaded++;
 
-      if (spotify_oversigt.get_spotify_update_flag()) {
-        // antalplaylists                                                   // anta in playlist
-        y = (float) 1.0f;                                                   // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
-        xx = (float) y*6;
-        for(int x=0;x<xx;x++) {
-          glDisable(GL_TEXTURE_2D);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), 125 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), 125+(25), 0.0);
-          glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), 125+(25) , 0.0);
-          glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), 125 , 0.0);
-          glEnd();
-        }
-        valgtnr=6;
-      }
       glDisable(GL_TEXTURE_2D);
       glTranslatef(statuswxpos+220+20,95,0);
       glScalef(24.0, 24.0, 1.0);
@@ -5820,7 +5815,7 @@ void display() {
                 break;
         case 5: glcRenderString("     Other");
                 break;
-        case 6: glcRenderString("   Spotify");
+        case 6: glcRenderString(" Spotify update");
                 break;
         default: glcRenderString("    Other");
       }

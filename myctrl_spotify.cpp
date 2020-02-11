@@ -328,6 +328,7 @@ spotify_class::spotify_class() : antal(0) {
     spotify_is_pause=false;                                                     // is player on pause
     show_search_result=false;                                                   // are we showing search result in view
     antalplaylists=0;                                                           // antal playlists
+    loaded_antal=0;                                                             // antal loaded
     search_playlist_song=0;
     int port_cnt, n;
     int err = 0;
@@ -953,6 +954,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   bool playlistexist;
   bool dbexist=false;
   conn = mysql_init(NULL);
+  loaded_antal=0;
   if (conn) {
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
        mysql_error(conn);
@@ -1040,6 +1042,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
             fscanf(json_file, "%s", file_contents);
             spotify_oversigt.spotify_get_playlist(file_contents,1,1);
             spotify_oversigt.clean_spotify_oversigt();
+            loaded_antal++;
           }
           fclose(json_file);
         }
