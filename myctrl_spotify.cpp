@@ -386,7 +386,7 @@ void spotify_class::set_spotify_update_flag(bool flag) {
 // ****************************************************************************************
 
 
-bool spotify_class::get_spotify_update_flag(bool flag) {
+bool spotify_class::get_spotify_update_flag() {
   return(spotify_update_loaded_begin);
 }
 
@@ -1000,7 +1000,8 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         fprintf(stderr,"Curl error get user playlists\n");
         exit(0);
       }
-      
+
+      /*
       // get info about file
       stat("spotify_users_playlist.json", &filestatus);                             // get file info
       file_size = filestatus.st_size;                                               // get filesize
@@ -1025,25 +1026,24 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       playlist_process_value(value, 0,0,conn);                                      // fill stack array
       json_value_free(value);                                                       // json clean up
       free(file_contents);                                                          // free memory again
-
-
-
+      */
       // save data to mysql db
-      /*
+
       system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
-      stat("spotify_users_playlist.txt", &filestatus);                                          // get file info
+      stat("spotify_users_playlist.txt", &filestatus);                              // get file info
       file_size = filestatus.st_size;                                               // get filesize
       file_contents = (char*) malloc(filestatus.st_size);
-      json_file = fopen("spotify_users_playlist.txt", "rt");
+      json_file = fopen("spotify_users_playlist.txt", "r");
       if (json_file) {
         while(!(feof(json_file))) {
-          fscanf(json_file, "%[^\n]", file_contents);
+          fscanf(json_file, "%s", file_contents);
           spotify_oversigt.spotify_get_playlist(file_contents,1,1);
           spotify_oversigt.clean_spotify_oversigt();
         }
         fclose(json_file);
       }
-      */
+      if (file_contents) free(file_contents);                                                          // free memory again
+
 
 
       // save data to mysql db

@@ -114,7 +114,7 @@ class spotify_class : vlc_controller {
     public:
         void settextureidfile(int nr,char *filename);
         void set_spotify_update_flag(bool flag);
-        bool get_spotify_update_flag(bool flag);
+        bool get_spotify_update_flag();
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         char overview_show_cd_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         bool search_spotify_online_done;
