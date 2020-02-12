@@ -5779,14 +5779,11 @@ void display() {
       } else y=0;
 
       if (spotify_oversigt.get_spotify_update_flag()) {
-        printf("******************** spotify_oversigt.loaded_antal=%d                \n",spotify_oversigt.loaded_antal);
         y = (float) spotify_oversigt.loaded_antal/50;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
         xx = (float) y*17;
         valgtnr=6;
       } else y=0;
-
       if (valgtnr==0) xx=0;
-
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
@@ -5815,7 +5812,7 @@ void display() {
                 break;
         case 5: glcRenderString("     Other");
                 break;
-        case 6: glcRenderString(" Spotify update");
+        case 6: glcRenderString("Update Spotify");
                 break;
         default: glcRenderString("    Other");
       }
