@@ -924,6 +924,41 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
 
 
 
+
+//****************************************************************************************
+// old stuf
+
+      /*
+      // get info about file
+      stat("spotify_users_playlist.json", &filestatus);                             // get file info
+      file_size = filestatus.st_size;                                               // get filesize
+      file_contents = (char*) malloc(filestatus.st_size);                           // get work men
+      json_file = fopen( "spotify_users_playlist.json", "rt");
+        if (json_file == NULL) {
+        fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
+        free(file_contents);                                                        //
+        return 1;
+      }
+      // read the file
+      if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
+        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
+        fclose(json_file);
+        free(file_contents);                                                        //
+        return 1;
+      }
+      fclose(json_file);
+      json = (json_char*) file_contents;
+      value = json_parse(json,file_size);                                           // json parse playlist file
+      // parse from root and inster in db (playlist table)
+      playlist_process_value(value, 0,0,conn);                                      // fill stack array
+      json_value_free(value);                                                       // json clean up
+      free(file_contents);                                                          // free memory again
+      */
+      // save data to mysql db
+
+
+
+
 // ****************************************************************************************
 //
 // Get users playlist
@@ -942,6 +977,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   char sql[8192];
   char doget[4096];
   char filename[4096];
+  char temptxt[80];
   char downloadfilenamelong[4096];
   int curl_error;
   FILE *json_file;
@@ -955,6 +991,9 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   bool dbexist=false;
   conn = mysql_init(NULL);
   loaded_antal=0;
+  unsigned int spotify_playlistantal=0;
+  unsigned int spotify_playlistantal_loaded=0;
+  bool spotifyplaylistloader_done=false;
   if (conn) {
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
        mysql_error(conn);
@@ -993,61 +1032,53 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       res = mysql_store_result(conn);
     }
     // download all playlist (name + id) in one big file NOT songs
+    // if we have a token
     if (strcmp(spotifytoken,"")!=0) {
       // 50 is the max
       //download_user_playlist(spotifytoken,startoffset);
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
-      curl_error=system(doget);
-      if (curl_error!=0) {
-        fprintf(stderr,"Curl error get user playlists\n");
-        exit(0);
-      }
-
-      /*
-      // get info about file
-      stat("spotify_users_playlist.json", &filestatus);                             // get file info
-      file_size = filestatus.st_size;                                               // get filesize
-      file_contents = (char*) malloc(filestatus.st_size);                           // get work men
-      json_file = fopen( "spotify_users_playlist.json", "rt");
-        if (json_file == NULL) {
-        fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
-        free(file_contents);                                                        //
-        return 1;
-      }
-      // read the file
-      if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
-        fclose(json_file);
-        free(file_contents);                                                        //
-        return 1;
-      }
-      fclose(json_file);
-      json = (json_char*) file_contents;
-      value = json_parse(json,file_size);                                           // json parse playlist file
-      // parse from root and inster in db (playlist table)
-      playlist_process_value(value, 0,0,conn);                                      // fill stack array
-      json_value_free(value);                                                       // json clean up
-      free(file_contents);                                                          // free memory again
-      */
-      // save data to mysql db
-
-      system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
-      stat("spotify_users_playlist.txt", &filestatus);                              // get file info
-      file_size = filestatus.st_size;                                               // get filesize
-      if (file_size>0) {
-        file_contents = (char*) malloc(filestatus.st_size);                           // get some work mem
-        json_file = fopen("spotify_users_playlist.txt", "r");
-        if (json_file) {
-          while(!(feof(json_file))) {
-            fscanf(json_file, "%s", file_contents);
-            spotify_oversigt.spotify_get_playlist(file_contents,1,1);
-            spotify_oversigt.clean_spotify_oversigt();
-            loaded_antal++;
-          }
+      while (spotifyplaylistloader_done==false) {
+        sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
+        curl_error=system(doget);
+        if (curl_error!=0) {
+          fprintf(stderr,"Curl error get user playlists\n");
+          exit(0);
+        }
+        system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
+        // get antal playliste first time (we can only load 50 at time)
+        if (spotify_playlistantal_loaded==0) {
+          system("cat spotify_users_playlist.json | grep total | tail -1 | awk {'print $3'} > spotify_users_playlist_antal.txt");
+          json_file = fopen("spotify_users_playlist_antal.txt", "r");
+          fscanf(json_file, "%s", temptxt);
+          if (strcmp(temptxt,"")!=0) spotify_oversigt.spotify_playlist_antal = atoi(temptxt);
+          else spotify_oversigt.spotify_playlist_antal = 0;
           fclose(json_file);
         }
-        if (file_contents) free(file_contents);                                                          // free memory again
+        stat("spotify_users_playlist.txt", &filestatus);                              // get file info
+        file_size = filestatus.st_size;                                               // get filesize
+        if (file_size>0) {
+          file_contents = (char*) malloc(filestatus.st_size);                           // get some work mem
+          json_file = fopen("spotify_users_playlist.txt", "r");
+          if (json_file) {
+            while(!(feof(json_file))) {
+              fscanf(json_file, "%s", file_contents);
+              spotify_oversigt.spotify_get_playlist(file_contents,1,1);
+              spotify_oversigt.clean_spotify_oversigt();
+              loaded_antal++;
+            }
+            fclose(json_file);
+          }
+          if (file_contents) free(file_contents);                                                          // free memory again
+        }
+        spotify_playlistantal_loaded+=startoffset;
+        // next loop
+        if ((startoffset+50)<spotify_oversigt.spotify_playlist_antal) {
+          startoffset+=50;
+        } else {
+          startoffset=spotify_oversigt.spotify_playlist_antal-startoffset;
+        }
+        if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
       }
+
       if (remove("spotify_users_playlist.txt")!=0) printf("Error remove user playlist file spotify_users_playlist.txt\n");
       // save data to mysql db
     } else {

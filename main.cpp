@@ -12793,8 +12793,8 @@ void *webupdate_loader_spotify(void *data) {
       // get user playlists
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get 50 first playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.spotify_get_user_playlists(true,50);                       // get next 50 playlists and update db (force update)
-      spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf again
+//      spotify_oversigt.spotify_get_user_playlists(true,50);                       // get next 50 playlists and update db (force update)
+//      spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf again
       //spotify_oversigt.spotify_get_user_playlists(true,100);                      // get next 50 playlists and update db (force update)
       //spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf again
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();    // update the decice list
