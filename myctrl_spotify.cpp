@@ -4083,7 +4083,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      if (spotify_oversigt.search_spotify_online_done) glcRenderString("   Loading ..."); else glcRenderString("   Not found ...");
+      if (spotify_oversigt.search_spotify_online_done) glcRenderString("   Loading ..."); else glcRenderString("   Please run update ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
