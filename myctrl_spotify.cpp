@@ -410,7 +410,7 @@ static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream
 // ****************************************************************************************
 //
 // Spotify refresh token
-//
+// Not in use
 // ****************************************************************************************
 
 int spotify_class::spotify_refresh_token() {
@@ -719,7 +719,9 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
           if (strcmp(filename,"")!=0) {
-            strcpy(downloadfilenamelong,"spotify_gfx/");
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/");
+            strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
           }
@@ -928,45 +930,10 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
 
 
 
-
-//****************************************************************************************
-// old stuf
-
-      /*
-      // get info about file
-      stat("spotify_users_playlist.json", &filestatus);                             // get file info
-      file_size = filestatus.st_size;                                               // get filesize
-      file_contents = (char*) malloc(filestatus.st_size);                           // get work men
-      json_file = fopen( "spotify_users_playlist.json", "rt");
-        if (json_file == NULL) {
-        fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
-        free(file_contents);                                                        //
-        return 1;
-      }
-      // read the file
-      if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
-        fclose(json_file);
-        free(file_contents);                                                        //
-        return 1;
-      }
-      fclose(json_file);
-      json = (json_char*) file_contents;
-      value = json_parse(json,file_size);                                           // json parse playlist file
-      // parse from root and inster in db (playlist table)
-      playlist_process_value(value, 0,0,conn);                                      // fill stack array
-      json_value_free(value);                                                       // json clean up
-      free(file_contents);                                                          // free memory again
-      */
-      // save data to mysql db
-
-
-
-
 // ****************************************************************************************
 //
 // Get users playlist
-// IN use
+// in use
 // The default view
 //
 // ****************************************************************************************
@@ -1457,7 +1424,6 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         }
       }
     }
-
     stat(playlistfilename, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
     file_contents = (char*) malloc(filestatus.st_size);
@@ -1531,7 +1497,9 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            strcpy(downloadfilenamelong,"spotify_gfx/");
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/");
+            strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
             if (!(file_exists(downloadfilenamelong))) {
@@ -3002,7 +2970,9 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (row[1]) {
                   if (strncmp(row[1],"http",4)==0) {
                     get_webfilename(downloadfilename,row[1]);
-                    strcpy(downloadfilenamelong,"spotify_gfx/");
+                    getuserhomedir(downloadfilenamelong);
+                    strcat(downloadfilenamelong,"/");
+                    strcat(downloadfilenamelong,spotify_gfx_path);
                     strcat(downloadfilenamelong,downloadfilename);
                     strcat(downloadfilenamelong,".jpg");
                     // download file
@@ -3187,7 +3157,9 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              strcpy(downloadfilenamelong,"spotify_gfx/");
+              getuserhomedir(downloadfilenamelong);
+              strcat(downloadfilenamelong,"/");
+              strcpy(downloadfilenamelong,spotify_gfx_path);
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
               strcat(downloadfilenamelong,".jpg");
               if (file_exists(downloadfilenamelong)) {
@@ -3376,7 +3348,9 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
-                strcpy(downloadfilenamelong,"spotify_gfx/");
+                getuserhomedir(downloadfilenamelong);
+                strcat(downloadfilenamelong,"/");
+                strcat(downloadfilenamelong,spotify_gfx_path);
                 strcat(downloadfilenamelong,filename);
                 strcat(downloadfilenamelong,".jpg");
                 // save name to db to next time
