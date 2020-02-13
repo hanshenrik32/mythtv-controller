@@ -5779,7 +5779,7 @@ void display() {
       } else y=0;
 
       if (spotify_oversigt.get_spotify_update_flag()) {
-        y = (float) spotify_oversigt.loaded_antal/50;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
+        y = (float) spotify_oversigt.spotify_playlist_antal;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
         xx = (float) y*17;
         valgtnr=6;
       } else y=0;
@@ -13895,11 +13895,9 @@ int main(int argc, char** argv) {
     // create dir for json files and icon files downloaded
     if (!(file_exists("~/spotify_json"))) {
       system("/bin/mkdir ~/spotify_json");
-      system("/bin/mkdir spotify_json");
     }
     if (!(file_exists("~/spotify_gfx"))) {
       system("/bin/mkdir ~/spotify_gfx");
-      system("/bin/mkdir spotify_gfx");
     }
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
