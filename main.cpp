@@ -5774,12 +5774,12 @@ void display() {
       // show movie loader status
       if (valgtnr==0) {
         y = (float) movie_oversigt_loaded_nr/film_oversigt.get_film_antal();
-        xx = (float) y*18;
+        xx = (float) y*17;
         if (y > 0.0f) valgtnr = 4;
       } else y=0;
 
       if (spotify_oversigt.get_spotify_update_flag()) {
-        y = (float) spotify_oversigt.spotify_playlist_antal;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
+        y = (float) spotify_oversigt.loaded_antal/spotify_oversigt.spotify_playlist_antal;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
         xx = (float) y*17;
         valgtnr=6;
       } else y=0;
