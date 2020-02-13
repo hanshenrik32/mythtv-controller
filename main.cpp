@@ -13892,6 +13892,15 @@ int main(int argc, char** argv) {
     printf("Numbers of cores :%d found.\n",numCPU);
     // Load config
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
+    // create dir for json files and icon files downloaded
+    if (!(file_exists("~/spotify_json"))) {
+      system("/bin/mkdir ~/spotify_json");
+      system("/bin/mkdir spotify_json");
+    }
+    if (!(file_exists("~/spotify_gfx"))) {
+      system("/bin/mkdir ~/spotify_gfx");
+      system("/bin/mkdir spotify_gfx");
+    }
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
       fprintf(stderr,"mythtv - Backend\n");

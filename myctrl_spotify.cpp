@@ -41,6 +41,10 @@ const int spotify_desclength=2000;
 const int feed_url=2000;
 
 
+const char *spotify_json_path = "spotify_json/";
+const char *spotify_gfx_path = "spotify_gfx/";
+
+
 size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);
     return size * nmemb;
@@ -1374,10 +1378,15 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
+  char homedir[1024];
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
   char auth_kode[1024];
-  strcpy(playlistfilename,"json/spotify_playlist_");                                 // create playlist file name
+  getuserhomedir(homedir);
+  strcpy(playlistfilename,homedir);
+  strcat(playlistfilename,"/");
+  strcat(playlistfilename,spotify_json_path);
+  strcat(playlistfilename,"spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
   strcpy(auth_kode,"Authorization: Bearer ");
@@ -1402,13 +1411,6 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   struct curl_slist *chunk = NULL;
   FILE *out_file;
   bool do_curl=true;
-  // create dir for json files and icon files downloaded
-  if (!(file_exists("json"))) {
-    system("/bin/mkdir json");
-  }
-  if (!(file_exists("spotify_gfx"))) {
-    system("/bin/mkdir spotify_gfx");
-  }
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
       // always here
