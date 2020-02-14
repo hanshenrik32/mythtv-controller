@@ -3218,6 +3218,22 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
+      // Brittas bedrag
+      if (check_rss_feed_exist(conn,(char *) "Brittas bedrag")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Brittas bedrag',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Brittas bedrag\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Brittas bedrag','Brittas bedrag',0,0,NULL,'https://www.dr.dk/mu/feed/britta-vs-staten.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Brittas bedrag.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
 
 
 
