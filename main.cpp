@@ -2351,15 +2351,17 @@ void newLine(float rStart, float rEnd, float angle) {
   glVertex2f((clockR*rEnd*c)+(screenx/2),(clockR*rEnd*s)+(screeny/2));
 }
 
-static bool do_update_xmltv_show = false;
-static bool do_update_rss_show = true;
-static bool do_update_rss = false;
-static bool do_update_music = false;
+
+// startup parameters
+// we have to start spotify to enable log from web
+
+static bool do_update_xmltv_show = false;                         //
+static bool do_update_rss_show = false;                           //
+static bool do_update_rss = false;                                //
+static bool do_update_music = false;                              //
 static bool do_update_music_now = false;                          // start the process to update music db from global dir
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
-static bool do_update_spotify = true;                            // set true to start thread on update spotify + run web server
-
-
+static bool do_update_spotify = true;                             // set true to start thread on update spotify + run web server
 
 // ****************************************************************************************
 //
@@ -6034,19 +6036,21 @@ void display() {
     }
     if (do_update_xmltv) {
       // call update xmltv multi phread
+      fprintf(stderr,"Start phread xmltv.\n");
       update_xmltv_phread_loader();
       do_update_xmltv=false;
     }
     if (do_update_rss) {
       // call update xmltv multi phread
+      fprintf(stderr,"Start phread podcast.\n");
       update_rss_phread_loader();
       do_update_rss = false;
     }
     if (do_update_music) {
+      fprintf(stderr,"Start phread music.\n");
       update_music_phread_loader();
       do_update_music = false;
     }
-
     if (do_update_spotify) {
       fprintf(stderr,"Start phread spotify and web server.\n");
       update_spotify_phread_loader();                                           // update spotify view (load it)
@@ -12863,7 +12867,7 @@ void *datainfoloader_webserver(void *data) {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode & 256) fprintf(stderr,"Thread xmltv file parser starting....\n");
+  if (debugmode & 256) fprintf(stderr,"loader thread starting - xmltv file parser starting....\n");
   //
   // multi thread
   // load xmltvguide from web
@@ -13864,6 +13868,7 @@ int check_radio_stations_icons() {
 // ****************************************************************************************
 
 int main(int argc, char** argv) {
+    int dircreatestatus;
     Display *dpy = NULL;
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
@@ -13894,10 +13899,12 @@ int main(int argc, char** argv) {
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     // create dir for json files and icon files downloaded
     if (!(file_exists("~/spotify_json"))) {
-      system("/bin/mkdir ~/spotify_json");
+      dircreatestatus = mkdir("~/spotify_json", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+      //system("/bin/mkdir ~/spotify_json");
     }
     if (!(file_exists("~/spotify_gfx"))) {
-      system("/bin/mkdir ~/spotify_gfx");
+      dircreatestatus = mkdir("~/spotify_gfx", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+      //system("/bin/mkdir ~/spotify_gfx");
     }
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
