@@ -1014,6 +1014,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           fprintf(stderr,"Curl error get user playlists\n");
           exit(0);
         }
+        // hent users playlist from spotify api
         system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
         // get antal playliste first time (we can only load 50 at time)
         if (spotify_playlistantal_loaded==0) {
@@ -1032,7 +1033,8 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           if (json_file) {
             while(!(feof(json_file))) {
               fscanf(json_file, "%s", file_contents);
-              spotify_oversigt.spotify_get_playlist(file_contents,1,1);
+              // process playlist id
+              spotify_oversigt.spotify_get_playlist(file_contents,force,1);
               spotify_oversigt.clean_spotify_oversigt();
               loaded_antal++;
             }
@@ -1042,6 +1044,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         }
         spotify_playlistantal_loaded+=startoffset;
         // next loop
+        // 50 is loaded on each loop until end
         if ((startoffset+50)<spotify_oversigt.spotify_playlist_antal) {
           startoffset+=50;
         } else {
@@ -1062,7 +1065,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+        if (debugmode) printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
         if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
           printf("Error create playlist %s \n",row[1]);
         }
@@ -1338,7 +1341,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 // ****************************************************************************************
 
 int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
-  int tt;
+  int tt=0;
   bool dbexist=false;
   int refid;
   int curl_error;
@@ -1519,6 +1522,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
               playlistexist=true;
             }
           }
+          // crete playlist
           if (!(playlistexist)) {
             sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
@@ -1573,6 +1577,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             playlistexist=true;
           }
         }
+        // crete playlist
         if (!(playlistexist)) {
           sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx,spotify_playlistid);
           mysql_query(conn,sql);
@@ -3728,6 +3733,7 @@ void spotify_class::settextureidfile(int nr,char *filename) {
 int spotify_class::load_spotify_iconoversigt() {
   int nr=0;
   int loadstatus;
+  char *imagenamepointer;
   char tmpfilename[2000];
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
@@ -3737,13 +3743,25 @@ int spotify_class::load_spotify_iconoversigt() {
   while(nr<streamantal()) {
     if (debugmode & 4) printf("Loading texture nr %-4d for %40s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
-      if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+      if (stack[nr]->textureId==0) {
+        // if url
+        if (strncmp("http",stack[nr]->feed_gfx_url,4)==0) {
+          imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
+          if ((imagenamepointer) && (strlen(imagenamepointer)<1990)) {
+            getuserhomedir(tmpfilename);
+            strcat(tmpfilename,"/spotify_gfx/");
+            strcat(tmpfilename,imagenamepointer+1);
+            strcat(tmpfilename,".jpg");
+            stack[nr]->textureId=loadTexture (tmpfilename);
+          }
+        } else stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+      }
     }
     nr++;
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"spotify download end ok. \n");
+    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
     else fprintf(stderr,"spotify download error. \n");
   }
   return(1);
