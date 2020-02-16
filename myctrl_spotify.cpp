@@ -1246,6 +1246,13 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 
           //printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
 
+          if (( depth == 5 ) && ( x == 1 )) {
+            if (stack[antal]) {
+              //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
+              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+              strcpy(playlistgfx,value->u.string.ptr);
+            }
+          }
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
               //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
@@ -3727,6 +3734,7 @@ void spotify_class::settextureidfile(int nr,char *filename) {
 // ****************************************************************************************
 //
 // loading spotify songs gfx in array.
+// if filename is url then change it to file name by the last name in the source http filename path
 //
 // ****************************************************************************************
 
