@@ -85,6 +85,7 @@ class spotify_class : vlc_controller {
         int spotify_aktiv_song_antal;					                                  // Antal songs in playlist
         bool spotify_update_loaded_begin;
         void print_depth_shift(int);
+        //
         void process_value_playlist(json_value*, int,int x);
         void process_object_playlist(json_value*, int);
         void process_array_playlist(json_value*, int);
@@ -93,6 +94,7 @@ class spotify_class : vlc_controller {
         void search_process_object(json_value*, int,int art);
         void search_process_array(json_value*, int,int art);
         // end spotify search online
+        // playlist process json obj
         void playlist_print_depth_shift(int depth);
         void playlist_process_object(json_value* value, int depth,MYSQL *conn);
         void playlist_process_array(json_value* value, int depth,MYSQL *conn);
@@ -140,16 +142,17 @@ class spotify_class : vlc_controller {
         int spotify_oversigt_loaded_nr;                                         //
         int spotify_oversigt_nowloading;				                                // denne tæller op når der loades gfx
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
-        // used my webserver
+        // used by webserver
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
+        //
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
         int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
-        bool gfx_loaded;			        // get artis
+        bool gfx_loaded;			                                                  // get artis
         // in use
-        void spotify_set_token(char *token,char *refresh);
-        char *spotify_get_token() { return(spotifytoken); };
+        void spotify_set_token(char *token,char *refresh);                      // set token in struct
+        char *spotify_get_token() { return(spotifytoken); };                    // get token from struct
         int spotify_refresh_token();                                            // refresh token on postify api
         int spotify_refresh_token2();                                            // refresh token on postify api 2
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
@@ -177,7 +180,7 @@ class spotify_class : vlc_controller {
         void clean_spotify_oversigt();                                          // clear list
         int spotify_req_playlist();                                             //
         int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
-        int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist + songs and update db
+        int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist
