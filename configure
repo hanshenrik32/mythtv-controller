@@ -1,0 +1,6 @@
+#AC_INIT([mythtv-controller], [0.1], [hans@linuxboxen.dk])
+#AM_INIT_AUTOMAKE
+#AC_PROG_CC
+#AC_CONFIG_FILES([Makefile])
+#AC_OUTPUT
+
