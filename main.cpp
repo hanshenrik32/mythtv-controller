@@ -284,7 +284,7 @@ bool vis_film_oversigt = false;				                    // vis film oversigt
 bool vis_recorded_oversigt = false;                       // vis recorded oversigt
 bool vis_tv_oversigt = false;                             // vis tv oversigt
 bool vis_radio_oversigt = false;                          // vis radio player
-bool vis_spotify_oversigt = false;                          // vis radio player
+bool vis_spotify_oversigt = false;                        // vis spotify player
 bool vis_old_recorded = false;                            //
 bool vis_tvrec_list = false;                              //
 bool saver_irq = false;                                   // er screen saver aktiv
@@ -3297,6 +3297,7 @@ void display() {
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
+            // start webbroser to login on spotify
             system("firefox localhost:8000");
             startwebbrowser=false;
           }
@@ -6881,7 +6882,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
           vis_music_oversigt = false;
           vis_radio_oversigt = false;
-          vis_spotify_oversigt = true;
+          vis_spotify_oversigt = true;                                          // show spotify overview
           vis_radio_or_music_oversigt = false;
         }
       }
@@ -7271,82 +7272,83 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   }
                 }
-                // normal spotify stuf
-                if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
-                  // spotify stuf
-                  // play
-                  if (retfunc==3) {
-                    if (spotifyknapnr>0) {
-                      do_play_spotify=1;
-                      do_open_spotifyplaylist=0;
-                      fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                if (vis_spotify_oversigt) {
+                  // normal spotify stuf
+                  if (do_show_spotify_search_oversigt==false) {
+                    // spotify stuf
+                    // play
+                    if (retfunc==3) {
+                      if (spotifyknapnr>0) {
+                        do_play_spotify=1;
+                        do_open_spotifyplaylist=0;
+                        fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                      }
                     }
-                  }
-                  // stop play
-                  if (retfunc==2) {
-                    if (spotifyknapnr==9) {
+                    // stop play
+                    if (retfunc==2) {
+                      if (spotifyknapnr==9) {
+                        do_play_spotify=0;
+                        do_open_spotifyplaylist=0;
+                        if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                      }
+                    }
+                    // next play
+                    if (retfunc==6) {
                       do_play_spotify=0;
-                      do_open_spotifyplaylist=0;
-                      if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                      do_open_spotifyplaylist=1;
+                      if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                      spotify_oversigt.spotify_next_play();
+                    }
+                    // last play
+                    if (retfunc==7) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=1;
+                      if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                      spotify_oversigt.spotify_last_play();
                     }
                   }
-                  // next play
-                  if (retfunc==6) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
-                    spotify_oversigt.spotify_next_play();
-                  }
-                  // last play
-                  if (retfunc==7) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
-                    spotify_oversigt.spotify_last_play();
+                  // online spotify stuf
+                  if (do_show_spotify_search_oversigt==true) {
+                    // spotify stuf
+                    if (retfunc==4) {
+                      if (spotifyknapnr>0) {
+                        do_play_spotify=1;
+                        do_open_spotifyplaylist=0;
+                        fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                      }
+                    }
+                    // open
+                    if (retfunc==6) {
+                      if (spotifyknapnr>0) {
+                        do_play_spotify=1;
+                        do_open_spotifyplaylist=0;
+                        fprintf(stderr,"Open spotify flag spotifyknapnr=%d \n",spotifyknapnr);
+                      }
+                    }
+                    // stop play online
+                    if (retfunc==5) {
+                      if (spotifyknapnr==9) {
+                        do_play_spotify=0;
+                        do_open_spotifyplaylist=0;
+                        fprintf(stderr,"Set stop play spotify flag\n");
+                      }
+                    }
+                    // next play  online
+                    if (retfunc==7) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=1;
+                      fprintf(stderr,"Set next play spotify flag\n");
+                      spotify_oversigt.spotify_next_play();
+                    }
+                    // last play online
+                    if (retfunc==8) {
+                      do_play_spotify=0;
+                      do_open_spotifyplaylist=1;
+                      fprintf(stderr,"Set last play spotify flag\n");
+                      spotify_oversigt.spotify_last_play();
+                    }
                   }
                 }
-                // online spotify stuf
-                if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==true)) {
-                  // spotify stuf
-                  if (retfunc==4) {
-                    if (spotifyknapnr>0) {
-                      do_play_spotify=1;
-                      do_open_spotifyplaylist=0;
-                      fprintf(stderr,"Set do_play_spotify flag spotifyknapnr=%d \n",spotifyknapnr);
-                    }
-                  }
-                  // open
-                  if (retfunc==6) {
-                    if (spotifyknapnr>0) {
-                      do_play_spotify=1;
-                      do_open_spotifyplaylist=0;
-                      fprintf(stderr,"Open spotify flag spotifyknapnr=%d \n",spotifyknapnr);
-                    }
-                  }
-                  // stop play online
-                  if (retfunc==5) {
-                    if (spotifyknapnr==9) {
-                      do_play_spotify=0;
-                      do_open_spotifyplaylist=0;
-                      fprintf(stderr,"Set stop play spotify flag\n");
-                    }
-                  }
-                  // next play  online
-                  if (retfunc==7) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    fprintf(stderr,"Set next play spotify flag\n");
-                    spotify_oversigt.spotify_next_play();
-                  }
-                  // last play online
-                  if (retfunc==8) {
-                    do_play_spotify=0;
-                    do_open_spotifyplaylist=1;
-                    fprintf(stderr,"Set last play spotify flag\n");
-                    spotify_oversigt.spotify_last_play();
-                  }
-                }
-
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
                   do_zoom_film_cover = true;
