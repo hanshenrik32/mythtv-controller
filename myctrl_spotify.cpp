@@ -595,6 +595,7 @@ bool playlist_process_items=false;
 char playlistname[256];
 char playlistid[256];
 char playlistgfx[2048];
+char playlistgfx_top[2048];
 
 // ****************************************************************************************
 // INTERNAL
@@ -744,7 +745,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           }
           // if not exist create playlist
           if (!(playlistexist)) {
-            printf("Song name insert : %s \n", playlistname );
+            //printf("Song name insert : %s \n", playlistname );
             sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
@@ -1243,16 +1244,13 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         // gfx url
         if ( process_image ) {
-
           //printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
-
+          // get playlist cover
           if (( depth == 5 ) && ( x == 1 )) {
-            if (stack[antal]) {
-              //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
-              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
-              strcpy(playlistgfx,value->u.string.ptr);
-            }
+            // get covver file url
+            strcpy(playlistgfx_top,value->u.string.ptr);
           }
+          // get song cover
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
               //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
@@ -1586,7 +1584,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         }
         // crete playlist
         if (!(playlistexist)) {
-          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx,spotify_playlistid);
+          //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
+          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
         }
@@ -3749,7 +3748,7 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<streamantal()) {
-    if (debugmode & 4) printf("Loading texture nr %-4d for %40s  %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    if (debugmode & 4) printf("Loading texture nr %-4d for %40s  path %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
         // if url
