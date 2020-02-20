@@ -327,7 +327,7 @@ spotify_class::spotify_class() : antal(0) {
     spotify_oversigt_loaded_nr=0;
     antal=0;
     spotify_aktiv_song_antal=0;                                                 //
-    gfx_loaded=false;			                                                      // gfx loaded
+    gfx_loaded=false;			                                                      // gfx loaded default false
     spotify_is_playing=false;                                                   // is we playing any media
     spotify_is_pause=false;                                                     // is player on pause
     show_search_result=false;                                                   // are we showing search result in view
@@ -1053,7 +1053,6 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         }
         if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
       }
-
       if (remove("spotify_users_playlist.txt")!=0) printf("Error remove user playlist file spotify_users_playlist.txt\n");
       // save data to mysql db
     } else {
@@ -3747,7 +3746,7 @@ int spotify_class::load_spotify_iconoversigt() {
   char homedir[200];
   this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("spotify icon loader.\n");
-  while(nr<streamantal()) {
+  while(nr<=streamantal()) {
     if (debugmode & 4) printf("Loading texture nr %-4d for %40s  path %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
@@ -3766,6 +3765,7 @@ int spotify_class::load_spotify_iconoversigt() {
     }
     nr++;
   }
+  // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
     if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
