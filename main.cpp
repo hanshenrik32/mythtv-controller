@@ -6607,54 +6607,54 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
               if ((spotify_oversigt.type==0) || (spotify_oversigt.type==1)) {
                 // update
-                spotify_selected_startofset=0;
+                spotify_selected_startofset=0;                                  // default selected in view
                 spotify_oversigt.opdatere_spotify_oversigt(0);                  // update view
                 spotify_oversigt.load_spotify_iconoversigt();                   // load icons
-                ask_open_dir_or_play_spotify = false;
+                ask_open_dir_or_play_spotify = false;                           // close windows again
                 fundet = true;
               }
             }
             // play playlist icon select (20) type 0
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
-              if (debugmode) fprintf(stderr,"play spotify playlist.\n");
+              if (debugmode & 4) fprintf(stderr,"play spotify playlist.\n");
               do_select_device_to_play=true;
               returnfunc = 4;
               fundet = true;
             }
             // play song icon select (20) type 1
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
-              if (debugmode) fprintf(stderr,"play spotify song.\n");
+              if (debugmode & 4) fprintf(stderr,"play spotify song.\n");
               do_select_device_to_play=true;
               returnfunc = 5;
               fundet = true;
             }
             // open
             if ((GLubyte) names[i*4+3]==21) {
-              if (debugmode) fprintf(stderr,"open spotify playlist\n");
+              if (debugmode & 4) fprintf(stderr,"open spotify playlist\n");
               returnfunc = 3;
               fundet = true;
             }
             // Stop play
             if ((GLubyte) names[i*4+3]==9) {
-              if (debugmode) fprintf(stderr,"(Spotify) Stop play\n");
+              if (debugmode & 4) fprintf(stderr,"(Spotify) Stop play\n");
               returnfunc = 5;                                                       //
               fundet = true;
             }
             // Next
             if ((GLubyte) names[i*4+3]==11) {
-              if (debugmode) fprintf(stderr,"(Spotify) Next song\n");
+              if (debugmode & 4) fprintf(stderr,"(Spotify) Next song\n");
               returnfunc = 6;                                                       //
               fundet = true;
             }
             // last
             if ((GLubyte) names[i*4+3]==10) {
-              if (debugmode) fprintf(stderr,"(Spotify) last song\n");
+              if (debugmode & 4) fprintf(stderr,"(Spotify) last song\n");
               returnfunc = 7;                                                       //
               fundet = true;
             }
             //  scroll down
             if ((GLubyte) names[i*4+3]==24) {
-              if (debugmode) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+              if (debugmode & 4) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
               // move playlists down
               if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
               returnfunc = 1;
@@ -6662,7 +6662,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // scroll up
             if ((GLubyte) names[i*4+3]==23) {
-              fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+              if (debugmode & 4) fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
               // move playlists up
               if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
               if (spotify_selected_startofset<0) spotify_selected_startofset=0;
@@ -7504,12 +7504,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         // scroll spotify up/down
         // and open / play / stop / next / last play control // open playlist
         if (!(do_zoom_spotify_cover)) {
-          if ((retfunc==2) || (button==4)) {
+          if ((retfunc == 2 ) || (button == 4 )) {
             if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
             button=0;
           }
           // scroll up
-          if ((retfunc==1) || (button==3)) {
+          if ((retfunc == 1 ) || (button == 3 )) {
             if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
             if (spotify_selected_startofset<0) spotify_selected_startofset=0;
             button=0;
@@ -7517,7 +7517,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
         if (do_zoom_spotify_cover) {
           // pause/stop spotify music
-          if ((retfunc==5) || (button==3)) {
+          if (( retfunc == 5 ) || (button==3)) {
             if (do_play_spotify_cover==false) spotify_oversigt.spotify_resume_play();
             spotify_oversigt.spotify_pause_play();                              // spotify stop play
             do_zoom_spotify_cover=false;
@@ -7529,9 +7529,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         } else {
           // open spotify playlist
-          if (((retfunc==3) || (button==3)) && (spotifyknapnr>0)) {
+          if ((( retfunc == 3 ) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
+            if ( debugmode & 4 ) fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
             spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
@@ -7620,9 +7620,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         } else {
           // open spotify artist
-          if (((retfunc==6) || (button==3)) && (spotifyknapnr>0)) {
+          if (((retfunc == 6 ) || (button == 3 )) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            fprintf(stderr,"Open spotify artist %s type %d \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
+            if ( debugmode & 4 ) fprintf(stderr,"Open spotify artist %s type %d \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
             // update from web
             // clear old first
             //static char huskname[1024];
@@ -7630,7 +7630,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
 
 
-printf("Loading view......\n");
+            printf("Loading view......\n");
 
 
             spotify_oversigt.clean_spotify_oversigt();
@@ -7638,7 +7638,7 @@ printf("Loading view......\n");
             spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
 
 
-printf("Done Loading view......\n");
+            printf("Done Loading view......\n");
 
             // reset select in spotify view
             spotifyknapnr=0;                                                  // reset selected
@@ -12772,7 +12772,7 @@ void *datainfoloader_spotify(void *data) {
 // ****************************************************************************************
 
 void *webupdate_loader_spotify(void *data) {
-  fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
+  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
     if (spotify_oversigt.spotify_get_user_id()) {
       spotify_update_loaded_begin=true;
@@ -12787,7 +12787,7 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists
-      spotify_oversigt.spotify_get_user_playlists(false,0);                        // get all playlist and update db (force update)
+      spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();    // update the decice list
       // update view from db

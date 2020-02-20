@@ -113,6 +113,7 @@ class spotify_class : vlc_controller {
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         int get_search_result_online(char *searchstring,int type);
         int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
+        bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
     public:
         int loaded_antal;                                                       // antal loaded i loader
         unsigned int spotify_playlist_antal;
@@ -120,7 +121,7 @@ class spotify_class : vlc_controller {
         void set_spotify_update_flag(bool flag);
         bool get_spotify_update_flag();
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
-        char overview_show_cd_name[81];                                       // name of the band show in overview then you search on band and play songs from it
+        char overview_show_cd_name[81];                                         // name of the band show in overview then you search on band and play songs from it
         bool search_spotify_online_done;
         bool show_search_result;                                                // are ew showing search result in spotify view ?
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
@@ -141,15 +142,14 @@ class spotify_class : vlc_controller {
         bool spotify_oversigt_loaded;                                           //
         int spotify_oversigt_loaded_nr;                                         //
         int spotify_oversigt_nowloading;				                                // denne tæller op når der loades gfx
+        int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used by webserver
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
-        //
+        // end webserver
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
-        int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
-        bool gfx_loaded;			                                                  // get artis
         // in use
         void spotify_set_token(char *token,char *refresh);                      // set token in struct
         char *spotify_get_token() { return(spotifytoken); };                    // get token from struct
