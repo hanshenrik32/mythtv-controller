@@ -9,9 +9,11 @@ extern char *dbname;                                           // internal datab
 
 
 
+// ****************************************************************************************
 //
 // hent path(s) fra kodi xml file
 //
+// ****************************************************************************************
 
 int xbmcsqlite::getxmlfilepath() {
 
@@ -41,8 +43,12 @@ int xbmcsqlite::getxmlfilepath() {
 
 
 
+// ****************************************************************************************
+//
 // xbmc version loader
 //
+// ****************************************************************************************
+
 
 int xbmcsqlite::xbmcloadversion() {
     int rc;
@@ -63,7 +69,10 @@ int xbmcsqlite::xbmcloadversion() {
 
 
 
+// ****************************************************************************************
 // xbmc music db loader
+//
+// ****************************************************************************************
 
 void xbmcsqlite::xbmc_readmusicdb() {
     int rc;
@@ -84,9 +93,14 @@ void xbmcsqlite::xbmc_readmusicdb() {
 
 
 
+
+// ****************************************************************************************
 //
 // xbmc movie db loader
 //
+// ****************************************************************************************
+
+
 void xbmcsqlite::xbmc_readmoviedb() {
     int rc;
     const char *sql = "SELECT * from movie_view"; // order by dateAdded";
@@ -107,10 +121,11 @@ void xbmcsqlite::xbmc_readmoviedb() {
     sqlite3_close(sqlitedb_obj);
 }
 
-
+// ****************************************************************************************
 //
 //
 //
+// ****************************************************************************************
 
 char search_and_replace(char *text) {
   int n=0;
@@ -136,7 +151,11 @@ char search_and_replace(char *text) {
 }
 
 
+// ****************************************************************************************
+//
 // callback to fill movie db in mythtv-controller from xbmc/sqlite
+//
+// ****************************************************************************************
 
 int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv, char **azColName) {
   MYSQL *conn;
@@ -344,11 +363,11 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
 }
 
 
-
-
-
-
+// ****************************************************************************************
+//
 // callback to fill music db in mythtv-controller
+//
+// ****************************************************************************************
 
 int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv, char **azColName) {
   MYSQL *conn;

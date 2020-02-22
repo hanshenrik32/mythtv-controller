@@ -941,7 +941,14 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 
 // 700 -> 1000 is free on intnr
 
-// operet databaser/tables if now exist
+
+
+// ****************************************************************************************
+//
+// Create databaser/tables if now exist
+//
+// ****************************************************************************************
+
 int create_radio_oversigt() {
     // mysql vars
 //    int dbexist=0;
@@ -957,25 +964,25 @@ int create_radio_oversigt() {
     mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, dbname, 0, NULL, 0);
     mysqlerror=mysql_errno(conn);
     if (mysqlerror) {
-        if (conn==NULL) {
-            conn=mysql_init(NULL);
-            mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, NULL, 0, NULL, 0);
-            mysqlerror=mysql_errno(conn);
-        }
-        if (conn) {
-            mysql_query(conn,"CREATE DATABASE mythtvcontroller");                   // create radio stations db
-            res = mysql_store_result(conn);
-            printf("Create db %s \nMysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
-            mysqlerror=mysql_errno(conn);
-        }
-        if (mysqlerror==1044) {
-            printf("No access to mysql database (mythtvcontroller) on host %s user %s mysql error code:%d \nPlease crate database mythtvcontroller \n",configmysqlhost,configmysqluser,mysql_errno(conn));
-            exit(-1);
-        }
-        if ((dbname,mysql_errno(conn)!=2006) && (dbname,mysql_errno(conn)!=2003) && (dbname,mysql_errno(conn)!=1049)) {
-            printf("Mysql error %s %s\n",dbname,mysql_error(conn));
-            exit(-1);
-        }
+      if (conn==NULL) {
+          conn=mysql_init(NULL);
+          mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, NULL, 0, NULL, 0);
+          mysqlerror=mysql_errno(conn);
+      }
+      if (conn) {
+          mysql_query(conn,"CREATE DATABASE mythtvcontroller");                   // create radio stations db
+          res = mysql_store_result(conn);
+          printf("Create db %s \nMysql error %d %s\n",dbname,mysql_errno(conn),mysql_error(conn));
+          mysqlerror=mysql_errno(conn);
+      }
+      if (mysqlerror==1044) {
+          printf("No access to mysql database (mythtvcontroller) on host %s user %s mysql error code:%d \nPlease crate database mythtvcontroller \n",configmysqlhost,configmysqluser,mysql_errno(conn));
+          exit(-1);
+      }
+      if ((dbname,mysql_errno(conn)!=2006) && (dbname,mysql_errno(conn)!=2003) && (dbname,mysql_errno(conn)!=1049)) {
+          printf("Mysql error %s %s\n",dbname,mysql_error(conn));
+          exit(-1);
+      }
     }
     if ((mysqlerror==1049) || (mysqlerror==2006)) {
         // create db
@@ -983,10 +990,13 @@ int create_radio_oversigt() {
         mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, "mysql", 0, NULL, 0);
         mysql_query(conn,"CREATE DATABASE IF NOT EXISTS mythtvcontroller");                   // create radio stations db
         res = mysql_store_result(conn);
-        printf("Create db %s Mysql error %d \n",dbname,mysql_errno(conn));
+        printf("Create db error %s \nMysql error %d \n",dbname,mysql_errno(conn));
         mysql_query(conn,"use mythtvcontroller");
         res = mysql_store_result(conn);
-        printf("On select mythtvcontroller Mysql error %d \n",mysql_errno(conn));
+        printf("\nPlease update the config file mysql connection informations.\n");
+        printf("Edit the file /etc/mythtv-ontroller.conf \nand update the mysql username and password settings.\n");
+        if (conn) mysql_close(conn);
+        exit(-1);
     }
     // connect
     if (conn) {

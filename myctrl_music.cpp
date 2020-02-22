@@ -56,8 +56,12 @@ extern GLint cur_avail_mem_kb;
 extern int orgwinsizey;
 extern int orgwinsizex;
 
+// ****************************************************************************************
+//
 // parameret til mysql er dirid = directory_id i database
 // retunere path og parent_id som bliver udfyldt fra mysql databasen
+//
+// ****************************************************************************************
 
 void hent_dir_id(char *path,char *parent_id,char *dirid) {
     // mysql stuf
@@ -86,8 +90,11 @@ void hent_dir_id(char *path,char *parent_id,char *dirid) {
     mysql_close(conn);
 }
 
-
+// ****************************************************************************************
+//
 // retunere parent dirid fra dir_id i mythtv music
+//
+// ****************************************************************************************
 
 unsigned int hent_parent_dir_id(int dirid) {
     // mysql stuf
@@ -119,7 +126,9 @@ unsigned int hent_parent_dir_id(int dirid) {
     return(returid);
 }
 
-
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void clean_music_oversigt(music_oversigt_type musicoversigt[])
 
@@ -139,10 +148,11 @@ void clean_music_oversigt(music_oversigt_type musicoversigt[])
     }
 }
 
-
+// ****************************************************************************************
 //
 // check about cd cover to created from
 //
+// ****************************************************************************************
 
 int findcoverfile(char *path,char *fundetnavn) {
     int n=0;
@@ -175,10 +185,11 @@ int findcoverfile(char *path,char *fundetnavn) {
     }
 }
 
+// ****************************************************************************************
 //
 // get artisid from db
 //
-
+// ****************************************************************************************
 
 int get_artistid(char *artistname) {
     // mysql stuf
@@ -209,7 +220,12 @@ int get_artistid(char *artistname) {
     return(artistid);
 }
 
+
+// ****************************************************************************************
+//
 // check about song name exist in db
+//
+// ****************************************************************************************
 
 int song_exist_in_db(char *filename,char *name) {
   char database[256];
@@ -237,10 +253,12 @@ int song_exist_in_db(char *filename,char *name) {
   return(songid);
 }
 
-
+// ****************************************************************************************
 //
 // build music database from path (dirpath)
 // return >0 if error
+//
+// ****************************************************************************************
 
 int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt[]) {
   int parent;
@@ -257,11 +275,11 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
   DIR *dirp=NULL;
   DIR *dirp1=NULL;
   DIR *dirp2=NULL;
-  char sqlselect[1024];
-  char sqlselect1[1024];
-  char sqlselect2[1024];
-  char checkdir[1024];
-  char checkdir2[1024];
+  char sqlselect[4096];
+  char sqlselect1[4096];
+  char sqlselect2[4096];
+  char checkdir[4096];
+  char checkdir2[4096];
   MYSQL *conn;
   MYSQL *conn1;
   MYSQL *conn2;
@@ -519,11 +537,12 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
   if (i) return 0; else return 1;
 }
 
-
+// ****************************************************************************************
 //
 // update_music_oversigt
 // update list pr dir id from mythtv-backend or internal loader
 //
+// ****************************************************************************************
 
 int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int directory_id) {
     char fundetpath[512];
@@ -632,8 +651,11 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
 
 
 
-
+// ****************************************************************************************
+//
 // update list med playlistes
+//
+// ****************************************************************************************
 
 int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     char sqlselect[512];
@@ -687,8 +709,11 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     return(i);
 }
 
-
+// ****************************************************************************************
+//
 // save playlistes in db
+//
+// ****************************************************************************************
 
 int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *playlistname) {
   bool fault;
@@ -728,14 +753,19 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *play
 }
 
 
-int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
+int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
+  return(0);
 }
 
-
+// ****************************************************************************************
 //
 // update music struct after search
 //
+// ****************************************************************************************
 
 int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *searchtxt,int search_art) {
     char convert_command[512];
@@ -830,10 +860,11 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
     return(i);
 }
 
-
+// ****************************************************************************************
 //
 // check music internal db exist if yes use it.
 // return true if exist
+// ****************************************************************************************
 
 bool global_use_internal_music_loader_system_exist() {
   MYSQL *conn;
@@ -856,10 +887,11 @@ bool global_use_internal_music_loader_system_exist() {
   return(dbexist);
 }
 
-
+// ****************************************************************************************
 //
 // loader valgte play liste
 //
+// ****************************************************************************************
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     GLuint texture; //The id of the texture
@@ -920,8 +952,11 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     mysql_close(conn);
 }
 
-
+// ****************************************************************************************
+//
 // load music conver gfx
+//
+// ****************************************************************************************
 
 int load_music_covergfx(music_oversigt_type musicoversigt[]) {
     unsigned int i=0; // hent alle music convers
@@ -938,10 +973,13 @@ int load_music_covergfx(music_oversigt_type musicoversigt[]) {
     return(i);
 }
 
-
+// ****************************************************************************************
+//
 // show music oversigt
 // denne som bruges **************************
 // this in use in main
+//
+// ****************************************************************************************
 
 void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected) {
     int buttonsize=180;

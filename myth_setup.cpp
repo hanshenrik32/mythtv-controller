@@ -125,7 +125,14 @@ const GLfloat selectcolor[3]={1.0f,1.0f,0.0f};		                              //
 
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
 
+
+
+// ****************************************************************************************
+//
 // Denne som bruges
+//
+// ****************************************************************************************
+
 
 void myglprint4(char *string)
 {
@@ -135,10 +142,11 @@ void myglprint4(char *string)
 }
 
 
-
+// ****************************************************************************************
 //
 // print string
 //
+// ****************************************************************************************
 
 void myglprint5(char *string)
 {
@@ -150,9 +158,11 @@ void myglprint5(char *string)
 }
 
 
+// ****************************************************************************************
 //
 // print string
 //
+// ****************************************************************************************
 
 void stroke_output2(GLfloat x, GLfloat y, char *format,...) {
     va_list args;
@@ -169,8 +179,11 @@ void stroke_output2(GLfloat x, GLfloat y, char *format,...) {
 }
 
 
-
+// ****************************************************************************************
+//
 // draw cursor on screen at pos
+//
+// ****************************************************************************************
 
 void showcoursornow(int cxpos,int cypos,int txtlength) {
   glPushMatrix();
@@ -198,7 +211,11 @@ void showcoursornow(int cxpos,int cypos,int txtlength) {
 
 // *********************************************************************************************************
 
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
 
 rss_stream_class::rss_stream_class() {
   antal=0;
@@ -210,8 +227,11 @@ rss_stream_class::rss_stream_class() {
   }
 }
 
-
+// ****************************************************************************************
+//
 // destructor
+//
+// ****************************************************************************************
 
 rss_stream_class::~rss_stream_class() {
   for(int n=0;n<maxantal;n++) {
@@ -220,10 +240,11 @@ rss_stream_class::~rss_stream_class() {
   }
 }
 
-
+// ****************************************************************************************
 //
 // loader from db
 //
+// ****************************************************************************************
 
 int rss_stream_class::load_rss_data() {
   // mysql vars
@@ -249,12 +270,14 @@ int rss_stream_class::load_rss_data() {
     }
     mysql_close(conn);
   }
+  return(1);
 }
 
-
+// ****************************************************************************************
 //
 // save/update rss db
 //
+// ****************************************************************************************
 
 int rss_stream_class::save_rss_data() {
   bool doexist;
@@ -325,7 +348,7 @@ int rss_stream_class::save_rss_data() {
               sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
-              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
+              sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
               mysql_query(conn,sqlstring);
               res1 = mysql_store_result(conn);
             }
@@ -335,7 +358,7 @@ int rss_stream_class::save_rss_data() {
           sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
-          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name,0);
+          sprintf(sqlstring,"insert into internetcontent (name,type) values('%s')",rss_source_feed[n].stream_name);
           mysql_query(conn,sqlstring);
           res1 = mysql_store_result(conn);
         }
@@ -343,25 +366,39 @@ int rss_stream_class::save_rss_data() {
     } //for next
     mysql_close(conn);
   }
+  return(1);
 }
 
 
+// ****************************************************************************************
+//
 // get url
+//
+// ****************************************************************************************
 
 int rss_stream_class::set_stream_url(int nr,char *url) {
   strcpy(rss_source_feed[nr].stream_url,url);
+  return(1);
 }
 
 
+// ****************************************************************************************
+//
 // update name
+//
+// ****************************************************************************************
 
 int rss_stream_class::set_stream_name(int nr,char *name) {
   strcpy(rss_source_feed[nr].stream_name,name);
+  return(1);
 }
 
 
-
-// ************************************************************** setup video config *************************
+// ****************************************************************************************
+//
+// Setup video config
+//
+// ****************************************************************************************
 
 void show_setup_screen() {
     char resl[1024];
@@ -686,9 +723,13 @@ void show_setup_screen() {
 }
 
 
+
+// ****************************************************************************************
 //
-// ************************************************************** setup video config *************************
-// play options menu
+// Setup video config
+//
+// ****************************************************************************************
+
 
 void show_setup_video() {
     char resl[1024];
@@ -912,9 +953,12 @@ void show_setup_video() {
 }
 
 
+// ****************************************************************************************
+//
+// Setup tema config
+//
+// ****************************************************************************************
 
-
-// ************************************************************** setup tema config *************************
 
 void show_setup_tema() {
     char temptxt[80];
@@ -1035,7 +1079,11 @@ void show_setup_tema() {
 
 
 
-// ************************************************ setup font ****************************
+// ****************************************************************************************
+//
+// Setup font
+//
+// ****************************************************************************************
 
 void show_setup_font(int startofset) {
     int i;
@@ -1060,12 +1108,12 @@ void show_setup_font(int startofset) {
     glEnd();
     glPopMatrix();
     for (i=0;i<8;i++) {
-      if (i==4) {
+      if (i==2) {
         winsizx=600;
         winsizy=20;
         xpos=180;
-        ypos=360;
-        glDisable(GL_BLEND);
+        ypos=360+40;
+        glDisable(GL_BLEND);//aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
         glBlendFunc(GL_ONE, GL_ONE);
         glBindTexture(GL_TEXTURE_2D,setupkeysbar1);                 // setupkeysbar1
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1084,12 +1132,26 @@ void show_setup_font(int startofset) {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(25.0f, 25.0f, 1.00f);
       if ((i+startofset)-3>=0) strcpy(temptxt,(char *) aktivfont.typeinfo[(i+startofset)-3].fontname);
-      else sprintf(temptxt,"                                        ");
-      //sprintf(temptxt,"Tema:%d ",tema);
+      else sprintf(temptxt,"                                     ");
+      //aktivfont.selectfont(aktivfont.typeinfo[i+startofset].fontname);
       glcRenderString(temptxt);
-        glEnable(GL_TEXTURE_2D);
+      glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+    // show sample
+    glPushMatrix();
+    glTranslatef(540 , 400 , 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(25.0f, 25.0f, 1.00f);
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    //aktivfont.selectfont(aktivfont.typeinfo[2].fontname);
+    //aktivfont.selectfont("ani");
+    aktivfont.selectfont((char *) aktivfont.typeinfo[(i+startofset)-3].fontname);
+    glcRenderString("Sample string...");
+    aktivfont.selectfont(configfontname);
+    glPopMatrix();
+
 /*
     // select selected font
     if ((startofset>0) && (fontselected==false)) {
@@ -1147,7 +1209,11 @@ void show_setup_font(int startofset) {
 
 
 
-// ****************************************************** network *************************
+// ****************************************************************************************
+//
+// Network
+//
+// ****************************************************************************************
 
 void show_wlan_networks(int valgtnr) {
     int i;
@@ -1257,9 +1323,11 @@ void show_wlan_networks(int valgtnr) {
     glPopMatrix();
 }
 
+// ****************************************************************************************
 //
-// ************** network setup window *****************************************************
+// network setup window
 //
+// ****************************************************************************************
 
 void show_setup_network() {
     char tmptxt[1024];
@@ -1503,8 +1571,11 @@ void show_setup_network() {
 
 
 
-
-// ******************************************* setup sound config **********************************************
+// ****************************************************************************************
+//
+// Setup sound config
+//
+// ****************************************************************************************
 
 void show_setup_sound() {
     // mask
@@ -1669,11 +1740,12 @@ void show_setup_sound() {
 }
 
 
-
+// ****************************************************************************************
 //
-// *********************************** setup sql database info ***********************************************
 // db mythtv or xbmc ok
-// backend
+// Backend
+//
+// ****************************************************************************************
 
 void show_setup_sql() {
     char text[200];
@@ -2024,11 +2096,11 @@ void show_setup_sql() {
     if (do_show_setup_select_linie==7) showcoursornow(-200,-550,strlen(configrecordpath));
 }
 
-
+// ****************************************************************************************
 //
-// ********************* setuo keys ************************************************************************
+// Setuo keys
 //
-
+// ****************************************************************************************
 void show_setup_keys() {
     int winsizx=100;
     int winsizy=300;
@@ -2625,10 +2697,12 @@ void showrss_list() {
 }
 
 
-//
-// ********************* setuo rss ************************************************************************
-//
 
+// ****************************************************************************************
+//
+// setuo rss
+//
+// ****************************************************************************************
 void show_setup_rss(unsigned int startofset) {
     int winsizx=100;
     int winsizy=300;
@@ -2819,11 +2893,13 @@ void show_setup_rss(unsigned int startofset) {
 
 
 
-
+// ****************************************************************************************
 //
 // call tv_graber create defaut config and do auto config if posible
 // will try to make list of all channels from tv_graber
 // by pipe the command in shell
+//
+// ****************************************************************************************
 
 int txmltvgraber_createconfig() {
   char path[1024];
@@ -2962,9 +3038,11 @@ int txmltvgraber_createconfig() {
 }
 
 
+// ****************************************************************************************
 //
 // create/update from old config file to new xmltv grabber config file. from tvgude config in array channel_list
 //
+// ****************************************************************************************
 
 int txmltvgraber_updateconfigfile() {
   char path[1024];
@@ -3035,10 +3113,11 @@ int txmltvgraber_updateconfigfile() {
 
 
 
-
+// ****************************************************************************************
 //
 // constructor for channel_list array
 //
+// ****************************************************************************************
 
 channel_configfile::channel_configfile() {
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
@@ -3055,10 +3134,11 @@ channel_configfile::~channel_configfile() {
 
 }
 
-
+// ****************************************************************************************
 //
 // read xmltv config file
 //
+// ****************************************************************************************
 
 int channel_configfile::readgraber_configfile() {
   char path[1024];
@@ -3120,22 +3200,27 @@ int channel_configfile::writegraber_configfile() {
 
 */
 
+// ****************************************************************************************
+//
 // kill running graber
 //
+// ****************************************************************************************
 
 int killrunninggraber() {
   int sysresult;
   char processname[1024];
   sprintf(processname,"killall -9 %s",aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   sysresult=system(processname);
-  if (sysresult) return(sysresult);
+  if (sysresult) return(sysresult); else return(0);
 }
 
 
-
+// ****************************************************************************************
 //
 // parse channel info from xmltvguide reader channel overview xmlfile
 // load in to channel_list array
+//
+// ****************************************************************************************
 
 int load_channel_list_from_graber() {
   FILE *fil;
@@ -3309,9 +3394,12 @@ int load_channel_list_from_graber() {
   if (errors) return(-1); else return(sysresult);
 }
 
+
+// ****************************************************************************************//
 //
 // save tvguide channel info
 //
+// ****************************************************************************************
 
 bool save_channel_list() {
   FILE *fil;
@@ -3410,10 +3498,13 @@ void order_channel_list() {
   }
 }
 
+
+// ****************************************************************************************
 //
 // order tv channels in tvguide db (mysql)
 // by order in channel_list array
 //
+// ****************************************************************************************
 
 int order_channel_list_in_tvguide_db() {
   // mysql vars
@@ -3448,11 +3539,11 @@ int order_channel_list_in_tvguide_db() {
 }
 
 
-
+// ****************************************************************************************
 //
 // tv guide
 //
-
+// ****************************************************************************************
 
 void show_setup_tv_graber(int startofset) {
     const char *weekdaysdk[10]={"Mandag","Tirsdag","Onsdag","Torsdag","Fredag","lørdag","søndag"};
@@ -3696,10 +3787,11 @@ void show_setup_tv_graber(int startofset) {
 
 
 
-
+// ****************************************************************************************
 //
-// ********************* setup start interface ********************************************** select sub menu
+// Setup start interface * select sub menu
 //
+// ****************************************************************************************
 
 void show_setup_interface() {
     int ii=0;

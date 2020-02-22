@@ -1,7 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.38.1"};
+const char *SHOWVER={"0.38.2.1"};
 
 // debug modes
 // 1  = wifi net
@@ -19,7 +19,7 @@ const char *SHOWVER={"0.38.1"};
 // Keys
 //
 // music overview 'S' Save playlist
-//
+// Spotify        'D' Select device to play on
 //
 
 //
@@ -29,6 +29,9 @@ const char *SHOWVER={"0.38.1"};
 //
 const int doxmltvupdateinterval=60*60*2;
 const int dorssupdateinterval=60*60;
+
+// max string length search spotify stuf
+const int search_string_max_length=15;
 
 // screen saver options
 

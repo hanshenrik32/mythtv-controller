@@ -13,55 +13,66 @@
 #include <curl/curl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <curl/curl.h>
+#include <string>
+// json parser
 #include "json-parser/json.h"
-#include "readjpg.h"
-#include "myctrl_readwebfile.h"
+// global def
 #include "myth_setup.h"
-
-// web server stuf
+// web server stuf used to get token
 #include "mongoose-master/mongoose.h"
-
-static const char *s_http_port = "8000";
-static struct mg_serve_http_opts s_http_server_opts;
-
-const int spotify_pathlength=80;
-const int spotify_namelength=80;
-const int spotify_desclength=2000;
-
-const int feed_url=2000;
-
 #include "utility.h"
 #include "myth_ttffont.h"
 #include "utility.h"
+// jpg/png file reader
 #include "readjpg.h"
 #include "loadpng.h"
 // web file loader
 #include "myctrl_readwebfile.h"
 #include "myctrl_spotify.h"
 
+// web port
+static const char *s_http_port = "8000";
+static struct mg_serve_http_opts s_http_server_opts;
+
+const int spotify_pathlength=80;
+const int spotify_namelength=80;
+const int spotify_desclength=2000;
+const int feed_url=2000;
+
+
+const char *spotify_json_path = "spotify_json/";
+const char *spotify_gfx_path = "spotify_gfx/";
+
+
+size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
+    data->append((char*) ptr, size * nmemb);
+    return size * nmemb;
+}
+
+
+
+// ****************************************************************************************
 //
 // text render is glcRenderString for freetype font support
 //
-
-
+// ****************************************************************************************
 
 extern int spotifyknapnr;
 extern int spotify_select_iconnr;
-
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
-
-extern GLuint big_search_bar;
-
+extern GLuint big_search_bar_playlist;                    // big search bar used by sporify search
+extern GLuint big_search_bar_track;                    // big search bar used by sporify search
+extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
+extern GLuint big_search_bar_artist;                    // big search bar used by sporify search
 extern char *keybuffer;
 extern int keybufferindex;
-
 extern bool do_select_device_to_play;
-
 extern GLuint mobileplayer_icon;
 extern GLuint pcplayer_icon;
 extern GLuint unknownplayer_icon;
-
+extern GLuint spotify_pil;
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -75,11 +86,9 @@ extern int screensizey;
 extern int screeny;
 extern GLuint spotify_askplay;                                  // ask open icon
 extern GLuint spotify_askopen;                                  // ask play icon
-
 extern GLuint setuprssback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
-
 extern int debugmode;
 extern unsigned int musicoversigt_antal;                        //
 extern int do_stream_icon_anim_icon_ofset;                      //
@@ -91,11 +100,9 @@ extern fontctrl aktivfont;
 extern int orgwinsizey,orgwinsizex;
 extern int _sangley;
 extern int do_show_setup_select_linie;
-
 extern GLuint _textureIdloading,_textureIdloading1;
-//extern GLuint _textureIdloading_mask;
 
-
+extern GLuint spotify_icon_border;
 // stream mask
 extern GLuint onlinestreammask;
 extern GLuint onlinestreammaskicon;		// icon mask on web icon
@@ -104,8 +111,14 @@ extern GLint cur_avail_mem_kb;
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
+extern bool spotify_oversigt_loaded_begin;
 
-// server handler
+
+// ****************************************************************************************
+//
+// web server handler (internal function)
+//
+// ****************************************************************************************
 
 static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
@@ -150,7 +163,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           }
           user_token[codel-4]='\0';
         }
-        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token2.txt",base64_code,user_token);
         sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
@@ -166,8 +178,8 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           error=getline(&file_contents,&len,tokenfile);
           strcpy(token_refresh,file_contents);
           token_refresh[strlen(token_refresh)-1]='\0';
-          printf("token     %s\n",token_string);
-          printf("ref token %s\n",token_refresh);
+//          printf("token     %s\n",token_string);
+//          printf("ref token %s\n",token_refresh);
           spotify_oversigt.spotify_set_token(token_string,token_refresh);
           fclose(tokenfile);
           free(file_contents);
@@ -203,9 +215,12 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
 }
 
 
-
+// ****************************************************************************************
+//
 // client handler
 // get JSON return from spotify
+//
+// ****************************************************************************************
 
 static int s_exit_flag = 0;
 bool debug_json=false;
@@ -241,10 +256,11 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 }
 
 
-
+// ****************************************************************************************
 //
-// constructor spotify devices
+// Constructor spotify devices
 //
+// ****************************************************************************************
 
 spotify_device_def::spotify_device_def() {
   strcpy(id,"");
@@ -256,12 +272,13 @@ spotify_device_def::spotify_device_def() {
   devvolume=0;
 }
 
+// ****************************************************************************************
 //
-// constructor spotify active player
+// Constructor spotify active player
 //
+// ****************************************************************************************
 
-
-spotify_active_play_info_type::spotify_active_play_info_type() {                // sample data down here
+spotify_active_play_info_type::spotify_active_play_info_type() {
   progress_ms=0;
   duration_ms=0;
   strcpy(song_name,"");
@@ -275,32 +292,36 @@ spotify_active_play_info_type::spotify_active_play_info_type() {                
 };
 
 
-
+// ****************************************************************************************
 //
-// constructor spotify oversigt type
+// Constructor spotify oversigt type
 //
+// ****************************************************************************************
 
 spotify_oversigt_type::spotify_oversigt_type() {
   strcpy(feed_showtxt,"");
   strcpy(feed_name,"");
   strcpy(feed_desc,"");
   strcpy(feed_gfx_url,"");
-  strcpy(feed_gfx_mythtv,"");
+  strcpy(feed_release_date,"");
   strcpy(playlistid,"");
   strcpy(playlisturl,"");
   feed_group_antal=0;
   feed_path_antal=0;
   nyt=false;
   textureId=0;
+  type=0;                                 // 0 = playlist / 1 = songs / 2 = search artist / 3 = artist records/albums
   intnr=0;
 };
 
 
 
 
+// ****************************************************************************************
 //
 // constructor
 //
+// ****************************************************************************************
 
 spotify_class::spotify_class() : antal(0) {
     for(int i=0;i<maxantal;i++) stack[i]=0;
@@ -308,12 +329,16 @@ spotify_class::spotify_class() : antal(0) {
     spotify_oversigt_loaded=false;
     spotify_oversigt_loaded_nr=0;
     antal=0;
+    type=0;
+    searchtype=0;
+    search_loaded=false;                                                        // load icobn gfx afload search is loaded done by thread.
     spotify_aktiv_song_antal=0;                                                 //
-    gfx_loaded=false;			                                                      // gfx loaded
+    gfx_loaded=false;			                                                      // gfx loaded default false
     spotify_is_playing=false;                                                   // is we playing any media
     spotify_is_pause=false;                                                     // is player on pause
     show_search_result=false;                                                   // are we showing search result in view
     antalplaylists=0;                                                           // antal playlists
+    loaded_antal=0;                                                             // antal loaded
     search_playlist_song=0;
     int port_cnt, n;
     int err = 0;
@@ -335,13 +360,18 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(spotify_client_id,"05b40c70078a429fa40ab0f9ccb485de");
     strcpy(spotify_secret_id,"e50c411d2d2f4faf85ddff16f587fea1");
     strcpy(active_default_play_device_name,"");
+    strcpy(overview_show_band_name,"");                                         //
+    strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
+    spotify_update_loaded_begin=false;                                          // true then we are update the stack data
 }
 
-
+// ****************************************************************************************
 //
 // destructor
 //
+// ****************************************************************************************
+
 spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
     mg_mgr_free(&client_mgr);
@@ -349,9 +379,45 @@ spotify_class::~spotify_class() {
 }
 
 
+// ****************************************************************************************
 //
-// refresh token
+// set loader flag
 //
+// ****************************************************************************************
+
+
+void spotify_class::set_spotify_update_flag(bool flag) {
+  spotify_update_loaded_begin=flag;
+}
+
+// ****************************************************************************************
+//
+// get loader flag
+//
+// ****************************************************************************************
+
+
+bool spotify_class::get_spotify_update_flag() {
+  return(spotify_update_loaded_begin);
+}
+
+
+
+// ****************************************************************************************
+// file writer
+// ****************************************************************************************
+
+static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+  return written;
+}
+
+
+// ****************************************************************************************
+//
+// Spotify refresh token
+// Not in use
+// ****************************************************************************************
 
 int spotify_class::spotify_refresh_token() {
   int curl_error;
@@ -395,56 +461,116 @@ int spotify_class::spotify_refresh_token() {
 
 
 
-//
-// Spotify Get user id
-//
 
-int spotify_class::spotify_get_user_id() {
-  int curl_error;
+// *********************************************************************************************************************************
+// In use
+// Refresh token
+// return http code
+//
+// ********************************************************************************************
+
+int spotify_class::spotify_refresh_token2() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
   char doget[2048];
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
-    printf("curl = %s \n",doget);
-    curl_error=system(doget);
-    if (WEXITSTATUS(curl_error)==0) {
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(newtoken,"");
+  curl = curl_easy_init();
+  if ((curl) && (strcmp(spotifytoken_refresh,"")!=0)) {
+    // add userinfo + basic auth
+    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, spotify_secret_id);
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //
+    curl_easy_setopt(curl, CURLOPT_URL, "https://accounts.spotify.com/api/token");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //chunk = curl_slist_append(chunk, base64_code);
+    errbuf[0] = 0;
+    // set type post
+    //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s",spotifytoken_refresh);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
     }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      printf("Spotify new token. \n");
+      //printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      //process_value_playinfo(value, 0,0);                                                     // fill play info
+      if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
+        strncpy(newtoken,response_string.c_str()+17,180);
+        newtoken[181]='\0';
+        printf("Token valid.\n");
+        strcpy(spotifytoken,newtoken);                                         // update spotify token
+      }
+    } else {
+      printf("Error code httpCode %d \n. ",httpCode);
+      printf("Curl error: %s\n", curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
   }
-  return 1;
+  return(httpCode);
 }
 
 
+
+// ****************************************************************************************
 //
-// save the token in used
+// save the refresh token in used
 //
+// ****************************************************************************************
 
 void spotify_class::spotify_set_token(char *token,char *refresh) {
   strcpy(spotifytoken,token);
   strcpy(spotifytoken_refresh,refresh);
 }
 
-//
-// Get a List of a User's Playlists
-// get only the id of playlists (not songs)
-//
-
-int spotify_class::spotify_get_list_of_users_playlists(char *client_id) {
-  int curl_error;
-  char doget[2048];
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/users/%s/playlists' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",client_id,spotifytoken);
-    //printf("doget = %s \n",doget);
-    //system(doget);
-    if (WEXITSTATUS(curl_error)==0) {
-    }
-  }
-}
 
 
 
-//
+// ****************************************************************************************
+// DEBUG code
 //  json parser used to parse the return files from spotify api
 //
-
+// ****************************************************************************************
 
 void spotify_class::playlist_print_depth_shift(int depth) {
   bool debug_json=false;
@@ -454,9 +580,16 @@ void spotify_class::playlist_print_depth_shift(int depth) {
   }
 }
 
+
+// * Default view ***********************************************************************************************************************************************
+
+
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 //
+// ****************************************************************************************
+
 bool playlist_process_playlist=false;
 bool playlist_process_songs=false;
 bool playlist_process_url=false;
@@ -468,10 +601,16 @@ bool playlist_process_items=false;
 char playlistname[256];
 char playlistid[256];
 char playlistgfx[2048];
+char playlistgfx_top[2048];
 
-//
+// ****************************************************************************************
+// INTERNAL
 // process types in file playlist
+// parse user playlist
 //
+// Set process flags for  playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) function
+//
+// ****************************************************************************************
 
 void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
@@ -504,6 +643,12 @@ void spotify_class::playlist_process_object(json_value* value, int depth,MYSQL *
 
 
 
+// ****************************************************************************************
+//
+// parse user playlist
+//
+// ****************************************************************************************
+
 void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *conn) {
   bool debug_json=false;
   int length, x;
@@ -518,15 +663,16 @@ void spotify_class::playlist_process_array(json_value* value, int depth,MYSQL *c
 }
 
 
-//
+// ****************************************************************************************
+// INTERNAL lolevel func
 // json parser start call function playlist db update
+// parse user playlist
 //
+// ****************************************************************************************
 
 void spotify_class::playlist_process_value(json_value* value, int depth,int x,MYSQL *conn) {
-
     char filename[512];
     char downloadfilenamelong[2048];
-
     MYSQL_RES *res;
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
@@ -566,29 +712,31 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           // set start of items in list
           playlist_process_items=false;
         }
-        if (( playlist_process_image ) && ( depth == 8 ) && ( x == 1 )) {
+        if ( playlist_process_image ) {
+          //printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+          if (( depth == 8 ) && ( x == 1 )) {
+          }
           playlist_process_image=false;
         }
         // works for songs not playlist
         if (playlist_process_url) {
-          printf("gfx icon found = %s \n", value->u.string.ptr);
+          //printf(" Process_image song *************************depth=%d x=%d url = %s  ********************************************** \n",depth,x,value->u.string.ptr);
+          //printf("Song gfx icon found = %s \n", value->u.string.ptr);
           strcpy(filename,"");
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
           if (strcmp(filename,"")!=0) {
-            strcpy(downloadfilenamelong,"tmp/");
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/");
+            strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
           }
           strcpy(playlistgfx,downloadfilenamelong);
           playlist_process_url=false;
         }
-        if (playlist_process_name) {
-          //printf("x = %2d deep=%2d ",x,depth);
-          //printf(" string = %10s \n ",value->u.string.ptr);
-        }
         // get playlist name
-        // and create datdabase record playlist info
+        // and create datdabase record playlist info record
         if ((playlist_process_name) && (depth==5) && (x==5)) {
           //if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
           strcpy(playlistname,value->u.string.ptr);
@@ -601,7 +749,9 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
               playlistexist=true;
             }
           }
+          // if not exist create playlist
           if (!(playlistexist)) {
+            //printf("Song name insert : %s \n", playlistname );
             sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
@@ -616,14 +766,186 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
 }
 
 
-
-// Get a List of Current User's Playlists
+// ****************************************************************************************
 //
+// Get a List of Current User's Playlists (playlist NOT songs)
+// IN use
 // get users play lists
 // write to spotify_users_playlist.json
 //
+//
+// ****************************************************************************************
 
-int spotify_class::spotify_get_user_playlists(bool force) {
+
+int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
+
+  std::size_t foundpos;
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  FILE *outfile;
+  char *base64_code;
+  char post_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+  char auth_kode[2048];
+  curl = curl_easy_init();
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  if (curl) {
+    // add userinfo + basic auth
+    //curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    //curl_easy_setopt(curl, CURLOPT_XOAUTH2_BEARER,spotifytoken);
+    //curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
+    //curl_easy_setopt(curl, CURLOPT_PASSWORD, spotify_secret_id);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    //
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/playlists");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    // set type post
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    /* Add a custom header */
+    errbuf[0] = 0;
+    // set type post
+    //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    sprintf(post_playlist_data,"limit=50&offset=%d",startofset);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
+    outfile=fopen("spotify_users_playlist.json","wb");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, outfile);
+
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      printf("Download ok. \n");
+      //printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      //process_value_playinfo(value, 0,0);                                                     // fill play info
+    } else {
+      printf("Error code httpCode %d \n. ",httpCode);
+      printf("Curl error: %s\n", curl_easy_strerror(res));
+    }
+    // always cleanup
+    fclose(outfile);
+    curl_easy_cleanup(curl);
+  }
+  return(httpCode);
+
+
+/*
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  FILE *outfile;
+  char *base64_code;
+  char get_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+  curl = curl_easy_init();
+  if (curl) {
+    // add userinfo + basic auth
+    // bearer
+    curl_easy_setopt(curl, CURLOPT_XOAUTH2_BEARER,spotifytoken);
+    // basic
+    //curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
+    //curl_easy_setopt(curl, CURLOPT_PASSWORD, spotify_secret_id);
+    // Add a custom header
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    // url
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/playlists");
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    // disable progress meter, set to 0L to enable and disable debug output
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+    errbuf[0] = 0;
+    // set type post
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    sprintf(get_playlist_data,"limit=50&offset=%d",startofset);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, get_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(get_playlist_data));
+    outfile=fopen("spotify_users_playlist.json","wb");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, outfile);
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if (len) fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    curl_easy_cleanup(curl);                                                    // always cleanup
+    fclose(outfile);                                                            // close file
+    if (httpCode == 200) {
+      printf("Spotify playlist downloaded.\n");
+      //printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      //process_value_playinfo(value, 0,0);                                                     // fill play info
+      //json_value_free(value);                                                                 // json clean up
+    } else {
+      printf("Error code httpCode %d \n. ",httpCode);
+      printf("error text : %s\n", curl_easy_strerror(res));
+      exit(1);
+    }
+  }
+  return(httpCode);
+  */
+}
+
+
+
+// ****************************************************************************************
+//
+// Get users playlist
+// in use
+// The default view
+//
+// ****************************************************************************************
+
+int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -633,6 +955,7 @@ int spotify_class::spotify_get_user_playlists(bool force) {
   char sql[8192];
   char doget[4096];
   char filename[4096];
+  char temptxt[80];
   char downloadfilenamelong[4096];
   int curl_error;
   FILE *json_file;
@@ -645,6 +968,10 @@ int spotify_class::spotify_get_user_playlists(bool force) {
   bool playlistexist;
   bool dbexist=false;
   conn = mysql_init(NULL);
+  loaded_antal=0;
+  unsigned int spotify_playlistantal=0;
+  unsigned int spotify_playlistantal_loaded=0;
+  bool spotifyplaylistloader_done=false;
   if (conn) {
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
        mysql_error(conn);
@@ -683,36 +1010,60 @@ int spotify_class::spotify_get_user_playlists(bool force) {
       res = mysql_store_result(conn);
     }
     // download all playlist (name + id) in one big file NOT songs
+    // if we have a token
     if (strcmp(spotifytoken,"")!=0) {
-      sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",spotifytoken);
-      printf("doget = %s \n",doget);
-      curl_error=system(doget);
-      if (curl_error!=0) {
-        fprintf(stderr,"Curl error get user playlists\n");
+      // 50 is the max
+      //download_user_playlist(spotifytoken,startoffset);
+      while (spotifyplaylistloader_done==false) {
+        sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
+        curl_error=system(doget);
+        if (curl_error!=0) {
+          fprintf(stderr,"Curl error get user playlists\n");
+          exit(0);
+        }
+        // hent users playlist from spotify api
+        system("cat spotify_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > spotify_users_playlist.txt");
+        // get antal playliste first time (we can only load 50 at time)
+        if (spotify_playlistantal_loaded==0) {
+          system("cat spotify_users_playlist.json | grep total | tail -1 | awk {'print $3'} > spotify_users_playlist_antal.txt");
+          json_file = fopen("spotify_users_playlist_antal.txt", "r");
+          fscanf(json_file, "%s", temptxt);
+          if (strcmp(temptxt,"")!=0) spotify_oversigt.spotify_playlist_antal = atoi(temptxt);
+          else spotify_oversigt.spotify_playlist_antal = 0;
+          fclose(json_file);
+        }
+        stat("spotify_users_playlist.txt", &filestatus);                              // get file info
+        file_size = filestatus.st_size;                                               // get filesize
+        if (file_size>0) {
+          file_contents = (char*) malloc(filestatus.st_size);                           // get some work mem
+          json_file = fopen("spotify_users_playlist.txt", "r");
+          if (json_file) {
+            while(!(feof(json_file))) {
+              fscanf(json_file, "%s", file_contents);
+              // process playlist id
+              spotify_oversigt.spotify_get_playlist(file_contents,force,1);
+              spotify_oversigt.clean_spotify_oversigt();
+              loaded_antal++;
+            }
+            fclose(json_file);
+          }
+          if (file_contents) free(file_contents);                                                          // free memory again
+        }
+        spotify_playlistantal_loaded+=startoffset;
+        // next loop
+        // 50 is loaded on each loop until end
+        if ((startoffset+50)<spotify_oversigt.spotify_playlist_antal) {
+          startoffset+=50;
+        } else {
+          startoffset=spotify_oversigt.spotify_playlist_antal-startoffset;
+        }
+        if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
       }
-      stat("spotify_users_playlist.json", &filestatus);                              // get file info
-      file_size = filestatus.st_size;                                               // get filesize
-      file_contents = (char*) malloc(filestatus.st_size);
-      json_file = fopen( "spotify_users_playlist.json", "rt");
-        if (json_file == NULL) {
-        fprintf(stderr, "Unable to open spotify_users_playlist.json\n");
-        free(file_contents);                                                        //
-        return 1;
-      }
-      if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-        fprintf(stderr, "Unable to read spotify playlist content of spotify_users_playlist.json\n");
-        fclose(json_file);
-        free(file_contents);                                                        //
-        return 1;
-      }
-      fclose(json_file);
-      json = (json_char*) file_contents;
-      value = json_parse(json,file_size);                                           // parse playlist file
-      // parse from root and inster in db (playlist table)
-      playlist_process_value(value, 0,0,conn);                                      // fill stack array
-      json_value_free(value);                                                       // json clean up
-      free(file_contents);                                                          // free memory again
+      if (remove("spotify_users_playlist.txt")!=0) printf("Error remove user playlist file spotify_users_playlist.txt\n");
       // save data to mysql db
+    } else {
+        printf("Error downloading user playlist");
+        exit(0);
     }
     sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
     printf("process playlist ...... \n");
@@ -720,8 +1071,8 @@ int spotify_class::spotify_get_user_playlists(bool force) {
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
-        if (spotify_oversigt.spotify_get_playlist(row[1],force)==1) {
+        if (debugmode) printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+        if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
           printf("Error create playlist %s \n",row[1]);
         }
       }
@@ -729,23 +1080,32 @@ int spotify_class::spotify_get_user_playlists(bool force) {
     printf("process playlist done.. \n");
     mysql_close(conn);
   }
+  return(1);
 }
 
-// json parser used to parse the return files from spotify api
-//
-//
+// songs ********************************************************************************************************************************
 
-void spotify_class::print_depth_shift(int depth)
-{
+
+// ****************************************************************************************
+//
+// json parser used to parse the return files from spotify api (playlist files (songs))
+//
+// ****************************************************************************************
+
+void spotify_class::print_depth_shift(int depth) {
   int j;
+  /*
   for (j=0; j < depth; j++) {
-    if (debug_json) printf(" ");
+    printf("\t");
   }
+  */
 }
 
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
-//
+// used to parse search result
+// ****************************************************************************************
 
 bool process_tracks=false;
 bool process_playlist=false;
@@ -756,21 +1116,25 @@ bool process_image=false;
 bool process_name=false;
 bool process_items=false;
 bool process_track_nr=false;
+bool process_release_date=false;
+bool process_uri=false;
+bool process_id=false;
 
+// ****************************************************************************************
 //
 // process types in file for process playlist files (songs)
 //
+// ****************************************************************************************
 
-void spotify_class::process_object(json_value* value, int depth) {
+void spotify_class::process_object_playlist(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
   }
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
-    print_depth_shift(depth);
-    //if (strcmp(value->u.object.values[x].name,"name")==0)
-    if (debug_json) printf("object[%d].name = %s\n", x, value->u.object.values[x].name);
+    //print_depth_shift(depth);
+    //printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name,"tracks")==0) {
       process_tracks=true;
     }
@@ -779,6 +1143,9 @@ void spotify_class::process_object(json_value* value, int depth) {
     }
     if (strcmp(value->u.object.values[x].name , "process_playlist" )==0) {
       process_playlist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "release_date" )==0) {
+      process_release_date=true;
     }
     if (strcmp(value->u.object.values[x].name , "description" )==0) {
       process_description=true;
@@ -789,49 +1156,67 @@ void spotify_class::process_object(json_value* value, int depth) {
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
       process_name=true;
     }
+    if (strcmp(value->u.object.values[x].name , "id" )==0) {
+      process_id=true;
+    }
     if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
       process_track_nr=true;
     }
     if (strcmp(value->u.object.values[x].name , "items" )==0) {
       process_items=true;
     }
-    process_value(value->u.object.values[x].value, depth+1,x);
+    if (strcmp(value->u.object.values[x].name , "uri" )==0) {
+      process_uri=true;
+    }
+
+    process_value_playlist(value->u.object.values[x].value, depth+1,x);
   }
+  //printf("Next record ****************************************************************************\n");
 }
 
 
-void spotify_class::process_array(json_value* value, int depth) {
+
+//
+// json
+//
+
+
+void spotify_class::process_array_playlist(json_value* value, int depth) {
   int length, x;
   if (value == NULL) {
     return;
   }
   length = value->u.array.length;
-  if (debug_json) printf("array\n");
+  //printf("array found\n");
   for (x = 0; x < length; x++) {
-    process_value(value->u.array.values[x], depth,x);
+    process_value_playlist(value->u.array.values[x], depth,x);
   }
 }
 
 
+// ****************************************************************************************
 //
 // json parser start call function for process playlist
 // do the data progcessing from json
+//
+// ****************************************************************************************
 
-void spotify_class::process_value(json_value* value, int depth,int x) {
+void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
+    std::string artist="";
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
-      if (debug_json) print_depth_shift(depth);
+      //print_depth_shift(depth);
     }
     switch (value->type) {
       case json_none:
         if (debug_json) printf("none\n");
         break;
       case json_object:
-        process_object(value, depth+1);
+        process_object_playlist(value, depth+1);
         break;
       case json_array:
-        process_array(value, depth+1);
+        process_array_playlist(value, depth+1);
         break;
       case json_integer:
         if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
@@ -840,7 +1225,7 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
         if (debug_json) printf("double: %f\n", value->u.dbl);
         break;
       case json_string:
-        //if (debug_json) printf("string: %s\n", value->u.string.ptr);
+        //printf("string: %s\n", value->u.string.ptr);
         if ((process_description) && (depth==11) && (x==7)) {
           if (!(stack[antal])) {
             antal++;
@@ -849,64 +1234,106 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
           //strcpy(stack[antal]->feed_desc,value->u.string.ptr);                           // desc
           process_description=false;
         }
-        if (process_items) {
+        if ( process_release_date ) {
+          //printf("antal %d process_release_date %s \n",antal,value->u.string.ptr);
+          strcpy( stack[antal]->feed_release_date , value->u.string.ptr );
+          process_release_date=false;
+        }
+        if ( process_items ) {
           // set start of items in list
           process_items=false;
         }
-        if (process_tracks) {
+        if ( process_tracks ) {
           // playlist id from spotify
           if (stack[antal]) {
-            //strcpy(stack[antal]->playlistid,value->u.string.ptr);                           // playlistid
           }
           process_tracks=false;
         }
-        if (( process_image ) && ( depth == 14 ) && ( x == 1 )) {
-          if (stack[antal]) {
-            strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+        // gfx url
+        if ( process_image ) {
+          //printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
+          // get playlist cover
+          if (( depth == 5 ) && ( x == 1 )) {
+            // get covver file url
+            strcpy(playlistgfx_top,value->u.string.ptr);
+          }
+          // get song cover
+          if (( depth == 14 ) && ( x == 1 )) {
+            if (stack[antal]) {
+              //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
+              strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
+              strcpy(playlistgfx,value->u.string.ptr);
+            }
           }
           process_image=false;
         }
-        if ((process_href) && (depth==9) && (x==9)) {
-          if (stack[antal]) {
-            strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
-          }
-          process_href=false;
-        }
-        // get playlist name
-        if ((process_name) && (depth==2) && (x==7)) {
-          strcpy(spotify_playlistname , value->u.string.ptr);
-        }
-        // get Song name
-        if ((process_name) && (depth==9) && (x==12)) {
-          if (antal==0) {
-            stack[antal]=new (spotify_oversigt_type);
-          } else {
-            // new record
-            antal++;
-            antalplaylists++;
-          }
-          if (antalplaylists<maxantal) {
-            if (!(stack[antal]))  {
-              stack[antal]=new (spotify_oversigt_type);
-            }
+        // get play link
+        // process song spotify id CHECKED OK
+        if ( process_uri ) {
+          if ((depth==9) && (x==18)) {
+            //if (playinfo_json_debug) printf("%s\n", value->u.string.ptr);
             if (stack[antal]) {
-              strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              if (stack[antal]) {
+                strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           //
+              }
             }
           }
-          process_name=false;
+          process_uri=false;
         }
-        // get artis
-        if ((process_name) && (depth==12) && (x==3)) {
-          if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+        if ( process_id ) {
+          // get playlist id
+          if ((depth==2) && (x==5)) {
+            //printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
+            //printf("playlist id %s \n",value->u.string.ptr);
+            strcpy(spotify_playlistid , value->u.string.ptr);
+          }
+          process_id=false;
         }
-
+        if ( process_name ) {
+          // get playlist name OK
+          if ((depth==2) && (x==7)) {
+            //printf("playlist name %-30s \n",value->u.string.ptr);
+            strcpy(spotify_playlistname , value->u.string.ptr);
+          }
+          // get playlist id
+          if ((depth==2) && (x==5)) {
+            //printf("playlist id %s \n",value->u.string.ptr);
+            strcpy(spotify_playlistid , value->u.string.ptr);
+          }
+          // get artis
+          if ((depth==13) && (x==3)) {
+            if (stack[antal]) {
+  //            printf("antal %d process_artist name %s \n",antal,value->u.string.ptr);
+              //strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+            }
+          }
+          // get Song name OK
+          if ((depth==9) && (x==12)) {
+            if (antal==0) {
+              stack[antal]=new (spotify_oversigt_type);
+            } else {
+              // new record
+              antal++;
+              antalplaylists++;
+            }
+            if ( antalplaylists<maxantal ) {
+              if (!(stack[antal]))  {
+                stack[antal]=new (spotify_oversigt_type);
+              }
+              if (stack[antal]) {
+  //              printf("antal %d process_name %s \n",antal,value->u.string.ptr);
+                strcpy(stack[antal]->feed_name,value->u.string.ptr);
+              }
+            }
+            process_name=false;
+          }
+        }
         // get tracknr
         if (process_track_nr) {
           process_track_nr=false;
           //printf(" text %s \n",value->u.string.ptr);
           // if (stack[antal]) strcpy( stack[antal]->feed_artist , value->u.string.ptr );
         }
-
         break;
       case json_boolean:
         if (debug_json) printf("bool: %d\n", value->u.boolean);
@@ -916,24 +1343,36 @@ void spotify_class::process_value(json_value* value, int depth,int x) {
 
 
 
+// ****************************************************************************************
+//
 // work
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
-// and update db from that file
+// and update db from that file all the songs in playlist
+//
+// ****************************************************************************************
 
-int spotify_class::spotify_get_playlist(char *playlist,bool force) {
-  int tt;
+int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
+  int tt=0;
   bool dbexist=false;
   int refid;
   int curl_error;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
+  char homedir[1024];
   char *database = (char *) "mythtvcontroller";
-  char playlistfilename[1024];
-  strcpy(playlistfilename,"spotify_playlist_");                                 // create playlist file name
+  char playlistfilename[2048];
+  char auth_kode[1024];
+  getuserhomedir(homedir);
+  strcpy(playlistfilename,homedir);
+  strcat(playlistfilename,"/");
+  strcat(playlistfilename,spotify_json_path);
+  strcat(playlistfilename,"spotify_playlist_");                                 // create playlist file name
   strcat(playlistfilename,playlist);                                            // add the spotify playlist id
   strcat(playlistfilename,".json");
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
   char sql[8594];
   char doget[4096];
   char filename[4096];
@@ -946,19 +1385,63 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
   char* file_contents;
   json_char* json;
   json_value* value;
+  // curl stuf
+  CURL *curl;
+  std::string response_string;
+  int httpCode;
+  CURLcode curl_res;
+  struct curl_slist *chunk = NULL;
+  FILE *out_file;
+  bool do_curl=true;
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
-      sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
-      curl_error=system(doget);
-      if (curl_error!=0) {
-        fprintf(stderr,"Curl error get playlist \n");
-        fprintf(stderr,"Curl error %s \n",doget);
-        //return 1;
+      // always here
+      if (do_curl) {
+        curl = curl_easy_init();
+        sprintf(doget,"https://api.spotify.com/v1/playlists/%s",playlist);
+        if (curl) {
+          curl_easy_setopt(curl, CURLOPT_URL, doget);
+          curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+          curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+          /* Add a custom header */
+          chunk = curl_slist_append(chunk, "Accept: application/json");
+          chunk = curl_slist_append(chunk, "Content-Type: application/json");
+          chunk = curl_slist_append(chunk, auth_kode);
+          out_file = fopen(playlistfilename, "wb");
+          if (out_file) {
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+            //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
+            // set type post/put
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+            curl_res = curl_easy_perform(curl);
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            fputs(response_string.c_str(),out_file);
+            if (curl_res != CURLE_OK) {
+              fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
+            }
+            // always cleanup
+            curl_easy_cleanup(curl);
+            fclose(out_file);
+            if (httpCode != 200) {
+              printf("Spotify error %d \n",httpCode);
+              exit(1);
+            }
+          }
+        }
+      } else {
+        sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
+        curl_error=system(doget);
+        if (curl_error!=0) {
+          fprintf(stderr,"Curl error get playlist \n");
+          fprintf(stderr,"Curl error %s \n",doget);
+          //return 1;
+        }
       }
     }
     stat(playlistfilename, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
-    file_contents = (char*)malloc(filestatus.st_size);
+    file_contents = (char*) malloc(filestatus.st_size);
     json_file = fopen(playlistfilename, "rt");
     if (json_file == NULL) {
       fprintf(stderr, "Unable to open %s\n", playlistfilename);
@@ -975,10 +1458,9 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
     json = (json_char*) file_contents;
     value = json_parse(json,file_size);                                           // parser
     // parse from root
-    process_value(value, 0,0);                                                    // fill stack array
+    process_value_playlist(value, 0,0);                                           // fill stack array
     json_value_free(value);                                                       // json clean up
     free(file_contents);                                                          //
-    // save data to mysql db
     conn = mysql_init(NULL);
     // Connect to database
     if (conn) {
@@ -995,21 +1477,44 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           dbexist = true;
         }
       }
-      if ((!(dbexist)) && (mysql_query(conn,"CREATE database if not exist mythtvcontroller")!=0)) {
-        //printf("mysql db create error. mythtvcontroller\n");
-      }
-      //
       // create db if not exist
-      res = mysql_store_result(conn);
+      if (!(dbexist)) {
+        if (dbexist==false) {
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            printf("mysql create table error.\n");
+            printf("SQL : %s\n",sql);
+          }
+          res = mysql_store_result(conn);
+          // create db (spotify songs)
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            printf("mysql create table error.\n");
+            printf("SQL : %s\n",sql);
+          }
+          res = mysql_store_result(conn);
+          // create db (spotify playlists)
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            printf("mysql create table error.\n");
+            printf("SQL : %s\n",sql);
+          }
+          // create db if not exist
+          res = mysql_store_result(conn);
+        }
+      }
       // create db spotify playlist process data
       // insert all record in db
       tt = 0;
       while(tt<antalplaylists) {
         if (stack[tt]) {
           if (debugmode & 4) printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
+          // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            strcpy(downloadfilenamelong,"tmp/");
+            getuserhomedir(downloadfilenamelong);
+            strcat(downloadfilenamelong,"/");
+            strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
             strcat(downloadfilenamelong,".jpg");
             if (!(file_exists(downloadfilenamelong))) {
@@ -1020,7 +1525,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           // check if playlist exist
           playlistexist=false;
           refid = 0;
-          sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname , "", "" , 0 );
+          sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
           if (res) {
@@ -1029,12 +1534,19 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               playlistexist=true;
             }
           }
+          // crete playlist
           if (!(playlistexist)) {
             sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
             res=mysql_store_result(conn);
+            /*
+            sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
+            mysql_query(conn,sql);
+            res=mysql_store_result(conn);
+            */
+
             if (refid==0) {
-              sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname , "", "" , 0 );
+              sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
               mysql_query(conn,sql);
               res=mysql_store_result(conn);
               if (res) {
@@ -1044,7 +1556,7 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
               }
             }
           }
-          if (stack[tt+1]) {
+          if (stack[tt+1]) {                                                    // if (stack[tt+1]) {
             playlistexist=false;
             sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
             mysql_query(conn,sql);
@@ -1065,24 +1577,279 @@ int spotify_class::spotify_get_playlist(char *playlist,bool force) {
           }
         }
         tt++;
-        //printf("tt=%d playlist id %s \n",tt,playlist);
       }
+      // create playlist if needed
+      if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
+        sprintf(sql,"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
+        mysql_query(conn,sql);
+        res = mysql_store_result(conn);
+        playlistexist=false;
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            playlistexist=true;
+          }
+        }
+        // crete playlist
+        if (!(playlistexist)) {
+          //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
+          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
+          mysql_query(conn,sql);
+          res = mysql_store_result(conn);
+        }
+      }
+
     }
     mysql_close(conn);
   }
-  return 0;
+  return tt;
+}
+
+
+// *****  ****************************************************************************************************************************
+
+bool process_playinfo_tracks=false;
+bool process_playinfo_playlist=false;
+bool process_playinfo_songs=false;
+bool process_playinfo_href=false;
+bool process_playinfo_description=false;
+bool process_playinfo_image=false;
+bool process_playinfo_name=false;
+bool process_playinfo_items=false;
+bool process_playinfo_artist=false;
+bool process_playinfo_track_nr=false;
+bool process_playinfo_date=false;
+bool process_playinfo_progress_ms=false;
+bool process_playinfo_duration_ms=false;
+bool playinfo_json_debug=false;
+
+
+// ****************************************************************************************
+//
+// process types in file for process playlist files (songs)
+//
+// ****************************************************************************************
+
+void spotify_class::process_object_playinfo(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.object.length;
+  for (x = 0; x < length; x++) {
+    print_depth_shift(depth);
+    //printf("x=%d depth=%d object[%d].name = %s  \n",x,depth, x, value->u.object.values[x].name);
+    if (strcmp(value->u.object.values[x].name,"tracks")==0) {
+      process_playinfo_tracks=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "href" )==0) {
+      process_playinfo_href=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "artist" )==0) {
+      process_playinfo_artist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "process_playlist" )==0) {
+      process_playinfo_playlist=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "description" )==0) {
+      process_playinfo_description=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "images" )==0) {
+      process_playinfo_image=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "name" )==0) {
+      process_playinfo_name=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "track_number" )==0) {
+      process_playinfo_track_nr=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "items" )==0) {
+      process_playinfo_items=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "release_date" )==0) {
+      process_playinfo_date=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "progress_ms" )==0) {
+      process_playinfo_progress_ms=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "duration_ms" )==0) {
+      process_playinfo_duration_ms=true;
+    }
+    process_value_playinfo(value->u.object.values[x].value, depth+1,x);
+  }
+}
+
+// *****************************************************************************************
+//
+// ****************************************************************************************
+
+void spotify_class::process_array_playinfo(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.array.length;
+  //printf("array found\n");
+  for (x = 0; x < length; x++) {
+    process_value_playinfo(value->u.array.values[x], depth,x);
+  }
+}
+
+
+// ****************************************************************************************
+//
+// json parser start call function for process playinfo
+// do the data progcessing from json
+//
+// ****************************************************************************************
+
+void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
+    int j;
+    if (value == NULL) return;
+    if (value->type != json_object) {
+      print_depth_shift(depth);
+    }
+    switch (value->type) {
+      case json_none:
+        if (debug_json) printf("none\n");
+        break;
+      case json_object:
+        process_object_playinfo(value, depth+1);
+        break;
+      case json_array:
+        process_array_playinfo(value, depth+1);
+        break;
+      case json_integer:
+        if (process_playinfo_duration_ms) {
+          spotify_aktiv_song[0].duration_ms=value->u.integer;
+          process_playinfo_duration_ms=false;
+        }
+        if (process_playinfo_progress_ms) {
+          spotify_aktiv_song[0].progress_ms=value->u.integer;
+          process_playinfo_progress_ms=false;
+        }
+        //printf("int: %10" PRId64 "\n", value->u.integer);
+        break;
+      case json_double:
+        if (debug_json) printf("double: %f\n", value->u.dbl);
+        break;
+      case json_string:
+        //printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+        if (process_playinfo_items) {
+          process_playinfo_items=false;
+        }
+        if (process_playinfo_tracks) {
+          process_playinfo_tracks=false;
+        }
+        if (process_playinfo_image) {
+          if (debug_json) printf("Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          strcpy(spotify_aktiv_song[0].cover_image_url,value->u.string.ptr);
+          process_playinfo_image=false;
+        }
+        if (process_playinfo_progress_ms) {
+          //printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if ((depth==1) && (x==5)) spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          process_playinfo_progress_ms=false;
+        }
+        if (process_playinfo_duration_ms) {
+          printf("Value found = %s \n ",value->u.string.ptr);
+          //if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
+          process_playinfo_duration_ms=false;
+        }
+        // release date
+        if (process_playinfo_date) {
+          if (debug_json) printf("date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          strcpy(spotify_aktiv_song[0].release_date,value->u.string.ptr);
+          process_playinfo_date=false;
+        }
+        // get playlist name
+        if (process_playinfo_name) {
+          if (debug_json) printf("name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          // artist name
+          if ((depth==9) && (x==3)) strcpy(spotify_aktiv_song[0].artist_name,value->u.string.ptr);
+          // album name
+          if ((depth==6) && (x==7)) strcpy(spotify_aktiv_song[0].album_name,value->u.string.ptr);
+          // song name
+          if ((depth==4) && (x==11)) strcpy(spotify_aktiv_song[0].song_name,value->u.string.ptr);
+          //
+          if ((depth==1) && (x==5)) {
+            printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+            spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
+          }
+          process_playinfo_name=false;
+        }
+        if (process_playinfo_artist) {
+
+          process_playinfo_artist=false;
+        }
+        // get tracknr
+        if (process_playinfo_track_nr) {
+          process_playinfo_track_nr=false;
+        }
+        break;
+      case json_boolean:
+        if (debug_json) printf("bool: %d\n", value->u.boolean);
+        break;
+    }
 }
 
 
 // *********************************************************************************************************************************
-
-
-//
-// work
-// get active song playing
-//
+// do we play ?
+// return http code
+// Work in use
+// ********************************************************************************************
 
 int spotify_class::spotify_do_we_play() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+      //printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      process_value_playinfo(value, 0,0);                                                     // fill play info
+      json_value_free(value);                                                                 // json clean up
+    }
+  }
+  return(httpCode);
+}
+
+
+
+// ****************************************************************************************
+// Not IN USE
+// work
+// get active song playing
+// use curl + system
+// ****************************************************************************************
+
+int spotify_class::spotify_do_we_play2() {
   bool find_length=true;
   bool find_progress=true;
   char call[4096];
@@ -1131,8 +1898,8 @@ int spotify_class::spotify_do_we_play() {
           if (aktiv_song_spotify_icon==0) {
             strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"https:");
             strcat(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,file_contents+10);
-            //get_webfile2(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"/tmp/gfx_icon.jpg");
-            //aktiv_song_spotify_icon=loadTexture("/tmp/gfx_icon.jpg");
+            //get_webfile2(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"/spotify_gfx/gfx_icon.jpg");
+            //aktiv_song_spotify_icon=loadTexture("/spotify_gfx/gfx_icon.jpg");
           }
         }
       }
@@ -1152,11 +1919,11 @@ int spotify_class::spotify_do_we_play() {
 
 
 // *******************************************************************************************************
-
 //
 // work
 // pause play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_pause_play() {
   int curl_error;
@@ -1169,11 +1936,53 @@ int spotify_class::spotify_pause_play() {
   return 0;
 }
 
+
+// ****************************************************************************************
+//
+// work ( need testing )
+// pause play
+//
+// ****************************************************************************************
+
+int spotify_class::spotify_pause_play2() {
+  char auth_kode[1024];
+  std::string response_string;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,spotifytoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/pause");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+    }
+  }
+}
+
+
 //
 // resume play
 //
-
-int spotify_class::spotify_resume_play() {
+/*
+int spotify_class::spotify_resume_play2() {
   int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
@@ -1183,11 +1992,67 @@ int spotify_class::spotify_resume_play() {
   }
   return 0;
 }
+*/
+
+// ****************************************************************************************
+//
+// in use resume play
+//
+// ****************************************************************************************
+
+int spotify_class::spotify_resume_play() {
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
 
 
+// ****************************************************************************************
 //
-// last play
+// last play do not work
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_last_play() {
   int curl_error;
@@ -1201,10 +2066,69 @@ int spotify_class::spotify_last_play() {
   return 0;
 }
 
+
+// ****************************************************************************************
+//
+// last play
+//
+// ****************************************************************************************
+
+
+int spotify_class::spotify_last_play2() {
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/last";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
+
+
+
+// ****************************************************************************************
 //
 // work
 // next play
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_next_play() {
   int curl_error;
@@ -1219,39 +2143,213 @@ int spotify_class::spotify_next_play() {
 }
 
 
+// ****************************************************************************************
+// DO not work for now
+// next play next song need testing
+//
+// ****************************************************************************************
+
+int spotify_class::spotify_next_play2() {
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/next";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
 
 
-// work
-// play song/playlist
+
+// ************** DEBUG CODE start ****************************************
+// enable it on earch start play type (func) to get the libcurl debug code
+// ************************************************************************
+
+
+int debug_callback(CURL *handle,curl_infotype type,char *data,size_t size,void *userptr);
+
+//CURLcode curl_easy_setopt(CURL *handle, CURLOPT_DEBUGFUNCTION,debug_callback);
+
+static void dump(const char *text,FILE *stream, unsigned char *ptr, size_t size) {
+  size_t i;
+  size_t c;
+  unsigned int width=0x10;
+
+  fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
+          text, (long)size, (long)size);
+
+  for(i=0; i<size; i+= width) {
+    fprintf(stream, "%4.4lx: ", (long)i);
+
+    /* show hex to the left */
+    for(c = 0; c < width; c++) {
+      if(i+c < size)
+        fprintf(stream, "%02x ", ptr[i+c]);
+      else
+        fputs("   ", stream);
+    }
+
+    /* show data on the right */
+    for(c = 0; (c < width) && (i+c < size); c++) {
+      char x = (ptr[i+c] >= 0x20 && ptr[i+c] < 0x80) ? ptr[i+c] : '.';
+      fputc(x, stream);
+    }
+
+    fputc('\n', stream); /* newline */
+  }
+}
+
+static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp) {
+  const char *text;
+  (void)handle; /* prevent compiler warning */
+  (void)userp;
+
+  switch (type) {
+  case CURLINFO_TEXT:
+    fprintf(stderr, "== Info: %s", data);
+  default: /* in case a new one is introduced to shock us */
+    return 0;
+
+  case CURLINFO_HEADER_OUT:
+    text = "=> Send header";
+    break;
+  case CURLINFO_DATA_OUT:
+    text = "=> Send data";
+    break;
+  case CURLINFO_SSL_DATA_OUT:
+    text = "=> Send SSL data";
+    break;
+  case CURLINFO_HEADER_IN:
+    text = "<= Recv header";
+    break;
+  case CURLINFO_DATA_IN:
+    text = "<= Recv data";
+    break;
+  case CURLINFO_SSL_DATA_IN:
+    text = "<= Recv SSL data";
+    break;
+  }
+  dump(text, stderr, (unsigned char *)data, size);
+  return 0;
+}
+
+// ****************************************************************************************
+// Upper is debug code *******************************************************************
+// ****************************************************************************************
+
+// ****************************************************************************************
+// Works
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+// ****************************************************************************************
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
-int spotify_class::spotify_play_now(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
+// HAVE some errors
+
+int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
+  std::string auth_kode;
+  char response_string[8192];
+  std::string url;
+  //std::string post_playlist_data;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  if (devid) url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    ////curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(1);
+    }
   }
-  return(curl_error);
+  return(0);
 }
 
 
 
 
+// ****************************************************************************************
+//
 // work
 // play song
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
+
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -1259,32 +2357,64 @@ int spotify_class::spotify_play_now(char *playlist_song,bool now) {
 // 429	Too Many Requests - Rate limiting has been applied.
 
 int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  printf("Go play song id %s \n",temptxt);
-//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:track:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
-  }
-  return(curl_error);
+  return(0);
 }
 
+// ****************************************************************************************
+//
 // work
 // play artist
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
+
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
@@ -1293,71 +2423,218 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
 
 
 int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:artist:%s\"}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  fprintf(stderr,"Go play Artist id %s \n",temptxt);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:artist:%s\\\"}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  //fprintf(stderr,"sql=%s\n",call);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
-  }
-  return(curl_error);
+  return(0);
 }
 
+
+
+
+
+// ****************************************************************************************
+//
 // work
 // play album
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
+//
+// ****************************************************************************************
 
 // 200	OK - The request has succeeded. The client can read the result of the request in the body and the headers of the response.
 // 401	Unauthorized - The request requires user authentication or, if the request included authorization credentials, authorization has been refused for those credentials.
 // 404	Not Found - The requested resource could not be found. This error can be due to a temporary or permanent condition
 // 429	Too Many Requests - Rate limiting has been applied.
 
-
 int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
-  int curl_error;
-  char call[4096];
-  char temptxt[2048];
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  devid[40]='\0';
-  printf("Devid *%s*\n",devid);
-  strcpy(temptxt,playlist_song);
-  //songstrpointer=strstr(temptxt,"https://api.spotify.com/v1/tracks/");
-  if (strlen(temptxt)>34) {
-    strcpy(temptxt,playlist_song+34);
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url=url + devid;
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
+    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:album:%s\"}",playlist_song);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
   }
-  printf("Go play album id %s \n",temptxt);
-//sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"context_uri\\\":\\\"spotify:playlist:%s\\\",\\\"offset\\\":{\\\"position\\\":5},\\\"position_ms\\\":0}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,playlist_song,spotifytoken);
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play?device_id=%s' --data \"{\\\"curis\\\":[\\\"spotify:album:%s\\\"]}\" -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s'",devid,temptxt,spotifytoken);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    fprintf(stderr,"Error start play %d \n",WEXITSTATUS(curl_error));
-    fprintf(stderr,"sql=%s\n",call);
-  }
-  return(curl_error);
+  return(0);
 }
 
 
 
 
 //
+// Spotify Get user id
+// OLD version
+
+/*
+int spotify_class::spotify_get_user_id2() {
+  int curl_error;
+  char doget[2048];
+  if (strcmp(spotifytoken,"")!=0) {
+    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
+    curl_error=system(doget);
+    if (WEXITSTATUS(curl_error)==0) {
+      return 200;
+    }
+  }
+  return curl_error;
+}
+*/
+
+
+
+// ****************************************************************************************
+// Do now work now
+// get user id from spotify api
+//
+// ****************************************************************************************
+
+int spotify_class::spotify_get_user_id() {
+  static const char *userfilename = "spotify_user_id.txt";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=spotify_oversigt.get_active_device_id();
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/me";
+  url=url + devid;
+  printf("Get user info.\n");
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 0);
+    // set type post/put
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+    userfile=fopen(userfilename,"w");
+    if (userfile) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(200);
+    }
+  }
+  return(httpCode);
+}
+
+
+
+
+// ****************************************************************************************
+//
 // Works
 // get device list and have it in spotify class
 //
-
-// char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\//\//g' | sed 's/[{\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +3 | head -n 7 > spotify_device_list.txt";
+// ****************************************************************************************
 
 int spotify_class::spotify_get_available_devices() {
   int device_antal=0;
@@ -1426,39 +2703,39 @@ int spotify_class::spotify_get_available_devices() {
     if ( devicenr>0 ) {
       conn=mysql_init(NULL);
       if (conn) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-          mysql_query(conn,"set NAMES 'utf8'");
-          res = mysql_store_result(conn);
-          mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
-          res = mysql_store_result(conn);
-          fprintf(stderr,"Found devices : %d\n",devicenr);
-          for( int t = 0 ; t < devicenr ; t++ ) {
-            if ( strcmp(spotify_device[t].name,"") !=0 ) {
-              device_antal++;
-              fprintf(stderr,"Device name      : %s \n",spotify_device[t].name);
-              fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
-              fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
-              fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
-              sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
-              mysql_query(conn,sql);
-              res = mysql_store_result(conn);
-              dbexist=false;
-              if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                  dbexist=true;
-                }
-              }
-              // create if not exist
-              if (dbexist==false) {
-                sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
-                mysql_query(conn,sql);
-                res = mysql_store_result(conn);
+        mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
+        res = mysql_store_result(conn);
+        fprintf(stderr,"Found devices : %d\n",devicenr);
+        for( int t = 0 ; t < devicenr ; t++ ) {
+          if ( strcmp(spotify_device[t].name,"") !=0 ) {
+            device_antal++;
+            fprintf(stderr,"Device name      : %s \n",spotify_device[t].name);
+            fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
+            fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
+            fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
+            sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
+            mysql_query(conn,sql);
+            res = mysql_store_result(conn);
+            dbexist=false;
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                dbexist=true;
               }
             }
+            // create if not exist
+            if (dbexist==false) {
+              sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+            }
           }
-          this->spotify_device_antal=device_antal;
-          if (conn) mysql_close(conn);
-          fprintf(stderr,"\n*****************\n");
+        }
+        this->spotify_device_antal=device_antal;
+        if (conn) mysql_close(conn);
+        fprintf(stderr,"\n*****************\n");
       }
     }
   }
@@ -1471,13 +2748,16 @@ int spotify_class::spotify_get_available_devices() {
 }
 
 
-
+// ****************************************************************************************
+//
 // get user access token
 // write to spotify_access_token
 //
+// ****************************************************************************************
 
 int spotify_class::spotify_get_access_token2() {
   struct mg_connection *nc;
+  // works
   mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
   nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "https://accounts.spotify.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
   mg_set_protocol_http_websocket(nc);
@@ -1509,35 +2789,66 @@ int spotify_class::spotify_get_access_token2() {
 
 
 
-
+// ****************************************************************************************
+//
 // return the intnr
+//
+// ****************************************************************************************
+
 int spotify_class::get_spotify_intnr(int nr) {
   if (nr < antal) return (stack[nr]->intnr); else return (0);
 }
 
-
+// ****************************************************************************************
+//
 // return the playlist/song name
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_name(int nr) {
   if (nr < antal) return (stack[nr]->feed_name); else return (NULL);
 }
 
+// ****************************************************************************************
+//
 // return the spotify playlist id
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_playlistid(int nr) {
   if (nr < antal) return (stack[nr]->playlistid); else return (NULL);
 }
 
-
+// ****************************************************************************************
+//
 // return the description
+//
+// ****************************************************************************************
+
 char *spotify_class::get_spotify_desc(int nr) {
   if (nr < antal) return (stack[nr]->feed_desc); else return (NULL);
 }
 
+
+
+// ****************************************************************************************
+//
 // clean up number of created
+//
+// ****************************************************************************************
+
 void spotify_class::clean_spotify_oversigt() {
     startup_loaded=false;
     for(int i=1;i<antal;i++) {
       if (stack[i]) {
-        if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+        // crash
+        if (stack[i]->textureId) {
+          if (&stack[i]->textureId) {
+            if (&stack[i]->textureId) {
+              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+            }
+          }
+        }
         delete stack[i];
       }
       stack[i]=NULL;
@@ -1550,17 +2861,21 @@ void spotify_class::clean_spotify_oversigt() {
 }
 
 
+// ****************************************************************************************
 //
 // set spotify icon image
 //
+// ****************************************************************************************
+
 void spotify_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
-
+// ****************************************************************************************
 //
 // get nr of spotify playlists
 //
+// ****************************************************************************************
 
 int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   int antalrss_feeds=0;
@@ -1579,16 +2894,21 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 }
 
 
-
+// ****************************************************************************************
 //
 // opdate show liste in view (det vi ser)
+// loaded from db
 //
-
+// ****************************************************************************************
+//
 // load felt 7 = mythtv gfx icon
 // fpath=stream path
 // atr = stream name
 
 int spotify_class::opdatere_spotify_oversigt(char *refid) {
+    char temptxt1[2048];
+    char temptxt2[2048];
+    char *songstrpointer;
     char sqlselect[2048];
     char tmpfilename[1024];
     char lasttmpfilename[1024];
@@ -1619,12 +2939,11 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          dbexist=true;
-        }
+        while ((row = mysql_fetch_row(res)) != NULL) dbexist=true;
       }
     }
-    clean_spotify_oversigt();                                                   // clean old list
+    // clear old view
+    clean_spotify_oversigt();
     strcpy(lasttmpfilename,"");
     if (debugmode & 4) {
       fprintf(stderr,"loading spotify data.\n");
@@ -1661,19 +2980,34 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
               strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
               strcpy(stack[antal]->feed_desc,"");                           // desc
               strcpy(stack[antal]->feed_gfx_url,"");
-              strcpy(stack[antal]->feed_gfx_mythtv,"");
+              strcpy(stack[antal]->feed_release_date,"");
               strcpy(stack[antal]->playlisturl,"");
               stack[antal]->feed_group_antal=0;
               stack[antal]->feed_path_antal=0;
               stack[antal]->textureId=0;
               stack[antal]->intnr=atoi(row[3]);
               stack[antal]->nyt=false;
+              stack[antal]->type=0;
               // top level (load playlist)
-              if (getart == 0) {
+              if (getart == playlisttype ) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
-                strncpy(stack[antal]->feed_gfx_url,row[1],2048);
-                strncpy(stack[antal]->playlistid,row[2],spotify_namelength);
+                if (row[1]) {
+                  if (strncmp(row[1],"http",4)==0) {
+                    get_webfilename(downloadfilename,row[1]);
+                    getuserhomedir(downloadfilenamelong);
+                    strcat(downloadfilenamelong,"/");
+                    strcat(downloadfilenamelong,spotify_gfx_path);
+                    strcat(downloadfilenamelong,downloadfilename);
+                    strcat(downloadfilenamelong,".jpg");
+                    // download file
+                    if (!(file_exists(downloadfilenamelong))) {
+                      get_webfile2(row[1],downloadfilenamelong);                // download file
+                    } else strcpy(downloadfilenamelong,row[1]);                 // no file name
+                  } else strcpy(downloadfilenamelong,row[1]);
+                  strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                }
+                strncpy(stack[antal]->playlistid,row[2],spotify_namelength);    //
 
                 /*
                 strncpy(downloadfilenamelong,row[2],spotify_pathlength);
@@ -1689,7 +3023,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (row[1]) {
                   get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
                   getuserhomedir(downloadfilenamelong);
-                  strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.37/tmp/");
+                  strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.38/spotify_gfx/");
                   strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
                   strcat(downloadfilenamelong,".jpg");
                   if (!(file_exists(downloadfilenamelong))) {
@@ -1717,7 +3051,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 antal++;
               }
               // load playlist songs
-              if (getart == 1) {
+              if (getart == songlisttype ) {
                 // First create the back button
                 if (antal == 0) {
                   strcpy(stack[antal]->feed_showtxt,"Back");
@@ -1729,17 +3063,15 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_showtxt,row[0],spotify_pathlength);
                 strncpy(stack[antal]->feed_name,row[0],spotify_namelength);
                 strncpy(stack[antal]->feed_gfx_url,row[1],spotify_namelength);
-                strncpy(stack[antal]->playlisturl,row[2],spotify_namelength);
-
-                char temptxt1[2048];
-                char temptxt2[2048];
-                char *songstrpointer;
-                songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
-                // get track id
+                strcpy(stack[antal]->playlisturl,row[2]);   // get trackid
+                stack[antal]->type=1;
+                //songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
+                songstrpointer=strstr(row[2],"spotify:track:");
+                // get track id from string
                 if (songstrpointer) {
-                  strcpy(temptxt2,songstrpointer);
-                  strncpy(stack[antal]->playlistid,temptxt2,spotify_namelength);
-                } else strcpy(stack[antal]->playlistid,"");
+                  strcpy(temptxt2,row[2]+14);
+                  strcpy(stack[antal]->playlistid,temptxt2);
+                } else strcpy(stack[antal]->playlistid,row[2]);
                 antal++;
               }
             }
@@ -1758,9 +3090,11 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
 
 
 
+// ****************************************************************************************
 //
-// search for playlist or song
+// search for playlist or song in db (from users playlist data in db)
 //
+// ****************************************************************************************
 
 
 int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type) {
@@ -1798,9 +3132,11 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
         dbexist=true;
       }
     }
+
     clean_spotify_oversigt();                                                   // clean old list
+
     // find records after type (0 = root, else = refid)
-    if (type == 0) {
+    if (type == playlisttype ) {
       sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist where playlistname like '");
       strcat(sqlselect,"%");
       strcat(sqlselect,keybuffer);
@@ -1825,13 +3161,14 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
             strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
             strcpy(stack[antal]->feed_desc,"");                           // desc
             strcpy(stack[antal]->feed_gfx_url,"");
-            strcpy(stack[antal]->feed_gfx_mythtv,"");
+            strcpy(stack[antal]->feed_release_date,"");
             strcpy(stack[antal]->playlisturl,"");
             stack[antal]->feed_group_antal=0;
             stack[antal]->feed_path_antal=0;
             stack[antal]->textureId=0;
             stack[antal]->nyt=false;
-            if (getart == 0) {
+            if (getart == playlisttype ) {
+              stack[antal]->type=0;
               if (antal == 0) {
                 strcpy(stack[antal]->feed_showtxt,"Back");
                 strcpy(stack[antal]->playlisturl,"");
@@ -1847,7 +3184,9 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              strcpy(downloadfilenamelong,"tmp/");
+              getuserhomedir(downloadfilenamelong);
+              strcat(downloadfilenamelong,"/");
+              strcpy(downloadfilenamelong,spotify_gfx_path);
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
               strcat(downloadfilenamelong,".jpg");
               if (file_exists(downloadfilenamelong)) {
@@ -1858,7 +3197,8 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               }
               antal++;
             }
-            if (getart == 1) {
+            if (getart == songlisttype ) {
+              stack[antal]->type=1;
               if (antal == 0) {
                 strcpy(stack[antal]->feed_showtxt,"Back");
                 strcpy(stack[antal]->playlisturl,"");
@@ -1887,14 +3227,16 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
 // json_parser search process result
 // *******************************************************************************************
 //
-
 // json parser used to parse the return files from spotify api
 //
-//
+// ****************************************************************************************
 
+
+// ****************************************************************************************
 //
 // static void spotify_class::process_value(json_value* value, int depth);
 //
+// ****************************************************************************************
 
 bool search_process_tracks=false;
 bool search_process_uri=false;
@@ -1906,9 +3248,12 @@ bool search_process_name=false;
 bool search_process_items=false;
 bool search_process_track_nr=false;
 
+
+// ****************************************************************************************
 //
 // process types in file for process playlist files (songs)
 //
+// ****************************************************************************************
 
 void spotify_class::search_process_object(json_value* value, int depth,int art) {
   int length, x;
@@ -1949,6 +3294,14 @@ void spotify_class::search_process_object(json_value* value, int depth,int art) 
 }
 
 
+
+// ****************************************************************************************
+//
+// json parser
+//
+// ****************************************************************************************
+
+
 void spotify_class::search_process_array(json_value* value, int depth,int art) {
   int length, x;
   if (value == NULL) {
@@ -1962,12 +3315,17 @@ void spotify_class::search_process_array(json_value* value, int depth,int art) {
 }
 
 
+// ****************************************************************************************
 //
-// json parser start call function for process playlist
+// json parser start call function for process playlist songs
 // do the data progcessing from json
+//
+// ****************************************************************************************
 
 void spotify_class::search_process_value(json_value* value, int depth,int x,int art) {
   char artisid[1024];
+  char filename[2048];
+  char downloadfilenamelong[2048];
   int j;
   if (value == NULL) return;
   if (value->type != json_object) {
@@ -1990,8 +3348,12 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       //printf("double: %f\n", value->u.dbl);
       break;
     case json_string:
-      printf("x = %2d deep = %2d art = %2d ",x,depth,art);
-      printf("string: %s\n", value->u.string.ptr);
+      if (debugmode) {
+        if ((depth!=8) && (depth!=10)) {
+          //printf("x = %2d deep = %2d art = %2d ",x,depth,art);
+          //printf("string: %s\n", value->u.string.ptr);
+        }
+      }
       if (search_process_items) {
         // set start of items in list
         search_process_items=false;
@@ -2001,44 +3363,85 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
       }
       if ( search_process_image ) {
         // get playid
+        if ((depth==10)  && (x==1)) {
+          //printf("antal = %d ******************************************************************************* Image process %s \n",antal,value->u.string.ptr);
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
+            stack[antal]->textureId=0;
+            strcpy(downloadfilenamelong,"");
+            // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
+            // get name from url
+            //printf(" # %d url found  : %s ",antal,value->u.string.ptr);
+            if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
+              strcpy(filename,value->u.string.ptr+24);
+              if (strcmp(value->u.string.ptr,"")) {
+                getuserhomedir(downloadfilenamelong);
+                strcat(downloadfilenamelong,"/");
+                strcat(downloadfilenamelong,spotify_gfx_path);
+                strcat(downloadfilenamelong,filename);
+                strcat(downloadfilenamelong,".jpg");
+                // save name to db to next time
+                strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                if (!(file_exists(downloadfilenamelong))) {
+                  // download icon image
+                  get_webfile2(value->u.string.ptr,downloadfilenamelong);
+                }
+              }
+            }
+            //printf(" gfx disk file %s  \n",stack[antal]->feed_gfx_url);
+          }
+        }
+
+        if ((depth==1) && (x==1)) {
+          //strcpy(stack[antal-1]->feed_gfx_url,value->u.string.ptr);
+        }
         search_process_image=false;
       }
       if (search_process_href) {
         search_process_href=false;
       }
-
-      if ((depth==7) && (x==9)) {
-        // get artist id
-        if (strlen(value->u.string.ptr)>16) {
-          strcpy(artisid,value->u.string.ptr+15);
-          strcpy(stack[antal-1]->playlistid,artisid);
+      // trackid
+      if (art==2) {
+        if ((depth==7) && (x==9)) {
+          // get artist playid
+          //printf("playlistid is set to = %s \n",value->u.string.ptr);
+          //strcpy(stack[antal-1]->playlistid,value->u.string.ptr);
         }
       }
-
+      if ((art==0) || (art==1)) {
+        if ((depth==7) && (x==9)) {
+          // get artist playid
+          if (strlen(value->u.string.ptr)>16) {
+            strcpy(artisid,value->u.string.ptr+15);
+            strcpy(stack[antal-1]->playlistid,artisid);
+          }
+        }
+      }
+      // art 0 = artist / art 1 = songs
       if ((art==0) || (art==1)) {
         // get name
         if ((search_process_name) && (depth==7) && (x==6)) {
-          if (antal==0) {
-            stack[antal]=new (spotify_oversigt_type);
-          }
           if (antalplaylists<maxantal) {
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            printf("Antal %d Title : %s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+
+            //if (debugmode) fprintf(stderr,"# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
+
+            stack[antal]->type=2;                                            // set type artist
             antal++;
             antalplaylists++;
           }
         }
       }
-      // spotify online type for en kunsner udgivelser (i potify db)
+      // albumid
       if (art==2) {
-        if ((search_process_name) && (depth==9) && (x==7)) {
-          if (antal==0) {
+        if ((depth==9) && (x==5)) {
+          if (antal==0) {                                                       // first record
             // first record back
             stack[antal]=new (spotify_oversigt_type);
             strcpy(stack[antal]->feed_name,"Back");
@@ -2052,14 +3455,38 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) {
               stack[antal]=new (spotify_oversigt_type);
             }
-            //printf("Antal %d \nTitle : %s \n",antal,value->u.string.ptr);
+            // get album playid
+            if (value->u.string.ptr) {
+              printf("# %d - album playlistid %s \n",antal,value->u.string.ptr);
+              if (!(stack[antal])) {
+                printf("******************************************* NO STACK error.\n");
+              }
+              strcpy(stack[antal]->playlistid,value->u.string.ptr);
+            }
+          }
+        }
+        // track list (artist name)
+        if ((depth==9) && (x==7)) {
+          //strcpy(stack[antal-1]->feed_artist,value->u.string.ptr);
+        }
+      }
+
+      // spotify online type for en kunsner udgivelser (i potify db) (album)
+      if (art==2) {
+        if ((search_process_name) && (depth==9) && (x==7)) {
+          if (antalplaylists<maxantal) {
             if (stack[antal]) {
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
+            stack[antal]->type=3;                                            // set type artist
             antal++;
             antalplaylists++;
           }
+        }
+        // artist name
+        if ((search_process_name) && (depth==10) && (x==3)) {
+          strcpy(stack[antal-1]->feed_artist,value->u.string.ptr);
         }
       }
       search_process_name=false;
@@ -2081,12 +3508,95 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
 
 
 
-
-
-
+// ****************************************************************************************
+// NOt working not in use
+// download file from search result
 //
-// search for playlist or song
+// ****************************************************************************************
+
+int spotify_class::get_search_result_online(char *searchstring,int type) {
+  static const char *userfilename = "spotify_search_result.json";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string url;
+  std::string response_string;
+  std::string searchstring_do;
+  char post_playlist_data[4096];
+  int httpCode;
+  CURLcode res;
+  struct curl_slist *header = NULL;                                             // q=%s&type=artist&limit=50
+  std::string post;
+  post="q=";
+  post=post + searchstring;
+  switch(type) {
+    case 0: post=post + "&type=artist&limit=50";
+            break;
+    case 1: post=post + "&type=album&limit=50";
+            break;
+    case 2: post=post + "&type=playlist&limit=50";
+            break;
+    case 3: post=post + "&type=track&limit=50";
+            break;
+    default: post=post + "&type=artist&limit=50";
+            break;
+  };
+  auth_kode="Authorization: Bearer ";
+  auth_kode=auth_kode + spotifytoken;
+  url="https://api.spotify.com/v1/search";
+  printf("Get search result info.\n");
+  // use libcurl
+  curl_global_init(CURL_GLOBAL_ALL);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    /* Add a custom header */
+    header = curl_slist_append(header, "Accept: application/json");
+    header = curl_slist_append(header, "Content-Type: application/json");
+    header = curl_slist_append(header, "charsets: utf-8");
+    header = curl_slist_append(header, auth_kode.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+    curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
+    // set type post/put/get
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+    userfile=fopen(userfilename,"w");
+    if (userfile) {
+      //curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+      res = curl_easy_perform(curl);
+      fclose(userfile);
+    }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    if (httpCode == 200) {
+      return(httpCode);
+    }
+  }
+  return(0);
+}
+
+
+
+// ****************************************************************************************
+// called from thread in main
 //
+// search for playlist artist or song or album by type
+// 0 = artist (default)
+// 1 = album
+// 2 = playlist
+// 3 = song
+//
+// ****************************************************************************************
 
 
 int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type) {
@@ -2116,6 +3626,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   int i=0;
   int ii=0;
   strcpy(searchstring,"");
+  // swap space to %20
   while(i<strlen(keybuffer)) {
     if (keybuffer[i]!=32) {
       *(searchstring+ii)=*(keybuffer+i);
@@ -2127,7 +3638,9 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     searchstring[ii]='\0';
     i++;
   }
-  switch(type) {
+  // search string is now coded to web call
+  curl_error=0;
+  switch(searchtype) {
             // search artist name
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
@@ -2137,11 +3650,12 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
             // search playlist name
     case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
-            // search track name
+            // search track/song name
     case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // default search artist name
-    default: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default:sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+            break;
   }
   curl_error=system(call);
   if (curl_error!=0) {
@@ -2149,15 +3663,18 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     printf("call= %s \n",call);
     return 1;
   }
+  // get file info
   stat("spotify_search_result.json", &filestatus);                              // get file info
   file_size = filestatus.st_size;                                               // get filesize
   file_contents = (char*) malloc(filestatus.st_size);
   json_file = fopen("spotify_search_result.json", "rt");
+  // if filesize is 0 drop
   if (json_file == NULL) {
     fprintf(stderr, "Unable to open spotify_search_result.json\n");
     free(file_contents);                                                        //
     return 1;
   }
+  // if unable to read file
   if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
     fprintf(stderr, "Unable to read spotify spotify_search_result content of spotify_search_result.json\n");
     fclose(json_file);
@@ -2166,14 +3683,31 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   }
   fclose(json_file);
   json = (json_char*) file_contents;
-  value = json_parse(json,file_size);                                           // parser
-
   // parse from root
-  if (type==0) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==1) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==2) search_process_value(value, 0,0,type);                                     // fill stack array
-  if (type==3) search_process_value(value, 0,0,2);                                        // fill stack array
-
+  value = json_parse(json,file_size);                                           // parser
+  switch(searchtype) {
+    case 0: printf("Search for playlist\n");
+            break;
+    case 1: printf("Search for songs\n");
+            break;
+    case 2: printf("Search for artist\n");
+            break;
+    case 3: printf("Search for songs\n");
+            break;
+  }
+  // fill stack array
+  if (type==0) {
+    search_process_value(value, 0,0,type);                                     // fill stack array playlist
+  }
+  if (type==1) {
+    search_process_value(value, 0,0,type);                                     // fill stack array songs
+  }
+  if (type==2) {
+    search_process_value(value, 0,0,type);                                     // fill stack array artist
+  }
+  if (type==3) {
+    search_process_value(value, 0,0,2);                                     // fill stack array songs
+  }
   json_value_free(value);                                                       // json clean up
   free(file_contents);                                                          //
   return(antal);
@@ -2181,9 +3715,11 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 
 
 
+// ****************************************************************************************
 //
 // thread web loader (loading all icons)
 //
+// ****************************************************************************************
 
 void *load_spotify_web(void *data) {
   if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
@@ -2193,9 +3729,11 @@ void *load_spotify_web(void *data) {
 
 
 
+// ****************************************************************************************
 //
+// load image
 //
-//
+// ****************************************************************************************
 
 int LoadImage(char *filename) {
     ILuint    image;
@@ -2211,50 +3749,79 @@ int LoadImage(char *filename) {
 }
 
 
-
+// ****************************************************************************************
 //
 // loading spotify songs gfx in array.
 //
+// ****************************************************************************************
+
+void spotify_class::settextureidfile(int nr,char *filename) {
+    if (stack[nr]->textureId==0) stack[nr]->textureId=loadTexture ((char *) filename);
+}
+
+
+// ****************************************************************************************
+//
+// loading spotify songs gfx in array.
+// if filename is url then change it to file name by the last name in the source http filename path
+//
+// ****************************************************************************************
 
 int spotify_class::load_spotify_iconoversigt() {
-  int texture;
   int nr=0;
   int loadstatus;
+  char *imagenamepointer;
   char tmpfilename[2000];
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
   char homedir[200];
-  this->gfx_loaded=false;
+  this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("spotify icon loader.\n");
-  while(nr<streamantal()) {
-    //printf("Loading texture %d %s \n",nr,stack[nr]->feed_gfx_url);
+  while(nr<=streamantal()) {
+    if (debugmode & 4) printf("Loading texture nr %-4d for %40s  path %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
-      //texture=LoadImage(stack[nr]->feed_gfx_url);
-      //if (texture!=-1) stack[nr]->textureId=texture;
+      if (stack[nr]->textureId==0) {
+        // if url
+        if (strncmp("http",stack[nr]->feed_gfx_url,4)==0) {
+          imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
+          if ((imagenamepointer) && (strlen(imagenamepointer)<1990)) {
+            getuserhomedir(tmpfilename);
+            strcat(tmpfilename,"/spotify_gfx/");
+            strcat(tmpfilename,imagenamepointer+1);
+            strcat(tmpfilename,".jpg");
+            stack[nr]->textureId=loadTexture (tmpfilename);
+          }
+        } else stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+      }
     }
     nr++;
   }
+  // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"spotify download end ok. \n");
+    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
     else fprintf(stderr,"spotify download error. \n");
   }
   return(1);
 }
 
 
+// ****************************************************************************************
 //
 // get active play device name
 //
+// ****************************************************************************************
 
 char *spotify_class::get_active_spotify_device_name() {
   return(spotify_device[active_spotify_device].name);
 }
 
 
+// ****************************************************************************************
 //
 //
-//
+// ****************************************************************************************
+
 
 void spotify_class::select_device_to_play() {
   static float select_device_to_playfader=1.0;
@@ -2374,11 +3941,13 @@ void spotify_class::select_device_to_play() {
 
 
 
+// ****************************************************************************************
 //
 // show spotify overview
 //
+// ****************************************************************************************
 
-void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
+void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected) {
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
@@ -2405,6 +3974,12 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
     int pline=0;
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
+    // load icons
+    if (this->search_loaded) {
+      this->search_loaded=false;
+      printf("Searech loaded done. Loading icons\n");
+      spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+    }
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -2422,9 +3997,11 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         // stream icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        // glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
@@ -2432,9 +4009,10 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         glEnd();
         glPushMatrix();
-        // indsite draw icon rss gfx
+        // indsite draw icon
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2446,24 +4024,12 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
           glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+          glTexCoord2f(0, 0); glVertex3f( xof+12, yof+12, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+12,yof+buttonsizey-22, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-12, yof+buttonsizey-22 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-12, yof+12 , 0.0);
         }
         glEnd();
-        // show nyt icon note
-        if (stack[i+sofset]->nyt) {
-          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-          glEnd();
-        }
         glPopMatrix();
       } else {
         // no draw default icon
@@ -2472,9 +4038,12 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
-          else glBindTexture(GL_TEXTURE_2D,normal_icon);
-        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdback);
+          } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -2523,9 +4092,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glDisable(GL_TEXTURE_2D);
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
       base=temptxt;
-      length=strlen(temptxt);
-      width = 19;
-      bool stop=false;
+      length=strlen(temptxt);                               // get length
+      width = 19;                                           // max length to show
+      bool stop=false;                                      // done
       while(*base) {
         // if text can be on line
         if(length <= width) {
@@ -2550,7 +4119,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
         *right_margin = '\0';
         glcRenderString(base);
         pline++;
-        glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
+        glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
+        //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
         length -= right_margin-base+1;                         // +1 for the space
         base = right_margin+1;
         if (pline>=2) break;
@@ -2582,7 +4152,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
       glScalef(22.0, 22.0, 1.0);
-      glcRenderString("   Loading ...");
+      if (spotify_oversigt.search_spotify_online_done) glcRenderString("   Loading ..."); else glcRenderString("   Please run update ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
@@ -2591,12 +4161,13 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint empty_icon,G
 
 
 
-
+// ****************************************************************************************
 //
 // show search/create playlist spotify overview
 //
+// ****************************************************************************************
 
-void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
+void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
@@ -2640,9 +4211,21 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,big_search_bar);
+    // type of search
+    switch (searchtype) {
+      case 0: glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+              break;
+      case 1: glBindTexture(GL_TEXTURE_2D,big_search_bar_albumm);
+              break;
+      case 2: glBindTexture(GL_TEXTURE_2D,big_search_bar_playlist);
+              break;
+      case 3: glBindTexture(GL_TEXTURE_2D,big_search_bar_track);
+              break;
+      default:glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+    }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glLoadName(0);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
     glTexCoord2f(0, 1); glVertex3f( xof_top+10,yof_top+buttonsizey-20, 0.0);
@@ -2660,6 +4243,13 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
     if (cursor) glcRenderString("_"); else glcRenderString(" ");
     glPopMatrix();
     //glPopMatrix();
+
+    if (this->search_loaded) {
+      this->search_loaded=false;
+      printf("Searech loaded done. Loading icons\n");
+      spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+    }
+
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -2673,12 +4263,15 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
         buttonsizey=180.0f;
         glColor4f(0.8f, 0.8f, 0.8f,1.0f);
       }
+
+      //printf("nr %d feed gfx url : %s \n",i+sofset,stack[i+sofset]->feed_gfx_url);
+      // search loader done
+
       if (stack[i+sofset]->textureId) {
-        // stream icon
+        // border icon
         glEnable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D,empty_icon);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -2690,7 +4283,8 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
         glPushMatrix();
         // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2702,10 +4296,10 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
           glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-10, yof+buttonsizey-20 , 0.0);
           glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-10, yof+10 , 0.0);
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-20, yof+20 , 0.0);
+          glTexCoord2f(0, 0); glVertex3f( xof+12, yof+12, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( xof+12,yof+buttonsizey-22, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( xof+buttonsize-12, yof+buttonsizey-22 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( xof+buttonsize-12, yof+12 , 0.0);
         }
         glEnd();
         // show nyt icon note
@@ -2729,9 +4323,14 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) glBindTexture(GL_TEXTURE_2D,backicon);
-          else glBindTexture(GL_TEXTURE_2D,normal_icon);
-        } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+            glBindTexture(GL_TEXTURE_2D,backicon);
+          } else {
+            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,empty_icon);
+          }
+        } else {
+          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,empty_icon);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -2843,16 +4442,40 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint empty
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+    bool vis_band_name=true;
+    if (vis_band_name) {
+      if (strcmp(overview_show_band_name,"")!=0) {
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glBindTexture(GL_TEXTURE_2D,spotify_pil);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-60), 14 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-60), 14+46, 0.0);
+        glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-60)+60, 14+46 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-60)+60, 14 , 0.0);
+        glEnd();
+        glPopMatrix();
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glTranslatef((orgwinsizex/2)-(130+(strlen(overview_show_band_name)*10)), 30 ,0.0f);
+        glScalef(22.0, 22.0, 1.0);
+        glcRenderString(overview_show_band_name);
+        glPopMatrix();
+        glPushMatrix();
+        glTranslatef(((orgwinsizex/2)+30), 30 ,0.0f);
+        glDisable(GL_TEXTURE_2D);
+        glScalef(22.0, 22.0, 1.0);
+        glcRenderString("Collection");
+        glPopMatrix();
+      }
+    }
 }
 
 
-
-
-
-
-
-
-const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 size_t b64_encoded_size(size_t inlen) {
 	size_t ret;
@@ -2865,7 +4488,15 @@ size_t b64_encoded_size(size_t inlen) {
 }
 
 
+// ****************************************************************************************
+//
+// 64bits incoder
+//
+// ****************************************************************************************
+
+
 char *b64_encode(const unsigned char *in, size_t len) {
+  const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	char   *out;
 	size_t  elen;
 	size_t  i;
@@ -2897,10 +4528,11 @@ char *b64_encode(const unsigned char *in, size_t len) {
 }
 
 
-
+// ****************************************************************************************
 //
-// ********************* show setup spotify stuf like dev and clientid/secrect ***************************
+// ********************* show setup spotify stuf like dev and clientid/secrect ************
 //
+// ****************************************************************************************
 
 void spotify_class::show_setup_spotify() {
     int i;
@@ -2915,6 +4547,25 @@ void spotify_class::show_setup_spotify() {
     MYSQL_ROW row;
     int dev_nr=0;
     char temptxt[200];
+    // ICON TEXT pos
+    const int icon_text_posx1=510;
+    const int icon_text_posy1=320;
+    const int icon_text_posx2=510+120;
+    const int icon_text_posy2=320;
+    const int icon_text_posx3=510+120+120;
+    const int icon_text_posy3=320;
+    const int icon_text_posx4=510+120+120+120;
+    const int icon_text_posy4=320;
+    const int icon_text_posx5=510;
+    const int icon_text_posy5=180;
+    const int icon_text_posx6=510+120;
+    const int icon_text_posy6=180;
+    const int icon_text_posx7=510+120+120;
+    const int icon_text_posy7=180;
+    const int icon_text_posx8=510+120+120+120;
+    const int icon_text_posy8=180;
+    std::string devname;
+    //
     static int spotify_device_antal=0;
     static bool first_time_update=true;
     char *database = (char *) "mythtvcontroller";
@@ -2936,15 +4587,29 @@ void spotify_class::show_setup_spotify() {
               spotify_device[dev_nr].is_active=false;
             }
             strcpy(spotify_device[dev_nr].devtype,row[2]);
-            /// set active device
-            if ((active_default_play_device!=-1) && (spotify_device[dev_nr].is_active)) {
+            // is one the default device set in config
+            // and exist in db
+            if ((strcmp(active_default_play_device_name,"")!=0) && (strcmp(active_default_play_device_name,row[0])==0)) {
               active_default_play_device=dev_nr;
+              //spotify_device[0].is_active=true;
+              //strcpy(spotify_device[0].name,active_default_play_device_name);
+            } else {
+              /// set active device
+              if ((active_default_play_device!=-1) && (spotify_device[dev_nr].is_active)) {
+                // is default defined in config set it active
+                if (strcmp(active_default_play_device_name,"")!=0) {
+                  if (strcmp(active_default_play_device_name,row[1])==0) active_default_play_device=dev_nr;
+                } else {
+                  active_default_play_device=dev_nr;
+                }
+              }
             }
             dev_nr++;
             spotify_device_antal++;
           }
         }
       }
+
     }
     // spotify setup
     // background
@@ -3119,11 +4784,13 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510, 310, 0.0f);
+      glTranslatef(icon_text_posx1, icon_text_posy1, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[0].name);
+      devname=spotify_device[0].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[1].name,"")!=0) {
@@ -3153,11 +4820,13 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120, 310, 0.0f);
+      glTranslatef(icon_text_posx2, icon_text_posy2, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[1].name);
+      devname=spotify_device[1].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[2].name,"")!=0) {
@@ -3187,11 +4856,13 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120, 310, 0.0f);
+      glTranslatef(icon_text_posx3, icon_text_posy3, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[2].name);
+      devname=spotify_device[2].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
     if (strcmp(spotify_device[3].name,"")!=0) {
@@ -3221,17 +4892,18 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120, 310, 0.0f);
+      glTranslatef(icon_text_posx4, icon_text_posy4, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[3].name);
+      devname=spotify_device[3].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-
     // row 2
     if (strcmp(spotify_device[4].name,"")!=0) {
-      // playerid 1
+      // playerid 5
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -3257,15 +4929,17 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510, 180, 0.0f);
+      glTranslatef(icon_text_posx5, icon_text_posy5, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[4].name);
+      devname=spotify_device[4].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[4].name,"")!=0) {
-      // playerid 1
+    if (strcmp(spotify_device[5].name,"")!=0) {
+      // playerid 6
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -3291,15 +4965,18 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120, 180, 0.0f);
+      glTranslatef(icon_text_posx6, icon_text_posy6, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[4].name);
+      devname=spotify_device[5].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[5].name,"")!=0) {
-      // playerid 1
+
+    if (strcmp(spotify_device[6].name,"")!=0) {
+      // playerid 7
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -3325,15 +5002,17 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120, 180, 0.0f);
+      glTranslatef(icon_text_posx7, icon_text_posy7, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[5].name);
+      devname=spotify_device[6].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
-    if (strcmp(spotify_device[6].name,"")!=0) {
-      // playerid 1
+    if (strcmp(spotify_device[7].name,"")!=0) {
+      // playerid 8
       glPushMatrix();
       winsizx=100;
       winsizy=100;
@@ -3359,50 +5038,24 @@ void spotify_class::show_setup_spotify() {
       glPopMatrix();
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120, 180, 0.0f);
+      glTranslatef(icon_text_posx8, icon_text_posy8, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor3f(1.0f, 1.0f, 1.0f);
       glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[6].name);
-      glPopMatrix();
-    }
-    if (strcmp(spotify_device[7].name,"")!=0) {
-      // playerid 1
-      glPushMatrix();
-      winsizx=100;
-      winsizy=100;
-      xpos=270+120+120+120;
-      ypos=70;
-      glEnable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(0.0f, 0.0f, 0.0f);
-      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-      if (strcmp(spotify_device[7].devtype,"Unknown")==0) glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      else if (strcmp(spotify_device[7].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
-      else if (strcmp(spotify_device[7].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
-      else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(18);                                                             // update button name
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
-      glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
-      glEnd();
-      glPopMatrix();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glTranslatef(510+120+120+120+120, 180, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glScalef(15.0, 15.0, 1.0);
-      glcRenderString(spotify_device[7].name);
+      devname=spotify_device[7].name;
+      devname.resize(10);
+      glcRenderString(devname.c_str());
       glPopMatrix();
     }
 }
 
- void spotify_class::set_default_device_to_play(int nr) {
+// ****************************************************************************************
+//
+// set default play device
+//
+// ****************************************************************************************
+
+void spotify_class::set_default_device_to_play(int nr) {
    active_spotify_device=nr;
    active_default_play_device=nr;
- }
+}

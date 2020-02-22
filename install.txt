@@ -5,12 +5,30 @@
 # updated 02-09-2014
 # updated 27-08-2017
 # updated 06-01-2018
+# updated 09-10-2019
 
 
 This packets need to be installed on Ubuntu.
 
 g++ make libdevil-dev libsdl1.2-dev glutg3-dev libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source 
 dialog libglc-dev imagemagick liblircclient-dev xmltv libglc-dev libdevil1c2 unzip lirc
+
+
+Version.
+
+mythtv-controller ver 0.38.x
+
+
+Now you have spotify view.
+
+Howto install.
+
+mkdir mythtv-controller
+cd mythtv-controller
+sudo make installsound
+make compile
+sudo make install
+
 
 Version.
 

@@ -1819,8 +1819,10 @@ float sinofsetz[]={
 2.15,2.13,2.11,2.09,2.07,2.05,2.03,2.01,1.99,1.97,1.95,1.93,1.91,1.89,1.87,1.85,1.83,1.81,1.79,1.77,
 1.75,1.73,1.71,1.69,1.67,1.65,1.63,1.61,1.59,1.57,1.55,1.53,1.51,1.49,1.47,1.45};
 
+// ****************************************************************************************
 // define layout
 // default layout
+// ****************************************************************************************
 
 void boxarray::build_default_array() {
   int x,y;
@@ -1844,7 +1846,11 @@ void boxarray::build_default_array() {
   }
 }
 
+// ****************************************************************************************
+//
 // constructor init array
+//
+// ****************************************************************************************
 
 boxarray::boxarray() {
     int x,y;
@@ -2247,8 +2253,11 @@ bool fileexists(const char * filename)
 }
 
 
-
+// ****************************************************************************************
+//
 // laver thum dir med alle pictures fra et dir  givet som startpath (normalt hentet fra mythtv men kan være andet)
+//
+// ****************************************************************************************
 
 void boxarray::createboxpictures()
 
@@ -2299,8 +2308,11 @@ void boxarray::createboxpictures()
     }
 }
 
-
+// ****************************************************************************************
+//
 // load textures (pictures from gallery)
+//
+// ****************************************************************************************
 
 int loadboxpic=1;
 
@@ -2352,8 +2364,9 @@ void boxarray::loadboxpictures()
     if (dp) closedir(dp);
 }
 
-
+// ****************************************************************************************
 // setter textures fra cd samling i mythtv
+// ****************************************************************************************
 
 void boxarray::settexture(struct music_oversigt_type *musicoversigt) {
     int x,y;
@@ -2388,9 +2401,11 @@ int n=0;
 
 static bool music_3d_statup=true;
 
+// ****************************************************************************************
 //
 // working in use
 //
+// ****************************************************************************************
 
 void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3) {
   static float rangle=0.0f;
@@ -2534,7 +2549,9 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
 }
 
 
-
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void boxarray::show_music_3d1(float aangle,GLuint textureId) {
     static float rangle=0.0f;

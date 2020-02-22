@@ -56,7 +56,13 @@ extern bool radio_oversigt_loaded_begin;
 extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
 
+
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
+
 radiostation_class::radiostation_class() : antal(0) {
     int i;
     for(i=0;i<maxantal;i++) stack[i]=0;
@@ -67,12 +73,23 @@ radiostation_class::radiostation_class() : antal(0) {
     radiooptionsselect=0;							// selected line in radio options
 }
 
+
+// ****************************************************************************************
+//
 // destructor
+//
+// ****************************************************************************************
+
 radiostation_class::~radiostation_class() {
     clean_radio_oversigt();
 }
 
+
+// ****************************************************************************************
+//
 // clean up number of created
+//
+// ****************************************************************************************
 
 void radiostation_class::clean_radio_oversigt() {
     startup_loaded=false;				// set radio station loaded in
@@ -102,10 +119,11 @@ void radiostation_class::set_texture(int nr,GLuint idtexture) {
     stack[nr]->textureId=idtexture;
 }
 
-
+// ****************************************************************************************
 //
 // update radio stations gfx link
 //
+// ****************************************************************************************
 
 int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
     char sqlselect[512];
@@ -125,8 +143,11 @@ int radiostation_class::opdatere_radiostation_gfx(int nr,char *gfxpath) {
     return(1);
 }
 
-
+// ****************************************************************************************
+//
 // load all radio stations gfx
+//
+// ****************************************************************************************
 
 int radiostation_class::load_radio_stations_gfx() {
     int i=0;
@@ -184,12 +205,14 @@ int radiostation_class::load_radio_stations_gfx() {
 
 
 
-
+// ****************************************************************************************
+//
 // TEMP USE TEMP USE TEMP USE TEMP USE
 // Shopw all radio stations working or not
 // You have to(set online to enable it on db)
 // OVERLOAD opdatere_radio_oversigt
 //
+// ****************************************************************************************
 
 int radiostation_class::opdatere_radio_oversigt() {
   char sqlselect[512];
@@ -253,11 +276,13 @@ int radiostation_class::opdatere_radio_oversigt() {
 
 
 
-
+// ****************************************************************************************
 //
 // search radio station in db after searchtxt
 // OVERLOAD
 //
+// ****************************************************************************************
+
 int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
     char sqlselect[512];
     // mysql vars
@@ -312,11 +337,13 @@ int radiostation_class::opdatere_radio_oversigt(char *searchtxt) {
 
 
 
-
+// ****************************************************************************************
 //
 // opdatere liste efter sort order (radiosortorder)
 // OVERLOAD
 //
+// ****************************************************************************************
+
 int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
     char sqlselect[512];
     // mysql vars
@@ -387,15 +414,13 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 }
 
 
-
+// ****************************************************************************************
 //
 //
 //
-
+// ****************************************************************************************
 extern int orgwinsizey;
 extern int orgwinsizex;
-
-
 
 bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
     int buttonsize=200;
@@ -646,10 +671,11 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
 }
 
 
-
+// ****************************************************************************************
 //
 // skal vi opdatere sort type oversigt første gang
 //
+// ****************************************************************************************
 
 static bool hentradioart=false;
 
@@ -796,11 +822,11 @@ int radiostation_class::set_radio_popular(int stationid) {
 
 
 
-
+// ****************************************************************************************
 //
-// *********************************************************************************
 // set online/offline status on radio station (stationid)
 //
+// ****************************************************************************************
 
 int radiostation_class::set_radio_online(int stationid,bool onoff) {
     char sqlselect[512];
@@ -828,10 +854,11 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     return(0);
 }
 
-
+// ****************************************************************************************
 //
 // get radio online flag
 //
+// ****************************************************************************************
 
 int radiostation_class::get_radio_online(int stationid) {
     if (((unsigned int) stationid<(unsigned int) antal) && (stack[stationid])) {
@@ -841,16 +868,22 @@ int radiostation_class::get_radio_online(int stationid) {
     }
 }
 
-
+// ****************************************************************************************
+//
 // set radio station online flag internal use
+//
+// ****************************************************************************************
 
 int radiostation_class::set_radio_intonline(int arraynr) {
     if (((unsigned int) arraynr<(unsigned int) antal) && (stack[arraynr])) stack[arraynr]->online=true; else return(0);
     return(1);
 }
 
-
+// ****************************************************************************************
+//
 // check if radio station is ofline in database and return true if redio station exist in db
+//
+// ****************************************************************************************
 
 bool radiostation_class::check_radio_online_bool() {
     char sqlselect[512];
@@ -871,6 +904,9 @@ bool radiostation_class::check_radio_online_bool() {
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
 //    stack[stationid]->intnr;
@@ -878,7 +914,9 @@ int radiostation_class::set_radio_aktiv(int stationid,bool onoff) {
     return(0);
 }
 
-
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 int init_sockaddr (struct sockaddr_in *name,const char *hostname,uint16_t port) {
@@ -895,10 +933,11 @@ int init_sockaddr (struct sockaddr_in *name,const char *hostname,uint16_t port) 
     return(error);
 }
 
-
+// ****************************************************************************************
 //
 // returm port nr from url if exist in url or 0
 //
+// ****************************************************************************************
 
 int get_url_data(char *url,char *ipadd) {
     char *sted;
@@ -937,10 +976,13 @@ int get_url_data(char *url,char *ipadd) {
 
 
 
-
+// ****************************************************************************************
+//
 // check if radio station is ofline in database and set it online again if it is back online
 // return where we are ind the database
 // if start recordnr>0 do it
+//
+// ****************************************************************************************
 
 bool check_radio_online_switch=true;
 

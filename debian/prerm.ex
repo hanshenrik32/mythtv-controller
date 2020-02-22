@@ -5,6 +5,9 @@
 
 set -e
 
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
 # summary of how this script can be called:
 #        * <prerm> `remove'
 #        * <old-prerm> `upgrade' <new-version>

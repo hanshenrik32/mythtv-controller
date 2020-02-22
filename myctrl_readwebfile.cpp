@@ -21,8 +21,13 @@ extern int debugmode;                                           // 64 = radio st
                                                                 // 512 = media importer
                                                                 // 1024 = flag loader
 
+
+
+// ****************************************************************************************
 //
 // return string for filename long = last path + name as filename
+//
+// ****************************************************************************************
 //
 
 int get_webfilenamelong(char *fname,char *webpath) {
@@ -56,10 +61,12 @@ int get_webfilenamelong(char *fname,char *webpath) {
 }
 
 
-
+// ****************************************************************************************
 //
 // return string for filename or null
 //
+// ****************************************************************************************
+
 
 int get_webfilename(char *fname,char *webpath) {
   char *npointer=NULL;
@@ -73,13 +80,15 @@ int get_webfilename(char *fname,char *webpath) {
 
 
 
-
+// ****************************************************************************************
+//
 // web downloader ver .1 by hans-henrik
 //
 // return hostname ,webpath from source link eks. www.dr.dk/images/image1.png
 // return hname   = www.dr.dk
 // return webpath = /images/image1.png
 //
+// ****************************************************************************************
 
 void get_host(char *hname,char *webpath,char *source) {
   int n=0;
@@ -110,8 +119,11 @@ void get_host(char *hname,char *webpath,char *source) {
   }
 }
 
-
+// ****************************************************************************************
+//
 // downloader of file
+//
+// ****************************************************************************************
 
 int get_webfile(char *webpath,char *outfile) {
     struct sockaddr_in servaddr;
@@ -214,23 +226,32 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) return(1); else return(0);
 }
 
+
+// ****************************************************************************************
+//
 // check if file is a image file of type jpg,png
+//
+// ****************************************************************************************
 
 bool check_filename_ext(const char *filename) {
     const char *dot = strrchr(filename, '.');
     if ((dot) && ((strcmp(dot,".jpg")==0) || (strcmp(dot,".png")))) return(1); else return(0);
 }
 
+// ****************************************************************************************
+//
 // used to download images from web
-// more secure now
+// more secure now use wget
+//
+// ****************************************************************************************
 
 int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
   // check file ext is image yes download
   if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
-    strcpy(command,"wget ");
+    strcpy(command,"wget \"");
     strcat(command,webpath);
-    strcat(command," -O- | convert -thumbnail 'x320^' - - > ");
+    strcat(command,"\" -O- | convert -thumbnail 'x320^' - - > ");
     strcat(command,outfile);
     //strcat(command," 2>%1 ");
     strcat(command," 2>> wget.log ");

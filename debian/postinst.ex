@@ -8,6 +8,11 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
+db_get mythtv-controller/username
+if [ "$RET" = "false" ]; then
+    
+fi
+
 # summary of how this script can be called:
 #        * <postinst> `configure' <most-recently-configured-version>
 #        * <old-postinst> `abort-upgrade' <new version>
@@ -19,8 +24,6 @@ set -e
 #          <conflicting-package> <version>
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
-
-db_get mythtv-controller/username
 
 case "$1" in
     configure)

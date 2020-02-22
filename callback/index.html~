@@ -1,19 +1,23 @@
-<script language="javascript" type="text/javascript"> 
-
-function closeWindow() { 
-    window.open('','_parent',''); 
-    window.close(); 
-} 
+<script language="javascript" type="text/javascript">
+function closeWindow() {
+window.open('','_parent','');
+window.close();
+}
 </script>
 
+<script language="javascript" type="text/javascript">
+setTimeout(function() { self.closeWindow();}, 2000);
+</script>
 <head>
 <html>
 <body>
 <center>get token back ok.</center>
 You can now close the browser again.
 <br><br>
-
+<meta http-equiv="refresh" content="4; URL='http://localhost:8000'" />
 Thanks.
+<br>
+<a href="javascript:closeWindow();">Close Window</a>
 </html>
 
 

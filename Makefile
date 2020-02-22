@@ -1,18 +1,19 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m32 -Wformat-overflow -std=c++11
+CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
+LDFLAGS= 
 
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
 DESTDIR    = /usr/share/mythtv-controller
-DESTDIRBIN = /usr/local/bin
+DESTDIRBIN = /usr/bin
 DESTIMG    = /usr/share/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi11011linux.tar.gz
+FMODFILE   = fmodstudioapi11014linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -27,14 +28,11 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so
-
-#	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi10605linux/api/lowlevel/lib/x86_64/libfmod.so
-
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -59,11 +57,11 @@ SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
 else
-	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2
+	LIBS = -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl
 endif
 
 all:
-	@echo "mythtv-controller ver 0.37.4 \nPossible targets:"
+	@echo "mythtv-controller ver 0.38.1 \nPossible targets:"
 	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
 	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
 	@echo "'make compile'             - Compile mythtv-controller"
@@ -77,9 +75,10 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
 
-$(PROG): $(SRCS)
-	$(CC) $(CFLAGS) $(BUILD_NUMBER_LDFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
+$(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
+	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
@@ -110,18 +109,17 @@ installsound:
 	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so.10
-	#@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.8 /usr/lib/libfmod.so
-	@ln -s /usr/share/mythtv-controller/fmodstudioapi11011linux/api/lowlevel/lib/x86_64/libfmod.so.10.11 /usr/lib/libfmod.so.10
+	#remove old link
+	@rm /usr/lib/libfmod.so.10
+	@ln -s /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
 
 install:
-	@echo "Installing mythtv-controller ver 0.37.x in /usr/share/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.38.x in /usr/share/mythtv-controller."
 	@mkdir -p /usr/share/mythtv-controller/images/radiostations
 	@mkdir -p /usr/share/mythtv-controller/convert/hires
-	@cp charset $(DESTDIR)
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
@@ -138,6 +136,24 @@ install:
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
 	  cp lirc/mythtv-controller* ~/.lirc/; fi
+	# create random password
+	PASSWDDB="$(openssl rand -base64 12)"
+	# replace "-" with "_" for database username
+	MAINDB="mythtvcontroller"
+	# If /root/.my.cnf exists then it won't ask for root password
+	#if [ -f /root/.my.cnf ]; then
+	#    mysql -e "CREATE DATABASE ${MAINDB} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
+	#    mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
+	#    mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
+	#    mysql -e "FLUSH PRIVILEGES;"
+	# If /root/.my.cnf doesn't exist then it'll ask for root password   
+	#else
+	#    echo "Please enter root user MySQL password!"
+	#    echo "Note: password will be hidden when typing"
+	#    read -sp rootpasswd
+	#    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE ${MAINDB} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
+	#    mysql -uroot -p${rootpasswd} -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
+	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
+	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
+	#fi
 
-
-include buildnumber.mak

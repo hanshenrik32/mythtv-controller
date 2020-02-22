@@ -31,8 +31,12 @@ extern GLuint _textureId23;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
 extern int screen_size;
 
+// ****************************************************************************************
+//
 // constructor
 // this fault why ?
+//
+// ****************************************************************************************
 
 recorded_oversigt_type::recorded_oversigt_type() {
 //    strcpy(title,"");
@@ -43,6 +47,9 @@ recorded_oversigt_type::recorded_oversigt_type() {
 //    strcpy(description,"");
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc)
 
@@ -56,6 +63,9 @@ void recorded_oversigt_type::put_recorded(char *tit,char *subtit,char *startdag,
     description[199]=0;
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc)
 
@@ -67,14 +77,21 @@ void recorded_oversigt_type::get_recorded(int recnr,char *tit,char *subtit,char 
     strcpy(desc,description);
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 void recorded_oversigt_type::get_recorded_filepath(char *filepath)
 
 {
     strcpy(filepath,recordedpath);
 }
 
-
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
 
 recorded_top_type::recorded_top_type()
 
@@ -83,7 +100,9 @@ recorded_top_type::recorded_top_type()
     prg_antal=0;
 }
 
-
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void recorded_top_type::put_recorded_top(char *title)
 
@@ -92,13 +111,19 @@ void recorded_top_type::put_recorded_top(char *title)
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 void recorded_top_type::get_recorded_top(char *title)
 
 {
     strcpy(title,this->title);
 }
 
-
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void draw_ccover() {
 
@@ -113,6 +138,9 @@ void draw_ccover() {
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void recorded_overigt::get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr)
 
@@ -122,6 +150,10 @@ void recorded_overigt::get_recorded_filepath(char *filepath,int valgtnr,int subv
     strcpy(filepath,temptxt);
 }
 
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 int find_storagegroupfile(char *filename) {
     bool fundet=false;
@@ -138,6 +170,11 @@ int find_storagegroupfile(char *filename) {
     }
     if (fundet) return(1); else return(0);
 }
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 int recorded_overigt::opdatere_recorded_oversigt() {
@@ -203,6 +240,10 @@ int recorded_overigt::opdatere_recorded_oversigt() {
     return(n);
 }
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 
 void myglprint3(char *string)
 {
@@ -212,6 +253,10 @@ void myglprint3(char *string)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[i]);
     }
 }
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
@@ -228,10 +273,13 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
       glPopMatrix();
 }
 
-
+// ****************************************************************************************
+//
 // Viser recorded programer
 // valgtnr= den valgte som skal vises med mark
 // subvalgtnr = den valgte som skal vises i under liste
+//
+// ****************************************************************************************
 
 void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     static GLuint texture=0;
@@ -492,6 +540,9 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
 
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 
 void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {

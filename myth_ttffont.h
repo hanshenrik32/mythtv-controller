@@ -8,13 +8,14 @@ class fontinf {
     char fonttype[20];
 };
 
-const int TYPE_MAX=200;
+const int FONT_TYPE_MAX=200;
 
 class fontctrl {
   public:
     unsigned int mastercount;			     // total antal font installed
-    fontinf typeinfo[TYPE_MAX];
+    fontinf typeinfo[FONT_TYPE_MAX];
     int updatefontlist();
+    int updatefontlist_old();
     int selectfont(char *fontname);
     fontctrl();                       // constructor
 };

@@ -45,7 +45,11 @@ extern int orgwinsizex;
 
 extern int debugmode;
 
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
 
 film_oversigt_type::film_oversigt_type() {
     film_id=0;				// filmid i mysql
@@ -72,8 +76,9 @@ film_oversigt_type::film_oversigt_type() {
     cover3d=false;
 }
 
-
+// ****************************************************************************************
 // destructor
+// ****************************************************************************************
 
 film_oversigt_type::~film_oversigt_type() {
     delete [] film_title;
@@ -90,31 +95,52 @@ film_oversigt_type::~film_oversigt_type() {
     delete [] genre;
 }
 
+// ****************************************************************************************
+//
 // gem texture filname
+//
+// ****************************************************************************************
 
 void film_oversigt_type::settextureidfile(char *filename) {
     if (textureId==0) textureId=loadTexture ((char *) filename);
 }
 
+
+// ****************************************************************************************
+//
 // load texture from file
+//
+// ****************************************************************************************
 
 void film_oversigt_type::loadfronttextureidfile() {
     if (frontcover==0) frontcover=loadTexture ((char *) film_frontcoverfile);
 }
 
+// ****************************************************************************************
+//
 // load texture from file
+//
+// ****************************************************************************************
 
 void film_oversigt_type::loadbacktextureidfile() {
     if (backcover==0) backcover=loadTexture ((char *) film_backcoverfile);
 }
 
+
+// ****************************************************************************************
 // load texture from file
+//
+// ****************************************************************************************
 
 void film_oversigt_type::loadsidetextureidfile() {
     if (sidecover==0) sidecover=loadTexture ((char *) film_sidecoverfile);
 }
 
 
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type *film2) {
     film_oversigt_type tempfilm;
@@ -200,7 +226,10 @@ void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type 
 
 
 
+// ****************************************************************************************
 // reset film info
+//
+// ****************************************************************************************
 
 void film_oversigt_type::resetfilm() {
      // reset film oversigt
@@ -213,7 +242,11 @@ void film_oversigt_type::resetfilm() {
 }
 
 
+// ****************************************************************************************
+//
 // constructor
+//
+// ****************************************************************************************
 
 film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
     filmoversigt=new film_oversigt_type[antal];
@@ -224,14 +257,23 @@ film_oversigt_typem::film_oversigt_typem(unsigned int antal) {
     volume=100;
 }
 
+// ****************************************************************************************
+//
 // destructor
+//
+// ****************************************************************************************
 
 film_oversigt_typem::~film_oversigt_typem() {
     if (filmoversigt) delete [] filmoversigt;
     filmoversigtsize=0;
 }
 
+
+// ****************************************************************************************
+//
 // reset all movies in array
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::resetallefilm() {
      for(unsigned int i=0;i<filmoversigtsize-1;i++) {
@@ -241,15 +283,25 @@ void film_oversigt_typem::resetallefilm() {
 }
 
 
+// ****************************************************************************************
+//
 // default player
 // stop playing movie
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::stopmovie() {
   if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
   film_is_playing=false;
 }
 
+
+// ****************************************************************************************
+//
 // vlc stop player
+//
+// ****************************************************************************************
+
 
 void film_oversigt_typem::softstopmovie() {
   if ((vlc_in_playing()) && (film_is_playing)) vlc_controller::stopmedia();
@@ -257,10 +309,12 @@ void film_oversigt_typem::softstopmovie() {
 }
 
 
-// to play streams from web
-//vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
-
-// start playing movie by vlclib
+// ****************************************************************************************
+//
+// Play streams from web like shis
+// vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
+//
+// ****************************************************************************************
 
 int film_oversigt_typem::playmovie(int nr) {
     char path[PATH_MAX];                                  // max path length from os
@@ -270,37 +324,72 @@ int film_oversigt_typem::playmovie(int nr) {
     film_is_playing=true;
     strcat(path,this->filmoversigt[nr].getfilmfilename());
     vlc_controller::playmedia(path);
+    return(1);
 }
 
+// ****************************************************************************************
+//
 // pause movie
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::pausemovie() {
   vlc_controller::pause(1);
 }
 
+// ****************************************************************************************
+//
 // get position
+//
+// ****************************************************************************************
 
 float film_oversigt_typem::getmovieposition() {
-  vlc_controller::get_position();
+  return(vlc_controller::get_position());
 }
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 
 void film_oversigt_typem::next_movie_chapther() {
   vlc_controller::pnext_chapter();
 }
 
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 void film_oversigt_typem::prevous_movie_chapther() {
   vlc_controller::plast_chapter();
 }
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::volumeup() {
   if (volume<100) volume+=10;
   vlc_controller::volume_up(volume);
 }
 
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 void film_oversigt_typem::volumedown() {
   if (volume>0) volume-=10;
   vlc_controller::volume_down(volume);
 }
+
+
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::setcolume(int volume) {
   //if ((volume>=0) && (volume<=100)) this->volume=volume;
@@ -314,6 +403,9 @@ void film_oversigt_typem::setcolume(int volume) {
 //type=1 by id
 //type=2 by add date
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::sortfilm(int type) {
   bool swap=false;
@@ -354,7 +446,12 @@ void film_oversigt_typem::sortfilm(int type) {
 
 
 
+// ****************************************************************************************
+//
 // load dvd gfx files covers in
+//
+// ****************************************************************************************
+
 
 int film_oversigt_typem::load_film_dvcovers() {
     unsigned int i=0;					// hent alle 3d film covers
@@ -370,6 +467,9 @@ int film_oversigt_typem::load_film_dvcovers() {
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
 
 void hentgenre(struct film_oversigt_type *film,unsigned int refnr) {
     MYSQL *conn;
@@ -401,6 +501,10 @@ void hentgenre(struct film_oversigt_type *film,unsigned int refnr) {
 }
 
 
+// ****************************************************************************************
+//
+// ****************************************************************************************
+
 void hentcast(struct film_oversigt_type *film, unsigned int refnr) {
     MYSQL *conn;
     MYSQL_RES *res;
@@ -429,7 +533,11 @@ void hentcast(struct film_oversigt_type *film, unsigned int refnr) {
 
 
 
+// ****************************************************************************************
+//
 // hent antal elementer i directory dirname
+//
+// ****************************************************************************************
 
 int countEntriesInDir(const char* dirname) {
     int n=0;
@@ -442,9 +550,13 @@ int countEntriesInDir(const char* dirname) {
 }
 
 
+// ****************************************************************************************
+//
 // overloaded function in .h file
 // hent film oversigt
 // create if not exist (mythtv/internal)
+//
+// ****************************************************************************************
 
 int film_oversigt_typem::opdatere_film_oversigt(void) {
     char convert_command[2000];
@@ -1020,14 +1132,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
 
 
 
-
-
-
-
-
+// ****************************************************************************************
+//
 // overloaded function in .h file
 // hent film oversigt
 // create if not exist (mythtv/internal)
+//
+// ****************************************************************************************
 
 int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
     char sqlselect[4000];
@@ -1051,7 +1162,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test fpom musik table exist
-      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'",database);
+      sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       if (res) {
@@ -1104,9 +1215,13 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
 
 
 
+// ****************************************************************************************
 //
 // mini oversigt
 // i start menu
+//
+// ****************************************************************************************
+
 
 void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int lfilmoversigt_antal=6;
@@ -1273,9 +1388,12 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
 }
 
 
+// ****************************************************************************************
 //
 // normal oversigt
 // ny udgave
+//
+// ****************************************************************************************
 
 void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int lfilmoversigt_antal=4*8;
