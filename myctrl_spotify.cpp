@@ -3640,7 +3640,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   }
   // search string is now coded to web call
   curl_error=0;
-  switch(type) {
+  switch(searchtype) {
             // search artist name
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
@@ -3685,7 +3685,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   json = (json_char*) file_contents;
   // parse from root
   value = json_parse(json,file_size);                                           // parser
-  switch(type) {
+  switch(searchtype) {
     case 0: printf("Search for playlist\n");
             break;
     case 1: printf("Search for songs\n");
