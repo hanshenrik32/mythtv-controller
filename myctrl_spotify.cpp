@@ -62,7 +62,10 @@ extern int spotifyknapnr;
 extern int spotify_select_iconnr;
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
-extern GLuint big_search_bar;
+extern GLuint big_search_bar_playlist;                    // big search bar used by sporify search
+extern GLuint big_search_bar_track;                    // big search bar used by sporify search
+extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
+extern GLuint big_search_bar_artist;                    // big search bar used by sporify search
 extern char *keybuffer;
 extern int keybufferindex;
 extern bool do_select_device_to_play;
@@ -326,6 +329,8 @@ spotify_class::spotify_class() : antal(0) {
     spotify_oversigt_loaded=false;
     spotify_oversigt_loaded_nr=0;
     antal=0;
+    type=0;
+    searchtype=0;
     search_loaded=false;                                                        // load icobn gfx afload search is loaded done by thread.
     spotify_aktiv_song_antal=0;                                                 //
     gfx_loaded=false;			                                                      // gfx loaded default false
@@ -3969,14 +3974,13 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
     int pline=0;
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-    // draw icons
-
+    // load icons
     if (this->search_loaded) {
       this->search_loaded=false;
       printf("Searech loaded done. Loading icons\n");
       spotify_oversigt.load_spotify_iconoversigt();                       // load icons
     }
-
+    // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -4207,7 +4211,18 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,big_search_bar);
+    // type of search
+    switch (searchtype) {
+      case 0: glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+              break;
+      case 1: glBindTexture(GL_TEXTURE_2D,big_search_bar_albumm);
+              break;
+      case 2: glBindTexture(GL_TEXTURE_2D,big_search_bar_playlist);
+              break;
+      case 3: glBindTexture(GL_TEXTURE_2D,big_search_bar_track);
+              break;
+      default:glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+    }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glLoadName(0);
