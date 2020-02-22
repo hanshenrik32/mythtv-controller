@@ -326,6 +326,7 @@ spotify_class::spotify_class() : antal(0) {
     spotify_oversigt_loaded=false;
     spotify_oversigt_loaded_nr=0;
     antal=0;
+    search_loaded=false;                                                        // load icobn gfx afload search is loaded done by thread.
     spotify_aktiv_song_antal=0;                                                 //
     gfx_loaded=false;			                                                      // gfx loaded default false
     spotify_is_playing=false;                                                   // is we playing any media
@@ -1088,9 +1089,11 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
 
 void spotify_class::print_depth_shift(int depth) {
   int j;
+  /*
   for (j=0; j < depth; j++) {
     printf("\t");
   }
+  */
 }
 
 // ****************************************************************************************
@@ -2833,7 +2836,14 @@ void spotify_class::clean_spotify_oversigt() {
     startup_loaded=false;
     for(int i=1;i<antal;i++) {
       if (stack[i]) {
-        if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+        // crash
+        if (stack[i]->textureId) {
+          if (&stack[i]->textureId) {
+            if (&stack[i]->textureId) {
+              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+            }
+          }
+        }
         delete stack[i];
       }
       stack[i]=NULL;
@@ -3117,7 +3127,9 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
         dbexist=true;
       }
     }
+
     clean_spotify_oversigt();                                                   // clean old list
+
     // find records after type (0 = root, else = refid)
     if (type == playlisttype ) {
       sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist where playlistname like '");
@@ -3354,7 +3366,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(downloadfilenamelong,"");
             // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
             // get name from url
-            printf(" # %d url found  : %s ",antal,value->u.string.ptr);
+            //printf(" # %d url found  : %s ",antal,value->u.string.ptr);
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3371,7 +3383,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 }
               }
             }
-            printf(" gfx disk file %s  \n",stack[antal]->feed_gfx_url);
+            //printf(" gfx disk file %s  \n",stack[antal]->feed_gfx_url);
           }
         }
 
@@ -3412,7 +3424,9 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
               strncpy(stack[antal]->feed_name,value->u.string.ptr,80);
               strncpy(stack[antal]->feed_showtxt,value->u.string.ptr,80);
             }
-            printf("# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
+
+            //if (debugmode) fprintf(stderr,"# %d Artist name found : %s gfx url found %s \n",antal,stack[antal]->feed_name,stack[antal]->feed_gfx_url);
+
             stack[antal]->type=2;                                            // set type artist
             antal++;
             antalplaylists++;
@@ -3569,8 +3583,13 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 
 
 // ****************************************************************************************
+// called from thread in main
 //
-// search for playlist or song
+// search for playlist artist or song or album by type
+// 0 = artist (default)
+// 1 = album
+// 2 = playlist
+// 3 = song
 //
 // ****************************************************************************************
 
@@ -3614,29 +3633,26 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
     searchstring[ii]='\0';
     i++;
   }
+  // search string is now coded to web call
   curl_error=0;
   switch(type) {
             // search artist name
     case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
-            curl_error=system(call);
-            //get_search_result_online(searchstring,0);
             break;
             // search album name
     case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
-            curl_error=system(call);
             break;
             // search playlist name
     case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
-            curl_error=system(call);
             break;
-            // search track name
+            // search track/song name
     case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
-            curl_error=system(call);
             break;
             // default search artist name
     default:sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
-            curl_error=system(call);
+            break;
   }
+  curl_error=system(call);
   if (curl_error!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
     printf("call= %s \n",call);
@@ -3662,9 +3678,19 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   }
   fclose(json_file);
   json = (json_char*) file_contents;
-  value = json_parse(json,file_size);                                           // parser
   // parse from root
-  printf("type=%d\n",type);
+  value = json_parse(json,file_size);                                           // parser
+  switch(type) {
+    case 0: printf("Search for playlist\n");
+            break;
+    case 1: printf("Search for songs\n");
+            break;
+    case 2: printf("Search for artist\n");
+            break;
+    case 3: printf("Search for songs\n");
+            break;
+  }
+  // fill stack array
   if (type==0) {
     search_process_value(value, 0,0,type);                                     // fill stack array playlist
   }
@@ -3944,6 +3970,13 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     // draw icons
+
+    if (this->search_loaded) {
+      this->search_loaded=false;
+      printf("Searech loaded done. Loading icons\n");
+      spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+    }
+
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -4195,6 +4228,13 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     if (cursor) glcRenderString("_"); else glcRenderString(" ");
     glPopMatrix();
     //glPopMatrix();
+
+    if (this->search_loaded) {
+      this->search_loaded=false;
+      printf("Searech loaded done. Loading icons\n");
+      spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+    }
+
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
@@ -4210,6 +4250,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       }
 
       //printf("nr %d feed gfx url : %s \n",i+sofset,stack[i+sofset]->feed_gfx_url);
+      // search loader done
 
       if (stack[i+sofset]->textureId) {
         // border icon

@@ -3230,7 +3230,7 @@ void display() {
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist
           else
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
-          spotify_oversigt.load_spotify_iconoversigt();
+          //spotify_oversigt.load_spotify_iconoversigt();
           keybuffer[0] = 0;
           keybufferindex = 0;
         }
@@ -6399,7 +6399,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt_loaded_begin=true;                                 //
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
-            spotify_oversigt.load_spotify_iconoversigt();                       // update icons
+            //spotify_oversigt.load_spotify_iconoversigt();                       // update icons
             spotify_oversigt_loaded_begin=false;                                //
           } else {
             do_show_spotify_search_oversigt=true;
@@ -6609,7 +6609,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 // update
                 spotify_selected_startofset=0;                                  // default selected in view
                 spotify_oversigt.opdatere_spotify_oversigt(0);                  // update view
-                spotify_oversigt.load_spotify_iconoversigt();                   // load icons
+                //spotify_oversigt.load_spotify_iconoversigt();                   // load icons
+                spotify_oversigt.set_search_loaded();                           // triger icon loader
                 ask_open_dir_or_play_spotify = false;                           // close windows again
                 fundet = true;
               }
@@ -6712,7 +6713,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // update
             spotify_selected_startofset=0;
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view
-            spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            spotify_oversigt.set_search_loaded();                           // triger icon loader
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
@@ -7535,6 +7537,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
             spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
+            //spotify_oversigt.set_search_loaded();                           // triger icon loader
             spotifyknapnr=0;                                                    // reset select
             spotify_selected_startofset=0;                                      //
             strcpy(spotify_oversigt.overview_show_band_name,"");
@@ -7597,10 +7600,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // back
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
+
+            if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
+
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
             spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
             //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
@@ -7632,9 +7639,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             printf("Loading view......\n");
 
-
+            // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
+            //spotify_oversigt.set_search_loaded();                           // triger icon loader
             spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
 
 
@@ -7643,7 +7651,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             // reset select in spotify view
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
-            //spotify_oversigt.load_spotify_iconoversigt();
           }
           // spotify play artist/or playlist / or cd
           if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (spotifyknapnr>0)) {
@@ -9563,8 +9570,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 hent_spotify_search=false;
                 vis_spotify_oversigt=false;
                 keybufferopenwin=false;
-                spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
-                spotify_oversigt.load_spotify_iconoversigt();
+                //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+                //spotify_oversigt.load_spotify_iconoversigt();
+                //spotify_oversigt.set_search_loaded();                           // triger icon loader
                 key=0;
               } else if ((!(do_show_setup)) && (key==27)) {
                 remove("mythtv-controller.lock");
@@ -12755,6 +12763,7 @@ void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
+  spotify_oversigt.set_search_loaded();                           // triger icon loader
   //spotify_oversigt.load_spotify_iconoversigt();                                 // update icons
 
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
@@ -12828,18 +12837,21 @@ void *datainfoloader_webserver(void *data) {
     }
     // get time
     time(&nowdate);
+    // get search result after search text is done.
     if (do_hent_spotify_search_online) {
       spotify_oversigt.search_spotify_online_done=false;
-      printf("Update spotify search result.\n");
+      printf("Update spotify search result thread.\n");
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
-
-      //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-
+      // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+      printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
+
+      spotify_oversigt.set_search_loaded();
+
       //spotify_oversigt.type=2;
     }
   }
@@ -12986,34 +12998,9 @@ void *update_webserver_phread_loader() {
 
 
 //
-// phread dataload
-// NOT IN USE
-
-void *datainfoloader(void *data) {
-  //pthread_mutex_lock(&count_mutex);
-  fprintf(stderr,"loader thread starting\nLoading data from mythtv.\n");
-  //pthread_mutex_unlock(&count_mutex);
-  if (strcmp(configbackend,"mythtv")==0) {
-      // Opdatere tv oversigt fra mythtv db
-      aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
-      // opdatere music oversigt
-      opdatere_music_oversigt(musicoversigt,0);        							// hent alt music info fra database                                                                                                    // opdatere film oversigt
-      film_oversigt.opdatere_film_oversigt();      					        // gen covers 3d hvis de ikke findes.
-                                                                  // load record file list
-/*
-      recordoversigt.opdatere_recorded_oversigt();    	    					// recorded program from mythtv
-      // load old recorded list not some recorded any more
-      oldrecorded.earlyrecordedload(configmysqlhost,configmysqluser,configmysqlpass);
-      // load new tv schecule program
-      newtcrecordlist.getrecordprogram(configmysqlhost,configmysqluser,configmysqlpass);		//
-*/
-      //create_radio_oversigt();										                          // Create radio mysql database if not exist
-      //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
-  }
-  fprintf(stderr,"loader thread done loaded %d radio stations \n",radiooversigt_antal);
-  pthread_exit(NULL);
-}
-
+// xbmc client
+// sql lite
+//
 
 CXBMCClient *xbmcclient=new CXBMCClient("");
 int configxbmcver=1;
