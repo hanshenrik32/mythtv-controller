@@ -668,7 +668,10 @@ GLuint _textureIdback; 	                  //
 GLuint _errorbox;	                        //
 GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
-GLuint big_search_bar;                    // big search bar used by sporify search
+GLuint big_search_bar_playlist;                    // big search bar used by sporify search
+GLuint big_search_bar_track;                    // big search bar used by sporify search
+GLuint big_search_bar_albumm;                    // big search bar used by sporify search
+GLuint big_search_bar_artist;                    // big search bar used by sporify search
 
 // radio view icons
 GLuint onlineradio;                       //
@@ -6399,6 +6402,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt_loaded_begin=true;                                 //
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
+            spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                       // update icons
             spotify_oversigt_loaded_begin=false;                                //
           } else {
@@ -7600,9 +7604,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // back
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
-
             if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
-
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
             spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
@@ -8782,7 +8784,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         vis_volume_timeout=80;
       }
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13)) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -8946,18 +8948,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
             }
-
             // show/select device to play on
             if ((vis_spotify_oversigt) && (keybufferindex==0)) {
               if (key=='D') {
                 do_select_device_to_play=true;
               }
             }
-            // søg efter spotify fill buffer from keyboard
+            // søg efter spotify not online fill buffer from keyboard
             if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
                 //do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
-                if (key!=13) {
+                if ((key!=13) && (key!='*')) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -8967,7 +8968,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             // do show search spodify oversigt online
             if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-              if ((key!=13) && (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='*') &&  (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -9585,8 +9586,9 @@ void handleKeypress(unsigned char key, int x, int y) {
             case '*':
               // update spotify
               //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
-              if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
-              else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
+              if (do_show_spotify_search_oversigt==false) {
+                if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
+              } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
               else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                    // show/hide music info
               else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;           // film
               else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
@@ -9597,6 +9599,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                 ask_tv_record = true;
                 tvknapnr=tvsubvalgtrecordnr;
                 do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+              }
+              if (vis_spotify_oversigt) {
+                if (do_show_spotify_search_oversigt) {
+                  spotify_oversigt.searchtype++;
+                  if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
+                }
+                printf("spotify_oversigt.searchtype = %d \n ", spotify_oversigt.searchtype );
               }
 
               break;
@@ -12801,7 +12810,6 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();    // update the decice list
       // update view from db
       spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
-      //spotify_oversigt.load_spotify_iconoversigt();                             // load icons
     }
   }
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
@@ -13531,7 +13539,10 @@ void loadgfx() {
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
-    big_search_bar        = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar");
+    big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
+    big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
+    big_search_bar_albumm  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_album");
+    big_search_bar_artist  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_artist");
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -13694,7 +13705,10 @@ void freegfx() {
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
     glDeleteTextures( 1, &spotify_pil);             //
-    glDeleteTextures( 1, &big_search_bar);          //
+    glDeleteTextures( 1, &big_search_bar_playlist); //
+    glDeleteTextures( 1, &big_search_bar_track);    //
+    glDeleteTextures( 1, &big_search_bar_artist);   //
+    glDeleteTextures( 1, &big_search_bar_albumm);   //
     glDeleteTextures( 1, &radiooptions);            //
     glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			      // lande mask

@@ -145,6 +145,7 @@ class spotify_class : vlc_controller {
         int spotify_oversigt_loaded_nr;                                         //
         int spotify_oversigt_nowloading;				                                // denne tæller op når der loades gfx
         int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
+        int searchtype;                                                         // 0 = artist, 1 = album, 2 = playlits, 3 = track
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used by webserver
         struct mg_mgr mgr;                                                      // web server
