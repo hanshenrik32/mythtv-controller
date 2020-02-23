@@ -214,6 +214,7 @@ class spotify_class : vlc_controller {
 };
 
 
+int download_image(char *imgurl,char *filename);
 
 void *load_spotify_web(void *data);
 char *b64_encode(const unsigned char *in, size_t len);
