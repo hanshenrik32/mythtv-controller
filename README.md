@@ -1,9 +1,13 @@
 # mythtv-controller 
 # packs to install to compile on Ubuntu 10/12/14/16/18.xx
-# Updated 06/15/2019
-#
+# Updated 02/25/2020
+# 
 
 Version.
+
+mythtv-controller ver 38.2
+
+Spotify now loading icons
 
 mythtv-controller ver 38.1
 
