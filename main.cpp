@@ -6595,10 +6595,10 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (do_show_spotify_search_oversigt==false) {
           if ((!(do_show_setup_spotify))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
-              spotifyknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
+              spotifyknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
               spotify_select_iconnr=spotifyknapnr;
-              fundet = true;
-              do_zoom_spotify_cover = false;                                        // close player status to ask about play other selected playlist/song
+              fundet = true;                                                    //
+              do_zoom_spotify_cover = false;                                    // close player status to ask about play other selected playlist/song
               if (spotify_oversigt.type==0) {
                 ask_open_dir_or_play_spotify=true;
               } else if (spotify_oversigt.type==1) {
@@ -6657,23 +6657,25 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 7;                                                       //
               fundet = true;
             }
-            //  scroll down
-            if ((GLubyte) names[i*4+3]==24) {
+            // scroll up
+            if ((GLubyte) names[i*4+3]==23) {
               if (debugmode & 4) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
-              // move playlists down
-              if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) spotify_selected_startofset+=8;
+              if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) {
+                spotify_selected_startofset+=8;
+                spotify_selected_startofset+=8;
+                returnfunc = 2;
+                fundet = true;
+              }
+            }
+            // scroll down
+            if ((GLubyte) names[i*4+3]==24) {
+              if (debugmode & 4) fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+              if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
+              if (spotify_selected_startofset<0) spotify_selected_startofset=0;
               returnfunc = 1;
               fundet = true;
             }
-            // scroll up
-            if ((GLubyte) names[i*4+3]==23) {
-              if (debugmode & 4) fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
-              // move playlists up
-              if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
-              if (spotify_selected_startofset<0) spotify_selected_startofset=0;
-              returnfunc = 2;
-              fundet = true;
-            }
+
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
@@ -7588,7 +7590,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
         }
       }
-      // and open / play / stop / next / last play control // open playlist
+      // and open / play / stop / next / last play control / open playlist / scroll
       if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==true)) {
         if (!(do_zoom_spotify_cover)) {
           // scroll down
@@ -7638,12 +7640,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
 
-
             printf("Loading view......\n");
 
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
+            else spotify_oversigt.opdatere_spotify_oversigt(0);
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
             spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
 
