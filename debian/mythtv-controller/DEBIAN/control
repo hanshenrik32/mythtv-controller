@@ -2,7 +2,7 @@ Package: mythtv-controller
 Version: 0.38-1
 Architecture: amd64
 Maintainer: Hans-Henrik Grüner-Pedersen <hanshenrik32@gmail.com>
-Installed-Size: 384696
+Installed-Size: 386605
 Depends: libvlccore9, libvlc-bin, libvlc5, libglewmx1.13, libglc0, freeglut3, libsdl-image1.2, libdevil1c2, libmysqlclient20, liballegro4.4, libftdi1-2, libmng2, libportaudio2, libproxy-tools, libsdl1.2debian, libusb-0.1-4, mysql-common, xmltv, libcurl4
 Section: video
 Priority: optional
