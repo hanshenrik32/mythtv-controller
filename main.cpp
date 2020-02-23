@@ -6675,7 +6675,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 1;
               fundet = true;
             }
-
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");

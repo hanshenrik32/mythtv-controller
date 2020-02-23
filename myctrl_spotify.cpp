@@ -50,6 +50,10 @@ size_t curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* dat
     return size * nmemb;
 }
 
+static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+  return written;
+}
 
 
 // ****************************************************************************************
@@ -549,6 +553,46 @@ int spotify_class::spotify_refresh_token2() {
   }
   return(httpCode);
 }
+
+
+// *********************************************************************************************************************************
+// Download image
+// sample call
+// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/hans/file.jpg");
+// ********************************************************************************************
+
+int download_image(char *imgurl,char *filename) {
+  FILE *file;
+  std::string response_string;
+  CURLcode res;
+  CURL *curl;
+  char *base64_code;
+  char errbuf[CURL_ERROR_SIZE];
+  curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, imgurl);
+    // send data to curl_writeFunction_file
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+    errbuf[0] = 0;
+    file = fopen(filename, "wb");
+    if (file) {
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+      // get file
+      res = curl_easy_perform(curl);
+      fclose(file);
+    }
+    if(res != CURLE_OK) {
+      fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    curl_easy_cleanup(curl);
+  }
+  return(1);
+}
+
 
 
 
@@ -1519,7 +1563,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             strcat(downloadfilenamelong,".jpg");
             if (!(file_exists(downloadfilenamelong))) {
               // download icon image
-              get_webfile2(stack[tt]->feed_gfx_url,downloadfilenamelong);
+              download_image(stack[tt]->feed_gfx_url,downloadfilenamelong);
+              //get_webfile2(stack[tt]->feed_gfx_url,downloadfilenamelong);
             }
           }
           // check if playlist exist
@@ -3002,7 +3047,8 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                     strcat(downloadfilenamelong,".jpg");
                     // download file
                     if (!(file_exists(downloadfilenamelong))) {
-                      get_webfile2(row[1],downloadfilenamelong);                // download file
+                      download_image(row[1],downloadfilenamelong);
+                      //get_webfile2(row[1],downloadfilenamelong);                // download file
                     } else strcpy(downloadfilenamelong,row[1]);                 // no file name
                   } else strcpy(downloadfilenamelong,row[1]);
                   strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
@@ -3384,7 +3430,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download icon image
-                  get_webfile2(value->u.string.ptr,downloadfilenamelong);
+
+                  download_image(value->u.string.ptr,downloadfilenamelong);
+
+                  //get_webfile2(value->u.string.ptr,downloadfilenamelong);
                 }
               }
             }
