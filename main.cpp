@@ -6657,7 +6657,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 7;                                                       //
               fundet = true;
             }
-
+            // scroll up
             if ((GLubyte) names[i*4+3]==23) {
               if (debugmode & 4) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
               if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) {
@@ -6667,6 +6667,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
                 fundet = true;
               }
             }
+            // scroll down
             if ((GLubyte) names[i*4+3]==24) {
               if (debugmode & 4) fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
               if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
@@ -7639,12 +7640,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
 
-
             printf("Loading view......\n");
 
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
+            else spotify_oversigt.opdatere_spotify_oversigt(0);
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
             spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
 
