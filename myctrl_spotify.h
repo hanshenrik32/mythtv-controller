@@ -158,6 +158,7 @@ class spotify_class : vlc_controller {
         char *spotify_get_token() { return(spotifytoken); };                    // get token from struct
         int spotify_refresh_token();                                            // refresh token on postify api
         int spotify_refresh_token2();                                            // refresh token on postify api 2
+        bool spotify_check_spotifydb_empty();
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
         char *spotify_aktiv_song_name() { return( spotify_aktiv_song[0].song_name ); };                       //
