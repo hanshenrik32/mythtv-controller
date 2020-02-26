@@ -115,7 +115,7 @@ extern GLint cur_avail_mem_kb;
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
-extern bool spotify_oversigt_loaded_begin;
+//extern bool spotify_oversigt_loaded_begin;
 
 
 // ****************************************************************************************
@@ -977,6 +977,44 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
   }
   return(httpCode);
   */
+}
+
+
+
+// ****************************************************************************************
+//
+// Check bout spotify have data in db.
+// in use in main
+//
+// ****************************************************************************************
+
+bool spotify_class::spotify_check_spotifydb_empty() {
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  MYSQL_RES *res1;
+  MYSQL_ROW row1;
+  char *database = (char *) "mythtvcontroller";
+  bool dbexist=false;
+  conn = mysql_init(NULL);
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+       mysql_error(conn);
+       //exit(1);
+    }
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    // test about rss table exist
+    mysql_query(conn,"SELECT playlistname from mythtvcontroller.spotifycontentplaylist limit 1");
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dbexist = true;
+      }
+    }
+    mysql_close(conn);
+  }
+  return(dbexist);
 }
 
 
