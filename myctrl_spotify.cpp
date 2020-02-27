@@ -378,8 +378,8 @@ spotify_class::spotify_class() : antal(0) {
 
 spotify_class::~spotify_class() {
     mg_mgr_free(&mgr);                        // delete web server again
-    mg_mgr_free(&client_mgr);
-    clean_spotify_oversigt();
+    mg_mgr_free(&client_mgr);                 // delete web client
+    clean_spotify_oversigt();                 // clean spotify class
 }
 
 
