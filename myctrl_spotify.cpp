@@ -4218,7 +4218,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       i++;
       xof+=(buttonsize+10);
     }
-
+    /*
     // no records loaded error
     if ((i==0) && (antal_spotify_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
@@ -4233,6 +4233,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
       glEnd();
+
       glPushMatrix();
       xof=700;
       yof=260;
@@ -4244,6 +4245,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
     }
+    */
 }
 
 

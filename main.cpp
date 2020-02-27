@@ -3376,13 +3376,13 @@ void display() {
       switch (configland) {
         case 0: glcRenderString("Do you wants to start the first time spotify update ?");
                 break;
-        case 1: glcRenderString("Ønsker du at starte første gang spotify opdatering ?");
+        case 1: glcRenderString("Ønsker du at starte første gangs spotify opdatering ?");
                 break;
-        case 2: glcRenderString("Voulez-vous démarrer la première mise à jour de Spotify O/N ?");
+        case 2: glcRenderString("Voulez-vous démarrer la première mise à jour de Spotify ?");
                 break;
-        case 3: glcRenderString("Möchten Sie das Spotify-Update zum ersten j/n starten?");
+        case 3: glcRenderString("Möchten Sie das Spotify-Update zum ersten starten?");
                 break;
-        default:glcRenderString("Do you wants to start the first time spotify update y/n ?");
+        default:glcRenderString("Do you wants to start the first time spotify update ?");
                 break;
       }
       glPopMatrix();
