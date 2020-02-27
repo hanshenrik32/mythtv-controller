@@ -3032,7 +3032,7 @@ void display() {
           }
         }
         // spotify online search button
-        if (vis_spotify_oversigt) {
+        if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
           glBindTexture(GL_TEXTURE_2D, spotify_search);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -9814,9 +9814,11 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 'y':
+              /*
                if (do_show_spotify_search_oversigt==false) {
                  if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
                }
+               */
 //               if ((firsttimespotifyupdate==true) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
 //                 do_update_spotify_playlist=true;             // start spotify update
 //                 do_update_spotify = true;                                       // set flag to update spotify
@@ -12976,6 +12978,7 @@ void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;
   spotify_oversigt.set_spotify_update_flag(false);
+  firsttimespotifyupdate=false;                                                 // close firsttime update window after update
   pthread_exit(NULL);
 }
 
