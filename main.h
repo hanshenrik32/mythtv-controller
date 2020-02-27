@@ -1,7 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.38.2.1"};
+const char *SHOWVER={"0.38.2.3"};
 
 // debug modes
 // 1  = wifi net
@@ -94,6 +94,12 @@ const char *movie_genre[]={"Genre","Genre","Genre","Genre","Genre"};
 const char *movie_cast[]={"Cast","Cast","Case","Case","Case"};
 const char *movie_description[]={"Description","Beskrivelse","Description","Description","Description"};
 const char *movie_year[]={"Year","År","Year","Year","Year"};
+
+const char *spotify_firsttime_line1[]={"Do you wants to start the first time spotify update ?","Ønsker du at starte første gangs spotify opdatering ?","Voulez-vous démarrer la première mise à jour de Spotify ?","Möchten Sie das Spotify-Update zum ersten starten?"};
+const char *spotify_firsttime_line2[]={"It can take some time to complete.","Det kan godt tage lidt tid at gemmenføre.","It can take some time to complete.","It can take some time to complete."};
+const char *spotify_firsttime_line3[]={"It will download you playlist collection.","Det henter din playliste samling.","Il vous téléchargera la collection de playlist.","Es wird Ihre Wiedergabelistensammlung herunterladen."};
+const char *spotify_firsttime_line4[]={"You can use '*' now to start the update now.","Du skal bruge * til at starte opdateringen.","You can use '*' now to start the update now.","You can use '*' now to start the update now."};
+const char *spotify_firsttime_pleasewait[]={"Please wait.","Vent venlist.","Please wait.","Please wait."};
 
 void *radio_check_statusloader(void *data);
 void *update_xmltv_phread_loader();

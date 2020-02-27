@@ -3366,26 +3366,21 @@ void display() {
       glEnd();
       glPopMatrix();
 
+      aktivfont.selectfont("URW Bookman L");
+
+      // print text in window
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(590, 370+300, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glScalef(20.5, 20.5, 1.0);
       // 0 = uk 1 = dk 2 =  France 3 = tysk 4 = Arabi
-      switch (configland) {
-        case 0: glcRenderString("Do you wants to start the first time spotify update ?");
-                break;
-        case 1: glcRenderString("Ønsker du at starte første gangs spotify opdatering ?");
-                break;
-        case 2: glcRenderString("Voulez-vous démarrer la première mise à jour de Spotify ?");
-                break;
-        case 3: glcRenderString("Möchten Sie das Spotify-Update zum ersten starten?");
-                break;
-        default:glcRenderString("Do you wants to start the first time spotify update ?");
-                break;
-      }
+      glcRenderString(spotify_firsttime_line1[configland]);
       glPopMatrix();
+      // print text in window
+
+      //aktivfont.selectfont("Courier 10 Pitch");
 
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
@@ -3393,60 +3388,27 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      switch (configland) {
-        case 0: glcRenderString("It can take some time to complete.");
-                break;
-        case 1: glcRenderString("Det kan godt tage lidt tid at gemmenføre.");
-                break;
-        case 2: glcRenderString("It can take some time to complete.");
-                break;
-        case 3: glcRenderString("It can take some time to complete.");
-                break;
-        default:glcRenderString("It can take some time to complete.");
-                break;
-      }
+      glcRenderString(spotify_firsttime_line2[configland]);
       glPopMatrix();
-
+      // print text in window
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(590, 370+250, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      switch (configland) {
-        case 0: glcRenderString("It will download you playlist collection.");
-                break;
-        case 1: glcRenderString("Det henter din playliste samling.");
-                break;
-        case 2: glcRenderString("Il vous téléchargera la collection de playlist.");
-                break;
-        case 3: glcRenderString("Es wird Ihre Wiedergabelistensammlung herunterladen.");
-                break;
-        default:glcRenderString("It will download you collections data.");
-                break;
-      }
+      glcRenderString(spotify_firsttime_line3[configland]);
       glPopMatrix();
-
+      // print text in window
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(590, 370+220, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      switch (configland) {
-        case 0: glcRenderString("You can use '*' now to start the update now.");
-                break;
-        case 1: glcRenderString("Du skal bruge '*' til at starte opdateringen.");
-                break;
-        case 2: glcRenderString("You can use '*' now to start the update now.");
-                break;
-        case 3: glcRenderString("You can use '*' now to start the update now.");
-                break;
-        default:glcRenderString("You can use '*' now to start the update now.");
-                break;
-      }
+      glcRenderString(spotify_firsttime_line4[configland]);
       glPopMatrix();
-
+      // print text in window
       static time_t today1=0;
       static time_t lasttime=0;
       static bool switch_text=false;
@@ -3457,25 +3419,15 @@ void display() {
       }
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
-      glTranslatef(790, 370+70, 0.0f);
+      glTranslatef(780, 370+70, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(30.5, 30.5, 1.0);                    // danish charset ttf
       if ((spotify_oversigt.get_spotify_update_flag()) && (switch_text)) {
-        switch (configland) {
-          case 0: glcRenderString("Please wait.");
-                  break;
-          case 1: glcRenderString("Vent venlist.");
-                  break;
-          case 2: glcRenderString("Please wait.");
-                  break;
-          case 3: glcRenderString("Please wait.");
-                  break;
-          default:glcRenderString("Please wait.");
-                  break;
-        }
+        glcRenderString(spotify_firsttime_pleasewait[configland]);
       }
       glPopMatrix();
+      aktivfont.selectfont(configfontname);
       /*
       if ((spotify_oversigt.get_spotify_update_flag()==false) && (switch_text)) {
         glPushMatrix();
