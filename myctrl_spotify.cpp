@@ -155,7 +155,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       // from spotify servers
       // is callback call
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
-        printf("Got reply server : %s \n", hm->uri);
+        fprintf(stdout,"Got reply server : %s \n", hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get soptify code from server
         if (p) {
@@ -174,7 +174,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           curl_error=system(sed);
           if (curl_error==0) {
           }
-          printf("\n******** Got token ********\n");
+          fprintf(stdout,"\n******** Got token ********\n");
           tokenfile=fopen("spotify_access_token2.txt","r");
           error=getline(&file_contents,&len,tokenfile);
           strcpy(token_string,file_contents);
@@ -208,13 +208,13 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
       break;
     case MG_EV_HTTP_REPLY:
-      printf("***************************************** CALL BACK server reply ***************************************");
+      fprintf(stdout,"***************************************** CALL BACK server reply ***************************************");
       c->flags |= MG_F_CLOSE_IMMEDIATELY;
       fwrite(hm->body.p, 1, hm->body.len, stdout);
       putchar('\n');
       break;
     case MG_EV_CLOSE:
-      printf("Server closed connection\n");
+      fprintf(stdout,"Server closed connection\n");
   }
 }
 
@@ -237,20 +237,20 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
       case MG_EV_CONNECT:
         connect_status = *(int *) ev_data;
         if (connect_status != 0) {
-          printf("Error connecting %s\n", strerror(connect_status));
+          fprintf(stderr,"Error connecting %s\n", strerror(connect_status));
           s_exit_flag = 1;
         }
         break;
       case MG_EV_HTTP_REPLY:
         fwrite(hm->message.p, 1, (int)hm->message.len, stdout);
-        printf("Got reply client :\n%.*s\n", (int) hm->body.len, hm->body.p);
-        printf("***************************************** CALL BACK **************************************************");
+        fprintf(stdout,"Got reply client :\n%.*s\n", (int) hm->body.len, hm->body.p);
+        fprintf(stdout,"***************************************** CALL BACK **************************************************");
         nc->flags |= MG_F_SEND_AND_CLOSE;
         s_exit_flag = 1;
         break;
       case MG_EV_CLOSE:
         if (s_exit_flag == 0) {
-          printf("Server closed connection\n");
+          fprintf(stdout,"Server closed connection\n");
           s_exit_flag = 1;
         };
         break;
@@ -442,7 +442,7 @@ int spotify_class::spotify_refresh_token() {
     sprintf(doget,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=refresh_token -d refresh_token=%s https://accounts.spotify.com/api/token > spotify_refresh_token.txt", base64_code ,spotifytoken_refresh);
     curl_error=system(doget);
     if (WEXITSTATUS(curl_error)==0) {
-      printf("Ok Spotify new token. ");
+      fprintf(stdout,"Ok Spotify new token. ");
       tokenfil=fopen("spotify_refresh_token.txt","rt");
       if (tokenfil) {
         fgets(data,4096,tokenfil);
@@ -452,12 +452,11 @@ int spotify_class::spotify_refresh_token() {
             newtoken[181]='\0';
           }
         }
-        printf(" %s \n",newtoken);
         strcpy(spotifytoken,newtoken);                                         // update spotify token
         fclose(tokenfil);
       }
     } else {
-      printf("Error Spotify renew token.\n");
+      fprintf(stdout,"Error Spotify renew token.\n");
     }
   }
   return 1;
@@ -533,7 +532,7 @@ int spotify_class::spotify_refresh_token2() {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
     if (httpCode == 200) {
-      printf("Spotify new token. \n");
+      fprintf(stdout,"Spotify new token. \n");
       //printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
@@ -541,12 +540,12 @@ int spotify_class::spotify_refresh_token2() {
       if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
-        printf("Token valid.\n");
+        fprintf(stdout,"Token valid.\n");
         strcpy(spotifytoken,newtoken);                                         // update spotify token
       }
     } else {
-      printf("Error code httpCode %d \n. ",httpCode);
-      printf("Curl error: %s\n", curl_easy_strerror(res));
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
     }
     // always cleanup
     curl_easy_cleanup(curl);
@@ -889,14 +888,14 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
     if (httpCode == 200) {
-      printf("Download ok. \n");
+      fprintf(stdout,"Download ok. \n");
       //printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
       //process_value_playinfo(value, 0,0);                                                     // fill play info
     } else {
-      printf("Error code httpCode %d \n. ",httpCode);
-      printf("Curl error: %s\n", curl_easy_strerror(res));
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
     }
     // always cleanup
     fclose(outfile);
@@ -1072,22 +1071,22 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
     if (dbexist==false) {
       sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sql)!=0) {
-        printf("mysql create table error.\n");
-        printf("SQL : %s\n",sql);
+        fprintf(stdout,"mysql create table error.\n");
+        fprintf(stdout,"SQL : %s\n",sql);
       }
       res = mysql_store_result(conn);
       // create db (spotify songs)
       sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sql)!=0) {
-        printf("mysql create table error.\n");
-        printf("SQL : %s\n",sql);
+        fprintf(stdout,"mysql create table error.\n");
+        fprintf(stdout,"SQL : %s\n",sql);
       }
       res = mysql_store_result(conn);
       // create db (spotify playlists)
       sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
       if (mysql_query(conn,sql)!=0) {
-        printf("mysql create table error.\n");
-        printf("SQL : %s\n",sql);
+        fprintf(stdout,"mysql create table error.\n");
+        fprintf(stdout,"SQL : %s\n",sql);
       }
       res = mysql_store_result(conn);
     }
@@ -1141,25 +1140,25 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         }
         if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
       }
-      if (remove("spotify_users_playlist.txt")!=0) printf("Error remove user playlist file spotify_users_playlist.txt\n");
+      if (remove("spotify_users_playlist.txt")!=0) fprintf(stdout,"Error remove user playlist file spotify_users_playlist.txt\n");
       // save data to mysql db
     } else {
-        printf("Error downloading user playlist");
+        fprintf(stdout,"Error downloading user playlist");
         exit(0);
     }
     sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
-    printf("process playlist ...... \n");
+    fprintf(stdout,"process playlist ...... \n");
     mysql_query(conn,sql);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        if (debugmode) printf("playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+        if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
         if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
-          printf("Error create playlist %s \n",row[1]);
+          fprintf(stderr,"Error create playlist %s \n",row[1]);
         }
       }
     }
-    printf("process playlist done.. \n");
+    fprintf(stdout,"process playlist done.. \n");
     mysql_close(conn);
   }
   return(1);
@@ -1292,7 +1291,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
     }
     switch (value->type) {
       case json_none:
-        if (debug_json) printf("none\n");
+        if (debug_json) fprintf(stdout,"none\n");
         break;
       case json_object:
         process_object_playlist(value, depth+1);
@@ -1301,10 +1300,10 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         process_array_playlist(value, depth+1);
         break;
       case json_integer:
-        if (debug_json) printf("int: %10" PRId64 "\n", value->u.integer);
+        if (debug_json) fprintf(stdout,"int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
-        if (debug_json) printf("double: %f\n", value->u.dbl);
+        if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:
         //printf("string: %s\n", value->u.string.ptr);
@@ -1418,7 +1417,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         break;
       case json_boolean:
-        if (debug_json) printf("bool: %d\n", value->u.boolean);
+        if (debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
         break;
     }
 }
@@ -1506,7 +1505,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             curl_easy_cleanup(curl);
             fclose(out_file);
             if (httpCode != 200) {
-              printf("Spotify error %d \n",httpCode);
+              fprintf(stderr,"Spotify error %d \n",httpCode);
               exit(1);
             }
           }
@@ -1564,22 +1563,22 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         if (dbexist==false) {
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            printf("mysql create table error.\n");
-            printf("SQL : %s\n",sql);
+            fprintf(stdout,"mysql create table error.\n");
+            fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify songs)
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            printf("mysql create table error.\n");
-            printf("SQL : %s\n",sql);
+            fprintf(stdout,"mysql create table error.\n");
+            fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify playlists)
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            printf("mysql create table error.\n");
-            printf("SQL : %s\n",sql);
+            fprintf(stdout,"mysql create table error.\n");
+            fprintf(stdout,"SQL : %s\n",sql);
           }
           // create db if not exist
           res = mysql_store_result(conn);
@@ -1590,7 +1589,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       tt = 0;
       while(tt<antalplaylists) {
         if (stack[tt]) {
-          if (debugmode & 4) printf("Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
+          //if (debugmode & 4) fprintf(stdout,"Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
@@ -1793,7 +1792,7 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
     }
     switch (value->type) {
       case json_none:
-        if (debug_json) printf("none\n");
+        if (debug_json) fprintf(stdout,"none\n");
         break;
       case json_object:
         process_object_playinfo(value, depth+1);
@@ -1813,7 +1812,7 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
         //printf("int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
-        if (debug_json) printf("double: %f\n", value->u.dbl);
+        if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:
         //printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
@@ -1824,7 +1823,7 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
           process_playinfo_tracks=false;
         }
         if (process_playinfo_image) {
-          if (debug_json) printf("Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          //if (debug_json) fprintf(stdout,"Image Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           strcpy(spotify_aktiv_song[0].cover_image_url,value->u.string.ptr);
           process_playinfo_image=false;
         }
@@ -1834,19 +1833,19 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
           process_playinfo_progress_ms=false;
         }
         if (process_playinfo_duration_ms) {
-          printf("Value found = %s \n ",value->u.string.ptr);
+          fprintf(stdout,"Value found = %s \n ",value->u.string.ptr);
           //if ((depth==3) && (x==4)) spotify_aktiv_song[0].duration_ms=atol(value->u.string.ptr);
           process_playinfo_duration_ms=false;
         }
         // release date
         if (process_playinfo_date) {
-          if (debug_json) printf("date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if (debug_json) fprintf(stdout,"date Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           strcpy(spotify_aktiv_song[0].release_date,value->u.string.ptr);
           process_playinfo_date=false;
         }
         // get playlist name
         if (process_playinfo_name) {
-          if (debug_json) printf("name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+          if (debug_json) fprintf(stdout,"name type Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
           // artist name
           if ((depth==9) && (x==3)) strcpy(spotify_aktiv_song[0].artist_name,value->u.string.ptr);
           // album name
@@ -1855,7 +1854,7 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
           if ((depth==4) && (x==11)) strcpy(spotify_aktiv_song[0].song_name,value->u.string.ptr);
           //
           if ((depth==1) && (x==5)) {
-            printf("progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+            fprintf(stdout,"progress ms Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
             spotify_aktiv_song[0].progress_ms=atol(value->u.string.ptr);
           }
           process_playinfo_name=false;
@@ -1870,7 +1869,7 @@ void spotify_class::process_value_playinfo(json_value* value, int depth,int x) {
         }
         break;
       case json_boolean:
-        if (debug_json) printf("bool: %d\n", value->u.boolean);
+        if (debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
         break;
     }
 }
@@ -2624,31 +2623,8 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
 }
 
 
-
-
-//
-// Spotify Get user id
-// OLD version
-
-/*
-int spotify_class::spotify_get_user_id2() {
-  int curl_error;
-  char doget[2048];
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me' -H 'Authorization: Bearer %s' > spotify_user_id.txt",spotifytoken);
-    curl_error=system(doget);
-    if (WEXITSTATUS(curl_error)==0) {
-      return 200;
-    }
-  }
-  return curl_error;
-}
-*/
-
-
-
 // ****************************************************************************************
-// Do now work now
+// Do work now
 // get user id from spotify api
 //
 // ****************************************************************************************
@@ -2708,9 +2684,6 @@ int spotify_class::spotify_get_user_id() {
   }
   return(httpCode);
 }
-
-
-
 
 // ****************************************************************************************
 //
@@ -3446,7 +3419,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
         search_process_tracks=false;
       }
       if ( search_process_image ) {
-        // get playid
+        if ((depth==1) && (x==1)) {
+          //strcpy(stack[antal-1]->feed_gfx_url,value->u.string.ptr);
+        }
+        // load artist conver icon gfx
         if ((depth==10)  && (x==1)) {
           //printf("antal = %d ******************************************************************************* Image process %s \n",antal,value->u.string.ptr);
           if (antalplaylists<maxantal) {
@@ -3455,7 +3431,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(downloadfilenamelong,"");
             // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
             // get name from url
-            //printf(" # %d url found  : %s ",antal,value->u.string.ptr);
+            if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3468,19 +3444,37 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
                 strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download icon image
-
                   download_image(value->u.string.ptr,downloadfilenamelong);
-
                   //get_webfile2(value->u.string.ptr,downloadfilenamelong);
                 }
               }
             }
-            //printf(" gfx disk file %s  \n",stack[antal]->feed_gfx_url);
           }
         }
-
-        if ((depth==1) && (x==1)) {
-          //strcpy(stack[antal-1]->feed_gfx_url,value->u.string.ptr);
+        // load cd conver icon gfx
+        if ((depth==12) && (x==1)) {
+          if (antalplaylists<maxantal) {
+            if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
+            stack[antal]->textureId=0;
+            strcpy(downloadfilenamelong,"");
+            if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
+            if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
+              strcpy(filename,value->u.string.ptr+24);
+              if (strcmp(value->u.string.ptr,"")) {
+                getuserhomedir(downloadfilenamelong);
+                strcat(downloadfilenamelong,"/");
+                strcat(downloadfilenamelong,spotify_gfx_path);
+                strcat(downloadfilenamelong,filename);
+                strcat(downloadfilenamelong,".jpg");
+                // save name to db to next time
+                strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
+                if (!(file_exists(downloadfilenamelong))) {
+                  // download icon image
+                  download_image(value->u.string.ptr,downloadfilenamelong);
+                }
+              }
+            }
+          }
         }
         search_process_image=false;
       }
@@ -3544,7 +3538,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             }
             // get album playid
             if (value->u.string.ptr) {
-              printf("# %d - album playlistid %s \n",antal,value->u.string.ptr);
+              //printf("# %d - album playlistid %s icon url \n",antal,value->u.string.ptr,stack[antal]->feed_gfx_url);
               if (!(stack[antal])) {
                 printf("******************************************* NO STACK error.\n");
               }
@@ -3865,7 +3859,7 @@ int spotify_class::load_spotify_iconoversigt() {
   this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("spotify icon loader.\n");
   while(nr<=streamantal()) {
-    if (debugmode & 4) printf("Loading texture nr %-4d for %40s  path %s \n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
         // if url
@@ -4339,7 +4333,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       printf("Searech loaded done. Loading icons\n");
       spotify_oversigt.load_spotify_iconoversigt();                       // load icons
     }
-
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
