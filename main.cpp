@@ -119,7 +119,7 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;           // do it first time
+static bool do_update_spotify_playlist = false;           // do it first time thread
 
 
 // struct used by keyboard config of functions keys
@@ -3233,8 +3233,8 @@ void display() {
         spotifyknapnr=1;                                                        // reset pos
         spotify_oversigt_loaded_begin=true;
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
-          if (spotify_oversigt.search_playlist_song==0)
-           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist
+          if (spotify_oversigt.search_playlist_song==0)                         //
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
           else
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
           //spotify_oversigt.load_spotify_iconoversigt();
@@ -3244,7 +3244,6 @@ void display() {
         spotify_oversigt_loaded_begin=false;
       }
     }
-
 
     //
     // auto search spotify online
@@ -3348,7 +3347,7 @@ void display() {
     }
 
     //firsttimespotifyupdate=true;
-    // show search box and text for radio and music and movie and spotify offline search NOT spotify online search
+    // show firsttime spotify update windows request
     if ((firsttimespotifyupdate) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
@@ -3365,9 +3364,7 @@ void display() {
       glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
       glEnd();
       glPopMatrix();
-
       aktivfont.selectfont("URW Bookman L");
-
       // print text in window
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
@@ -3379,9 +3376,6 @@ void display() {
       glcRenderString(spotify_firsttime_line1[configland]);
       glPopMatrix();
       // print text in window
-
-      //aktivfont.selectfont("Courier 10 Pitch");
-
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glTranslatef(590, 370+275, 0.0f);
@@ -3428,20 +3422,6 @@ void display() {
       }
       glPopMatrix();
       aktivfont.selectfont(configfontname);
-      /*
-      if ((spotify_oversigt.get_spotify_update_flag()==false) && (switch_text)) {
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef(1090, 370+296, 0.0f);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
-        glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 20.0, 0.0);
-        glTexCoord2f(1.0, 1.0); glVertex3f(20.0, 20.0, 0.0);
-        glTexCoord2f(1.0, 0.0); glVertex3f(20.0, 0.0, 0.0);
-        glEnd();
-        glPopMatrix();
-      }
-      */
     }
 
     // show search box and text for radio and music and movie and spotify offline search NOT spotify online search
@@ -5823,10 +5803,12 @@ void display() {
       }
       glPopMatrix();
     }
+
+
     //
     // show status of all the thread loaders
     //
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_spotify_playlist) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       show_status_update=true;
       // show loader status
       int statuswxpos = 1470;
@@ -6505,8 +6487,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt_loaded_begin=true;                                 //
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
-            spotify_oversigt.set_search_loaded();                           // triger icon loader
-            //spotify_oversigt.load_spotify_iconoversigt();                       // update icons
+            spotify_oversigt.set_search_loaded();                               // triger icon loader
+            //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
             spotify_oversigt_loaded_begin=false;                                //
           } else {
             do_show_spotify_search_oversigt=true;
@@ -7741,19 +7723,15 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
-
             printf("Loading view......\n");
-
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
-            spotify_oversigt.clean_spotify_oversigt();
+            spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
-            spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
-
-
+            //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
+            spotify_oversigt.set_search_loaded();
             printf("Done Loading view......\n");
-
             // reset select in spotify view
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
@@ -12888,8 +12866,6 @@ void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
   spotify_oversigt.set_search_loaded();                           // triger icon loader
-  //spotify_oversigt.load_spotify_iconoversigt();                                 // update icons
-
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   //spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
