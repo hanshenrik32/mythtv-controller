@@ -111,6 +111,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
 #include "myctrl_spotify.h"
+#include "myctrl_tidal.h"
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -120,6 +121,11 @@ extern rss_stream_class rssstreamoversigt;
 
 spotify_class spotify_oversigt;
 static bool do_update_spotify_playlist = false;           // do it first time thread
+
+tridal_class tridal_oversigt;
+
+// tidal music class
+
 
 
 // struct used by keyboard config of functions keys
