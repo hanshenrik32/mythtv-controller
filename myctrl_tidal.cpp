@@ -118,7 +118,7 @@ extern bool stream_loadergfx_started_break;
 
 // ****************************************************************************************
 //
-// Constructor spotify devices
+// Constructor tidal devices
 //
 // ****************************************************************************************
 
@@ -134,7 +134,7 @@ tridal_device_def::tridal_device_def() {
 
 // ****************************************************************************************
 //
-// Constructor spotify active player
+// Constructor tidal active player
 //
 // ****************************************************************************************
 
@@ -154,7 +154,7 @@ tridal_active_play_info_type::tridal_active_play_info_type() {
 
 // ****************************************************************************************
 //
-// Constructor spotify oversigt type
+// Constructor tidal oversigt type
 //
 // ****************************************************************************************
 
@@ -210,7 +210,7 @@ tridal_class::tridal_class() : antal(0) {
 //    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
 //    mg_set_protocol_http_websocket(this->c);                                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-    active_tridal_device=-1;                                                   // active spotify device -1 = no dev is active
+    active_tridal_device=-1;                                                   // active tidal device -1 = no dev is active
     active_default_play_device=active_tridal_device;
     aktiv_song_tridal_icon=0;                                                  //
     strcpy(tidal_client_id,"");                                               //
@@ -235,7 +235,7 @@ tridal_class::tridal_class() : antal(0) {
 tridal_class::~tridal_class() {
     //mg_mgr_free(&mgr);                        // delete web server again
     //mg_mgr_free(&client_mgr);                 // delete web client
-    clean_tridal_oversigt();                 // clean spotify class
+    clean_tridal_oversigt();                 // clean tidal class
 }
 
 
@@ -325,7 +325,7 @@ int tridal_class::tridal_refresh_token() {
     errbuf[0] = 0;
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
     sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s",tidaltoken_refresh);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
@@ -344,7 +344,7 @@ int tridal_class::tridal_refresh_token() {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
     if (httpCode == 200) {
-      fprintf(stdout,"Spotify new token. \n");
+      fprintf(stdout,"tidal new token. \n");
       //printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
@@ -353,7 +353,7 @@ int tridal_class::tridal_refresh_token() {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
         fprintf(stdout,"Token valid.\n");
-        strcpy(tidaltoken,newtoken);                                         // update spotify token
+        strcpy(tidaltoken,newtoken);                                         // update tidal token
       }
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
@@ -417,7 +417,7 @@ int tridal_class::download_user_playlist(char *tridaltoken,int startofset) {
   if (curl) {
     // add userinfo + basic auth
     //curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    //curl_easy_setopt(curl, CURLOPT_XOAUTH2_BEARER,spotifytoken);
+    //curl_easy_setopt(curl, CURLOPT_XOAUTH2_BEARER,tidaltoken);
     //curl_easy_setopt(curl, CURLOPT_USERNAME, tridal_client_id);
     //curl_easy_setopt(curl, CURLOPT_PASSWORD, tridal_secret_id);
     /* Add a custom header */
@@ -425,7 +425,7 @@ int tridal_class::download_user_playlist(char *tridaltoken,int startofset) {
     chunk = curl_slist_append(chunk, "Content-Type: application/json");
     chunk = curl_slist_append(chunk, auth_kode);
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/playlists");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/playlists");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -437,7 +437,7 @@ int tridal_class::download_user_playlist(char *tridaltoken,int startofset) {
     errbuf[0] = 0;
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
     sprintf(post_playlist_data,"limit=50&offset=%d",startofset);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
@@ -479,7 +479,7 @@ int tridal_class::download_user_playlist(char *tridaltoken,int startofset) {
 
 // ****************************************************************************************
 //
-// Check bout spotify have data in db.
+// Check bout tidal have data in db.
 // in use in main
 //
 // ****************************************************************************************
@@ -524,7 +524,6 @@ bool tridal_class::tridal_check_tridaldb_empty() {
 //
 // Get users playlist
 // in use
-// The default view
 //
 // ****************************************************************************************
 
@@ -554,7 +553,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
   loaded_antal=0;
   unsigned int tridal_playlistantal=0;
   unsigned int tridal_playlistantal_loaded=0;
-  bool spotifyplaylistloader_done=false;
+  bool tidalplaylistloader_done=false;
   try {
     if (conn) {
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
@@ -564,7 +563,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // test about rss table exist
-      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
+      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.tidalcontentarticles limit 1");
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
@@ -572,21 +571,21 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
         }
       }
       if (dbexist==false) {
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           fprintf(stdout,"mysql create table error.\n");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
-        // create db (spotify songs)
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        // create db (tidal songs)
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           fprintf(stdout,"mysql create table error.\n");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
-        // create db (spotify playlists)
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        // create db (tidal playlists)
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           fprintf(stdout,"mysql create table error.\n");
           fprintf(stdout,"SQL : %s\n",sql);
@@ -597,16 +596,16 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
       // if we have a token
       if (strcmp(tidaltoken,"")!=0) {
         // 50 is the max
-        //download_user_playlist(spotifytoken,startoffset);
-        while (spotifyplaylistloader_done==false) {
-          sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > tidal_users_playlist.json",startoffset,tidaltoken);
+        //download_user_playlist(tidaltoken,startoffset);
+        while (tidalplaylistloader_done==false) {
+          sprintf(doget,"curl -X GET 'https://api.tidal.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > tidal_users_playlist.json",startoffset,tidaltoken);
           curl_error=system(doget);
           if (curl_error!=0) {
             fprintf(stderr,"Curl error get user playlists\n");
             exit(0);
           }
-          // hent users playlist from spotify api
-          system("cat tidal_users_playlist.json | grep spotify:playlist: | awk {'print substr($0,31,22)'} > tidal_users_playlist.txt");
+          // hent users playlist from tidal api
+          system("cat tidal_users_playlist.json | grep tidal:playlist: | awk {'print substr($0,31,22)'} > tidal_users_playlist.txt");
           // get antal playliste first time (we can only load 50 at time)
           if (tridal_playlistantal_loaded==0) {
             system("cat tidal_users_playlist.json | grep total | tail -1 | awk {'print $3'} > tidal_users_playlist_antal.txt");
@@ -641,7 +640,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
           } else {
             startoffset=tridal_oversigt.tridal_playlist_antal-startoffset;
           }
-          if (tridal_playlistantal_loaded>=tridal_oversigt.tridal_playlist_antal) spotifyplaylistloader_done=true;
+          if (tridal_playlistantal_loaded>=tridal_oversigt.tridal_playlist_antal) tidalplaylistloader_done=true;
         }
         if (remove("tidal_users_playlist.txt")!=0) fprintf(stdout,"Error remove user playlist file tidal_users_playlist.txt\n");
         // save data to mysql db
@@ -649,13 +648,13 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
           fprintf(stdout,"Error downloading user playlist");
           exit(0);
       }
-      sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
+      sprintf(sql,"select playlistname,playlistid from mythtvcontroller.tidalcontentplaylist");
       fprintf(stdout,"process playlist ...... \n");
       mysql_query(conn,sql);
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
-          if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+          if (debugmode & 4) fprintf(stdout,"playlist %-60s tidalid %-20s \n",row[0],row[1]);
 //          if (tridal_oversigt.tridal_get_playlist(row[1],force,0)==1) {
 //            fprintf(stderr,"Error create playlist %s \n",row[1]);
 //          }
@@ -692,7 +691,7 @@ int tridal_class::tridal_do_we_play() {
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
@@ -733,7 +732,7 @@ int tridal_class::tridal_do_we_play() {
 int tridal_class::tridal_pause_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
+  sprintf(call,"curl -f -X PUT 'https://api.tidal.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
   curl_error=system(call);
   if (curl_error!=0) {
     return 1;
@@ -761,7 +760,7 @@ int tridal_class::tridal_pause_play2() {
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/pause");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player/pause");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
@@ -801,7 +800,7 @@ int tridal_class::tridal_resume_play() {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/play";
+  url="https://api.tidal.com/v1/me/player/play";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -847,7 +846,7 @@ int tridal_class::tridal_resume_play() {
 int tridal_class::tridal_last_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
+  sprintf(call,"curl -f -X POST 'https://api.tidal.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
   curl_error=system(call);
   if (WEXITSTATUS(curl_error)!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
@@ -875,7 +874,7 @@ int tridal_class::tridal_last_play2() {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/last";
+  url="https://api.tidal.com/v1/me/player/last";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -923,7 +922,7 @@ int tridal_class::tridal_last_play2() {
 int tridal_class::tridal_next_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
+  sprintf(call,"curl -f -X POST 'https://api.tidal.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
   curl_error=system(call);
   if (curl_error==0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
@@ -950,7 +949,7 @@ int tridal_class::tridal_next_play2() {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/next";
+  url="https://api.tidal.com/v1/me/player/next";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -994,7 +993,7 @@ int tridal_class::tridal_next_play2() {
 
 // ****************************************************************************************
 // Works
-// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 // ****************************************************************************************
 
@@ -1017,7 +1016,7 @@ int tridal_class::tridal_play_now_playlist(char *playlist_song,bool now) {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url="https://api.tidal.com/v1/me/player/play?device_id=";
   if (devid) url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -1038,7 +1037,7 @@ int tridal_class::tridal_play_now_playlist(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
+    sprintf((char *) post_playlist_data,"{\"context_uri\":\"tidal:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -1063,7 +1062,7 @@ int tridal_class::tridal_play_now_playlist(char *playlist_song,bool now) {
 //
 // work
 // play song
-// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 //
 // ****************************************************************************************
@@ -1085,7 +1084,7 @@ int tridal_class::tridal_play_now_song(char *playlist_song,bool now) {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url="https://api.tidal.com/v1/me/player/play?device_id=";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -1106,7 +1105,7 @@ int tridal_class::tridal_play_now_song(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
+    sprintf(post_playlist_data,"{\"uris\":[\"tidal:track:%s\"]}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -1128,7 +1127,7 @@ int tridal_class::tridal_play_now_song(char *playlist_song,bool now) {
 //
 // work
 // play artist
-// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 //
 // ****************************************************************************************
@@ -1151,7 +1150,7 @@ int tridal_class::tridal_play_now_artist(char *playlist_song,bool now) {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url="https://api.tidal.com/v1/me/player/play?device_id=";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -1172,7 +1171,7 @@ int tridal_class::tridal_play_now_artist(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:artist:%s\"}",playlist_song);
+    sprintf(post_playlist_data,"{\"context_uri\":\"tidal:artist:%s\"}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -1198,7 +1197,7 @@ int tridal_class::tridal_play_now_artist(char *playlist_song,bool now) {
 //
 // work
 // play album
-// Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
+// Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 //
 // ****************************************************************************************
@@ -1219,7 +1218,7 @@ int tridal_class::tridal_play_now_album(char *playlist_song,bool now) {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me/player/play?device_id=";
+  url="https://api.tidal.com/v1/me/player/play?device_id=";
   url=url + devid;
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -1240,7 +1239,7 @@ int tridal_class::tridal_play_now_album(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:album:%s\"}",playlist_song);
+    sprintf(post_playlist_data,"{\"context_uri\":\"tidal:album:%s\"}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -1261,7 +1260,7 @@ int tridal_class::tridal_play_now_album(char *playlist_song,bool now) {
 
 // ****************************************************************************************
 // Do work now
-// get user id from spotify api
+// get user id from tidal api
 //
 // ****************************************************************************************
 
@@ -1278,7 +1277,7 @@ int tridal_class::tridal_get_user_id() {
   char *devid=tridal_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/me";
+  url="https://api.tidal.com/v1/me";
   url=url + devid;
   printf("Get user info.\n");
   // use libcurl
@@ -1324,7 +1323,7 @@ int tridal_class::tridal_get_user_id() {
 // ****************************************************************************************
 //
 // Works
-// get device list and have it in spotify class
+// get device list and have it in tidal class
 //
 // ****************************************************************************************
 
@@ -1343,7 +1342,7 @@ int tridal_class::tridal_get_available_devices() {
   bool dbexist;
   char *database = (char *) "mythtvcontroller";
   char call_sed[]="cat tidal_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > tidal_device_list.txt";
-  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > tidal_device_list.json 2>&1",tidaltoken);
+  sprintf(call,"curl -f -X GET 'https://api.tidal.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > tidal_device_list.json 2>&1",tidaltoken);
   curl_exitcode=system(call);
   if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
@@ -1451,7 +1450,7 @@ int tridal_class::tridal_get_access_token2() {
   struct mg_connection *nc;
   // works
   //mg_mgr_init(&tridal_oversigt.client_mgr, NULL);
-  //nc = mg_connect_http(&tridal_oversigt.client_mgr, ev_handler, "https://accounts.spotify.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
+  //nc = mg_connect_http(&tridal_oversigt.client_mgr, ev_handler, "https://accounts.tidal.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
   //mg_set_protocol_http_websocket(nc);
 //  while (s_exit_flag == 0) {
 //    mg_mgr_poll(&mgr, 1000);
@@ -1467,7 +1466,7 @@ int tridal_class::tridal_get_access_token2() {
   base64_code=b64_encode((const unsigned char *) data, 65);
   *(base64_code+88)='\0';
   // works
-  //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > tridal_access_token.txt",base64_code);
+  sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.tidal.com/api/token > tridal_access_token.txt",base64_code);
   myfile = fopen("tridal_access_token.txt","r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
@@ -1503,7 +1502,7 @@ char *tridal_class::get_tridal_name(int nr) {
 
 // ****************************************************************************************
 //
-// return the spotify playlist id
+// return the tidal playlist id
 //
 // ****************************************************************************************
 
@@ -1537,7 +1536,7 @@ void tridal_class::clean_tridal_oversigt() {
         if (stack[i]->textureId) {
           if (&stack[i]->textureId) {
             if (&stack[i]->textureId) {
-              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete tidal texture
             }
           }
         }
@@ -1555,7 +1554,7 @@ void tridal_class::clean_tridal_oversigt() {
 
 // ****************************************************************************************
 //
-// set spotify icon image
+// set tidal icon image
 //
 // ****************************************************************************************
 
@@ -1565,7 +1564,7 @@ void tridal_class::set_texture(int nr,GLuint idtexture) {
 
 // ****************************************************************************************
 //
-// get nr of spotify playlists
+// get nr of tidal playlists
 //
 // ****************************************************************************************
 
@@ -1638,7 +1637,7 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
     clean_tridal_oversigt();
     strcpy(lasttmpfilename,"");
     if (debugmode & 4) {
-      fprintf(stderr,"loading spotify data.\n");
+      fprintf(stderr,"loading tidal data.\n");
     }
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
@@ -1651,7 +1650,7 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
-    if (debugmode & 4) fprintf(stderr,"spotify loader started... \n");
+    if (debugmode & 4) fprintf(stderr,"tidal loader started... \n");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -1758,8 +1757,8 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_gfx_url,row[1],tridal_namelength);
                 strcpy(stack[antal]->playlisturl,row[2]);   // get trackid
                 stack[antal]->type=1;
-                //songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
-                songstrpointer=strstr(row[2],"spotify:track:");
+                //songstrpointer=strstr(row[2],"https://api.tidal.com/v1/tracks/");
+                songstrpointer=strstr(row[2],"tidal:track:");
                 // get track id from string
                 if (songstrpointer) {
                   strcpy(temptxt2,row[2]+14);
@@ -1772,12 +1771,12 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
         }
         mysql_close(conn);
       } else {
-        if (debugmode & 4) fprintf(stderr,"No spotify data loaded \n");
+        if (debugmode & 4) fprintf(stderr,"No tidal data loaded \n");
       }
       antalplaylists=antal;
       return(antal);
-    } else fprintf(stderr,"Failed to update Spotify db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) fprintf(stderr,"Spotify loader done... \n");
+    } else fprintf(stderr,"Failed to update tidal db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+    if (debugmode & 4) fprintf(stderr,"tidal loader done... \n");
     return(0);
 }
 
@@ -1953,7 +1952,7 @@ int tridal_class::get_search_result_online(char *searchstring,int type) {
   };
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
-  url="https://api.spotify.com/v1/search";
+  url="https://api.tidal.com/v1/search";
   printf("Get search result info.\n");
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
@@ -2026,7 +2025,7 @@ void tridal_class::settextureidfile(int nr,char *filename) {
 
 // ****************************************************************************************
 //
-// loading spotify songs gfx in array.
+// loading tidal songs gfx in array.
 // if filename is url then change it to file name by the last name in the source http filename path
 //
 // ****************************************************************************************
@@ -2209,7 +2208,7 @@ void tridal_class::select_device_to_play() {
 
 // ****************************************************************************************
 //
-// show spotify overview
+// show tidal overview
 //
 // ****************************************************************************************
 
@@ -2264,7 +2263,7 @@ void tridal_class::show_tridal_oversigt(GLuint normal_icon,GLuint song_icon,GLui
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         // glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-//        glBindTexture(GL_TEXTURE_2D,tridal_icon_border);                               // normal icon then the spotify have icon
+//        glBindTexture(GL_TEXTURE_2D,tridal_icon_border);                               // normal icon then the tidal have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -2431,7 +2430,7 @@ void tridal_class::show_tridal_oversigt(GLuint normal_icon,GLuint song_icon,GLui
 
 // ****************************************************************************************
 //
-// show search/create playlist spotify overview
+// show search/create playlist tidal overview
 //
 // ****************************************************************************************
 
@@ -2538,7 +2537,7 @@ void tridal_class::show_tridal_search_oversigt(GLuint normal_icon,GLuint song_ic
         // border icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBindTexture(GL_TEXTURE_2D,tridal_icon_border);                               // normal icon then the spotify have icon
+        //glBindTexture(GL_TEXTURE_2D,tridal_icon_border);                               // normal icon then the tidal have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
@@ -2746,7 +2745,7 @@ void tridal_class::show_tridal_search_oversigt(GLuint normal_icon,GLuint song_ic
 
 // ****************************************************************************************
 //
-// ********************* show setup spotify stuf like dev and clientid/secrect ************
+// ********************* show setup tidal stuf like dev and clientid/secrect ************
 //
 // ****************************************************************************************
 
@@ -2827,7 +2826,7 @@ void tridal_class::show_setup_tridal() {
       }
 
     }
-    // spotify setup
+    // tidal setup
     // background
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 0.0f);

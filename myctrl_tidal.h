@@ -19,7 +19,7 @@ const int tidal_songlisttype=1;                         // song list type
 
 class tridal_device_def {
   public:
-    char        id[41];                     // spotify id
+    char        id[41];                     // tidal id
     bool        is_active;                  // is it working
     bool        is_private_session;         //
     bool        is_restricted;              // is private
@@ -31,7 +31,7 @@ class tridal_device_def {
 
 
 //
-// playlist/song overview def spotify
+// playlist/song overview def tidal
 //
 
 class tridal_oversigt_type {
@@ -43,7 +43,7 @@ class tridal_oversigt_type {
     char        feed_gfx_url[1024+1];             //
     char        feed_release_date[40+1];				  //
     char        playlistid[100+1];                // playlist id
-    char        playlisturl[1024+1];               // play list url + spotify command
+    char        playlisturl[1024+1];               // play list url + tidal command
     unsigned int feed_group_antal;
     unsigned int feed_path_antal;
     bool        nyt;                              //
@@ -72,12 +72,12 @@ class tridal_active_play_info_type {                // sample data down here
     bool is_playing;                                    // (true)
 };
 
-// spotify global class
+// tidal global class
 
 class tridal_class {
     private:
         enum { maxantal=5000 };					                                        // MAX antal rss stream in wiew
-        tridal_oversigt_type *stack[maxantal];			                            // spotify playlist stack
+        tridal_oversigt_type *stack[maxantal];			                            // tidal playlist stack
         tridal_device_def tridal_device[10];
         int tridal_device_antal;                                               // antal device found
         tridal_active_play_info_type tridal_aktiv_song[1];                    //
@@ -92,7 +92,7 @@ class tridal_class {
         bool tridal_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         int get_search_result_online(char *searchstring,int type);
-        int download_user_playlist(char *tidaltoken,int startofset);          // download playlist(json) file from spotify
+        int download_user_playlist(char *tidaltoken,int startofset);          // download playlist(json) file from tidal
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
@@ -105,18 +105,18 @@ class tridal_class {
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         char overview_show_cd_name[81];                                         // name of the band show in overview then you search on band and play songs from it
         bool search_tridal_online_done;
-        bool show_search_result;                                                // are ew showing search result in spotify view ?
+        bool show_search_result;                                                // are ew showing search result in tidal view ?
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
         char tidal_client_id[255];                                            // Client id
         char tidal_secret_id[255];                                            // Secret id
         GLuint aktiv_song_tridal_icon;                                         // loaded gfx info for playing
-        int active_tridal_device;                                              // active device then get spotify devices or -1
+        int active_tridal_device;                                              // active device then get tidal devices or -1
         int active_default_play_device;                                         // active device or -1
         char active_default_play_device_name[256];                              // active device name
         char tridal_playlistname[256];
         char tridal_playlistid[256];
-        char client_id[120];                                                    // spotify client id
-        char client_secret[120];                                                // spotify client secret
+        char client_id[120];                                                    // tidal client id
+        char client_secret[120];                                                // tidal client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);                              // set texture
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      // NOT in use
@@ -187,7 +187,7 @@ class tridal_class {
         int opdatere_tridal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
         int opdatere_tridal_oversigt_searchtxt(char *keybuffer,int type);        // search in db
         int opdatere_tridal_oversigt_searchtxt_online(char *keybuffer,int type); // search online
-        // show spotify playlist overview
+        // show tidal playlist overview
         void show_tridal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_tridal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 };
@@ -195,7 +195,7 @@ class tridal_class {
 
 int download_image(char *imgurl,char *filename);
 
-void *load_spotify_web(void *data);
+void *load_tidal_web(void *data);
 char *b64_encode(const unsigned char *in, size_t len);
 
 #endif
