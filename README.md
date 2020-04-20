@@ -1,9 +1,13 @@
 # mythtv-controller 
-# packs to install to compile on Ubuntu 10/12/14/16/18.xx
-# Updated 02/25/2020
+# packs to install to compile on Ubuntu 10/12/14/16/18.xx/19.xx
+# Updated 04/20/2020
 # 
 
 Version.
+
+mythtv-controller ver 38.4
+
+Install dir movied to /opt/mythtv-controller
 
 mythtv-controller ver 38.2
 
