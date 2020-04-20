@@ -29,6 +29,10 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
+
+#define ENABLE_TIDAL
+#define ENABLE_SPOTIFY
+
 // web server
 static bool runwebserver=true;
 bool do_open_spotifyplaylist=false;
@@ -54,8 +58,8 @@ bool stream_jump = false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"
@@ -110,8 +114,12 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
+#ifdef ENABLE_TIDAL
 #include "myctrl_spotify.h"
+#endif
+#ifdef ENABLE_TIDAL
 #include "myctrl_tidal.h"
+#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -119,12 +127,17 @@ extern char __BUILD_NUMBER;
 
 extern rss_stream_class rssstreamoversigt;
 
+#ifdef ENABLE_TIDAL
 spotify_class spotify_oversigt;
 static bool do_update_spotify_playlist = false;           // do it first time thread
-
-tridal_class tridal_oversigt;
+#endif
 
 // tidal music class
+#ifdef ENABLE_TIDAL
+tridal_class tridal_oversigt;
+#endif
+
+
 
 
 
@@ -13491,16 +13504,16 @@ void loadgfx() {
     printf ("Loading init graphic.\n");
     strcpy(temapath,"");
     strcpy(temapath1,"");
-    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
+    if (tema == 1) strcpy(temapath,"/opt/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/opt/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/opt/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/opt/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/opt/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/opt/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/opt/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/opt/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/opt/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/opt/mythtv-controller/tema10/"); else {
       // default tema
       strcpy(temapath,"tema1/");
       tema=1;
@@ -13654,7 +13667,7 @@ void loadgfx() {
     // main logo
     _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
-    strcpy(fileload,(char *) "/usr/share/mythtv-controller/images/landemask.jpg");
+    strcpy(fileload,(char *) "/opt/mythtv-controller/images/landemask.jpg");
     gfxlandemask          = loadTexture (fileload);
 // ************************** screen saver boxes **************************************
     screensaverbox        = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
@@ -13859,9 +13872,9 @@ void load_lande_flags() {
     strcpy(path2,"");
     while(i < 69) {
       fprintf(stderr,"load flag %d %s \n",i,lande[i]);
-      strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
+      strcpy(tmpfilename,"/opt/mythtv-controller/images/");
       strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
-      strcpy(path,"/usr/share/mythtv-controller/images/");
+      strcpy(path,"/opt/mythtv-controller/images/");
       if (strcmp(lande[i],"") != 0) {
         gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
         //gfxlande[i]=loadTexture ((char *) tmpfilename);
@@ -13884,26 +13897,26 @@ void InitGL()              // We call this right after our OpenGL window is crea
     char fileload[256];
     char temapath[256];
     strcpy(temapath,"");
-    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else
-    if (tema == 11) strcpy(temapath,"/usr/share/mythtv-controller/tema11/"); else
-    if (tema == 12) strcpy(temapath,"/usr/share/mythtv-controller/tema12/"); else
-    if (tema == 13) strcpy(temapath,"/usr/share/mythtv-controller/tema13/"); else
-    if (tema == 14) strcpy(temapath,"/usr/share/mythtv-controller/tema14/"); else
-    if (tema == 15) strcpy(temapath,"/usr/share/mythtv-controller/tema15/"); else
-    if (tema == 16) strcpy(temapath,"/usr/share/mythtv-controller/tema16/"); else
-    if (tema == 17) strcpy(temapath,"/usr/share/mythtv-controller/tema17/"); else
-    if (tema == 18) strcpy(temapath,"/usr/share/mythtv-controller/tema18/"); else
-    if (tema == 19) strcpy(temapath,"/usr/share/mythtv-controller/tema19/"); else
-    if (tema == 20) strcpy(temapath,"/usr/share/mythtv-controller/tema20/"); else {
+    if (tema == 1) strcpy(temapath,"/opt/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/opt/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/opt/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/opt/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/opt/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/opt/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/opt/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/opt/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/opt/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/opt/mythtv-controller/tema10/"); else
+    if (tema == 11) strcpy(temapath,"/opt/mythtv-controller/tema11/"); else
+    if (tema == 12) strcpy(temapath,"/opt/mythtv-controller/tema12/"); else
+    if (tema == 13) strcpy(temapath,"/opt/mythtv-controller/tema13/"); else
+    if (tema == 14) strcpy(temapath,"/opt/mythtv-controller/tema14/"); else
+    if (tema == 15) strcpy(temapath,"/opt/mythtv-controller/tema15/"); else
+    if (tema == 16) strcpy(temapath,"/opt/mythtv-controller/tema16/"); else
+    if (tema == 17) strcpy(temapath,"/opt/mythtv-controller/tema17/"); else
+    if (tema == 18) strcpy(temapath,"/opt/mythtv-controller/tema18/"); else
+    if (tema == 19) strcpy(temapath,"/opt/mythtv-controller/tema19/"); else
+    if (tema == 20) strcpy(temapath,"/opt/mythtv-controller/tema20/"); else {
       strcpy(temapath,"tema1/");
       tema = 1;
     }
@@ -14045,7 +14058,12 @@ int main(int argc, char** argv) {
                 break;
       }
     }
-    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
+
+    #ifdef ENABLE_TIDAL
+    tridal_oversigt.tridal_login_token();
+//    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
+    #endif
+
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
@@ -14170,6 +14188,7 @@ int main(int argc, char** argv) {
     glutCreateWindow (overskrift);
     init();                                           // init gopengl
     loadgfx();                                        // load gfx stuf
+    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
