@@ -132,11 +132,11 @@ class tridal_class {
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
         // end webserver
-        int load_tridal_iconoversigt();			                                  // load web gfx in to cache dir
+        int load_tridal_iconoversigt();			                                    // load web gfx in to cache dir
         // in use
-        void tridal_set_token(char *token,char *refresh);                      // set token in struct
-        char *tridal_get_token() { return(tidaltoken); };                    // get token from struct
-        int tridal_refresh_token();                                            // refresh token on postify api 2
+        void tridal_set_token(char *token,char *refresh);                       // set token in struct
+        char *tridal_get_token() { return(tidaltoken); };                       // get token from struct
+        int tridal_login_token();                                               // login on tidal
         bool tridal_check_tridaldb_empty();
         int tridal_aktiv_song_msplay() { return( tridal_aktiv_song[0].progress_ms ); };                     //
         int tridal_aktiv_song_mslength() { return( tridal_aktiv_song[0].duration_ms ); };                   //
@@ -165,7 +165,6 @@ class tridal_class {
         int tridal_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
         int tridal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         int tridal_get_user_id();
-        int tridal_play_playlist(char *songarray);
         int tridal_play_now_playlist(char *playlist_song,bool now);            // play playlist
         int tridal_play_now_playlist2(char *playlist_name,bool now);            // play playlist
         int tridal_play_now_song(char *playlist_song,bool now);                // play song
@@ -188,6 +187,7 @@ class tridal_class {
         int opdatere_tridal_oversigt_searchtxt(char *keybuffer,int type);        // search in db
         int opdatere_tridal_oversigt_searchtxt_online(char *keybuffer,int type); // search online
         // show tidal playlist overview
+        int tridal_play_playlist(char *playlist);                               // play playlist
         void show_tridal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_tridal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 };

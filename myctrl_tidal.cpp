@@ -213,12 +213,10 @@ tridal_class::tridal_class() : antal(0) {
     active_tridal_device=-1;                                                   // active tidal device -1 = no dev is active
     active_default_play_device=active_tridal_device;
     aktiv_song_tridal_icon=0;                                                  //
-    strcpy(tidal_client_id,"");                                               //
-    strcpy(tidal_secret_id,"");                                               //
     strcpy(tidaltoken,"");                                                    //
     strcpy(tidaltoken_refresh,"");                                            //
-    strcpy(tidal_client_id,"");
-    strcpy(tidal_secret_id,"");
+    strcpy(tidal_client_id,"hanshenrik32@gmail.com");                                               //
+    strcpy(tidal_secret_id,"yk83xbip");                                               //
     strcpy(active_default_play_device_name,"");
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
@@ -282,9 +280,14 @@ bool tridal_class::get_tridal_update_flag() {
 // Refresh token
 // return http code
 //
+// 1. https://listen.tidal.com/login
+// 2. https://listen.tidal.com/login/username
+// 3. https://listen.tidal.com/login
+// 4. https://api.tidal.com/v1       - aktiv
+//
 // ********************************************************************************************
 
-int tridal_class::tridal_refresh_token() {
+int tridal_class::tridal_login_token() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -303,30 +306,32 @@ int tridal_class::tridal_refresh_token() {
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
   curl = curl_easy_init();
-  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+  if (curl) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
     curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
     /* Add a custom header */
-    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "x-tidal-token:kgsOOmYk3zShYrNP");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1");
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/login/username");          // /login/username
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "TIDAL_ANDROID/686 okhttp/3.3.1");
+
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //chunk = curl_slist_append(chunk, base64_code);
     errbuf[0] = 0;
     // set type post
-    //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
-    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s",tidaltoken_refresh);
+    sprintf(post_playlist_data,"");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -345,16 +350,20 @@ int tridal_class::tridal_refresh_token() {
     }
     if (httpCode == 200) {
       fprintf(stdout,"tidal new token. \n");
-      //printf("%s \n", response_string.c_str());
-      //printf("resp length %d \n",response_string.length());
-      //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
-      //process_value_playinfo(value, 0,0);                                                     // fill play info
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
+
+      /*
       if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
         fprintf(stdout,"Token valid.\n");
         strcpy(tidaltoken,newtoken);                                         // update tidal token
       }
+      */
+    } else if (httpCode == 405) {
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
       fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
@@ -365,6 +374,94 @@ int tridal_class::tridal_refresh_token() {
   return(httpCode);
 }
 
+
+// *****************************************************************************
+//
+// 1. https://tidal.com/playlist/
+// 2. https://embed.tidal.com/playlists
+//
+// *****************************************************************************
+
+int tridal_class::tridal_play_playlist(char *playlist) {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(newtoken,"");
+  curl = curl_easy_init();
+  if (curl) {
+    // add userinfo + basic auth
+    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //
+    strcpy(call,"https://embed.tidal.com/playlists");
+    strcat(call,playlist);
+    curl_easy_setopt(curl, CURLOPT_URL, call);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    //curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);                        // folow url 301 redirect
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //chunk = curl_slist_append(chunk, base64_code);
+    errbuf[0] = 0;
+    // set type post
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
+    sprintf(post_playlist_data,"x-tidal-token wdgaB1CilGA-S_s2");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      fprintf(stdout,"tidal new token. \n");
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
+    }
+    if (httpCode == 301) {
+      fprintf(stdout,"redirect.\n");
+      printf("Resp: %s \n", response_string.c_str());
+      printf("resp length %d \n",response_string.length());
+    } else {
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+  }
+  return(httpCode);
+}
 
 
 

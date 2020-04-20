@@ -7,9 +7,9 @@ LDFLAGS=
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
-DESTDIR    = /usr/share/mythtv-controller
+DESTDIR    = /opt/mythtv-controller
 DESTDIRBIN = /usr/bin
-DESTIMG    = /usr/share/mythtv-controller/images
+DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
@@ -28,11 +28,11 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
+	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -50,7 +50,7 @@ endif
 
 
 
-OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
+OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -l OpenGL -I/usr/include/libxml2
 
 SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myth_vlcplayer.cpp myctrl_spotify.cpp myctrl_tidal.cpp  mongoose-master/mongoose.c json-parser/json.c
 
@@ -106,32 +106,35 @@ installsound:
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
-	tar -zxvf $(FMODFILE) -C /usr/share/mythtv-controller/
+	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	#remove old link
 	@rm /usr/lib/libfmod.so.10
-	@ln -s /usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+	@ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /usr/share/mythtv-controller."
-	@mkdir -p /usr/share/mythtv-controller/images/radiostations
-	@mkdir -p /usr/share/mythtv-controller/convert/hires
+	@mkdir -p /opt/mythtv-controller/images/radiostations	
+	@mkdir -p /opt/mythtv-controller/convert/hires
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
+	#@mkdir -p /usr/share/mythtv-controller/images/radiostations
+	#@mkdir -p /usr/share/mythtv-controller/convert/hires
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
-	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
+	#@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
+	#@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
-	@cp mythtv-controller.png  /usr/share/mythtv-controller/mythtv-controller.png
+	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
-	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
+	@chmod 777 /opt/mythtv-controller/tema*
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \

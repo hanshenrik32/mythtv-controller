@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
 Terminal=false
-Version=0.37.1
+Version=0.38.4
 Name=Myhthtv-controller
 Comment=Touch screen Mediacenter
-Icon=/usr/share/mythtv-controller/mythtv-controller.png
+Icon=/opt/mythtv-controller/mythtv-controller.png
 Exec=/usr/local/bin/mythtv-controller
 
