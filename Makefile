@@ -110,23 +110,19 @@ installsound:
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	#remove old link
-	@rm /usr/lib/libfmod.so.10
+	@if test -e /usr/lib/libfmod.so.10; then @rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
 
 install:
-	@echo "Installing mythtv-controller ver 0.38.x in /usr/share/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
 	@mkdir -p /opt/mythtv-controller/images/radiostations	
 	@mkdir -p /opt/mythtv-controller/convert/hires
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
-	#@mkdir -p /usr/share/mythtv-controller/images/radiostations
-	#@mkdir -p /usr/share/mythtv-controller/convert/hires
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	#@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
-	#@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
