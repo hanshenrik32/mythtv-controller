@@ -1,7 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.38.2.3"};
+const char *SHOWVER={"0.38.4.1"};
 
 // debug modes
 // 1  = wifi net

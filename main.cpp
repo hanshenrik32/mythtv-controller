@@ -3383,7 +3383,7 @@ void display() {
       glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
       glEnd();
       glPopMatrix();
-      aktivfont.selectfont("URW Bookman L");
+      aktivfont.selectfont((char *) "URW Bookman L");
       // print text in window
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
@@ -14060,7 +14060,7 @@ int main(int argc, char** argv) {
     }
 
     #ifdef ENABLE_TIDAL
-    tridal_oversigt.tridal_login_token();
+    //tridal_oversigt.tridal_login_token();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 

@@ -207,21 +207,21 @@ tridal_class::tridal_class() : antal(0) {
 //    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
 //    fprintf(stdout,"Starting web server on port %s\n", s_http_port);
-//    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
-//    mg_set_protocol_http_websocket(this->c);                                    // make http protocol
+//    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                  // Create listening connection and add it to the event manager
+//    mg_set_protocol_http_websocket(this->c);                                  // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-    active_tridal_device=-1;                                                   // active tidal device -1 = no dev is active
+    active_tridal_device=-1;                                                    // active tidal device -1 = no dev is active
     active_default_play_device=active_tridal_device;
-    aktiv_song_tridal_icon=0;                                                  //
-    strcpy(tidaltoken,"");                                                    //
-    strcpy(tidaltoken_refresh,"");                                            //
-    strcpy(tidal_client_id,"hanshenrik32@gmail.com");                                               //
-    strcpy(tidal_secret_id,"yk83xbip");                                               //
-    strcpy(active_default_play_device_name,"");
+    aktiv_song_tridal_icon=0;                                                   //
+    strcpy(tidaltoken,"");                                                      //
+    strcpy(tidaltoken_refresh,"");                                              //
+    strcpy(tidal_client_id,"hanshenrik32@gmail.com");                           //
+    strcpy(tidal_secret_id,"");                                         //
+    strcpy(active_default_play_device_name,"");                                 // default device to play on
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
-    tridal_device_antal=0;
-    tridal_update_loaded_begin=false;                                          // true then we are update the stack data
+    tridal_device_antal=0;                                                      //
+    tridal_update_loaded_begin=false;                                           // true then we are update the stack data
 }
 
 // ****************************************************************************************
