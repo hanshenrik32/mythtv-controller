@@ -107,8 +107,6 @@ installsound:
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	cp xmltv_config/*  ~/.xmltv/
-	chmod 666 ~/.xmltv/*
 	#remove old link
 	@if test -e /usr/lib/libfmod.so.10; then @rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
@@ -130,6 +128,8 @@ install:
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
+	@cp xmltv_config/*  ~/.xmltv/
+	@chmod 666 ~/.xmltv/*
 	@chmod 777 /opt/mythtv-controller/tema*
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
