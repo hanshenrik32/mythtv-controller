@@ -14061,6 +14061,7 @@ int main(int argc, char** argv) {
 
     #ifdef ENABLE_TIDAL
     //tridal_oversigt.tridal_login_token();
+    tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 

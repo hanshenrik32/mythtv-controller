@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <string>
+#include <string.h>
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -274,6 +275,23 @@ bool tridal_class::get_tridal_update_flag() {
 
 
 
+// In use
+
+int tridal_class::tridal_login_token2() {
+  char sql[1024];
+  // https://api.tidalhifi.com/v1/login/username?token=kgsOOmYk3zShYrNP
+//sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+  sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=hanshenrik32@gmail.com&password=hhpky83xbip > tridal_access_token.txt");
+  int curl_error=system(sql);
+  if (curl_error==0) {
+    //curl_error=system(sed);
+    if (curl_error==0) {
+    }
+    fprintf(stdout,"\n******** Got token ********\n");
+  }
+}
+
+
 
 // *********************************************************************************************************************************
 // In use
@@ -302,7 +320,7 @@ int tridal_class::tridal_login_token() {
   FILE *tokenfil;
   char *base64_code;
   char newtoken[1024];
-  char post_playlist_data[1024];
+  char post_playlist_data[2048];
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
   curl = curl_easy_init();
@@ -312,7 +330,7 @@ int tridal_class::tridal_login_token() {
     curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
     curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
     /* Add a custom header */
-    chunk = curl_slist_append(chunk, "x-tidal-token:kgsOOmYk3zShYrNP");
+    //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/login/username");          // /login/username
@@ -331,9 +349,10 @@ int tridal_class::tridal_login_token() {
     // set type post
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
-    sprintf(post_playlist_data,"");
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(data));
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
       size_t len = strlen(errbuf);
@@ -366,7 +385,9 @@ int tridal_class::tridal_login_token() {
       printf("resp length %d \n",response_string.length());
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      //if (strstr(response_string,"token")) fprintf(stderr,"Error Missing token.\n");
       fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
+      printf("%s \n", response_string.c_str());
     }
     // always cleanup
     curl_easy_cleanup(curl);

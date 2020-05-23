@@ -137,6 +137,7 @@ class tridal_class {
         void tridal_set_token(char *token,char *refresh);                       // set token in struct
         char *tridal_get_token() { return(tidaltoken); };                       // get token from struct
         int tridal_login_token();                                               // login on tidal
+        int tridal_login_token2();                                              // GET TORKEN
         bool tridal_check_tridaldb_empty();
         int tridal_aktiv_song_msplay() { return( tridal_aktiv_song[0].progress_ms ); };                     //
         int tridal_aktiv_song_mslength() { return( tridal_aktiv_song[0].duration_ms ); };                   //
