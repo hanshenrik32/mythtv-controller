@@ -216,7 +216,7 @@ tridal_class::tridal_class() : antal(0) {
     aktiv_song_tridal_icon=0;                                                   //
     strcpy(tidaltoken,"");                                                      //
     strcpy(tidaltoken_refresh,"");                                              //
-    strcpy(tidal_client_id,"hanshenrik32@gmail.com");                           //
+    strcpy(tidal_client_id,"emailadresse");                           //
     strcpy(tidal_secret_id,"");                                         //
     strcpy(active_default_play_device_name,"");                                 // default device to play on
     strcpy(overview_show_band_name,"");                                         //
@@ -281,7 +281,7 @@ int tridal_class::tridal_login_token2() {
   char sql[1024];
   // https://api.tidalhifi.com/v1/login/username?token=kgsOOmYk3zShYrNP
 //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
-  sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=hanshenrik32@gmail.com&password=hhpky83xbip > tridal_access_token.txt");
+  sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=emailadresse&password=passwordhere > tridal_access_token.txt");
   int curl_error=system(sql);
   if (curl_error==0) {
     //curl_error=system(sed);
