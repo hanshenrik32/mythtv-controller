@@ -114,7 +114,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
-#ifdef ENABLE_TIDAL
+#ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
 #endif
 #ifdef ENABLE_TIDAL
@@ -127,7 +127,7 @@ extern char __BUILD_NUMBER;
 
 extern rss_stream_class rssstreamoversigt;
 
-#ifdef ENABLE_TIDAL
+#ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
 static bool do_update_spotify_playlist = false;           // do it first time thread
 #endif
