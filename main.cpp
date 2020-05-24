@@ -29,6 +29,10 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
+
+#define ENABLE_TIDAL
+#define ENABLE_SPOTIFY
+
 // web server
 static bool runwebserver=true;
 bool do_open_spotifyplaylist=false;
@@ -54,8 +58,8 @@ bool stream_jump = false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
-#include "/usr/share/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"
@@ -110,7 +114,12 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
+#ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
+#endif
+#ifdef ENABLE_TIDAL
+#include "myctrl_tidal.h"
+#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -118,8 +127,18 @@ extern char __BUILD_NUMBER;
 
 extern rss_stream_class rssstreamoversigt;
 
+#ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;           // do it first time
+static bool do_update_spotify_playlist = false;           // do it first time thread
+#endif
+
+// tidal music class
+#ifdef ENABLE_TIDAL
+tridal_class tridal_oversigt;
+#endif
+
+
+
 
 
 // struct used by keyboard config of functions keys
@@ -211,10 +230,11 @@ int screen_size=3;		                            			// default screen size
 bool do_shift_song = false;				                        // jump to next song to play
 bool do_stop_music = false;                               // stop all play
 bool do_stop_radio = false;                               // stop all play
-int soundsystem=0;		      		                      	// used sound system 1=FMOD 2=OPENSOUND
-int numbersofsoundsystems=0;                            // antal devices
-unsigned int musicoversigt_antal=0;                     // antal aktive sange
-unsigned int spotifycoversigt_antal=0;                     // antal aktive sange
+int soundsystem=0;		      		                      	  // used sound system 1=FMOD 2=OPENSOUND
+int numbersofsoundsystems=0;                              // antal devices
+unsigned int musicoversigt_antal=0;                       // antal aktive sange
+unsigned int spotifycoversigt_antal=0;                    // antal aktive sange
+bool firsttimespotifyupdate=true;                         // default show the option to update spotify db
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
@@ -2366,6 +2386,9 @@ static bool do_update_music_now = false;                          // start the p
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
 static bool do_update_spotify = true;                             // set true to start thread on update spotify + run web server
 
+
+
+
 // ****************************************************************************************
 //
 // Main diskplay
@@ -3028,7 +3051,7 @@ void display() {
           }
         }
         // spotify online search button
-        if (vis_spotify_oversigt) {
+        if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
           glBindTexture(GL_TEXTURE_2D, spotify_search);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3229,8 +3252,8 @@ void display() {
         spotifyknapnr=1;                                                        // reset pos
         spotify_oversigt_loaded_begin=true;
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
-          if (spotify_oversigt.search_playlist_song==0)
-           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist
+          if (spotify_oversigt.search_playlist_song==0)                         //
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
           else
            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
           //spotify_oversigt.load_spotify_iconoversigt();
@@ -3241,16 +3264,16 @@ void display() {
       }
     }
 
-
     //
     // auto search spotify online
     //
+    const int start_search_action_waittime=4;
     struct tm* t1;
     static time_t lasttime1=0;
     static time_t nowdate1;
     time(&nowdate1);
     if (do_show_spotify_search_oversigt) {
-      if ((search_spotify_string_changed) && (difftime(nowdate1, lasttime1)>2)) {
+      if ((search_spotify_string_changed) && (difftime(nowdate1, lasttime1)>start_search_action_waittime)) {
         time(&lasttime1);
         hent_spotify_search_online=true;
         search_spotify_string_changed=false;
@@ -3341,6 +3364,85 @@ void display() {
         if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
+
+    //firsttimespotifyupdate=true;
+    // show firsttime spotify update windows request
+    if ((firsttimespotifyupdate) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glEnable(GL_BLEND);
+      glBindTexture(GL_TEXTURE_2D,_texturemusicplayer);                           // _texturemovieinfobox
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      glTranslatef(550, 350, 0.0f);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);
+      glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
+      glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
+      glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
+      glEnd();
+      glPopMatrix();
+      aktivfont.selectfont((char *) "URW Bookman L");
+      // print text in window
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(590, 370+300, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glScalef(20.5, 20.5, 1.0);
+      // 0 = uk 1 = dk 2 =  France 3 = tysk 4 = Arabi
+      glcRenderString(spotify_firsttime_line1[configland]);
+      glPopMatrix();
+      // print text in window
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(590, 370+275, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString(spotify_firsttime_line2[configland]);
+      glPopMatrix();
+      // print text in window
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(590, 370+250, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString(spotify_firsttime_line3[configland]);
+      glPopMatrix();
+      // print text in window
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(590, 370+220, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+      glcRenderString(spotify_firsttime_line4[configland]);
+      glPopMatrix();
+      // print text in window
+      static time_t today1=0;
+      static time_t lasttime=0;
+      static bool switch_text=false;
+      today1=time(NULL);
+      if ((lasttime==0) || (lasttime+1<=today1)) {
+        lasttime=today1;
+        switch_text=!switch_text;
+      }
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glTranslatef(780, 370+70, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      glScalef(30.5, 30.5, 1.0);                    // danish charset ttf
+      if ((spotify_oversigt.get_spotify_update_flag()) && (switch_text)) {
+        glcRenderString(spotify_firsttime_pleasewait[configland]);
+      }
+      glPopMatrix();
+      aktivfont.selectfont(configfontname);
+    }
+
     // show search box and text for radio and music and movie and spotify offline search NOT spotify online search
     if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false))) {
       if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
@@ -5720,10 +5822,12 @@ void display() {
       }
       glPopMatrix();
     }
+
+
     //
     // show status of all the thread loaders
     //
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_spotify_playlist) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       show_status_update=true;
       // show loader status
       int statuswxpos = 1470;
@@ -6402,8 +6506,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             do_show_spotify_search_oversigt=false;
             spotify_oversigt_loaded_begin=true;                                 //
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view from root
-            spotify_oversigt.set_search_loaded();                           // triger icon loader
-            //spotify_oversigt.load_spotify_iconoversigt();                       // update icons
+            spotify_oversigt.set_search_loaded();                               // triger icon loader
+            //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
             spotify_oversigt_loaded_begin=false;                                //
           } else {
             do_show_spotify_search_oversigt=true;
@@ -6675,7 +6779,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 1;
               fundet = true;
             }
-
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
@@ -7639,19 +7742,15 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
-
             printf("Loading view......\n");
-
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
-            spotify_oversigt.clean_spotify_oversigt();
+            spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
-            spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
-
-
+            //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
+            spotify_oversigt.set_search_loaded();
             printf("Done Loading view......\n");
-
             // reset select in spotify view
             spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
@@ -8928,34 +9027,35 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       // gem key pressed in buffer
       if (keybufferindex<80) {
-          if (key==8) {						// back space
-            if (keybufferindex>0) {
-              keybufferindex--;
-              keybuffer[keybufferindex]=0;
-            }
-          } else {
-            if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
-                if (key==32) {
-                  dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
-                }
-            }
-            //hvis vi ikke gør andre ting
-            if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
-              // søg sang/artist navn
-              if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
-                if (key!=13) {
-                  keybuffer[keybufferindex]=key;
-                  keybufferindex++;
-                  keybuffer[keybufferindex]='\0';       // else input key text in buffer
-                }
+        if (key==8) {						// back space
+          if (keybufferindex>0) {
+            keybufferindex--;
+            keybuffer[keybufferindex]=0;
+          }
+        } else {
+          if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
+              if (key==32) {
+                dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
+              }
+          }
+          //hvis vi ikke gør andre ting
+          if ((ask_save_playlist==false) || (save_ask_save_playlist==false)) {
+            // søg sang/artist navn
+            if ((vis_music_oversigt) && (!(ask_open_dir_or_play))) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
             }
-            // show/select device to play on
-            if ((vis_spotify_oversigt) && (keybufferindex==0)) {
-              if (key=='D') {
-                do_select_device_to_play=true;
-              }
+          }
+          // show/select device to play on
+          if ((vis_spotify_oversigt) && (keybufferindex==0)) {
+            if (key=='D') {
+              do_select_device_to_play=true;
             }
+          }
+          if ((firsttimespotifyupdate==false) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
             // søg efter spotify not online fill buffer from keyboard
             if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
@@ -8978,174 +9078,57 @@ void handleKeypress(unsigned char key, int x, int y) {
                 search_spotify_string_changed=true;
               }
             }
-            // søg efter radio station navn fill buffer from keyboard
-            if ((vis_radio_oversigt) && (!(show_radio_options))) {
-              if (key!=13) {
+          }
+          // søg efter radio station navn fill buffer from keyboard
+          if ((vis_radio_oversigt) && (!(show_radio_options))) {
+            if (key!=13) {
+              keybuffer[keybufferindex]=key;
+              keybufferindex++;
+              keybuffer[keybufferindex]='\0';       // else input key text in buffer
+              if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+            }
+          }
+          // is ask for playlist file name use keybuffer to get filename
+          if (ask_save_playlist) {
+            if (key!=13) {
+              if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              strcpy(playlistfilename,keybuffer);
+              playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+            }
+          }
+          // is ask movie totle fill buffer from keyboard
+          if (vis_film_oversigt) {
+            if (key!=13) {
+              if ((key>31) && (key<127)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
-                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               }
+              if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
             }
-            // is ask for playlist file name use keybuffer to get filename
-            if (ask_save_playlist) {
-              if (key!=13) {
-                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-                strcpy(playlistfilename,keybuffer);
-                playlistfilename[keybufferindex]='\0';       // else input key text in buffer
-              }
-            }
-            // is ask movie totle fill buffer from keyboard
-            if (vis_film_oversigt) {
-              if (key!=13) {
-                if ((key>31) && (key<127)) {
-                  keybuffer[keybufferindex]=key;
-                  keybufferindex++;
-                  keybuffer[keybufferindex]='\0';       // else input key text in buffer
-                }
-                if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-              }
-            }
-            // setup window
-            if (do_show_setup) {
-              if (do_show_setup_sound) {
-                  if (do_show_setup_select_linie==0) {
-                    if (key==32) {
-                      if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
-                      strcpy(keybuffer,avalible_device[soundsystem]);
-                      strcpy(configmythsoundsystem,avalible_device[soundsystem]);
-                    } else strcpy(keybuffer,avalible_device[soundsystem]);
-                  } else if (do_show_setup_select_linie==1) {
-                    if (key==32) {
-                      if (strcmp(keybuffer,"HDMI")==0) strcpy(keybuffer,"SPDIF");
-                      else if (strcmp(keybuffer,"SPDIF")==0) strcpy(keybuffer,"STREAM");
-                      else if (strcmp(keybuffer,"STREAM")==0) strcpy(keybuffer,"HDMI");
-                      else strcpy(keybuffer,"STREAM");
-                    } else strcpy(keybuffer,"DEFAULT");
-                  } else if (do_show_setup_select_linie==2) {
-                    if (key==32) {
-                      if (strcmp(keybuffer,"FMOD")==0) strcpy(keybuffer,"SDL");
-                      else if (strcmp(keybuffer,"SDL")==0) strcpy(keybuffer,"FMOD");
-                      else strcpy(keybuffer,"FMOD");
-                    } else strcpy(keybuffer,"FMOD");
-                  } else {
-                    if (key!=13) {
-                      keybuffer[keybufferindex]=key;
-                      keybufferindex++;
-                      keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                    }
-                  }
-              } else if (do_show_setup_screen) {
+          }
+          // setup window
+          if (do_show_setup) {
+            if (do_show_setup_sound) {
                 if (do_show_setup_select_linie==0) {
-                  if (key==32) {		// space key
-                    if (screen_size==1) {
-                      strcpy(keybuffer,"1280 x 1024 (720p)");
-                      screen_size=2;
-                    } else if (screen_size==2) {
-                      strcpy(keybuffer,"1920 x 1080 (1080p)");
-                      screen_size=3;
-                    } else if (screen_size==3) {
-                      strcpy(keybuffer,"1360 x 768         ");
-                      screen_size=4;
-                    } else if (screen_size==4) {
-                      strcpy(keybuffer,"1024 x 768 (720p)  ");
-                      screen_size=1;
-                    }
-                  }
-                // screen saver
+                  if (key==32) {
+                    if (soundsystem<numbersofsoundsystems-1) soundsystem++; else soundsystem=0;
+                    strcpy(keybuffer,avalible_device[soundsystem]);
+                    strcpy(configmythsoundsystem,avalible_device[soundsystem]);
+                  } else strcpy(keybuffer,avalible_device[soundsystem]);
                 } else if (do_show_setup_select_linie==1) {
-                  if (key==32) {		// space key
-                    if (strncmp(keybuffer,"analog",7)==0) {
-                      strcpy(keybuffer,"digital");
-                      urtype=DIGITAL;
-                    } else if (strcmp(keybuffer,"digital")==0) {
-                      strcpy(keybuffer,"3D");
-                      urtype=SAVER3D;
-                    } else if (strcmp(keybuffer,"3D")==0) {
-                      strcpy(keybuffer,"3D2");
-                      urtype=SAVER3D2;
-                    } else if (strcmp(keybuffer,"3D2")==0) {
-                      strcpy(keybuffer,"PICTURE3D");
-                      urtype=PICTURE3D;
-                    } else if (strcmp(keybuffer,"PICTURE3D")==0) {
-                      strcpy(keybuffer,"None");
-                      urtype=0;
-                    } else if (strcmp(keybuffer,"None")==0) {
-                      strcpy(keybuffer,"analog");
-                      urtype=ANALOG;
-                    } else strcpy(keybuffer,"analog");
-                  }
-                  // screen saver timeout
+                  if (key==32) {
+                    if (strcmp(keybuffer,"HDMI")==0) strcpy(keybuffer,"SPDIF");
+                    else if (strcmp(keybuffer,"SPDIF")==0) strcpy(keybuffer,"STREAM");
+                    else if (strcmp(keybuffer,"STREAM")==0) strcpy(keybuffer,"HDMI");
+                    else strcpy(keybuffer,"STREAM");
+                  } else strcpy(keybuffer,"DEFAULT");
                 } else if (do_show_setup_select_linie==2) {
-                  if (key!=13) {
-                    keybuffer[keybufferindex]=key;
-                    keybufferindex++;
-                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  } // use3d
-                } else if (do_show_setup_select_linie==3) {
                   if (key==32) {
-                    if (use3deffect==true) {
-                      use3deffect=false;
-                      strcpy(configuse3deffect,"no");
-                      strcpy(keybuffer,"no");
-                    } else if (use3deffect==false) {
-                      strcpy(configuse3deffect,"yes");
-                      strcpy(keybuffer,"yes");
-                      use3deffect=true;
-                    }
-                  } else strcpy(keybuffer,configuse3deffect);
-                // language
-                } else if (do_show_setup_select_linie==4) {
-                  if (key==32) {
-                    if (configland<(configlandantal-1)) configland++;
-                    else configland=0;
-                  }
-                  strcpy(keybuffer,configlandsprog[configland]);
-                } else if (do_show_setup_select_linie==5) {
-                  if (key==32) full_screen=!full_screen;
-                  if (full_screen) strcpy(keybuffer,"yes"); else strcpy(keybuffer,"no");
-                }
-              } else if (do_show_setup_network) {
-                // hostname
-                if (do_show_setup_select_linie==0) {
-                  if (key!=13) {
-                    keybuffer[keybufferindex]=key;
-                    keybufferindex++;
-                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  }
-                  // network link type
-                } else if (do_show_setup_select_linie==1) {
-                  if (key==32) {				// space key
-                    if (strcmp(keybuffer,"DHCP")==0) strcpy(keybuffer,"MANUAL");
-                    else if (strcmp(keybuffer,"MANUAL")==0) strcpy(keybuffer,"DHCP");
-                  }
-                } else if (do_show_setup_select_linie==2) {
-                  // mulighed for at manuelt indtaste wlan essid to use
-                  if (key!=13) {
-                    keybuffer[keybufferindex]=key;
-                    keybufferindex++;
-                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  }
-                } else if (do_show_setup_select_linie==3) {
-                  // set show wlan network select
-                  if (key==32) {
-                    show_wlan_select=!show_wlan_select;
-                  }
-                } else if (do_show_setup_select_linie==4) {
-                  // set show wlan network password
-                  if (key!=13) {
-                    keybuffer[keybufferindex]=key;
-                    keybufferindex++;
-                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                  }
-                }
-                // sql setup
-              } else if (do_show_setup_sql) {
-                if (do_show_setup_select_linie==0) {
-                  if (key==32) {
-                    if (strcmp(keybuffer,"xbmc")==0) strcpy(keybuffer,"mythtv");
-                    else if (strcmp(keybuffer,"mythtv")==0) strcpy(keybuffer,"xbmc");
-                  }
+                    if (strcmp(keybuffer,"FMOD")==0) strcpy(keybuffer,"SDL");
+                    else if (strcmp(keybuffer,"SDL")==0) strcpy(keybuffer,"FMOD");
+                    else strcpy(keybuffer,"FMOD");
+                  } else strcpy(keybuffer,"FMOD");
                 } else {
                   if (key!=13) {
                     keybuffer[keybufferindex]=key;
@@ -9153,328 +9136,446 @@ void handleKeypress(unsigned char key, int x, int y) {
                     keybuffer[keybufferindex]='\0';	// else input key text in buffer
                   }
                 }
-              } else if (do_show_setup_tema) {
-                if (do_show_setup_select_linie==0) {
-                  if (key==32) {
-                    tema++;
-                    if (tema>TEMA_ANTAL) tema=1;
+            } else if (do_show_setup_screen) {
+              if (do_show_setup_select_linie==0) {
+                if (key==32) {		// space key
+                  if (screen_size==1) {
+                    strcpy(keybuffer,"1280 x 1024 (720p)");
+                    screen_size=2;
+                  } else if (screen_size==2) {
+                    strcpy(keybuffer,"1920 x 1080 (1080p)");
+                    screen_size=3;
+                  } else if (screen_size==3) {
+                    strcpy(keybuffer,"1360 x 768         ");
+                    screen_size=4;
+                  } else if (screen_size==4) {
+                    strcpy(keybuffer,"1024 x 768 (720p)  ");
+                    screen_size=1;
                   }
                 }
-              } else if (do_show_setup_keys) {
+              // screen saver
+              } else if (do_show_setup_select_linie==1) {
+                if (key==32) {		// space key
+                  if (strncmp(keybuffer,"analog",7)==0) {
+                    strcpy(keybuffer,"digital");
+                    urtype=DIGITAL;
+                  } else if (strcmp(keybuffer,"digital")==0) {
+                    strcpy(keybuffer,"3D");
+                    urtype=SAVER3D;
+                  } else if (strcmp(keybuffer,"3D")==0) {
+                    strcpy(keybuffer,"3D2");
+                    urtype=SAVER3D2;
+                  } else if (strcmp(keybuffer,"3D2")==0) {
+                    strcpy(keybuffer,"PICTURE3D");
+                    urtype=PICTURE3D;
+                  } else if (strcmp(keybuffer,"PICTURE3D")==0) {
+                    strcpy(keybuffer,"None");
+                    urtype=0;
+                  } else if (strcmp(keybuffer,"None")==0) {
+                    strcpy(keybuffer,"analog");
+                    urtype=ANALOG;
+                  } else strcpy(keybuffer,"analog");
+                }
+                // screen saver timeout
+              } else if (do_show_setup_select_linie==2) {
+                if (key!=13) {
+                  keybuffer[keybufferindex]=key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                } // use3d
+              } else if (do_show_setup_select_linie==3) {
+                if (key==32) {
+                  if (use3deffect==true) {
+                    use3deffect=false;
+                    strcpy(configuse3deffect,"no");
+                    strcpy(keybuffer,"no");
+                  } else if (use3deffect==false) {
+                    strcpy(configuse3deffect,"yes");
+                    strcpy(keybuffer,"yes");
+                    use3deffect=true;
+                  }
+                } else strcpy(keybuffer,configuse3deffect);
+              // language
+              } else if (do_show_setup_select_linie==4) {
+                if (key==32) {
+                  if (configland<(configlandantal-1)) configland++;
+                  else configland=0;
+                }
+                strcpy(keybuffer,configlandsprog[configland]);
+              } else if (do_show_setup_select_linie==5) {
+                if (key==32) full_screen=!full_screen;
+                if (full_screen) strcpy(keybuffer,"yes"); else strcpy(keybuffer,"no");
+              }
+            } else if (do_show_setup_network) {
+              // hostname
+              if (do_show_setup_select_linie==0) {
                 if (key!=13) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
-                // rss editor
-              } else if (do_show_setup_rss) {
+                // network link type
+              } else if (do_show_setup_select_linie==1) {
+                if (key==32) {				// space key
+                  if (strcmp(keybuffer,"DHCP")==0) strcpy(keybuffer,"MANUAL");
+                  else if (strcmp(keybuffer,"MANUAL")==0) strcpy(keybuffer,"DHCP");
+                }
+              } else if (do_show_setup_select_linie==2) {
+                // mulighed for at manuelt indtaste wlan essid to use
                 if (key!=13) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
-              } else if (do_show_setup_spotify) {
+              } else if (do_show_setup_select_linie==3) {
+                // set show wlan network select
+                if (key==32) {
+                  show_wlan_select=!show_wlan_select;
+                }
+              } else if (do_show_setup_select_linie==4) {
+                // set show wlan network password
                 if (key!=13) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';	// else input key text in buffer
                 }
+              }
+              // sql setup
+            } else if (do_show_setup_sql) {
+              if (do_show_setup_select_linie==0) {
+                if (key==32) {
+                  if (strcmp(keybuffer,"xbmc")==0) strcpy(keybuffer,"mythtv");
+                  else if (strcmp(keybuffer,"mythtv")==0) strcpy(keybuffer,"xbmc");
+                }
+              } else {
+                if (key!=13) {
+                  keybuffer[keybufferindex]=key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                }
+              }
+            } else if (do_show_setup_tema) {
+              if (do_show_setup_select_linie==0) {
+                if (key==32) {
+                  tema++;
+                  if (tema>TEMA_ANTAL) tema=1;
+                }
+              }
+            } else if (do_show_setup_keys) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
+              // rss editor
+            } else if (do_show_setup_rss) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
+            } else if (do_show_setup_spotify) {
+              if (key!=13) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
 
-              } else if (do_show_videoplayer) {
-                // video player setting
-                if (do_show_setup_select_linie==0) {
-                  if (key!=13) {
-                    keybuffer[keybufferindex] = key;
-                    keybufferindex++;
-                    keybuffer[keybufferindex]='\0';	// else input key text in buffer
-                    //if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-                  }
+            } else if (do_show_videoplayer) {
+              // video player setting
+              if (do_show_setup_select_linie==0) {
+                if (key!=13) {
+                  keybuffer[keybufferindex] = key;
+                  keybufferindex++;
+                  keybuffer[keybufferindex]='\0';	// else input key text in buffer
+                  //if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
                 }
-                // video player screen mode
-                if (do_show_setup_select_linie==1) {
-                  if (key==32) {
-                    if (configdefaultplayer_screenmode<3) configdefaultplayer_screenmode++;
-                    else configdefaultplayer_screenmode = 0;
-                  }
+              }
+              // video player screen mode
+              if (do_show_setup_select_linie==1) {
+                if (key==32) {
+                  if (configdefaultplayer_screenmode<3) configdefaultplayer_screenmode++;
+                  else configdefaultplayer_screenmode = 0;
                 }
-                // select debug mode to show in console
-                if (do_show_setup_select_linie==2) {
-                  if (key==32) {
-                    if (debugmode>1) debugmode=debugmode*2; else debugmode++;
-                    if (debugmode>512) debugmode = 0;
-                  }
+              }
+              // select debug mode to show in console
+              if (do_show_setup_select_linie==2) {
+                if (key==32) {
+                  if (debugmode>1) debugmode=debugmode*2; else debugmode++;
+                  if (debugmode>512) debugmode = 0;
                 }
-                // uv meter mode
-                if (do_show_setup_select_linie==3) {
-                  if (key==32) {
-                    configuvmeter=+1;
-                    if (configuvmeter>2) configuvmeter = 0;
-                  }
-                  if (configuvmeter==0) strcpy(keybuffer,"none");
-                  if (configuvmeter==1) strcpy(keybuffer,"Simple");
-                  if (configuvmeter==2) strcpy(keybuffer,"Dual");
-                  sprintf(keybuffer,"%d",configuvmeter);
+              }
+              // uv meter mode
+              if (do_show_setup_select_linie==3) {
+                if (key==32) {
+                  configuvmeter=+1;
+                  if (configuvmeter>2) configuvmeter = 0;
                 }
-              } else if (do_show_tvgraber) {
-                // in setup menu
-                // show_setup_tv_graber = true
-                if ((key==32) && (do_show_setup_select_linie==0)) {
-                  if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal+1) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
-                  // husk last selected
-                  strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
-                  strcpy(configbackend_tvgraber,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
-                  // set load flag to show_setup_tv_graber() func not good way to do it global var
-                  // and delete old db file to get the graber to update it
-                }
-                if (debugmode) fprintf(stderr,"do_show_setup_select_linie %d tvchannel_startofset %d \n",do_show_setup_select_linie,tvchannel_startofset);
-                if (do_show_setup_select_linie>=1) {
-                  // set tvguide channel activate or inactive
-                  channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
-                }
+                if (configuvmeter==0) strcpy(keybuffer,"none");
+                if (configuvmeter==1) strcpy(keybuffer,"Simple");
+                if (configuvmeter==2) strcpy(keybuffer,"Dual");
+                sprintf(keybuffer,"%d",configuvmeter);
+              }
+            } else if (do_show_tvgraber) {
+              // in setup menu
+              // show_setup_tv_graber = true
+              if ((key==32) && (do_show_setup_select_linie==0)) {
+                if (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal+1) aktiv_tv_graber.graberaktivnr++; else aktiv_tv_graber.graberaktivnr=0;
+                // husk last selected
+                strcpy(configbackend_tvgraber_old,configbackend_tvgraber);
+                strcpy(configbackend_tvgraber,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
+                // set load flag to show_setup_tv_graber() func not good way to do it global var
+                // and delete old db file to get the graber to update it
+              }
+              if (debugmode) fprintf(stderr,"do_show_setup_select_linie %d tvchannel_startofset %d \n",do_show_setup_select_linie,tvchannel_startofset);
+              if (do_show_setup_select_linie>=1) {
+                // set tvguide channel activate or inactive
+                channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
               }
             }
           }
         }
-        // ved setup window
-        if (do_show_setup) {
-           if (do_show_setup_sound) {
-               switch(do_show_setup_select_linie) {
-                   case 0:
-                    strcpy(configmythsoundsystem,keybuffer);
-                    break;
-                   case 1:
-                    strcpy(configsoundoutport,keybuffer);
-                    break;
-                   case 2:
-                    //#if defined USE_FMOD_MIXER
-                    //if strcmp(keybuffer,"SDL") soundsystem=1;
-                    //if strcmp(keybuffer,"SDL") soundsystem=1;
-                    break;
-              }
-           } else if (do_show_setup_screen) {
-               switch(do_show_setup_select_linie) {
-                   case 0:
-                    if (screen_size==1) strcpy(keybuffer,"1024 x 768 ");
-                    else if (screen_size==2) strcpy(keybuffer,"1280 x 1024");
-                    else if (screen_size==3) strcpy(keybuffer,"1920 x 1080");
-                    else if (screen_size==4) strcpy(keybuffer,"1360 x 768 ");
-                    break;
-                   case 1:
-                    strcpy(configaktivescreensavername,keybuffer);
-                    break;
-                   case 2:
-                    strcpy(configscreensavertimeout,keybuffer);
-                    break;
-                   case 3:
-                    //strcpy(configuse3deffect,keybuffer);
-                    break;
-                   case 4:
-                     //strcpy(configuse3deffect,keybuffer);
-                    break;
-                   case 5:
-                    if (key==32) full_screen=!full_screen;
-              }
-           } else if (do_show_setup_network) {
-               switch(do_show_setup_select_linie) {
-                   case 0:
-                    strcpy(confighostname,keybuffer);
-                    break;
-                   case 1:
-                    strcpy(confighostip,keybuffer);
-                    break;
-                   case 2:
-                    strcpy(confighostwlanname,keybuffer);
-                    break;
-                   case 3:
-                    // bruges ikke (er en knap (space bar))
-                    break;
-                   case 4:
-                    wifinets.put_wifipass(setupwlanselectofset,keybuffer);
-                    //strcpy(confighostip,keybuffer);
-                    break;
-              }
-           } else if (do_show_setup_sql) {
-               switch(do_show_setup_select_linie) {
-                   case 0: strcpy(configbackend,keybuffer);
-                           break;
-                   case 1: strcpy(configmysqlhost,keybuffer);
-                           configmythtvver=hentmythtvver();
-                           break;
-                   case 2: strcpy(configmysqluser,keybuffer);
-                           configmythtvver=hentmythtvver();
-                           break;
-                   case 3: strcpy(configmysqlpass,keybuffer);
-                           configmythtvver=hentmythtvver();
-                           break;
-                   case 4: strcpy(configmusicpath,keybuffer);
-                           break;
-                   case 5: strcpy(configpicturepath,keybuffer);
-                           break;
-                   case 6: strcpy(configmoviepath,keybuffer);
-                           break;
-                   case 7: strcpy(configrecordpath,keybuffer);
-                           break;
-              }
-           } else if (do_show_setup_rss) {
-              // update records
-              switch(do_show_setup_select_linie) {
-                case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
-                        break;
-                case 1: rssstreamoversigt.set_stream_url(0+configrss_ofset,keybuffer);
-                        break;
-                case 2: rssstreamoversigt.set_stream_name(1+configrss_ofset,keybuffer);
-                        break;
-                case 3: rssstreamoversigt.set_stream_url(1+configrss_ofset,keybuffer);
-                        break;
-                case 4: rssstreamoversigt.set_stream_name(2+configrss_ofset,keybuffer);
-                        break;
-                case 5: rssstreamoversigt.set_stream_url(2+configrss_ofset,keybuffer);
-                        break;
-                case 6: rssstreamoversigt.set_stream_name(3+configrss_ofset,keybuffer);
-                        break;
-                case 7: rssstreamoversigt.set_stream_url(3+configrss_ofset,keybuffer);
-                        break;
-                case 8: rssstreamoversigt.set_stream_name(4+configrss_ofset,keybuffer);
-                        break;
-                case 9: rssstreamoversigt.set_stream_url(4+configrss_ofset,keybuffer);
-                        break;
-                case 10:rssstreamoversigt.set_stream_name(5+configrss_ofset,keybuffer);
-                        break;
-                case 11:rssstreamoversigt.set_stream_url(5+configrss_ofset,keybuffer);
-                        break;
-                case 12:rssstreamoversigt.set_stream_name(6+configrss_ofset,keybuffer);
-                        break;
-                case 13:rssstreamoversigt.set_stream_url(6+configrss_ofset,keybuffer);
-                        break;
-                case 14:rssstreamoversigt.set_stream_name(7+configrss_ofset,keybuffer);
-                        break;
-                case 15:rssstreamoversigt.set_stream_url(7+configrss_ofset,keybuffer);
-                        break;
-                case 16:rssstreamoversigt.set_stream_name(8+configrss_ofset,keybuffer);
-                        break;
-                case 17:rssstreamoversigt.set_stream_url(8+configrss_ofset,keybuffer);
-                        break;
-                case 18: rssstreamoversigt.set_stream_name(9+configrss_ofset,keybuffer);
-                        break;
-                case 19: rssstreamoversigt.set_stream_url(9+configrss_ofset,keybuffer);
-                        break;
-                case 20: rssstreamoversigt.set_stream_name(10+configrss_ofset,keybuffer);
-                        break;
-                case 21: rssstreamoversigt.set_stream_url(10+configrss_ofset,keybuffer);
-                        break;
-                case 22: rssstreamoversigt.set_stream_name(11+configrss_ofset,keybuffer);
-                        break;
-                case 23: rssstreamoversigt.set_stream_url(11+configrss_ofset,keybuffer);
-                        break;
-                case 24: rssstreamoversigt.set_stream_name(12+configrss_ofset,keybuffer);
-                        break;
-                case 25: rssstreamoversigt.set_stream_url(12+configrss_ofset,keybuffer);
-                        break;
-                case 26: rssstreamoversigt.set_stream_name(13+configrss_ofset,keybuffer);
-                        break;
-                case 27: rssstreamoversigt.set_stream_url(13+configrss_ofset,keybuffer);
-                        break;
-                case 28:rssstreamoversigt.set_stream_name(14+configrss_ofset,keybuffer);
-                        break;
-                case 29:rssstreamoversigt.set_stream_url(14+configrss_ofset,keybuffer);
-                        break;
-                case 30:rssstreamoversigt.set_stream_name(15+configrss_ofset,keybuffer);
-                        break;
-                case 31:rssstreamoversigt.set_stream_url(15+configrss_ofset,keybuffer);
-                        break;
-                case 32:rssstreamoversigt.set_stream_name(16+configrss_ofset,keybuffer);
-                        break;
-                case 33:rssstreamoversigt.set_stream_url(16+configrss_ofset,keybuffer);
-                        break;
-                case 34:rssstreamoversigt.set_stream_name(17+configrss_ofset,keybuffer);
-                        break;
-                case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,keybuffer);
-                        break;
-                case 36:rssstreamoversigt.set_stream_name(18+configrss_ofset,keybuffer);
-                        break;
-                case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
-                        break;
-               }
-           } else if (do_show_setup_spotify) {
-               switch(do_show_setup_select_linie) {
-                 case 0: strcpy(spotify_oversigt.spotify_client_id,keybuffer);
-                         break;
-                 case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
-                         break;
-               }
-           } else if (do_show_setup_keys) {
-               switch(do_show_setup_select_linie) {
-                   case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
-                           break;
-                   case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
-                           break;
-                   case 2: strcpy(configkeyslayout[1].cmdname,keybuffer);
-                           break;
-                   case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
-                           break;
-                   case 4: strcpy(configkeyslayout[2].cmdname,keybuffer);
-                           break;
-                   case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
-                           break;
-                   case 6: strcpy(configkeyslayout[3].cmdname,keybuffer);
-                           break;
-                   case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
-                           break;
-                   case 8: strcpy(configkeyslayout[4].cmdname,keybuffer);
-                           break;
-                   case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
-                           break;
-                   case 10: strcpy(configkeyslayout[5].cmdname,keybuffer);
-                           break;
-                   case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
-                            break;
-                   case 12: strcpy(configkeyslayout[6].cmdname,keybuffer);
-                            break;
-                   case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
-                            break;
-                   case 14: strcpy(configkeyslayout[7].cmdname,keybuffer);
-                            break;
-                   case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
-                            break;
-                   case 16: strcpy(configkeyslayout[8].cmdname,keybuffer);
-                            break;
-                   case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
-                            break;
-                   case 18: strcpy(configkeyslayout[9].cmdname,keybuffer);
-                            break;
-                   case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
-                            break;
-               }
-           } else if (do_show_videoplayer) {
-              switch(do_show_setup_select_linie) {
-                  case 0: strcpy(configdefaultplayer,keybuffer);
-                          break;
-                  case 1: strcpy(configvideoplayer,keybuffer);
-                          break;
-                  case 2: debugmode=atoi(keybuffer);                   // set debugmode
-                          break;
-                  case 3: if ((keybuffer,"none")==0) {
-                            configuvmeter=0;
-                          } else if ((keybuffer,"single")==0) {
-                            configuvmeter=1;
-                          } else if ((keybuffer,"dual")==0) {
-                            configuvmeter=2;
-                          } else configuvmeter=1;
-                          break;
-              }
-           } else if (do_show_tvgraber) {
+      }
+      // ved setup window
+      if (do_show_setup) {
+         if (do_show_setup_sound) {
              switch(do_show_setup_select_linie) {
-                case 0: break;
-                case 1: if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraberland,keybuffer);
-                        else {
-                          fprintf(stderr,"Select tv channels\n");
-                        }
-                        break;
-                case 2: break;
-                default: break;
+                 case 0:
+                  strcpy(configmythsoundsystem,keybuffer);
+                  break;
+                 case 1:
+                  strcpy(configsoundoutport,keybuffer);
+                  break;
+                 case 2:
+                  //#if defined USE_FMOD_MIXER
+                  //if strcmp(keybuffer,"SDL") soundsystem=1;
+                  //if strcmp(keybuffer,"SDL") soundsystem=1;
+                  break;
+            }
+         } else if (do_show_setup_screen) {
+             switch(do_show_setup_select_linie) {
+                 case 0:
+                  if (screen_size==1) strcpy(keybuffer,"1024 x 768 ");
+                  else if (screen_size==2) strcpy(keybuffer,"1280 x 1024");
+                  else if (screen_size==3) strcpy(keybuffer,"1920 x 1080");
+                  else if (screen_size==4) strcpy(keybuffer,"1360 x 768 ");
+                  break;
+                 case 1:
+                  strcpy(configaktivescreensavername,keybuffer);
+                  break;
+                 case 2:
+                  strcpy(configscreensavertimeout,keybuffer);
+                  break;
+                 case 3:
+                  //strcpy(configuse3deffect,keybuffer);
+                  break;
+                 case 4:
+                   //strcpy(configuse3deffect,keybuffer);
+                  break;
+                 case 5:
+                  if (key==32) full_screen=!full_screen;
+            }
+         } else if (do_show_setup_network) {
+             switch(do_show_setup_select_linie) {
+                 case 0:
+                  strcpy(confighostname,keybuffer);
+                  break;
+                 case 1:
+                  strcpy(confighostip,keybuffer);
+                  break;
+                 case 2:
+                  strcpy(confighostwlanname,keybuffer);
+                  break;
+                 case 3:
+                  // bruges ikke (er en knap (space bar))
+                  break;
+                 case 4:
+                  wifinets.put_wifipass(setupwlanselectofset,keybuffer);
+                  //strcpy(confighostip,keybuffer);
+                  break;
+            }
+         } else if (do_show_setup_sql) {
+             switch(do_show_setup_select_linie) {
+                 case 0: strcpy(configbackend,keybuffer);
+                         break;
+                 case 1: strcpy(configmysqlhost,keybuffer);
+                         configmythtvver=hentmythtvver();
+                         break;
+                 case 2: strcpy(configmysqluser,keybuffer);
+                         configmythtvver=hentmythtvver();
+                         break;
+                 case 3: strcpy(configmysqlpass,keybuffer);
+                         configmythtvver=hentmythtvver();
+                         break;
+                 case 4: strcpy(configmusicpath,keybuffer);
+                         break;
+                 case 5: strcpy(configpicturepath,keybuffer);
+                         break;
+                 case 6: strcpy(configmoviepath,keybuffer);
+                         break;
+                 case 7: strcpy(configrecordpath,keybuffer);
+                         break;
+            }
+         } else if (do_show_setup_rss) {
+            // update records
+            switch(do_show_setup_select_linie) {
+              case 0: rssstreamoversigt.set_stream_name(0+configrss_ofset,keybuffer);
+                      break;
+              case 1: rssstreamoversigt.set_stream_url(0+configrss_ofset,keybuffer);
+                      break;
+              case 2: rssstreamoversigt.set_stream_name(1+configrss_ofset,keybuffer);
+                      break;
+              case 3: rssstreamoversigt.set_stream_url(1+configrss_ofset,keybuffer);
+                      break;
+              case 4: rssstreamoversigt.set_stream_name(2+configrss_ofset,keybuffer);
+                      break;
+              case 5: rssstreamoversigt.set_stream_url(2+configrss_ofset,keybuffer);
+                      break;
+              case 6: rssstreamoversigt.set_stream_name(3+configrss_ofset,keybuffer);
+                      break;
+              case 7: rssstreamoversigt.set_stream_url(3+configrss_ofset,keybuffer);
+                      break;
+              case 8: rssstreamoversigt.set_stream_name(4+configrss_ofset,keybuffer);
+                      break;
+              case 9: rssstreamoversigt.set_stream_url(4+configrss_ofset,keybuffer);
+                      break;
+              case 10:rssstreamoversigt.set_stream_name(5+configrss_ofset,keybuffer);
+                      break;
+              case 11:rssstreamoversigt.set_stream_url(5+configrss_ofset,keybuffer);
+                      break;
+              case 12:rssstreamoversigt.set_stream_name(6+configrss_ofset,keybuffer);
+                      break;
+              case 13:rssstreamoversigt.set_stream_url(6+configrss_ofset,keybuffer);
+                      break;
+              case 14:rssstreamoversigt.set_stream_name(7+configrss_ofset,keybuffer);
+                      break;
+              case 15:rssstreamoversigt.set_stream_url(7+configrss_ofset,keybuffer);
+                      break;
+              case 16:rssstreamoversigt.set_stream_name(8+configrss_ofset,keybuffer);
+                      break;
+              case 17:rssstreamoversigt.set_stream_url(8+configrss_ofset,keybuffer);
+                      break;
+              case 18: rssstreamoversigt.set_stream_name(9+configrss_ofset,keybuffer);
+                      break;
+              case 19: rssstreamoversigt.set_stream_url(9+configrss_ofset,keybuffer);
+                      break;
+              case 20: rssstreamoversigt.set_stream_name(10+configrss_ofset,keybuffer);
+                      break;
+              case 21: rssstreamoversigt.set_stream_url(10+configrss_ofset,keybuffer);
+                      break;
+              case 22: rssstreamoversigt.set_stream_name(11+configrss_ofset,keybuffer);
+                      break;
+              case 23: rssstreamoversigt.set_stream_url(11+configrss_ofset,keybuffer);
+                      break;
+              case 24: rssstreamoversigt.set_stream_name(12+configrss_ofset,keybuffer);
+                      break;
+              case 25: rssstreamoversigt.set_stream_url(12+configrss_ofset,keybuffer);
+                      break;
+              case 26: rssstreamoversigt.set_stream_name(13+configrss_ofset,keybuffer);
+                      break;
+              case 27: rssstreamoversigt.set_stream_url(13+configrss_ofset,keybuffer);
+                      break;
+              case 28:rssstreamoversigt.set_stream_name(14+configrss_ofset,keybuffer);
+                      break;
+              case 29:rssstreamoversigt.set_stream_url(14+configrss_ofset,keybuffer);
+                      break;
+              case 30:rssstreamoversigt.set_stream_name(15+configrss_ofset,keybuffer);
+                      break;
+              case 31:rssstreamoversigt.set_stream_url(15+configrss_ofset,keybuffer);
+                      break;
+              case 32:rssstreamoversigt.set_stream_name(16+configrss_ofset,keybuffer);
+                      break;
+              case 33:rssstreamoversigt.set_stream_url(16+configrss_ofset,keybuffer);
+                      break;
+              case 34:rssstreamoversigt.set_stream_name(17+configrss_ofset,keybuffer);
+                      break;
+              case 35:rssstreamoversigt.set_stream_url(17+configrss_ofset,keybuffer);
+                      break;
+              case 36:rssstreamoversigt.set_stream_name(18+configrss_ofset,keybuffer);
+                      break;
+              case 37:rssstreamoversigt.set_stream_url(18+configrss_ofset,keybuffer);
+                      break;
              }
+         } else if (do_show_setup_spotify) {
+             switch(do_show_setup_select_linie) {
+               case 0: strcpy(spotify_oversigt.spotify_client_id,keybuffer);
+                       break;
+               case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
+                       break;
+             }
+         } else if (do_show_setup_keys) {
+             switch(do_show_setup_select_linie) {
+                 case 0: strcpy(configkeyslayout[0].cmdname,keybuffer);
+                         break;
+                 case 1: configkeyslayout[0].scrnr=atoi(keybuffer);
+                         break;
+                 case 2: strcpy(configkeyslayout[1].cmdname,keybuffer);
+                         break;
+                 case 3: configkeyslayout[1].scrnr=atoi(keybuffer);
+                         break;
+                 case 4: strcpy(configkeyslayout[2].cmdname,keybuffer);
+                         break;
+                 case 5: configkeyslayout[2].scrnr=atoi(keybuffer);
+                         break;
+                 case 6: strcpy(configkeyslayout[3].cmdname,keybuffer);
+                         break;
+                 case 7: configkeyslayout[3].scrnr=atoi(keybuffer);
+                         break;
+                 case 8: strcpy(configkeyslayout[4].cmdname,keybuffer);
+                         break;
+                 case 9: configkeyslayout[4].scrnr=atoi(keybuffer);
+                         break;
+                 case 10: strcpy(configkeyslayout[5].cmdname,keybuffer);
+                         break;
+                 case 11: configkeyslayout[5].scrnr=atoi(keybuffer);
+                          break;
+                 case 12: strcpy(configkeyslayout[6].cmdname,keybuffer);
+                          break;
+                 case 13: configkeyslayout[6].scrnr=atoi(keybuffer);
+                          break;
+                 case 14: strcpy(configkeyslayout[7].cmdname,keybuffer);
+                          break;
+                 case 15: configkeyslayout[7].scrnr=atoi(keybuffer);
+                          break;
+                 case 16: strcpy(configkeyslayout[8].cmdname,keybuffer);
+                          break;
+                 case 17: configkeyslayout[8].scrnr=atoi(keybuffer);
+                          break;
+                 case 18: strcpy(configkeyslayout[9].cmdname,keybuffer);
+                          break;
+                 case 19: configkeyslayout[9].scrnr=atoi(keybuffer);
+                          break;
+             }
+         } else if (do_show_videoplayer) {
+            switch(do_show_setup_select_linie) {
+                case 0: strcpy(configdefaultplayer,keybuffer);
+                        break;
+                case 1: strcpy(configvideoplayer,keybuffer);
+                        break;
+                case 2: debugmode=atoi(keybuffer);                   // set debugmode
+                        break;
+                case 3: if ((keybuffer,"none")==0) {
+                          configuvmeter=0;
+                        } else if ((keybuffer,"single")==0) {
+                          configuvmeter=1;
+                        } else if ((keybuffer,"dual")==0) {
+                          configuvmeter=2;
+                        } else configuvmeter=1;
+                        break;
+            }
+         } else if (do_show_tvgraber) {
+           switch(do_show_setup_select_linie) {
+              case 0: break;
+              case 1: if (strcmp(configbackend_tvgraber,"Other")==0) strcpy(configbackend_tvgraberland,keybuffer);
+                      else {
+                        fprintf(stderr,"Select tv channels\n");
+                      }
+                      break;
+              case 2: break;
+              default: break;
            }
-       }
+         }
+      }
     // end if **( start if) ****************************************
     // All other keys that + - * S U ESC
     } else {
@@ -9591,25 +9692,23 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (do_show_spotify_search_oversigt==false) {
                 if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
               } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
-              else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                    // show/hide music info
-              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;           // film
-              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;
-              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                   // tv oversigt
+              else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
+              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
+              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
+              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
                 ask_tv_record = true;
-                tvknapnr=tvsubvalgtrecordnr;
-                do_zoom_tvprg_aktiv_nr=tvknapnr;					// husk den valgte aktiv tv prg
+                tvknapnr=tvsubvalgtrecordnr;                                                   // set program nr
+                do_zoom_tvprg_aktiv_nr=tvknapnr;					                                     // husk den valgte aktiv tv prg
               }
               if (vis_spotify_oversigt) {
                 if (do_show_spotify_search_oversigt) {
                   spotify_oversigt.searchtype++;
                   if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
                 }
-                printf("spotify_oversigt.searchtype = %d \n ", spotify_oversigt.searchtype );
               }
-
               break;
             case optionmenukey:
               if (vis_film_oversigt) {
@@ -9663,6 +9762,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                 vis_movie_options=false;                        // luk option window igen
               }
               break;
+            case 'y':
+              /*
+               if (do_show_spotify_search_oversigt==false) {
+                 if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
+               }
+               */
+//               if ((firsttimespotifyupdate==true) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
+//                 do_update_spotify_playlist=true;             // start spotify update
+//                 do_update_spotify = true;                                       // set flag to update spotify
+//               }
+               break;
             case 'u':
               if ((vis_tv_oversigt) && (loading_tv_guide==false)) {
                 // u key
@@ -12775,8 +12885,6 @@ void *datainfoloader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
   spotify_oversigt.set_search_loaded();                           // triger icon loader
-  //spotify_oversigt.load_spotify_iconoversigt();                                 // update icons
-
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   //spotify_oversigt.load_spotify_iconoversigt();
   if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
@@ -12817,6 +12925,7 @@ void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
   spotify_update_loaded_begin=false;
   spotify_oversigt.set_spotify_update_flag(false);
+  firsttimespotifyupdate=false;                                                 // close firsttime update window after update
   pthread_exit(NULL);
 }
 
@@ -13395,16 +13504,16 @@ void loadgfx() {
     printf ("Loading init graphic.\n");
     strcpy(temapath,"");
     strcpy(temapath1,"");
-    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else {
+    if (tema == 1) strcpy(temapath,"/opt/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/opt/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/opt/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/opt/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/opt/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/opt/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/opt/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/opt/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/opt/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/opt/mythtv-controller/tema10/"); else {
       // default tema
       strcpy(temapath,"tema1/");
       tema=1;
@@ -13558,7 +13667,7 @@ void loadgfx() {
     // main logo
     _mainlogo             = loadgfxfile(temapath,(char *) "images/",(char *) "logo");
     // mask for flags
-    strcpy(fileload,(char *) "/usr/share/mythtv-controller/images/landemask.jpg");
+    strcpy(fileload,(char *) "/opt/mythtv-controller/images/landemask.jpg");
     gfxlandemask          = loadTexture (fileload);
 // ************************** screen saver boxes **************************************
     screensaverbox        = loadgfxfile(temapath,(char *) "images/",(char *) "3d_brix");
@@ -13763,9 +13872,9 @@ void load_lande_flags() {
     strcpy(path2,"");
     while(i < 69) {
       fprintf(stderr,"load flag %d %s \n",i,lande[i]);
-      strcpy(tmpfilename,"/usr/share/mythtv-controller/images/");
+      strcpy(tmpfilename,"/opt/mythtv-controller/images/");
       strcat(tmpfilename,lande[i]);							// add lande kode id fra table lande.
-      strcpy(path,"/usr/share/mythtv-controller/images/");
+      strcpy(path,"/opt/mythtv-controller/images/");
       if (strcmp(lande[i],"") != 0) {
         gfxlande[i]=loadgfxfile(path2,path,(char *) lande[i]);
         //gfxlande[i]=loadTexture ((char *) tmpfilename);
@@ -13788,26 +13897,26 @@ void InitGL()              // We call this right after our OpenGL window is crea
     char fileload[256];
     char temapath[256];
     strcpy(temapath,"");
-    if (tema == 1) strcpy(temapath,"/usr/share/mythtv-controller/tema1/"); else
-    if (tema == 2) strcpy(temapath,"/usr/share/mythtv-controller/tema2/"); else
-    if (tema == 3) strcpy(temapath,"/usr/share/mythtv-controller/tema3/"); else
-    if (tema == 4) strcpy(temapath,"/usr/share/mythtv-controller/tema4/"); else
-    if (tema == 5) strcpy(temapath,"/usr/share/mythtv-controller/tema5/"); else
-    if (tema == 6) strcpy(temapath,"/usr/share/mythtv-controller/tema6/"); else
-    if (tema == 7) strcpy(temapath,"/usr/share/mythtv-controller/tema7/"); else
-    if (tema == 8) strcpy(temapath,"/usr/share/mythtv-controller/tema8/"); else
-    if (tema == 9) strcpy(temapath,"/usr/share/mythtv-controller/tema9/"); else
-    if (tema == 10) strcpy(temapath,"/usr/share/mythtv-controller/tema10/"); else
-    if (tema == 11) strcpy(temapath,"/usr/share/mythtv-controller/tema11/"); else
-    if (tema == 12) strcpy(temapath,"/usr/share/mythtv-controller/tema12/"); else
-    if (tema == 13) strcpy(temapath,"/usr/share/mythtv-controller/tema13/"); else
-    if (tema == 14) strcpy(temapath,"/usr/share/mythtv-controller/tema14/"); else
-    if (tema == 15) strcpy(temapath,"/usr/share/mythtv-controller/tema15/"); else
-    if (tema == 16) strcpy(temapath,"/usr/share/mythtv-controller/tema16/"); else
-    if (tema == 17) strcpy(temapath,"/usr/share/mythtv-controller/tema17/"); else
-    if (tema == 18) strcpy(temapath,"/usr/share/mythtv-controller/tema18/"); else
-    if (tema == 19) strcpy(temapath,"/usr/share/mythtv-controller/tema19/"); else
-    if (tema == 20) strcpy(temapath,"/usr/share/mythtv-controller/tema20/"); else {
+    if (tema == 1) strcpy(temapath,"/opt/mythtv-controller/tema1/"); else
+    if (tema == 2) strcpy(temapath,"/opt/mythtv-controller/tema2/"); else
+    if (tema == 3) strcpy(temapath,"/opt/mythtv-controller/tema3/"); else
+    if (tema == 4) strcpy(temapath,"/opt/mythtv-controller/tema4/"); else
+    if (tema == 5) strcpy(temapath,"/opt/mythtv-controller/tema5/"); else
+    if (tema == 6) strcpy(temapath,"/opt/mythtv-controller/tema6/"); else
+    if (tema == 7) strcpy(temapath,"/opt/mythtv-controller/tema7/"); else
+    if (tema == 8) strcpy(temapath,"/opt/mythtv-controller/tema8/"); else
+    if (tema == 9) strcpy(temapath,"/opt/mythtv-controller/tema9/"); else
+    if (tema == 10) strcpy(temapath,"/opt/mythtv-controller/tema10/"); else
+    if (tema == 11) strcpy(temapath,"/opt/mythtv-controller/tema11/"); else
+    if (tema == 12) strcpy(temapath,"/opt/mythtv-controller/tema12/"); else
+    if (tema == 13) strcpy(temapath,"/opt/mythtv-controller/tema13/"); else
+    if (tema == 14) strcpy(temapath,"/opt/mythtv-controller/tema14/"); else
+    if (tema == 15) strcpy(temapath,"/opt/mythtv-controller/tema15/"); else
+    if (tema == 16) strcpy(temapath,"/opt/mythtv-controller/tema16/"); else
+    if (tema == 17) strcpy(temapath,"/opt/mythtv-controller/tema17/"); else
+    if (tema == 18) strcpy(temapath,"/opt/mythtv-controller/tema18/"); else
+    if (tema == 19) strcpy(temapath,"/opt/mythtv-controller/tema19/"); else
+    if (tema == 20) strcpy(temapath,"/opt/mythtv-controller/tema20/"); else {
       strcpy(temapath,"tema1/");
       tema = 1;
     }
@@ -13949,7 +14058,13 @@ int main(int argc, char** argv) {
                 break;
       }
     }
-    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
+
+    #ifdef ENABLE_TIDAL
+    //tridal_oversigt.tridal_login_token();
+    tridal_oversigt.tridal_login_token2();
+//    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
+    #endif
+
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
@@ -14074,6 +14189,7 @@ int main(int argc, char** argv) {
     glutCreateWindow (overskrift);
     init();                                           // init gopengl
     loadgfx();                                        // load gfx stuf
+    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
@@ -14082,6 +14198,9 @@ int main(int argc, char** argv) {
     glutMouseFunc(handleMouse);                       // setup mousehandler
     glutTimerFunc(25, update2, 0);                    // set start loop
     init_ttf_fonts();                                 // init fonts
+
+    if (spotify_oversigt.spotify_check_spotifydb_empty()==true) firsttimespotifyupdate=false; // if true show update option first time
+
     // select start func if argc is this
     if ((argc>1) && (strcmp(argv[1],"-p")==0)) vis_tv_oversigt = true;
     if ((argc>1) && (strcmp(argv[1],"-r")==0)) vis_radio_oversigt = true;

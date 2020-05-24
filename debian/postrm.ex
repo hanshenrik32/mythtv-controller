@@ -29,7 +29,7 @@ case "$1" in
     db_fset mythtv-controller/username seen false
     db_fset mythtv-controller/password seen false
     rm /usr/lib/libfmod.so.10
-    rm -r /usr/share/mythtv-controller
+    rm -r /opt/mythtv-controller
     rm /etc/mythtv-controller.conf
     rm /usr/local/bin/mythtv-controller
     ;;

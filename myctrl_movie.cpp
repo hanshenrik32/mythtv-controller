@@ -1111,7 +1111,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   fputs("\n",filhandle);
                   delrecid=atol(row[0]);
                   // delete from db
-                  sprintf(sqlselect,"delete from videometadata where intid=%d limit 1",delrecid);
+                  sprintf(sqlselect,"delete from videometadata where intid=%ld limit 1",delrecid);
                   mysql_query(conn,sqlselect);
                   res = mysql_store_result(conn);
                 }

@@ -12,6 +12,10 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 
 Version.
 
+mythtv-controller ver 0.38.4
+
+install dir move to /opt/mythtv-cotroller
+
 mythtv-controller ver 0.38.1
 
 Spotify player added.
