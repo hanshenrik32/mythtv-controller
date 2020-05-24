@@ -728,7 +728,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
           if (tridal_playlistantal_loaded==0) {
             system("cat tidal_users_playlist.json | grep total | tail -1 | awk {'print $3'} > tidal_users_playlist_antal.txt");
             json_file = fopen("tidal_users_playlist_antal.txt", "r");
-            fscanf(json_file, "%s", temptxt);
+            fscanf(json_file, "%s", temptxt);            
             if (strcmp(temptxt,"")!=0) tridal_oversigt.tridal_playlist_antal = atoi(temptxt);
             else tridal_oversigt.tridal_playlist_antal = 0;
             fclose(json_file);
