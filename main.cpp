@@ -615,9 +615,6 @@ FMOD_RESULT     result;
 unsigned int    fmodversion;
 #endif
 
-
-
-
 bool            playing = 0;
 int             snd=0;
 
@@ -861,9 +858,7 @@ int hentmythtvver() {
 
 // fmod error handler
 
-void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
-
-{
+void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
   char file_path[1024];
   if (result != FMOD_OK) {
     fprintf(stderr,"FMOD error! (%d): %s on songnr %d \n", result, FMOD_ErrorString(result),songnr);
@@ -887,9 +882,7 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
 
 
 
-void ERRCHECK_SDL(char *text,unsigned int songnr)
-
-{
+void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
     aktiv_playlist.m_play_playlist(file_path,songnr);
@@ -1797,7 +1790,7 @@ int hent_mythtv_playlist(int playlistnr) {
 // ****************************************************************************************
 //
 // MUSIC stuf
-//
+// Måske memory error
 // load dir icons efter et update.
 //
 // ****************************************************************************************
@@ -2382,6 +2375,7 @@ static bool do_update_xmltv_show = false;                         //
 static bool do_update_rss_show = false;                           //
 static bool do_update_rss = false;                                //
 static bool do_update_music = false;                              //
+static bool do_update_xmltv = false;
 static bool do_update_music_now = false;                          // start the process to update music db from global dir
 static bool do_update_moviedb = false;                            // set true to start thread on update movie db
 static bool do_update_spotify = true;                             // set true to start thread on update spotify + run web server
@@ -2401,7 +2395,6 @@ void display() {
     static bool getstarttidintvguidefromarray = true;
     static time_t today=0;
     static time_t lasttoday=0;
-    static bool do_update_xmltv = false;
     static bool firsttime_rssupdate = false;                                    // only used first time
     static int starttimer=0;                                                    // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];                             // array til at fortælle om sange i playlist askopendir er aktiv
@@ -2563,7 +2556,7 @@ void display() {
       lasttoday = today;                                                          // rember last update
       do_update_xmltv = true;                                                     // do update tvguide
       do_update_xmltv_show = true;                                                // show we are updating
-      firsttime_xmltvupdate=false;                                              // only used first time
+      firsttime_xmltvupdate=false;                                                // only used first time
     }
     // rss update
     // update interval
@@ -2578,8 +2571,8 @@ void display() {
     //
     // do the update from spotify
     //
-    if (do_update_spotify_playlist) {
-      printf("Start spotify update thread\n");
+    if ((do_update_spotify_playlist) && ((do_update_rss==false) && (do_update_xmltv==false))) {
+      if (debugmode & 4) printf("Start spotify update thread\n");
       update_spotifyonline_phread_loader();                                     // start thread loader
       do_update_spotify_playlist=false;
     }
@@ -6354,12 +6347,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // test for tema setup/info
         if (((GLubyte) names[i*4+3]==41) && (do_show_setup_sound==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_font==false) && (do_show_setup_tema))  {
+          // next tema
           tema++;
           if (tema>TEMA_ANTAL) tema = 1;
           fundet = true;
         }
         // test for rss setup
         if (((GLubyte) names[i*4+3]==42) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false)) {
+          // close  all show setup windows
           do_show_setup_sound = false;
           do_show_setup_sql = false;
           do_show_setup_network = false;
@@ -6377,6 +6372,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 
         // test for spotify setup
         if (((GLubyte) names[i*4+3]==43) && (do_show_setup_sql==false) && (do_show_tvgraber==false) && (do_show_setup_network==false) && (do_show_setup_screen==false) && (do_show_setup_tema==false) && (do_show_setup_rss==false)) {
+          // close  all show setup windows
           do_show_setup_sound = false;
           do_show_setup_sql = false;
           do_show_setup_network = false;
@@ -6431,6 +6427,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // test for menu select film/streams
         if ((GLubyte) names[i*4+3]==3) {
           vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
+          // close all other setup windows
           vis_radio_oversigt = false;
           vis_music_oversigt = false;
           vis_film_oversigt = false;
@@ -6444,6 +6441,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // test for menu select recorded
         if ((GLubyte) names[i*4+3]==4) {
+          // close all other setup windows
           vis_music_oversigt = false;
           vis_film_oversigt = false;
           vis_tv_oversigt = false;
@@ -6460,6 +6458,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((!(vis_radio_oversigt)) && (!(vis_music_oversigt)) && (!(vis_recorded_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_stream_oversigt))) {
         // test for menu select setup
         if ((GLubyte) names[i*4+3]==5) {
+          // close all other setup windows
           do_show_setup =! do_show_setup;
           vis_music_oversigt = false;
           vis_film_oversigt = false;
@@ -6475,6 +6474,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // test for exit selected                                               // exit program
         if ((GLubyte) names[i*4+3]==6) {
+          // close all other setup windows
           vis_music_oversigt = false;
           vis_film_oversigt = false;
           vis_tv_oversigt =! vis_tv_oversigt;
@@ -6662,6 +6662,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             fundet = true;
           }
+
+
           // next song
           if ((GLubyte) names[i*4+3]==7) {
             if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
