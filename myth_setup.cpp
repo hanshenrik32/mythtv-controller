@@ -3095,9 +3095,9 @@ int txmltvgraber_updateconfigfile() {
       }
       cnr++;
     }
+    if (filin) fclose(filin);
+    if (filout) fclose(filout);
   }
-  fclose(filin);
-  fclose(filout);
   // copy new config file to xmltv homedir ~/.xmltv
   getuserhomedir(path);                                                     // get user homedir
   strcpy(filename,"cp ");
