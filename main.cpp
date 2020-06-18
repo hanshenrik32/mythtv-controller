@@ -6669,6 +6669,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             fundet = true;
           }
+
+          
           // next song
           if ((GLubyte) names[i*4+3]==7) {
             if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
