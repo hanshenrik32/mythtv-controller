@@ -615,9 +615,6 @@ FMOD_RESULT     result;
 unsigned int    fmodversion;
 #endif
 
-
-
-
 bool            playing = 0;
 int             snd=0;
 
@@ -861,9 +858,7 @@ int hentmythtvver() {
 
 // fmod error handler
 
-void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
-
-{
+void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
   char file_path[1024];
   if (result != FMOD_OK) {
     fprintf(stderr,"FMOD error! (%d): %s on songnr %d \n", result, FMOD_ErrorString(result),songnr);
@@ -887,9 +882,7 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr)
 
 
 
-void ERRCHECK_SDL(char *text,unsigned int songnr)
-
-{
+void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
     aktiv_playlist.m_play_playlist(file_path,songnr);
@@ -1797,7 +1790,7 @@ int hent_mythtv_playlist(int playlistnr) {
 // ****************************************************************************************
 //
 // MUSIC stuf
-//
+// Måske memory error
 // load dir icons efter et update.
 //
 // ****************************************************************************************
@@ -6670,7 +6663,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
 
-          
+
           // next song
           if ((GLubyte) names[i*4+3]==7) {
             if ((do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) && (do_shift_song==false)) {
