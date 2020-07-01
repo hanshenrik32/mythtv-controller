@@ -385,7 +385,6 @@ char search_and_replace2(char *text) {
     if (text[n]=='"') {
       strcat(newtext,"'");
       n++;
-//      nn+=1;
     } else {
       newtext[nn]=text[n];
       newtext[nn+1]='\0';                               // null terminate string
@@ -442,226 +441,228 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   strcpy(rssauthor,"");
   strcpy(rssprgimage,"");
   strcpy(rssprgimage1,"");
-  conn=mysql_init(NULL);
-  document = xmlReadFile(filename, NULL, 0);            // open xml file
-  // if exist do all the parse and update db
-  // it use REPLACE in mysql to create/update records if changed in xmlfile
-  raw_tid=time(NULL);
-  opret_dato=localtime(&raw_tid);
-  strftime(rssopretdato,28,"%F %T",opret_dato);
-  if ((document) && (conn)) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    if (conn) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-    }
-    root = xmlDocGetRootElement(document);
-    first_child = root->children;
-    for (node = first_child; node; node = node->next) {
-      if (node->type==XML_ELEMENT_NODE) {
-        if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
-          content = xmlNodeGetContent(node);
-          if (content) {
-            //strcpy(result,(char *) content);
+  if (check_zerro_bytes_file(filename)>0) {    
+    conn=mysql_init(NULL);
+    document = xmlReadFile(filename, NULL, 0);            // open xml file
+    // if exist do all the parse and update db
+    // it use REPLACE in mysql to create/update records if changed in xmlfile
+    raw_tid=time(NULL);
+    opret_dato=localtime(&raw_tid);
+    strftime(rssopretdato,28,"%F %T",opret_dato);
+    if ((document) && (conn)) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      if (conn) {
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+      }
+      root = xmlDocGetRootElement(document);
+      first_child = root->children;
+      for (node = first_child; node; node = node->next) {
+        if (node->type==XML_ELEMENT_NODE) {
+          if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
+            content = xmlNodeGetContent(node);
+            if (content) {
+              //strcpy(result,(char *) content);
+            }
+            subnode=node->xmlChildrenNode;
+            while(subnode) {
+              xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
+              content = xmlNodeGetContent(subnode);
+              if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
+                content = xmlNodeGetContent(subnode);
+                strcpy(rssprgtitle,(char *) content);
+              }
+              // images
+              // rssprgimage
+              // paththumb
+              //
+              if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
+                content = xmlNodeGetContent(subnode);
+                tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+                if (tmpdat) {
+                  strcpy(rssprgimage,(char *) tmpdat);
+                  strcpy(baseiconfile,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
+              }
+              if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
+                content = xmlNodeGetContent(subnode);
+                tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+                if (tmpdat) {
+                  strcpy(rssprgimage,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
+              }
+              // item type element
+              if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
+                subnode2=subnode->xmlChildrenNode;
+                while(subnode2) {
+                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgfeedtitle,(char *) content);
+                  }
+                  // get play url
+                  if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                    if (tmpdat) {
+                      strcpy(rssvideolink,(char *) tmpdat);
+                      xmlFree(tmpdat);
+                    }
+                  }
+                  // rssprgpubdate
+                  if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgpubdate,(char *) content);
+                  }
+                  // get length
+                  if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) strcpy(rsstime,(char *) content);
+                  }
+                  // get episode
+                  if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) rssepisode=atoi((char *) content);
+                  }
+                  // get season
+                  if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) rssseason=atoi((char *) content);
+                  }
+                  // get author
+                  if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) strcpy(rssauthor,(char *) content);
+                  }
+                  // get description
+                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) {
+                      xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
+                      if (xmlrssid) strcpy(rssprgdesc,(char *) content);
+                      xmlFree(xmlrssid);
+                    }
+                  }
+                  subnode2=subnode2->next;
+                }
+                recordexist=false;
+                // check if record exist
+                if (strcmp(rssvideolink,"")!=0) {
+                  sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
+                  mysql_query(conn,sqlinsert);
+                  res = mysql_store_result(conn);
+                  if (res) {
+                    while ((row = mysql_fetch_row(res)) != NULL) {
+                      recordexist=true;
+                    }
+                  }
+                  // creoate record if not exist
+                  if (!(recordexist)) {
+                    search_and_replace2(rssprgtitle);
+                    search_and_replace2(rssprgfeedtitle);
+                    search_and_replace2(rssprgdesc);
+                    if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
+                    sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+                    if (mysql_query(conn,sqlinsert)!=0) {
+                      printf("mysql REPLACE table error. %s\n",sqlinsert);
+                    }
+                    res = mysql_store_result(conn);
+                  }
+                }
+              }
+              subnode=subnode->next;
+            }
+            // end while loop
           }
-          subnode=node->xmlChildrenNode;
-          while(subnode) {
-            xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
-            content = xmlNodeGetContent(subnode);
-            if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
-              content = xmlNodeGetContent(subnode);
-              strcpy(rssprgtitle,(char *) content);
-            }
-            // images
-            // rssprgimage
-            // paththumb
-            //
-            if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                strcpy(baseiconfile,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            // item type element
-            if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
-              subnode2=subnode->xmlChildrenNode;
+          // youtube type
+          // get title
+          if (strcmp((char *) node->name,"title")==0) {
+            strcpy(rssprgtitle,"");
+            content = xmlNodeGetContent(node);
+            if (content) strcpy(rssprgtitle,(char *) content);
+          }
+          if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
+            // reset for earch element loading
+            strcpy(rssvideolink,"");
+            strcpy(rssprgfeedtitle,"");
+            rssepisode=0;
+            rssseason=0;
+            strcpy(rssauthor,"");
+            strcpy(rssprgdesc,"");
+            strcpy(rssprgimage1,"");
+            strcpy(rssprgimage,"");
+            if (strcmp((char *) node->name,"entry")==0) {
+              subnode2=node->xmlChildrenNode;
               while(subnode2) {
+                strcpy(rssprgimage,"");
                 if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   strcpy(rssprgfeedtitle,(char *) content);
                 }
                 // get play url
-                if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
                   content = xmlNodeGetContent(subnode2);
-                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
                   if (tmpdat) {
                     strcpy(rssvideolink,(char *) tmpdat);
                     xmlFree(tmpdat);
                   }
                 }
-                // rssprgpubdate
-                if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  strcpy(rssprgpubdate,(char *) content);
-                }
-                // get length
-                if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rsstime,(char *) content);
-                }
-                // get episode
-                if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssepisode=atoi((char *) content);
-                }
-                // get season
-                if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssseason=atoi((char *) content);
-                }
-                // get author
-                if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rssauthor,(char *) content);
-                }
-                // get description
-                if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) {
-                    xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
-                    if (xmlrssid) strcpy(rssprgdesc,(char *) content);
-                    xmlFree(xmlrssid);
+                if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
+                  subnode3=subnode2->xmlChildrenNode;
+                  while(subnode3) {
+                    if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgtitle,(char *) content);
+                    }
+                    if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgdesc,(char *) content);
+                    }
+                    // get icon gfx
+                    if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
+                      content = xmlNodeGetContent(subnode3);
+                      tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
+                      if (tmpdat) {
+                        //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
+                        strcpy(rssprgimage1,(char *) tmpdat);
+                        xmlFree(tmpdat);
+                      }
+                    }
+                    subnode3=subnode3->next;
                   }
                 }
                 subnode2=subnode2->next;
               }
               recordexist=false;
-              // check if record exist
-              if (strcmp(rssvideolink,"")!=0) {
-                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
-                mysql_query(conn,sqlinsert);
-                res = mysql_store_result(conn);
-                if (res) {
-                  while ((row = mysql_fetch_row(res)) != NULL) {
-                    recordexist=true;
-                  }
-                }
-                // creoate record if not exist
-                if (!(recordexist)) {
-                  search_and_replace2(rssprgtitle);
-                  search_and_replace2(rssprgfeedtitle);
-                  search_and_replace2(rssprgdesc);
-                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                  if (mysql_query(conn,sqlinsert)!=0) {
-                    printf("mysql REPLACE table error. %s\n",sqlinsert);
-                  }
-                  res = mysql_store_result(conn);
-                }
-              }
-            }
-            subnode=subnode->next;
-          }
-          // end while loop
-        }
-        // youtube type
-        // get title
-        if (strcmp((char *) node->name,"title")==0) {
-          strcpy(rssprgtitle,"");
-          content = xmlNodeGetContent(node);
-          if (content) strcpy(rssprgtitle,(char *) content);
-        }
-        if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
-          // reset for earch element loading
-          strcpy(rssvideolink,"");
-          strcpy(rssprgfeedtitle,"");
-          rssepisode=0;
-          rssseason=0;
-          strcpy(rssauthor,"");
-          strcpy(rssprgdesc,"");
-          strcpy(rssprgimage1,"");
-          strcpy(rssprgimage,"");
-          if (strcmp((char *) node->name,"entry")==0) {
-            subnode2=node->xmlChildrenNode;
-            while(subnode2) {
-              strcpy(rssprgimage,"");
-              if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                strcpy(rssprgfeedtitle,(char *) content);
-              }
-              // get play url
-              if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
-                if (tmpdat) {
-                  strcpy(rssvideolink,(char *) tmpdat);
-                  xmlFree(tmpdat);
-                }
-              }
-              if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
-                subnode3=subnode2->xmlChildrenNode;
-                while(subnode3) {
-                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgtitle,(char *) content);
-                  }
-                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgdesc,(char *) content);
-                  }
-                  // get icon gfx
-                  if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
-                    content = xmlNodeGetContent(subnode3);
-                    tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
-                    if (tmpdat) {
-                      //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
-                      strcpy(rssprgimage1,(char *) tmpdat);
-                      xmlFree(tmpdat);
-                    }
-                  }
-                  subnode3=subnode3->next;
-                }
-              }
-              subnode2=subnode2->next;
-            }
-            recordexist=false;
-            sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
-            mysql_query(conn,sqlinsert);
-            res = mysql_store_result(conn);
-            if (res) {
-              while ((row = mysql_fetch_row(res)) != NULL) {
-                recordexist=true;
-              }
-            }
-            if (!(recordexist)) {
-              search_and_replace2(rssprgtitle);
-              search_and_replace2(rssprgfeedtitle);
-              search_and_replace2(rssprgdesc);
-              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
-              //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
-              if (mysql_query(conn,sqlinsert)!=0) {
-                printf("mysql REPLACE table error. %s\n",sqlinsert);
-              }
+              sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+              mysql_query(conn,sqlinsert);
               res = mysql_store_result(conn);
+              if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                  recordexist=true;
+                }
+              }
+              if (!(recordexist)) {
+                search_and_replace2(rssprgtitle);
+                search_and_replace2(rssprgfeedtitle);
+                search_and_replace2(rssprgdesc);
+                if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
+                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
+                //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+                if (mysql_query(conn,sqlinsert)!=0) {
+                  printf("mysql REPLACE table error. %s\n",sqlinsert);
+                }
+                res = mysql_store_result(conn);
+              }
             }
           }
         }
       }
+      xmlFreeDoc(document);
+      mysql_close(conn);
     }
-    xmlFreeDoc(document);
-    mysql_close(conn);
   } else {
     if (debugmode & 4) printf("Read error on %s xmlfile downloaded to rss dir \n",filename);
   }
