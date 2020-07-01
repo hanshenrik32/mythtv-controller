@@ -441,7 +441,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   strcpy(rssauthor,"");
   strcpy(rssprgimage,"");
   strcpy(rssprgimage1,"");
-  if (check_zerro_bytes_file(filename)>0) {    
+  if (check_zerro_bytes_file(filename)>0) {
     conn=mysql_init(NULL);
     document = xmlReadFile(filename, NULL, 0);            // open xml file
     // if exist do all the parse and update db
@@ -3256,6 +3256,23 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
+
+      // https://friesb4guyspodcast.libsyn.com/rss
+      if (check_rss_feed_exist(conn,(char *) "Fries before guys")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Fries before guys',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Fries before guys.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Fries before guys',NULL,NULL,'Fries before guys ',0,0,NULL,'https://friesb4guyspodcast.libsyn.com/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Fries before guys.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
 
 
       // close mysql
