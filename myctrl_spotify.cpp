@@ -1203,6 +1203,7 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
 
 //
 // json
+// process playlist
 //
 
 
@@ -1222,7 +1223,7 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
 // ****************************************************************************************
 //
 // json parser start call function for process playlist
-// do the data progcessing from json
+// do the data progcessing from json (value)
 //
 // ****************************************************************************************
 
@@ -1290,12 +1291,12 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
               strcpy(playlistgfx,value->u.string.ptr);
             }
           }
-          process_image=false;
+          process_image = false;
         }
         // get play link
         // process song spotify id CHECKED OK
         if ( process_uri ) {
-          if ((depth==9) && (x==18)) {
+          if (( depth == 9 ) && ( x == 18 )) {
             //if (playinfo_json_debug) printf("%s\n", value->u.string.ptr);
             if (stack[antal]) {
               if (stack[antal]) {
@@ -1307,7 +1308,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         if ( process_id ) {
           // get playlist id
-          if ((depth==2) && (x==5)) {
+          if (( depth == 2 ) && ( x == 5 )) {
             //printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
             //printf("playlist id %s \n",value->u.string.ptr);
             strcpy(spotify_playlistid , value->u.string.ptr);
@@ -1316,7 +1317,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         if ( process_name ) {
           // get playlist name OK
-          if ((depth==2) && (x==7)) {
+          if (( depth == 2 ) && ( x == 7 )) {
             //printf("playlist name %-30s \n",value->u.string.ptr);
             strcpy(spotify_playlistname , value->u.string.ptr);
           }
