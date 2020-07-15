@@ -12904,7 +12904,7 @@ void *datainfoloader_spotify(void *data) {
 void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
-    if (spotify_oversigt.spotify_get_user_id()) {
+    if (spotify_oversigt.spotify_get_user_id()!=0) {
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify

@@ -2572,6 +2572,8 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
 // Do work now
 // get user id from spotify api
 //
+// return 0 if fault
+//
 // ****************************************************************************************
 
 int spotify_class::spotify_get_user_id() {
@@ -2581,50 +2583,52 @@ int spotify_class::spotify_get_user_id() {
   std::string response_string;
   std::string url;
   char post_playlist_data[4096];
-  int httpCode;
+  int httpCode=0;
   CURLcode res;
   struct curl_slist *header = NULL;
   char *devid=spotify_oversigt.get_active_device_id();
-  auth_kode="Authorization: Bearer ";
-  auth_kode=auth_kode + spotifytoken;
-  url="https://api.spotify.com/v1/me";
-  url=url + devid;
-  printf("Get user info.\n");
-  // use libcurl
-  curl_global_init(CURL_GLOBAL_ALL);
-  CURL *curl = curl_easy_init();
-  if (curl) {
-    /* Add a custom header */
-    header = curl_slist_append(header, "Accept: application/json");
-    header = curl_slist_append(header, "Content-Type: application/json");
-    header = curl_slist_append(header, "charsets: utf-8");
-    header = curl_slist_append(header, auth_kode.c_str());
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-    //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
-    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POST, 0);
-    // set type post/put
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
-    userfile=fopen(userfilename,"w");
-    if (userfile) {
-      curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
-      res = curl_easy_perform(curl);
-      fclose(userfile);
-    }
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-    }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    if (httpCode == 200) {
-      return(200);
+  if (devid) {
+    auth_kode="Authorization: Bearer ";
+    auth_kode=auth_kode + spotifytoken;
+    url="https://api.spotify.com/v1/me";
+    url=url + devid;
+    printf("Get user info.\n");
+    // use libcurl
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl = curl_easy_init();
+    if ((curl) && (strlen(auth_kode.c_str())>0)) {
+      /* Add a custom header */
+      header = curl_slist_append(header, "Accept: application/json");
+      header = curl_slist_append(header, "Content-Type: application/json");
+      header = curl_slist_append(header, "charsets: utf-8");
+      header = curl_slist_append(header, auth_kode.c_str());
+      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+      //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
+      curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+      curl_easy_setopt(curl, CURLOPT_POST, 0);
+      // set type post/put
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+      userfile=fopen(userfilename,"w");
+      if (userfile) {
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+        res = curl_easy_perform(curl);
+        fclose(userfile);
+      }
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      if (httpCode == 200) {
+        return(200);
+      }
     }
   }
   return(httpCode);
@@ -2654,6 +2658,7 @@ int spotify_class::spotify_get_available_devices() {
   char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
   sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotifytoken);
   curl_exitcode=system(call);
+  //get json file
   if (WEXITSTATUS(curl_exitcode)==0) {
     // convert file by sed (call_sed) easy hack
     curl_exitcode=system(call_sed);
@@ -3134,7 +3139,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
         dbexist=true;
       }
     }
-
+    // clear old list (view)
     clean_spotify_oversigt();                                                   // clean old list
 
     // find records after type (0 = root, else = refid)
