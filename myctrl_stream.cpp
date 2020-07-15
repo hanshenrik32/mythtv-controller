@@ -3367,6 +3367,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
                 }
+                // tmpfilename is now the bame of the icon
                 strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
                 antal++;
               } else {
@@ -3385,78 +3386,80 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 }
                 // alloc new element in array
                 if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
-                stack[antal]->intnr=1;
-                if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-                if (getart==1) {
-                  // old ver used path from mysql
-                  //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                } else {
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                }
-                if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                // old ver
-                //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
-                switch(getart) {
-                  case 0: if (row[9]) strcpy(tmpfilename,row[9]);
-                          break;
-                  case 1: if (row[7]) strcpy(tmpfilename,row[7]);
-                          break;
-                  case 2: if (row[5]) strcpy(tmpfilename,row[5]);
-                          break;
-                }
-                // test antal afspillinger this 0 set som new rss
-                if (row[9]) {
-                  if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
-                }
-                if (strlen(tmpfilename)>7) {
-                  if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
-                    strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
-                    if (strlen(row[7])>10) {
-                      if (getart==1) {
-                        if (row[7]) strncat(tmpfilename,row[7]+10,100);
-                      }
-                      if (getart==2) {
-                        if (row[6]) strncat(tmpfilename,row[6]+10,100);
-                      }
-                    }
+                if (stack[antal]) {
+                  stack[antal]->intnr=1;
+                  if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                  if (getart==1) {
+                    // old ver used path from mysql
+                    //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   } else {
-                    // rss download
-                    // downloadfilename = name on file, from tmpfilename = full web url
-                    get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                    // check filename fro ? or = and replace to _
-                    strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                    int mmm=0;
-                    while(mmm<strlen(downloadfilename)) {
-                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                      mmm++;
-                    }
-                    strcpy(lasttmpfilename,tmpfilename);			              // husk file name
-                    // save file in  user homedir rss/
-                    getuserhomedir(homedir);                                  // get homedir
-                    strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
-                      // download gfx file and use as icon
-                      if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
-                        printf("Download error \n");
-                      } else strcpy(tmpfilename,"");
-                    }
-                    strcpy(tmpfilename,downloadfilenamelong);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   }
-                } else strcpy(tmpfilename,"");
-                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
-//                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                // no texture now
-                stack[antal]->textureId=0;
-                // opdatere group antal
-                if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
-                antal++;
+                  if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                  if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                  // old ver
+                  //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                  if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                  switch(getart) {
+                    case 0: if (row[9]) strcpy(tmpfilename,row[9]);
+                            break;
+                    case 1: if (row[7]) strcpy(tmpfilename,row[7]);
+                            break;
+                    case 2: if (row[5]) strcpy(tmpfilename,row[5]);
+                            break;
+                  }
+                  // test antal afspillinger this 0 set som new rss
+                  if (row[9]) {
+                    if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                  }
+                  if (strlen(tmpfilename)>7) {
+                    if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
+                      strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
+                      if (strlen(row[7])>10) {
+                        if (getart==1) {
+                          if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                        }
+                        if (getart==2) {
+                          if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                        }
+                      }
+                    } else {
+                      // rss download
+                      // downloadfilename = name on file, from tmpfilename = full web url
+                      get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                      // check filename fro ? or = and replace to _
+                      strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                      int mmm=0;
+                      while(mmm<strlen(downloadfilename)) {
+                        if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                        mmm++;
+                      }
+                      strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                      // save file in  user homedir rss/
+                      getuserhomedir(homedir);                                  // get homedir
+                      strcpy(downloadfilenamelong,homedir);
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      if (!(file_exists(downloadfilenamelong))) {
+                        if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                        // download gfx file and use as icon
+                        if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
+                          printf("Download error \n");
+                        } else strcpy(tmpfilename,"");
+                      }
+                      strcpy(tmpfilename,downloadfilenamelong);
+                    }
+                  } else strcpy(tmpfilename,"");
+                  strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+  //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
+                  if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                  // no texture now
+                  stack[antal]->textureId=0;
+                  // opdatere group antal
+                  if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
+                  antal++;
+                }
               }
             }
           }
