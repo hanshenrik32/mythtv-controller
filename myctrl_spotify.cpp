@@ -2263,6 +2263,11 @@ static void dump(const char *text,FILE *stream, unsigned char *ptr, size_t size)
   }
 }
 
+
+//
+//
+//
+
 static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp) {
   const char *text;
   (void)handle; /* prevent compiler warning */
@@ -2273,7 +2278,6 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
     fprintf(stderr, "== Info: %s", data);
   default: /* in case a new one is introduced to shock us */
     return 0;
-
   case CURLINFO_HEADER_OUT:
     text = "=> Send header";
     break;
@@ -2303,6 +2307,7 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
 
 // ****************************************************************************************
 // Works
+// Play playlist on spotify device by id
 // Optional. Spotify URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 // ****************************************************************************************
@@ -2757,23 +2762,24 @@ int spotify_class::spotify_get_available_devices() {
 // ****************************************************************************************
 //
 // get user access token
-// write to spotify_access_token
+// write to spotify_access_token.txt file
 //
 // ****************************************************************************************
 
 int spotify_class::spotify_get_access_token2() {
-  struct mg_connection *nc;
   // works
+  struct mg_connection *nc;
+  char homedirfile[4096];
+  FILE *myfile;
+  char data[4096];
+  char call[4096];
+  char *base64_code;
   mg_mgr_init(&spotify_oversigt.client_mgr, NULL);
   nc = mg_connect_http(&spotify_oversigt.client_mgr, ev_handler, "https://accounts.spotify.com/api/token", "Content-Type: application/x-www-form-urlencoded\r\n", "");
   mg_set_protocol_http_websocket(nc);
   while (s_exit_flag == 0) {
     mg_mgr_poll(&mgr, 1000);
   }
-  FILE *myfile;
-  char data[4096];
-  char call[4096];
-  char *base64_code;
   strcpy(data,spotify_client_id);
   strcat(data,":");
   strcat(data,spotify_secret_id);
@@ -2782,7 +2788,11 @@ int spotify_class::spotify_get_access_token2() {
   *(base64_code+88)='\0';
   // works
   //sprintf(call,"curl -X 'POST' -H 'Authorization: Basic %s' -d grant_type=client_credentials https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code);
-  myfile = fopen("spotify_access_token.txt","r");
+
+  //strcpy(homedirfile,getenv("HOME"));
+  strcpy(homedirfile,"");
+  strcat(homedirfile,"spotify_access_token.txt");
+  myfile = fopen(homedirfile,"r");
   if (myfile) {
     fgets(data,4095,myfile);                      // read file
     fclose(myfile);
