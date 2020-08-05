@@ -4120,7 +4120,7 @@ void display() {
     // ******************************************************************************************************************
     // ******************************************************************************************************************
     // ******************************************************************************************************************
-    // vis vi player music
+    // show we player music
     if ((vis_music_oversigt) && (!(visur))) {
       // spiller vi en sang vis status info i 3d   (do_play_music_aktiv=1 hvis der er status vindow
       if (do_zoom_music_cover) {
@@ -4787,7 +4787,7 @@ void display() {
     }
     //
     // *************** RADIO stuf *******************************************************************************
-    // show player
+    // show radio player
     if (!(visur)) {
       if (vis_radio_oversigt) {
         // show playing radio station
@@ -5369,11 +5369,11 @@ void display() {
                 case 14:
                         glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
                         glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot)
-                break;
+                        break;
                 default:
                         glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
                         glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
-                break;
+                        break;
             }
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 -uvyypos, 0.0);
@@ -5402,7 +5402,10 @@ void display() {
       //freegfx();                                                                // free gfx loaded
       //loadgfx();                                                                // reload all menu + icon gfx
     }
+    //
+    // show update if rss podcast
     // update rss db
+    //
     if (do_save_setup_rss) {
       if (debugmode) fprintf(stderr,"Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
