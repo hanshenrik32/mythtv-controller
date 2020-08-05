@@ -214,7 +214,7 @@ float stream_class::getstream_pos() {
 
 
 // ****************************************************************************************
-// update nr of view
+// update nr of view on podcast
 //
 // ****************************************************************************************
 
@@ -227,13 +227,18 @@ void stream_class::update_rss_nr_of_view(char *url) {
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // get homedir
-  if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
-    mysql_query(conn,sqlinsert);
-    res = mysql_store_result(conn);
-    mysql_free_result(res);
-    mysql_close(conn);
+  try {
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
+      mysql_query(conn,sqlinsert);
+      res = mysql_store_result(conn);
+      mysql_free_result(res);
+      mysql_close(conn);
+    }
+  }
+  catch (...) {
+    printf("Error open mysql connection.\n");
   }
 }
 
@@ -684,20 +689,19 @@ int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   char sqlselect[4096];
   MYSQL_RES *res;
   MYSQL_ROW row;
-
-  printf("*************************************************************************************\n");
-
+  int antal=0;
+  //printf("*************************************************************************************\n");
   if (conn) {
     sprintf(sqlselect,"SELECT count(name) from mythtvcontroller.internetcontent");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        antalrss_feeds=atoi(row[0]);
+        antal=atoi(row[0]);
       }
     }
   }
-  return(1);
+  return(antal);
 }
 
 
@@ -742,7 +746,7 @@ int get_podcasttype_antal(char *typedata) {
 
 // ****************************************************************************************
 //
-// check if exist
+// check if title exist
 //
 // ****************************************************************************************
 
@@ -768,7 +772,7 @@ int check_rss_feed_exist(MYSQL *conn,char *rssname) {
 
 // ****************************************************************************************
 //
-// opdate show liste in view (det vi ser)
+// opdate show liste in view (The view)
 //
 // load felt 7 = mythtv gfx icon
 // fpath=stream path
@@ -816,7 +820,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // create db if not exist
       // and dump some default rss feeed in
       //
-      if (dbexist==false) {
+      if (!(dbexist)) {
         printf("Creating/Update RSS/PODCAST for new rss feed\n");
         // thumbnail   = name of an local image file
         // commandline = Program to fetch content with
@@ -3170,13 +3174,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+
       // Erotic Audio
       if (check_rss_feed_exist(conn,(char *) "Erotic Audio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Erotic Audio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den sorte boks - podcast.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Erotic Audio','Erotic Audio',0,0,NULL,'https://feeds.buzzsprout.com/687557.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Erotic Audio','Erotic Audio',0,0,NULL,'https://feeds.buzzsprout.com/687557.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
@@ -3187,15 +3192,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-
-
       //
       if (check_rss_feed_exist(conn,(char *) "Den sorte boks - podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den sorte boks - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den sorte boks - podcast.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den sorte boks - podcast','Den sorte boks - podcast',0,0,NULL,'https://www.dr.dk/mu/feed/den-sorte-boks-podcast.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den sorte boks - podcast','Den sorte boks - podcast',0,0,NULL,'https://www.dr.dk/mu/feed/den-sorte-boks-podcast.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
@@ -3294,8 +3297,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-
-
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
@@ -3333,7 +3334,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-      get_antal_rss_feeds_sources(conn);
+      antalrss_feeds=get_antal_rss_feeds_sources(conn);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
@@ -3389,6 +3390,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
                 }
+                // tmpfilename is now the bame of the icon
                 strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
                 antal++;
               } else {
@@ -3407,78 +3409,80 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 }
                 // alloc new element in array
                 if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
-                stack[antal]->intnr=1;
-                if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-                if (getart==1) {
-                  // old ver used path from mysql
-                  //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                } else {
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                }
-                if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                // old ver
-                //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
-                switch(getart) {
-                  case 0: if (row[9]) strcpy(tmpfilename,row[9]);
-                          break;
-                  case 1: if (row[7]) strcpy(tmpfilename,row[7]);
-                          break;
-                  case 2: if (row[5]) strcpy(tmpfilename,row[5]);
-                          break;
-                }
-                // test antal afspillinger this 0 set som new rss
-                if (row[9]) {
-                  if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
-                }
-                if (strlen(tmpfilename)>7) {
-                  if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
-                    strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
-                    if (strlen(row[7])>10) {
-                      if (getart==1) {
-                        if (row[7]) strncat(tmpfilename,row[7]+10,100);
-                      }
-                      if (getart==2) {
-                        if (row[6]) strncat(tmpfilename,row[6]+10,100);
-                      }
-                    }
+                if (stack[antal]) {
+                  stack[antal]->intnr=1;
+                  if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                  if (getart==1) {
+                    // old ver used path from mysql
+                    //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   } else {
-                    // rss download
-                    // downloadfilename = name on file, from tmpfilename = full web url
-                    get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                    // check filename fro ? or = and replace to _
-                    strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                    int mmm=0;
-                    while(mmm<strlen(downloadfilename)) {
-                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                      mmm++;
-                    }
-                    strcpy(lasttmpfilename,tmpfilename);			              // husk file name
-                    // save file in  user homedir rss/
-                    getuserhomedir(homedir);                                  // get homedir
-                    strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
-                      // download gfx file and use as icon
-                      if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
-                        printf("Download error \n");
-                      } else strcpy(tmpfilename,"");
-                    }
-                    strcpy(tmpfilename,downloadfilenamelong);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   }
-                } else strcpy(tmpfilename,"");
-                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
-//                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                // no texture now
-                stack[antal]->textureId=0;
-                // opdatere group antal
-                if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
-                antal++;
+                  if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                  if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                  // old ver
+                  //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                  if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                  switch(getart) {
+                    case 0: if (row[9]) strcpy(tmpfilename,row[9]);
+                            break;
+                    case 1: if (row[7]) strcpy(tmpfilename,row[7]);
+                            break;
+                    case 2: if (row[5]) strcpy(tmpfilename,row[5]);
+                            break;
+                  }
+                  // test antal afspillinger this 0 set som new rss
+                  if (row[9]) {
+                    if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                  }
+                  if (strlen(tmpfilename)>7) {
+                    if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
+                      strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
+                      if (strlen(row[7])>10) {
+                        if (getart==1) {
+                          if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                        }
+                        if (getart==2) {
+                          if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                        }
+                      }
+                    } else {
+                      // rss download
+                      // downloadfilename = name on file, from tmpfilename = full web url
+                      get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                      // check filename fro ? or = and replace to _
+                      strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                      int mmm=0;
+                      while(mmm<strlen(downloadfilename)) {
+                        if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                        mmm++;
+                      }
+                      strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                      // save file in  user homedir rss/
+                      getuserhomedir(homedir);                                  // get homedir
+                      strcpy(downloadfilenamelong,homedir);
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      if (!(file_exists(downloadfilenamelong))) {
+                        if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                        // download gfx file and use as icon
+                        if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
+                          printf("Download error \n");
+                        } else strcpy(tmpfilename,"");
+                      }
+                      strcpy(tmpfilename,downloadfilenamelong);
+                    }
+                  } else strcpy(tmpfilename,"");
+                  strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+  //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
+                  if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                  // no texture now
+                  stack[antal]->textureId=0;
+                  // opdatere group antal
+                  if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
+                  antal++;
+                }
               }
             }
           }
@@ -3515,7 +3519,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 void *loadweb(void *data) {
   if (debugmode & 4) printf("Start web icon loader thread\n");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("Stop web icon loader thread\n");
+  if (debugmode & 4) printf("End/Stop web icon loader thread\n");
 }
 
 
@@ -3623,70 +3627,75 @@ void *load_all_stream_gfx(void *data) {
     strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
-        if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
-              mysql_query(conn,"set NAMES 'utf8'");
-              res1 = mysql_store_result(conn);
-              mysql_query(conn,sqlselect1);
-              res1 = mysql_store_result(conn);
-              if (res1) {
-                antal=0;
-                if (debugmode & 4) printf("Found : %40s ",row[1]);
-                nr=0;
-                while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                  antal++;
-                  strcpy(tmpfilename,row1[5]);
-                  if (stream_loadergfx_started_break) break;
-                  // http
-                  if (strncmp(tmpfilename,"http://",7)==0) {
-                    strcpy(lastfile,downloadfilename);
-                    get_webfilename(downloadfilename,tmpfilename);
-                    getuserhomedir(homedir);                                                  // get home dir
-                    strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    filechange=strcmp(lastfile,downloadfilename);
-                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                      nr++;
-                    } else {
-                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+    try {
+      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
+          if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
+                mysql_query(conn,"set NAMES 'utf8'");
+                res1 = mysql_store_result(conn);
+                mysql_query(conn,sqlselect1);
+                res1 = mysql_store_result(conn);
+                if (res1) {
+                  antal=0;
+                  if (debugmode & 4) printf("Found : %40s ",row[1]);
+                  nr=0;
+                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
+                    antal++;
+                    strcpy(tmpfilename,row1[5]);
+                    if (stream_loadergfx_started_break) break;
+                    // http
+                    if (strncmp(tmpfilename,"http://",7)==0) {
+                      strcpy(lastfile,downloadfilename);
+                      get_webfilename(downloadfilename,tmpfilename);
+                      getuserhomedir(homedir);                                                  // get home dir
+                      strcpy(downloadfilenamelong,homedir);
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      filechange=strcmp(lastfile,downloadfilename);
+                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                        nr++;
+                      } else {
+                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      }
+                      total_antal++;
+                    // https
+                    } else if (strncmp(tmpfilename,"https://",8)==0) {
+                      strcpy(lastfile,downloadfilename);
+                      get_webfilename(downloadfilename,tmpfilename);
+                      getuserhomedir(homedir);
+                      strcpy(downloadfilenamelong,homedir);                                   // get home dir
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      filechange=strcmp(lastfile,downloadfilename);
+                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                        nr++;
+                      } else {
+                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      }
+                      total_antal++;
                     }
-                    total_antal++;
-                  // https
-                  } else if (strncmp(tmpfilename,"https://",8)==0) {
-                    strcpy(lastfile,downloadfilename);
-                    get_webfilename(downloadfilename,tmpfilename);
-                    getuserhomedir(homedir);
-                    strcpy(downloadfilenamelong,homedir);                                   // get home dir
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    filechange=strcmp(lastfile,downloadfilename);
-                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                      nr++;
-                    } else {
-                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
-                    }
-                    total_antal++;
                   }
                 }
+                if (stream_loadergfx_started_break) break;
               }
-              if (stream_loadergfx_started_break) break;
-            }
-            if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
-            stream_loadergfx_started_break=false;
-        }
-        if (conn) mysql_close(conn);
+              if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
+              stream_loadergfx_started_break=false;
+          }
+          if (conn) mysql_close(conn);
+      }
+    }
+    catch (...) {
+      printf("Error open mysql connection.\n");
     }
     if (debugmode & 4) printf("End gfx thread loader\n ");
 }
