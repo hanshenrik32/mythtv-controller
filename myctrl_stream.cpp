@@ -3348,18 +3348,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           if (antal<maxantal) {
             stack[antal]=new (struct stream_oversigt_type);
             if (stack[antal]) {
-              strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
-              strcpy(stack[antal]->feed_desc,"");                           // desc
-              strcpy(stack[antal]->feed_path,"");                           // mythtv db path
-              strcpy(stack[antal]->feed_gfx_url,"");
-              strcpy(stack[antal]->feed_gfx_mythtv,"");
-              strcpy(stack[antal]->feed_streamurl,"");
-              stack[antal]->feed_group_antal=0;
-              stack[antal]->feed_path_antal=0;
-              stack[antal]->textureId=0;
-              stack[antal]->intnr=0;
-              stack[antal]->nyt=false;
+              strcpy(stack[antal]->feed_showtxt,"");          	        // show name
+              strcpy(stack[antal]->feed_name,"");		        // mythtv db feedtitle
+              strcpy(stack[antal]->feed_desc,"");                       // desc
+              strcpy(stack[antal]->feed_path,"");                       // mythtv db path
+              strcpy(stack[antal]->feed_gfx_url,"");			//
+              strcpy(stack[antal]->feed_gfx_mythtv,"");			//
+              strcpy(stack[antal]->feed_streamurl,"");			//
+              stack[antal]->feed_group_antal=0;				//
+              stack[antal]->feed_path_antal=0;				//
+              stack[antal]->textureId=0;				//
+              stack[antal]->intnr=0;					//
+              stack[antal]->nyt=false;					// New podcast ?
               // top level
               if (getart==0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
@@ -3979,3 +3979,4 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glPopMatrix();
     }
 }
+

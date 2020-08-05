@@ -5409,7 +5409,7 @@ void display() {
     if (do_save_setup_rss) {
       if (debugmode) fprintf(stderr,"Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
-      streamoversigt.loadrssfile(1);                                            // download rss files (())
+      streamoversigt.loadrssfile(1);                                            // download rss files (1=force all)
       do_save_setup_rss=false;
     }
     // do start movie player
