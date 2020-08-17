@@ -2143,7 +2143,7 @@ unsigned int do_playlist_restore_playlist() {
     MYSQL_RES *res,*res1,*res2;
     MYSQL_ROW row,row1;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    const char *database = (char *) "mythconverg";
     bool fundet;
     char playlistname[512];
     fprintf(stderr,"Restore music from playlist backup \n");
@@ -2233,7 +2233,7 @@ unsigned int do_playlist_backup_playlist() {
     MYSQL_RES *res,*res1,*res2,*res3;
     MYSQL_ROW row,row3;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    const char *database = (char *) "mythconverg";
     bool finish = false;
     char playlistname[256];
 //    GLuint textureId;
@@ -2442,7 +2442,7 @@ void display() {
     // uv color table
     static int tmpcounter=0;
     // fade colors (over time) for clock
-    float analogclock_color_table[]={1.0,1.0,1.0, \
+    const float analogclock_color_table[]={1.0,1.0,1.0, \
                                      0.8,0.8,0.8, \
                                      0.6,0.6,0.6, \
                                      0.4,0.4,0.4, \
@@ -2453,7 +2453,7 @@ void display() {
                                      0.8,0.8,0.8, \
                                      0.9,0.9,0.9, \
                                      1.0,1.0,1.0};
-    float uvcolortable[]={0.0,0.8,0.8, \
+    const float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
                           0.3,0.7,0.7, \
@@ -2468,7 +2468,7 @@ void display() {
                           0.9,0.0,0.0, \
                           0.9,0.0,0.0};
     // uv color table 2
-    float uvcolortable2[]={0.8,0.8,0.8, \
+    const float uvcolortable2[]={0.8,0.8,0.8, \
                           0.8,0.8,0.8, \
                           0.7,0.7,0.7, \
                           0.7,0.7,0.7, \
@@ -10140,16 +10140,13 @@ void update2(int value) {
   int n;
   char *code=0;
 
-  float MOVIE_CS;		// movie dvd cover side
-  float MUSIC_CS;		// music cd cover side
-  float RADIO_CS;		// radio cover size
   int numbers_film_covers_on_line;
   int numbers_cd_covers_on_line;
   int numbers_radio_covers_on_line;
   int numbers_stream_covers_on_line;
-  MOVIE_CS=46.0f;					// movie dvd cover side
-  MUSIC_CS=41.0;					// music cd cover side
-  RADIO_CS=41.0;					// radio cd cover side
+  const float MOVIE_CS=46.0f;					// movie dvd cover side
+  const float MUSIC_CS=41.0;					// music cd cover side
+  const float RADIO_CS=41.0;					// radio cd cover side
   numbers_cd_covers_on_line=8;        // 9
   numbers_film_covers_on_line=8;
   numbers_radio_covers_on_line=8;
@@ -13980,9 +13977,7 @@ int main(int argc, char** argv) {
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
     //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
-    printf("\n\nMythtv-controller Version ");
-    printf("%s",SHOWVER);
-    printf("\n");
+    printf("\n\nMythtv-controller Version %s \n",SHOWVER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
@@ -13994,7 +13989,13 @@ int main(int argc, char** argv) {
         printf("-r For radio mode\n");
         printf("-f For film mode\n");
         printf("-s For podcast mode\n");
+        printf("-v Show version\n");
         printf("-h This help screen\n\n");
+        exit(0);
+      }
+      // show version and exit
+      if (strcmp(argv[1],"-v")==0) {
+        printf("\n\nVersion %s \n",SHOWVER);
         exit(0);
       }
     }
@@ -14066,6 +14067,7 @@ int main(int argc, char** argv) {
 
     #ifdef ENABLE_TIDAL
     //tridal_oversigt.tridal_login_token();
+    // in use tridal_oversigt.tridal_login_token2
     tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
