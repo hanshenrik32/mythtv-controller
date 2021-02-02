@@ -11,6 +11,20 @@ const int feed_desclength=200;
 const int feed_pathlength=200;
 const int feed_url=400;
 
+
+// not in use for now.
+
+template<typename streamoversigt_type>
+struct Data {
+  Data(const std::size_t size)
+    : data(new streamoversigt_type[size]) {
+  }
+  ~Data() { delete [] data; }
+  streamoversigt_type *data;
+};
+
+
+
 struct stream_oversigt_type {
     char feed_showtxt[feed_namelength+1];			// show name
     char feed_name[feed_namelength+1];				// mythtv db feedtitle
@@ -29,7 +43,7 @@ struct stream_oversigt_type {
 class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
-        stream_oversigt_type *stack[maxantal];			                            // radio stack
+        stream_oversigt_type *stack[maxantal];			                            // radio stack array
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises

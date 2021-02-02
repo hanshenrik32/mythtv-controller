@@ -25,6 +25,8 @@ struct music_oversigt_type {
 
 
 // class tempplate to music oversigt;
+// not in use for now.
+
 
 template <class T> class list {
   public:
