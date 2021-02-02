@@ -2237,7 +2237,7 @@ int debug_callback(CURL *handle,curl_infotype type,char *data,size_t size,void *
 static void dump(const char *text,FILE *stream, unsigned char *ptr, size_t size) {
   size_t i;
   size_t c;
-  unsigned int width=0x10;
+  const unsigned int width=0x10;
 
   fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
           text, (long)size, (long)size);
@@ -2265,7 +2265,7 @@ static void dump(const char *text,FILE *stream, unsigned char *ptr, size_t size)
 
 
 //
-//
+// trace
 //
 
 static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp) {
@@ -2936,7 +2936,7 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythtvcontroller";
+    const char *database = (char *) "mythtvcontroller";
     bool online;
     int getart=0;
     bool loadstatus=true;
@@ -3126,7 +3126,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-  char *database = (char *) "mythtvcontroller";
+  const char *database = (char *) "mythtvcontroller";
   bool online;
   int getart=0;
   bool loadstatus=true;
@@ -3649,7 +3649,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-  char *database = (char *) "mythtvcontroller";
+  const char *database = (char *) "mythtvcontroller";
   bool online;
   int getart=0;
   int curl_error;
