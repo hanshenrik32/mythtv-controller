@@ -13,7 +13,7 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi11014linux.tar.gz
+FMODFILE   = fmodstudioapi20107linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -28,11 +28,13 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
+	#LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/ -name 'libfmod.so')
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
+	#LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
+	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86/ -name 'libfmod.so')
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -47,7 +49,6 @@ else
 	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
-
 
 
 OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
@@ -110,7 +111,7 @@ installsound:
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
 	ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
-	@echo "Done installing fmod32/64 version 4.44.41"
+	@echo "Done installing fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 
 
