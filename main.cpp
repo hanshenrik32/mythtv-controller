@@ -139,8 +139,6 @@ tridal_class tridal_oversigt;
 
 
 
-
-
 // struct used by keyboard config of functions keys
 
 struct configkeytype {
@@ -12904,7 +12902,8 @@ void *datainfoloader_spotify(void *data) {
 void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
-    if (spotify_oversigt.spotify_get_user_id()!=0) {
+    // check if spotify user info is loaded.
+    if ((spotify_oversigt.spotify_get_user_id()==200) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
@@ -12919,7 +12918,8 @@ void *webupdate_loader_spotify(void *data) {
       // get user playlists
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();    // update the decice list
+      // update the playback device list
+      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       // update view from db
       spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
     }

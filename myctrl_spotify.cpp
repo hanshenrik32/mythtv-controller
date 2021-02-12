@@ -2578,6 +2578,7 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
 // get user id from spotify api
 //
 // return 0 if fault
+// 200  on ok
 //
 // ****************************************************************************************
 
