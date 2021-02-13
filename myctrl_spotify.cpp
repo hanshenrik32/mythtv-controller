@@ -728,7 +728,6 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
     char downloadfilenamelong[2048];
     MYSQL_RES *res;
     MYSQL_ROW row;
-    char *database = (char *) "mythtvcontroller";
     char tempstring[1024];
     char sql[8192];
     bool debug_json=false;
@@ -795,21 +794,26 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           strcpy(playlistname,value->u.string.ptr);
           playlistexist=false;
           sprintf(sql,"select id from mythtvcontroller.spotifycontentplaylist where playlistname like '%s' limit 1", playlistname );
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              playlistexist=true;
-            }
-          }
-          // if not exist create playlist
-          if (!(playlistexist)) {
-            //printf("Song name insert : %s \n", playlistname );
-            sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
+          try {
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                playlistexist=true;
+              }
+            }
+            // if not exist create playlist
+            if (!(playlistexist)) {
+              //printf("Song name insert : %s \n", playlistname );
+              sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+            }
+            playlist_process_name=false;
           }
-          playlist_process_name=false;
+          catch (...) {
+            fprintf(stdout,"Error update mysql playlist db.\n");
+          }
         }
         break;
       case json_boolean:
@@ -3862,6 +3866,7 @@ char *spotify_class::get_active_spotify_device_name() {
 
 // ****************************************************************************************
 //
+// Select device to play on
 //
 // ****************************************************************************************
 
