@@ -282,14 +282,18 @@ int tridal_class::tridal_login_token2() {
   // https://api.tidalhifi.com/v1/login/username?token=kgsOOmYk3zShYrNP
 //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
   // org
-  sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=emailadresse&password=passwordhere > tridal_access_token.txt");
-
-  int curl_error=system(sql);
-  if (curl_error==0) {
-    //curl_error=system(sed);
+  try {
+    sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=emailadresse&password=passwordhere > tridal_access_token.txt");
+    int curl_error=system(sql);
     if (curl_error==0) {
+      //curl_error=system(sed);
+      if (curl_error==0) {
+      }
+      fprintf(stdout,"\n******** Got token ********\n");
     }
-    fprintf(stdout,"\n******** Got token ********\n");
+  }
+  catch (...) {
+    fprintf(stdout,"Error on system call.\n");
   }
 }
 
@@ -730,7 +734,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
           if (tridal_playlistantal_loaded==0) {
             system("cat tidal_users_playlist.json | grep total | tail -1 | awk {'print $3'} > tidal_users_playlist_antal.txt");
             json_file = fopen("tidal_users_playlist_antal.txt", "r");
-            fscanf(json_file, "%s", temptxt);            
+            fscanf(json_file, "%s", temptxt);
             if (strcmp(temptxt,"")!=0) tridal_oversigt.tridal_playlist_antal = atoi(temptxt);
             else tridal_oversigt.tridal_playlist_antal = 0;
             fclose(json_file);
@@ -809,31 +813,36 @@ int tridal_class::tridal_do_we_play() {
   struct curl_slist *chunk = NULL;
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
-  CURL *curl = curl_easy_init();
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
-    /* Add a custom header */
-    chunk = curl_slist_append(chunk, "Accept: application/json");
-    chunk = curl_slist_append(chunk, "Content-Type: application/json");
-    chunk = curl_slist_append(chunk, auth_kode);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-    res = curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+  try {
+    CURL *curl = curl_easy_init();
+    if (curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player");
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+      /* Add a custom header */
+      chunk = curl_slist_append(chunk, "Accept: application/json");
+      chunk = curl_slist_append(chunk, "Content-Type: application/json");
+      chunk = curl_slist_append(chunk, auth_kode);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+      res = curl_easy_perform(curl);
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      if (httpCode == 200) {
+        //printf("%s \n", response_string.c_str());
+        //printf("resp length %d \n",response_string.length());
+        value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+        //process_value_playinfo(value, 0,0);                                                     // fill play info
+        json_value_free(value);                                                                 // json clean up
+      }
     }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    if (httpCode == 200) {
-      //printf("%s \n", response_string.c_str());
-      //printf("resp length %d \n",response_string.length());
-      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
-      //process_value_playinfo(value, 0,0);                                                     // fill play info
-      json_value_free(value);                                                                 // json clean up
-    }
+  }
+  catch (...) {
+    fprintf(stdout,"Error on system curl call.\n");
   }
   return(httpCode);
 }
@@ -853,7 +862,12 @@ int tridal_class::tridal_pause_play() {
   int curl_error;
   char call[4096];
   sprintf(call,"curl -f -X PUT 'https://api.tidal.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",tidaltoken);
-  curl_error=system(call);
+  try {
+    curl_error=system(call);
+  }
+  catch (...) {
+    fprintf(stdout,"Error on system call.\n");
+  }
   if (curl_error!=0) {
     return 1;
   }
@@ -878,26 +892,31 @@ int tridal_class::tridal_pause_play2() {
   struct curl_slist *chunk = NULL;
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
-  CURL *curl = curl_easy_init();
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player/pause");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
-    /* Add a custom header */
-    chunk = curl_slist_append(chunk, "Accept: application/json");
-    chunk = curl_slist_append(chunk, "Content-Type: application/json");
-    chunk = curl_slist_append(chunk, auth_kode);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-    res = curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+  try {
+    CURL *curl = curl_easy_init();
+    if (curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/me/player/pause");
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+      /* Add a custom header */
+      chunk = curl_slist_append(chunk, "Accept: application/json");
+      chunk = curl_slist_append(chunk, "Content-Type: application/json");
+      chunk = curl_slist_append(chunk, auth_kode);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+      res = curl_easy_perform(curl);
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      if (httpCode == 200) {
+      }
     }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    if (httpCode == 200) {
-    }
+  }
+  catch (...) {
+    fprintf(stdout,"Error on system curl call.\n");
   }
 }
 
