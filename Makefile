@@ -110,7 +110,7 @@ installsound:
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
-	ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+	ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.12
 	@echo "Done installing fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 
