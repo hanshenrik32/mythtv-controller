@@ -247,6 +247,8 @@ int recorded_overigt::opdatere_recorded_oversigt() {
 
 // ****************************************************************************************
 //
+// bitmap font
+//
 // ****************************************************************************************
 
 
@@ -261,7 +263,7 @@ void myglprint3(char *string)
 
 // ****************************************************************************************
 //
-//
+// glut print func
 //
 // ****************************************************************************************
 
@@ -280,274 +282,15 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
       glPopMatrix();
 }
 
+
+
 // ****************************************************************************************
+//
+// In use
 //
 // Viser recorded programer
 // valgtnr= den valgte som skal vises med mark
 // subvalgtnr = den valgte som skal vises i under liste
-//
-// ****************************************************************************************
-
-void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
-    static GLuint texture=0;
-    unsigned int i=0;
-    int ii,iii;
-    unsigned int startofset=0;
-    unsigned int substartofset=0;
-    float glprintyofset=0.0f;
-    float screen_zofset;
-    char title[128];
-    char subtitle[128];
-    char startdato[40];
-    char slutdato[40];
-    char desc[200];			// desc
-    float yofset=0.5f;
-    float yof=0.0f;
-    char temptxt[256];
-    char temptxt1[256];
-    if (valgtnr>10) {
-      startofset=valgtnr-10;
-      valgtnr=10;
-    } else startofset=0;
-    switch(screen_size) {
-        case 0: screen_zofset=0;
-                break;
-        case 1: screen_zofset=0;
-                break;
-        case 2: screen_zofset=-5;
-                break;
-        case 3: screen_zofset=-1;
-                break;
-    }
-    // box2
-    glLoadIdentity();
-    glTranslatef(-2.0f, 4.0f,-15.0f+screen_zofset);
-    glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,_textureId23);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1, 2.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1, -4.5f, 0.0);
-    glEnd(); //End quadrilateral coordinates
-    // box3
-    glLoadIdentity();
-    glTranslatef(3.5f, 4.0f,-15.0f+screen_zofset);
-    glEnable(GL_TEXTURE_2D);
-    //glBlendFunc(GL_ONE, GL_ONE);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,_textureId24);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glTexCoord2f(0.0, 0.0); glVertex3f(-6, -4.5f, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-6, 2.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(1, 2.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(1, -4.5f, 0.0);
-    glEnd(); //End quadrilateral coordinates
-    // box1
-    glLoadIdentity();
-    glTranslatef(-3.0f, -2.7f,-15.0f+screen_zofset);
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D,_textureId22);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    glTexCoord2f(0.0, 0.0); glVertex3f(-5, -2.5, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-5, 1.5, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(7, 1.5, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(7, -2.5, 0.0);
-    glEnd(); //End quadrilateral coordinates
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
-        recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc);
-        if (i+startofset==valgtnr+startofset) {
-          glLoadIdentity();
-          glColor3f(0.0f, 0.0f, 1.0f);
-          glTranslatef(-7.8f, 5.1f+yof,-14.9f+screen_zofset);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          glVertex3f(-0.0f, -0.2f, 0.0f);
-          glVertex3f(-0.0f, 0.3f, 0.0f);
-          glVertex3f(4.5f, 0.3f, 0.0f);
-          glVertex3f(4.5f, -0.2f, 0.0f);
-          glEnd(); //End quadrilateral coordinates
-        }
-        glLoadIdentity();
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(-7.7f, 5.0f+yof,-14.8f+screen_zofset);
-        glRasterPos2f(0.0f, 0.0f);
-        strcpy(temptxt,title);
-        if ((i+startofset)==valgtnr+startofset) {
-          temptxt[25]=0;
-          glScalef(0.25f, 0.25f, 0.25f);
-          glcRenderString(temptxt);
-        } else {
-          temptxt[28]=0;
-          glScalef(0.2f, 0.2f, 0.2f);
-          glcRenderString(temptxt);
-        }
-        i++;
-        yof-=yofset;
-    }
-    yof=0;
-    i=0;
-    if (subvalgtnr>10) {
-      substartofset=subvalgtnr-10;
-      subvalgtnr=10;
-    } else substartofset=0;
-
-    while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
-        recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);
-        if (i+substartofset==subvalgtnr+substartofset) {
-          glLoadIdentity();
-          glColor3f(0.0f, 0.0f, 1.0f);
-          glTranslatef(-1.7f, 5.1f+yof,-14.9f+screen_zofset);
-          glBegin(GL_QUADS); //Begin quadrilateral coordinates
-          glVertex3f(-0.5, -0.2, 0.0);
-          glVertex3f(-0.5, 0.3, 0.0);
-          glVertex3f(5.9, 0.3, 0.0);
-          glVertex3f(5.9, -0.2, 0.0);
-          glEnd(); //End quadrilateral coordinates
-        }
-        glLoadIdentity();
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(-2.1f, 5.0f+yof,-14.8f+screen_zofset);
-        glRasterPos2f(0.0f, 0.0f);
-        strcpy(temptxt,subtitle);
-        if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);		// Hvis der ikke er nogle subtitle bruge description i stedet
-        temptxt[26]=0;
-        if (i+substartofset==subvalgtnr+substartofset) {
-          glScalef(0.25f, 0.25f, 0.25f);
-          glcRenderString(temptxt);
-        } else {
-          glScalef(0.2f, 0.2f, 0.2f);
-          glcRenderString(temptxt);
-        }
-        i++;
-        yof-=yofset;
-    }
-    recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc);
-    glLoadIdentity();
-    glTranslatef(-4.0f, -2.0f,-14.8f+screen_zofset);
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(0.25f, 0.25f, 0.25f);
-    glcRenderString("Date...:");
-    strcpy(temptxt,startdato);
-    temptxt[10]=0;
-    glcRenderString(temptxt);
-    strcpy(temptxt,startdato+11);
-    temptxt[5]=0;
-    glcRenderString(" KL.:");
-    glcRenderString(temptxt);
-    static time_t tm;				// this time (now)
-    struct tm *nutid;
-    struct tm prgstarttid;
-    struct tm prgsluttid;
-    char dagsdag[40];
-    tm=time(0);				// get time
-    nutid=localtime(&tm);
-    strftime(dagsdag, 40, "%Y-%m-%d %H:%M:%S", nutid );
-    strptime(startdato,"%Y-%m-%d %H:%M:%S",&prgstarttid);
-    strptime(slutdato,"%Y-%m-%d %H:%M:%S",&prgsluttid);
-    prgstarttid.tm_isdst=1;
-    prgsluttid.tm_isdst=1;
-    time_t st=mktime(&prgstarttid);
-    time_t et=mktime(&prgsluttid);
-    if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
-      glColor3f(1.0f, 0.0f, 0.0f);
-      glScalef(0.2f, 0.2f, 0.2f);
-      glcRenderString((char *) "Recording");
-    }
-    recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr].get_recorded_filepath(temptxt1);
-    strcat(temptxt1,".png");
-    strcpy(temptxt,temptxt1);
-    // check local paths
-    if (!(file_exists(temptxt))) {
-      strcpy(temptxt,"~/.mythtv/remotecache/");
-      strcat(temptxt,temptxt1);
-      //printf("Not found. Check %s \n",temptxt);
-    }
-    if (file_exists(temptxt)) {
-      glLoadIdentity();
-      glTranslatef(-5.9f, -3.5f,-14.8f+screen_zofset);
-      glRotatef(0.0f, 0.0f,0.0f, 0.0f);
-      glEnable(GL_BLEND);
-      glDisable(GL_DEPTH_TEST);
-      glBlendFunc(GL_DST_COLOR, GL_ZERO);
-      glEnable(GL_TEXTURE_2D);
-      //glBindTexture(GL_TEXTURE_2D, _textureId25);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0.0, 0.0); glVertex3f(-1.55f, -1.2f, 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(-1.55f, 1.2f, 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(1.55f, 1.2f, 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(1.55f, -1.2f, 0.0);
-      glEnd(); //End quadrilateral coordinates
-      if ((texture) && (reset_recorded_texture)) {
-        reset_recorded_texture=false;				// load kun texture 1 gang
-        glDeleteTextures (1, &texture);
-        texture=0;
-      }
-      if (!(texture)) texture=loadTexture(temptxt);
-      glLoadIdentity();
-      glTranslatef(-5.9f, -3.5f,-14.8f+screen_zofset);
-      glRotatef(0.0f, 0.0f,0.0f, 0.0f);
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE,GL_ONE);
-      glBindTexture(GL_TEXTURE_2D,texture);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); //Begin quadrilateral coordinates
-      glTexCoord2f(0.0, 0.0); glVertex3f(-1.55f, -1.2f, 0.0);
-      glTexCoord2f(0.0, 1.0); glVertex3f(-1.55f, 1.2f, 0.0);
-      glTexCoord2f(1.0, 1.0); glVertex3f(1.55f, 1.2f, 0.0);
-      glTexCoord2f(1.0, 0.0); glVertex3f(1.55f, -1.2f, 0.0);
-      glEnd(); //End quadrilateral coordinates
-    }
-    glDisable(GL_TEXTURE_2D);
-    ii=0;
-    iii=0;
-    while (ii<(int) strlen((char *) desc)) {
-      // check max linie længe
-      if (iii<41)  {
-        temptxt[iii]=desc[ii];
-        temptxt[iii+1]=0;
-        iii++;
-        ii++;
-      } else {
-        glLoadIdentity();
-        glTranslatef(-4.1f, -2.6f+glprintyofset,-14.8f+screen_zofset);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(0.32f, 0.32f, 0.32f);
-        glcRenderString(temptxt);
-        temptxt[0]=0;
-        iii=0;
-        glprintyofset-=0.3;
-      }
-    }
-    // er der mere tekst
-    if (iii>0) {
-      glLoadIdentity();
-      glTranslatef(-4.1f, -2.6f+glprintyofset,-14.8f+screen_zofset);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(0.32f, 0.32f, 0.32f);
-      glcRenderString(temptxt);
-    }
-    //printf("valgtnr=%d subvalgtnr=%d antal= %d \n ",valgtnr,subvalgtnr,recordoversigt.top_antal());
-}
-
-
-
-// ****************************************************************************************
 //
 // ****************************************************************************************
 
