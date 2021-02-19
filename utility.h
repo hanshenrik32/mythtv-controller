@@ -8,4 +8,6 @@ int getuserhomedir(char *homedir);
 int check_zerro_bytes_file(char *filename);
 unsigned int hourtounixtime(int hour);
 
+void write_logfile(char *logentry);
+
 #endif

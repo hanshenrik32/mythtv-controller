@@ -77,7 +77,7 @@ binary:
 	@unzip -n mongoose-master -d debian/mythtv-controller/opt/mythtv-controller/
 	@tar -zxvf json-parser.tar.gz -C debian/mythtv-controller/opt/mythtv-controller/ json-parser/json.c json-parser/json.h
 	@if [ -L debian/mythtv-controller/usr/lib/libfmod.so.12 ]; then rm debian/mythtv-controller/usr/lib/libfmod.so.12; fi
-	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.12
+	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmod.so debian/mythtv-controller/usr/lib/libfmod.so.12
 	@chown root:root -R debian/mythtv-controller/opt/mythtv-controller/fmodstudioapi20107linux/*
 	# create random password
 	#PASSWDDB="$(openssl rand -base64 12)"
