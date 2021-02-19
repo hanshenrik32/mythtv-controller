@@ -1031,7 +1031,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     bool cerror;
     struct timeval tv;
     fd_set myset;
-    if (debugmode & 1) printf(" ********************************** Check radio stations *****************************************************\n");
+    write_logfile("Check radio stations.");
     if (check_radio_online_switch) {
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
@@ -1058,11 +1058,11 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 error=(init_sockaddr(&servername,ipadresse,port));
                 if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
                   if (cerror==0) {
-                    if (debugmode & 1) fprintf(stderr," Station OK. \n ");
+                    write_logfile("Station OK.");
                     radiook=true;
                   } else radiook=false;
                 } else {
-                  if (debugmode & 1) fprintf(stderr," Station BAD. \n ");
+                  write_logfile("Station BAD.");
                   radiook=false;
                 }
                 close (sock);

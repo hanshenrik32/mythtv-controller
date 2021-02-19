@@ -3306,10 +3306,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
-    if (debugmode & 4) {
-      printf("loading rss/stream data.\n");
-      printf("art = %s tpath = %s \n",art,fpath);
-    }
+    write_logfile("loading rss/stream data.");
+    //printf("art = %s tpath = %s \n",art,fpath);
     // find records after type to find
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
@@ -3330,7 +3328,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       getart=2;
     }
     this->type=getart;					// husk sql type
-    if (debugmode & 4) printf("RSS stream loader started... \n");
+    write_logfile("RSS stream loader started.");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -3489,7 +3487,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         mysql_close(conn);
       } else {
-        if (debugmode & 4) printf("No stream data loaded \n");
+        write_logfile("No stream data loaded.");
       }
       //load_stream_gfx();
       //
@@ -3503,7 +3501,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) printf("RSS/PODCAST loader done... \n");
+    write_logfile("RSS/PODCAST loader done.");
     return(0);
 }
 
@@ -3517,9 +3515,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 void *loadweb(void *data) {
-  if (debugmode & 4) printf("Start web icon loader thread\n");
+  write_logfile("Start web icon loader thread.");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("End/Stop web icon loader thread\n");
+  write_logfile("End/Stop web icon loader thread.");
 }
 
 
@@ -3540,7 +3538,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
-  if (debugmode & 4) printf("rss stream gfx download start \n");
+  write_logfile("rss stream gfx download start.");
   while(nr<antal) {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
@@ -3587,8 +3585,8 @@ int stream_class::loadweb_stream_iconoversigt() {
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
-    if (gfx_loaded) printf("rss stream gfx download end ok. \n");
-    else printf("rss stream gfx download error. \n");
+    if (gfx_loaded) write_logfile("rss stream gfx download end.");
+    else write_logfile("rss stream gfx download error.");
   }
   return(1);
 }
@@ -3622,7 +3620,7 @@ void *load_all_stream_gfx(void *data) {
     int antal=0;
     int total_antal=0;
     int nr;
-    if (debugmode & 4) printf("Start gfx thread loader\n ");
+    write_logfile("Start gfx thread loader.");
     strcpy(lastfile,"");
     strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
@@ -3633,7 +3631,7 @@ void *load_all_stream_gfx(void *data) {
           res = mysql_store_result(conn);
           mysql_query(conn,sqlselect);
           res = mysql_store_result(conn);
-          if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
+          write_logfile("Loading RSS gfx.");
           if (res) {
               while ((row = mysql_fetch_row(res)) != NULL) {
                 sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
@@ -3697,7 +3695,7 @@ void *load_all_stream_gfx(void *data) {
     catch (...) {
       printf("Error open mysql connection.\n");
     }
-    if (debugmode & 4) printf("End gfx thread loader\n ");
+    write_logfile("End gfx thread loader.");
 }
 
 
@@ -3979,4 +3977,3 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glPopMatrix();
     }
 }
-

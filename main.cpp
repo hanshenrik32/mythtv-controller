@@ -880,6 +880,14 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
 
 
 
+
+// ***********************************************************
+//
+// error handler
+//
+// ***********************************************************
+
+
 void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
@@ -888,7 +896,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr) {
   }
   vis_error=1;			// vis error
   if (strcmp(text,"music parameter was NULL")==0) vis_error_flag=36;
-  vis_error = true;			// set vis error falg
+  vis_error = true;			            // set vis error falg
   do_zoom_radio = false;            // close play info
   vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
   vis_error_timeout=ERROR_TIMEOUT;
@@ -2550,7 +2558,7 @@ void display() {
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
-      if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
+      write_logfile("start timer xmltvguide update process.");
       lasttoday = today;                                                          // rember last update
       do_update_xmltv = true;                                                     // do update tvguide
       do_update_xmltv_show = true;                                                // show we are updating
@@ -2560,7 +2568,7 @@ void display() {
     // update interval
     // set in main.h
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
-      if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
+      write_logfile("start timer rss update process.");
       lasttoday = today;                                                          // rember last update
       do_update_rss = true;                                                       // do update rss
       do_update_rss_show = true;                                                  // show we are updating rss
@@ -2570,7 +2578,7 @@ void display() {
     // do the update from spotify
     //
     if ((do_update_spotify_playlist) && ((do_update_rss==false) && (do_update_xmltv==false))) {
-      if (debugmode & 4) printf("Start spotify update thread\n");
+      write_logfile("Start spotify update thread");
       update_spotifyonline_phread_loader();                                     // start thread loader
       do_update_spotify_playlist=false;
     }
@@ -14196,8 +14204,9 @@ int main(int argc, char** argv) {
     //strcat(overskrift,overskrift1);
     glutCreateWindow (overskrift);
     init();                                           // init gopengl
+    write_logfile("Loading init graphic.");
     loadgfx();                                        // load gfx stuf
-    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
+    if (full_screen) write_logfile("Enter full screen mode.");
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
@@ -14224,6 +14233,7 @@ int main(int argc, char** argv) {
     // start main loop now
     // start main loop now
     glutMainLoop();
+    write_logfile("Close down exit.");
     #if defined USE_FMOD_MIXER
     result=sound->release();
     ERRCHECK(result,0);

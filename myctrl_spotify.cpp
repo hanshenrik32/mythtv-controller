@@ -174,7 +174,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           curl_error=system(sed);
           if (curl_error==0) {
           }
-          fprintf(stdout,"\n******** Got token ********\n");
+          write_logfile("******** Got spotify token ********");
           tokenfile=fopen("spotify_access_token2.txt","r");
           error=getline(&file_contents,&len,tokenfile);
           strcpy(token_string,file_contents);
@@ -350,7 +350,7 @@ spotify_class::spotify_class() : antal(0) {
     // create web server
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
-    fprintf(stdout,"Starting web server on port %s\n", s_http_port);
+    write_logfile("Starting web server on port 80");
     this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->c);                                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
@@ -443,7 +443,7 @@ int spotify_class::spotify_refresh_token() {
     try {
       curl_error=system(doget);
       if (WEXITSTATUS(curl_error)==0) {
-        fprintf(stdout,"Ok Spotify new token. ");
+        write_logfile("Ok Spotify new token.");
         tokenfil=fopen("spotify_refresh_token.txt","rt");
         if (tokenfil) {
           fgets(data,4096,tokenfil);
@@ -457,7 +457,7 @@ int spotify_class::spotify_refresh_token() {
           fclose(tokenfil);
         }
       } else {
-        fprintf(stdout,"Error Spotify renew token.\n");
+        write_logfile("Error Spotify renew token.");
       }
     }
     catch (...) {
@@ -537,7 +537,7 @@ int spotify_class::spotify_refresh_token2() {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
     if (httpCode == 200) {
-      fprintf(stdout,"Spotify new token. \n");
+      write_logfile("Spotify new token.");
       //printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
@@ -545,7 +545,7 @@ int spotify_class::spotify_refresh_token2() {
       if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
-        fprintf(stdout,"Token valid.\n");
+        write_logfile("Spotify token valid.");
         strcpy(spotifytoken,newtoken);                                         // update spotify token
       }
     } else {
@@ -812,7 +812,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
             playlist_process_name=false;
           }
           catch (...) {
-            fprintf(stdout,"Error update mysql playlist db.\n");
+            write_logfile("Error update mysql playlist db.");
           }
         }
         break;
@@ -900,7 +900,7 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
     if (httpCode == 200) {
-      fprintf(stdout,"Download ok code 200. \n");
+      write_logfile("Download ok code 200");
       //printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
@@ -954,7 +954,7 @@ bool spotify_class::spotify_check_spotifydb_empty() {
     }
   }
   catch (...) {
-    fprintf(stdout,"Error use mysql\n");
+    write_logfile("Error use mysql");
   }
   return(dbexist);
 }
@@ -1015,21 +1015,21 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (dbexist==false) {
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
-          fprintf(stdout,"mysql create table error.\n");
+          write_logfile("mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify songs)
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
-          fprintf(stdout,"mysql create table error.\n");
+          write_logfile("mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify playlists)
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
-          fprintf(stdout,"mysql create table error.\n");
+          write_logfile("mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
@@ -1084,14 +1084,14 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           }
           if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
         }
-        if (remove("spotify_users_playlist.txt")!=0) fprintf(stdout,"Error remove user playlist file spotify_users_playlist.txt\n");
+        if (remove("spotify_users_playlist.txt")!=0) write_logfile("Error remove user playlist file spotify_users_playlist.txt");
         // save data to mysql db
       } else {
-          fprintf(stdout,"Error downloading user playlist");
+          write_logfile("Error downloading user playlist");
           exit(0);
       }
       sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
-      fprintf(stdout,"process playlist ...... \n");
+      write_logfile("process playlist ......");
       mysql_query(conn,sql);
       res = mysql_store_result(conn);
       if (res) {
@@ -1102,12 +1102,12 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           }
         }
       }
-      fprintf(stdout,"process playlist done.. \n");
+      write_logfile("process playlist done..");
       mysql_close(conn);
     }
   }
   catch (...) {
-    fprintf(stdout,"Error process playlist\n");
+    write_logfile("Error process playlist");
   }
   return(1);
 }
@@ -1512,21 +1512,21 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         if (dbexist==false) {
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            fprintf(stdout,"mysql create table error.\n");
+            write_logfile("mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify songs)
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            fprintf(stdout,"mysql create table error.\n");
+            write_logfile("mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify playlists)
           sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
-            fprintf(stdout,"mysql create table error.\n");
+            write_logfile("mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
           }
           // create db if not exist
