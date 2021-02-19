@@ -58,8 +58,8 @@ bool stream_jump = false;
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
-#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod.hpp"
-#include "/opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/inc/fmod_errors.h"
+#include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod_errors.h"
 #endif
 
 #include "mongoose-master/mongoose.h"
@@ -136,8 +136,6 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 #ifdef ENABLE_TIDAL
 tridal_class tridal_oversigt;
 #endif
-
-
 
 
 
@@ -882,6 +880,14 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
 
 
 
+
+// ***********************************************************
+//
+// error handler
+//
+// ***********************************************************
+
+
 void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
@@ -890,7 +896,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr) {
   }
   vis_error=1;			// vis error
   if (strcmp(text,"music parameter was NULL")==0) vis_error_flag=36;
-  vis_error = true;			// set vis error falg
+  vis_error = true;			            // set vis error falg
   do_zoom_radio = false;            // close play info
   vis_error_songnr=songnr;          // gem fil navn som ikke kan spilles
   vis_error_timeout=ERROR_TIMEOUT;
@@ -2143,7 +2149,7 @@ unsigned int do_playlist_restore_playlist() {
     MYSQL_RES *res,*res1,*res2;
     MYSQL_ROW row,row1;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    const char *database = (char *) "mythconverg";
     bool fundet;
     char playlistname[512];
     fprintf(stderr,"Restore music from playlist backup \n");
@@ -2233,7 +2239,7 @@ unsigned int do_playlist_backup_playlist() {
     MYSQL_RES *res,*res1,*res2,*res3;
     MYSQL_ROW row,row3;
     // mysql stuf
-    char *database = (char *) "mythconverg";
+    const char *database = (char *) "mythconverg";
     bool finish = false;
     char playlistname[256];
 //    GLuint textureId;
@@ -2442,7 +2448,7 @@ void display() {
     // uv color table
     static int tmpcounter=0;
     // fade colors (over time) for clock
-    float analogclock_color_table[]={1.0,1.0,1.0, \
+    const float analogclock_color_table[]={1.0,1.0,1.0, \
                                      0.8,0.8,0.8, \
                                      0.6,0.6,0.6, \
                                      0.4,0.4,0.4, \
@@ -2453,7 +2459,7 @@ void display() {
                                      0.8,0.8,0.8, \
                                      0.9,0.9,0.9, \
                                      1.0,1.0,1.0};
-    float uvcolortable[]={0.0,0.8,0.8, \
+    const float uvcolortable[]={0.0,0.8,0.8, \
                           0.2,0.8,0.8, \
                           0.3,0.7,0.7, \
                           0.3,0.7,0.7, \
@@ -2468,7 +2474,7 @@ void display() {
                           0.9,0.0,0.0, \
                           0.9,0.0,0.0};
     // uv color table 2
-    float uvcolortable2[]={0.8,0.8,0.8, \
+    const float uvcolortable2[]={0.8,0.8,0.8, \
                           0.8,0.8,0.8, \
                           0.7,0.7,0.7, \
                           0.7,0.7,0.7, \
@@ -2552,7 +2558,7 @@ void display() {
     // update interval
     // set in main.h
     if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
-      if (debugmode) fprintf(stdout,"start timer xmltvguide update process.\n");
+      write_logfile("start timer xmltvguide update process.");
       lasttoday = today;                                                          // rember last update
       do_update_xmltv = true;                                                     // do update tvguide
       do_update_xmltv_show = true;                                                // show we are updating
@@ -2562,7 +2568,7 @@ void display() {
     // update interval
     // set in main.h
     if (((lasttoday+(dorssupdateinterval)<today) && (do_update_rss==false)) || (firsttime_rssupdate)) {
-      if (debugmode & 4) fprintf(stdout,"start timer rss update process.\n");
+      write_logfile("start timer rss update process.");
       lasttoday = today;                                                          // rember last update
       do_update_rss = true;                                                       // do update rss
       do_update_rss_show = true;                                                  // show we are updating rss
@@ -2572,7 +2578,7 @@ void display() {
     // do the update from spotify
     //
     if ((do_update_spotify_playlist) && ((do_update_rss==false) && (do_update_xmltv==false))) {
-      if (debugmode & 4) printf("Start spotify update thread\n");
+      write_logfile("Start spotify update thread");
       update_spotifyonline_phread_loader();                                     // start thread loader
       do_update_spotify_playlist=false;
     }
@@ -4120,7 +4126,7 @@ void display() {
     // ******************************************************************************************************************
     // ******************************************************************************************************************
     // ******************************************************************************************************************
-    // vis vi player music
+    // show we player music
     if ((vis_music_oversigt) && (!(visur))) {
       // spiller vi en sang vis status info i 3d   (do_play_music_aktiv=1 hvis der er status vindow
       if (do_zoom_music_cover) {
@@ -4787,7 +4793,7 @@ void display() {
     }
     //
     // *************** RADIO stuf *******************************************************************************
-    // show player
+    // show radio player
     if (!(visur)) {
       if (vis_radio_oversigt) {
         // show playing radio station
@@ -5369,11 +5375,11 @@ void display() {
                 case 14:
                         glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
                         glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot)
-                break;
+                        break;
                 default:
                         glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
                         glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
-                break;
+                        break;
             }
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+1250 +(qq*6),  120+4 -uvyypos, 0.0);
@@ -5402,11 +5408,14 @@ void display() {
       //freegfx();                                                                // free gfx loaded
       //loadgfx();                                                                // reload all menu + icon gfx
     }
+    //
+    // show update if rss podcast
     // update rss db
+    //
     if (do_save_setup_rss) {
       if (debugmode) fprintf(stderr,"Saving rssdb to mysql\n");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
-      streamoversigt.loadrssfile(1);                                            // download rss files (())
+      streamoversigt.loadrssfile(1);                                            // download rss files (1=force all)
       do_save_setup_rss=false;
     }
     // do start movie player
@@ -10137,16 +10146,13 @@ void update2(int value) {
   int n;
   char *code=0;
 
-  float MOVIE_CS;		// movie dvd cover side
-  float MUSIC_CS;		// music cd cover side
-  float RADIO_CS;		// radio cover size
   int numbers_film_covers_on_line;
   int numbers_cd_covers_on_line;
   int numbers_radio_covers_on_line;
   int numbers_stream_covers_on_line;
-  MOVIE_CS=46.0f;					// movie dvd cover side
-  MUSIC_CS=41.0;					// music cd cover side
-  RADIO_CS=41.0;					// radio cd cover side
+  const float MOVIE_CS=46.0f;					// movie dvd cover side
+  const float MUSIC_CS=41.0;					// music cd cover side
+  const float RADIO_CS=41.0;					// radio cd cover side
   numbers_cd_covers_on_line=8;        // 9
   numbers_film_covers_on_line=8;
   numbers_radio_covers_on_line=8;
@@ -12904,10 +12910,12 @@ void *datainfoloader_spotify(void *data) {
 void *webupdate_loader_spotify(void *data) {
   if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
-    if (spotify_oversigt.spotify_get_user_id()) {
+    // check if spotify user info is loaded.
+    if ((spotify_oversigt.spotify_get_user_id()==200) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
+      // you have to call clean_spotify_oversigt after earch spodify_get_playlist
       spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
@@ -12919,7 +12927,8 @@ void *webupdate_loader_spotify(void *data) {
       // get user playlists
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();    // update the decice list
+      // update the playback device list
+      spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       // update view from db
       spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
     }
@@ -13977,9 +13986,7 @@ int main(int argc, char** argv) {
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
     //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
-    printf("\n\nMythtv-controller Version ");
-    printf("%s",SHOWVER);
-    printf("\n");
+    printf("\n\nMythtv-controller Version %s \n",SHOWVER);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
@@ -13991,7 +13998,13 @@ int main(int argc, char** argv) {
         printf("-r For radio mode\n");
         printf("-f For film mode\n");
         printf("-s For podcast mode\n");
+        printf("-v Show version\n");
         printf("-h This help screen\n\n");
+        exit(0);
+      }
+      // show version and exit
+      if (strcmp(argv[1],"-v")==0) {
+        printf("\n\nVersion %s \n",SHOWVER);
         exit(0);
       }
     }
@@ -14063,6 +14076,7 @@ int main(int argc, char** argv) {
 
     #ifdef ENABLE_TIDAL
     //tridal_oversigt.tridal_login_token();
+    // in use tridal_oversigt.tridal_login_token2
     tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
@@ -14190,8 +14204,9 @@ int main(int argc, char** argv) {
     //strcat(overskrift,overskrift1);
     glutCreateWindow (overskrift);
     init();                                           // init gopengl
+    write_logfile("Loading init graphic.");
     loadgfx();                                        // load gfx stuf
-    if ((full_screen) && (debugmode)) fprintf(stderr,"Enter full screen mode.\n");
+    if (full_screen) write_logfile("Enter full screen mode.");
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
@@ -14218,6 +14233,7 @@ int main(int argc, char** argv) {
     // start main loop now
     // start main loop now
     glutMainLoop();
+    write_logfile("Close down exit.");
     #if defined USE_FMOD_MIXER
     result=sound->release();
     ERRCHECK(result,0);

@@ -110,19 +110,24 @@ unsigned int hent_parent_dir_id(int dirid) {
     sprintf(temp,"%d",dirid);
     strcpy(sqlselect,"select parent_id from music_directories where directory_id=");
     strcat(sqlselect,temp);
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) {
-        returid=atol(row[0]);
+    try {
+      conn=mysql_init(NULL);
+      // Connect to database
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          returid=atol(row[0]);
+        }
       }
+      mysql_close(conn);
     }
-    mysql_close(conn);
+    catch (...) {
+      write_logfile("Mysql db connect error");
+    }
     return(returid);
 }
 
@@ -202,20 +207,25 @@ int get_artistid(char *artistname) {
     int artistid=0;
     char sqlselect1[1024];
     // hent atrist id
-    conn2=mysql_init(NULL);
-    if (conn2) {
-      mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-      artistid=0;
-      // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
-      sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
-      mysql_query(conn2,sqlselect1);
-      res2 = mysql_store_result(conn2);
-      if (res2) {
-        while ((row2 = mysql_fetch_row(res2)) != NULL) {
-          artistid=atol(row2[0]);
+    try {
+      conn2=mysql_init(NULL);
+      if (conn2) {
+        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+        artistid=0;
+        // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
+        sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",artistname);
+        mysql_query(conn2,sqlselect1);
+        res2 = mysql_store_result(conn2);
+        if (res2) {
+          while ((row2 = mysql_fetch_row(res2)) != NULL) {
+            artistid=atol(row2[0]);
+          }
         }
+        mysql_close(conn2);
       }
-      mysql_close(conn2);
+    }
+    catch (...) {
+      write_logfile("Mysql db connect error");
     }
     return(artistid);
 }
@@ -237,18 +247,23 @@ int song_exist_in_db(char *filename,char *name) {
   int songid=0;
   char sqlselect1[1024];
   // hent atrist id
-  conn2=mysql_init(NULL);
-  if (conn2) {
-    mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sqlselect1,"select song_id from music_songs where filename like '%s' and name like '%s'",filename,name);
-    mysql_query(conn2,sqlselect1);
-    res2 = mysql_store_result(conn2);
-    if (res2) {
-      while ((row2 = mysql_fetch_row(res2)) != NULL) {
-        songid=atol(row2[0]);
+  try {
+    conn2=mysql_init(NULL);
+    if (conn2) {
+      mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      sprintf(sqlselect1,"select song_id from music_songs where filename like '%s' and name like '%s'",filename,name);
+      mysql_query(conn2,sqlselect1);
+      res2 = mysql_store_result(conn2);
+      if (res2) {
+        while ((row2 = mysql_fetch_row(res2)) != NULL) {
+          songid=atol(row2[0]);
+        }
       }
+      mysql_close(conn2);
     }
-    mysql_close(conn2);
+  }
+  catch (...) {
+    write_logfile("Mysql db connect error");
   }
   return(songid);
 }
@@ -319,7 +334,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
     // if database not exist do dir scan and create tables for music
     //
     if (!(dbexist)) {
-      if (debugmode & 2) printf("Creating database for music\n");
+      write_logfile("Creating database for music.");
       strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
@@ -638,7 +653,7 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
         i++;
       }        	// end while
     } else {
-      if (debugmode & 2) printf("MYTHTV - sql database err.\n");
+      write_logfile("mysql sql database err.");
       i=0;
     }
     if (i>0) {
@@ -667,7 +682,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     char database[256];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);
-    if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
+    write_logfile("Opdatere music oversigt fra database.");
     i=0;
     strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
     strcpy(musicoversigt[0].album_name,"   BACK");
@@ -680,32 +695,37 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     musicoversigt[0].artist_id=0;
     musicoversigt[0].oversigttype=0;
     i++;
-    if (debugmode & 2) printf("Loading playlists from internal db.\n");
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
-        strcpy(musicoversigt[i].album_name,row[1]);
-        strcpy(musicoversigt[i].album_path,"");
-        musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
-        musicoversigt[i].parent_id=0;
-        musicoversigt[i].album_id=0;
-        musicoversigt[i].artist_id=0;
-        musicoversigt[i].oversigttype=-1;
-        i++;
-      }        	// end while
-    } else {
-      printf("SQL DATBASE ERROR\n");
-      i=0;
+    write_logfile("Loading playlists from internal db.");
+    try {
+      conn=mysql_init(NULL);
+      // Connect to database
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      if (res) {
+        while (((row = mysql_fetch_row(res)) != NULL) && (i<MUSIC_OVERSIGT_TYPE_SIZE)) {
+          strcpy(musicoversigt[i].album_name,row[1]);
+          strcpy(musicoversigt[i].album_path,"");
+          musicoversigt[i].directory_id=atoi(row[0]);			// husk playlist_id
+          musicoversigt[i].parent_id=0;
+          musicoversigt[i].album_id=0;
+          musicoversigt[i].artist_id=0;
+          musicoversigt[i].oversigttype=-1;
+          i++;
+        }        	// end while
+      } else {
+        printf("SQL DATBASE ERROR\n");
+        i=0;
+      }
+      if (debugmode & 2) printf("Fundet antal %d playlists. \n",i);
+      musicoversigt_antal=i;						// antal i oversigt
+      mysql_close(conn);
     }
-    if (debugmode & 2) printf("Fundet antal %d playlists. \n",i);
-    musicoversigt_antal=i;						// antal i oversigt
-    mysql_close(conn);
+    catch (...) {
+      write_logfile("Error process playlist.");
+    }
     return(i);
 }
 
@@ -727,7 +747,7 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *play
   char database[256];
   strcpy(database,dbname);
   //clean_music_oversigt(musicoversigt);
-  if (debugmode & 2) printf("Save music playlist\n");
+  write_logfile("Save music playlist.");
   i=0;
   conn=mysql_init(NULL);
   // Connect to database
@@ -781,7 +801,7 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
     char tmptxt[512];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);
-    if (debugmode & 2) printf("Opdatere music oversigt fra database \n");
+    write_logfile("Opdatere music oversigt fra database.");
     i=0;
     if (strcmp(searchtxt,"")==0) {			// hent fra starten top music directory
       strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");

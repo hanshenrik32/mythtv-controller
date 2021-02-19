@@ -214,7 +214,7 @@ float stream_class::getstream_pos() {
 
 
 // ****************************************************************************************
-// update nr of view
+// update nr of view on podcast
 //
 // ****************************************************************************************
 
@@ -227,13 +227,18 @@ void stream_class::update_rss_nr_of_view(char *url) {
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // get homedir
-  if (conn) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
-    mysql_query(conn,sqlinsert);
-    res = mysql_store_result(conn);
-    mysql_free_result(res);
-    mysql_close(conn);
+  try {
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      sprintf(sqlinsert,"update mythtvcontroller.internetcontentarticles set time=time+1 where mediaURL like '%s'",url);
+      mysql_query(conn,sqlinsert);
+      res = mysql_store_result(conn);
+      mysql_free_result(res);
+      mysql_close(conn);
+    }
+  }
+  catch (...) {
+    printf("Error open mysql connection.\n");
   }
 }
 
@@ -385,7 +390,6 @@ char search_and_replace2(char *text) {
     if (text[n]=='"') {
       strcat(newtext,"'");
       n++;
-//      nn+=1;
     } else {
       newtext[nn]=text[n];
       newtext[nn+1]='\0';                               // null terminate string
@@ -442,226 +446,228 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   strcpy(rssauthor,"");
   strcpy(rssprgimage,"");
   strcpy(rssprgimage1,"");
-  conn=mysql_init(NULL);
-  document = xmlReadFile(filename, NULL, 0);            // open xml file
-  // if exist do all the parse and update db
-  // it use REPLACE in mysql to create/update records if changed in xmlfile
-  raw_tid=time(NULL);
-  opret_dato=localtime(&raw_tid);
-  strftime(rssopretdato,28,"%F %T",opret_dato);
-  if ((document) && (conn)) {
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    if (conn) {
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-    }
-    root = xmlDocGetRootElement(document);
-    first_child = root->children;
-    for (node = first_child; node; node = node->next) {
-      if (node->type==XML_ELEMENT_NODE) {
-        if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
-          content = xmlNodeGetContent(node);
-          if (content) {
-            //strcpy(result,(char *) content);
+  if (check_zerro_bytes_file(filename)>0) {
+    conn=mysql_init(NULL);
+    document = xmlReadFile(filename, NULL, 0);            // open xml file
+    // if exist do all the parse and update db
+    // it use REPLACE in mysql to create/update records if changed in xmlfile
+    raw_tid=time(NULL);
+    opret_dato=localtime(&raw_tid);
+    strftime(rssopretdato,28,"%F %T",opret_dato);
+    if ((document) && (conn)) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      if (conn) {
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+      }
+      root = xmlDocGetRootElement(document);
+      first_child = root->children;
+      for (node = first_child; node; node = node->next) {
+        if (node->type==XML_ELEMENT_NODE) {
+          if ((strcmp((char *) node->name,"channel")==0) || (strcmp((char *) node->name,"feed")==0)) {
+            content = xmlNodeGetContent(node);
+            if (content) {
+              //strcpy(result,(char *) content);
+            }
+            subnode=node->xmlChildrenNode;
+            while(subnode) {
+              xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
+              content = xmlNodeGetContent(subnode);
+              if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
+                content = xmlNodeGetContent(subnode);
+                strcpy(rssprgtitle,(char *) content);
+              }
+              // images
+              // rssprgimage
+              // paththumb
+              //
+              if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
+                content = xmlNodeGetContent(subnode);
+                tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+                if (tmpdat) {
+                  strcpy(rssprgimage,(char *) tmpdat);
+                  strcpy(baseiconfile,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
+              }
+              if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
+                content = xmlNodeGetContent(subnode);
+                tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
+                if (tmpdat) {
+                  strcpy(rssprgimage,(char *) tmpdat);
+                  xmlFree(tmpdat);
+                }
+              }
+              // item type element
+              if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
+                subnode2=subnode->xmlChildrenNode;
+                while(subnode2) {
+                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgfeedtitle,(char *) content);
+                  }
+                  // get play url
+                  if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                    if (tmpdat) {
+                      strcpy(rssvideolink,(char *) tmpdat);
+                      xmlFree(tmpdat);
+                    }
+                  }
+                  // rssprgpubdate
+                  if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    strcpy(rssprgpubdate,(char *) content);
+                  }
+                  // get length
+                  if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) strcpy(rsstime,(char *) content);
+                  }
+                  // get episode
+                  if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) rssepisode=atoi((char *) content);
+                  }
+                  // get season
+                  if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) rssseason=atoi((char *) content);
+                  }
+                  // get author
+                  if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) strcpy(rssauthor,(char *) content);
+                  }
+                  // get description
+                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                    content = xmlNodeGetContent(subnode2);
+                    if (content) {
+                      xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
+                      if (xmlrssid) strcpy(rssprgdesc,(char *) content);
+                      xmlFree(xmlrssid);
+                    }
+                  }
+                  subnode2=subnode2->next;
+                }
+                recordexist=false;
+                // check if record exist
+                if (strcmp(rssvideolink,"")!=0) {
+                  sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
+                  mysql_query(conn,sqlinsert);
+                  res = mysql_store_result(conn);
+                  if (res) {
+                    while ((row = mysql_fetch_row(res)) != NULL) {
+                      recordexist=true;
+                    }
+                  }
+                  // creoate record if not exist
+                  if (!(recordexist)) {
+                    search_and_replace2(rssprgtitle);
+                    search_and_replace2(rssprgfeedtitle);
+                    search_and_replace2(rssprgdesc);
+                    if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
+                    sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+                    if (mysql_query(conn,sqlinsert)!=0) {
+                      printf("mysql REPLACE table error. %s\n",sqlinsert);
+                    }
+                    res = mysql_store_result(conn);
+                  }
+                }
+              }
+              subnode=subnode->next;
+            }
+            // end while loop
           }
-          subnode=node->xmlChildrenNode;
-          while(subnode) {
-            xmlrssid=xmlGetProp(subnode,( xmlChar *) "title");
-            content = xmlNodeGetContent(subnode);
-            if ((content) && (strcmp((char *) subnode->name,"title")==0)) {
-              content = xmlNodeGetContent(subnode);
-              strcpy(rssprgtitle,(char *) content);
-            }
-            // images
-            // rssprgimage
-            // paththumb
-            //
-            if ((content) && (strcmp((char *) subnode->name,"image")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                strcpy(baseiconfile,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            if ((content) && (strcmp((char *) subnode->name,"thumbnail")==0)) {
-              content = xmlNodeGetContent(subnode);
-              tmpdat=xmlGetProp(subnode,( xmlChar *) "href");
-              if (tmpdat) {
-                strcpy(rssprgimage,(char *) tmpdat);
-                xmlFree(tmpdat);
-              }
-            }
-            // item type element
-            if ((content) && (strcmp((char *) subnode->name,"item")==0)) {
-              subnode2=subnode->xmlChildrenNode;
+          // youtube type
+          // get title
+          if (strcmp((char *) node->name,"title")==0) {
+            strcpy(rssprgtitle,"");
+            content = xmlNodeGetContent(node);
+            if (content) strcpy(rssprgtitle,(char *) content);
+          }
+          if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
+            // reset for earch element loading
+            strcpy(rssvideolink,"");
+            strcpy(rssprgfeedtitle,"");
+            rssepisode=0;
+            rssseason=0;
+            strcpy(rssauthor,"");
+            strcpy(rssprgdesc,"");
+            strcpy(rssprgimage1,"");
+            strcpy(rssprgimage,"");
+            if (strcmp((char *) node->name,"entry")==0) {
+              subnode2=node->xmlChildrenNode;
               while(subnode2) {
+                strcpy(rssprgimage,"");
                 if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
                   content = xmlNodeGetContent(subnode2);
                   strcpy(rssprgfeedtitle,(char *) content);
                 }
                 // get play url
-                if ((content) && (strcmp((char *) subnode2->name,"enclosure")==0)) {
+                if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
                   content = xmlNodeGetContent(subnode2);
-                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "url");
+                  tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
                   if (tmpdat) {
                     strcpy(rssvideolink,(char *) tmpdat);
                     xmlFree(tmpdat);
                   }
                 }
-                // rssprgpubdate
-                if ((content) && (strcmp((char *) subnode2->name,"pubDate")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  strcpy(rssprgpubdate,(char *) content);
-                }
-                // get length
-                if ((content) && (strcmp((char *) subnode2->name,"duration")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rsstime,(char *) content);
-                }
-                // get episode
-                if ((content) && (strcmp((char *) subnode2->name,"episode")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssepisode=atoi((char *) content);
-                }
-                // get season
-                if ((content) && (strcmp((char *) subnode2->name,"season")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) rssseason=atoi((char *) content);
-                }
-                // get author
-                if ((content) && (strcmp((char *) subnode2->name,"author")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) strcpy(rssauthor,(char *) content);
-                }
-                // get description
-                if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                  content = xmlNodeGetContent(subnode2);
-                  if (content) {
-                    xmlrssid=xmlGetProp(subnode2,( xmlChar *) "description");
-                    if (xmlrssid) strcpy(rssprgdesc,(char *) content);
-                    xmlFree(xmlrssid);
+                if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
+                  subnode3=subnode2->xmlChildrenNode;
+                  while(subnode3) {
+                    if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgtitle,(char *) content);
+                    }
+                    if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
+                      content = xmlNodeGetContent(subnode2);
+                      strcpy(rssprgdesc,(char *) content);
+                    }
+                    // get icon gfx
+                    if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
+                      content = xmlNodeGetContent(subnode3);
+                      tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
+                      if (tmpdat) {
+                        //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
+                        strcpy(rssprgimage1,(char *) tmpdat);
+                        xmlFree(tmpdat);
+                      }
+                    }
+                    subnode3=subnode3->next;
                   }
                 }
                 subnode2=subnode2->next;
               }
               recordexist=false;
-              // check if record exist
-              if (strcmp(rssvideolink,"")!=0) {
-                sprintf(sqlinsert,"select feedtitle from internetcontentarticles where (feedtitle like '%s' and mediaURL like '%s')",rssprgtitle,rssvideolink);
-                mysql_query(conn,sqlinsert);
-                res = mysql_store_result(conn);
-                if (res) {
-                  while ((row = mysql_fetch_row(res)) != NULL) {
-                    recordexist=true;
-                  }
-                }
-                // creoate record if not exist
-                if (!(recordexist)) {
-                  search_and_replace2(rssprgtitle);
-                  search_and_replace2(rssprgfeedtitle);
-                  search_and_replace2(rssprgdesc);
-                  if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-                  sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
-                  if (mysql_query(conn,sqlinsert)!=0) {
-                    printf("mysql REPLACE table error. %s\n",sqlinsert);
-                  }
-                  res = mysql_store_result(conn);
-                }
-              }
-            }
-            subnode=subnode->next;
-          }
-          // end while loop
-        }
-        // youtube type
-        // get title
-        if (strcmp((char *) node->name,"title")==0) {
-          strcpy(rssprgtitle,"");
-          content = xmlNodeGetContent(node);
-          if (content) strcpy(rssprgtitle,(char *) content);
-        }
-        if ((strcmp((char *) node->name,"link")==0) || (strcmp((char *) node->name,"entry")==0)) {
-          // reset for earch element loading
-          strcpy(rssvideolink,"");
-          strcpy(rssprgfeedtitle,"");
-          rssepisode=0;
-          rssseason=0;
-          strcpy(rssauthor,"");
-          strcpy(rssprgdesc,"");
-          strcpy(rssprgimage1,"");
-          strcpy(rssprgimage,"");
-          if (strcmp((char *) node->name,"entry")==0) {
-            subnode2=node->xmlChildrenNode;
-            while(subnode2) {
-              strcpy(rssprgimage,"");
-              if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                strcpy(rssprgfeedtitle,(char *) content);
-              }
-              // get play url
-              if ((content) && (strcmp((char *) subnode2->name,"link")==0)) {
-                content = xmlNodeGetContent(subnode2);
-                tmpdat=xmlGetProp(subnode2,( xmlChar *) "href");
-                if (tmpdat) {
-                  strcpy(rssvideolink,(char *) tmpdat);
-                  xmlFree(tmpdat);
-                }
-              }
-              if ((content) && (strcmp((char *) subnode2->name,"group")==0)) {
-                subnode3=subnode2->xmlChildrenNode;
-                while(subnode3) {
-                  if ((content) && (strcmp((char *) subnode2->name,"title")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgtitle,(char *) content);
-                  }
-                  if ((content) && (strcmp((char *) subnode2->name,"description")==0)) {
-                    content = xmlNodeGetContent(subnode2);
-                    strcpy(rssprgdesc,(char *) content);
-                  }
-                  // get icon gfx
-                  if ((content) && (strcmp((char *) subnode3->name,"thumbnail")==0)) {
-                    content = xmlNodeGetContent(subnode3);
-                    tmpdat=xmlGetProp(subnode3,( xmlChar *) "url");
-                    if (tmpdat) {
-                      //if (debugmode & 4) printf("Get image url %s \n",tmpdat);
-                      strcpy(rssprgimage1,(char *) tmpdat);
-                      xmlFree(tmpdat);
-                    }
-                  }
-                  subnode3=subnode3->next;
-                }
-              }
-              subnode2=subnode2->next;
-            }
-            recordexist=false;
-            sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
-            mysql_query(conn,sqlinsert);
-            res = mysql_store_result(conn);
-            if (res) {
-              while ((row = mysql_fetch_row(res)) != NULL) {
-                recordexist=true;
-              }
-            }
-            if (!(recordexist)) {
-              search_and_replace2(rssprgtitle);
-              search_and_replace2(rssprgfeedtitle);
-              search_and_replace2(rssprgdesc);
-              if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
-              sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
-              //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
-              if (mysql_query(conn,sqlinsert)!=0) {
-                printf("mysql REPLACE table error. %s\n",sqlinsert);
-              }
+              sprintf(sqlinsert,"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+              mysql_query(conn,sqlinsert);
               res = mysql_store_result(conn);
+              if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                  recordexist=true;
+                }
+              }
+              if (!(recordexist)) {
+                search_and_replace2(rssprgtitle);
+                search_and_replace2(rssprgfeedtitle);
+                search_and_replace2(rssprgdesc);
+                if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
+                sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
+                //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+                if (mysql_query(conn,sqlinsert)!=0) {
+                  printf("mysql REPLACE table error. %s\n",sqlinsert);
+                }
+                res = mysql_store_result(conn);
+              }
             }
           }
         }
       }
+      xmlFreeDoc(document);
+      mysql_close(conn);
     }
-    xmlFreeDoc(document);
-    mysql_close(conn);
   } else {
     if (debugmode & 4) printf("Read error on %s xmlfile downloaded to rss dir \n",filename);
   }
@@ -683,20 +689,19 @@ int stream_class::get_antal_rss_feeds_sources(MYSQL *conn) {
   char sqlselect[4096];
   MYSQL_RES *res;
   MYSQL_ROW row;
-
-  printf("*************************************************************************************\n");
-
+  int antal=0;
+  //printf("*************************************************************************************\n");
   if (conn) {
     sprintf(sqlselect,"SELECT count(name) from mythtvcontroller.internetcontent");
     mysql_query(conn,sqlselect);
     res = mysql_store_result(conn);
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        antalrss_feeds=atoi(row[0]);
+        antal=atoi(row[0]);
       }
     }
   }
-  return(1);
+  return(antal);
 }
 
 
@@ -741,7 +746,7 @@ int get_podcasttype_antal(char *typedata) {
 
 // ****************************************************************************************
 //
-// check if exist
+// check if title exist
 //
 // ****************************************************************************************
 
@@ -767,7 +772,7 @@ int check_rss_feed_exist(MYSQL *conn,char *rssname) {
 
 // ****************************************************************************************
 //
-// opdate show liste in view (det vi ser)
+// opdate show liste in view (The view)
 //
 // load felt 7 = mythtv gfx icon
 // fpath=stream path
@@ -815,7 +820,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       // create db if not exist
       // and dump some default rss feeed in
       //
-      if (dbexist==false) {
+      if (!(dbexist)) {
         printf("Creating/Update RSS/PODCAST for new rss feed\n");
         // thumbnail   = name of an local image file
         // commandline = Program to fetch content with
@@ -3169,13 +3174,14 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+
       // Erotic Audio
       if (check_rss_feed_exist(conn,(char *) "Erotic Audio")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Erotic Audio',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den sorte boks - podcast.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Erotic Audio','Erotic Audio',0,0,NULL,'https://feeds.buzzsprout.com/687557.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Erotic Audio','Erotic Audio',0,0,NULL,'https://feeds.buzzsprout.com/687557.rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
@@ -3186,15 +3192,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-
-
       //
       if (check_rss_feed_exist(conn,(char *) "Den sorte boks - podcast")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den sorte boks - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den sorte boks - podcast.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den sorte boks - podcast','Den sorte boks - podcast',0,0,NULL,'https://www.dr.dk/mu/feed/den-sorte-boks-podcast.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den sorte boks - podcast','Den sorte boks - podcast',0,0,NULL,'https://www.dr.dk/mu/feed/den-sorte-boks-podcast.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
@@ -3257,6 +3261,42 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+      // Er der liv på Venus?
+      if (check_rss_feed_exist(conn,(char *) "Er der liv på Venus?")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Er der liv på Venus?',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Er der liv på Venus?.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Er der liv på Venus?',NULL,NULL,'Er der liv på Venus?',0,0,NULL,'https://www.dr.dk/mu/feed/er-der-liv-pa-venus.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql errror insert Er der liv på Venus?.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
+
+
+
+      // https://friesb4guyspodcast.libsyn.com/rss
+      if (check_rss_feed_exist(conn,(char *) "Fries before guys")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Fries before guys',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Fries before guys.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Fries before guys',NULL,NULL,'Fries before guys ',0,0,NULL,'https://friesb4guyspodcast.libsyn.com/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Fries before guys.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db
@@ -3266,10 +3306,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
-    if (debugmode & 4) {
-      printf("loading rss/stream data.\n");
-      printf("art = %s tpath = %s \n",art,fpath);
-    }
+    write_logfile("loading rss/stream data.");
+    //printf("art = %s tpath = %s \n",art,fpath);
     // find records after type to find
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
       // select internetcontentarticles.feedtitle,
@@ -3290,11 +3328,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       getart=2;
     }
     this->type=getart;					// husk sql type
-    if (debugmode & 4) printf("RSS stream loader started... \n");
+    write_logfile("RSS stream loader started.");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-      get_antal_rss_feeds_sources(conn);
+      antalrss_feeds=get_antal_rss_feeds_sources(conn);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
@@ -3308,18 +3346,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
           if (antal<maxantal) {
             stack[antal]=new (struct stream_oversigt_type);
             if (stack[antal]) {
-              strcpy(stack[antal]->feed_showtxt,"");          	            // show name
-              strcpy(stack[antal]->feed_name,"");		                        // mythtv db feedtitle
-              strcpy(stack[antal]->feed_desc,"");                           // desc
-              strcpy(stack[antal]->feed_path,"");                           // mythtv db path
-              strcpy(stack[antal]->feed_gfx_url,"");
-              strcpy(stack[antal]->feed_gfx_mythtv,"");
-              strcpy(stack[antal]->feed_streamurl,"");
-              stack[antal]->feed_group_antal=0;
-              stack[antal]->feed_path_antal=0;
-              stack[antal]->textureId=0;
-              stack[antal]->intnr=0;
-              stack[antal]->nyt=false;
+              strcpy(stack[antal]->feed_showtxt,"");          	        // show name
+              strcpy(stack[antal]->feed_name,"");		        // mythtv db feedtitle
+              strcpy(stack[antal]->feed_desc,"");                       // desc
+              strcpy(stack[antal]->feed_path,"");                       // mythtv db path
+              strcpy(stack[antal]->feed_gfx_url,"");			//
+              strcpy(stack[antal]->feed_gfx_mythtv,"");			//
+              strcpy(stack[antal]->feed_streamurl,"");			//
+              stack[antal]->feed_group_antal=0;				//
+              stack[antal]->feed_path_antal=0;				//
+              stack[antal]->textureId=0;				//
+              stack[antal]->intnr=0;					//
+              stack[antal]->nyt=false;					// New podcast ?
               // top level
               if (getart==0) {
                 strncpy(stack[antal]->feed_showtxt,row[0],feed_pathlength);
@@ -3350,6 +3388,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                     printf("Download error \n");
                   } else strcpy(tmpfilename,"");
                 }
+                // tmpfilename is now the bame of the icon
                 strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
                 antal++;
               } else {
@@ -3368,85 +3407,87 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 }
                 // alloc new element in array
                 if (stack[antal]==NULL) stack[antal]=new (struct stream_oversigt_type);
-                stack[antal]->intnr=1;
-                if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
-                if (getart==1) {
-                  // old ver used path from mysql
-                  //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                } else {
-                  if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
-                }
-                if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
-                if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
-                // old ver
-                //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
-                if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
-                switch(getart) {
-                  case 0: if (row[9]) strcpy(tmpfilename,row[9]);
-                          break;
-                  case 1: if (row[7]) strcpy(tmpfilename,row[7]);
-                          break;
-                  case 2: if (row[5]) strcpy(tmpfilename,row[5]);
-                          break;
-                }
-                // test antal afspillinger this 0 set som new rss
-                if (row[9]) {
-                  if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
-                }
-                if (strlen(tmpfilename)>7) {
-                  if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
-                    strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
-                    if (strlen(row[7])>10) {
-                      if (getart==1) {
-                        if (row[7]) strncat(tmpfilename,row[7]+10,100);
-                      }
-                      if (getart==2) {
-                        if (row[6]) strncat(tmpfilename,row[6]+10,100);
-                      }
-                    }
+                if (stack[antal]) {
+                  stack[antal]->intnr=1;
+                  if (row[5]) strncpy(stack[antal]->feed_gfx_url,row[5],feed_url);
+                  if (getart==1) {
+                    // old ver used path from mysql
+                    //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   } else {
-                    // rss download
-                    // downloadfilename = name on file, from tmpfilename = full web url
-                    get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                    // check filename fro ? or = and replace to _
-                    strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                    int mmm=0;
-                    while(mmm<strlen(downloadfilename)) {
-                      if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                      mmm++;
-                    }
-                    strcpy(lasttmpfilename,tmpfilename);			              // husk file name
-                    // save file in  user homedir rss/
-                    getuserhomedir(homedir);                                  // get homedir
-                    strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    if (!(file_exists(downloadfilenamelong))) {
-                      if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
-                      // download gfx file and use as icon
-                      if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
-                        printf("Download error \n");
-                      } else strcpy(tmpfilename,"");
-                    }
-                    strcpy(tmpfilename,downloadfilenamelong);
+                    if (row[2]) strncpy(stack[antal]->feed_showtxt,row[2],feed_pathlength);
                   }
-                } else strcpy(tmpfilename,"");
-                strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
-//                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
-                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
-                // no texture now
-                stack[antal]->textureId=0;
-                // opdatere group antal
-                if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
-                antal++;
+                  if (row[1]) strncpy(stack[antal]->feed_path,row[1],feed_pathlength);		// path
+                  if (row[2]) strncpy(stack[antal]->feed_name,row[0],feed_namelength);		// feedtitle
+                  // old ver
+                  //if (row[4]) strncpy(stack[antal]->feed_streamurl,row[4],feed_url);		  // save play url
+                  if (row[8]) strncpy(stack[antal]->feed_streamurl,row[8],feed_url);		  // save play url
+                  switch(getart) {
+                    case 0: if (row[9]) strcpy(tmpfilename,row[9]);
+                            break;
+                    case 1: if (row[7]) strcpy(tmpfilename,row[7]);
+                            break;
+                    case 2: if (row[5]) strcpy(tmpfilename,row[5]);
+                            break;
+                  }
+                  // test antal afspillinger this 0 set som new rss
+                  if (row[9]) {
+                    if (atoi(row[9])==0) stack[antal]->nyt=true; else stack[antal]->nyt=false;
+                  }
+                  if (strlen(tmpfilename)>7) {
+                    if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
+                      strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
+                      if (strlen(row[7])>10) {
+                        if (getart==1) {
+                          if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                        }
+                        if (getart==2) {
+                          if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                        }
+                      }
+                    } else {
+                      // rss download
+                      // downloadfilename = name on file, from tmpfilename = full web url
+                      get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                      // check filename fro ? or = and replace to _
+                      strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                      int mmm=0;
+                      while(mmm<strlen(downloadfilename)) {
+                        if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                        mmm++;
+                      }
+                      strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                      // save file in  user homedir rss/
+                      getuserhomedir(homedir);                                  // get homedir
+                      strcpy(downloadfilenamelong,homedir);
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      if (!(file_exists(downloadfilenamelong))) {
+                        if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                        // download gfx file and use as icon
+                        if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
+                          printf("Download error \n");
+                        } else strcpy(tmpfilename,"");
+                      }
+                      strcpy(tmpfilename,downloadfilenamelong);
+                    }
+                  } else strcpy(tmpfilename,"");
+                  strncpy(stack[antal]->feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+  //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
+                  if (row[3]) strncpy(stack[antal]->feed_desc,row[3],feed_desclength);
+                  // no texture now
+                  stack[antal]->textureId=0;
+                  // opdatere group antal
+                  if (getart==1) stack[antal]->feed_group_antal=atoi(row[6]); else stack[antal]->feed_group_antal=0;
+                  antal++;
+                }
               }
             }
           }
         }
         mysql_close(conn);
       } else {
-        if (debugmode & 4) printf("No stream data loaded \n");
+        write_logfile("No stream data loaded.");
       }
       //load_stream_gfx();
       //
@@ -3460,7 +3501,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) printf("RSS/PODCAST loader done... \n");
+    write_logfile("RSS/PODCAST loader done.");
     return(0);
 }
 
@@ -3474,9 +3515,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 void *loadweb(void *data) {
-  if (debugmode & 4) printf("Start web icon loader thread\n");
+  write_logfile("Start web icon loader thread.");
   streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) printf("Stop web icon loader thread\n");
+  write_logfile("End/Stop web icon loader thread.");
 }
 
 
@@ -3497,7 +3538,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
-  if (debugmode & 4) printf("rss stream gfx download start \n");
+  write_logfile("rss stream gfx download start.");
   while(nr<antal) {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
@@ -3544,8 +3585,8 @@ int stream_class::loadweb_stream_iconoversigt() {
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   if (debugmode & 4) {
-    if (gfx_loaded) printf("rss stream gfx download end ok. \n");
-    else printf("rss stream gfx download error. \n");
+    if (gfx_loaded) write_logfile("rss stream gfx download end.");
+    else write_logfile("rss stream gfx download error.");
   }
   return(1);
 }
@@ -3579,77 +3620,82 @@ void *load_all_stream_gfx(void *data) {
     int antal=0;
     int total_antal=0;
     int nr;
-    if (debugmode & 4) printf("Start gfx thread loader\n ");
+    write_logfile("Start gfx thread loader.");
     strcpy(lastfile,"");
     strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
     // Connect to database
-    if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-        mysql_query(conn,"set NAMES 'utf8'");
-        res = mysql_store_result(conn);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        if (debugmode & 4) printf("\n\nLoading RSS gfx..\n\n");
-        if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
-              mysql_query(conn,"set NAMES 'utf8'");
-              res1 = mysql_store_result(conn);
-              mysql_query(conn,sqlselect1);
-              res1 = mysql_store_result(conn);
-              if (res1) {
-                antal=0;
-                if (debugmode & 4) printf("Found : %40s ",row[1]);
-                nr=0;
-                while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                  antal++;
-                  strcpy(tmpfilename,row1[5]);
-                  if (stream_loadergfx_started_break) break;
-                  // http
-                  if (strncmp(tmpfilename,"http://",7)==0) {
-                    strcpy(lastfile,downloadfilename);
-                    get_webfilename(downloadfilename,tmpfilename);
-                    getuserhomedir(homedir);                                                  // get home dir
-                    strcpy(downloadfilenamelong,homedir);
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    filechange=strcmp(lastfile,downloadfilename);
-                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                      nr++;
-                    } else {
-                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+    try {
+      if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
+          mysql_query(conn,"set NAMES 'utf8'");
+          res = mysql_store_result(conn);
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          write_logfile("Loading RSS gfx.");
+          if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
+                mysql_query(conn,"set NAMES 'utf8'");
+                res1 = mysql_store_result(conn);
+                mysql_query(conn,sqlselect1);
+                res1 = mysql_store_result(conn);
+                if (res1) {
+                  antal=0;
+                  if (debugmode & 4) printf("Found : %40s ",row[1]);
+                  nr=0;
+                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
+                    antal++;
+                    strcpy(tmpfilename,row1[5]);
+                    if (stream_loadergfx_started_break) break;
+                    // http
+                    if (strncmp(tmpfilename,"http://",7)==0) {
+                      strcpy(lastfile,downloadfilename);
+                      get_webfilename(downloadfilename,tmpfilename);
+                      getuserhomedir(homedir);                                                  // get home dir
+                      strcpy(downloadfilenamelong,homedir);
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      filechange=strcmp(lastfile,downloadfilename);
+                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                        nr++;
+                      } else {
+                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      }
+                      total_antal++;
+                    // https
+                    } else if (strncmp(tmpfilename,"https://",8)==0) {
+                      strcpy(lastfile,downloadfilename);
+                      get_webfilename(downloadfilename,tmpfilename);
+                      getuserhomedir(homedir);
+                      strcpy(downloadfilenamelong,homedir);                                   // get home dir
+                      strcat(downloadfilenamelong,"/rss/images/");
+                      strcat(downloadfilenamelong,downloadfilename);
+                      filechange=strcmp(lastfile,downloadfilename);
+                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                        nr++;
+                      } else {
+                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                      }
+                      total_antal++;
                     }
-                    total_antal++;
-                  // https
-                  } else if (strncmp(tmpfilename,"https://",8)==0) {
-                    strcpy(lastfile,downloadfilename);
-                    get_webfilename(downloadfilename,tmpfilename);
-                    getuserhomedir(homedir);
-                    strcpy(downloadfilenamelong,homedir);                                   // get home dir
-                    strcat(downloadfilenamelong,"/rss/images/");
-                    strcat(downloadfilenamelong,downloadfilename);
-                    filechange=strcmp(lastfile,downloadfilename);
-                    if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                      if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                      loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                      nr++;
-                    } else {
-                      if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
-                    }
-                    total_antal++;
                   }
                 }
+                if (stream_loadergfx_started_break) break;
               }
-              if (stream_loadergfx_started_break) break;
-            }
-            if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
-            stream_loadergfx_started_break=false;
-        }
-        if (conn) mysql_close(conn);
+              if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
+              stream_loadergfx_started_break=false;
+          }
+          if (conn) mysql_close(conn);
+      }
     }
-    if (debugmode & 4) printf("End gfx thread loader\n ");
+    catch (...) {
+      printf("Error open mysql connection.\n");
+    }
+    write_logfile("End gfx thread loader.");
 }
 
 

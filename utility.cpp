@@ -18,6 +18,27 @@ unsigned int hourtounixtime(int hour) {
   return(mktime(tid));
 }
 
+// ***********************************************************
+//
+// write to log file
+//
+// ***********************************************************
+
+void write_logfile(char *logentry) {
+  time_t nutid;
+  struct tm *tid;
+  time(&nutid);                                                            // get time
+  tid=localtime(&nutid);                                                   // fillout struct
+  FILE *logfile;
+  logfile=fopen("mythtv-controller.log","a");
+  if (logfile==NULL) logfile=fopen("mythtv-controller.log","w");
+  if (logfile) {
+    fprintf(logfile,"%02d:%02d:%02d ",tid->tm_hour,tid->tm_min,tid->tm_sec);
+    fputs(logentry,logfile);
+    fputs("\n",logfile);
+    fclose(logfile);
+  }
+}
 
 
 // get user homedir
