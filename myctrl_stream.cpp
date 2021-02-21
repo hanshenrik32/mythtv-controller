@@ -23,7 +23,7 @@
 //
 // text render is glcRenderString for freetype font support
 //
-
+extern char debuglogdata[1024];                                  // used by log system
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -669,7 +669,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
       mysql_close(conn);
     }
   } else {
-    if (debugmode & 4) printf("Read error on %s xmlfile downloaded to rss dir \n",filename);
+    // write debug log
+    sprintf(debuglogdata,"Error reading %s xmlfile 0 bytes long.",filename);
+    write_logfile(debuglogdata);
   }
   return(1);
 }

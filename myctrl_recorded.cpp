@@ -17,6 +17,9 @@
 #include "myctrl_recorded.h"
 #include "myctrl_storagedef.h"
 
+
+extern char debuglogdata[1024];                                  // used by log system
+
 extern int fonttype;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //

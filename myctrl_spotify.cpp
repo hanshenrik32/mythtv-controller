@@ -31,6 +31,8 @@
 #include "myctrl_readwebfile.h"
 #include "myctrl_spotify.h"
 
+extern char debuglogdata[1024];                                  // used by log system
+
 // web port
 static const char *s_http_port = "8000";
 static struct mg_serve_http_opts s_http_server_opts;
@@ -2966,9 +2968,9 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     // clear old view
     clean_spotify_oversigt();
     strcpy(lasttmpfilename,"");
-    if (debugmode & 4) {
-      fprintf(stderr,"loading spotify data.\n");
-    }
+    // write debug log
+    write_logfile("loading spotify data.");
+
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
       show_search_result=false;
@@ -2980,7 +2982,8 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
-    if (debugmode & 4) fprintf(stderr,"spotify loader started... \n");
+    // write debug log
+    write_logfile("Spotify loader started...");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -3101,12 +3104,15 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
         }
         mysql_close(conn);
       } else {
-        if (debugmode & 4) fprintf(stderr,"No spotify data loaded \n");
+        fprintf(stderr,"No spotify data loaded \n");
+        // write debug log
+        write_logfile("No spotify data loaded.");
       }
       antalplaylists=antal;
       return(antal);
     } else fprintf(stderr,"Failed to update Spotify db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) fprintf(stderr,"Spotify loader done... \n");
+    // write debug log
+    write_logfile("Spotify loader done.");
     return(0);
 }
 
@@ -3768,9 +3774,10 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 // ****************************************************************************************
 
 void *load_spotify_web(void *data) {
-  if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
+  // write debug log
+  write_logfile("Start spotify loader thread.");
   //streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");
+  write_logfile("Stop spotify loader thread.");
 }
 
 
@@ -3822,7 +3829,8 @@ int spotify_class::load_spotify_iconoversigt() {
   char downloadfilenamelong[5000];
   char homedir[200];
   this->gfx_loaded=false;                                                           // set loaded flag to false
-  if (debugmode & 4) printf("spotify icon loader.\n");
+  // write debug log
+  write_logfile("Spotify icon loader.");
   while(nr<=streamantal()) {
     if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
@@ -3844,10 +3852,9 @@ int spotify_class::load_spotify_iconoversigt() {
   }
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
-    else fprintf(stderr,"spotify download error. \n");
-  }
+  // write debug log
+  if (gfx_loaded) write_logfile("Spotify icon loader.");
+  else write_logfile("Spotify icon loader error.");
   gfx_loaded=true;
   return(1);
 }
