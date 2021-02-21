@@ -14,6 +14,9 @@
 #include "readjpg.h"
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
+
+extern char debuglogdata[1024];                                  // used by log system
+
 extern float configdefaultmoviefontsize;                                      // font size
 extern char configmoviepath[256];                              //
 extern char configdefaultmoviepath[256];

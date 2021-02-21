@@ -21,6 +21,9 @@
 #include "readjpg.h"
 #include "loadpng.h"
 
+
+extern char debuglogdata[1024];                                  // used by log system
+
 extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
 extern char configmysqluser[256];                             //

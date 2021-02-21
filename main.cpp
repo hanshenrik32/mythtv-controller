@@ -101,6 +101,8 @@ extern char __BUILD_DATE;
 extern char __BUILD_NUMBER;
 //
 
+
+
 #include "main.h"
 #include "myctrl_storagedef.h"
 #include "myth_saver.h"
@@ -137,6 +139,9 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 tridal_class tridal_oversigt;
 #endif
 
+
+
+char debuglogdata[1024];                                  // used by log system
 
 
 // struct used by keyboard config of functions keys
@@ -1483,7 +1488,10 @@ void load_config(char * filename) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         strcpy(configmusicpath,row[0]);
-        if (debugmode & 32) fprintf(stderr,"Fundet music config directorys %s \n",row[0]);
+        // write to debug log
+        strcpy(debuglogdata,"Fundet music config directory ");
+        strcat(debuglogdata,row[0]);
+        write_logfile(debuglogdata);
       }
       //
       // hvis der ikke er fundet et dir denne mysql server med rigtigt hostname
@@ -1496,7 +1504,10 @@ void load_config(char * filename) {
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
             strcpy(configmusicpath,row[0]);
-            if (debugmode & 32) fprintf(stderr,"Search on 'MusicLocation' give config dir %s \n",row[0]);
+            // write to debug log
+            strcpy(debuglogdata,"Search on 'MusicLocation' give config dir ");
+            strcat(debuglogdata,row[0]);
+            write_logfile(debuglogdata);
           }
         }
       }
@@ -1525,7 +1536,11 @@ void load_config(char * filename) {
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
             strcpy(configmoviepath,row[0]);
-            if (debugmode & 32) fprintf(stderr,"Search on 'VideoStartupDir' give config dir %s \n",row[0]);
+            // write to debug log
+            strcpy(debuglogdata,"Search on 'VideoStartupDir' give config dir ");
+            strcat(debuglogdata,row[0]);
+            write_logfile(debuglogdata);
+
           }
         }
       }
@@ -1725,7 +1740,12 @@ int hent_mythtv_playlist(int playlistnr) {
     // mysql stuf
     char database[255];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
+
+    // write to debug log
+    strcpy(debuglogdata,"Hent info om playlist nr: ");
+    write_logfile(debuglogdata);
     if (debugmode & 2) fprintf(stderr,"Hent info om playlist nr: %d \n",playlistnr);
+
     songnr=1;
     aktiv_playlist.clean_playlist();		// clear old playlist
     conn=mysql_init(NULL);
@@ -1756,7 +1776,11 @@ int hent_mythtv_playlist(int playlistnr) {
               strcpy(songname,row1[4]);
               strcpy(artistname,row1[6]);
               strcpy(songlength,row1[7]);
-              if (debugmode & 2) fprintf(stderr,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
+
+              // write to debug log
+              sprintf(debuglogdata,"Fundet sang song_id=%s artist id=%s filename=%40s  \n",songid,row1[5],row1[1]);
+              write_logfile(debuglogdata);
+
               strcpy(tmptxt,configmusicpath);		// start path
               sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
               hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
@@ -1846,7 +1870,11 @@ unsigned int hent_antal_dir_songs_playlist(int playlistnr) {
     long songantal=0;				// antal sange i array i database
     int songnr=1;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    if (debugmode & 2) fprintf(stderr,"Henter info om playlistnr = %d \n",playlistnr);
+    if (debugmode & 2) {
+      fprintf(stderr,"Henter info om playlistnr = %d \n",playlistnr);
+      sprintf(debuglogdata,"Henter info om playlistnr = %d \n",playlistnr);
+      write_logfile(debuglogdata);
+    }
     dirmusic.emtydirmusic();
     conn=mysql_init(NULL);
     // Connect to mythtv database
@@ -1909,7 +1937,9 @@ unsigned int hent_antal_dir_songs(int dirid) {
     // mysql stuf
     char database[256];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    if (debugmode & 2) fprintf(stderr,"Hent info om directory_id = %d \n",dirid);
+    // write debug log
+    sprintf(debuglogdata,"Hent info om directory_id = %d \n",dirid);
+    write_logfile(debuglogdata);
     dirmusic.emtydirmusic();
     strcpy(sqlselect,"SELECT song_id,name,artist_id FROM music_songs where directory_id=");
     sprintf(tmptxt,"%d order by name limit %d",dirid,dirliste_size);
@@ -1990,7 +2020,8 @@ int initlirc() {
   sock=lirc_init((char *) "mythtv-controller",1);                  // print error to stderr
   if (sock!=-1) {
     if (lirc_readconfig("~/.config/lirc/mythtv-controller.lircrc",&lircconfig,NULL)!=0) {
-      if (debugmode) fprintf(stderr,"No lirc mythtv-controller config file found.\n");
+      // write debug log status for remote controller is loaded
+      write_logfile("No lirc mythtv-controller config file found.");
       lirc_deinit();
       sock=-1;                                              				// lirc error code
     } else {
@@ -2287,7 +2318,9 @@ unsigned int do_playlist_backup_playlist() {
               sprintf(sqlselect,"select song_id, filename, music_albums.album_name, name, music_artists.artist_name, music_genres.genre, length, numplays, rating, lastplay, date_entered, date_modified, music_directories.path,music_songs.year  from music_songs,music_artists,music_albums,music_genres,music_directories where song_id=%d and music_artists.artist_id=music_songs.artist_id and music_songs.album_id=music_albums.album_id and music_songs.genre_id=music_genres.genre_id and music_songs.directory_id=music_directories.directory_id",songintnr);
               mysql_query(conn,sqlselect);
               res1 = mysql_store_result(conn);
-        	    if (debugmode & 2) fprintf(stderr,"Playlist %s Hentet music nummer = %ld af %ld \n",playlistname,i,songantal);
+              // write debug log
+              sprintf(debuglogdata,"Playlist %s Hentet music nummer = %ld af %ld \n",playlistname,i,songantal);
+              write_logfile(debuglogdata);
               if (res1) {
                 while ((row = mysql_fetch_row(res1)) != NULL) {
                   sprintf(sqlselect,"insert music_songs_tmp values (0,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%d','%s','%s','%d','%d','%d','%d','%d','%s','%d','%d','%d','%d','%s')",
@@ -3878,7 +3911,8 @@ void display() {
         }
         if (snd==0) {
           snd = 1;
-          if (debugmode & 4) fprintf(stderr,"Play radio station nr %d url %s \n",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
+          sprintf(debuglogdata,"Play radio station nr %d url %s \n",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
+          write_logfile(debuglogdata);
           if (snd == 0) {
               #if defined USE_FMOD_MIXER
               result = sndsystem->init(32, FMOD_INIT_NORMAL, 0);
@@ -3911,7 +3945,9 @@ void display() {
           #endif
           if (strcmp(radiooversigt.get_stream_url(rknapnr-1),"")!=0) {
             strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
-            if (debugmode & 2) fprintf(stderr,"play radio path = %s \n ",aktivplay_music_path);
+            // write debug log
+            sprintf(debuglogdata,"play radio path = %s \n ",aktivplay_music_path);
+            write_logfile(debuglogdata);
             // fmod player
             #if defined USE_FMOD_MIXER
             // set big sound buffer to stop lag
@@ -5422,7 +5458,9 @@ void display() {
     if ((startmovie) && (do_zoom_film_cover)) {
       // non default player
       if (strcmp("default",configdefaultplayer)!=0)  {
-        if (debugmode && 16) fprintf(stderr,"Start movie nr %d Player is vlc path :%s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        // write debug log
+        sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        write_logfile(debuglogdata);
         strcpy(systemcommand,"/bin/sh /usr/bin/startmovie.sh ");
         strcat(systemcommand,"'");
         strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
@@ -5431,10 +5469,13 @@ void display() {
       } else {
         // default
         // start internal player (vlc)
-        if (debugmode && 16) fprintf(stderr,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        sprintf(debuglogdata,"Start play use default player film nr: %d name: %s \n",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        // write to log file
+        write_logfile(debuglogdata);
         // if we play music/stream (radio) stop that before play movie stream (vlc)
         // stop music if play before start movie
-        if (debugmode & 16) fprintf(stderr,"Stop playing music/radio.\n");
+        // write to log
+        write_logfile("Stop playing music/radio.");
         #if defined USE_FMOD_MIXER
         if ((sound) && (snd)) {
           // stop sound playing
@@ -5456,9 +5497,11 @@ void display() {
         // clean music playlist
         aktiv_playlist.clean_playlist();                // clean play list (reset) play list
         do_play_music_aktiv_table_nr=1;			// reset play start nr
-        if (debugmode & 16) fprintf(stderr,"Stop playing media/wideo if any \n");
+        // write to log
+        write_logfile("Stop playing media/wideo if any");
         if (film_oversigt.film_is_playing) {
-          if (debugmode) fprintf(stderr,"Stop playing last movie before start new\n");
+          //write to debug log
+          write_logfile("Stop playing last movie before start new");
           // stop playing (active movie)
           film_oversigt.softstopmovie();
         }
@@ -5471,7 +5514,8 @@ void display() {
       startmovie = false;                   // start kun 1 instans
     }
     if (stopmovie) {
-      if (debugmode && 16) fprintf(stderr,"Stop movie\n");
+      // write debug log
+      write_logfile("Stop movie");
       //sleep(10); // play
       if (strcmp("default",configdefaultplayer)!=0) {
         // close non default player
@@ -5510,10 +5554,11 @@ void display() {
         }
       } else {
         // start play stream or show rss page
-        if (debugmode & 4) {
-          fprintf(stderr,"Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
-          fprintf(stderr,"Start stream. Player is internal \n");
-        }
+        // write to log file
+        sprintf(debuglogdata,"Stream to play %s \n",streamoversigt.get_stream_url(sknapnr-1));
+        write_logfile(debuglogdata);
+        sprintf(debuglogdata,"Start stream. Player is internal \n");
+        write_logfile(debuglogdata);
         // stop playing stream
         if (streamoversigt.stream_is_playing) {
           streamoversigt.stopstream();
@@ -5564,7 +5609,9 @@ void display() {
         strcpy(stream_playing_desc,"");
         stream_playing_icon = 0;
         if (streamoversigt.stream_is_playing) {
-          if (debugmode) fprintf(stderr,"Stop playing stream\n");
+          // write debug log
+          sprintf(debuglogdata,"Stop playing stream");
+          write_logfile(debuglogdata);
           // stop playing (active movie)
           //film_oversigt.softstopmovie();
         }
@@ -5577,22 +5624,31 @@ void display() {
     }
     // play recorded program
     if (do_play_recorded_aktiv_nr) {
-      if (debugmode & 64) fprintf(stderr,"Start playing recorded program\n");
+      // write debug log
+      sprintf(debuglogdata,"Start playing recorded program");
+      write_logfile(debuglogdata);
+
       if (strcmp("default",configdefaultplayer)!=0) {
         strcpy(systemcommand,"./startrecorded.sh ");
         recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
         //strcat(systemcommand,configrecordpath);
         strcat(systemcommand,temptxt);
-        if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
+        if (debugmode & 64) {
+          sprintf(debuglogdata,"Start command :%s \n",systemcommand);
+          write_logfile(debuglogdata);
+        }
         system(systemcommand);
         do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
       } else {
-        if (debugmode & 64) fprintf(stderr,"Start default playing recorded program\n");
+        // write debug log
+        write_logfile("Start default playing recorded program");
         strcpy(systemcommand,"./startrecorded.sh ");
         recordoversigt.get_recorded_filepath(temptxt,valgtrecordnr,subvalgtrecordnr);               // hent filepath
         //strcat(systemcommand,configrecordpath);
         strcat(systemcommand,temptxt);
-         if (debugmode & 64) fprintf(stderr,"Start command :%s \n",systemcommand);
+        // write debug log
+        sprintf(debuglogdata,"Start command :%s \n",systemcommand);
+        write_logfile(debuglogdata);
         system(systemcommand);
         do_play_recorded_aktiv_nr=0;                                                                // start kun 1 player
       }
@@ -6052,7 +6108,8 @@ void display() {
               Mix_FreeMusic(sdlmusicplayer);
               sdlmusicplayer = NULL;
               #endif
-              if (debugmode & 2) fprintf(stderr,"STOP player and clear playlist\n");
+              // write debug log
+              write_logfile("Stop player and clear playlist");
               do_stop_music_all = true;				                                 // stop all music
               snd = 0;	                                             					 // clear music pointer for irrsound
               do_zoom_music_cover = false;			                                 // remove play info window
@@ -6095,13 +6152,17 @@ void display() {
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (sdlmusicplayer==NULL) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
           #endif
-          if (debugmode & 2) fprintf(stderr,"User Next song %s \n",aktivplay_music_path);
+          // write debug log
+          sprintf(debuglogdata,"User Next song %s \n",aktivplay_music_path);
+          write_logfile(debuglogdata);
         }
     } else if (vis_music_oversigt) {
       // press play on music
       if (do_shift_song) {
         aktiv_playlist.m_play_playlist(aktivplay_music_path,do_play_music_aktiv_table_nr-1);			// hent første sang ,0
-        if (debugmode & 2) fprintf(stderr,"Auto2 Next song %s \n",aktivplay_music_path);
+        // write debug log
+        sprintf(debuglogdata,"Auto2 Next song %s \n",aktivplay_music_path);
+        write_logfile(debuglogdata);
         #if defined USE_FMOD_MIXER
         if (strcmp(aktivplay_music_path,"")) sound->release();          								// stop last playing song
         ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -6700,6 +6761,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             fundet = true;
             if (debugmode & 2) fprintf(stderr,"Start play \n");
+            // write to debug log
+            write_logfile("Start play");
           }
         }
       }
@@ -6736,45 +6799,49 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // play playlist icon select (20) type 0
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
-              if (debugmode & 4) fprintf(stderr,"play spotify playlist.\n");
+              // write to debug log
+              sprintf(debuglogdata,"play spotify playlist.");
+              write_logfile(debuglogdata);
               do_select_device_to_play=true;
               returnfunc = 4;
               fundet = true;
             }
             // play song icon select (20) type 1
             if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
-              if (debugmode & 4) fprintf(stderr,"play spotify song.\n");
+              write_logfile("play spotify song.");
               do_select_device_to_play=true;
               returnfunc = 5;
               fundet = true;
             }
             // open
             if ((GLubyte) names[i*4+3]==21) {
-              if (debugmode & 4) fprintf(stderr,"open spotify playlist\n");
+              write_logfile("open spotify playlist");
               returnfunc = 3;
               fundet = true;
             }
             // Stop play
             if ((GLubyte) names[i*4+3]==9) {
-              if (debugmode & 4) fprintf(stderr,"(Spotify) Stop play\n");
+              write_logfile("(Spotify) Stop play");
               returnfunc = 5;                                                       //
               fundet = true;
             }
             // Next
             if ((GLubyte) names[i*4+3]==11) {
-              if (debugmode & 4) fprintf(stderr,"(Spotify) Next song\n");
+              write_logfile("(Spotify) Next song");
               returnfunc = 6;                                                       //
               fundet = true;
             }
             // last
             if ((GLubyte) names[i*4+3]==10) {
-              if (debugmode & 4) fprintf(stderr,"(Spotify) last song\n");
+              write_logfile("(Spotify) last song");
               returnfunc = 7;                                                       //
               fundet = true;
             }
             // scroll up
             if ((GLubyte) names[i*4+3]==23) {
-              if (debugmode & 4) fprintf(stderr,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+              // write debug log
+              sprintf(debuglogdata,"scroll down spotify_selected_startofset = %d \n",spotify_selected_startofset);
+              write_logfile(debuglogdata);
               if (spotify_selected_startofset+40<spotify_oversigt.streamantal()) {
                 spotify_selected_startofset+=8;
                 spotify_selected_startofset+=8;
@@ -6784,7 +6851,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // scroll down
             if ((GLubyte) names[i*4+3]==24) {
-              if (debugmode & 4) fprintf(stderr,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+              // write debug log
+              sprintf(debuglogdata,"scroll up spotify_selected_startofset = %d\n",spotify_selected_startofset);
+              write_logfile(debuglogdata);
               if ((spotify_selected_startofset+8)>8) spotify_selected_startofset-=8;
               if (spotify_selected_startofset<0) spotify_selected_startofset=0;
               returnfunc = 1;
@@ -6792,7 +6861,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
-              if (debugmode & 8) fprintf(stderr,"Show/close spotify info\n");
+              // write debug log
+              write_logfile("Show/close spotify info\n");
               if (ask_open_dir_or_play_spotify==false) do_zoom_spotify_cover =! do_zoom_spotify_cover;
               if (ask_open_dir_or_play_spotify) ask_open_dir_or_play_spotify=false;
               fundet = true;
@@ -6823,7 +6893,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               fundet = true;
             }
           }
-          if (debugmode) printf("spotifyknapnr %d type=%d fundet %d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr),fundet);
+          // write debug log
+          sprintf(debuglogdata,"spotifyknapnr %d type=%d fundet %d \n",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
+          write_logfile(debuglogdata);
           // back button
 
           // works ok
@@ -7036,7 +7108,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // we have a select mouse/touch element dirid
           if ((GLuint) names[i*4+3]>=100) {
             rknapnr = (GLuint) names[i*4+3]-99;				// hent music knap nr
-            if (debugmode & 8) fprintf(stderr,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
+            // write debug log
+            sprintf(debuglogdata,"radio station selected=%d glID=%u  \n",rknapnr,names[i*4+3]-99);
+            write_logfile(debuglogdata);
             fundet = true;
           }
           // husk last
@@ -7047,7 +7121,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (!(fundet)) {
           // tryk stop radio
           if ((GLubyte) names[i*4+3]==9) {
-            if (debugmode & 8) fprintf(stderr,"stop radio\n");
+            // write debug log
+            write_logfile("stop radio");
             do_stop_radio = 1;
             do_play_radio = false;			// no playing
             fundet = true;
@@ -7082,7 +7157,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((vis_stream_oversigt) && (!(fundet))) {
         if ((GLuint) names[i*4+3]>=100) {
           sknapnr=(GLuint) names[i*4+3]-99;				// hent stream knap nr
-          if (debugmode & 128) fprintf(stderr,"stream selected=%u\n",sknapnr);
+          // write debug log
+          sprintf(debuglogdata,"stream selected=%u\n",sknapnr);
+          write_logfile(debuglogdata);
           fundet = true;
         }
         // close open stream or movie
@@ -7118,7 +7195,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (((GLubyte) names[i*4+3]==12) && (do_zoom_stream_cover) && (fundet==false)) {
           fundet = true;
           if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
-          if (debugmode & 4) fprintf(stderr,"Set/reset player pause.\n");
+          // write debug log
+          write_logfile("Set/reset player pause.");
         }
         // jump forward button stream
         if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
@@ -7136,13 +7214,15 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       // film oversigt
       if ((vis_film_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==25) {
-          if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+          // write debug log
+          write_logfile("Start movie player.");
           fundet = true;
           startmovie = true;
         }
         // stop play movie
         if ((GLubyte) names[i*4+3]==26) {
-          if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+          // write debug log
+          write_logfile("Stop movie.");
           fundet = true;
           // stop movie playing
           stopmovie = true;
@@ -7151,18 +7231,23 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((!(fundet)) && ((GLuint) names[i*4+3]>=100)) {
           fknapnr=(GLuint) names[i*4+3]-99;			                                // get movie id
           fprintf(stderr,"Film selected=%d\n",fknapnr);                                 //
+          // write debug log
+          sprintf(debuglogdata,"Film selected=%d\n",fknapnr);                                 //
+          write_logfile(debuglogdata);
           fundet = true;
         }
       }
       // vis ny film oversigt
       if ((vis_nyefilm_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==25) {
-          if (debugmode & 16) fprintf(stderr,"Start movie player.\n");
+          // write debug log
+          write_logfile("Start movie player.");
           fundet = true;
           startmovie = true;
         }
         if ((GLubyte) names[i*4+3]==26) {
-          if (debugmode & 16) fprintf(stderr,"Stop movie.\n");
+          // write debug log
+          write_logfile("Stop movie player.");
           fundet = true;
           stopmovie = true;
         }
@@ -7175,7 +7260,8 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((vis_tv_oversigt) && (!(fundet))) {
         // close view
         if ((GLubyte) names[i*4+3]==27) {
-          if (debugmode & 256) fprintf(stderr,"Close tv oversigt 1\n");
+          // write debug log
+          write_logfile("Close tv oversigt.");
           vis_tv_oversigt = false;
           fundet = true;
         }
@@ -7219,14 +7305,16 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // er vi igang med at spørge om vi skal optage programmet
         if (ask_tv_record) {
           if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
-            if (debugmode & 256) fprintf(stderr,"Close window again.\n");
+            // write debug log
+            write_logfile("Close window again.");
             ask_tv_record = false;
             fundet = true;
             returnfunc = 3;
             do_zoom_tvprg_aktiv_nr = 0;
           }
           if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
-            if (debugmode & 256) fprintf(stderr,"Set program to record.\n");
+            // write debug log
+            write_logfile("Set program to record.");
             ask_tv_record = false;
             fundet = true;
             returnfunc = 3;
@@ -7368,7 +7456,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       if (do_play_music_aktiv_nr>0) {
                         antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
                       } else antal_songs=0;
-                      if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                      // write debug log
+                      sprintf(debuglogdata,"Found numbers of songs:%2d",antal_songs);
+                      write_logfile(debuglogdata);
                       if (antal_songs==0) {
                         ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                       } else {
@@ -7411,21 +7501,24 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       if (spotifyknapnr==9) {
                         do_play_spotify=0;
                         do_open_spotifyplaylist=0;
-                        if (debugmode) fprintf(stderr,"Set stop play spotify flag\n");
+                        // write debug log
+                        write_logfile("Set stop play spotify flag");
                       }
                     }
                     // next play
                     if (retfunc==6) {
                       do_play_spotify=0;
                       do_open_spotifyplaylist=1;
-                      if (debugmode) fprintf(stderr,"Set next play spotify flag\n");
+                      // write debug log
+                      write_logfile("Set next play spotify flag");
                       spotify_oversigt.spotify_next_play();
                     }
                     // last play
                     if (retfunc==7) {
                       do_play_spotify=0;
                       do_open_spotifyplaylist=1;
-                      if (debugmode) fprintf(stderr,"Set last play spotify flag\n");
+                      // write debug log
+                      write_logfile("Set last play spotify flag");
                       spotify_oversigt.spotify_last_play();
                     }
                   }
@@ -7557,12 +7650,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           ask_open_dir_or_play=false;
           ask_open_dir_or_play_aopen=false;
           if (musicoversigt[mknapnr-1].oversigttype==-1) {
-            if (debugmode & 2) fprintf(stderr,"Open/read playlist id %d \n",musicoversigt[mknapnr-1].directory_id);
-            if (debugmode & 2) fprintf(stderr,"Opdatere musicarray henter playlist oversigt \n");
+            // write debug log
+            sprintf(debuglogdata,"Open/read playlist id %d \n",musicoversigt[mknapnr-1].directory_id);
+            write_logfile(debuglogdata);
+            sprintf(debuglogdata,"Opdatere musicarray henter playlist oversigt \n");
+            // write debug log
+            write_logfile(debuglogdata);
             // hent playlist oversigt
             opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
           } else {
-            if (debugmode & 2) fprintf(stderr,"Opdatere musicarray Henter oversigt dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
+            // write debug log
+            sprintf(debuglogdata,"Opdatere musicarray Henter oversigt dir id = %d \n",musicoversigt[mknapnr-1].directory_id);
+            write_logfile(debuglogdata);
             // opdate fra mythtv-backend if avable
             if ((opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id))>0) {
               opdatere_music_oversigt_icons();
@@ -7653,7 +7752,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // open spotify playlist
           if ((( retfunc == 3 ) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            if ( debugmode & 4 ) fprintf(stderr,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
+            // write debug log
+            sprintf(debuglogdata,"Open spotify playliste %s \n", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
+            write_logfile(debuglogdata);
             // opdate view from intnr id.
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
             spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
@@ -7747,7 +7848,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // open spotify artist
           if (((retfunc == 6 ) || (button == 3 )) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
-            if ( debugmode & 4 ) fprintf(stderr,"Open spotify artist %s type %d \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
+            // write debug log
+            sprintf(debuglogdata,"Open spotify artist %s type %d \n", spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.type);
+            write_logfile(debuglogdata);
             // update from web
             // clear old first
             //static char huskname[1024];
@@ -9741,7 +9844,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               // load tv guide
               if (vis_tv_oversigt) {
                 // load tv guide
-                if (debugmode) fprintf(stderr,"Loading tvguidedb file\n");
+                // write debug log
+                write_logfile("Loading tvguidedb file");
                 aktiv_tv_oversigt.loadparsexmltvdb();
               }
               break;
@@ -9821,7 +9925,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                 pthread_t loaderthread1;                                          // loader thread
                 // start multi thread and update movie overview
                 // movie loader
-                if (debugmode) fprintf(stderr,"Update movie db.\n");
+                // write debug log
+                write_logfile("Update movie db.");
                 if ((strncmp(configbackend,"xbmc",4)==0) || (strncmp(configbackend,"kodi",4)==0)) {
                   int rc1=pthread_create(&loaderthread1,NULL,xbmcdatainfoloader_movie,NULL);
                   if (rc1) {
@@ -9905,7 +10010,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (do_play_music_aktiv_nr>0) {
                     antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
                   } else antal_songs=0;
-                  if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
+                  // write debug log
+                  sprintf(debuglogdata,"Found numbers of songs:%2d\n",antal_songs);
+                  write_logfile(debuglogdata);
                   if (antal_songs==0) {
                     ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                   } else {
@@ -9922,8 +10029,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   if (do_play_music_aktiv_nr>0) {
 //                          antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
                   } else antal_songs=0;
-                  if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d\n",antal_songs);
-
+                  // write debug log
+                  sprintf(debuglogdata,"Found numbers of songs:%2d\n",antal_songs);
+                  write_logfile(debuglogdata);
                   if (antal_songs==0) {
                     ask_open_dir_or_play_aopen = true;					// ask om de skal spilles
                   } else {
@@ -10083,14 +10191,16 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_spotify_oversigt) {
                 if (do_select_device_to_play) {
                   // select device to play on
-                  if (debugmode) fprintf(stderr,"Send play command to spotify device \n");
+                  // write debug log
+                  write_logfile("Send play command to spotify device");
                   spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( (spotifyknapnr+spotify_selected_startofset)-1 ) ,1);
                   // close window again
                   do_select_device_to_play=false;
                 }
                 // search func
                 if (!(do_select_device_to_play)) {
-                  if (debugmode) fprintf(stderr,"Start search spotify \n");
+                  // write debug log
+                  write_logfile("Start search spotify");
                 }
               }
 
@@ -11369,6 +11479,9 @@ void update(int value) {
             if (lircconfig) {
                 while((ret=lirc_code2char(lircconfig,code,&c))==0 && c!=NULL) {
                     if (debugmode) fprintf(stderr,"Lirc Command %s \n ",c);
+                    // write debug log
+                    sprintf(debuglogdata,"Lirc Command %s ",c);
+                    write_logfile(debuglogdata);
                     saver_irq = true;				// RESET (sluk hvis aktiv) screen saver
                     if (strcmp(c,"Music")==0) {							// show music directoy
                       vis_tv_oversigt=false;
@@ -12566,7 +12679,8 @@ void update(int value) {
                         }
                       }
                       do_zoom_music_cover_remove_timeout=showtimeout;		// show music info timeout
-                      if (debugmode & 2) fprintf(stderr,"lirc Set Play it flag \n");
+                      // write debug log
+                      write_logfile("lirc Set Play it flag");
                     }
                     if ((vis_film_oversigt) && (do_zoom_film_cover)) {
                       fprintf(stderr,"lirc Start movie player.\n");
@@ -12804,7 +12918,8 @@ void *radio_check_statusloader(void *data) {
 
 void *datainfoloader_music(void *data) {
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode % 1) fprintf(stderr,"loader thread starting - Loading music info.\n");
+  // write debug log
+  write_logfile("loader thread starting - Loading music info.");
   if (strcmp(configbackend,"mythtv")==0) {
     // opdatere music oversigt
     // hent alt music info fra database
@@ -12817,6 +12932,7 @@ void *datainfoloader_music(void *data) {
       // build new db (internal db loader)
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
       if (debugmode & 2) fprintf(stderr,"Done update db from datasource.\n");
+      write_logfile("Done update db from datasource.");
       global_use_internal_music_loader_system = true;
     }
     // update music db from disk
@@ -12829,7 +12945,8 @@ void *datainfoloader_music(void *data) {
     // load music db created by opdatere_music_oversigt_nodb function
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
       //opdatere_music_oversigt_icons(); 					// load gfx icons
-      if (debugmode & 2) fprintf(stderr,"Nusic db loaded.\n");
+      if (debugmode & 2) fprintf(stderr,"Music db loaded.\n");
+      write_logfile("Music db loaded..");
     }
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
@@ -12840,7 +12957,8 @@ void *datainfoloader_music(void *data) {
     opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
-  if (debugmode & 1) fprintf(stderr,"loader thread done loaded music info\n");
+  // write debug log
+  write_logfile("loader thread done loaded music info");
   pthread_exit(NULL);
 }
 
@@ -12856,13 +12974,16 @@ void *datainfoloader_movie(void *data) {
 
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
-    if (debugmode & 16) fprintf(stderr,"loader thread starting - Loading movie info from mythtv.\n");
+    // write debug log
+    write_logfile("loader thread starting - Loading movie info from mythtv.");
     film_oversigt.opdatere_film_oversigt();     	              // gen covers 3d hvis de ikke findes.
     do_update_moviedb=false;                                    // set done
   } else {
     if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
   }
-  if (debugmode & 16) fprintf(stderr,"loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  // write debug log
+  sprintf(debuglogdata,"loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  write_logfile(debuglogdata);
   pthread_exit(NULL);
 }
 
@@ -12874,10 +12995,11 @@ void *datainfoloader_movie(void *data) {
 // ****************************************************************************************
 
 void *datainfoloader_stream(void *data) {
-  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading stream info from rss feed.\n");
+  // write debug log
+  write_logfile("loader thread starting - Loading stream info from rss feed.");
   streamoversigt.loadrssfile(0);                                              // download rss files (())
   streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-  if (debugmode & 4) fprintf(stderr,"loader thread done loaded stream stations \n");
+  write_logfile("loader thread done loaded stream stations");
   do_update_rss_show=false;
   pthread_exit(NULL);
 }
@@ -12890,12 +13012,13 @@ void *datainfoloader_stream(void *data) {
 
 void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
-  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from db.\n");
+  // write debug log
+  write_logfile("loader thread starting - Loading spotify info from db.");
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
   spotify_oversigt.set_search_loaded();                           // triger icon loader
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   //spotify_oversigt.load_spotify_iconoversigt();
-  if (debugmode & 4) fprintf(stderr,"loader thread done loaded spotify\n");
+  write_logfile("loader thread done loaded spotify");
   spotify_oversigt_loaded_begin=false;
   pthread_exit(NULL);
 }
@@ -12908,7 +13031,8 @@ void *datainfoloader_spotify(void *data) {
 // ****************************************************************************************
 
 void *webupdate_loader_spotify(void *data) {
-  if (debugmode & 4) fprintf(stderr,"loader thread starting - Loading spotify info from web.\n");
+  // write debug log
+  write_logfile("loader thread starting - Loading spotify info from web.");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
     // check if spotify user info is loaded.
     if ((spotify_oversigt.spotify_get_user_id()==200) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
@@ -12933,7 +13057,8 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
     }
   }
-  if (debugmode & 4) fprintf(stderr,"loader thread done update spotify from web.\n");
+  // write debug log
+  write_logfile("loader thread done update spotify from web.");
   spotify_update_loaded_begin=false;
   spotify_oversigt.set_spotify_update_flag(false);
   firsttimespotifyupdate=false;                                                 // close firsttime update window after update
@@ -12997,7 +13122,8 @@ void *datainfoloader_webserver(void *data) {
 void *datainfoloader_xmltv(void *data) {
   int error;
   //pthread_mutex_lock(&count_mutex);
-  if (debugmode & 256) fprintf(stderr,"loader thread starting - xmltv file parser starting....\n");
+  // write debug log
+  write_logfile("loader thread starting - xmltv file parser starting.");
   //
   // multi thread
   // load xmltvguide from web
@@ -13013,7 +13139,7 @@ void *datainfoloader_xmltv(void *data) {
   }
     // save config again
   save_config((char *) "/etc/mythtv-controller.conf");
-  if (debugmode & 256) fprintf(stderr,"parser xmltv guide done.\n");
+  write_logfile("parser xmltv guide done.");
   // set update flag for done
   do_update_xmltv_show=false;
   //pthread_mutex_unlock(&count_mutex);
@@ -13158,7 +13284,8 @@ void *xbmcdatainfoloader(void *data) {
   char musichomedirpath[1024];
   bool allokay=false;
   //pthread_mutex_lock(&count_mutex);
-  fprintf(stderr,"loader thread starting - Loading music from xbmc/kodi).\n");
+  // write debug log
+  write_logfile("loader thread starting - Loading music from xbmc/kodi).");
   //pthread_mutex_unlock(&count_mutex);
   conn=mysql_init(NULL);
   // Connect to database
@@ -13281,8 +13408,9 @@ void *xbmcdatainfoloader(void *data) {
   // set use internal db for music
   global_use_internal_music_loader_system = true;
   // load db
-  if (debugmode & 2) fprintf(stderr,"Numbers of music records loaded %d \n", opdatere_music_oversigt(musicoversigt,0));
-  if (debugmode & 2) fprintf(stderr,"Nusic db loaded.\n");
+  // write debug log
+  sprintf(debuglogdata,"Numbers of music records loaded %d.", opdatere_music_oversigt(musicoversigt,0));
+  write_logfile(debuglogdata);
   pthread_exit(NULL);
 }
 
@@ -13445,7 +13573,8 @@ void *xbmcdatainfoloader_movie(void *data) {
                 strcat(musichomedirpath,"/.kodi/userdata/Database/MyMusic32.db");
                 break;
     }
-    if (debugmode & 16) fprintf(stderr,"loader thread starting - Loading movies from xbmc/kodi.\n");
+    // write debug log
+    write_logfile("loader thread starting - Loading movies from xbmc/kodi.");
     xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
     //xbmcSQL=new xbmcsqlite((char *) configmysqlhost,(char *)"~/.kodi/userdata/Database/MyVideos75.db",(char *)"~/.kodi/userdata/Database/MyMusic18.db",(char *)"~/.kodi/userdata/Database/MyVideos75.db");
     if (xbmcSQL) {
@@ -13462,7 +13591,9 @@ void *xbmcdatainfoloader_movie(void *data) {
       film_oversigt.opdatere_film_oversigt();     // gen covers 3d hvis de ikke findes.
     }
   }
-  if (debugmode & 16) fprintf(stderr,"loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
+  // write debug log
+  sprintf(debuglogdata,"loader thread done loaded %d movie(s) \n",film_oversigt.get_film_antal());
+  write_logfile(debuglogdata);
   do_update_moviedb = false;
   pthread_exit(NULL);
 }
