@@ -3238,7 +3238,9 @@ void display() {
         // hent søgte sange oversigt
         if ((keybufferopenwin) && (hent_radio_search)) {				// vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_radio_search = false;
-          if (debugmode & 8) fprintf(stderr,"Search radio string: %s \n ",keybuffer);
+          // write debug log
+          sprintf(debuglogdata,"Search radio string: %s \n ",keybuffer);
+          write_logfile(debuglogdata);
           radiooversigt.clean_radio_oversigt();			// clean old liste
           radiooversigt.opdatere_radio_oversigt(keybuffer);	// load new
           radiooversigt.load_radio_stations_gfx();
@@ -10094,6 +10096,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               // opdatere radio oversigt igen efter vis radio options
               if ((vis_radio_oversigt) && (show_radio_options)) {
+                // write debug log
+                write_logfile("Update radio overview.");
                 radiooversigt.clean_radio_oversigt();				// clean old liste
                 radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
                 radiooversigt.load_radio_stations_gfx();
@@ -11278,6 +11282,8 @@ void update2(int value) {
           }
           // opdatere radio oversigt efter pressed on the remorte control from lirc
           if ((vis_radio_oversigt) && (show_radio_options)) {
+            // write debug log
+            write_logfile("Update radio overview.");
             radiooversigt.clean_radio_oversigt();			                        // clean old liste
             radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
             radiooversigt.load_radio_stations_gfx();
@@ -12710,6 +12716,8 @@ void update(int value) {
                     }
                     // opdatere radio oversigt efter efter pressed on the remorte control from lirc
                     if ((vis_radio_oversigt) && (show_radio_options)) {
+                      // write debug log
+                      write_logfile("Update radio overview.");
                       radiooversigt.clean_radio_oversigt();			// clean old liste
                       radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(radiooversigt.getradiooptionsselect());
                       radiooversigt.load_radio_stations_gfx();
@@ -12958,7 +12966,7 @@ void *datainfoloader_music(void *data) {
   }
   do_update_music=false;
   // write debug log
-  write_logfile("loader thread done loaded music info");
+  write_logfile("loader thread done loaded music info.");
   pthread_exit(NULL);
 }
 
@@ -12982,7 +12990,7 @@ void *datainfoloader_movie(void *data) {
     if (debugmode & 16) fprintf(stderr,"Load movie from xbmc/kodi\n");
   }
   // write debug log
-  sprintf(debuglogdata,"loader thread done loaded %d movie \n",film_oversigt.get_film_antal());
+  sprintf(debuglogdata,"loader thread done loaded %d movie.",film_oversigt.get_film_antal());
   write_logfile(debuglogdata);
   pthread_exit(NULL);
 }
@@ -12999,7 +13007,7 @@ void *datainfoloader_stream(void *data) {
   write_logfile("loader thread starting - Loading stream info from rss feed.");
   streamoversigt.loadrssfile(0);                                              // download rss files (())
   streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-  write_logfile("loader thread done loaded stream stations");
+  write_logfile("loader thread done loaded stream stations.");
   do_update_rss_show=false;
   pthread_exit(NULL);
 }
@@ -13018,7 +13026,7 @@ void *datainfoloader_spotify(void *data) {
   spotify_oversigt.set_search_loaded();                           // triger icon loader
   //spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   //spotify_oversigt.load_spotify_iconoversigt();
-  write_logfile("loader thread done loaded spotify");
+  write_logfile("loader thread done loaded spotify.");
   spotify_oversigt_loaded_begin=false;
   pthread_exit(NULL);
 }
@@ -13394,16 +13402,19 @@ void *xbmcdatainfoloader(void *data) {
     xbmcSQL=new xbmcsqlite((char *) configmysqlhost,videohomedirpath,musichomedirpath,videohomedirpath);
     if (xbmcSQL) {
         xbmcSQL->xbmcloadversion();									// get version number fropm mxbc db
-        fprintf(stderr,"XBMC - Load running\n");
+        sprintf(debuglogdata,"XBMC - Loader is running.");
+        // write debug log
+        write_logfile(debuglogdata);
         xbmcSQL->xbmc_readmusicdb();     // IN use
-        fprintf(stderr,"XBMC - loader done.\n");
+        sprintf(debuglogdata,"XBMC - Loader is done.");
+        write_logfile(debuglogdata);
         //create_radio_oversigt();									// Create radio mysql database if not exist
         //radiooversigt_antal=radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
     } else {
-      if (debugmode & 2) fprintf(stderr,"Error loading kodi db\n");
+      write_logfile("Error loading kodi db.");
       exit(1);
     }
-    if (debugmode & 2) fprintf(stderr,"loader thread done loaded kodi \n");
+    write_logfile("loader thread done loaded kodi.");
   }
   // set use internal db for music
   global_use_internal_music_loader_system = true;
