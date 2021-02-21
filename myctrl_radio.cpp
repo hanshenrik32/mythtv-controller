@@ -722,27 +722,6 @@ void radiostation_class::show_radio_options() {
     int winsizy=800;
     int xpos=0;
     int ypos=0;
-    // mask
-    /*
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,0.8f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, radiooptionsmask); 					//_textureId18_1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    // draw  front box
-    glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glEnd();
-    glPopMatrix();
-    */
     // background
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -833,6 +812,8 @@ int radiostation_class::set_radio_popular(int stationid) {
     char sqlselect[512];
     MYSQL *conn;
     MYSQL_RES *res;
+    // write debug log
+    write_logfile("Update played radio station.");
     sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
@@ -861,6 +842,7 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    write_logfile("Update played radio station online.");
     if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
       else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
@@ -1050,7 +1032,9 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
             if (strcmp(hostname,"")!=0) {
               // get port and ip
               port=get_url_data(hostname,ipadresse);
-              if (debugmode & 1) fprintf(stderr,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
+              // write debug log
+              sprintf(debuglogdata,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
+              write_logfile(debuglogdata);
               sock=socket(PF_INET, SOCK_STREAM, 0);
               if (sock) {
                 //fcntl(sock, F_SETFL, O_NONBLOCK);

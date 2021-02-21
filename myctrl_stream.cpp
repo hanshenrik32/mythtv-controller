@@ -3586,10 +3586,8 @@ int stream_class::loadweb_stream_iconoversigt() {
     nr++;
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (debugmode & 4) {
-    if (gfx_loaded) write_logfile("rss stream gfx download end.");
-    else write_logfile("rss stream gfx download error.");
-  }
+  if (gfx_loaded) write_logfile("rss stream gfx download end.");
+  else write_logfile("rss stream gfx download error.");
   return(1);
 }
 

@@ -747,10 +747,10 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                         del_rec_nr=atoi(row[0]);
                       }
                     }
-                    if (debugmode & 16) {
-                      if (fundet) printf("checking/replace movietitle %s \n",movietitle);
-                      else printf("checking..insert movietitle %s \n",movietitle);
-                    }
+                    // write debug log
+                    if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s'",movietitle);
+                    else sprintf(debuglogdata,"Checking/Insert movietitle '%s'",movietitle);
+                    write_logfile(debuglogdata);
                     // check if record exist (video file exist)
                     if ((fundet) && (del_rec_nr)) {
                       if (!(file_exists(moviepathcheck))) {
@@ -812,10 +812,10 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       del_rec_nr=atoi(row[0]);
                     }
                   }
-                  if (debugmode & 16) {
-                    if (fundet) printf("checking/replace movietitle %s \n",movietitle);
-                    else printf("checking ..found movietitle %s \n",movietitle);
-                  }
+                  // write debug log
+                  if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
+                  else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
+                  write_logfile(debuglogdata);
                   // findes filmen i db i forvejen så slet den og opret den igen
                   // ellers bare opret den
                   // dette skal gøres hvis dir eller fil navn ændre sig
@@ -1128,7 +1128,9 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
     //gotoxy(10,18);
-    if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
+    // write debug log
+    sprintf(debuglogdata," %d dvd covers loaded\n",filmantal);
+    write_logfile(debuglogdata);
     mysql_close(conn);
     return(filmantal);
 }
@@ -1208,8 +1210,9 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       }
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal; else this->filmoversigt_antal=0;
-    //gotoxy(10,18);
-    if (debugmode & 16) printf(" %d dvd covers loaded\n",filmantal);
+    // write debug log
+    sprintf(debuglogdata," %d dvd covers loaded.",filmantal);
+    write_logfile(debuglogdata);
     mysql_close(conn);
     return(filmantal);
 }
