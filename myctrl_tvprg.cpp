@@ -22,6 +22,8 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
+extern char debuglogdata[1024];                                // used by log system
+
 extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
 extern GLuint setupnetworkwlanback;
@@ -121,9 +123,15 @@ int get_tvguide_fromweb() {
     strcpy(exestring,configbackend_tvgraber);
     if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    if (debugmode & 256) printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
+    //if (debugmode & 256) printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
+    // write debug log
+    sprintf(debuglogdata,"Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
+    write_logfile(debuglogdata);
     result=system(exestring);   // do it
-    if (debugmode & 256) printf("Done tv graber background process exit kode %d\n",result);
+    //if (debugmode & 256) printf("Done tv graber background process exit kode %d\n",result);
+    // write debug log
+    sprintf(debuglogdata,"Done tv graber background process exit kode %d\n",result);
+    write_logfile(debuglogdata);
   } else printf("Graber is already ruuning.\n");
   return(result);
 }
@@ -535,7 +543,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
               if (content) {
                 strcpy(result,(char *) content);
                 s=trimwhitespace(result);
-                if (debugmode & 256) printf("TV chanel found : %s \n",s);
+                //if (debugmode & 256) printf("TV chanel found : %s \n",s);
+                sprintf(debuglogdata,"TV chanel found : %s",s);
+                write_logfile(debuglogdata);
               }
               subnode=node->xmlChildrenNode;
               while(subnode) {
@@ -2925,9 +2935,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
         fprintf(stdout, "...\n");
         xmlFreeDoc(document);
       } else {
-        if (debugmode & 256) printf("tvguide.xml not found \n");
+        //if (debugmode & 256) printf("tvguide.xml not found \n");
+        // write debug log
+        write_logfile("tvguide.xml not found");
       }
-
     }
   }
   loading_tv_guide=false;
@@ -3452,8 +3463,12 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
     this->starttid=rawtime;						                                // gem tider i class
     this->sluttid=rawtime2;						                                //
-    if (debugmode & 256) printf("\nGet/update Tvguide.\n");
-    if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
+    //if (debugmode & 256) printf("\nGet/update Tvguide.\n");
+    // write debug log
+    write_logfile("Get/Update Tvguide.");
+    //if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
+    sprintf(debuglogdata,"Tvguide from %-19s to %-19s",dagsdato,enddate);
+    write_logfile(debuglogdata);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -3473,7 +3488,11 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-            if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
+            //if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
+            // write debug log
+            sprintf(debuglogdata,"Antal channels/tvguide %s",row[0]);
+            write_logfile(debuglogdata);
+
           }
         }
         // do select from db
@@ -3623,7 +3642,9 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
-            if (debugmode & 256) printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            //if (debugmode & 256) printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            sprintf(debuglogdata,"Found nr of tv channels %4d Found nr of programs  %4d",this->kanal_antal,totalantalprogrammer);
+            write_logfile(debuglogdata);
         }
         mysql_close(conn);
     }
