@@ -1129,10 +1129,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       }
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
-    //gotoxy(10,18);
-    // write debug log
-    sprintf(debuglogdata," %d dvd covers loaded\n",filmantal);
-    write_logfile(debuglogdata);
     mysql_close(conn);
     return(filmantal);
 }
@@ -1212,9 +1208,6 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       }
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal; else this->filmoversigt_antal=0;
-    // write debug log
-    sprintf(debuglogdata," %d dvd covers loaded.",filmantal);
-    write_logfile(debuglogdata);
     mysql_close(conn);
     return(filmantal);
 }
