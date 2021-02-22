@@ -15,9 +15,9 @@
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
 
-extern char debuglogdata[1024];                                  // used by log system
+extern char debuglogdata[1024];                                // used by log system
 
-extern float configdefaultmoviefontsize;                                      // font size
+extern float configdefaultmoviefontsize;                       // font size
 extern char configmoviepath[256];                              //
 extern char configdefaultmoviepath[256];
 extern char configbackend[];
@@ -46,7 +46,7 @@ extern bool movie_oversigt_gfx_loading;
 extern int orgwinsizey;
 extern int orgwinsizex;
 
-extern int debugmode;
+
 
 // ****************************************************************************************
 //
@@ -768,7 +768,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       res = mysql_store_result(conn);
                       mysql_query(conn,sqlselect);
                       res = mysql_store_result(conn);
-                      if ((mysql_error(conn)) && (debugmode & 512)) {
+                      if (mysql_error(conn)) {
+                        write_logfile("Mysql error");
                         printf("%s\n",mysql_error(conn));
                         exit(0);
                       }
@@ -836,7 +837,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     res = mysql_store_result(conn);
                     mysql_query(conn,sqlselect);
                     res = mysql_store_result(conn);
-                    if ((mysql_error(conn)) && (debugmode & 512)) {
+                    if (mysql_error(conn)) {
+                      write_logfile("Mysql error.");
                       printf("%s\n",mysql_error(conn));
                       exit(0);
                     }
