@@ -1,5 +1,11 @@
 husk imageconvert 
 
+tv module to use in the future
+
+https://tvheadend.org/projects/tvheadend/wiki/Faq
+
+
+
 if ypu wants to make the deb file you have to install debhelper
 
 https://www.imagemagick.org/Usage/thumbnails/#cut
@@ -11,6 +17,11 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 # Soon support for vdr recording
 
 Version.
+
+
+mythtv-controller ver 0.39.0
+
+tty default log is now write to logfile mythtv-controller.log
 
 mythtv-controller ver 0.38.4
 
