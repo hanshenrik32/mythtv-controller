@@ -3,7 +3,7 @@
 #include <libxml/parser.h>
 
 extern char configdefaultmusicpath[256];                      // internal db for music
-//extern int debugmode;
+extern int debugmode;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 
 
@@ -323,9 +323,9 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       // download file and save it same path as movile file
       if (!(file_exists(filetodownload))) {
         if (get_webfile(moviecover,filetodownload)) {
-          //if (debugmode & 512) printf("Downloading cover %s\n",movietitle);
+          if (debugmode & 512) printf("Downloading cover %s\n",movietitle);
         } else {
-          printf("Error downloading file cover from %s\n",moviecover);
+          if (debugmode & 512) printf("Error downloading file cover from %s\n",moviecover);
         }
       }
     }
@@ -346,7 +346,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
   }
   // create if not exist
   if (!(fundet)) {
-    //if (debugmode & 512) printf("Import kodi title %40s\n",movietitle);
+    if (debugmode & 512) printf("Import kodi title %40s\n",movietitle);
     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                               (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
                                               movietitle,moviesubtitle,movieplot,movieimdb,movieyear,movieuserrating,movielength ,moviepath1,filetodownload);
@@ -355,7 +355,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,dbname, 0, NULL, 0);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      if (mysql_error(conn)) fprintf(stderr,"%s\n",mysql_error(conn));
+      if ((mysql_error(conn)) && (debugmode & 512)) printf("%s\n",mysql_error(conn));
       mysql_close(conn);
     }
   }
@@ -603,7 +603,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   aaa=strlen(sted);
   sted[aaa-1]=0;
   strcat(temp,filename1);
-  //if (debugmode & 512) printf("Import kodi song %40s \n",songname);
+  if (debugmode & 512) printf("Import kodi song %40s \n",songname);
   sprintf(sqlselect,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
                 (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
                 0,      temp,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,directoryid);

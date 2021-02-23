@@ -20,6 +20,8 @@
 
 #include "myth_saver.h"
 
+extern char debuglogdata[1024];
+
 extern float configdefaultmusicfontsize;                        // default font
 extern char music_db_update_loader[256];                       //
 extern int music_oversigt_loaded_nr;
@@ -126,7 +128,7 @@ unsigned int hent_parent_dir_id(int dirid) {
       mysql_close(conn);
     }
     catch (...) {
-      write_logfile((char *) "Mysql db connect error");
+      write_logfile("Mysql db connect error");
     }
     return(returid);
 }
@@ -225,7 +227,7 @@ int get_artistid(char *artistname) {
       }
     }
     catch (...) {
-      write_logfile((char *) "Mysql db connect error");
+      write_logfile("Mysql db connect error");
     }
     return(artistid);
 }
@@ -263,7 +265,7 @@ int song_exist_in_db(char *filename,char *name) {
     }
   }
   catch (...) {
-    write_logfile((char *) "Mysql db connect error");
+    write_logfile("Mysql db connect error");
   }
   return(songid);
 }
@@ -334,7 +336,7 @@ int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt
     // if database not exist do dir scan and create tables for music
     //
     if (!(dbexist)) {
-      write_logfile((char *) "Creating database for music.");
+      write_logfile("Creating database for music.");
       strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
@@ -576,7 +578,9 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     // select the right db to update from
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);				// clear music oversigt
-    if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
+    //if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
+    printf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
+    write_logfile(debuglogdata);
     i=0;
     if (directory_id==0) {			// hent fra starten top music directory
       strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
@@ -653,7 +657,7 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
         i++;
       }        	// end while
     } else {
-      write_logfile((char *) "mysql sql database err.");
+      write_logfile("mysql sql database err.");
       i=0;
     }
     if (i>0) {
@@ -682,7 +686,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     char database[256];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);
-    write_logfile((char *) "Opdatere music oversigt fra database.");
+    write_logfile("Opdatere music oversigt fra database.");
     i=0;
     strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
     strcpy(musicoversigt[0].album_name,"   BACK");
@@ -695,7 +699,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
     musicoversigt[0].artist_id=0;
     musicoversigt[0].oversigttype=0;
     i++;
-    write_logfile((char *) "Loading playlists from internal db.");
+    write_logfile("Loading playlists from internal db.");
     try {
       conn=mysql_init(NULL);
       // Connect to database
@@ -724,7 +728,7 @@ int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]) {
       mysql_close(conn);
     }
     catch (...) {
-      write_logfile((char *) "Error process playlist.");
+      write_logfile("Error process playlist.");
     }
     return(i);
 }
@@ -747,7 +751,7 @@ int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *play
   char database[256];
   strcpy(database,dbname);
   //clean_music_oversigt(musicoversigt);
-  write_logfile((char *) "Save music playlist.");
+  write_logfile("Save music playlist.");
   i=0;
   conn=mysql_init(NULL);
   // Connect to database
@@ -801,7 +805,7 @@ int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *
     char tmptxt[512];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);
-    write_logfile((char *) "Opdatere music oversigt fra database.");
+    write_logfile("Opdatere music oversigt fra database.");
     i=0;
     if (strcmp(searchtxt,"")==0) {			// hent fra starten top music directory
       strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");

@@ -3023,12 +3023,13 @@ int txmltvgraber_createconfig() {
     // add configure paramters to tv_grab_*
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
+
     switch(aktiv_tv_graber.graberaktivnr) {
-      case 8: sysresult=system("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
-              printf("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+      case 8: sysresult=system("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              printf("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
       default:
-              sysresult=system(exebuffer);
+              //sysresult=system(exebuffer);
               break;
 
     }
@@ -3096,11 +3097,9 @@ int txmltvgraber_updateconfigfile() {
       cnr++;
     }
   }
-  // close files again
-  if (filin) fclose(filin);
-  if (filout) fclose(filout);
+  fclose(filin);
+  fclose(filout);
   // copy new config file to xmltv homedir ~/.xmltv
-  /*
   getuserhomedir(path);                                                     // get user homedir
   strcpy(filename,"cp ");
   strcat(filename,path);
@@ -3111,7 +3110,6 @@ int txmltvgraber_updateconfigfile() {
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
   sysresult=system(filename);
-  */
 }
 
 

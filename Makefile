@@ -69,6 +69,8 @@ all:
 
 
 compile: $(PROG)
+	@if ! test -f build-number.txt; then ouch build-number.txt; fi
+	
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
