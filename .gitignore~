@@ -1,3 +1,6 @@
+mythtv-controller-0.38.4.tgz
+mythtv-controller-0.38.3.tgz
+mythtv-controller_0.38-1_amd64.deb
 index.html.backup
 .vscode/
 debian/
@@ -26,7 +29,6 @@ spotify_access_token.txt
 fmodstudioapi11011linux/
 tema5/buttons/radio_button.xcf
 update_build_src_bin_files.sh
-json-parser/
 spotify_code.txt
 spotify_access_token2.txt
 spotify_song_playing.json
