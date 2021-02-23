@@ -1,9 +1,13 @@
 # mythtv-controller 
-# packs to install to compile on Ubuntu 10/12/14/16/18.xx/19.xx
+# packs to install to compile on Ubuntu 16/18.xx/19.xx/20.04
 # Updated 04/20/2020
 # 
 
 Version.
+
+mythtv-controller ver 39.0
+
+All log is moved to log file in you home directory.
 
 mythtv-controller ver 38.4
 
