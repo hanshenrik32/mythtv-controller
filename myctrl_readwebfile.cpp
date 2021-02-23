@@ -15,7 +15,7 @@
                                                                 // 8  = keyboard/mouse move
                                                                 // 16 = movie
                                                                 // 32 = searcg
-extern int debugmode;                                           // 64 = radio station land icon loader
+//extern int debugmode;                                           // 64 = radio station land icon loader
                                                                 // 128= stream search
                                                                 // 256 = tv program stuf
                                                                 // 512 = media importer
@@ -121,7 +121,7 @@ void get_host(char *hname,char *webpath,char *source) {
 
 // ****************************************************************************************
 //
-// downloader of file
+// Download webpath file to outfile by socket
 //
 // ****************************************************************************************
 
@@ -210,8 +210,8 @@ int get_webfile(char *webpath,char *outfile) {
     if (!(loaderror)) {
       fil=fopen(outfile,"w");
       if (!(fil)) {
-        if (debugmode) fprintf(stderr," Open file for write error %s \n",outfile);
-        loaderror=true;							// not posible to save file
+        fprintf(stderr," Open file for write error %s \n",outfile);
+        loaderror=true;						                                             // not posible to save file
       }
       if (fil) {
         for (i = 0;i < webobjlength; i++) {

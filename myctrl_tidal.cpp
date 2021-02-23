@@ -92,7 +92,7 @@ extern GLuint tridal_askopen;                                  // ask play icon
 extern GLuint setuprssback;
 extern GLuint _textureclose;
 extern GLuint setupkeysbar1;
-extern int debugmode;
+//extern int debugmode;
 extern unsigned int musicoversigt_antal;                        //
 extern int do_stream_icon_anim_icon_ofset;                      //
 extern GLuint radiooptions,radiooptionsmask;			              //
@@ -778,7 +778,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
       res = mysql_store_result(conn);
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
-          if (debugmode & 4) fprintf(stdout,"playlist %-60s tidalid %-20s \n",row[0],row[1]);
+          //if (debugmode & 4) fprintf(stdout,"playlist %-60s tidalid %-20s \n",row[0],row[1]);
 //          if (tridal_oversigt.tridal_get_playlist(row[1],force,0)==1) {
 //            fprintf(stderr,"Error create playlist %s \n",row[1]);
 //          }
@@ -1775,9 +1775,7 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
     // clear old view
     clean_tridal_oversigt();
     strcpy(lasttmpfilename,"");
-    if (debugmode & 4) {
-      fprintf(stderr,"loading tidal data.\n");
-    }
+    write_logfile((char *) "loading tidal data.");
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
       show_search_result=false;
@@ -1789,7 +1787,8 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
-    if (debugmode & 4) fprintf(stderr,"tidal loader started... \n");
+    // write debug log
+    write_logfile((char *) "tidal loader started...");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -1910,12 +1909,14 @@ int tridal_class::opdatere_tridal_oversigt(char *refid) {
         }
         mysql_close(conn);
       } else {
-        if (debugmode & 4) fprintf(stderr,"No tidal data loaded \n");
+        //if (debugmode & 4) fprintf(stderr,"No tidal data loaded \n");
+        write_logfile((char *) "No tidal data loaded");
       }
       antalplaylists=antal;
       return(antal);
     } else fprintf(stderr,"Failed to update tidal db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    if (debugmode & 4) fprintf(stderr,"tidal loader done... \n");
+    //if (debugmode & 4) fprintf(stderr,"Tidal loader done... \n");
+    write_logfile((char *) "Tidal loader done...");
     return(0);
 }
 
@@ -2143,9 +2144,9 @@ int tridal_class::get_search_result_online(char *searchstring,int type) {
 // ****************************************************************************************
 
 void *load_tridal_web(void *data) {
-  if (debugmode & 4) fprintf(stderr,"Start tridal loader thread\n");
+  write_logfile((char *) "Start tridal loader thread");
   //streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) fprintf(stderr,"Stop tridal loader thread\n");
+  write_logfile((char *) "Stop tridal loader thread");
 }
 
 
@@ -2178,9 +2179,10 @@ int tridal_class::load_tridal_iconoversigt() {
   char downloadfilenamelong[5000];
   char homedir[200];
   this->gfx_loaded=false;                                                           // set loaded flag to false
-  if (debugmode & 4) printf("tridal icon loader.\n");
+  // debug log
+  write_logfile((char *) "Running tidal icon loader.");
   while(nr<=streamantal()) {
-    if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    //if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
         // if url
@@ -2200,10 +2202,9 @@ int tridal_class::load_tridal_iconoversigt() {
   }
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"tridal download done. \n");
-    else fprintf(stderr,"tridal download error. \n");
-  }
+  // write debug log
+  if (gfx_loaded) write_logfile((char *) "tridal download done.");
+  else write_logfile((char *) "tridal download error.");
   gfx_loaded=true;
   return(1);
 }
