@@ -3096,9 +3096,11 @@ int txmltvgraber_updateconfigfile() {
       cnr++;
     }
   }
-  fclose(filin);
-  fclose(filout);
+  // close files again
+  if (filin) fclose(filin);
+  if (filout) fclose(filout);
   // copy new config file to xmltv homedir ~/.xmltv
+  /*
   getuserhomedir(path);                                                     // get user homedir
   strcpy(filename,"cp ");
   strcat(filename,path);
@@ -3109,6 +3111,7 @@ int txmltvgraber_updateconfigfile() {
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
   sysresult=system(filename);
+  */
 }
 
 

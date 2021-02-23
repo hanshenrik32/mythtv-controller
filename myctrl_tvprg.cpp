@@ -126,12 +126,12 @@ int get_tvguide_fromweb() {
     //if (debugmode & 256) printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
     // write debug log
     sprintf(debuglogdata,"Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
-    write_logfile(debuglogdata);
+    write_logfile((char *) debuglogdata);
     result=system(exestring);   // do it
     //if (debugmode & 256) printf("Done tv graber background process exit kode %d\n",result);
     // write debug log
     sprintf(debuglogdata,"Done tv graber background process exit kode %d\n",result);
-    write_logfile(debuglogdata);
+    write_logfile((char *) debuglogdata);
   } else printf("Graber is already ruuning.\n");
   return(result);
 }
@@ -354,7 +354,7 @@ void expand_escapes(char* dest, const char* src) {
 
 // ****************************************************************************************
 //
-//
+// Save tv channel db
 //
 // ****************************************************************************************
 
@@ -373,7 +373,7 @@ int tv_oversigt::saveparsexmltvdb() {
 
 // ****************************************************************************************
 //
-//
+// Load tv channel db
 //
 // ****************************************************************************************
 
@@ -545,7 +545,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 s=trimwhitespace(result);
                 //if (debugmode & 256) printf("TV chanel found : %s \n",s);
                 sprintf(debuglogdata,"TV chanel found : %s",s);
-                write_logfile(debuglogdata);
+                write_logfile((char *) debuglogdata);
               }
               subnode=node->xmlChildrenNode;
               while(subnode) {
@@ -2937,7 +2937,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
       } else {
         //if (debugmode & 256) printf("tvguide.xml not found \n");
         // write debug log
-        write_logfile("tvguide.xml not found");
+        write_logfile((char *) "tvguide.xml not found");
       }
     }
   }
@@ -2998,9 +2998,11 @@ tv_oversigt_prgtype::tv_oversigt_prgtype() {
 }
 
 
+// *****************************************************************************************
 //
 // destructor
 //
+// *****************************************************************************************
 
 tv_oversigt_prgtype::~tv_oversigt_prgtype() {
 
@@ -3465,10 +3467,10 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     this->sluttid=rawtime2;						                                //
     //if (debugmode & 256) printf("\nGet/update Tvguide.\n");
     // write debug log
-    write_logfile("Get/Update Tvguide.");
+    write_logfile((char *) "Get/Update Tvguide.");
     //if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
     sprintf(debuglogdata,"Tvguide from %-19s to %-19s",dagsdato,enddate);
-    write_logfile(debuglogdata);
+    write_logfile((char *) debuglogdata);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -3491,7 +3493,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             //if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
             // write debug log
             sprintf(debuglogdata,"Antal channels/tvguide %s",row[0]);
-            write_logfile(debuglogdata);
+            write_logfile((char *) debuglogdata);
 
           }
         }
@@ -3644,10 +3646,11 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             this->kanal_antal=kanalnr+1;
             //if (debugmode & 256) printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
             sprintf(debuglogdata,"Found nr of tv channels %4d Found nr of programs  %4d",this->kanal_antal,totalantalprogrammer);
-            write_logfile(debuglogdata);
+            write_logfile((char *) debuglogdata);
         }
         mysql_close(conn);
     }
+    // load icons
     opdatere_tv_oversigt_kanal_icons();
     loading_tv_guide=false;
 }
@@ -3738,6 +3741,8 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 
 // ****************************************************************************************
+//
+//
 //
 // ****************************************************************************************
 
