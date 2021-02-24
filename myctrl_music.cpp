@@ -579,7 +579,7 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     clean_music_oversigt(musicoversigt);				// clear music oversigt
     //if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
-    printf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
+    sprintf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
     write_logfile(debuglogdata);
     i=0;
     if (directory_id==0) {			// hent fra starten top music directory

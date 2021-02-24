@@ -13127,6 +13127,7 @@ void *datainfoloader_webserver(void *data) {
 // ****************************************************************************************
 //
 // phread dataload xmltv
+// called from update_xmltv_phread_loader
 //
 // ****************************************************************************************
 
@@ -13145,7 +13146,8 @@ void *datainfoloader_xmltv(void *data) {
       //save array to disk
       aktiv_tv_oversigt.saveparsexmltvdb();
     } else {
-      if (debugmode & 256) fprintf(stderr,"Parse xmltv error (mysql connection error)\n");
+      write_logfile("parser xmltv tv guide error.");
+      fprintf(stderr,"Parse xmltv error\n");
     }
   }
     // save config again
@@ -14160,11 +14162,10 @@ int main(int argc, char** argv) {
     // create dir for json files and icon files downloaded
     if (!(file_exists("~/spotify_json"))) {
       dircreatestatus = mkdir("~/spotify_json", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-      //system("/bin/mkdir ~/spotify_json");
     }
+    // create dir
     if (!(file_exists("~/spotify_gfx"))) {
       dircreatestatus = mkdir("~/spotify_gfx", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-      //system("/bin/mkdir ~/spotify_gfx");
     }
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
@@ -14349,8 +14350,10 @@ int main(int argc, char** argv) {
     //strcat(overskrift,overskrift1);
     glutCreateWindow (overskrift);
     init();                                           // init gopengl
-    write_logfile("Loading init graphic.");
+    write_logfile("Mythtv-controller startup.");
+    write_logfile("Loading graphic.");
     loadgfx();                                        // load gfx stuf
+    write_logfile("Graphic loaded.");
     if (full_screen) write_logfile("Enter full screen mode.");
     if (full_screen) glutFullScreen();                // set full screen mode
     glutDisplayFunc(display);                         // main loop func

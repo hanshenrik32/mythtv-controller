@@ -443,13 +443,14 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
 // ****************************************************************************************
 //
-//
+// show radio stations overview
 //
 // ****************************************************************************************
-extern int orgwinsizey;
+extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
 bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+    static bool show_all_kode_errors=false;
     int buttonsize=200;
     int buttonsizey=180;
     int xof=5;
@@ -602,8 +603,8 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             sprintf(debuglogdata,"Contry code %d missing flag, File name %s",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             if (gfxlande[stack[i+sofset]->land]==0) {
               sprintf(debuglogdata,"Contry code %d is missing filename.",stack[i+sofset]->land);
-              write_logfile(debuglogdata);
-            } else write_logfile(debuglogdata);
+              if (show_all_kode_errors==false) write_logfile(debuglogdata);
+            } else if (show_all_kode_errors==false) write_logfile(debuglogdata);
           }
         }
         // print radios station name
@@ -700,6 +701,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
       glPopMatrix();
     }
     glPopMatrix();
+    show_all_kode_errors=true;                                                  // stop loging.
     return(radio_pictureloaded);
 }
 

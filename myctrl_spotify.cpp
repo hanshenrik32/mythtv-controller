@@ -31,7 +31,7 @@
 #include "myctrl_readwebfile.h"
 #include "myctrl_spotify.h"
 
-extern char debuglogdata[1024];                                  // used by log system
+extern char debuglogdata[1024];                                                // used by log system
 
 // web port
 static const char *s_http_port = "8000";
@@ -2732,6 +2732,8 @@ int spotify_class::spotify_get_available_devices() {
         mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
         res = mysql_store_result(conn);
         fprintf(stderr,"Found devices : %d\n",devicenr);
+        sprintf(debuglogdata,"Found devices : %d ",devicenr);
+        write_logfile(debuglogdata);
         for( int t = 0 ; t < devicenr ; t++ ) {
           if ( strcmp(spotify_device[t].name,"") !=0 ) {
             device_antal++;
@@ -2754,6 +2756,8 @@ int spotify_class::spotify_get_available_devices() {
               mysql_query(conn,sql);
               res = mysql_store_result(conn);
             }
+            sprintf(debuglogdata,"Spotify device name : %-20s Device type : %s",spotify_device[t].name,spotify_device[t].devtype);
+            write_logfile(debuglogdata);
           }
         }
         this->spotify_device_antal=device_antal;
