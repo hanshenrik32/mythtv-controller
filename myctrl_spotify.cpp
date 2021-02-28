@@ -2931,14 +2931,11 @@ int spotify_class::get_antal_rss_feeds_sources(MYSQL *conn) {
 
 // ****************************************************************************************
 //
-// opdate show liste in view (det vi ser)
+// opdate show liste in view (what you see on the screen)
 // loaded from db
+// refid=0 if top level else refid is the album
 //
 // ****************************************************************************************
-//
-// load felt 7 = mythtv gfx icon
-// fpath=stream path
-// atr = stream name
 
 int spotify_class::opdatere_spotify_oversigt(char *refid) {
     char temptxt1[2048];
@@ -3631,6 +3628,7 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
     // set type post/put/get
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
     userfile=fopen(userfilename,"w");
+    // write to file
     if (userfile) {
       //curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
       res = curl_easy_perform(curl);

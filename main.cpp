@@ -74,6 +74,9 @@ bool stream_jump = false;
 // GLUT_BITMAP_HELVETICA_12 - A 12-point variable-width Helvetica font.
 // GLUT_BITMAP_HELVETICA_18 - A 18-point variable-width Helvetica font.
 
+
+extern float sinofsetz[];
+
 bool tv_guide_firsttime_update = false;
 
 int radio_oversigt_loaded_nr=0;                                                  //
@@ -2536,6 +2539,8 @@ void display() {
                           0.3,0.3,0.3, \
                           0.8,0.1,0.1, \
                           0.8,0.1,0.1};
+
+
     struct timeb tb;
     struct tm* t;
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
@@ -2722,9 +2727,11 @@ void display() {
                 glEndList();
               } else {
                 // Call display list to show object
+                // show clock static background
                 glCallList(index);
               }
               // make the analog clock
+              glTranslatef(0.0f, 0.0f, 0.0f);
               glDisable(GL_TEXTURE_2D);
               glLineWidth(5.0f);
               glBegin(GL_LINES);

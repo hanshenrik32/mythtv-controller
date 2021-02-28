@@ -128,7 +128,7 @@ int get_tvguide_fromweb() {
     write_logfile(debuglogdata);
     result=system(exestring);   // do it
     // write debug log
-    sprintf(debuglogdata,"Done tv graber background process. Exit kode %d\n",result);
+    sprintf(debuglogdata,"Done tv graber background process. Exit kode %d",result);
     write_logfile(debuglogdata);
   } else printf("Graber is already ruuning.\n");
   return(result);
@@ -210,28 +210,25 @@ unsigned long get_cannel_id(MYSQL *conn,char *channelname) {
 //
 // ****************************************************************************************
 
-bool do_cannel_exist(char *channelname) {
+bool do_cannel_exist(MYSQL *conn,char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
-  // mysql stuf
-  conn=mysql_init(NULL);
-  if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+  try {
+    if (conn) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
+      mysql_query(conn,sql);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
-    mysql_close(conn);
+  } catch (...) {
+    printf("Error connect to mysql.");
   }
   if (id==0) return(false); else return(true);
 }
@@ -243,28 +240,25 @@ bool do_cannel_exist(char *channelname) {
 //
 // ****************************************************************************************
 
-bool do_program_exist(int pchanid,char *ptitle,char *pstarttime) {
+bool do_program_exist(MYSQL *conn,int pchanid,char *ptitle,char *pstarttime) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
-  // mysql stuf
-  conn=mysql_init(NULL);
-  if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+  try {
+    if (conn) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
+      mysql_query(conn,sql);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
-    mysql_close(conn);
+  } catch (...) {
+    printf("Error connect to mysql.");
   }
   if (id==0) {
     return(false);
@@ -564,7 +558,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 }
                 subnode=subnode->next;
               }
-              cidfundet=do_cannel_exist(channelidname);
+              cidfundet=do_cannel_exist(conn,channelidname);
               if (cidfundet==0) {
                 sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid,iconfile) values(0,'%s','%s','%s','%s')",channelidname,s,xmltvid,realfilename);
                 mysql_query(conn,sql);
@@ -2904,7 +2898,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
               // convert spec chars to esc string in string
               expand_escapes(temptxt,prgtitle);
               strncpy(prgtitle,temptxt,1024-1);
-              if (!(do_program_exist(channelid,prgtitle,starttime))) {
+              if (!(do_program_exist(conn,channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
                 // convert spec chars to esc string in string
@@ -2918,6 +2912,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
                 prg_antal++;
+                sprintf(debuglogdata,"#%4d of Tvguide records created.... Channel %20s %s->%s %s ",prg_antal,channelname,starttime,endtime,prgtitle);
+                write_logfile(debuglogdata);
 //                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
 //                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
