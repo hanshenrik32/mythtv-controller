@@ -182,20 +182,13 @@ char *trimwhitespace(char *str)
 // OK
 // ****************************************************************************************
 
-unsigned long get_cannel_id(char *channelname) {
+unsigned long get_cannel_id(MYSQL *conn,char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
   // mysql stuf
   try {
-    conn=mysql_init(NULL);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
     if (conn) {
       sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
       mysql_query(conn,sql);
@@ -204,7 +197,6 @@ unsigned long get_cannel_id(char *channelname) {
         while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
       }
       mysql_free_result(res);
-      mysql_close(conn);
     }
   } catch (...) {
     printf("Error connect to mysql.");
@@ -2908,7 +2900,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
               //            tmpdat=xmlGetProp(subnode,( xmlChar *) "category");
               //            if (tmpdat) printf("category: %s\n", tmpdat);
               // get changel id to db
-              channelid=get_cannel_id(channelname);
+              channelid=get_cannel_id(conn,channelname);
               // convert spec chars to esc string in string
               expand_escapes(temptxt,prgtitle);
               strncpy(prgtitle,temptxt,1024-1);

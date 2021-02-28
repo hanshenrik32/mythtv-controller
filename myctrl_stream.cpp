@@ -3290,15 +3290,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 
-
-
       // https://friesb4guyspodcast.libsyn.com/rss
       if (check_rss_feed_exist(conn,(char *) "Fries before guys")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Fries before guys',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Fries before guys.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Fries before guys',NULL,NULL,'Fries before guys ',0,0,NULL,'https://friesb4guyspodcast.libsyn.com/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Fries before guys',NULL,NULL,'Fries before guys',0,0,NULL,'https://friesb4guyspodcast.libsyn.com/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
@@ -3307,6 +3305,28 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
+
+
+      // TikTok manden
+      if (check_rss_feed_exist(conn,(char *) "TikTok-manden")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('TikTok-manden',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error TikTok-manden.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('TikTok-manden',NULL,NULL,'TikTok-manden',0,0,NULL,'https://www.spreaker.com/show/4711015/episodes/feed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Fries before guys.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
+
+
+
 
       // close mysql
       if (conn) mysql_close(conn);

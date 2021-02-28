@@ -3372,7 +3372,7 @@ void display() {
         // show tv guide
         // take time on it
         aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << std::endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -3395,7 +3395,7 @@ void display() {
         glPushMatrix();
         aktiv_crecordlist.showtvreclist();
         glPopMatrix();
-        if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
 
@@ -6561,7 +6561,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           runwebserver=false;
           order_channel_list();                                               // order tv channel list
           save_channel_list();                                                //
-          txmltvgraber_createconfig();                                        //
+          txmltvgraber_createconfig();                                        // create tv grabber config
           exit(0);                                                            // exit
         }
       }

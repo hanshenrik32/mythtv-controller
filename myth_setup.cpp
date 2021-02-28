@@ -22,6 +22,8 @@
 #include "checknet.h"
 #include "utility.h"
 
+extern char debuglogdata[1024];                                  // used by log system
+
 extern float configdefaultradiofontsize;                                        // font size in overviews
 extern float configdefaulttvguidefontsize;
 extern float configdefaultmusicfontsize;
@@ -2905,20 +2907,26 @@ int txmltvgraber_createconfig() {
   char path[1024];
   char exebuffer[1024];
   int sysresult;
-
+  // delete old config from dir
   strcpy(exebuffer,"rm ");
   getuserhomedir(path);
   strcat(path,"/.xmltv/");
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(exebuffer,path);
   strcat(exebuffer,".conf");
+  sysresult=system(exebuffer);
   // delete old config from dir
+  sprintf(debuglogdata,"Graber in use: %d",aktiv_tv_graber.graberaktivnr);
+  write_logfile(debuglogdata);
+
+
   if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
-    // delete old file
-    ////////////////////////////////////////////////////////  sysresult=system(exebuffer);
     // create new config
+    // make kommand do do in shell first
     switch (aktiv_tv_graber.graberaktivnr) {
               // create new config for tv_grab_na_dd
+      case 0: sprintf(exebuffer,"echo -e '0\n\n\all\n' |");
+              break;
       case 1: sprintf(exebuffer,"'\n\nall\n' |");
               break;
               // create new config for tv_grab_nl
@@ -2960,10 +2968,12 @@ int txmltvgraber_createconfig() {
               15: All TV Channels
               */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"echo -e '2\n\n\all\n' |");
+      case 8: sprintf(exebuffer,"echo -e '2\n\nall\n' |");
+              write_logfile("XMLTv update from denmark");
               break;
               // create new config for tv_grab_se_swedb
       case 9: sprintf(exebuffer,"echo -e '\n\nall\n' |");
+              write_logfile("XMLTv update from Sweden");
               break;
               // create new config for tv_grab_fr
               // take some time to finish
@@ -3019,23 +3029,27 @@ int txmltvgraber_createconfig() {
               exebuffer[0]='\0';
               break;
       default: sprintf(exebuffer,"echo -e '\nall\n' |");
+              break;
     }
     // get grabercmd command
     // add configure paramters to tv_grab_*
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     // do not work
-    /*
+    printf("xml config command : %s \n",exebuffer);
+    sysresult=system(exebuffer);
     switch(aktiv_tv_graber.graberaktivnr) {
-      case 8: sysresult=system("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+      case 8: //sysresult=system("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              write_logfile("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               printf("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
       default:
-              sysresult=system(exebuffer);
+              //sysresult=system(exebuffer);
+              //write_logfile("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              //printf("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
 
     }
-    */
     // sysresult = -1 if error else command return value
     return(1);
   } else return(0);
@@ -3088,6 +3102,15 @@ int txmltvgraber_updateconfigfile() {
       strcpy(buffer,"");
       switch (aktiv_tv_graber.graberaktivnr) {
         case 8: if (channel_list[cnr].selected) {
+                  strcpy(buffer,"channel=");
+                } else {
+                  strcpy(buffer,"channel!");
+                }
+                strcat(buffer,channel_list[cnr].id);
+                fputs(buffer,filout);
+                fputs("\n",filout);
+                break;
+        defaut: if (channel_list[cnr].selected) {
                   strcpy(buffer,"channel=");
                 } else {
                   strcpy(buffer,"channel!");

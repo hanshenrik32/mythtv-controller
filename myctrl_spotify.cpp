@@ -1475,6 +1475,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           //return 1;
         }
       }
+    } else {
+      write_logfile("Error loading spotify data spotifytoken missing.");
     }
     stat(playlistfilename, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
@@ -1487,6 +1489,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
     }
     if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
       fprintf(stderr, "Unable to read spotify playlist content of %s\n", playlistfilename);
+      write_logfile("Unable to read spotify playlist.");
       fclose(json_file);
       free(file_contents);                                                        //
       return 1;
@@ -1643,7 +1646,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
 }
 
 
-// *****  ****************************************************************************************************************************
+// ********************************************************************************************************************
 
 bool process_playinfo_tracks=false;
 bool process_playinfo_playlist=false;
@@ -3863,7 +3866,7 @@ int spotify_class::load_spotify_iconoversigt() {
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
   // write debug log
-  if (gfx_loaded) write_logfile("Spotify icon loader stop.");
+  if (gfx_loaded) write_logfile("Spotify icon loader done ok.");
   else write_logfile("Spotify icon loader error.");
   gfx_loaded=true;
   return(1);

@@ -142,5 +142,6 @@ const char oldrecordning[]="Old recordeds.";
 //bool check_tvguide_process_running(char *processname);
 int parsexmltv();
 int get_tvguide_fromweb();
+unsigned long get_cannel_id(MYSQL *conn,char *channelname);
 
 #endif
