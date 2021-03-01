@@ -3543,7 +3543,7 @@ int order_channel_list_in_tvguide_db() {
   // mysql stuf
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
-  // Connect to database
+  // Connect to database and update
   if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -3554,9 +3554,9 @@ int order_channel_list_in_tvguide_db() {
     for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
       if (channel_list[n].selected) {
         sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
-        if (debugmode) printf("sql %s \n",sqlselect);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
+        write_logfile(sqlselect);                                     // write to debug log
         done=true;
       }
     }

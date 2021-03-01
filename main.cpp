@@ -2413,15 +2413,15 @@ void newLine(float rStart, float rEnd, float angle) {
 // startup parameters
 // we have to start spotify to enable log from web
 
-static bool do_update_xmltv_show = false;                         //
-static bool do_update_rss_show = false;                           //
-static bool do_update_rss = false;                                //
-static bool do_update_music = false;                              //
-static bool do_update_xmltv = false;
-static bool do_update_music_now = false;                          // start the process to update music db from global dir
-static bool do_update_moviedb = false;                            // set true to start thread on update movie db
-static bool do_update_spotify = true;                             // set true to start thread on update spotify + run web server
-
+static bool do_update_xmltv_show = false;                           // Show update xml tv
+static bool do_update_rss_show  = false;                            //
+static bool do_update_rss       = false;                            // Show update rss
+static bool do_update_music     = false;                            // Show update music Library
+// do stuff
+static bool do_update_xmltv     = false;                            // Start update
+static bool do_update_music_now = false;                            // start the process to update music db from global dir
+static bool do_update_moviedb   = false;                            // set true to start thread on update movie db
+static bool do_update_spotify   = true;                             // set true to start thread on update spotify + run web server
 
 
 
@@ -3408,7 +3408,7 @@ void display() {
 
     //firsttimespotifyupdate=true;
     // show firsttime spotify update windows request
-    if ((firsttimespotifyupdate) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
+    if ((!(visur)) && (firsttimespotifyupdate) && (vis_spotify_oversigt) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -5955,6 +5955,7 @@ void display() {
         if (y > 0.0f) valgtnr = 4;
       } else y=0;
 
+      // show spotify loader status
       if (spotify_oversigt.get_spotify_update_flag()) {
         y = (float) spotify_oversigt.loaded_antal/spotify_oversigt.spotify_playlist_antal;                                          // spotify_oversigt_loaded/spotify_oversigt.antal_spotify_streams();
         xx = (float) y*17;
@@ -9833,7 +9834,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
               break;
-            case optionmenukey:
+            case optionmenukey:                                                       // default o
               if (vis_film_oversigt) {
                 vis_movie_options=!vis_movie_options;
               } else if ((vis_tv_oversigt) && (!(vis_tvrec_list))) {
@@ -13058,13 +13059,13 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
       // you have to call clean_spotify_oversigt after earch spodify_get_playlist
-      spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,1);        // songs on repeat playlist
+      spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,true);        // songs on repeat playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,1);        // Your discovery weekly tunes
+      spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,true);        // Your discovery weekly tunes
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,1);        // dansk dancehall
+      spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,true);        // dansk dancehall
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,1);        // hot Hits dk playlist
+      spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);        // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)

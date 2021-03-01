@@ -936,27 +936,22 @@ bool spotify_class::spotify_check_spotifydb_empty() {
   char *database = (char *) "mythtvcontroller";
   bool dbexist=false;
   conn = mysql_init(NULL);
-  try {
-    if (conn) {
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
-         mysql_error(conn);
-         //exit(1);
-      }
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      // test about rss table exist
-      mysql_query(conn,"SELECT playlistname from mythtvcontroller.spotifycontentplaylist limit 1");
-      res = mysql_store_result(conn);
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          dbexist = true;
-        }
-      }
-      mysql_close(conn);
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+      printf("Mysql error (check_spotify_db_empty)\n");
+      mysql_error(conn);
     }
-  }
-  catch (...) {
-    write_logfile("Error use mysql");
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    // test about rss table exist
+    mysql_query(conn,"SELECT playlistname from mythtvcontroller.spotifycontentplaylist limit 1");
+    res = mysql_store_result(conn);
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        dbexist = true;
+      }
+    }
+    mysql_close(conn);
   }
   return(dbexist);
 }
@@ -1085,6 +1080,11 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
             startoffset=spotify_oversigt.spotify_playlist_antal-startoffset;
           }
           if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
+
+          //sprintf(debuglogdata,"%s",);
+          //write_logfile("loader thread starting - Loading spotify info from web.");
+
+
         }
         if (remove("spotify_users_playlist.txt")!=0) write_logfile("Error remove user playlist file spotify_users_playlist.txt");
         // save data to mysql db
@@ -1432,6 +1432,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   bool do_curl=true;
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
+      // download spotify sjon play list file if not exist
       // always here
       if (do_curl) {
         curl = curl_easy_init();
@@ -1461,9 +1462,15 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             curl_easy_cleanup(curl);
             fclose(out_file);
             if (httpCode != 200) {
+              write_logfile("Error downloading spotify playlist");
               fprintf(stderr,"Spotify error %d \n",httpCode);
               exit(1);
             }
+          } else {
+            // open error on file write
+            printf("Error write to playlist file on disk.\n");
+            write_logfile("Error write to playlist file on disk.");
+            exit(1);
           }
         }
       } else {
@@ -1548,6 +1555,10 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       tt = 0;
       while(tt<antalplaylists) {
         if (stack[tt]) {
+
+          sprintf(debuglogdata,"Opdatere spotify track %s ",stack[tt]->feed_name);
+          write_logfile(debuglogdata);
+
           //if (debugmode & 4) fprintf(stdout,"Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
