@@ -769,9 +769,9 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       mysql_query(conn,sqlselect);
                       res = mysql_store_result(conn);
                       if (mysql_error(conn)) {
-                        write_logfile("Mysql error");
+                        write_logfile("Mysql error 'insert into videometadata'");
                         printf("%s\n",mysql_error(conn));
-                        exit(0);
+                        //exit(0);
                       }
                     }
                   }
@@ -833,14 +833,14 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                                                               movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
                     recnr++;
                     fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
-                    mysql_query(conn,"set NAMES 'utf8'");
-                    res = mysql_store_result(conn);
+                    //mysql_query(conn,"set NAMES 'utf8'");
+                    //res = mysql_store_result(conn);
                     mysql_query(conn,sqlselect);
                     res = mysql_store_result(conn);
                     if (mysql_error(conn)) {
                       write_logfile("Mysql error.");
                       printf("%s\n",mysql_error(conn));
-                      exit(0);
+                      //exit(0);
                     }
                   }
                 }
