@@ -1384,7 +1384,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 //
 // work
 // get songs from playlist (any public user)
-// write to spotify_playlist_{spotifyid}.json
+// write to spotify_playlist_{spotifyid}.json in homedir/spotify_json dir
 // and update db from that file all the songs in playlist
 //
 // ****************************************************************************************
@@ -2623,7 +2623,7 @@ int spotify_class::spotify_get_user_id() {
     auth_kode=auth_kode + spotifytoken;
     url="https://api.spotify.com/v1/me";
     url=url + devid;
-    printf("Get user info.\n");
+    printf("Spotify get user info.\n");
     // use libcurl
     curl_global_init(CURL_GLOBAL_ALL);
     CURL *curl = curl_easy_init();

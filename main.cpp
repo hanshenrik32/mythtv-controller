@@ -13050,11 +13050,14 @@ void *datainfoloader_spotify(void *data) {
 // ****************************************************************************************
 
 void *webupdate_loader_spotify(void *data) {
+  bool loadedspotify=false;
+  int spotify_user_id_check;
   // write debug log
-  write_logfile("loader thread starting - Loading spotify info from web.");
+  write_logfile("Loader thread starting - Loading spotify info from web.");
   if (!(spotify_oversigt.get_spotify_update_flag())) {
     // check if spotify user info is loaded.
-    if ((spotify_oversigt.spotify_get_user_id()==200) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
+    if ((spotify_oversigt.spotify_get_user_id()==404) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
+      loadedspotify=true;
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
@@ -13077,7 +13080,16 @@ void *webupdate_loader_spotify(void *data) {
     }
   }
   // write debug log
-  write_logfile("loader thread done update spotify from web.");
+  if (loadedspotify) write_logfile("Loader thread done update spotify from web.");
+  else {
+    write_logfile("Loader thread done update spotify.");
+    if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) write_logfile("Error on spotify token.");
+    else {
+      spotify_user_id_check=spotify_oversigt.spotify_get_user_id();
+      sprintf(debuglogdata,"Error loading spotify user data. Error code %d",spotify_user_id_check);
+      write_logfile(debuglogdata);
+    }
+  }
   spotify_update_loaded_begin=false;
   spotify_oversigt.set_spotify_update_flag(false);
   firsttimespotifyupdate=false;                                                 // close firsttime update window after update
