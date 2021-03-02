@@ -2745,16 +2745,19 @@ int spotify_class::spotify_get_available_devices() {
         res = mysql_store_result(conn);
         mysql_query(conn,"create TABLE mythtvcontroller.spotify_device (device_name varchar(255),active bool,devtype varchar (255),dev_id varchar (255),intnr INT AUTO_INCREMENT,PRIMARY KEY (intnr))");
         res = mysql_store_result(conn);
-        fprintf(stderr,"Found devices : %d\n",devicenr);
         sprintf(debuglogdata,"Found devices : %d ",devicenr);
         write_logfile(debuglogdata);
         for( int t = 0 ; t < devicenr ; t++ ) {
           if ( strcmp(spotify_device[t].name,"") !=0 ) {
             device_antal++;
-            fprintf(stderr,"Device name      : %s \n",spotify_device[t].name);
-            fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
-            fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
-            fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
+            sprintf(debuglogdata,"Device name      : %s",spotify_device[t].name);
+            write_logfile(debuglogdata);
+            sprintf(debuglogdata,"Device is active : %d",spotify_device[t].is_active);
+            write_logfile(debuglogdata);
+            sprintf(debuglogdata,"Device type      : %s",spotify_device[t].devtype);
+            write_logfile(debuglogdata);
+            sprintf(debuglogdata,"Device id        : %s",spotify_device[t].id);
+            write_logfile(debuglogdata);
             sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
@@ -2776,7 +2779,6 @@ int spotify_class::spotify_get_available_devices() {
         }
         this->spotify_device_antal=device_antal;
         if (conn) mysql_close(conn);
-        fprintf(stderr,"\n*****************\n");
       }
     }
   }

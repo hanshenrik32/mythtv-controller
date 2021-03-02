@@ -3955,8 +3955,8 @@ void display() {
           if (strcmp(radiooversigt.get_stream_url(rknapnr-1),"")!=0) {
             strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
             // write debug log
-            sprintf(debuglogdata,"play radio path = %s ",aktivplay_music_path);
-            write_logfile(debuglogdata);
+            //sprintf(debuglogdata,"play radio path = %s ",aktivplay_music_path);
+            //write_logfile(debuglogdata);
             // fmod player
             #if defined USE_FMOD_MIXER
             // set big sound buffer to stop lag
@@ -5207,11 +5207,7 @@ void display() {
           spectrum_right[zz] = 0.0f;                                            // used for spectium
           uvmax_values[zz] = 0.0f;                                              // used for spectium
         }
-        fprintf(stderr,"Create table\n");
-        for (int i=0;i<13;i++) {
-          frequencyOctaves[i]=(int) (44100/2)/(float) pow(2,12-i);
-          fprintf(stderr,"%d \n",frequencyOctaves[i]);
-        }
+        for (int i=0;i<13;i++) frequencyOctaves[i]=(int) (44100/2)/(float) pow(2,12-i);
       }
       FMOD::ChannelGroup *mastergroup;
       if (!(dsp)) {
