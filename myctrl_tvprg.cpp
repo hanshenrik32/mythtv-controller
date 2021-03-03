@@ -517,7 +517,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
       // save last updated
       setlastupdate(mktime(lastmod));
       configtvguidelastupdate=mktime(lastmod);
-      document = xmlReadFile(path, NULL, 0);            // open xml file
+      document = xmlReadFile(path, NULL, 0);                                    // open/read xml file
       // if exist do all the parse and update db
       // it use REPLACE in mysql to create/update records if changed in xmlfile
       if (document) {
@@ -2922,13 +2922,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
             // save rec
           }
         } // for loop end
-        fprintf(stdout, "...\n");
         xmlFreeDoc(document);
-      } else {
-        //if (debugmode & 256) printf("tvguide.xml not found \n");
-        // write debug log
-        write_logfile("tvguide.xml not found");
-      }
+      } else write_logfile("tvguide.xml not found");
     }
   }
   loading_tv_guide=false;

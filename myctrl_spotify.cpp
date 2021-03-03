@@ -170,7 +170,6 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           user_token[codel-4]='\0';
         }
         sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
-        //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
         if (curl_error==0) {
           curl_error=system(sed);
@@ -597,7 +596,9 @@ int download_image(char *imgurl,char *filename) {
       }
     }
     catch (...) {
-      printf("Erro open file.\n");
+      if (debugmode & 4) printf("Download error open file. %s \n",filename);
+      sprintf(debuglogdata,"Download error on file %s",filename);
+      write_logfile(debuglogdata);
     }
     curl_easy_cleanup(curl);
   }
@@ -1400,7 +1401,9 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   char homedir[1024];
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
+  char spotifydir[2048];
   char auth_kode[1024];
+  struct stat filestat;
   getuserhomedir(homedir);
   strcpy(playlistfilename,homedir);
   strcat(playlistfilename,"/");
@@ -1410,6 +1413,18 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   strcat(playlistfilename,".json");
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,spotifytoken);
+  // create spotifydir if not exist spotify_json
+  strcpy(spotifydir,homedir);
+  strcat(spotifydir,"/spotify_json");
+  if (stat(spotifydir, &filestat) == -1) {
+     mkdir(spotifydir, 0700);
+  }
+// create spotifydir if not exist spotify_gfx
+  strcpy(spotifydir,homedir);
+  strcat(spotifydir,"/spotify_gfx");
+  if (stat(spotifydir, &filestat) == -1) {
+     mkdir(spotifydir, 0700);
+  }
   char sql[8594];
   char doget[4096];
   char filename[4096];
@@ -1462,14 +1477,16 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             curl_easy_cleanup(curl);
             fclose(out_file);
             if (httpCode != 200) {
-              write_logfile("Error downloading spotify playlist");
-              fprintf(stderr,"Spotify error %d \n",httpCode);
+              write_logfile("Error downloading spotify api playlist");
+              fprintf(stderr,"Spotify web api error %d \n",httpCode);
               exit(1);
             }
           } else {
             // open error on file write
             printf("Error write to playlist file on disk.\n");
+            printf("Please check file access to spotify_json and spodify_gfx directoys in you home folder.\n");
             write_logfile("Error write to playlist file on disk.");
+            write_logfile("Please check file access to spotify_json and spodify_gfx directoys in you home folder.");
             exit(1);
           }
         }
@@ -1525,31 +1542,31 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         }
       }
       // create db if not exist
-      if (!(dbexist)) {
-        if (dbexist==false) {
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile("mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
-          }
-          res = mysql_store_result(conn);
-          // create db (spotify songs)
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile("mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
-          }
-          res = mysql_store_result(conn);
-          // create db (spotify playlists)
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile("mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
-          }
-          // create db if not exist
-          res = mysql_store_result(conn);
+      //if (!(dbexist)) {
+      if (dbexist==false) {
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        if (mysql_query(conn,sql)!=0) {
+          write_logfile("mysql create table error.");
+          fprintf(stdout,"SQL : %s\n",sql);
         }
+        res = mysql_store_result(conn);
+        // create db (spotify songs)
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        if (mysql_query(conn,sql)!=0) {
+          write_logfile("mysql create table error.");
+          fprintf(stdout,"SQL : %s\n",sql);
+        }
+        res = mysql_store_result(conn);
+        // create db (spotify playlists)
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        if (mysql_query(conn,sql)!=0) {
+          write_logfile("mysql create table error.");
+          fprintf(stdout,"SQL : %s\n",sql);
+        }
+        // create db if not exist
+        res = mysql_store_result(conn);
       }
+      //}
       // create db spotify playlist process data
       // insert all record in db
       tt = 0;
@@ -3425,6 +3442,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
             // get name from url
             if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
+
+            sprintf(debuglogdata,"# %d artist icon url found  : %s ",antal,value->u.string.ptr);
+            write_logfile(debuglogdata);
+
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3856,7 +3877,11 @@ int spotify_class::load_spotify_iconoversigt() {
   // write debug log
   write_logfile("Spotify icon loader start.");
   while(nr<=streamantal()) {
-    if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    //if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+
+    sprintf(debuglogdata,"Loading texture nr %-4d Title %40s  icon path %s",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    write_logfile(debuglogdata);
+
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
         // if url http(s) image

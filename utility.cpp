@@ -39,10 +39,12 @@ void write_logfile(char *logentry) {
   logfile=fopen(filename,"a");
   if (logfile==NULL) logfile=fopen("mythtv-controller.log","w");
   if (logfile) {
-    fprintf(logfile,"%02d/%02d/%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
+    fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
     fputs(logentry,logfile);
     fputs("\n",logfile);
     fclose(logfile);
+  } else {
+    printf("Error write to logfile...\n");
   }
 }
 

@@ -9808,6 +9808,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               break;
             case '*':
               // update spotify
+              // or tv
               //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
               if (do_show_spotify_search_oversigt==false) {
                 if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
@@ -9863,9 +9864,17 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 'r':
+              // sort movies
               if (vis_movie_options) {
                 vis_movie_sort_option=1;
                 vis_movie_options=false;			// luk option window igen
+              }
+              // Ask record tv channel ?
+              if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr==0)) {                     // tv oversigt zoom
+                // spørg kan/skal vi optage den ?
+                ask_tv_record = true;
+                tvknapnr=tvsubvalgtrecordnr;                                                   // set program nr
+                do_zoom_tvprg_aktiv_nr=tvknapnr;					                                     // husk den valgte aktiv tv prg
               }
               break;
               // save playlist
@@ -9893,12 +9902,13 @@ void handleKeypress(unsigned char key, int x, int y) {
 //                 do_update_spotify_playlist=true;             // start spotify update
 //                 do_update_spotify = true;                                       // set flag to update spotify
 //               }
-               break;
+              write_logfile("Key y Not in use");
+              break;
             case 'u':
               if ((vis_tv_oversigt) && (loading_tv_guide==false)) {
                 // u key
                 // Update tv guide
-                fprintf(stderr,"Update tv guide\n");
+                write_logfile("Update tv guide");
                 tv_guide_firsttime_update = true;
                 // set flag for show update
                 do_update_xmltv_show = true;
@@ -9910,6 +9920,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
                 tv_guide_firsttime_update = true;                                 // set update flag
               }
+              // Update rss stuf
               if (vis_stream_oversigt) {
                 do_update_rss_show = true;
                 do_update_rss = true;
@@ -9918,11 +9929,13 @@ void handleKeypress(unsigned char key, int x, int y) {
             case 'U':
               // music
               if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
+                write_logfile("Update music db.");
                 do_update_music = true;                                               // show update
                 do_update_music_now = true;                                           // and do the update flag
               }
               // spotify
               if (vis_spotify_oversigt) {
+                write_logfile("Update Spotify");
                 do_update_spotify = true;                                       // set flag to update spotify
               }
 
@@ -9951,6 +9964,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 13:
+              write_logfile("Start search....");
               if (debugmode) {
                 if (vis_music_oversigt) {
                   if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
