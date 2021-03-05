@@ -60,7 +60,7 @@ int fontctrl::updatefontlist()
     if (fil) {
       while((!(feof(fil))) && (i<FONT_TYPE_MAX-1)) {
         fgets(typeinfo[i].fontname,sizeof(typeinfo[i].fontname),fil);
-        if (debugmode & 128) printf("Font name found %s",typeinfo[i].fontname);
+        //if (debugmode & 16) printf("Font name found %s",typeinfo[i].fontname);
         i++;
       }
       mastercount=i;
@@ -108,7 +108,7 @@ int fontctrl::updatefontlist_old()
         if (glcGetMasterc(i, GLC_FAMILY)) {
           const GLCchar *font = glcGetMasterc(i, GLC_FAMILY );
           strcpy(typeinfo[i].fontname,(char *) glcGetMasterc(i, GLC_FAMILY));
-          if (debugmode & 16) printf("Font named %10s found \n",typeinfo[i].fontname);
+          //if (debugmode & 16) printf("Font named %10s found \n",typeinfo[i].fontname);
           face_count = glcGetMasteri(i, GLC_FACE_COUNT);
           for (j = 0; j < face_count; j++) {
               //if (debugmode & 128) printf(" Face types %s \n ",(char *) glcGetMasterListc(i, GLC_FACE_LIST, j));

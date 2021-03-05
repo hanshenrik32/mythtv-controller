@@ -6469,7 +6469,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fprintf(stderr,"45 Button pressed \n");
         }
       }
+      //
       // main menu
+      //
       if ((fundet==false) && (do_show_setup==false)) {
         // test for menu select tv
         if ((GLubyte) names[i*4+3]==1) {
@@ -6961,6 +6963,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // play playlist icon select (20) type 0
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==0)) {
             fprintf(stderr,"play spotify playlist. type 0\n");
+            write_logfile((char *) "play spotify playlist.");
             do_select_device_to_play=true;
             returnfunc = 4;
             fundet = true;
@@ -6968,6 +6971,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // play song icon select (20) type 1
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==1)) {
             fprintf(stderr,"play spotify song. type 1\n");
+            write_logfile((char *) "play spotify song.");
             do_select_device_to_play=true;
             returnfunc = 5;
             fundet = true;
@@ -6975,6 +6979,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // play song icon select (20) type 1
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==2)) {
             fprintf(stderr,"play spotify artist. type 2\n");
+            write_logfile((char *) "play spotify artist.");
             do_select_device_to_play=true;
             returnfunc = 5;
             fundet = true;
@@ -6988,18 +6993,21 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // Stop play
           if ((GLubyte) names[i*4+3]==9) {
             fprintf(stderr,"(Spotify) Stop play\n");
+            write_logfile((char *) "Stop Spotify play.");
             returnfunc = 5;                                                       //
             fundet = true;
           }
           // next song
           if ((GLubyte) names[i*4+3]==11) {
             fprintf(stderr,"(Spotify) Next song\n");
-            returnfunc = 7;                                                       //
+            write_logfile((char *) "Next Spotify song.");
+            returnfunc = 7;
             fundet = true;
           }
           // last song
           if ((GLubyte) names[i*4+3]==12) {
             fprintf(stderr,"(Spotify) last song\n");
+            write_logfile((char *) "Last Spotify song.");
             returnfunc = 7;                                                       //
             fundet = true;
           }
@@ -7014,48 +7022,56 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if ((GLubyte) names[i*4+3]==10) {
           fprintf(stderr,"selected first device\n");
           spotify_oversigt.set_default_device_to_play(0);
+          write_logfile((char *) "selected 1 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==11) {
           fprintf(stderr,"selected 2 device\n");
           spotify_oversigt.set_default_device_to_play(1);
+          write_logfile((char *) "selected 2 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==12) {
           fprintf(stderr,"selected 3 device\n");
           spotify_oversigt.set_default_device_to_play(2);
+          write_logfile((char *) "selected 3 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==13) {
           fprintf(stderr,"selected 4 device\n");
           spotify_oversigt.set_default_device_to_play(3);
+          write_logfile((char *) "selected 4 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==14) {
           fprintf(stderr,"selected 5 device\n");
           spotify_oversigt.set_default_device_to_play(4);
+          write_logfile((char *) "selected 5 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==15) {
           fprintf(stderr,"selected 6 device\n");
           spotify_oversigt.set_default_device_to_play(5);
+          write_logfile((char *) "selected 6 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==16) {
           fprintf(stderr,"selected 7 device\n");
           spotify_oversigt.set_default_device_to_play(6);
+          write_logfile((char *) "selected 7 device.");
           returnfunc = 0;
           fundet = true;
         }
         if ((GLubyte) names[i*4+3]==17) {
           fprintf(stderr,"selected 8 device\n");
           spotify_oversigt.set_default_device_to_play(7);
+          write_logfile((char *) "selected 8 device.");
           returnfunc = 0;
           fundet = true;
         }
@@ -7202,7 +7218,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
           if (do_pause_stream) do_pause_stream=false; else do_pause_stream=true;
           // write debug log
-          write_logfile("Set/reset player pause.");
+          write_logfile((char *) "Set/reset player pause.");
         }
         // jump forward button stream
         if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
@@ -7221,14 +7237,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((vis_film_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==25) {
           // write debug log
-          write_logfile("Start movie player.");
+          write_logfile((char *) "Start movie player.");
           fundet = true;
           startmovie = true;
         }
         // stop play movie
         if ((GLubyte) names[i*4+3]==26) {
           // write debug log
-          write_logfile("Stop movie.");
+          write_logfile((char *) "Stop movie.");
           fundet = true;
           // stop movie playing
           stopmovie = true;
@@ -7247,13 +7263,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       if ((vis_nyefilm_oversigt) && (!(fundet))) {
         if ((GLubyte) names[i*4+3]==25) {
           // write debug log
-          write_logfile("Start movie player.");
+          write_logfile((char *) "Start movie player.");
           fundet = true;
           startmovie = true;
         }
         if ((GLubyte) names[i*4+3]==26) {
           // write debug log
-          write_logfile("Stop movie player.");
+          write_logfile((char *) "Stop movie player.");
           fundet = true;
           stopmovie = true;
         }
@@ -7267,13 +7283,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // close view
         if ((GLubyte) names[i*4+3]==27) {
           // write debug log
-          write_logfile("Close tv oversigt.");
+          write_logfile((char *) "Close tv overview.");
           vis_tv_oversigt = false;
           fundet = true;
         }
         // show recorded programs
         if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
-          if (debugmode & 64) fprintf(stderr,"show start record tv program.\n");
+          write_logfile((char *) "Close recorded overview.");
           vis_tv_oversigt = false;
           fundet = true;
         }
@@ -7312,7 +7328,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (ask_tv_record) {
           if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
             // write debug log
-            write_logfile("Close window again.");
+            write_logfile((char *) "Close window again.");
             ask_tv_record = false;
             fundet = true;
             returnfunc = 3;
@@ -7320,7 +7336,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
             // write debug log
-            write_logfile("Set program to record.");
+            write_logfile((char *) "Set program to record.");
             ask_tv_record = false;
             fundet = true;
             returnfunc = 3;
@@ -9922,8 +9938,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               // Update rss stuf
               if (vis_stream_oversigt) {
-                do_update_rss_show = true;
-                do_update_rss = true;
+                do_update_rss_show = true;                                     // set show update flag
+                do_update_rss = true;                                          // set update flag
               }
               break;
             case 'U':
@@ -9931,7 +9947,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((vis_music_oversigt) && (ask_open_dir_or_play==false)) {
                 write_logfile("Update music db.");
                 do_update_music = true;                                               // show update
-                do_update_music_now = true;                                           // and do the update flag
+                do_update_music_now = true;                                           // Set update flag
               }
               // spotify
               if (vis_spotify_oversigt) {

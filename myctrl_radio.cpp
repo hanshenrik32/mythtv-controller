@@ -168,7 +168,7 @@ int radiostation_class::load_radio_stations_gfx() {
       if (startup_loaded) return(0);
       startup_loaded=true;
       while(i<radiooversigt.radioantal()) {
-        strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");	// hent path
+        strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");	// hent path
         strcpy(gfxfilename,radiooversigt.get_station_gfxfile(i));			// hent radio icon gfx filename
         strcat(tmpfilename,gfxfilename);        					// add filename to path
         if ((strcmp(gfxfilename,"")!=0) && (file_exists(tmpfilename))) {		// den har et navn samt gfx filen findes.
@@ -177,7 +177,7 @@ int radiostation_class::load_radio_stations_gfx() {
         } else if (strcmp(gfxfilename,"")==0) {
           // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
           // hvis der gør load denne fil.
-          strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");
+          strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
           strcat(tmpfilename,radiooversigt.get_station_name(i));
           strcat(tmpfilename,".png");
           if (file_exists(tmpfilename)) {
@@ -187,12 +187,12 @@ int radiostation_class::load_radio_stations_gfx() {
             strcat(stack[i]->gfxfilename,".png");
             opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
           } else {
-            strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");
+            strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
             strcat(tmpfilename,radiooversigt.get_station_name(i));
             strcat(tmpfilename,".jpg");
             if (file_exists(tmpfilename)) {
               texture=loadTexture ((char *) tmpfilename);                                 // load texture
-              set_texture(i,texture);     		                                // save it in radio station struct
+              set_texture(i,texture);     		                                            // save it in radio station struct
               strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
               strcat(stack[i]->gfxfilename,".png");
               opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
@@ -466,7 +466,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     char temptxt[200];
     char *lastslash;
     bool radio_pictureloaded=true;
-    const char *radiostation_iconsgfx="/usr/share/mythtv-controller/images/radiostations/";
+    const char *radiostation_iconsgfx="/opt/mythtv-controller/images/radiostations/";
     char *base,*right_margin;
     int length,width;
     int pline=0;
@@ -1004,7 +1004,6 @@ int get_url_data(char *url,char *ipadd) {
 bool check_radio_online_switch=true;
 
 unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) {
-
     short int port=0;
     int sock;
     struct sockaddr_in servername;
