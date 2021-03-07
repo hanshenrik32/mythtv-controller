@@ -3446,14 +3446,10 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     mktime(&timeinfo3);
     sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
     sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
-    //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
-    this->starttid=rawtime;						                                // gem tider i class
-    this->sluttid=rawtime2;						                                //
-    //if (debugmode & 256) printf("\nGet/update Tvguide.\n");
+    this->starttid=rawtime;						                                          // save time in class
+    this->sluttid=rawtime2;						                                          // save time in class
     // write debug log
     write_logfile("Get/Update Tvguide.");
-    //if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
     sprintf(debuglogdata,"Tvguide from %-19s to %-19s",dagsdato,enddate);
     write_logfile(debuglogdata);
     // clear last tv guide array
@@ -4789,7 +4785,7 @@ void earlyrecorded::showtvreclist() {
   glTranslatef(0.0f, 0.0f, 0.0f);
   glColor3f(1.0f, 1.0f, 1.0f);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);                    //_texturemovieinfobox
+  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glBegin(GL_QUADS);

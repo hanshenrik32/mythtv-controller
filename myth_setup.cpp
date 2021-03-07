@@ -3596,7 +3596,7 @@ void show_setup_tv_graber(int startofset) {
     // update channel list before show it
     // channel list editor
     if (hent_tv_channels==false) {
-      // try to load struct channel info
+      // try to load struct channel info first time
       //tvguide_channels.dat
       if (!(load_channel_list())) {
         // load channel names from tvguide grapper and save it to internal db
@@ -3634,10 +3634,12 @@ void show_setup_tv_graber(int startofset) {
     }
     // background
     glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(0.6f, 0.6f, 0.6f);
     glBindTexture(GL_TEXTURE_2D,setuptvgraberback);
+    //glBindTexture(GL_TEXTURE_2D,setuptexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
