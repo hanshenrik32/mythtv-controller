@@ -85,13 +85,13 @@ class tv_oversigt {
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
         ~tv_oversigt();                                                                                       // destructor
-        int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
+        //int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
-        void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
+        void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);                  //
         void show_canal_names();                                                                              //
-        //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
-        void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	  // show the prg info in
+        //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	// show the prg info in
+        void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	// show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //
         bool changetime(time_t difftime) { starttid+=difftime; sluttid+=difftime; return(true); }             //
         int cleanchannels();                                                                                  // clear all tv channels
@@ -140,8 +140,8 @@ const char upcommingrec[]="Upcoming Recordings.";
 const char oldrecordning[]="Old recordeds.";
 
 //bool check_tvguide_process_running(char *processname);
-int parsexmltv();
-int get_tvguide_fromweb();
-unsigned long get_cannel_id(MYSQL *conn,char *channelname);
+int parsexmltv();                                                               // parse xml file
+int get_tvguide_fromweb();                                                      //
+unsigned long get_cannel_id(MYSQL *conn,char *channelname);                     //
 
 #endif

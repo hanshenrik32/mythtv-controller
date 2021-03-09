@@ -3381,16 +3381,18 @@ int load_channel_list_from_graber() {
               strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
               break;
     }
-    printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
+    //printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
+    write_logfile("Create channel list file from tv_graber_config.");
     switch (aktiv_tv_graber.graberaktivnr) {
         case 13:sysresult=system(exestring);
               break;
         default:
               sysresult=system(exestring);
               if (sysresult) {
-                printf("\nError Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
+                write_logfile("Error create channel list file from tv_graber_config. Check xmltv is installed.");
               }
     }
+    // read channel list into channel_list struct
     if (check_zerro_bytes_file(filename)!=0) {
       fil=fopen(filename,"r");
       if (fil) {
@@ -3611,7 +3613,7 @@ void show_setup_tv_graber(int startofset) {
         */
         //
         // load all channels name from tv_graber
-        load_channel_list_from_graber();
+        load_channel_list_from_graber();                                        // get channel list from graber
         // save channel list to struct db file
         // struct channel_list
         order_channel_list();
