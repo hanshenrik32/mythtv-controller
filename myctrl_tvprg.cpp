@@ -286,6 +286,8 @@ void getfirstlinefromstring(char *resl,char *line) {
 
 // ****************************************************************************************
 //
+//
+//
 // ****************************************************************************************
 
 void expand_escapes(char* dest, const char* src) {
@@ -342,14 +344,17 @@ void expand_escapes(char* dest, const char* src) {
 
 // ****************************************************************************************
 //
-//
+// Save tc channel db
 //
 // ****************************************************************************************
 
 int tv_oversigt::saveparsexmltvdb() {
   int n=0;
   FILE *dbfil;
-  dbfil=fopen(tvguidedbfilename,"w");
+  char writefilename[1024];
+  getuserhomedir(writefilename);
+  strcat(writefilename,tvguidedbfilename);
+  dbfil=fopen(writefilename,"w");
   if (dbfil) {
     while(n<this->kanal_antal) {
       fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
@@ -361,14 +366,17 @@ int tv_oversigt::saveparsexmltvdb() {
 
 // ****************************************************************************************
 //
-// read tc channel db
+// Load tc channel db
 //
 // ****************************************************************************************
 
 int tv_oversigt::loadparsexmltvdb() {
   int n=0;
   FILE *dbfil;
-  dbfil=fopen(tvguidedbfilename,"r");
+  char writefilename[1024];
+  getuserhomedir(writefilename);
+  strcat(writefilename,tvguidedbfilename);
+  dbfil=fopen(writefilename,"r");
   if (dbfil) {
     while(!(feof(dbfil))) {
       fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
@@ -382,6 +390,7 @@ int tv_oversigt::loadparsexmltvdb() {
 //
 // read tv guide from file. And update tvguide db (create if not exist)
 // return >0 on error
+//
 // ****************************************************************************************
 
 int tv_oversigt::parsexmltv(const char *filename) {
@@ -2982,10 +2991,11 @@ tv_oversigt_prgtype::tv_oversigt_prgtype() {
     settorecord=false;
 }
 
-
+// ****************************************************************************************
 //
 // destructor
 //
+// ****************************************************************************************
 
 tv_oversigt_prgtype::~tv_oversigt_prgtype() {
 
@@ -2993,6 +3003,8 @@ tv_oversigt_prgtype::~tv_oversigt_prgtype() {
 
 
 // ****************************************************************************************
+//
+//
 //
 // ****************************************************************************************
 
@@ -3014,6 +3026,8 @@ int tv_oversigt_prgtype::putprograminfo(char *prgname,char *stime,char *etime,ch
 
 // ****************************************************************************************
 //
+// Store tv program data in stuct
+//
 // ****************************************************************************************
 
 void tv_oversigt_prgtype::getprograminfo(char *prgname,char *stime,char *etime,int *prglength,unsigned long *sunixtime,unsigned long *eunixtime,char *desc,char *subtitle,int *ptype,bool *bgt,int *prgrecorded) {
@@ -3032,6 +3046,8 @@ void tv_oversigt_prgtype::getprograminfo(char *prgname,char *stime,char *etime,i
 
 // ****************************************************************************************
 //
+// get tv guide data from struct
+//
 // ****************************************************************************************
 
 void tv_oversigt_prgtype::getprogramrecinfo(char *prgname,char *stime,char *etime) {
@@ -3042,7 +3058,9 @@ void tv_oversigt_prgtype::getprogramrecinfo(char *prgname,char *stime,char *etim
 
 
 // ****************************************************************************************
-// constructor
+//
+// Constructor
+//
 // ****************************************************************************************
 
 tv_oversigt_pr_kanal::tv_oversigt_pr_kanal() {
@@ -3053,7 +3071,9 @@ tv_oversigt_pr_kanal::tv_oversigt_pr_kanal() {
 
 
 // ****************************************************************************************
-// destructor
+//
+// Destructor
+//
 // ****************************************************************************************
 
 tv_oversigt_pr_kanal::~tv_oversigt_pr_kanal() {
@@ -3062,7 +3082,7 @@ tv_oversigt_pr_kanal::~tv_oversigt_pr_kanal() {
 
 // ****************************************************************************************
 //
-// update chanel name
+// Update chanel name
 //
 // ****************************************************************************************
 
@@ -3071,7 +3091,9 @@ void tv_oversigt_pr_kanal::putkanalname(char *kname) {
 }
 
 // ****************************************************************************************
+//
 // Clean view
+//
 // ****************************************************************************************
 
 void tv_oversigt_pr_kanal::cleanprogram_kanal() {
@@ -3092,7 +3114,9 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
 }
 
 // ****************************************************************************************
-// constructor tv_oversigt class
+//
+// Constructor tv_oversigt class
+//
 // ****************************************************************************************
 
 tv_oversigt::tv_oversigt() {
@@ -3105,7 +3129,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(loadinginfotxt,"");
     lastupdated=0;
     vistvguidecolors=true;
-    vis_kanal_antal=8;                                                        // nr of channels to display
+    vis_kanal_antal=8;                                                        // default nr of channels to display (will change if no room to show all the channels)
     // get time now
     time(&rawtime);
     // convert clovk to localtime
@@ -3115,7 +3139,9 @@ tv_oversigt::tv_oversigt() {
 }
 
 // ****************************************************************************************
-// destructor tv_oversigt class
+//
+// Destructor tv_oversigt class
+//
 // ****************************************************************************************
 
 tv_oversigt::~tv_oversigt() {
@@ -3123,6 +3149,8 @@ tv_oversigt::~tv_oversigt() {
 
 
 // ****************************************************************************************
+//
+// Reset tvguide time to localtime
 //
 // ****************************************************************************************
 
@@ -3270,7 +3298,7 @@ int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchanne
 
 // ****************************************************************************************
 //
-// Indsæt into table record to sectule new tv recording
+// Indsæt into table record to schetule new tv recording
 //
 // ****************************************************************************************
 
@@ -3371,6 +3399,7 @@ time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
 // ****************************************************************************************
 //
 // load kanal icons
+// used internal by opdatere_tv_oversigt
 //
 // ****************************************************************************************
 
@@ -3447,7 +3476,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
     sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
     this->starttid=rawtime;						                                          // save time in class
-    this->sluttid=rawtime2;						                                          // save time in class
+    this->sluttid=rawtime2;						                                          // save
     // write debug log
     write_logfile("Get/Update Tvguide.");
     sprintf(debuglogdata,"Tvguide from %-19s to %-19s",dagsdato,enddate);
@@ -3721,11 +3750,20 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 // ****************************************************************************************
 //
+//
+//
 // ****************************************************************************************
 
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
 }
+
+// ****************************************************************************************
+//
+//
+//
+// ****************************************************************************************
+
 
 unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
@@ -3940,6 +3978,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   nutid=mktime(&nowtime_h);
   xpos=50+40;
   int do_kanal_nr=0;
+  // Find # of channels to show. By screen width
   switch (screen_size) {
     case 4: this->vis_kanal_antal=5;                        // antal kanler som vises 768*1024
             break;
@@ -3953,6 +3992,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   // loop for channel
   //
   int xx=xpos-50;
+  // show channel to vis_kanal_antal or man screen width
   while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -4559,11 +4599,6 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 }
 
 
-
-
-//
-//*******************************************************************************************************************************//
-//
 
 // ****************************************************************************************
 //

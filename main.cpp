@@ -8107,9 +8107,14 @@ void handlespeckeypress(int key,int x,int y) {
     switch(key) {
         // F1 setup menu
         case 1: if (vis_tv_oversigt) {
-                  do_show_tvgraber=true;
-                  printf("Show TV channel setup menu.\n");
-                  write_logfile("Show TV channel Setup menu.");
+                  do_show_tvgraber=!do_show_tvgraber;
+                  if (do_show_tvgraber) write_logfile("Show TV channel Setup menu."); else write_logfile("Hide TV channel Setup menu.");
+                  // update the view
+                  if (do_show_tvgraber==false) {
+                    //
+                    //order_channel_list_in_tvguide_db();
+                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                  }
                 } else if (vis_music_oversigt) {
                   if (findtype==0) findtype=1;
                   else if (findtype==1) findtype=0;
@@ -13380,6 +13385,7 @@ void *datainfoloader_xmltv(void *data) {
       aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
       //save array to disk
       aktiv_tv_oversigt.saveparsexmltvdb();
+      write_logfile("tvguidedb file saved ok.");
     } else {
       write_logfile("parser xmltv tv guide error.");
       fprintf(stderr,"Parse xmltv error\n");

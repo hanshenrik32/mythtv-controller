@@ -76,6 +76,7 @@ class tv_oversigt {
         char loadinginfotxt[200];
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);                              //
         time_t lastupdated;                                                                                   // last updated unix date
+        void opdatere_tv_oversigt_kanal_icons();                                                              // load kanal icons
     public:
         tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
@@ -88,7 +89,6 @@ class tv_oversigt {
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
         void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
-        void opdatere_tv_oversigt_kanal_icons();      // load kanal icons
         void show_canal_names();                                                                              //
         //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
         void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	  // show the prg info in
@@ -107,9 +107,9 @@ class tv_oversigt {
         unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
         char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
         void reset_tvguide_time();                                                                            // reset show tv guide to now (time)
-        int saveparsexmltvdb();                                     // tvguidedbfilename
-        int loadparsexmltvdb();                                     // tvguidedbfilename
-        void set_program_torecord(int selectchanel,int selectprg);                                     // tvguidedbfilename
+        int saveparsexmltvdb();                                                                               // tvguidedb filename
+        int loadparsexmltvdb();                                                                               // tvguidedb filename
+        void set_program_torecord(int selectchanel,int selectprg);                                            // tvguidedb filename
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 
