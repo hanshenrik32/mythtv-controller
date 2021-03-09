@@ -2914,7 +2914,7 @@ int txmltvgraber_createconfig() {
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(exebuffer,path);
   strcat(exebuffer,".conf");
-  sysresult=system(exebuffer);
+  //sysresult=system(exebuffer);
   // delete old config from dir
   sprintf(debuglogdata,"Graber in use: %d",aktiv_tv_graber.graberaktivnr);
   write_logfile(debuglogdata);
@@ -3036,12 +3036,11 @@ int txmltvgraber_createconfig() {
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
     // do not work
-    printf("xml config command : %s \n",exebuffer);
-    sysresult=system(exebuffer);
+    //printf("xml config command : %s \n",exebuffer);
+    //sysresult=system(exebuffer);
     switch(aktiv_tv_graber.graberaktivnr) {
       case 8: //sysresult=system("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
-              write_logfile("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
-              printf("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              write_logfile("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/ (disabled)");
               break;
       default:
               //sysresult=system(exebuffer);

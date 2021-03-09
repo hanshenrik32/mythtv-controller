@@ -8111,9 +8111,33 @@ void handlespeckeypress(int key,int x,int y) {
                   if (do_show_tvgraber) write_logfile("Show TV channel Setup menu."); else write_logfile("Hide TV channel Setup menu.");
                   // update the view
                   if (do_show_tvgraber==false) {
-                    //
                     //order_channel_list_in_tvguide_db();
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+                    //update_xmltv_phread_loader();                   // start thred update flag in main loop
+
+                    // Need testing
+                    /*
+                    // kill running graber
+                    killrunninggraber();
+                    // clear old tvguide in db
+                    aktiv_tv_oversigt.cleartvguide();
+                    // save chennel list info to internal datafile
+                    order_channel_list();
+                    save_channel_list();
+                    // buid new config file for xmltv from saved db
+                    //xmltv_configcontrol.graber_configbuild();
+                    // hent ny tv guide
+                    //if (get_tvguide_fromweb()!=-1)
+                    // update db med tvguide
+                    aktiv_tv_oversigt.parsexmltv("tvguide.xml");
+
+                    // hent/update tv guide from db
+                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                    // set update flag in display() func
+                    firsttime_xmltvupdate = true;                                 // if true reset xml config file
+                    // close tv graber windows again
+                    */
+
                   }
                 } else if (vis_music_oversigt) {
                   if (findtype==0) findtype=1;

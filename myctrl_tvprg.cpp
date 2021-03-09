@@ -24,6 +24,7 @@
 
 extern char debuglogdata[1024];                                // used by log system
 
+extern GLuint setuptvgraberback;
 extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
 extern GLuint setupnetworkwlanback;
@@ -354,13 +355,15 @@ int tv_oversigt::saveparsexmltvdb() {
   char writefilename[1024];
   getuserhomedir(writefilename);
   strcat(writefilename,tvguidedbfilename);
-  dbfil=fopen(writefilename,"w");
+  dbfil=fopen("tvguidedb.dat","w");
   if (dbfil) {
     while(n<this->kanal_antal) {
       fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
       n++;
     }
     fclose(dbfil);
+  } else {
+    write_logfile("Error write tvguidedb.dat to disk.");
   }
 }
 
@@ -376,13 +379,15 @@ int tv_oversigt::loadparsexmltvdb() {
   char writefilename[1024];
   getuserhomedir(writefilename);
   strcat(writefilename,tvguidedbfilename);
-  dbfil=fopen(writefilename,"r");
+  dbfil=fopen("tvguidedb.dat","r");
   if (dbfil) {
     while(!(feof(dbfil))) {
       fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
       n++;
     }
     fclose(dbfil);
+  } else {
+    write_logfile("Error loading tvguidedb.dat from disk.");
   }
 }
 
@@ -3658,6 +3663,8 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             write_logfile(debuglogdata);
         }
         mysql_close(conn);
+    } else {
+      write_logfile("Mysql error connect.");
     }
     opdatere_tv_oversigt_kanal_icons();
     loading_tv_guide=false;
@@ -4815,12 +4822,15 @@ void earlyrecorded::showtvreclist() {
   // background
   //glLoadIdentity();
   int i=0;
+  static GLuint setuptvgraberback=0;
+  glLoadIdentity();
   glEnable(GL_TEXTURE);
   glEnable(GL_BLEND);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glColor3f(1.0f, 1.0f, 1.0f);
+  if (setuptvgraberback==0) setuptvgraberback  = loadTexture("/opt/mythtv-controller/tema3/images/setuptvgraberback.png");
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);
+  glBindTexture(GL_TEXTURE_2D,setuptvgraberback);                          // _texturemovieinfobox
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glBegin(GL_QUADS);

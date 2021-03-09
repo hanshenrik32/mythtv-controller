@@ -130,7 +130,7 @@ public:
     void earlyrecordedload(char *mysqlhost,char *mysqluser,char *mysqlpass);
     void showearlyrecorded();
     void getrecordprogram(char *mysqlhost,char *mysqluser,char *mysqlpass);
-    void showtvreclist();
+    void showtvreclist();    
 };
 
 const char ugedage[7][12]={"Søndag","Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"};
