@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <string.h>
+#include "myth_setup.h"
 
 // antal programer pr kanal
 const int maxprogram_antal=400;
@@ -66,8 +67,8 @@ class tv_oversigt_pr_kanal {
 
 class tv_oversigt {
     private:
-        int kanal_antal;
-        int vis_kanal_antal;                                                                                  // # of channels show in tv guide on same screen
+        int kanal_antal;                                                                                      // # of channels in array
+        int vis_kanal_antal;                                                                                  // # of channels max show in tv guide on same screen
         time_t starttid;
         time_t sluttid;
         char mysqllhost[200];
@@ -110,6 +111,7 @@ class tv_oversigt {
         int saveparsexmltvdb();                                                                               // tvguidedb filename
         int loadparsexmltvdb();                                                                               // tvguidedb filename
         void set_program_torecord(int selectchanel,int selectprg);                                            // tvguidedb filename
+        int set_channel_state(channel_list_struct *channel_list);
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 
@@ -130,7 +132,7 @@ public:
     void earlyrecordedload(char *mysqlhost,char *mysqluser,char *mysqlpass);
     void showearlyrecorded();
     void getrecordprogram(char *mysqlhost,char *mysqluser,char *mysqlpass);
-    void showtvreclist();    
+    void showtvreclist();
 };
 
 const char ugedage[7][12]={"Søndag","Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"};

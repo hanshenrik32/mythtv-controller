@@ -3414,9 +3414,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download gfx file and use as icon
-                  if (debugmode & 4) printf("Loading1 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                  //if (debugmode & 4) printf("Loading1 image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
-                    printf("Download error \n");
+                    //printf("Download error \n");
+                    write_logfile("Image download error.");
                   } else strcpy(tmpfilename,"");
                 }
                 // tmpfilename is now the bame of the icon

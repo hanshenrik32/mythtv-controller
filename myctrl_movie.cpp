@@ -724,6 +724,9 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     if (ext) {
                       *ext='\0';
                     }
+                    // check for '\n' in the end of the string and remove it
+                    if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
+
                     strcpy(moviepath1,moviefil->d_name);
                     strcat(moviepath1,"/");
                     strcat(moviepath1,submoviefil->d_name);

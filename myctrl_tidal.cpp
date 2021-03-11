@@ -289,7 +289,7 @@ int tridal_class::tridal_login_token2() {
       //curl_error=system(sed);
       if (curl_error==0) {
       }
-      fprintf(stdout,"\n******** Got token ********\n");
+      //fprintf(stdout,"\n******** Got token ********\n");
     }
   }
   catch (...) {

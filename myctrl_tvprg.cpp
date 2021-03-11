@@ -22,6 +22,9 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
+
+extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
+
 extern char debuglogdata[1024];                                // used by log system
 
 extern GLuint setuptvgraberback;
@@ -382,6 +385,7 @@ int tv_oversigt::loadparsexmltvdb() {
   dbfil=fopen("tvguidedb.dat","r");
   if (dbfil) {
     while(!(feof(dbfil))) {
+      printf("Loading channel # %d \n",n);
       fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
       n++;
     }
@@ -3426,6 +3430,41 @@ void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
 
 // ****************************************************************************************
 //
+// update tv channel status (view/hide) from struct
+//
+// ****************************************************************************************
+
+int tv_oversigt::set_channel_state(channel_list_struct *channel_list) {
+  char sqlselect[2048];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  int nr=0;
+  // mysql stuf
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, this->mysqllhost,this->mysqlluser, this->mysqllpass, database, 0, NULL, 0)) {
+    while ((strcmp(channel_list[nr].name,"")!=0) && (nr<199)) {
+      strcpy(sqlselect,"UPDATE channel set channel.visible=");
+      if (channel_list[nr].selected) strcat(sqlselect,"1");
+      else strcat(sqlselect,"0");
+      strcat(sqlselect," where name like '");
+      strcat(sqlselect,channel_list[nr].name);
+      strcat(sqlselect,"' limit 1");
+      mysql_query(conn,sqlselect);
+      write_logfile(sqlselect);                                                // write to log file
+      res = mysql_store_result(conn);
+      nr++;
+    }
+  } else nr=-1; // set error flag
+  if (nr==-1) write_logfile("Error connect to mysql server.");
+  return(1);
+}
+
+
+// ****************************************************************************************
+//
 // henter aktiv tv overigt fra mythtv or internal localdb created like mythtv in use
 //
 // ****************************************************************************************
@@ -3496,11 +3535,15 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         // do select from db count nr of records
+        // OLD strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and endtime>='");
         strcat(sqlselect,dagsdato);
-        strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
+        strcat(sqlselect,"' order by orderid,abs(channel.channum),starttime");
+
+        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
@@ -3518,6 +3561,11 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
+
+        write_logfile(sqlselect);
+
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         kanalnr=0;
@@ -3659,11 +3707,13 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
+            //
             sprintf(debuglogdata,"Found %4d tv channels and %4d # tv programs.",this->kanal_antal,totalantalprogrammer);
             write_logfile(debuglogdata);
         }
         mysql_close(conn);
     } else {
+      // if error
       write_logfile("Mysql error connect.");
     }
     opdatere_tv_oversigt_kanal_icons();
@@ -3994,6 +4044,9 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     default:this->vis_kanal_antal=7;                        // antal kanler som vises
             break;
   }
+
+  //printf("Kanal antal %d vis kantal %d \n",kanal_antal,this->vis_kanal_antal);
+
   if (kanal_antal<this->vis_kanal_antal) this->vis_kanal_antal=kanal_antal;
   //
   // loop for channel

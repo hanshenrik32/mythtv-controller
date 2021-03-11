@@ -3271,11 +3271,12 @@ int load_channel_list_from_graber() {
   bool errors=false;
   char userhomedir[1024];
   char filename[1024];
+  // contry xml graber
   const char *grabercmd[35]={"","tv_grab_na_dd","tv_grab_nl","tv_grab_es_laguiatv","tv_grab_il","tv_grab_na_tvmedia","tv_grab_dtv_la","tv_grab_fi","tv_grab_eu_dotmedia","tv_grab_se_swedb",
                             "tv_grab_pt_meo","tv_grab_fr","tv_grab_uk_bleb","tv_grab_huro","tv_grab_ch_search","tv_grab_it","tv_grab_is","tv_grab_fi_sv","tv_grab_na_dtv","tv_grab_tr",
                             "tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide","tv_grab_zz_sdjson"};
 
-  if (debugmode) printf("Get channel list file from tv graber sub system.\n");
+  write_logfile("Get channel list file from tv graber sub system.");
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/tvguide_channels.txt");
@@ -3382,15 +3383,16 @@ int load_channel_list_from_graber() {
     }
     //printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
     write_logfile("Create channel list file from tv_graber_config.");
+    write_logfile(exestring);
     switch (aktiv_tv_graber.graberaktivnr) {
-        case 13:sysresult=system(exestring);
+        case 13:
+              sysresult=system(exestring);
               break;
         default:
               sysresult=system(exestring);
-              if (sysresult) {
-                write_logfile("Error create channel list file from tv_graber_config. Check xmltv is installed.");
-              }
+              break;
     }
+    if (sysresult) write_logfile("Error create channel list file from tv_graber_config. Check xmltv is installed.");
     // read channel list into channel_list struct
     if (check_zerro_bytes_file(filename)!=0) {
       fil=fopen(filename,"r");
@@ -3420,16 +3422,19 @@ int load_channel_list_from_graber() {
       // remove temp file again
       sysresult=system("rm ~/tvguide_channels.txt");
       if (sysresult) printf("error remove file ~/tvguide_channels.txt \n ");
-      if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
+      //if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     } else errors=true;
-  } else errors=true;
+  } else {
+    errors=true;
+    write_logfile("No tv graber selected in config file.");
+  }
   if (errors) return(-1); else return(sysresult);
 }
 
 
 // ****************************************************************************************//
 //
-// save tvguide channel info
+// save tvguide channel info to tvguide_channels.dat in homedir
 //
 // ****************************************************************************************
 
@@ -3441,19 +3446,22 @@ bool save_channel_list() {
   bool errors=false;
   getuserhomedir(userhomedir);                                                // get user homedir
   strcpy(filename,userhomedir);
+  strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                     // add the filename
   if (PRGLIST_ANTAL>0) {
-    fil=fopen(filename,"w");                                                  // open file for write
+    fil=fopen(filename,"w");                                                 // open file for write
     if (fil) {
-      printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
+      //printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
       while(cnr<PRGLIST_ANTAL) {
         fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
         cnr++;
       }
       fclose(fil);
       order_channel_list_in_tvguide_db();                                       // ret db liste til som i channel_list
-      if (debugmode) printf("Saving tvguidedb ok.\n");
-    } else errors=true;
+    } else {
+      errors=true;
+      write_logfile("Error save tvguide_channels.dat");
+    }
   }
   if (cnr>0) return(true); else return(false);
 }
@@ -3462,7 +3470,7 @@ bool save_channel_list() {
 
 // ****************************************************************************************
 //
-// load tvguide channel info
+// load tvguide channel info from tvguide_channels.dat in homedir
 // return antal loaded
 //
 // ****************************************************************************************
@@ -3476,6 +3484,7 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
+  strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
     channel_list[n].selected=false;                                             // is program channel active (default)
@@ -3488,19 +3497,21 @@ int load_channel_list() {
   if (fil) {
     while((!(feof(fil))) && (cnr<MAXCHANNEL_ANTAL-1)) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-      //printf("L # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
       cnr++;
       PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
     fclose(fil);
-  } else errors=true;
+  } else {
+    errors=true;
+    write_logfile("Error loading tvguide_channels.dat");
+  }
   if (errors==false) return(cnr); return(0);
 }
 
 
 // ****************************************************************************************
 //
-// sort record after selected
+// sort record after selected (struct)
 //
 // ****************************************************************************************
 
@@ -3588,6 +3599,7 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+    int channel_antal;
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
@@ -3599,7 +3611,8 @@ void show_setup_tv_graber(int startofset) {
     if (hent_tv_channels==false) {
       // try to load struct channel info first time
       // tvguide_channels.dat
-      if (!(load_channel_list())) {
+      channel_antal=load_channel_list();
+      if (channel_antal==0) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
         // crete mew config file
@@ -3615,9 +3628,9 @@ void show_setup_tv_graber(int startofset) {
         load_channel_list_from_graber();                                        // get channel list from graber
         // save channel list to struct db file
         // struct channel_list
-        order_channel_list();
-        save_channel_list();
-        //firsttime_xmltvupdate=true;                                               // if true reset xml config fi
+        order_channel_list();                                                   // Order data
+        save_channel_list();                                                    // save to db file
+        //firsttime_xmltvupdate=true;                                           // if true reset xml config fi
         //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.

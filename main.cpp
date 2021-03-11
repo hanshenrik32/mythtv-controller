@@ -8112,31 +8112,27 @@ void handlespeckeypress(int key,int x,int y) {
                   // update the view
                   if (do_show_tvgraber==false) {
                     //order_channel_list_in_tvguide_db();
-                    aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+
+                    //aktiv_tv_oversigt.set_channel_state(channel_list);                      // update channel struct
+                    //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
+
                     //update_xmltv_phread_loader();                   // start thred update flag in main loop
 
-                    // Need testing
-                    /*
-                    // kill running graber
                     killrunninggraber();
                     // clear old tvguide in db
                     aktiv_tv_oversigt.cleartvguide();
                     // save chennel list info to internal datafile
-                    order_channel_list();
-                    save_channel_list();
-                    // buid new config file for xmltv from saved db
-                    //xmltv_configcontrol.graber_configbuild();
-                    // hent ny tv guide
-                    //if (get_tvguide_fromweb()!=-1)
-                    // update db med tvguide
-                    aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-
+                    order_channel_list();                                         // ordre struct
+                    save_channel_list();                                          // save to db file
+                    aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
                     // hent/update tv guide from db
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                     // set update flag in display() func
                     firsttime_xmltvupdate = true;                                 // if true reset xml config file
-                    // close tv graber windows again
-                    */
+
+
+
+
 
                   }
                 } else if (vis_music_oversigt) {
@@ -9943,18 +9939,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // clear old tvguide in db
                   aktiv_tv_oversigt.cleartvguide();
                   // save chennel list info to internal datafile
-                  order_channel_list();
-                  save_channel_list();
-                  // buid new config file for xmltv from saved db
-                  //xmltv_configcontrol.graber_configbuild();
-                  // hent ny tv guide
-                  //if (get_tvguide_fromweb()!=-1)
-                  // update db med tvguide
-                  aktiv_tv_oversigt.parsexmltv("tvguide.xml");
-/*
-                  // order channels in db (mysqldb)
-                  order_channel_list_in_tvguide_db();
-*/
+                  order_channel_list();                                         // ordre struct
+                  save_channel_list();                                          // save to db file
+                  aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
                   // hent/update tv guide from db
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                   // set update flag in display() func
@@ -10086,7 +10073,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_tv_oversigt) {
                 // load tv guide
                 // write debug log
-                write_logfile("Loading tvguidedb file");
+                write_logfile("Loading tvguidedb file.");
                 aktiv_tv_oversigt.loadparsexmltvdb();
               }
               break;
