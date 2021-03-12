@@ -13402,12 +13402,11 @@ void *datainfoloader_xmltv(void *data) {
       fprintf(stderr,"Parse xmltv error\n");
     }
   }
-    // save config again
-  save_config((char *) "/etc/mythtv-controller.conf");
   write_logfile("parser xmltv guide done.");
+  // save config again
+  save_config((char *) "/etc/mythtv-controller.conf");
   // set update flag for done
   do_update_xmltv_show=false;
-  //pthread_mutex_unlock(&count_mutex);
   pthread_exit(NULL);
 }
 

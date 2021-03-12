@@ -773,7 +773,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       res = mysql_store_result(conn);
                       if (mysql_error(conn)) {
                         write_logfile("Mysql error 'insert into videometadata'");
-                        printf("%s\n",mysql_error(conn));
+                        printf("Mysql error : %s\n",mysql_error(conn));
                         //exit(0);
                       }
                     }

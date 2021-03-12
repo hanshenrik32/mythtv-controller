@@ -9,9 +9,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "myth_ttffont.h"
+#include "utility.h"
 
 extern GLint ctx, myFont;
 extern int debugmode;                   // debugmode
+extern char debuglogdata[1024];                                                // used by log system
 
 
 // ****************************************************************************************
@@ -53,7 +55,9 @@ int fontctrl::updatefontlist()
     glcAppendCatalog("/usr/share/fonts/type1/");
     /* Choose a master and a face. */
     mastercount=glcGeti(GLC_MASTER_COUNT);		// gem antal af fonte
-    if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
+    sprintf(debuglogdata,"Numbers of fonts found %d",mastercount);
+    write_logfile(debuglogdata);
+    //if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
     master = 0;
     i=0;
     fil=fopen("fontlist.txt","r");
@@ -100,7 +104,8 @@ int fontctrl::updatefontlist_old()
     count = glcGeti(GLC_FONT_COUNT);                                       // GLC_FONT_COUNT GLC_CATALOG_COUNT
     if (debugmode) printf("\nTrue type fonts is found in this path\n");
     for (i = 0; i<count; i++) {
-      printf("%s\n",(char *) glcGetListc(GLC_CATALOG_LIST, i));
+      sprintf(debuglogdata,"%s",(char *) glcGetListc(GLC_CATALOG_LIST, i));
+      write_logfile(debuglogdata);
     }
     // load font list
     i=0;
@@ -125,7 +130,7 @@ int fontctrl::updatefontlist_old()
 
 // ****************************************************************************************
 //
-// select font
+// select font (by fontname)
 //
 // ****************************************************************************************
 
@@ -134,9 +139,8 @@ int fontctrl::updatefontlist_old()
 int fontctrl::selectfont(char *fontname)
 {
     bool glresl;
-    glcNewFontFromFamily(myFont, fontname);               // Droid Serif,Ubuntu
-    //glcFont(myFont);                                      // clear
+    glcNewFontFromFamily(myFont, fontname);                                     // Droid Serif,Ubuntu
     glcFontFace(myFont, "Bold");
-    glcFont(myFont);                                      // clear
+    glcFont(myFont);                                                            // Select font
     return(1);
 }
