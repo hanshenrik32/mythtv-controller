@@ -123,14 +123,14 @@ install:
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
-	@cp -r xmltv_config $(DESTDIR)	
+	#@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
-	@cp xmltv_config/*  ~/.xmltv/
-	@chmod 666 ~/.xmltv/*
+	#@cp xmltv_config/*  ~/.xmltv/
+	#@chmod 666 ~/.xmltv/*
 	@chmod 777 /opt/mythtv-controller/tema*
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
