@@ -8109,7 +8109,7 @@ void handlespeckeypress(int key,int x,int y) {
         case 1: if (vis_tv_oversigt) {
                   do_show_tvgraber=!do_show_tvgraber;
                   if (do_show_tvgraber) write_logfile("Show TV channel Setup menu."); else write_logfile("Hide TV channel Setup menu.");
-                  // update the view
+                  // update the tv overview
                   if (do_show_tvgraber==false) {
                     //order_channel_list_in_tvguide_db();
                     //aktiv_tv_oversigt.set_channel_state(channel_list);                      // update channel struct
@@ -8118,16 +8118,13 @@ void handlespeckeypress(int key,int x,int y) {
                     killrunninggraber();
                     // clear old tvguide in db
                     aktiv_tv_oversigt.cleartvguide();
-                    // save chennel list info to internal datafile
                     aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
                     order_channel_list();                                         // ordre struct
                     save_channel_list();                                          // save to db file
                     // hent/update tv guide from db
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                     // set update flag in display() func
-
                     firsttime_xmltvupdate = true;                                 // if true reset xml config file
-
                   }
                 } else if (vis_music_oversigt) {
                   if (findtype==0) findtype=1;
@@ -9926,10 +9923,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                 ask_save_playlist=false;
               }
               // close setup windows again or close proram window.
-              if (do_show_setup) {
+            if (do_show_setup) {
                 if (do_show_tvgraber) {
-
-
+                  // make new tv overview
                   // kill running graber
                   killrunninggraber();
                   // clear old tvguide in db
@@ -9943,8 +9939,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // set update flag in display() func
                   firsttime_xmltvupdate = true;                                 // if true reset xml config file
                   // close tv graber windows again
-
-
                   do_show_tvgraber=false;
                   do_show_setup=false;
                   key=0;
@@ -9980,7 +9974,25 @@ void handleKeypress(unsigned char key, int x, int y) {
                 } else do_show_setup=false;
                 key=0;
               }
-              if (vis_music_oversigt) {
+              // vis tv overview and show tv_guide setup and press ESC key
+              if ((vis_tv_oversigt) && (do_show_setup==false) && (do_show_tvgraber)) {
+                // make new tv overview
+                // kill running graber
+                killrunninggraber();
+                // clear old tvguide in db
+                aktiv_tv_oversigt.cleartvguide();                             // clear old db
+                aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
+                // hent/update tv guide from db
+                aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                order_channel_list();                                         // ordre struct
+                // save chennel list info to internal datafile
+                save_channel_list();                                          // save to db file
+                // set update flag in display() func
+                firsttime_xmltvupdate = true;                                 // if true reset xml config file
+                // close tv graber windows again
+                do_show_tvgraber=false;
+                key=0;
+              } else if (vis_music_oversigt) {
                 vis_music_oversigt=false;
                 key=0;
               } else if (vis_radio_oversigt) {
@@ -9992,7 +10004,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               } else if (vis_stream_oversigt) {
                 vis_stream_oversigt=false;
                 key=0;
-              } else if ((vis_tv_oversigt) && (do_show_tvgraber==false)) {
+              } else if (vis_tv_oversigt) {
                 vis_tv_oversigt=false;
                 key=0;
               } else if (vis_recorded_oversigt) {
