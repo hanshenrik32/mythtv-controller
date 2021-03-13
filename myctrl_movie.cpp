@@ -606,7 +606,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     strcpy(database,dbname);
     int checkdirexist=0;
 //    gotoxy(10,16);
-    write_logfile("Opdatere Film oversigt fra db :");
+    write_logfile((char *) "Opdatere Film oversigt fra db :");
     sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
 //    sprintf(sqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,videogenre.genre from videogenre,videometadatagenre,videometadata left join videocategory on videometadata.category=videocategory.intid where videometadatagenre.idvideo=videometadata.intid and browse=1 group by idvideo order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
     conn=mysql_init(NULL);
@@ -753,7 +753,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     // write debug log
                     if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s'",movietitle);
                     else sprintf(debuglogdata,"Checking/Insert movietitle '%s'",movietitle);
-                    write_logfile(debuglogdata);
+                    write_logfile((char *) debuglogdata);
                     // check if record exist (video file exist)
                     if ((fundet) && (del_rec_nr)) {
                       if (!(file_exists(moviepathcheck))) {
@@ -772,7 +772,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       mysql_query(conn,sqlselect);
                       res = mysql_store_result(conn);
                       if (mysql_error(conn)) {
-                        write_logfile("Mysql error 'insert into videometadata'");
+                        write_logfile((char *) "Mysql error 'insert into videometadata'");
                         printf("Mysql error : %s\n",mysql_error(conn));
                         //exit(0);
                       }
@@ -819,7 +819,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   // write debug log
                   if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
                   else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
-                  write_logfile(debuglogdata);
+                  write_logfile((char *) debuglogdata);
                   // findes filmen i db i forvejen så slet den og opret den igen
                   // ellers bare opret den
                   // dette skal gøres hvis dir eller fil navn ændre sig
@@ -841,7 +841,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     mysql_query(conn,sqlselect);
                     res = mysql_store_result(conn);
                     if (mysql_error(conn)) {
-                      write_logfile("Mysql error.");
+                      write_logfile((char *) "Mysql error.");
                       printf("%s\n",mysql_error(conn));
                       //exit(0);
                     }
