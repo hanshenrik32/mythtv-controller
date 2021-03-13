@@ -21,6 +21,9 @@
 #include "readjpg.h"
 #include "loadpng.h"
 
+
+extern char debuglogdata[1024];                                  // used by log system
+
 extern float configdefaultradiofontsize;
 extern const char *dbname;                                    // db name in mysql
 extern char configmysqluser[256];                             //
@@ -31,7 +34,6 @@ extern int configmythtvver;
 extern int screen_size;                                       //
 extern int screensizey;                                       //
 extern int screeny;                                           //
-extern int debugmode;                                         // set in main
 extern unsigned int musicoversigt_antal;                      //
 extern int radio_key_selected;                                //
 extern int music_select_iconnr;                               //
@@ -166,7 +168,7 @@ int radiostation_class::load_radio_stations_gfx() {
       if (startup_loaded) return(0);
       startup_loaded=true;
       while(i<radiooversigt.radioantal()) {
-        strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");	// hent path
+        strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");	// hent path
         strcpy(gfxfilename,radiooversigt.get_station_gfxfile(i));			// hent radio icon gfx filename
         strcat(tmpfilename,gfxfilename);        					// add filename to path
         if ((strcmp(gfxfilename,"")!=0) && (file_exists(tmpfilename))) {		// den har et navn samt gfx filen findes.
@@ -175,7 +177,7 @@ int radiostation_class::load_radio_stations_gfx() {
         } else if (strcmp(gfxfilename,"")==0) {
           // check hvis ikke noget navn om der findes en fil med radio station navnet *.png/jpg
           // hvis der gør load denne fil.
-          strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");
+          strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
           strcat(tmpfilename,radiooversigt.get_station_name(i));
           strcat(tmpfilename,".png");
           if (file_exists(tmpfilename)) {
@@ -185,12 +187,12 @@ int radiostation_class::load_radio_stations_gfx() {
             strcat(stack[i]->gfxfilename,".png");
             opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
           } else {
-            strcpy(tmpfilename,"/usr/share/mythtv-controller/images/radiostations/");
+            strcpy(tmpfilename,"/opt/mythtv-controller/images/radiostations/");
             strcat(tmpfilename,radiooversigt.get_station_name(i));
             strcat(tmpfilename,".jpg");
             if (file_exists(tmpfilename)) {
               texture=loadTexture ((char *) tmpfilename);                                 // load texture
-              set_texture(i,texture);     		                                // save it in radio station struct
+              set_texture(i,texture);     		                                            // save it in radio station struct
               strncpy(stack[i]->gfxfilename,get_station_name(i),stationamelength-1);      // update station gfxfilename to station name
               strcat(stack[i]->gfxfilename,".png");
               opdatere_radiostation_gfx(stack[i]->intnr,stack[i]->gfxfilename);           // and update db filename
@@ -441,13 +443,14 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 
 // ****************************************************************************************
 //
-//
+// show radio stations overview
 //
 // ****************************************************************************************
-extern int orgwinsizey;
+extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
 bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+    static bool show_all_kode_errors=false;
     int buttonsize=200;
     int buttonsizey=180;
     int xof=5;
@@ -463,7 +466,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
     char temptxt[200];
     char *lastslash;
     bool radio_pictureloaded=true;
-    const char *radiostation_iconsgfx="/usr/share/mythtv-controller/images/radiostations/";
+    const char *radiostation_iconsgfx="/opt/mythtv-controller/images/radiostations/";
     char *base,*right_margin;
     int length,width;
     int pline=0;
@@ -595,7 +598,13 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             glTexCoord2f(1, 0); glVertex3f(10+ xof+40,yof +10, 0.0);
             glEnd();
           } else {
-            if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
+            //if (debugmode & 1024) printf("Contry kode %d missing flag, File name %s\n",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
+            // write debug log
+            sprintf(debuglogdata,"Contry code %d missing flag, File name %s",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
+            if (gfxlande[stack[i+sofset]->land]==0) {
+              sprintf(debuglogdata,"Contry code %d is missing filename.",stack[i+sofset]->land);
+              if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
+            } else if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
           }
         }
         // print radios station name
@@ -692,6 +701,7 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
       glPopMatrix();
     }
     glPopMatrix();
+    show_all_kode_errors=true;                                                  // stop loging.
     return(radio_pictureloaded);
 }
 
@@ -719,27 +729,6 @@ void radiostation_class::show_radio_options() {
     int winsizy=800;
     int xpos=0;
     int ypos=0;
-    // mask
-    /*
-    glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glTranslatef(0.0f, 0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,0.8f);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_DST_COLOR, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, radiooptionsmask); 					//_textureId18_1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBegin(GL_QUADS); //Begin quadrilateral coordinates
-    // draw  front box
-    glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2)),((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
-    glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
-    glEnd();
-    glPopMatrix();
-    */
     // background
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -830,6 +819,8 @@ int radiostation_class::set_radio_popular(int stationid) {
     char sqlselect[512];
     MYSQL *conn;
     MYSQL_RES *res;
+    // write debug log
+    write_logfile((char *) "Update played radio station.");
     sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
@@ -858,6 +849,7 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    write_logfile((char *) "Update played radio station online.");
     if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
       else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
@@ -1012,7 +1004,6 @@ int get_url_data(char *url,char *ipadd) {
 bool check_radio_online_switch=true;
 
 unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) {
-
     short int port=0;
     int sock;
     struct sockaddr_in servername;
@@ -1031,7 +1022,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     bool cerror;
     struct timeval tv;
     fd_set myset;
-    write_logfile("Check radio stations.");
+    write_logfile((char *) "Check radio stations.");
     if (check_radio_online_switch) {
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
@@ -1047,7 +1038,9 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
             if (strcmp(hostname,"")!=0) {
               // get port and ip
               port=get_url_data(hostname,ipadresse);
-              if (debugmode & 1) fprintf(stderr,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
+              // write debug log
+              sprintf(debuglogdata,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
+              write_logfile((char *) debuglogdata);
               sock=socket(PF_INET, SOCK_STREAM, 0);
               if (sock) {
                 //fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -1058,11 +1051,11 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 error=(init_sockaddr(&servername,ipadresse,port));
                 if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
                   if (cerror==0) {
-                    write_logfile("Station OK.");
+                    write_logfile((char *) "Station OK.");
                     radiook=true;
                   } else radiook=false;
                 } else {
-                  write_logfile("Station BAD.");
+                  write_logfile((char *) "Station BAD.");
                   radiook=false;
                 }
                 close (sock);

@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <string.h>
+#include "myth_setup.h"
 
 // antal programer pr kanal
 const int maxprogram_antal=400;
@@ -66,8 +67,8 @@ class tv_oversigt_pr_kanal {
 
 class tv_oversigt {
     private:
-        int kanal_antal;
-        int vis_kanal_antal;                                                                                  // # of channels show in tv guide on same screen
+        int kanal_antal;                                                                                      // # of channels in array
+        int vis_kanal_antal;                                                                                  // # of channels max show in tv guide on same screen
         time_t starttid;
         time_t sluttid;
         char mysqllhost[200];
@@ -76,6 +77,7 @@ class tv_oversigt {
         char loadinginfotxt[200];
         int removetvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);                              //
         time_t lastupdated;                                                                                   // last updated unix date
+        void opdatere_tv_oversigt_kanal_icons();                                                              // load kanal icons
     public:
         tv_oversigt_pr_kanal tvkanaler[MAXKANAL_ANTAL];                                                       //
         int tvprgrecorded(char *fstarttime,char *ftitle,char *fchannelid);					                          // return type (1/2/3) found of tv program to record
@@ -84,14 +86,13 @@ class tv_oversigt {
         int vistvguidekl;                                                                                     // vis tv guide kl
         tv_oversigt();                                                                                        // constructor
         ~tv_oversigt();                                                                                       // destructor
-        int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
+        //int gettvprogramrecinfo(int channelnr,int prgnr,char *prgname,char *stime,char *etime) { tvkanaler[channelnr].tv_prog_guide[prgnr].getprogramrecinfo(prgname,stime,etime); return(1); }
         int tv_kanal_antal() { return (kanal_antal); }                                                        // return nr of th channels
         void opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mysqlpass,time_t starttid);           //
-        void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);        //
-        void opdatere_tv_oversigt_kanal_icons();      // load kanal icons
+        void show_fasttv_oversigt(int selectchanel,int selectprg,bool do_update_xmltv_show);                  //
         void show_canal_names();                                                                              //
-        //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	  // show the prg info in
-        void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	  // show the prg info in
+        //void showandsetprginfo(int kanalnr,int tvprgnr);					                                         	// show the prg info in
+        void showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr);                                  	// show the prg info in
         int kanal_prg_antal(int kanalnr) { return tvkanaler[kanalnr].program_antal(); }                       //
         bool changetime(time_t difftime) { starttid+=difftime; sluttid+=difftime; return(true); }             //
         int cleanchannels();                                                                                  // clear all tv channels
@@ -107,9 +108,10 @@ class tv_oversigt {
         unsigned long getprogram_startunixtume(int selectchanel,int selectprg);
         char *getprogram_prgname(int selectchanel,int selectprg);                                             // return pointer to prgname in tvguide
         void reset_tvguide_time();                                                                            // reset show tv guide to now (time)
-        int saveparsexmltvdb();                                     // tvguidedbfilename
-        int loadparsexmltvdb();                                     // tvguidedbfilename
-        void set_program_torecord(int selectchanel,int selectprg);                                     // tvguidedbfilename
+        int saveparsexmltvdb();                                                                               // tvguidedb filename
+        int loadparsexmltvdb();                                                                               // tvguidedb filename
+        void set_program_torecord(int selectchanel,int selectprg);                                            // tvguidedb filename
+        int set_channel_state(channel_list_struct *channel_list);
         //int find_start_kl_returnpointinarray(int selectchanel,int findtime);
 };
 
@@ -140,7 +142,8 @@ const char upcommingrec[]="Upcoming Recordings.";
 const char oldrecordning[]="Old recordeds.";
 
 //bool check_tvguide_process_running(char *processname);
-int parsexmltv();
-int get_tvguide_fromweb();
+int parsexmltv();                                                               // parse xml file
+int get_tvguide_fromweb();                                                      //
+unsigned long get_cannel_id(MYSQL *conn,char *channelname);                     //
 
 #endif

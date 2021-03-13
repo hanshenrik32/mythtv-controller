@@ -13,7 +13,8 @@
 #include <IL/ilut.h>
 #include <math.h>
 #include <ctype.h>
-#include <ical.h>
+//#include <ical.h>
+#include <libical/ical.h>
 #include <libxml/parser.h>
 #include "utility.h"
 #include "myctrl_tvprg.h"
@@ -22,6 +23,12 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
+
+extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
+
+extern char debuglogdata[1024];                                // used by log system
+
+extern GLuint setuptvgraberback;
 extern bool tv_guide_firsttime_update;
 extern float configdefaulttvguidefontsize;                                     // font size in tvguide
 extern GLuint setupnetworkwlanback;
@@ -109,21 +116,25 @@ bool check_tvguide_process_running(char *processname) {
 //
 // intern function for _xmltv
 // used to cmd/download the tvguide.xml file to xmlparser
-// use 2 days for tv_grab_eu_dotmedia it is fast as hell
+// use 2 days for tv_grab_eu_dotmedia it is fast.
 //
 // ****************************************************************************************
 
 int get_tvguide_fromweb() {
   char exestring[2048];
   int result=-1;
-  // check if active xml_tv graber is running
+  // check if active xml_tv graber is running (running = true)
   if (check_tvguide_process_running((char *) aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr])==false) {
     strcpy(exestring,configbackend_tvgraber);
     if ((aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr],"tv_grab_eu_dotmedia")==0) strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
     else strcat(exestring," --days 2 --output ~/tvguide.xml 2> ~/tvguide.log");
-    if (debugmode & 256) printf("Start tv graber background process %s\n command :%s\n",configbackend_tvgraber,exestring);
+    // write debug log
+    sprintf(debuglogdata,"Run tv graber use %s: Command : %s",configbackend_tvgraber,exestring);
+    write_logfile((char *) debuglogdata);
     result=system(exestring);   // do it
-    if (debugmode & 256) printf("Done tv graber background process exit kode %d\n",result);
+    // write debug log
+    sprintf(debuglogdata,"Done tv graber background process. Exit kode %d",result);
+    write_logfile((char *) debuglogdata);
   } else printf("Graber is already ruuning.\n");
   return(result);
 }
@@ -176,28 +187,24 @@ char *trimwhitespace(char *str)
 // OK
 // ****************************************************************************************
 
-unsigned long get_cannel_id(char *channelname) {
+unsigned long get_cannel_id(MYSQL *conn,char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
   // mysql stuf
-  conn=mysql_init(NULL);
-  // Connect to database
-  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-  mysql_query(conn,"set NAMES 'utf8'");
-  res = mysql_store_result(conn);
-  if (conn) {
-    sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+  try {
+    if (conn) {
+      sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
+      mysql_query(conn,sql);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
-    mysql_close(conn);
+  } catch (...) {
+    printf("Error connect to mysql.");
   }
   return(id);
 }
@@ -208,28 +215,25 @@ unsigned long get_cannel_id(char *channelname) {
 //
 // ****************************************************************************************
 
-bool do_cannel_exist(char *channelname) {
+bool do_cannel_exist(MYSQL *conn,char *channelname) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
-  // mysql stuf
-  conn=mysql_init(NULL);
-  if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+  try {
+    if (conn) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      sprintf(sql,"select chanid from channel where callsign like '%s'",channelname);
+      mysql_query(conn,sql);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
-    mysql_close(conn);
+  } catch (...) {
+    printf("Error connect to mysql.");
   }
   if (id==0) return(false); else return(true);
 }
@@ -241,28 +245,25 @@ bool do_cannel_exist(char *channelname) {
 //
 // ****************************************************************************************
 
-bool do_program_exist(int pchanid,char *ptitle,char *pstarttime) {
+bool do_program_exist(MYSQL *conn,int pchanid,char *ptitle,char *pstarttime) {
   char sql[4096];
-  char *database = (char *) "mythtvcontroller";
-  MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
   unsigned long id=0;
-  // mysql stuf
-  conn=mysql_init(NULL);
-  if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    // Connect to database
-    mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-    sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) {
-      while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+  try {
+    if (conn) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      sprintf(sql,"select chanid from program where chanid=%d and starttime like '%s' limit 1",pchanid,pstarttime);
+      mysql_query(conn,sql);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) id=atol(row[0]);
+      }
+      mysql_free_result(res);
     }
-    mysql_free_result(res);
-    mysql_close(conn);
+  } catch (...) {
+    printf("Error connect to mysql.");
   }
   if (id==0) {
     return(false);
@@ -289,6 +290,8 @@ void getfirstlinefromstring(char *resl,char *line) {
 
 
 // ****************************************************************************************
+//
+//
 //
 // ****************************************************************************************
 
@@ -346,39 +349,52 @@ void expand_escapes(char* dest, const char* src) {
 
 // ****************************************************************************************
 //
-//
+// Save channel (tvguide) data
 //
 // ****************************************************************************************
 
 int tv_oversigt::saveparsexmltvdb() {
   int n=0;
   FILE *dbfil;
-  dbfil=fopen(tvguidedbfilename,"w");
+  char writefilename[1024];
+  getuserhomedir(writefilename);
+  strcat(writefilename,"/");
+  strcat(writefilename,tvguidedbfilename);
+  dbfil=fopen(writefilename,"w");                                             //tvguidedb.dat
   if (dbfil) {
     while(n<this->kanal_antal) {
       fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
       n++;
     }
     fclose(dbfil);
+  } else {
+    write_logfile((char *) "Error write tvguidedb.dat to disk.");
   }
 }
 
 // ****************************************************************************************
 //
-//
+// Load channel (tvguide) data
 //
 // ****************************************************************************************
 
 int tv_oversigt::loadparsexmltvdb() {
   int n=0;
   FILE *dbfil;
-  dbfil=fopen(tvguidedbfilename,"r");
+  char writefilename[1024];
+  getuserhomedir(writefilename);
+  strcat(writefilename,"/");
+  strcat(writefilename,tvguidedbfilename);
+  dbfil=fopen(writefilename,"r");                                             // tvguidedb.dat
   if (dbfil) {
     while(!(feof(dbfil))) {
+      printf("Loading channel # %d \n",n);
       fread(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
       n++;
     }
     fclose(dbfil);
+  } else {
+    write_logfile((char *) "Error loading tvguidedb.dat from disk.");
   }
 }
 
@@ -386,6 +402,7 @@ int tv_oversigt::loadparsexmltvdb() {
 //
 // read tv guide from file. And update tvguide db (create if not exist)
 // return >0 on error
+//
 // ****************************************************************************************
 
 int tv_oversigt::parsexmltv(const char *filename) {
@@ -521,7 +538,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
       // save last updated
       setlastupdate(mktime(lastmod));
       configtvguidelastupdate=mktime(lastmod);
-      document = xmlReadFile(path, NULL, 0);            // open xml file
+      document = xmlReadFile(path, NULL, 0);                                    // open/read xml file
       // if exist do all the parse and update db
       // it use REPLACE in mysql to create/update records if changed in xmlfile
       if (document) {
@@ -535,7 +552,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
               if (content) {
                 strcpy(result,(char *) content);
                 s=trimwhitespace(result);
-                if (debugmode & 256) printf("TV chanel found : %s \n",s);
+                //if (debugmode & 256) printf("TV chanel found : %s \n",s);
+                sprintf(debuglogdata,"TV chanel found : %s",s);
+                write_logfile((char *) debuglogdata);
               }
               subnode=node->xmlChildrenNode;
               while(subnode) {
@@ -560,7 +579,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 }
                 subnode=subnode->next;
               }
-              cidfundet=do_cannel_exist(channelidname);
+              cidfundet=do_cannel_exist(conn,channelidname);
               if (cidfundet==0) {
                 sprintf(sql,"insert into channel (chanid,callsign,name,xmltvid,iconfile) values(0,'%s','%s','%s','%s')",channelidname,s,xmltvid,realfilename);
                 mysql_query(conn,sql);
@@ -2896,11 +2915,11 @@ int tv_oversigt::parsexmltv(const char *filename) {
               //            tmpdat=xmlGetProp(subnode,( xmlChar *) "category");
               //            if (tmpdat) printf("category: %s\n", tmpdat);
               // get changel id to db
-              channelid=get_cannel_id(channelname);
+              channelid=get_cannel_id(conn,channelname);
               // convert spec chars to esc string in string
               expand_escapes(temptxt,prgtitle);
               strncpy(prgtitle,temptxt,1024-1);
-              if (!(do_program_exist(channelid,prgtitle,starttime))) {
+              if (!(do_program_exist(conn,channelid,prgtitle,starttime))) {
                 if (strcmp("",(char *) category)==0) strcpy(category,"None");
                 // create/update record in program guide table
                 // convert spec chars to esc string in string
@@ -2914,6 +2933,8 @@ int tv_oversigt::parsexmltv(const char *filename) {
                 res = mysql_store_result(conn);
                 mysql_free_result(res);
                 prg_antal++;
+                sprintf(debuglogdata,"#%4d of Tvguide records created.... Channel %20s %s->%s %s ",prg_antal,channelname,starttime,endtime,prgtitle);
+                write_logfile((char *) debuglogdata);
 //                if (debugmode & 256) fprintf(stdout,"#%4d of Tvguide records created.... Channel %20s %s->%s %s \n",prg_antal,channelname,starttime,endtime,prgtitle);
               } else {
 //                if (debugmode & 256) fprintf(stdout,"Tvguide Program exist Channel......         %20s %s->%s %s \n",channelname,starttime,endtime,prgtitle);
@@ -2922,14 +2943,10 @@ int tv_oversigt::parsexmltv(const char *filename) {
             // save rec
           }
         } // for loop end
-        fprintf(stdout, "...\n");
         xmlFreeDoc(document);
-      } else {
-        if (debugmode & 256) printf("tvguide.xml not found \n");
-      }
-
-    }
-  }
+      } else write_logfile((char *) "tvguide.xml not found.");
+    } else write_logfile((char *) "tvguide.xml Do not need update.");
+  } else write_logfile((char *) "Error connect to mysql while update tvguide.");
   loading_tv_guide=false;
   mysql_close(conn);
   return(error);
@@ -2945,7 +2962,6 @@ void tv_oversigt::cleartvguide() {
   char sql[4096];
   int error=0;
   bool fundet=false;
-  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -2955,13 +2971,14 @@ void tv_oversigt::cleartvguide() {
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
   if (!(conn)) error=1;
   if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
+    mysql_query(conn,"DROP table channel");
     mysql_free_result(res);
-    sprintf(sql,"DROP DATABASE %s",database);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) mysql_free_result(res);
+    mysql_query(conn,"DROP table program");
+    mysql_free_result(res);
+    mysql_query(conn,"DROP table programgenres");
+    mysql_free_result(res);
+    mysql_query(conn,"DROP table programrating");
+    mysql_free_result(res);
     mysql_close(conn);
   }
 }
@@ -2986,10 +3003,11 @@ tv_oversigt_prgtype::tv_oversigt_prgtype() {
     settorecord=false;
 }
 
-
+// ****************************************************************************************
 //
 // destructor
 //
+// ****************************************************************************************
 
 tv_oversigt_prgtype::~tv_oversigt_prgtype() {
 
@@ -2997,6 +3015,8 @@ tv_oversigt_prgtype::~tv_oversigt_prgtype() {
 
 
 // ****************************************************************************************
+//
+//
 //
 // ****************************************************************************************
 
@@ -3018,6 +3038,8 @@ int tv_oversigt_prgtype::putprograminfo(char *prgname,char *stime,char *etime,ch
 
 // ****************************************************************************************
 //
+// Store tv program data in stuct
+//
 // ****************************************************************************************
 
 void tv_oversigt_prgtype::getprograminfo(char *prgname,char *stime,char *etime,int *prglength,unsigned long *sunixtime,unsigned long *eunixtime,char *desc,char *subtitle,int *ptype,bool *bgt,int *prgrecorded) {
@@ -3036,6 +3058,8 @@ void tv_oversigt_prgtype::getprograminfo(char *prgname,char *stime,char *etime,i
 
 // ****************************************************************************************
 //
+// get tv guide data from struct
+//
 // ****************************************************************************************
 
 void tv_oversigt_prgtype::getprogramrecinfo(char *prgname,char *stime,char *etime) {
@@ -3046,7 +3070,9 @@ void tv_oversigt_prgtype::getprogramrecinfo(char *prgname,char *stime,char *etim
 
 
 // ****************************************************************************************
-// constructor
+//
+// Constructor
+//
 // ****************************************************************************************
 
 tv_oversigt_pr_kanal::tv_oversigt_pr_kanal() {
@@ -3057,7 +3083,9 @@ tv_oversigt_pr_kanal::tv_oversigt_pr_kanal() {
 
 
 // ****************************************************************************************
-// destructor
+//
+// Destructor
+//
 // ****************************************************************************************
 
 tv_oversigt_pr_kanal::~tv_oversigt_pr_kanal() {
@@ -3066,6 +3094,8 @@ tv_oversigt_pr_kanal::~tv_oversigt_pr_kanal() {
 
 // ****************************************************************************************
 //
+// Update chanel name
+//
 // ****************************************************************************************
 
 void tv_oversigt_pr_kanal::putkanalname(char *kname) {
@@ -3073,7 +3103,9 @@ void tv_oversigt_pr_kanal::putkanalname(char *kname) {
 }
 
 // ****************************************************************************************
+//
 // Clean view
+//
 // ****************************************************************************************
 
 void tv_oversigt_pr_kanal::cleanprogram_kanal() {
@@ -3094,7 +3126,9 @@ void tv_oversigt_pr_kanal::cleanprogram_kanal() {
 }
 
 // ****************************************************************************************
-// constructor tv_oversigt class
+//
+// Constructor tv_oversigt class
+//
 // ****************************************************************************************
 
 tv_oversigt::tv_oversigt() {
@@ -3107,7 +3141,7 @@ tv_oversigt::tv_oversigt() {
     strcpy(loadinginfotxt,"");
     lastupdated=0;
     vistvguidecolors=true;
-    vis_kanal_antal=8;                                                        // nr of channels to display
+    vis_kanal_antal=8;                                                        // default nr of channels to display (will change if no room to show all the channels)
     // get time now
     time(&rawtime);
     // convert clovk to localtime
@@ -3117,7 +3151,9 @@ tv_oversigt::tv_oversigt() {
 }
 
 // ****************************************************************************************
-// destructor tv_oversigt class
+//
+// Destructor tv_oversigt class
+//
 // ****************************************************************************************
 
 tv_oversigt::~tv_oversigt() {
@@ -3125,6 +3161,8 @@ tv_oversigt::~tv_oversigt() {
 
 
 // ****************************************************************************************
+//
+// Reset tvguide time to localtime
 //
 // ****************************************************************************************
 
@@ -3164,8 +3202,6 @@ int tv_oversigt::cleanchannels() {
     */
     return(1);
 }
-
-
 
 
 // ****************************************************************************************
@@ -3272,7 +3308,7 @@ int tv_oversigt::removetvprgrecorded(char *fstarttime,char *ftitle,char *fchanne
 
 // ****************************************************************************************
 //
-// Indsæt into table record to sectule new tv recording
+// Indsæt into table record to schetule new tv recording
 //
 // ****************************************************************************************
 
@@ -3373,6 +3409,7 @@ time_t tv_oversigt::hentprgstartklint(int kanalnr,int prgnr) {
 // ****************************************************************************************
 //
 // load kanal icons
+// used internal by opdatere_tv_oversigt
 //
 // ****************************************************************************************
 
@@ -3389,6 +3426,41 @@ void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
       tvkanaler[i].set_kanal_icon(icon);
     }
   }
+}
+
+
+// ****************************************************************************************
+//
+// update tv channel status (view/hide) fro
+//
+// ****************************************************************************************
+
+int tv_oversigt::set_channel_state(channel_list_struct *channel_list) {
+  char sqlselect[2048];
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  int nr=0;
+  // mysql stuf
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // Connect to database
+  if (mysql_real_connect(conn, this->mysqllhost,this->mysqlluser, this->mysqllpass, database, 0, NULL, 0)) {
+    while ((strcmp(channel_list[nr].name,"")!=0) && (nr<199)) {
+      strcpy(sqlselect,"UPDATE channel set channel.visible=");
+      if (channel_list[nr].selected) strcat(sqlselect,"1");
+      else strcat(sqlselect,"0");
+      strcat(sqlselect," where name like '");
+      strcat(sqlselect,channel_list[nr].name);
+      strcat(sqlselect,"' limit 1");
+      mysql_query(conn,sqlselect);
+      write_logfile((char *) sqlselect);                                                // write to log file
+      res = mysql_store_result(conn);
+      nr++;
+    }
+  } else nr=-1; // set error flag
+  if (nr==-1) write_logfile((char *) "Error connect to mysql server.");
+  return(1);
 }
 
 
@@ -3448,12 +3520,12 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
     mktime(&timeinfo3);
     sprintf(dagsdato,"%04d-%02d-%02d 00:00:00",timeinfo->tm_year+1900,timeinfo->tm_mon+1,timeinfo->tm_mday);
     sprintf(enddate,"%04d-%02d-%02d 23:59:59",timeinfo3.tm_year+1900,timeinfo3.tm_mon+1,timeinfo3.tm_mday);
-    //strftime(dagsdato, 128, "%Y-%m-%d 00:00:00", timeinfo);		        // lav nu tids sting strftime(dagsdato, 128, "%Y-%m-%d %H:%M:%S", timeinfo );
-    //strftime(enddate, 128, "%Y-%m-%d 23:59:59", timeinfo2);		        // lav nu tids sting
-    this->starttid=rawtime;						                                // gem tider i class
-    this->sluttid=rawtime2;						                                //
-    if (debugmode & 256) printf("\nGet/update Tvguide.\n");
-    if (debugmode & 256) printf("Tvguide from %-19s to %-19s \n",dagsdato,enddate);
+    this->starttid=rawtime;						                                          // save time in class
+    this->sluttid=rawtime2;						                                          // save
+    // write debug log
+    write_logfile((char *) "Get/Update Tvguide.");
+    sprintf(debuglogdata,"Tvguide from %-19s to %-19s",dagsdato,enddate);
+    write_logfile((char *) debuglogdata);
     // clear last tv guide array
     cleanchannels();
     conn=mysql_init(NULL);
@@ -3464,16 +3536,24 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         // do select from db count nr of records
+        // OLD strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcpy(sqlselect,"SELECT count(channel.name) FROM program left join channel on program.chanid=channel.chanid where channel.visible=1 and endtime<='");
         strcat(sqlselect,enddate);
         strcat(sqlselect,"' and endtime>='");
         strcat(sqlselect,dagsdato);
-        strcat(sqlselect,"' order by chanid,orderid,abs(channel.channum),starttime");
+        strcat(sqlselect,"' order by orderid,abs(channel.channum),starttime");
+
+        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
-            if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
+            //if (debugmode & 256) printf("Antal channels/tvguide %s \n",row[0]);
+            // write debug log
+            sprintf(debuglogdata,"Antal channels/tvguide %s",row[0]);
+            write_logfile((char *) debuglogdata);
+
           }
         }
         // do select from db
@@ -3482,6 +3562,11 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
         strcat(sqlselect,"' and starttime>='");
         strcat(sqlselect,dagsdato);
         strcat(sqlselect,"' order by orderid,chanid,abs(channel.channum),starttime");
+
+        write_logfile((char *) sqlselect);
+
+        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         kanalnr=0;
@@ -3623,9 +3708,14 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
             tvkanaler[kanalnr].set_program_antal(huskprgantal);
             // total nr of channels
             this->kanal_antal=kanalnr+1;
-            if (debugmode & 256) printf("\nFound nr of tv channels %4d\nFound nr of programs    %4d\n",this->kanal_antal,totalantalprogrammer);
+            //
+            sprintf(debuglogdata,"Found %4d tv channels and %4d # tv programs.",this->kanal_antal,totalantalprogrammer);
+            write_logfile((char *) debuglogdata);
         }
         mysql_close(conn);
+    } else {
+      // if error
+      write_logfile((char *) "Mysql error connect.");
     }
     opdatere_tv_oversigt_kanal_icons();
     loading_tv_guide=false;
@@ -3718,11 +3808,20 @@ int tv_oversigt::find_start_pointinarray(int selectchanel) {
 
 // ****************************************************************************************
 //
+//
+//
 // ****************************************************************************************
 
 unsigned long tv_oversigt::getprogram_endunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].endtime_unix);
 }
+
+// ****************************************************************************************
+//
+//
+//
+// ****************************************************************************************
+
 
 unsigned long tv_oversigt::getprogram_startunixtume(int selectchanel,int selectprg) {
   if (selectchanel<=tv_kanal_antal()) return(tvkanaler[selectchanel].tv_prog_guide[selectprg].starttime_unix);
@@ -3937,6 +4036,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
   nutid=mktime(&nowtime_h);
   xpos=50+40;
   int do_kanal_nr=0;
+  // Find # of channels to show. By screen width
   switch (screen_size) {
     case 4: this->vis_kanal_antal=5;                        // antal kanler som vises 768*1024
             break;
@@ -3945,11 +4045,15 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
     default:this->vis_kanal_antal=7;                        // antal kanler som vises
             break;
   }
+
+  //printf("Kanal antal %d vis kantal %d \n",kanal_antal,this->vis_kanal_antal);
+
   if (kanal_antal<this->vis_kanal_antal) this->vis_kanal_antal=kanal_antal;
   //
   // loop for channel
   //
   int xx=xpos-50;
+  // show channel to vis_kanal_antal or man screen width
   while ((xpos<orgwinsizex) && (do_kanal_nr<this->vis_kanal_antal)) {
     startyofset=0;
     glPushMatrix();
@@ -4557,11 +4661,6 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 
 
 
-
-//
-//*******************************************************************************************************************************//
-//
-
 // ****************************************************************************************
 //
 // construktor
@@ -4777,12 +4876,15 @@ void earlyrecorded::showtvreclist() {
   // background
   //glLoadIdentity();
   int i=0;
+  static GLuint setuptvgraberback=0;
+  glLoadIdentity();
   glEnable(GL_TEXTURE);
   glEnable(GL_BLEND);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glColor3f(1.0f, 1.0f, 1.0f);
+  if (setuptvgraberback==0) setuptvgraberback  = loadTexture("/opt/mythtv-controller/tema3/images/setuptvgraberback.png");
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-  glBindTexture(GL_TEXTURE_2D,_texturemovieinfobox);                    //_texturemovieinfobox
+  glBindTexture(GL_TEXTURE_2D,setuptvgraberback);                          // _texturemovieinfobox
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glBegin(GL_QUADS);

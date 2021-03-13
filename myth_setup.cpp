@@ -21,6 +21,9 @@
 #include "myth_setup.h"
 #include "checknet.h"
 #include "utility.h"
+#include "myctrl_tvprg.h"
+
+extern char debuglogdata[1024];                                  // used by log system
 
 extern float configdefaultradiofontsize;                                        // font size in overviews
 extern float configdefaulttvguidefontsize;
@@ -2905,19 +2908,26 @@ int txmltvgraber_createconfig() {
   char path[1024];
   char exebuffer[1024];
   int sysresult;
+  // delete old config from dir
   strcpy(exebuffer,"rm ");
   getuserhomedir(path);
   strcat(path,"/.xmltv/");
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(exebuffer,path);
   strcat(exebuffer,".conf");
+  //sysresult=system(exebuffer);
   // delete old config from dir
+  sprintf(debuglogdata,"Graber in use: %d",aktiv_tv_graber.graberaktivnr);
+  write_logfile((char *) debuglogdata);
+
+
   if ((aktiv_tv_graber.graberaktivnr>0) && (aktiv_tv_graber.graberaktivnr<aktiv_tv_graber.graberantal)) {
-    // delete old file
-    sysresult=system(exebuffer);
     // create new config
+    // make kommand do do in shell first
     switch (aktiv_tv_graber.graberaktivnr) {
               // create new config for tv_grab_na_dd
+      case 0: sprintf(exebuffer,"echo -e '0\n\n\all\n' |");
+              break;
       case 1: sprintf(exebuffer,"'\n\nall\n' |");
               break;
               // create new config for tv_grab_nl
@@ -2959,10 +2969,12 @@ int txmltvgraber_createconfig() {
               15: All TV Channels
               */
               // create new config for tv_grab_eu_dotmedia
-      case 8: sprintf(exebuffer,"echo -e '2\n\n\all\n' |");
+      case 8: sprintf(exebuffer,"echo -e '2\n\nall\n' |");
+              write_logfile((char *) "XMLTv update from denmark");
               break;
               // create new config for tv_grab_se_swedb
       case 9: sprintf(exebuffer,"echo -e '\n\nall\n' |");
+              write_logfile((char *) "XMLTv update from Sweden");
               break;
               // create new config for tv_grab_fr
               // take some time to finish
@@ -3018,17 +3030,23 @@ int txmltvgraber_createconfig() {
               exebuffer[0]='\0';
               break;
       default: sprintf(exebuffer,"echo -e '\nall\n' |");
+              break;
     }
     // get grabercmd command
     // add configure paramters to tv_grab_*
     strcat(exebuffer,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
     strcat(exebuffer, " --configure");
+    // do not work
+    //printf("xml config command : %s \n",exebuffer);
+    //sysresult=system(exebuffer);
     switch(aktiv_tv_graber.graberaktivnr) {
-      case 8: sysresult=system("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
-              printf("cp /usr/share/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+      case 8: //sysresult=system("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              write_logfile((char *) "cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/ (disabled)");
               break;
       default:
-              sysresult=system(exebuffer);
+              //sysresult=system(exebuffer);
+              //write_logfile("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
+              //printf("cp /opt/mythtv-controller/xmltv_config/tv_grab_eu_dotmedia.conf ~/.xmltv/");
               break;
 
     }
@@ -3053,17 +3071,20 @@ int txmltvgraber_updateconfigfile() {
   FILE *filout;
   int sysresult;
   int cnr;
+  // source file
   getuserhomedir(filename);                                                 // get user homedir
   strcat(filename,"/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
   strcat(filename,".conf");
   // create new config file
+  // dest file
   getuserhomedir(outfilename);                                                 // get user homedir
   strcat(outfilename,"/tmp_");
   strcat(outfilename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
   strcat(outfilename,".conf");
   filin=fopen(filename,"r");
   filout=fopen(outfilename,"w");
+  // copy header from in file to out file
   if ((filout) && (filin)) {
     switch (aktiv_tv_graber.graberaktivnr) {
       case 8: fgets(buffer,512,filin);
@@ -3080,10 +3101,20 @@ int txmltvgraber_updateconfigfile() {
               break;
     }
     cnr=0;
+
     while((cnr<PRGLIST_ANTAL) && (strcmp(channel_list[cnr].id,"")!=0)) {
       strcpy(buffer,"");
       switch (aktiv_tv_graber.graberaktivnr) {
         case 8: if (channel_list[cnr].selected) {
+                  strcpy(buffer,"channel=");
+                } else {
+                  strcpy(buffer,"channel!");
+                }
+                strcat(buffer,channel_list[cnr].id);
+                fputs(buffer,filout);
+                fputs("\n",filout);
+                break;
+        defaut: if (channel_list[cnr].selected) {
                   strcpy(buffer,"channel=");
                 } else {
                   strcpy(buffer,"channel!");
@@ -3108,7 +3139,7 @@ int txmltvgraber_updateconfigfile() {
   strcat(filename," ~/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
-  sysresult=system(filename);
+  //sysresult=system(filename);
 }
 
 
@@ -3136,7 +3167,7 @@ channel_configfile::~channel_configfile() {
 
 // ****************************************************************************************
 //
-// read xmltv config file
+// Read xmltv config file
 //
 // ****************************************************************************************
 
@@ -3241,11 +3272,12 @@ int load_channel_list_from_graber() {
   bool errors=false;
   char userhomedir[1024];
   char filename[1024];
+  // contry xml graber
   const char *grabercmd[35]={"","tv_grab_na_dd","tv_grab_nl","tv_grab_es_laguiatv","tv_grab_il","tv_grab_na_tvmedia","tv_grab_dtv_la","tv_grab_fi","tv_grab_eu_dotmedia","tv_grab_se_swedb",
                             "tv_grab_pt_meo","tv_grab_fr","tv_grab_uk_bleb","tv_grab_huro","tv_grab_ch_search","tv_grab_it","tv_grab_is","tv_grab_fi_sv","tv_grab_na_dtv","tv_grab_tr",
                             "tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide","tv_grab_zz_sdjson"};
 
-  if (debugmode) printf("Get channel list file from tv graber sub system.\n");
+  write_logfile((char *) "Get channel list file from tv graber sub system.");
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/tvguide_channels.txt");
@@ -3350,16 +3382,19 @@ int load_channel_list_from_graber() {
               strcat(exestring," --list-channels | grep -oP '(?<=<channel id=\"|<display-name lang=\"en\">).*(?=\">|</display-name>)' > ~/tvguide_channels.txt");
               break;
     }
-    printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
+    //printf("Create channel list file from tv_graber_config \nexestring = %s\n",exestring);
+    write_logfile((char *) "Create channel list file from tv_graber_config.");
+    write_logfile((char *) exestring);
     switch (aktiv_tv_graber.graberaktivnr) {
-        case 13:sysresult=system(exestring);
+        case 13:
+              sysresult=system(exestring);
               break;
         default:
               sysresult=system(exestring);
-              if (sysresult) {
-                printf("\nError Create channel list from tv grabber doing %s  error code %d \n ",exestring,sysresult);
-              }
+              break;
     }
+    if (sysresult) write_logfile((char *) "Error create channel list file from tv_graber_config. Check xmltv is installed.");
+    // read channel list into channel_list struct
     if (check_zerro_bytes_file(filename)!=0) {
       fil=fopen(filename,"r");
       if (fil) {
@@ -3388,16 +3423,60 @@ int load_channel_list_from_graber() {
       // remove temp file again
       sysresult=system("rm ~/tvguide_channels.txt");
       if (sysresult) printf("error remove file ~/tvguide_channels.txt \n ");
-      if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
+      //if (debugmode) printf("Done channel list file from web. found %2d channels\n",cnr);
     } else errors=true;
-  } else errors=true;
+  } else {
+    errors=true;
+    write_logfile((char *) "No tv graber selected in config file.");
+  }
   if (errors) return(-1); else return(sysresult);
 }
 
 
+
 // ****************************************************************************************//
 //
-// save tvguide channel info
+// load channel list in to channel_list array from tv_guide db
+//
+// ****************************************************************************************
+
+
+int load_channel_list_from_tvguide() {
+  // mysql vars
+  bool done=false;
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  int cnr=0;
+  PRGLIST_ANTAL=0;
+  // mysql stuf
+  char *database = (char *) "mythtvcontroller";
+  conn=mysql_init(NULL);
+  // Connect to database and update
+  if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+    mysql_query(conn,"set NAMES 'utf8'");
+    res = mysql_store_result(conn);
+    mysql_query(conn,"SELECT c.name,c.chanid,c.orderid FROM program inner join channel c where c.chanid=program.chanid group by program.chanid");
+    res = mysql_store_result(conn);
+    if (res) {
+      while (((row = mysql_fetch_row(res)) != NULL) && (cnr<MAXKANAL_ANTAL)) {
+        strcpy(channel_list[cnr].id,row[1]);
+        strcpy(channel_list[cnr].name,row[0]);
+        channel_list[cnr].selected=true;                                     // default select channel
+        channel_list[cnr].ordernr=atoi(row[2]);                              // default
+        cnr++;
+        PRGLIST_ANTAL++;
+      }
+    }
+    mysql_close(conn);
+  }
+}
+
+
+
+// ****************************************************************************************//
+//
+// save tvguide channel info to tvguide_channels.dat in homedir
 //
 // ****************************************************************************************
 
@@ -3409,28 +3488,34 @@ bool save_channel_list() {
   bool errors=false;
   getuserhomedir(userhomedir);                                                // get user homedir
   strcpy(filename,userhomedir);
+  strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                     // add the filename
   if (PRGLIST_ANTAL>0) {
-    fil=fopen(filename,"w");                                                  // open file for write
+    fil=fopen(filename,"w");                                                 // open file for write
     if (fil) {
-      printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
+      //printf("PRGLIST_ANTAL = %d \n",PRGLIST_ANTAL);
       while(cnr<PRGLIST_ANTAL) {
         fwrite(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
         cnr++;
       }
       fclose(fil);
       order_channel_list_in_tvguide_db();                                       // ret db liste til som i channel_list
-      if (debugmode) printf("Saving tvguidedb ok.\n");
-    } else errors=true;
+    } else {
+      errors=true;
+      write_logfile((char *) "Error save tvguide_channels.dat");
+    }
   }
   if (cnr>0) return(true); else return(false);
 }
 
 
+
+// ****************************************************************************************
 //
-// load tvguide channel info
+// load tvguide channel info from tvguide_channels.dat in homedir
 // return antal loaded
 //
+// ****************************************************************************************
 
 int load_channel_list() {
   FILE *fil;
@@ -3441,6 +3526,7 @@ int load_channel_list() {
   PRGLIST_ANTAL=0;
   getuserhomedir(userhomedir);
   strcpy(filename,userhomedir);
+  strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                        // filename
   for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
     channel_list[n].selected=false;                                             // is program channel active (default)
@@ -3453,19 +3539,23 @@ int load_channel_list() {
   if (fil) {
     while((!(feof(fil))) && (cnr<MAXCHANNEL_ANTAL-1)) {
       fread(&channel_list[cnr],sizeof(channel_list_struct),1,fil);
-      //printf("L # %d active %d name %s \n",cnr,channel_list[cnr].selected,channel_list[cnr].name);
       cnr++;
       PRGLIST_ANTAL++;                                                          // set nr of records loaded
     }
     fclose(fil);
-  } else errors=true;
+  } else {
+    errors=true;
+    write_logfile((char *) "Error loading tvguide_channels.dat");
+  }
   if (errors==false) return(cnr); return(0);
 }
 
 
+// ****************************************************************************************
 //
-// sort record after selected
+// sort record after selected (struct)
 //
+// ****************************************************************************************
 
 void order_channel_list() {
   struct channel_list_struct tmpchannel;
@@ -3516,7 +3606,7 @@ int order_channel_list_in_tvguide_db() {
   // mysql stuf
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
-  // Connect to database
+  // Connect to database and update
   if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -3527,9 +3617,9 @@ int order_channel_list_in_tvguide_db() {
     for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
       if (channel_list[n].selected) {
         sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
-        if (debugmode) printf("sql %s \n",sqlselect);
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
+        write_logfile((char *) sqlselect);                                     // write to debug log
         done=true;
       }
     }
@@ -3541,7 +3631,7 @@ int order_channel_list_in_tvguide_db() {
 
 // ****************************************************************************************
 //
-// tv guide
+// tv guide setup tool
 //
 // ****************************************************************************************
 
@@ -3551,6 +3641,7 @@ void show_setup_tv_graber(int startofset) {
     const char *weekdaysfr[10]={"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samed","Dimanche"};
     const char *weekdaysgr[11]={"Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Sonnabend","Sonntag"};
     const char *weekdaysar[10]={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+    int channel_antal;
     int winsizx=100;
     struct tm *xmlupdatelasttime;
     int winsizy=300;
@@ -3560,33 +3651,39 @@ void show_setup_tv_graber(int startofset) {
     // update channel list before show it
     // channel list editor
     if (hent_tv_channels==false) {
-      // try to load struct channel info
-      //tvguide_channels.dat
-      if (!(load_channel_list())) {
+      // try to load struct channel info first time
+      // tvguide_channels.dat
+      channel_antal=load_channel_list();
+      if (channel_antal==0) {
         // load channel names from tvguide grapper and save it to internal db
         // it is a first time program thing
         // crete mew config file
-        printf("Create config file for xmltv first time.\n");
+        printf("Create config file for xmltv first time. (disabled)\n");
+        write_logfile((char *) "Create config file for xmltv first time. (disabled).");
+        /*
         if (txmltvgraber_createconfig()==0) {
           printf("\nError xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
-          //exit(0);
         }
+        */
         //
         // load all channels name from tv_graber
-        load_channel_list_from_graber();
+
+        //load_channel_list_from_graber();                                        // get channel list from graber
+        load_channel_list_from_tvguide();
+
         // save channel list to struct db file
         // struct channel_list
-        order_channel_list();
-        save_channel_list();
-        //firsttime_xmltvupdate=true;                                               // if true reset xml config fi
+        order_channel_list();                                                   // Order data
+        save_channel_list();                                                    // save to db file
+        //firsttime_xmltvupdate=true;                                           // if true reset xml config fi
         //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.
         // set flag to load channel list
         order_channel_list();
-        save_channel_list();
+        //save_channel_list();
         // update conf file to xmltv grabber
-        txmltvgraber_updateconfigfile();
+        //txmltvgraber_updateconfigfile();
         //
         // this func create new config and make all channel's active
         // txmltvgraber_createconfig();
@@ -3596,10 +3693,12 @@ void show_setup_tv_graber(int startofset) {
     }
     // background
     glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(0.6f, 0.6f, 0.6f);
     glBindTexture(GL_TEXTURE_2D,setuptvgraberback);
+    //glBindTexture(GL_TEXTURE_2D,setuptexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
@@ -3733,18 +3832,18 @@ void show_setup_tv_graber(int startofset) {
       //
       // English, danish, france, tysk, Arabic
       switch (configland) {
-        case 0: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+        case 0: sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
                 break;
-        case 1: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+        case 1: sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysdk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
                 break;
-        case 2: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+        case 2: sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysfr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
                 break;
-        case 3: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+        case 3: sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysgr[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
                 break;
-        case 4: sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+        case 4: sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysar[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
                 break;
         default:
-                sprintf(keybuffer,"%s %d %d %d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
+                sprintf(keybuffer,"%s %d/%d/%d %02d:%02d",weekdaysuk[xmlupdatelasttime->tm_wday],xmlupdatelasttime->tm_mday,xmlupdatelasttime->tm_mon+1,xmlupdatelasttime->tm_year+1900,xmlupdatelasttime->tm_hour,xmlupdatelasttime->tm_min);
       }
     } else sprintf(keybuffer,"Never.... ");
     myglprint4((char *) keybuffer);   // keybuffer

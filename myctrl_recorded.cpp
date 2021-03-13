@@ -17,6 +17,9 @@
 #include "myctrl_recorded.h"
 #include "myctrl_storagedef.h"
 
+
+extern char debuglogdata[1024];                                  // used by log system
+
 extern int fonttype;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -201,7 +204,8 @@ int recorded_overigt::opdatere_recorded_oversigt() {
         strcpy(sqlselect,"create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
-        printf("Update recorded programs from mythtv database.\n");
+        write_logfile((char *) "Update recorded programs from mythtv database.");
+
         strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -229,18 +233,18 @@ int recorded_overigt::opdatere_recorded_oversigt() {
                 }
             }        	// end while
         } else {
-          printf("SQL DATBASE ERROR                                                    \n");
+          write_logfile((char *) "SQL Database error.");
           n=0;
         }
         set_top_antal(n);					// sætter hvor mange der er i array
         if (n>0) {
-          printf("Fundet %d recorded programs.                                                \n",n);
+          //printf("Fundet %d recorded programs.                                                \n",n);
         }
         mysql_close(conn);
       }
     }
     catch (...) {
-      fprintf(stdout,"Error connect to mysql.\n");
+      write_logfile((char *) "Error connect to mysql..");
     }
     return(n);
 }

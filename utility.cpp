@@ -25,18 +25,26 @@ unsigned int hourtounixtime(int hour) {
 // ***********************************************************
 
 void write_logfile(char *logentry) {
+  char homedirpath[1024];
+  char filename[2048];
   time_t nutid;
   struct tm *tid;
   time(&nutid);                                                            // get time
   tid=localtime(&nutid);                                                   // fillout struct
   FILE *logfile;
-  logfile=fopen("mythtv-controller.log","a");
+  getuserhomedir(homedirpath);
+  strcpy(filename,homedirpath);
+  strcat(filename,"/");
+  strcat(filename,"mythtv-controller.log");
+  logfile=fopen(filename,"a");
   if (logfile==NULL) logfile=fopen("mythtv-controller.log","w");
   if (logfile) {
-    fprintf(logfile,"%02d:%02d:%02d ",tid->tm_hour,tid->tm_min,tid->tm_sec);
+    fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
     fputs(logentry,logfile);
     fputs("\n",logfile);
     fclose(logfile);
+  } else {
+    printf("Error write to logfile...\n");
   }
 }
 
