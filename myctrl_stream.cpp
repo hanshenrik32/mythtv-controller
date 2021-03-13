@@ -573,7 +573,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                     //if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
                     // write debug log
                     sprintf(debuglogdata,"Update title %-20s Date %s",rssprgtitle,rssprgpubdate);
-                    write_logfile(debuglogdata);
+                    write_logfile((char *) debuglogdata);
                     sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                     if (mysql_query(conn,sqlinsert)!=0) {
                       printf("mysql REPLACE table error. %s\n",sqlinsert);
@@ -662,7 +662,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 //if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
                 // write debug log
                 sprintf(debuglogdata,"Update title %-20s Date %s",rssprgtitle,rssprgpubdate);
-                write_logfile(debuglogdata);
+                write_logfile((char *) debuglogdata);
                 sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
                 //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
                 if (mysql_query(conn,sqlinsert)!=0) {
@@ -680,7 +680,7 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   } else {
     // write debug log
     sprintf(debuglogdata,"Error reading %s xmlfile 0 bytes long.",filename);
-    write_logfile(debuglogdata);
+    write_logfile((char *) debuglogdata);
   }
   return(1);
 }
@@ -3337,7 +3337,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
     clean_stream_oversigt();                // clean old list
     strcpy(lasttmpfilename,"");    					// reset
-    write_logfile("loading rss/stream data.");
+    write_logfile((char *) "loading rss/stream data.");
     //printf("art = %s tpath = %s \n",art,fpath);
     // find records after type to find
     if ((strcmp(art,"")==0) && (strcmp(fpath,"")==0)) {
@@ -3359,7 +3359,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       getart=2;
     }
     this->type=getart;					// husk sql type
-    write_logfile("RSS stream loader started.");
+    write_logfile((char *) "RSS stream loader started.");
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -3414,10 +3414,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download gfx file and use as icon
-                  //if (debugmode & 4) printf("Loading1 image %s realname %s \n",tmpfilename,downloadfilenamelong);
                   if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                     //printf("Download error \n");
-                    write_logfile("Image download error.");
+                    write_logfile((char *) "Image download error.");
                   } else strcpy(tmpfilename,"");
                 }
                 // tmpfilename is now the bame of the icon
@@ -3519,7 +3518,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         mysql_close(conn);
       } else {
-        write_logfile("No stream data loaded.");
+        write_logfile((char *) "No stream data loaded.");
       }
       //load_stream_gfx();
       //
@@ -3533,7 +3532,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
       return(antal-1);
     } else printf("Failed to update feed stream db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
-    write_logfile("RSS/PODCAST loader done.");
+    write_logfile((char *) "RSS/PODCAST loader done.");
     return(0);
 }
 
@@ -3547,9 +3546,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
 
 
 void *loadweb(void *data) {
-  write_logfile("Start web icon loader thread.");
+  write_logfile((char *) "Start web icon loader thread.");
   streamoversigt.loadweb_stream_iconoversigt();
-  write_logfile("End/Stop web icon loader thread.");
+  write_logfile((char *) "End/Stop web icon loader thread.");
 }
 
 
@@ -3570,7 +3569,7 @@ int stream_class::loadweb_stream_iconoversigt() {
   char homedir[200];
   antal=this->streamantal();
   this->gfx_loaded=false;
-  write_logfile("rss stream gfx download start.");
+  write_logfile((char *) "RSS stream graphic download start.");
   while(nr<antal) {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
@@ -3616,8 +3615,8 @@ int stream_class::loadweb_stream_iconoversigt() {
     nr++;
   }
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (gfx_loaded) write_logfile("rss stream gfx download end.");
-  else write_logfile("rss stream gfx download error.");
+  if (gfx_loaded) write_logfile((char *) "RSS stream graphic download end.");
+  else write_logfile((char *) "RSS stream graphic download error.");
   return(1);
 }
 
@@ -3650,7 +3649,7 @@ void *load_all_stream_gfx(void *data) {
     int antal=0;
     int total_antal=0;
     int nr;
-    write_logfile("Start gfx thread loader.");
+    write_logfile((char *) "Start gfx thread loader.");
     strcpy(lastfile,"");
     strcpy(sqlselect,"select ANY_VALUE(internetcontent.name),ANY_VALUE(internetcontentarticles.path),count(internetcontentarticles.feedtitle),ANY_VALUE(internetcontent.thumbnail) from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
     conn=mysql_init(NULL);
@@ -3661,7 +3660,7 @@ void *load_all_stream_gfx(void *data) {
           res = mysql_store_result(conn);
           mysql_query(conn,sqlselect);
           res = mysql_store_result(conn);
-          write_logfile("Loading RSS gfx.");
+          write_logfile((char *) "Loading RSS gfx.");
           if (res) {
               while ((row = mysql_fetch_row(res)) != NULL) {
                 sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
@@ -3725,7 +3724,7 @@ void *load_all_stream_gfx(void *data) {
     catch (...) {
       printf("Error open mysql connection.\n");
     }
-    write_logfile("End gfx thread loader.");
+    write_logfile((char *) "End gfx thread loader.");
 }
 
 

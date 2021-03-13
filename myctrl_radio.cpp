@@ -603,8 +603,8 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             sprintf(debuglogdata,"Contry code %d missing flag, File name %s",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             if (gfxlande[stack[i+sofset]->land]==0) {
               sprintf(debuglogdata,"Contry code %d is missing filename.",stack[i+sofset]->land);
-              if (show_all_kode_errors==false) write_logfile(debuglogdata);
-            } else if (show_all_kode_errors==false) write_logfile(debuglogdata);
+              if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
+            } else if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
           }
         }
         // print radios station name
@@ -820,7 +820,7 @@ int radiostation_class::set_radio_popular(int stationid) {
     MYSQL *conn;
     MYSQL_RES *res;
     // write debug log
-    write_logfile("Update played radio station.");
+    write_logfile((char *) "Update played radio station.");
     sprintf(sqlselect,"update radio_stations set popular=popular+1,lastplayed=now() where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
     // Connect to database
@@ -849,7 +849,7 @@ int radiostation_class::set_radio_online(int stationid,bool onoff) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    write_logfile("Update played radio station online.");
+    write_logfile((char *) "Update played radio station online.");
     if (onoff) sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld",stack[stationid]->intnr);
       else sprintf(sqlselect,"update radio_stations set online=0 where intnr=%ld",stack[stationid]->intnr);
     conn=mysql_init(NULL);
@@ -1022,7 +1022,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     bool cerror;
     struct timeval tv;
     fd_set myset;
-    write_logfile("Check radio stations.");
+    write_logfile((char *) "Check radio stations.");
     if (check_radio_online_switch) {
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
@@ -1040,7 +1040,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
               port=get_url_data(hostname,ipadresse);
               // write debug log
               sprintf(debuglogdata,"Checking Station : %-50s - hostname : %s port %d ",row[0],hostname,port);
-              write_logfile(debuglogdata);
+              write_logfile((char *) debuglogdata);
               sock=socket(PF_INET, SOCK_STREAM, 0);
               if (sock) {
                 //fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -1051,11 +1051,11 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 error=(init_sockaddr(&servername,ipadresse,port));
                 if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
                   if (cerror==0) {
-                    write_logfile("Station OK.");
+                    write_logfile((char *) "Station OK.");
                     radiook=true;
                   } else radiook=false;
                 } else {
-                  write_logfile("Station BAD.");
+                  write_logfile((char *) "Station BAD.");
                   radiook=false;
                 }
                 close (sock);

@@ -348,7 +348,7 @@ void expand_escapes(char* dest, const char* src) {
 
 // ****************************************************************************************
 //
-// Save tc channel db
+// Save channel (tvguide) data
 //
 // ****************************************************************************************
 
@@ -357,8 +357,9 @@ int tv_oversigt::saveparsexmltvdb() {
   FILE *dbfil;
   char writefilename[1024];
   getuserhomedir(writefilename);
+  strcat(writefilename,"/");
   strcat(writefilename,tvguidedbfilename);
-  dbfil=fopen("tvguidedb.dat","w");
+  dbfil=fopen(writefilename,"w");                                             //tvguidedb.dat
   if (dbfil) {
     while(n<this->kanal_antal) {
       fwrite(&tvkanaler[n],sizeof(tv_oversigt_pr_kanal),1,dbfil);
@@ -372,7 +373,7 @@ int tv_oversigt::saveparsexmltvdb() {
 
 // ****************************************************************************************
 //
-// Load tc channel db
+// Load channel (tvguide) data
 //
 // ****************************************************************************************
 
@@ -381,8 +382,9 @@ int tv_oversigt::loadparsexmltvdb() {
   FILE *dbfil;
   char writefilename[1024];
   getuserhomedir(writefilename);
+  strcat(writefilename,"/");
   strcat(writefilename,tvguidedbfilename);
-  dbfil=fopen("tvguidedb.dat","r");
+  dbfil=fopen(writefilename,"r");                                             // tvguidedb.dat
   if (dbfil) {
     while(!(feof(dbfil))) {
       printf("Loading channel # %d \n",n);
@@ -2959,7 +2961,6 @@ void tv_oversigt::cleartvguide() {
   char sql[4096];
   int error=0;
   bool fundet=false;
-  char *database = (char *) "mythtvcontroller";
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -2969,13 +2970,14 @@ void tv_oversigt::cleartvguide() {
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
   if (!(conn)) error=1;
   if (conn) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
+    mysql_query(conn,"DROP table channel");
     mysql_free_result(res);
-    sprintf(sql,"DROP DATABASE %s",database);
-    mysql_query(conn,sql);
-    res = mysql_store_result(conn);
-    if (res) mysql_free_result(res);
+    mysql_query(conn,"DROP table program");
+    mysql_free_result(res);
+    mysql_query(conn,"DROP table programgenres");
+    mysql_free_result(res);
+    mysql_query(conn,"DROP table programrating");
+    mysql_free_result(res);
     mysql_close(conn);
   }
 }
@@ -3199,8 +3201,6 @@ int tv_oversigt::cleanchannels() {
     */
     return(1);
 }
-
-
 
 
 // ****************************************************************************************
@@ -3430,7 +3430,7 @@ void tv_oversigt::opdatere_tv_oversigt_kanal_icons() {
 
 // ****************************************************************************************
 //
-// update tv channel status (view/hide) from struct
+// update tv channel status (view/hide) fro
 //
 // ****************************************************************************************
 

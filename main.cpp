@@ -8128,10 +8128,8 @@ void handlespeckeypress(int key,int x,int y) {
                     // hent/update tv guide from db
                     aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
                     // set update flag in display() func
+
                     firsttime_xmltvupdate = true;                                 // if true reset xml config file
-
-
-
 
 
                   }
@@ -9934,19 +9932,23 @@ void handleKeypress(unsigned char key, int x, int y) {
               // close setup windows again or close proram window.
               if (do_show_setup) {
                 if (do_show_tvgraber) {
+
+
                   // kill running graber
                   killrunninggraber();
                   // clear old tvguide in db
-                  aktiv_tv_oversigt.cleartvguide();
-                  // save chennel list info to internal datafile
-                  order_channel_list();                                         // ordre struct
-                  save_channel_list();                                          // save to db file
+                  aktiv_tv_oversigt.cleartvguide();                             // clear old db
                   aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
                   // hent/update tv guide from db
                   aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+                  order_channel_list();                                         // ordre struct
+                  // save chennel list info to internal datafile
+                  save_channel_list();                                          // save to db file
                   // set update flag in display() func
                   firsttime_xmltvupdate = true;                                 // if true reset xml config file
                   // close tv graber windows again
+
+
                   do_show_tvgraber=false;
                   do_show_setup=false;
                   key=0;
