@@ -376,7 +376,7 @@ int tridal_class::tridal_login_token() {
     if (httpCode == 200) {
       fprintf(stdout,"tidal new token. \n");
       printf("%s \n", response_string.c_str());
-      printf("resp length %d \n",response_string.length());
+      printf("resp length %d \n",(int) response_string.length());
 
       /*
       if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
@@ -388,7 +388,7 @@ int tridal_class::tridal_login_token() {
       */
     } else if (httpCode == 405) {
       printf("%s \n", response_string.c_str());
-      printf("resp length %d \n",response_string.length());
+      printf("resp length %d \n",(int) response_string.length());
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
       //if (strstr(response_string,"token")) fprintf(stderr,"Error Missing token.\n");
@@ -474,12 +474,12 @@ int tridal_class::tridal_play_playlist(char *playlist) {
     if (httpCode == 200) {
       fprintf(stdout,"tidal new token. \n");
       printf("%s \n", response_string.c_str());
-      printf("resp length %d \n",response_string.length());
+      printf("resp length %d \n",(int) response_string.length());
     }
     if (httpCode == 301) {
       fprintf(stdout,"redirect.\n");
       printf("Resp: %s \n", response_string.c_str());
-      printf("resp length %d \n",response_string.length());
+      printf("resp length %d \n",(int) response_string.length());
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
       fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));

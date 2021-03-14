@@ -7288,82 +7288,102 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           fundet = true;
         }
       }
-      if ((vis_tv_oversigt) && (do_show_tvgraber==false) && (!(fundet))) {
-        // close view
-        if ((GLubyte) names[i*4+3]==27) {
-          // write debug log
-          write_logfile((char *) "Close tv overview.");
-          vis_tv_oversigt = false;
-          fundet = true;
-        }
-        // show recorded programs
-        if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
-          write_logfile((char *) "Close recorded overview.");
-          vis_tv_oversigt = false;
-          fundet = true;
-        }
-        // close record
-        if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
-          if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
-          ask_tv_record = true;
-          do_zoom_tvprg_aktiv_nr = 0;
-          //                vis_tv_oversigt=false;
-          fundet = true;
-        }
-        //
-        // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
-        //
-        if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
-          // er der trykket på et tv program
-          if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
-            tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
-            if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
-            fundet = true;
-          }
-        }
-        // show old recordings
-        if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
-          fprintf(stderr,"Show old recordings \n");
-          vis_old_recorded =! vis_old_recorded;							// SKAL fixes
-          fundet = true;
-        }
-        // show new recordings
-        if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
-          fprintf(stderr,"Show new recordings \n");
-          vis_tvrec_list =! vis_tvrec_list;
-          fundet = true;
-        }
-        // er vi igang med at spørge om vi skal optage programmet
-        if (ask_tv_record) {
-          if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
+      // vis tv overview
+      if (vis_tv_oversigt) {
+        if ((do_show_tvgraber==false) && (!(fundet))) {
+          // close view
+          if ((GLubyte) names[i*4+3]==27) {
             // write debug log
-            write_logfile((char *) "Close ask do we record tv program window again.");
-            ask_tv_record = false;
+            write_logfile((char *) "Close tv overview.");
+            vis_tv_oversigt = false;
             fundet = true;
-            returnfunc = 3;
-            do_zoom_tvprg_aktiv_nr = 0;
           }
-          if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
-            // write debug log
-            write_logfile((char *) "Set program to record.");
-            ask_tv_record = false;
+          // show recorded programs
+          if (((GLubyte) names[i*4+3]==28) && (!(fundet))) {
+            write_logfile((char *) "Close recorded overview.");
+            vis_tv_oversigt = false;
             fundet = true;
-            returnfunc = 3;
-            do_zoom_tvprg_aktiv_nr = 0;
-            // set start record tv prgoram
-            //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
-            aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
-            // opdatere tv guide med nyt info
-            aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
           }
-        }
-      }
+          // close record
+          if (((GLubyte) names[i*4+3]==29) && (!(fundet))) {
+            if (debugmode & 64) fprintf(stderr,"close start record tv program.\n");
+            ask_tv_record = true;
+            do_zoom_tvprg_aktiv_nr = 0;
+            //                vis_tv_oversigt=false;
+            fundet = true;
+          }
+          //
+          // hvis vi viser tv guide og der ikke er valgt vis old rec/vis optager liste
+          //
+          if ((!(vis_old_recorded)) && (!(vis_tvrec_list))) {
+            // er der trykket på et tv program
+            if ((!(fundet)) && ((GLubyte) names[i*4+3]>=100) && ((GLubyte) names[i*4+3]<=1000)) {
+              tvknapnr=(GLuint) names[i*4+3]-100;        					                // hent tv knap nr
+              if (debugmode & 256) fprintf(stderr,"tvknapnr %d.\n",tvknapnr);
+              fundet = true;
+            }
+          }
+          // show old recordings
+          if ((!(fundet)) && (!(vis_tvrec_list)) && ((GLubyte) names[i*4+3]==44)) {
+            fprintf(stderr,"Show old recordings \n");
+            vis_old_recorded =! vis_old_recorded;							// SKAL fixes
+            fundet = true;
+          }
+          // show new recordings
+          if ((!(fundet)) && (!(vis_old_recorded)) && ((GLubyte) names[i*4+3]==45)) {
+            fprintf(stderr,"Show new recordings \n");
+            vis_tvrec_list =! vis_tvrec_list;
+            fundet = true;
+          }
+          // er vi igang med at spørge om vi skal optage programmet
+          if (ask_tv_record) {
+            if (((GLubyte) names[i*4+3]==40) && (!(fundet))) {
+              // write debug log
+              write_logfile((char *) "Close ask do we record tv program window again.");
+              ask_tv_record = false;
+              fundet = true;
+              returnfunc = 3;
+              do_zoom_tvprg_aktiv_nr = 0;
+            }
+            if (((GLubyte) names[i*4+3]==41) && (!(fundet))) {
+              // write debug log
+              write_logfile((char *) "Set program to record.");
+              ask_tv_record = false;
+              fundet = true;
+              returnfunc = 3;
+              do_zoom_tvprg_aktiv_nr = 0;
+              // set start record tv prgoram
+              //aktiv_tv_oversigt.gettvprogramrecinfo(tvvalgtrecordnr,tvsubvalgtrecordnr,prgtitle,prgstarttid,prgendtid);
+              aktiv_tv_oversigt.tvprgrecord_addrec(tvvalgtrecordnr,tvsubvalgtrecordnr);					// put tv prgoram into table record in mythtv backend (to set mythtv to record the program)
+              // opdatere tv guide med nyt info
+              aktiv_tv_oversigt.set_program_torecord(tvvalgtrecordnr,tvsubvalgtrecordnr);       // set record flag to show in tv_guide
+            }
+          }
+        } else if ((show_setup_tv_graber) && (!(fundet))) {
+          if ((GLubyte) names[i*4+3]==40) {
+            write_logfile((char *) "Close tv graber config overview.");
+            do_show_tvgraber = false;
 
-      if ((vis_tv_oversigt) && (show_setup_tv_graber) && (!(fundet))) {
-        if ((GLubyte) names[i*4+3]==40) {
-          write_logfile((char *) "Close tv graber config overview.");
-          do_show_tvgraber = false;
-          fundet = true;
+            // close tv_graber cofig (mouse)
+
+            // kill running graber
+            killrunninggraber();
+            // clear old tvguide in db
+            aktiv_tv_oversigt.cleartvguide();                             // clear old db
+            aktiv_tv_oversigt.parsexmltv("tvguide.xml");                  // parse all channels xml file again
+            // hent/update tv guide from db
+            aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,0);
+            order_channel_list();                                         // ordre struct
+            // save chennel list info to internal datafile
+            save_channel_list();                                          // save to db file
+            // set update flag in display() func
+            firsttime_xmltvupdate = true;                                 // if true reset xml config file
+            // close tv graber windows again
+            do_show_tvgraber=false;
+            do_show_setup=false;
+
+            fundet = true;
+          }
         }
       }
 
@@ -8115,6 +8135,7 @@ void handlespeckeypress(int key,int x,int y) {
                     //aktiv_tv_oversigt.set_channel_state(channel_list);                      // update channel struct
                     //aktiv_tv_oversigt.opdatere_tv_oversigt(configmysqlhost,configmysqluser,configmysqlpass,1);
                     //update_xmltv_phread_loader();                   // start thred update flag in main loop
+                    // F1 key
                     killrunninggraber();
                     // clear old tvguide in db
                     aktiv_tv_oversigt.cleartvguide();
@@ -9927,6 +9948,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (do_show_tvgraber) {
                   // make new tv overview
                   // kill running graber
+                  // NOT ESC key
                   killrunninggraber();
                   // clear old tvguide in db
                   aktiv_tv_oversigt.cleartvguide();                             // clear old db
@@ -9975,9 +9997,11 @@ void handleKeypress(unsigned char key, int x, int y) {
                 key=0;
               }
               // vis tv overview and show tv_guide setup and press ESC key
+              // called by esc  key
               if ((vis_tv_oversigt) && (do_show_setup==false) && (do_show_tvgraber)) {
                 // make new tv overview
                 // kill running graber
+                // ESC KEY
                 killrunninggraber();
                 // clear old tvguide in db
                 aktiv_tv_oversigt.cleartvguide();                             // clear old db

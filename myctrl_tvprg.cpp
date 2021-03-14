@@ -2959,27 +2959,36 @@ int tv_oversigt::parsexmltv(const char *filename) {
 // ****************************************************************************************
 
 void tv_oversigt::cleartvguide() {
-  char sql[4096];
   int error=0;
   bool fundet=false;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
+  char sqlstr[2048];
   // mysql stuf
   conn=mysql_init(NULL);
   // Connect to database
-  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0);
-  if (!(conn)) error=1;
   if (conn) {
-    mysql_query(conn,"DROP table channel");
-    mysql_free_result(res);
-    mysql_query(conn,"DROP table program");
-    mysql_free_result(res);
-    mysql_query(conn,"DROP table programgenres");
-    mysql_free_result(res);
-    mysql_query(conn,"DROP table programrating");
-    mysql_free_result(res);
-    mysql_close(conn);
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, NULL, 0, NULL, 0)) {
+      printf("Mysql error (drop tables).\n");
+      mysql_error(conn);
+      error=1;
+    }
+    if (error==0) {
+      strcpy(sqlstr,"delete from mythtvcontroller.channel where chanid like '%'");
+      mysql_query(conn,sqlstr);
+      mysql_free_result(res);
+      strcpy(sqlstr,"delete from mythtvcontroller.program where chanid like '%'");
+      mysql_query(conn,sqlstr);
+      mysql_free_result(res);
+      strcpy(sqlstr,"delete from mythtvcontroller.programgenres where chanid like '%'");
+      mysql_query(conn,sqlstr);
+      mysql_free_result(res);
+      strcpy(sqlstr,"delete from mythtvcontroller.programrating where chanid like '%'");
+      mysql_query(conn,sqlstr);
+      mysql_free_result(res);
+      mysql_close(conn);
+    }
   }
 }
 
