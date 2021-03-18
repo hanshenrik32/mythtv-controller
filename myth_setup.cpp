@@ -3659,7 +3659,7 @@ void show_setup_tv_graber(int startofset) {
         // it is a first time program thing
         // crete mew config file
         printf("Create config file for xmltv first time. (disabled)\n");
-        write_logfile((char *) "Create config file for xmltv first time. (disabled).");
+        //write_logfile((char *) "Create config file for xmltv first time. (disabled).");
         /*
         if (txmltvgraber_createconfig()==0) {
           printf("\nError xmltv create graber confg. Set to %s \n",configbackend_tvgraber);
@@ -3764,7 +3764,7 @@ void show_setup_tv_graber(int startofset) {
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(540, 600, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    myglprint4((char *) "Last update    ");
+    myglprint4((char *) "Last update.");
     glPopMatrix();
     // start af input felter
     glPushMatrix();
@@ -4081,7 +4081,6 @@ void show_setup_interface() {
     glTexCoord2f(1, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
     glTexCoord2f(1, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2))+winsizx,ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glEnd();
-
 
     // close button
     xpos=200;
