@@ -1680,7 +1680,7 @@ int update_afspillinger_music_song(char *filename)
 //
 // ****************************************************************************************
 
-void hent_dir_id1(char *path,char *parent_id,char *dirid) {
+void hent_dir_id_info(char *path,char *parent_id,char *dirid) {
     // mysql stuf
     char database[256];
     char sqlselect[256];
@@ -1742,12 +1742,9 @@ int hent_mythtv_playlist(int playlistnr) {
     // mysql stuf
     char database[255];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-
     // write to debug log
-    strcpy(debuglogdata,"Hent info om playlist nr: ");
+    sprintf(debuglogdata,"Loading info about playlist nr: %d ",playlistnr);
     write_logfile((char *) debuglogdata);
-    if (debugmode & 2) fprintf(stderr,"Hent info om playlist nr: %d \n",playlistnr);
-
     songnr=1;
     aktiv_playlist.clean_playlist();		// clear old playlist
     conn=mysql_init(NULL);
@@ -1783,17 +1780,17 @@ int hent_mythtv_playlist(int playlistnr) {
               sprintf(debuglogdata,"Fundet sang song_id=%s artist id=%s filename=%40s",songid,row1[5],row1[1]);
               write_logfile((char *) debuglogdata);
 
-              strcpy(tmptxt,configmusicpath);		// start path
-              sprintf(tmptxt2,"%s",row1[2]);			// hent dir id
-              hent_dir_id1(tmptxt1,parent_id,tmptxt2);		// hent path af tmptxt2 som er = dir_id
-              strcat(tmptxt,tmptxt1);				// add path
+              strcpy(tmptxt,configmusicpath);		                           // start path
+              sprintf(tmptxt2,"%s",row1[2]);			                         // hent dir id
+              hent_dir_id_info(tmptxt1,parent_id,tmptxt2);		             // hent path af tmptxt2 som er = dir_id
+              strcat(tmptxt,tmptxt1);				                               // add path
               strcat(tmptxt,"/");
-              strcpy(tmptxt3,tmptxt);			// er = path
-              strcat(tmptxt3,"mythcFront.jpg");		// add filename til cover
-              strcat(tmptxt,row1[1]);				// add filename til sang
-              strcpy(tmptxt,row1[1]);				// add filename til sang
+              strcpy(tmptxt3,tmptxt);			                                 // er = path
+              strcat(tmptxt3,"mythcFront.jpg");		                         // add filename til cover
+              strcat(tmptxt,row1[1]);				                               // add filename til sang
+              strcpy(tmptxt,row1[1]);				                               // add filename til sang
               if (file_exists(tmptxt3)) {
-                texture=loadTexture(tmptxt3);				// load texture
+                texture=loadTexture(tmptxt3);				                       // load texture
               } else {
                 fprintf(stderr," Error loading texture file : %s \n",tmptxt3);
                 texture=0;
@@ -1822,8 +1819,8 @@ int hent_mythtv_playlist(int playlistnr) {
 // ****************************************************************************************
 //
 // MUSIC stuf
-// Måske memory error
-// load dir icons efter et update.
+// Can have memory error
+// load dir icons after update.
 //
 // ****************************************************************************************
 
@@ -1837,7 +1834,7 @@ void opdatere_music_oversigt_icons() {
   while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
     strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
     if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-      // load covers file into opengl as textures (jpg)
+      // load covers file into opengl as textures (png/jpg)
       musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
     } else {
       musicoversigt[i].textureId=0;
@@ -6577,6 +6574,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           order_channel_list();                                               // order tv channel list
           save_channel_list();                                                //
           txmltvgraber_createconfig();                                        // create tv grabber config
+          write_logfile("Exit program.");
           exit(0);                                                            // exit
         }
       }
@@ -7726,7 +7724,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             write_logfile((char *) debuglogdata);
             // opdate fra mythtv-backend if avable
             if ((opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id))>0) {
-              opdatere_music_oversigt_icons();
+              opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra internpath
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
@@ -10054,6 +10052,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 runwebserver=false;
                 order_channel_list();
                 save_channel_list();
+                write_logfile("Exit program.");
                 exit(0);                                                        //  exit program
               } else if ((vis_tv_oversigt) && (do_show_tvgraber)) {
                 // Close tv_graber view from tv_oversigt
@@ -12931,7 +12930,7 @@ void update(int value) {
                         if ((antal_songs==0) && (musicoversigt[mknapnr].oversigttype==0)) {
                           // normalt dir (IKKE playlist)
                           opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr].directory_id);
-                          opdatere_music_oversigt_icons();
+                          opdatere_music_oversigt_icons();                      // load icons
                           music_icon_anim_icon_ofset = 0;
                           music_icon_anim_icon_ofsety = 0;
                           mknapnr = 0;
@@ -13228,7 +13227,7 @@ void *datainfoloader_music(void *data) {
     }
     // load music db created by opdatere_music_oversigt_nodb function
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
-      //opdatere_music_oversigt_icons(); 					// load gfx icons
+      //opdatere_music_oversigt_icons(); 					                              // load gfx icons
       if (debugmode & 2) fprintf(stderr,"Music db loaded.\n");
       write_logfile((char *) "Music db loaded..");
     }
@@ -14419,6 +14418,8 @@ int main(int argc, char** argv) {
     //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
     //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
+    sprintf(debuglogdata,"Mythtv-controller Version %s",SHOWVER);
+    write_logfile((char *) debuglogdata);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
       if (strcmp(argv[1],"-h")==0) {
@@ -14441,7 +14442,9 @@ int main(int argc, char** argv) {
       }
     }
     numCPU = sysconf( _SC_NPROCESSORS_ONLN );
-    printf("Numbers of cores :%d found.\n",numCPU);
+    // write cpu info to log file
+    sprintf(debuglogdata,"Numbers of cores :%d found.",numCPU);
+    write_logfile((char *) debuglogdata);
     // Load config
     load_config((char *) "/etc/mythtv-controller.conf");				// load setup config
     // create dir for json files and icon files downloaded
@@ -14454,30 +14457,65 @@ int main(int argc, char** argv) {
     }
     if ((strncmp(configbackend,"mythtv",5)==0) || (strncmp(configbackend,"any",3)==0)) configmythtvver=hentmythtvver(); 		// get mythtv-backend version
     if (strncmp(configbackend,"mythtv",5)==0) {
-      fprintf(stderr,"mythtv - Backend\n");
-      fprintf(stderr,"Mythtv database version %d\n",configmythtvver);
-      fprintf(stderr,"configmysqluser   =%s \n",configmysqluser);
-      fprintf(stderr,"configmysqlhost   =%s \n",configmysqlhost);
-      fprintf(stderr,"config movie path =%s \n",configmoviepath);
-      fprintf(stderr,"config music path =%s \n",configmusicpath);
-      fprintf(stderr,"config record path=%s \n",configrecordpath);
-      fprintf(stderr,"config hostname   =%s \n",confighostname);
-      fprintf(stderr,"config fontname   =%s \n",configfontname);
-      fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
-      fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
+      write_logfile((char *) "mythtv - Backend");
+      sprintf(debuglogdata,"configmysqluser   =%s ",configmysqluser);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"configmysqlhost   =%s ",configmysqlhost);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config movie path =%s ",configmoviepath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config music path =%s ",configmusicpath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config record path=%s ",configrecordpath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config hostname   =%s ",confighostname);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config fontname   =%s ",configfontname);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"Sound interface   =%s ",configsoundoutport);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"Default player    =%s ",configdefaultplayer);
+      write_logfile((char *) debuglogdata);
+      //fprintf(stderr,"Mythtv database version %d\n",configmythtvver);
+      //fprintf(stderr,"configmysqluser   =%s \n",configmysqluser);
+      //fprintf(stderr,"configmysqlhost   =%s \n",configmysqlhost);
+      //fprintf(stderr,"config movie path =%s \n",configmoviepath);
+      //fprintf(stderr,"config music path =%s \n",configmusicpath);
+      //fprintf(stderr,"config record path=%s \n",configrecordpath);
+      //fprintf(stderr,"config hostname   =%s \n",confighostname);
+      //fprintf(stderr,"config fontname   =%s \n",configfontname);
+      //fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
+      //fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (strncmp(configbackend,"xbmc",4)==0) {
-      fprintf(stderr,"XBMC - Backend\n");
-      fprintf(stderr,"sqluser           =%s \n",configmysqluser);
-      //printf("sqlpass           =%s \n",configmysqlpass);
-      fprintf(stderr,"host              =%s \n",configmysqlhost);
-      fprintf(stderr,"config movie path =%s \n",configmoviepath);
-      fprintf(stderr,"config music path =%s \n",configmusicpath);
-      fprintf(stderr,"config record path=%s \n",configrecordpath);
-      fprintf(stderr,"config hostname   =%s \n",confighostname);
-      fprintf(stderr,"config fontname   =%s \n",configfontname);
-      fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
-      fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
+      write_logfile((char *) "XBMC - Backend");
+      sprintf(debuglogdata,"configmysqluser   =%s ",configmysqluser);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"configmysqlhost   =%s ",configmysqlhost);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config movie path =%s ",configmoviepath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config music path =%s ",configmusicpath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config record path=%s ",configrecordpath);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config hostname   =%s ",confighostname);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"config fontname   =%s ",configfontname);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"Sound interface   =%s ",configsoundoutport);
+      write_logfile((char *) debuglogdata);
+      sprintf(debuglogdata,"Default player    =%s ",configdefaultplayer);
+      write_logfile((char *) debuglogdata);
+      //fprintf(stderr,"sqluser           =%s \n",configmysqluser);
+      //fprintf(stderr,"host              =%s \n",configmysqlhost);
+      //fprintf(stderr,"config movie path =%s \n",configmoviepath);
+      //fprintf(stderr,"config music path =%s \n",configmusicpath);
+      //fprintf(stderr,"config record path=%s \n",configrecordpath);
+      //fprintf(stderr,"config hostname   =%s \n",confighostname);
+      //fprintf(stderr,"config fontname   =%s \n",configfontname);
+      //fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
+      //fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (debugmode) {
       fprintf(stderr,"Debug mode selected ");
@@ -14679,5 +14717,6 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
+    write_logfile("Exit program.");
     return(EXIT_SUCCESS);
 }
