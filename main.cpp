@@ -78,7 +78,6 @@ bool stream_jump = false;
 extern float sinofsetz[];
 
 bool tv_guide_firsttime_update = false;
-
 int radio_oversigt_loaded_nr=0;                                                  //
 bool radio_oversigt_loaded_begin = false;                                         // true first time radio is loaded
 int radio_oversigt_antal=0;                                                      //
@@ -142,10 +141,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 tridal_class tridal_oversigt;
 #endif
 
-
-
 char debuglogdata[1024];                                  // used by log system
-
 
 // struct used by keyboard config of functions keys
 
@@ -250,7 +246,7 @@ int orgwinsizex,orgwinsizey;
                                                           // 8  = keyboard/mouse move
                                                           // 16 = movie
                                                           // 32 = searcg
-int debugmode=2+1;                                        // 64 = radio station land icon loader
+int debugmode=0;                                          // 64 = radio station land icon loader
                                                           // 128= stream search
                                                           // 256 = tv program stuf
                                                           // 512 = media importer

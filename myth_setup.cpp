@@ -23,8 +23,7 @@
 #include "utility.h"
 #include "myctrl_tvprg.h"
 
-extern char debuglogdata[1024];                                  // used by log system
-
+extern char debuglogdata[1024];                                                 // used by log system
 extern float configdefaultradiofontsize;                                        // font size in overviews
 extern float configdefaulttvguidefontsize;
 extern float configdefaultmusicfontsize;
@@ -33,7 +32,6 @@ extern float configdefaultmoviefontsize;
 
 extern int configuvmeter;
 extern int debugmode;
-extern bool firsttime_xmltvupdate;
 extern int vis_nyefilm_oversigt;
 
 // controll rss
@@ -3675,8 +3673,6 @@ void show_setup_tv_graber(int startofset) {
         // struct channel_list
         order_channel_list();                                                   // Order data
         save_channel_list();                                                    // save to db file
-        //firsttime_xmltvupdate=true;                                           // if true reset xml config fi
-        //firsttime_xmltvupdate=true;
       } else {
         // the channel list is loaded from db file.
         // set flag to load channel list
