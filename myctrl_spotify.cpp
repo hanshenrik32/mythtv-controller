@@ -155,7 +155,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       // from spotify servers
       // is callback call
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
-        fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
+        if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
         if (p) {

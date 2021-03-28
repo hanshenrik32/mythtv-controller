@@ -56,7 +56,7 @@ int fontctrl::updatefontlist()
     /* Choose a master and a face. */
     mastercount=glcGeti(GLC_MASTER_COUNT);		// gem antal af fonte
     sprintf(debuglogdata,"Numbers of fonts found %d",mastercount);
-    write_logfile(debuglogdata);
+    write_logfile((char *) debuglogdata);
     //if (debugmode) printf("Numbers of fonts found %d \n",mastercount);
     master = 0;
     i=0;
@@ -69,6 +69,7 @@ int fontctrl::updatefontlist()
       }
       mastercount=i;
       fclose(fil);
+      int ret=system("rm fontlist.txt");                                        // remove file again
     }
     return(i);
 }
@@ -102,10 +103,10 @@ int fontctrl::updatefontlist_old()
     i=0;
     // Print the path to the catalogs
     count = glcGeti(GLC_FONT_COUNT);                                       // GLC_FONT_COUNT GLC_CATALOG_COUNT
-    if (debugmode) printf("\nTrue type fonts is found in this path\n");
+    write_logfile((char *) "True type fonts is found in this path");
     for (i = 0; i<count; i++) {
       sprintf(debuglogdata,"%s",(char *) glcGetListc(GLC_CATALOG_LIST, i));
-      write_logfile(debuglogdata);
+      write_logfile((char *) debuglogdata);
     }
     // load font list
     i=0;

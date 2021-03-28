@@ -704,6 +704,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
               perror("stat");
               exit(EXIT_FAILURE);
             }
+            // if dir
             if ((statbuffer.st_mode & S_IFMT)==S_IFDIR) {
               // it a dir opendir and find files
               subdirp=opendir(statfilename);
@@ -781,6 +782,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                 }
               }
             } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {
+              // if file get ext of filename
               ext = strrchr(moviefil->d_name, '.');
               if (ext) {
                 film_ok=false;
@@ -847,6 +849,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     }
                   }
                 }
+              } else {
+                // not file
               }
             }
           }
@@ -1084,13 +1088,14 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
 	        i++;
         }
       }
+    } else {
+      write_logfile((char *) "Can not connect to mysql server.");
     }
     if (filhandle) {
       fputs("No db avable\n",filhandle);
       fclose(filhandle);							// close log file again
     }
     // check if movied is deleted in dir
-
     if (is_db_updated_then_do_clean_up) {
       sprintf(mainsqlselect,"SELECT videometadata.intid,filename from videometadata");
       conn=mysql_init(NULL);
@@ -1109,13 +1114,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             filepathsize=strlen(configmoviepath)+strlen(row[1])+1+1;            // + NULL + /
             file_to_check_path=new char[filepathsize];
             if (file_to_check_path) {
-              strcpy(file_to_check_path,configmoviepath);                                        // make path to file
+              strcpy(file_to_check_path,configmoviepath);                       // make path to file
               strcat(file_to_check_path,"/");
               strcat(file_to_check_path,row[1]);
               if (strlen(file_to_check_path)>1) {
                 if (!(file_exists(file_to_check_path))) {
                   fputs("Movie deleted filename ",filhandle);
-                  fputs(row[1],filhandle);                                        // write to log file
+                  fputs(row[1],filhandle);                                      // write to log file
                   fputs("\n",filhandle);
                   delrecid=atol(row[0]);
                   // delete from db
@@ -1124,15 +1129,17 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   res = mysql_store_result(conn);
                 }
               }
-              delete [] file_to_check_path;
+              delete [] file_to_check_path;                                     // clean up
             }
           }
         }
         if (filhandle) fclose(filhandle);
+      } else {
+        write_logfile((char *) "Can not connect to mysql server.");
       }
     }
     if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
-    mysql_close(conn);
+    if (conn) mysql_close(conn);
     return(filmantal);
 }
 

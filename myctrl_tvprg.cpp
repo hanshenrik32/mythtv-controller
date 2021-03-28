@@ -3986,7 +3986,7 @@ void tv_oversigt::show_fasttv_oversigt(int selectchanel,int selectprg,bool do_up
             break;
     case 3: if (!(do_update_xmltv_show)) sprintf(tmptxt,"TV Guide %s %d-%02d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
               if (mytimelist.tm_sec & 2) sprintf(tmptxt,"TV Guide %s %d-%02d-%d Updating.",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
-              else sprintf(tmptxt,"TV Guide %02s %d-%02d-%d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
+              else sprintf(tmptxt,"TV Guide %s %d-%02d-%d",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
             break;
     case 4: if (!(do_update_xmltv_show)) sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900); else
               if (mytimelist.tm_sec & 2) sprintf(tmptxt,"دليل التلفزيون %s %d-%d-%d ",ugedage[timeinfo->tm_wday],timeinfo->tm_mday,(timeinfo->tm_mon)+1,(timeinfo->tm_year)+1900);
@@ -4891,7 +4891,7 @@ void earlyrecorded::showtvreclist() {
   glEnable(GL_BLEND);
   glTranslatef(0.0f, 0.0f, 0.0f);
   glColor3f(1.0f, 1.0f, 1.0f);
-  if (setuptvgraberback==0) setuptvgraberback  = loadTexture("/opt/mythtv-controller/tema3/images/setuptvgraberback.png");
+  if (setuptvgraberback==0) setuptvgraberback  = loadTexture((char *) "/opt/mythtv-controller/tema3/images/setuptvgraberback.png");
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glBindTexture(GL_TEXTURE_2D,setuptvgraberback);                          // _texturemovieinfobox
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

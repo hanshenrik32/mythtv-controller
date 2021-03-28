@@ -6550,6 +6550,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           do_show_tvgraber = false;
           do_show_setup_rss = false;
           do_show_setup_spotify = false;
+          if (do_show_setup) write_logfile((char *) "Show setup menu."); else write_logfile((char *) "close setup menu.");
           fundet = true;
         }
         // test for exit selected                                               // exit program
@@ -6570,7 +6571,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           order_channel_list();                                               // order tv channel list
           save_channel_list();                                                //
           txmltvgraber_createconfig();                                        // create tv grabber config
-          write_logfile("Exit program.");
+          write_logfile((char *) "Exit program.");
           exit(0);                                                            // exit
         }
       }
@@ -6593,6 +6594,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           } else {
             do_show_spotify_search_oversigt=true;
           }
+          write_logfile((char *) "Spotify search.");
         }
       }
 
@@ -6613,12 +6615,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           if ((GLubyte) names[i*4+3]==27) {
-            fprintf(stderr,"Close stream info\n");
+            //fprintf(stderr,"Close stream info\n");
             returnfunc = 2;
             do_zoom_stream_cover = false;
             do_stop_stream = true;                                            // flag to stop play
             stopstream = true;                                                // flag to stop play
             do_play_stream = false;                                           // we are not play a
+            write_logfile((char *) "Close stream info.");
             fundet = true;
           }
         }
@@ -6643,9 +6646,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // close window
           if ((GLubyte) names[i*4+3]==27) {
-            if (debugmode & 8) fprintf(stderr,"Close movie info\n");
             returnfunc = 2;
             do_zoom_film_cover = false;
+            write_logfile((char *) "Close movie info.");
             fundet = true;
           }
           // reset movie search view
@@ -6676,9 +6679,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fundet = true;
           }
           if ((GLubyte) names[i*4+3]==27) {
-            if (debugmode & 2) fprintf(stderr,"Show music info\n");
             do_zoom_music_cover =! do_zoom_music_cover;
             ask_open_dir_or_play = false;
+            if (do_zoom_music_cover) write_logfile((char *) "Show music info."); else write_logfile((char *) "Show music info.");
             fundet = true;
           }
         }
@@ -6743,7 +6746,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
             fundet = true;
           }
-
 
           // next song
           if ((GLubyte) names[i*4+3]==7) {
@@ -10048,7 +10050,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 runwebserver=false;
                 order_channel_list();
                 save_channel_list();
-                write_logfile("Exit program.");
+                write_logfile((char *) "Exit program.");
                 exit(0);                                                        //  exit program
               } else if ((vis_tv_oversigt) && (do_show_tvgraber)) {
                 // Close tv_graber view from tv_oversigt
@@ -14551,6 +14553,7 @@ int main(int argc, char** argv) {
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations
       strcpy(configbackend_tvgraber_old,"");
     } else {
+      write_logfile((char *) "Exit program, Not posible to load radio overview.");
       exit(1);
     }
     // if kodi
@@ -14622,11 +14625,14 @@ int main(int argc, char** argv) {
     orgwinsizey=glutGet(GLUT_SCREEN_HEIGHT);
     if (orgwinsizex==1366) screen_size=4;
     if (orgwinsizex==1920) screen_size=3;
-    fprintf(stderr,"Real size %dx%d\n",orgwinsizex,orgwinsizey);
+    sprintf(debuglogdata,"Real size %dx%d",orgwinsizex,orgwinsizey);
+    write_logfile((char *) debuglogdata);
     if (orgwinsizex>1920) orgwinsizex=1920;
     if (orgwinsizey>1080) orgwinsizey=1080;
-    fprintf(stderr,"Screen size %dx%d\n",orgwinsizex,orgwinsizey);
-    fprintf(stderr,"Screen mode %d\n",screen_size);
+    sprintf(debuglogdata,"Screen size %dx%d",orgwinsizex,orgwinsizey);
+    write_logfile((char *) debuglogdata);
+    sprintf(debuglogdata,"Screen mode %d\n",screen_size);
+    write_logfile((char *) debuglogdata);
     // get first monitor screen size (pixel)
     dpy = XOpenDisplay(":1");
     if (dpy) {
@@ -14673,8 +14679,10 @@ int main(int argc, char** argv) {
     write_logfile((char *) "Loading graphic.");
     loadgfx();                                        // load gfx stuf
     write_logfile((char *) "Graphic loaded.");
-    if (full_screen) write_logfile((char *) "Enter full screen mode.");
-    if (full_screen) glutFullScreen();                // set full screen mode
+    if (full_screen) {
+      write_logfile((char *) "Enter full screen mode.");
+      glutFullScreen();                // set full screen mode
+    }
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
@@ -14700,7 +14708,7 @@ int main(int argc, char** argv) {
     // start main loop now
     // start main loop now
     glutMainLoop();
-    write_logfile((char *) "Close down exit.");
+    write_logfile((char *) "Close down.");
     #if defined USE_FMOD_MIXER
     result=sound->release();
     ERRCHECK(result,0);
@@ -14713,6 +14721,6 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
-    write_logfile("Exit program.");
+    write_logfile((char *) "Exit program.");
     return(EXIT_SUCCESS);
 }
