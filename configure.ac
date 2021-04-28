@@ -3,7 +3,7 @@ AM_INIT_AUTOMAKE
 # check gcc
 AC_PROG_CC
 # check libs
-
+AC_PROG_CXX
 #check for time.h 
 AC_CHECK_HEADERS([sys/time.h])
 
