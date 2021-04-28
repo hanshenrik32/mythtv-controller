@@ -270,7 +270,7 @@ int rss_stream_class::load_rss_data() {
       }
     }
     mysql_close(conn);
-  }
+  } else write_logfile((char *) "Error connect to mysql.");
   return(1);
 }
 
@@ -354,7 +354,7 @@ int rss_stream_class::save_rss_data() {
               res1 = mysql_store_result(conn);
             }
           }
-  } else {
+        } else {
           // no update of name of url create new
           sprintf(sqlstring,"insert into internetcontentarticles (feedtitle,title,url) values('%s','%s','%s')",rss_source_feed[n].stream_name,rss_source_feed[n].stream_name,rss_source_feed[n].stream_url);
           mysql_query(conn,sqlstring);
@@ -366,7 +366,7 @@ int rss_stream_class::save_rss_data() {
       }
     } //for next
     mysql_close(conn);
-  }
+  } else write_logfile((char *) "Error open mysql.");
   return(1);
 }
 
@@ -3451,23 +3451,25 @@ int load_channel_list_from_tvguide() {
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // Connect to database and update
-  if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    mysql_query(conn,"SELECT c.name,c.chanid,c.orderid FROM program inner join channel c where c.chanid=program.chanid group by program.chanid");
-    res = mysql_store_result(conn);
-    if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (cnr<MAXKANAL_ANTAL)) {
-        strcpy(channel_list[cnr].id,row[1]);
-        strcpy(channel_list[cnr].name,row[0]);
-        channel_list[cnr].selected=true;                                     // default select channel
-        channel_list[cnr].ordernr=atoi(row[2]);                              // default
-        cnr++;
-        PRGLIST_ANTAL++;
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      mysql_query(conn,"SELECT c.name,c.chanid,c.orderid FROM program inner join channel c where c.chanid=program.chanid group by program.chanid");
+      res = mysql_store_result(conn);
+      if (res) {
+        while (((row = mysql_fetch_row(res)) != NULL) && (cnr<MAXKANAL_ANTAL)) {
+          strcpy(channel_list[cnr].id,row[1]);
+          strcpy(channel_list[cnr].name,row[0]);
+          channel_list[cnr].selected=true;                                     // default select channel
+          channel_list[cnr].ordernr=atoi(row[2]);                              // default
+          cnr++;
+          PRGLIST_ANTAL++;
+        }
       }
+      mysql_close(conn);
     }
-    mysql_close(conn);
-  }
+  } else write_logfile((char *) "Error connect to mysql.");
 }
 
 
@@ -3605,24 +3607,26 @@ int order_channel_list_in_tvguide_db() {
   char *database = (char *) "mythtvcontroller";
   conn=mysql_init(NULL);
   // Connect to database and update
-  if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
-    mysql_query(conn,"set NAMES 'utf8'");
-    res = mysql_store_result(conn);
-    sprintf(sqlselect,"update channel set channel.visible=0 where chanid>=0");
-    mysql_query(conn,sqlselect);
-    res = mysql_store_result(conn);
-    // make channel active from config
-    for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
-      if (channel_list[n].selected) {
-        sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
-        mysql_query(conn,sqlselect);
-        res = mysql_store_result(conn);
-        write_logfile((char *) sqlselect);                                     // write to debug log
-        done=true;
+  if (conn) {
+    if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
+      mysql_query(conn,"set NAMES 'utf8'");
+      res = mysql_store_result(conn);
+      sprintf(sqlselect,"update channel set channel.visible=0 where chanid>=0");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      // make channel active from config
+      for(int n=0;n<MAXCHANNEL_ANTAL-1;n++) {
+        if (channel_list[n].selected) {
+          sprintf(sqlselect,"update channel set channel.orderid=%d,channel.visible=1 where channel.name like '%s' limit 1",n,channel_list[n].name);
+          mysql_query(conn,sqlselect);
+          res = mysql_store_result(conn);
+          write_logfile((char *) sqlselect);                                     // write to debug log
+          done=true;
+        }
       }
+      mysql_close(conn);
     }
-    mysql_close(conn);
-  }
+  } else write_logfile((char *) "Error open mysql.");
   return(done);
 }
 

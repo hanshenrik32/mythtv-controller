@@ -570,9 +570,8 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                     search_and_replace2(rssprgtitle);
                     search_and_replace2(rssprgfeedtitle);
                     search_and_replace2(rssprgdesc);
-                    //if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
                     // write debug log
-                    sprintf(debuglogdata,"Update title %-20s Date %s",rssprgtitle,rssprgpubdate);
+                    sprintf(debuglogdata,"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
                     write_logfile((char *) debuglogdata);
                     sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
                     if (mysql_query(conn,sqlinsert)!=0) {
@@ -659,9 +658,8 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 search_and_replace2(rssprgtitle);
                 search_and_replace2(rssprgfeedtitle);
                 search_and_replace2(rssprgdesc);
-                //if (debugmode & 4) printf("\t Update title %-20s Date %s\n",rssprgtitle,rssprgpubdate);
                 // write debug log
-                sprintf(debuglogdata,"Update title %-20s Date %s",rssprgtitle,rssprgpubdate);
+                sprintf(debuglogdata,"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
                 write_logfile((char *) debuglogdata);
                 sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
                 //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
@@ -3377,7 +3375,37 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
+      // Drone Radio Show
+      if (check_rss_feed_exist(conn,(char *) "Drone Radio Show")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Drone Radio Show',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Drone Trainer Podcast.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Drone Radio Show',NULL,NULL,'Drone Radio Show',0,0,NULL,'http://droneradioshow.com/feed/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Drone Radio Show.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
 
+      // <![CDATA[The Business of Drones]]>
+      if (check_rss_feed_exist(conn,(char *) "<![CDATA[The Business of Drones]]>")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('<![CDATA[The Business of Drones]]>',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Drone Trainer Podcast.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('<![CDATA[The Business of Drones]]>',NULL,NULL,'<![CDATA[The Business of Drones]]>',0,0,NULL,'https://anchor.fm/s/2bdc4bc/podcast/rss',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Drone Radio Show.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
 
 
       // close mysql

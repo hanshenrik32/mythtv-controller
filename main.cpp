@@ -9634,7 +9634,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
-
             } else if (do_show_videoplayer) {
               // video player setting
               if (do_show_setup_select_linie==0) {
@@ -13377,7 +13376,7 @@ void *datainfoloader_webserver(void *data) {
     // run time server to update spotify token
     if (difftime(nowdate, lasttime)>500) {                                     // 3500
       time(&lasttime);
-      fprintf(stderr,"update spotify token\n");
+      write_logfile((char *) "Update spotify token");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
         //spotify_oversigt.spotify_refresh_token();       // old ver
         spotify_oversigt.spotify_refresh_token2();        // new ver
@@ -13388,7 +13387,7 @@ void *datainfoloader_webserver(void *data) {
     // get search result after search text is done.
     if (do_hent_spotify_search_online) {
       spotify_oversigt.search_spotify_online_done=false;
-      printf("Update spotify search result thread.\n");
+      fprintf(stderr,"Update spotify search result thread.\n");
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
@@ -13397,9 +13396,7 @@ void *datainfoloader_webserver(void *data) {
       printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
-
       spotify_oversigt.set_search_loaded();
-
       //spotify_oversigt.type=2;
     }
   }
@@ -14631,7 +14628,7 @@ int main(int argc, char** argv) {
     if (orgwinsizey>1080) orgwinsizey=1080;
     sprintf(debuglogdata,"Screen size %dx%d",orgwinsizex,orgwinsizey);
     write_logfile((char *) debuglogdata);
-    sprintf(debuglogdata,"Screen mode %d\n",screen_size);
+    sprintf(debuglogdata,"Screen mode %d",screen_size);
     write_logfile((char *) debuglogdata);
     // get first monitor screen size (pixel)
     dpy = XOpenDisplay(":1");

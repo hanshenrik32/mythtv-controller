@@ -11,9 +11,7 @@
 #include <netdb.h>
 #include <ifaddrs.h>
 #include "checknet.h"
-
-extern int debugmode;
-
+#include "utility.h"
 
 extern char confighostwlanname[256];
 
@@ -105,7 +103,7 @@ void wifinetdef::find_interfacenames() {
       if (ifa->ifa_addr == NULL)
         continue;
       family = ifa->ifa_addr->sa_family;
-      if ((debugmode & 1) && ((family==AF_INET) || (family==AF_INET6))) printf("interface %-12s ",ifa->ifa_name);
+      if (((family==AF_INET) || (family==AF_INET6))) printf("interface %-12s ",ifa->ifa_name);
       // For an AF_INET* interface address, display the address
         if (family == AF_INET || family == AF_INET6) {
         s = getnameinfo(ifa->ifa_addr,(family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6),host, NI_MAXHOST,NULL, 0, NI_NUMERICHOST);
@@ -118,7 +116,7 @@ void wifinetdef::find_interfacenames() {
             strcpy(interfacename,ifa->ifa_name);                                // save in config
             strcpy(interfaceaddress,host);                                      // save ipadress in config
         }
-        if (debugmode & 1) printf("address: <%s>\n", host);
+        printf("address: <%s>\n", host);
       }
     }
     if (ifaddr) freeifaddrs(ifaddr);
@@ -141,7 +139,8 @@ int wifinetdef::create_wifilist() {
       int signal=0;
       int encrypt=0;
       int finish=0;
-      if (debugmode & 1) fprintf(stderr,"Scanning for wifi networks.\n");
+      fprintf(stderr,"Scanning for wifi networks.\n");
+      write_logfile((char *) "Scanning for wifi networks.");
       find_interfacenames();                      // get interface names and select wifi networks
       strcpy(foundinterfacename,"/sbin/iwlist ");
       strcat(foundinterfacename,this->interfacename);       // add found interface name found by find_interfacenames
@@ -179,7 +178,10 @@ int wifinetdef::create_wifilist() {
                         finish=0;
                   }
             }
-      } else if (debugmode & 1) fprintf(stderr,"ERROR loading wifi network list by missing command /sbin/iwlist\n");
+      } else {
+        write_logfile((char *) "ERROR loading wifi network list by missing command /sbin/iwlist");
+        fprintf(stderr,"ERROR loading wifi network list by missing command /sbin/iwlist\n");
+      }
       if (fp) pclose(fp);
       return(wifinetantal);
 }
@@ -203,7 +205,10 @@ int wifinetdef::findaktiv_wifi(char *aktivhardwareadress) {
                         finish=true;
                   }
             }
-      } else if (debugmode & 1) fprintf(stderr,"Warning no wifi interface found,\n");
+      } else {
+        fprintf(stderr,"Warning no wifi interface found,\n");
+        write_logfile((char *) "Warning no wifi interface found,");
+      }
       if (fp) {
             pclose(fp);
             if (finish) {
