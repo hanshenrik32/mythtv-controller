@@ -115,6 +115,16 @@ You can uninstall by.
 
 'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang/ libraries and headers
 
+screen saver types
+
+analog		- Analog clock
+digital		- Digital clock
+3D		- 3d cover
+3D2		- 
+PICTURE3D	- Pictures in Photos directory in homedir
+none		- None screen saver
+MUSICMETER	- Music meter
+
 
 # First start is slow, if your mythtv is setup right. The program have to
 # convert some gfx/cdcover/dvdcover file to internal format.
@@ -131,4 +141,6 @@ You can uninstall by.
 # release under GPL
 # hanshenrik32@gmail.com
 #
+
+
 

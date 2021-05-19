@@ -2765,7 +2765,7 @@ void display() {
             glTranslatef(0.0f, 0.0f, -7.0f);
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
-
+*/
             // music gfx loaded
             // if not load before screen saver
             if (!(music_oversigt_loaded)) {
@@ -2773,7 +2773,7 @@ void display() {
                 load_music_covergfx(musicoversigt);
                 mybox.settexture(musicoversigt);
             }
-*/
+
             _angle++;
             glPushMatrix();
             std::clock_t start;
@@ -2784,20 +2784,23 @@ void display() {
             break;
         case SAVER3D2:
             // reset pos
-            glLoadIdentity();
-            glTranslatef(0.0f, 0.0f, -2.0f);
-            glEnable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
+            //glLoadIdentity();
+            //glTranslatef(0.0f, 0.0f, -2.0f);
+            //glEnable(GL_DEPTH_TEST);
+            //glDisable(GL_BLEND);
             start = std::clock();
-            //mybox.show_music_3d1(_angle,screensaverbox);	//_textureId19
-            //mybox.show_music_3d_new(_angle,screensaverbox);	//_textureId19
+            mybox.show_music_3d1(_angle,screensaverbox);	//_textureId19
             if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             break;
         case PICTURE3D:
             // picture screen saver
-            std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            start = std::clock();
             if (psaver==NULL) psaver=new picture_saver();
+            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            //glLoadIdentity();
+            glPushMatrix();
             psaver->show_pictures();
+            glPopMatrix();
             break;
 
       }

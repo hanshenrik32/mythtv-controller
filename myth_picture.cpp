@@ -109,6 +109,9 @@ picture_saver::~picture_saver()
 void picture_saver::show_pictures()
 
 {
+    const int switch_timer=20;                                                    // fade time
+
+    static float colorfade=1.0f;                                                  // image fader
     static time_t now=0;
     static time_t lasttime=0;
     char *homedir;
@@ -116,15 +119,15 @@ void picture_saver::show_pictures()
     //char startdir[1000];
     static int show_picnr=0;
     static unsigned int timeout=0;
-    static float pi=0.0f;
-    float xof;
+    float xof=0.0f;
+    static float xoff=0.0f;
     int winsizx=1920;
     int winsizy=1080;
-
     if (loaded==false) {
-      //homedir = getenv ("HOME");
-      //strcpy(startdir,homedir);
-      dir_loader("/home/hans/Photos");		// load dir
+      homedir = getenv ("HOME");
+      strcpy(startdir,homedir);
+      strcat(startdir,"/Photos");
+      dir_loader(startdir);		// load dir "/home/hans/Photos"
       loaded=true;
     }
     switch(screen_size) {
@@ -140,25 +143,33 @@ void picture_saver::show_pictures()
     }
     //glRotatef(0, 0.0f, 0.0f, 1.0f);
     //glRotatef(0, 0.0f, 1.0f, 0.0f);
-    // 10 time load new pic
+    // load new pic
     if ((picture_antal>0) && (screensaverpicturepaths) && (screensaverpicturepaths[0])) {
         if (!(screensaver_pic)) screensaver_pic=loadTexture(screensaverpicturepaths[0]);
         now=time(NULL);
-        if (lasttime+4<now) {
+        if (lasttime+switch_timer<now) {
             lasttime=now;
             if (show_picnr>=this->picture_antal) show_picnr=0;
             if (screensaver_pic) glDeleteTextures( 1, &screensaver_pic);				// del last picture loaded
             screensaver_pic=loadTexture(screensaverpicturepaths[show_picnr]);	// load next picture
             show_picnr++;
+            xoff=0.0f;
+            colorfade=1.0f;
         }
-        glPushMatrix();
+        if (lasttime+(switch_timer-1)<now) {
+          colorfade-=0.1f;
+        }
         glEnable(GL_TEXTURE_2D);
-        glTranslatef(0.0f, 0.0f, 0.0f);
+        glTranslatef(0.0f, 0.0f, 0.0f-xoff);
+        xoff=xoff+1.1f;
+        //printf("xoff=%f val=%f \n",xoff,sin(xoff));
         /*
         glTranslatef(0, 0, -7+sin(pi));
         pi=pi+0.01f;
         if (pi>=(3.14159265f)) pi=0.0f;
         */
+        // fade colors out
+        glColor4f(1.0f, colorfade, colorfade, colorfade);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,screensaver_pic);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -169,6 +180,5 @@ void picture_saver::show_pictures()
         glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2))+winsizy , 0.0);
         glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-(winsizx/2))+winsizx,((orgwinsizey/2)-(winsizy/2)) , 0.0);
         glEnd();
-        glPopMatrix();
     } else printf("No pictures in homedir/Photos directory.\n");
 }

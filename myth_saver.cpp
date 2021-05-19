@@ -2556,7 +2556,6 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
 
 void boxarray::show_music_3d1(float aangle,GLuint textureId) {
     static float rangle=0.0f;
-    //float random_r_color,random_g_color,random_b_color;
     int x,y;
     float angle=aangle;
     float zof=-20.0f;
