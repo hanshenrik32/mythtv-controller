@@ -2554,11 +2554,12 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
 //
 // ****************************************************************************************
 
-void boxarray::show_music_3d1(float aangle,GLuint textureId) {
+void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
+    float BOX_SIZE=140.0f;
     static float rangle=0.0f;
     int x,y;
     float angle=aangle;
-    float zof=-20.0f;
+    float zof=0.0f;
     int i=0;
     int rotate=1;
     glPushMatrix();
@@ -2580,15 +2581,15 @@ void boxarray::show_music_3d1(float aangle,GLuint textureId) {
       if ((y==0) || (y==4) || (y==8)) rool_sinus();
       for(x=0;x<11;x++) {
         glPushMatrix();
-        zof=-20+(sinofsetz[i]/4);			// GET FROM TABLE
+        zof=10*(sinofsetz[i]/4);	                                                  		// GET FROM TABLE
         i+=180*2;
-        glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);        // -27
+        //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);      // -27
+        glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos-zof);      // -27
         glRotatef(angle, 0.0f, -1.0f, 0.0f);
         angle+=9;
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
         //    glEnable(GL_CULL_FACE);
-        float BOX_SIZE=2.0f;
         glBindTexture(GL_TEXTURE_2D,textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
