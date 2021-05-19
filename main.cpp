@@ -110,6 +110,7 @@ extern char __BUILD_NUMBER;
 #include "myth_saver.h"
 #include "myth_setup.h"
 #include "myth_setupsql.h"
+#include "myth_picture.h"
 #include "myctrl_xbmc.h"
 #include "myctrl_movie.h"
 #include "myctrl_music.h"
@@ -2426,7 +2427,11 @@ static bool do_update_spotify   = true;                             // set true 
 //
 // ****************************************************************************************
 
+
+
 void display() {
+    static picture_saver *psaver=NULL;
+
     // used by xmltv updater func
     static bool startwebbrowser=true;                                           // start web browser to enable login to spotify
     static bool getstarttidintvguidefromarray = true;
@@ -2790,12 +2795,11 @@ void display() {
             break;
         case PICTURE3D:
             // picture screen saver
-            glLoadIdentity();
-            glDisable(GL_BLEND);
-            // picture_saver psaver;
-            //ifsaver_irq (psaver==NULL) psaver=new picture_saver();
-            // psaver.show_pictures();
+            std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (psaver==NULL) psaver=new picture_saver();
+            psaver->show_pictures();
             break;
+
       }
       glPopMatrix();
     }
