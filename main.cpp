@@ -2788,6 +2788,8 @@ void display() {
             //glEnable(GL_DEPTH_TEST);
             //glDisable(GL_BLEND);
             start = std::clock();
+            _angle++;
+            mybox.settexture(musicoversigt);
             mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
             if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
             break;

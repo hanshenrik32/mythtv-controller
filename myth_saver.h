@@ -24,11 +24,11 @@ struct boxpos {
 class boxarray {
   private:
     void build_default_array();
-  public:
+    void set_new_textures(int mode,int type,GLuint newtexture);
     struct boxpos matrix[11][11];
     float tilt;
+  public:
     boxarray();
-    void set_new_textures(int mode,int type,GLuint newtexture);
     void settexture(struct music_oversigt_type *musicoversigt);
     void show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3);
     //void show_music_3d_new(int aangle,GLuint textureId);
@@ -37,10 +37,6 @@ class boxarray {
     void createboxpictures();
 };
 
-
-
-
-//void show_music_3d(int angle,GLuint textureId,GLuint textureIdmask,GLuint textureIdmask1);
 
 
 #endif

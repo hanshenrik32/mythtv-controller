@@ -3407,6 +3407,41 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
+      // VENNETJENESTEN
+      if (check_rss_feed_exist(conn,(char *) "VENNETJENESTEN")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('VENNETJENESTEN',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Drone Trainer Podcast.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('VENNETJENESTEN',NULL,NULL,'VENNETJENESTEN',0,0,NULL,'https://radio4.dk/rss/xml/vennetjenesten.xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Drone Radio Show.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
+
+      // Alex og kaninhullet
+      if (check_rss_feed_exist(conn,(char *) "Alex og kaninhullet")==0) {
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Alex og kaninhullet',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error The Drone Trainer Podcast.\n");
+        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Alex og kaninhullet',NULL,NULL,'Alex og kaninhullet',0,0,NULL,'https://politiken.dk/webservice/podcast/channels/channel_alex/feed/itunes/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error Drone Radio Show.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
 
       // close mysql
       if (conn) mysql_close(conn);
