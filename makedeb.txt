@@ -2,5 +2,5 @@
 #debuild -us -uc -nc
 #goto mythtv-controller dir and do
 #dpkg-buildpackage -S -khanshenrik32@gmail.com
-dpkg-buildpackage -b -khanshenrik32@gmail.com
+dpkg-buildpackage -b -uc -khanshenrik32@gmail.com
 cp ../mythtv-controller_0.38-1_amd64.deb mythtv-controller_0.39-1_amd64.deb

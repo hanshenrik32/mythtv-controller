@@ -517,3 +517,15 @@ dh_builddeb
 dh_gencontrol
 dh_installdeb
 dh_builddeb
+dh_gencontrol
+dh_installdeb
+dh_builddeb
+dh_gencontrol
+dh_installdeb
+dh_builddeb
+dh_gencontrol
+dh_installdeb
+dh_builddeb
+dh_gencontrol
+dh_installdeb
+dh_builddeb

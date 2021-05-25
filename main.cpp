@@ -2803,7 +2803,6 @@ void display() {
             psaver->show_pictures();
             glPopMatrix();
             break;
-
       }
       glPopMatrix();
     }
