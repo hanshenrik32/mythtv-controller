@@ -1,3 +1,6 @@
+//
+// Screen savers
+//
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -9,6 +12,7 @@
 #include "myth_saver.h"
 #include "myctrl_music.h"
 #include "readjpg.h"
+#include "utility.h"
 
 extern char configpicturepath[256];
 extern GLuint screensaverbox;
@@ -2323,13 +2327,14 @@ void boxarray::loadboxpictures()
     GLuint textureid;
     DIR *dp;
     struct dirent *dirp;
-    strcpy(startpath,configpicturepath);
-    strcat(startpath,"mythc_gallery/");
+    //strcpy(startpath,configpicturepath);
+    getuserhomedir(startpath);
+    strcat(startpath,"/Pictures/mythc_gallery/");
     int x=0;
     int y=0;
     dp  = opendir(startpath);
     if (dp==NULL) {
-      printf("Dir error\n");
+      printf("Open dir error %s\n",startpath);
     }
     if (dp) {
       if (loadboxpic) {

@@ -1,3 +1,6 @@
+//
+// vlc loader/player controller
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <vlc/vlc.h>

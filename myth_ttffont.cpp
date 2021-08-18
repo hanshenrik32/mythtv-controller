@@ -1,3 +1,6 @@
+//
+// true type font manager
+//
 #include <GL/gl.h>
 #if defined __APPLE__ && defined __MACH__
 #include <OpenGL/gl.h>

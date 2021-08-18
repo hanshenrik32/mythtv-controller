@@ -1,3 +1,6 @@
+//
+// Show movie overview
+//
 #include <stdlib.h>
 #include <stdio.h>
 #include <GL/glut.h>

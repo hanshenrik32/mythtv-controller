@@ -1,3 +1,6 @@
+//
+// xbmc loader
+//
 #include "myctrl_xbmc.h"
 #include <string.h>
 #include <libxml/parser.h>

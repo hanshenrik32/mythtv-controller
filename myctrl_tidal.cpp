@@ -1,3 +1,6 @@
+//
+// All tridal functios
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -275,6 +278,9 @@ bool tridal_class::get_tridal_update_flag() {
 
 
 
+/*  read more here,
+ https://github.com/yusufusta/php-tidal/blob/master/src/Tidal/TidalAPI.php */
+
 // In use
 
 int tridal_class::tridal_login_token2() {
@@ -300,7 +306,7 @@ int tridal_class::tridal_login_token2() {
 
 
 // *********************************************************************************************************************************
-// In use
+// NOT In use
 // Refresh token
 // return http code
 //

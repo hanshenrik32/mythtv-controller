@@ -1,3 +1,6 @@
+//
+// main code
+//
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -2766,6 +2769,9 @@ void display() {
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_BLEND);
 */
+            //glTranslatef(0.0f, 0.0f, -7.0f);
+            //glEnable(GL_DEPTH_TEST);
+            glDisable(GL_BLEND);
             // music gfx loaded
             // if not load before screen saver
             if (!(music_oversigt_loaded)) {
@@ -2773,6 +2779,7 @@ void display() {
                 load_music_covergfx(musicoversigt);
                 mybox.settexture(musicoversigt);
             }
+            mybox.loadboxpictures();
             _angle++;
             glPushMatrix();
             std::clock_t start;

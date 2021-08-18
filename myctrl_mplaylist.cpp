@@ -1,3 +1,6 @@
+//
+// Music playlist manager
+//
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
