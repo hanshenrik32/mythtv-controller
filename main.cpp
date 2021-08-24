@@ -2771,6 +2771,7 @@ void display() {
 */
             //glTranslatef(0.0f, 0.0f, -7.0f);
             //glEnable(GL_DEPTH_TEST);
+            printf("Saver3D \n");
             glDisable(GL_BLEND);
             // music gfx loaded
             // if not load before screen saver

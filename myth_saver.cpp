@@ -2351,12 +2351,15 @@ void boxarray::loadboxpictures()
                   strcat(temptxt,dirp->d_name);
                   textureid=loadTexture(temptxt);
                   if (textureid) {
-                    matrix[x][y].texture=textureid;		// gem texture hvis den ikke har
-                    matrix[x][y].pictexture=textureid;	// gem texture hvis den ikke har
+                    if (matrix[x][y].texture==0) {
+                      matrix[x][y].texture=textureid;		// gem texture hvis den ikke har
+                      matrix[x][y].pictexture=textureid;	// gem texture hvis den ikke har
+                    }
                   }
                 }
               }
             } else {
+              printf("Set default picture texture \n");
               matrix[x][y].texture=matrix[x][y].pictexture;
             }
             x++;
