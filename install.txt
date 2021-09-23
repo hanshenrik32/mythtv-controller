@@ -1,11 +1,12 @@
 # packs to install to compile
 # The program req 300 Mbytes of diskspace.
 # open shell
-# write in shell
+# 
 # updated 02-09-2014
 # updated 27-08-2017
 # updated 06-01-2018
 # updated 09-10-2019
+# updated 21-08-2021
 
 
 This packets need to be installed on Ubuntu.
