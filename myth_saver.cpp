@@ -2322,6 +2322,7 @@ int loadboxpic=1;
 void boxarray::loadboxpictures()
 
 {
+    char debuglogdata[1024];
     char startpath[512];
     char temptxt[512];
     GLuint textureid;
@@ -2347,6 +2348,10 @@ void boxarray::loadboxpictures()
               if (dirp) {
                 if ((strcmp(dirp->d_name,".")!=0) && ((strcmp(dirp->d_name,"..")!=0))) {
                   printf("filnavn to load is %s x=%d Y=%d \n ",dirp->d_name,x,y);
+                  // write debug log
+                  sprintf(debuglogdata,"filnavn to load is %s x=%d Y=%d \n ",dirp->d_name,x,y);
+                  write_logfile((char *) debuglogdata);
+                  //
                   strcpy(temptxt,startpath);
                   strcat(temptxt,dirp->d_name);
                   textureid=loadTexture(temptxt);

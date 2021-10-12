@@ -657,6 +657,9 @@ bool tridal_class::tridal_check_tridaldb_empty() {
 //
 // ****************************************************************************************
 
+
+//#if defined(ENABLE_TIDAL)
+
 int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
   MYSQL *conn;
   MYSQL_RES *res;
@@ -800,6 +803,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
   return(1);
 }
 
+//#endif
 
 // *********************************************************************************************************************************
 // do we play ?

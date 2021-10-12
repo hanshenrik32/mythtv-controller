@@ -33,8 +33,13 @@
 #include <iostream>
 #include <pthread.h>                      // multi thread support
 
+
+// if defined the support will be enabled
+
 #define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
+
+//
 
 // web server
 static bool runwebserver=true;
@@ -80,7 +85,7 @@ bool stream_jump = false;
 
 extern float sinofsetz[];
 
-bool tv_guide_firsttime_update = false;
+bool tv_guide_firsttime_update = false;                                           //
 int radio_oversigt_loaded_nr=0;                                                  //
 bool radio_oversigt_loaded_begin = false;                                         // true first time radio is loaded
 int radio_oversigt_antal=0;                                                      //
@@ -10175,7 +10180,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // u key
                 // Update tv guide
                 write_logfile((char *) "Update tv guide.");
-                tv_guide_firsttime_update = true;
                 // set flag for show update
                 do_update_xmltv_show = true;
                 loading_tv_guide = true;
