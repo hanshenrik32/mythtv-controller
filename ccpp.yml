@@ -1,0 +1,39 @@
+name: C/C++ CI
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    name: Linux build
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libkrb5-dev
+    - name: configure
+      run: |
+        ./bootstrap
+        ./configure
+    - name: make
+      run: make
+    - name: make distcheck
+      run: make distcheck
+
+  build-windows:
+    name: Windows build
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: make configure
+      run: |
+        make 
+    - name: Build (MSVC)
+      run: |
+        make --build .
+
