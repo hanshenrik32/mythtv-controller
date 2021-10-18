@@ -14,10 +14,9 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libkrb5-dev curl xmltv libvlc-dev lirc
-    - name: configure
-      run: |
     - name: make compile
       run: make compile
     - name: make compile
       run: make compile
 
+~
