@@ -16,24 +16,9 @@ jobs:
         sudo apt install -y libkrb5-dev
     - name: configure
       run: |
-        ./bootstrap
         ./configure
     - name: make
       run: make
-    - name: make distcheck
-      run: make distcheck
-
-  build-windows:
-    name: Windows build
-
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: make configure
-      run: |
-        make 
-    - name: Build (MSVC)
-      run: |
-        make --build .
+    - name: make compile
+      run: make compile
 
