@@ -13,11 +13,13 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev
+        sudo apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev
         tar -zxvf fmodstudioapi20107linux.tar.gz
     - name: make installsound
       run: make installsound
     - name: make
+        tar -zxvf fmodstudioapi20107linux.tar.gz
+        make installsound
       run: make compile
 
 ~
