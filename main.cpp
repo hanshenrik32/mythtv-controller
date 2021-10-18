@@ -6260,7 +6260,10 @@ void display() {
     //  start processing buffered OpenGL routines
     //
     glFlush();
+    //glfwPollEvents(); // do not exist in linux
     glutSwapBuffers();
+
+
 }
 // end display()
 

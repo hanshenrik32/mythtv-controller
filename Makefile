@@ -13,7 +13,7 @@ DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
-FMODFILE   = fmodstudioapi20107linux.tar.gz
+FMODFILE   = fmodstudioapi11014linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
 FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
@@ -28,11 +28,11 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/ -name 'libfmod.so')
+	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
 	CFLAGS = -pthread -m64
 	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86/ -name 'libfmod.so')
+	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86/libfmod.so
         CFLAGS = -pthread -m32
 	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
 endif
@@ -47,6 +47,7 @@ else
 	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
+
 
 
 OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
@@ -69,13 +70,12 @@ all:
 
 
 compile: $(PROG)
-	@if ! test -f build-number.txt; then touch build-number.txt; fi	
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
+	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
@@ -108,9 +108,9 @@ installsound:
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
 	#remove old link
-	if test -e /usr/lib/libfmod.so.12; then rm /usr/lib/libfmod.so.12; fi
-	ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmod.so /usr/lib/libfmod.so.12
-	@echo "Done installing fmod32/64 bit version 4.44.41"
+	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
+	ln -s /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
 
@@ -122,14 +122,14 @@ install:
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
-	#@cp -r xmltv_config $(DESTDIR)	
+	@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
-	#@cp xmltv_config/*  ~/.xmltv/
-	#@chmod 666 ~/.xmltv/*
+	@cp xmltv_config/*  ~/.xmltv/
+	@chmod 666 ~/.xmltv/*
 	@chmod 777 /opt/mythtv-controller/tema*
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
