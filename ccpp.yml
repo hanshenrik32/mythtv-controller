@@ -17,6 +17,7 @@ jobs:
         sudo apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl2-dev
     - name: make
       run: |
+        make installsound
         make compile
 
 ~
