@@ -13,7 +13,7 @@ jobs:
     - uses: mstksg/get-package@v1
     - name: Install dependencies
       with:
-        apt-get: libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libportmidi-dev libical-dev 
+        apt-get: libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libportmidi-dev libical-dev dialog libxrandr-dev
       run: |
         ls ${{ github.workspace }}
         apt update
