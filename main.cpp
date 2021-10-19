@@ -48,9 +48,11 @@ bool do_select_device_to_play=false;
 bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 bool stream_jump = false;
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
+
 #if defined USE_SDL_MIXER
 #include <SDL_mixer.h>
 #endif

@@ -19,8 +19,8 @@ jobs:
     - name: make installsound
       run: make installsound
     - name: make
-        tar -zxvf fmodstudioapi20107linux.tar.gz
-        make installsound
+      run: tar -zxvf fmodstudioapi20107linux.tar.gz
+      run: make installsound
       run: make compile
 
 ~
