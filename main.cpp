@@ -97,7 +97,9 @@ bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
 
+#ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                   // fmod Sound device
+#endif
 
 // screen saver uv stuf
 float spectrum[2000];                                                           // used for spectium
@@ -3924,20 +3926,20 @@ void display() {
     if (vis_radio_oversigt) {
       if ((do_play_radio) && (rknapnr>0) && (rknapnr<=radiooversigt.radioantal())) {
         // do we play now ?
+        #if defined USE_FMOD_MIXER
         if (snd) {
-          #if defined USE_FMOD_MIXER
           // yes stop play
           // stop old playing
           sound->release();                                                                       // stop last playing song
           dsp = 0;                                                                                  // reset uv
           ERRCHECK(result,0);
-          #endif
           #if defined USE_SDL_MIXER
           if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
           sdlmusicplayer = NULL;
           #endif
           snd = 0;                                // set play new flag
         }
+        #endif
         if (snd==0) {
           snd = 1;
           sprintf(debuglogdata,"Play radio station nr %d url %s ",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
@@ -5215,11 +5217,11 @@ void display() {
     //
     // calc spectrum
     // from fmod
+    #if defined USE_FMOD_MIXER
     if (snd) {
       // getSpectrum() performs the frequency analysis, see explanation below
       sampleSize = 1024;                // nr of samples default 64
       // uv works only on fmod for now
-      #if defined USE_FMOD_MIXER
       FMOD_DSP_PARAMETER_FFT *fft = 0;
       int chan;
       static bool build_frequencyOctaves=false;
@@ -5245,7 +5247,6 @@ void display() {
       }
       result=dsp->getParameterData(FMOD_DSP_FFT_SPECTRUMDATA, (void **)&fft, 0, 0, 0);
       if (result!=FMOD_OK) fprintf(stderr,"Error DSP %s\n",FMOD_ErrorString(result));
-      #endif
       int length = fft->length/2;
       int numChannels = fft->numchannels;
       if (fft) {
@@ -5261,6 +5262,8 @@ void display() {
         }
       }
     }
+    #endif
+
     //
     // show uv metter in music player
     //
@@ -5521,8 +5524,10 @@ void display() {
         sdlmusicplayer=NULL;
         #endif
         // no play sound flag
+        #if defined USE_FMOD_MIXER
         snd = 0;
         sound = 0;
+        #endif
         // clean music playlist
         aktiv_playlist.clean_playlist();                // clean play list (reset) play list
         do_play_music_aktiv_table_nr=1;			// reset play start nr
