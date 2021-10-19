@@ -89,7 +89,7 @@ Debug: $(PROG)
 gitcompile:
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
-	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
+	$(CC) -pthread -m64 -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS)  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient /usr/lib/x86_64-linux-gnu/liblirc_client.so /usr/lib/x86_64-linux-gnu/libical.so /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so /usr/lib/x86_64-linux-gnu/libstdc++.so.6  /usr/lib/x86_64-linux-gnu/libGL.so -lsqlite3 -lvlc -lfontconfig /usr/lib/x86_64-linux-gnu/libfreetype.so /usr/lib/libGLC.so -lXrandr -I/usr/include/libxml2 -lX11 -lglut -lGLU -lm -lIL -lSDL `sdl-config --libs` -lSDL_image -lpthread -lxml2 -lcurl $(LDFLAGS)
 
 
 
