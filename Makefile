@@ -86,10 +86,10 @@ $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 Debug: $(PROG)
 
 
-gitcompile:
+gitcompile: $(PROG)
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
-	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -march=native -O0 -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 
 
