@@ -1,1 +1,2 @@
+tar -zxvf fmodstudioapi20107linux.tar.gz
 exit 0
