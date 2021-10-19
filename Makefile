@@ -89,7 +89,7 @@ Debug: $(PROG)
 gitcompile:
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
-	$(CC) -pthread -m64 -march=native -O0 -o $(PROG) $(SRCS) $(OPTS) $(LIBS)  $(LDFLAGS)
+	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 
 
