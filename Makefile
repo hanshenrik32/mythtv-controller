@@ -85,6 +85,14 @@ $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 
 Debug: $(PROG)
 
+
+gitcompile:
+
+$(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
+	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
+
+
+
 mysqlfix:
 	echo 'sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"' > /etc/mysql/mysql.conf.d/mysqld.cnf
 	service mysql restart        
