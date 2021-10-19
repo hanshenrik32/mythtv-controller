@@ -15,11 +15,8 @@ jobs:
         ls ${{ github.workspace }}
         sudo apt update
         sudo apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl2-dev
-    - name: make installsound
-      run: make installsound
     - name: make
       run: |
-        make installsound
         make compile
 
 ~
