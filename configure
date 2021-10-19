@@ -1,2 +1,2 @@
-tar -zxvf fmodstudioapi20107linux.tar.gz
+tar -zxvf fmodstudioapi20107linux.tar.gz -C /opt/mythtv-controller/
 exit 0
