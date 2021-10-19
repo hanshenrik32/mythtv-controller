@@ -156,3 +156,5 @@ install:
 	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
 	#fi
 
+check:
+       
