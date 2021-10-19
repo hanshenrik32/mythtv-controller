@@ -87,10 +87,8 @@ Debug: $(PROG)
 
 
 gitcompile: $(PROG)
-
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
-
 
 
 mysqlfix:
