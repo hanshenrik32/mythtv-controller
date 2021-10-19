@@ -23,4 +23,8 @@ jobs:
         ./apt-get_20.04.sh
         make installsound
         make gitcompile 
+        
+    - name: make check
+      run: |
+        make ./configure
 ~
