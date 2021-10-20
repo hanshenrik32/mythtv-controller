@@ -25,7 +25,7 @@ BUILD_NUMBER_FILE=build-number.txt
 
 LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 
-LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
+LIBICAL := $(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
 	LIBFMOD    = /opt/mythtv-controller/fmodstudioapi11014linux/api/lowlevel/lib/x86_64/libfmod.so
