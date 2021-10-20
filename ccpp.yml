@@ -14,9 +14,9 @@ jobs:
     - name: Install dependencies
       with:
         apt-get: libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libportmidi-dev libical-dev dialog libxrandr-dev
-      run: |
-        apt update
-        apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libportmidi-dev
+#      run: |
+#        apt update
+#        apt install -y libkrb5-dev curl xmltv libvlc-dev lirc glutg3-dev libsdl1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libportmidi-dev
     - name: make
       run: |
         ./apt-get_20.04.sh
