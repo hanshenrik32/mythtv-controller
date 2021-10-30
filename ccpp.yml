@@ -29,6 +29,4 @@ jobs:
       run: |
         make ./configure
 
-    - name: make distcheck
-        LIBGL: /usr/lib/x86_64-linux-gnu/libGL.so
 ~
