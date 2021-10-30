@@ -97,9 +97,9 @@ check:
         fi
 
 distcheck: $(PROG)
-	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
-	$(CC) $(CFLAGS) -march=native -O0 -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
+	#tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
+	#@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+
 
 Debug: $(PROG)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
