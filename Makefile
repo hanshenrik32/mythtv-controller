@@ -82,14 +82,12 @@ $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
-
 gitcompile:
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-
 
 
 check:
@@ -99,6 +97,7 @@ check:
         fi
 
 distcheck: $(PROG)
+
 	$(CC) $(CFLAGS) -march=native -O0 -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 Debug: $(PROG)
