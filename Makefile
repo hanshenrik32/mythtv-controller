@@ -98,6 +98,11 @@ check:
                 cp lirc/* ~/.config/lirc/; \
         fi
 
+distcheck:
+	@if ! test -d ~/.config/lirc/; then \
+	mkdir  ~/.config/lirc/; \
+                cp lirc/* ~/.config/lirc/; \
+        fi
 
 Debug: $(PROG)
 
