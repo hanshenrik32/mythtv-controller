@@ -97,8 +97,8 @@ check:
         fi
 
 distcheck: $(PROG)
-	#tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	#@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
+	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 
 
 Debug: $(PROG)
