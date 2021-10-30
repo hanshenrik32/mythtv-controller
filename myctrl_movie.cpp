@@ -49,7 +49,7 @@ extern bool movie_oversigt_gfx_loading;
 extern int orgwinsizey;
 extern int orgwinsizex;
 
-
+extern GLuint _textureId9_askbox;
 
 // ****************************************************************************************
 //
@@ -777,7 +777,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       res = mysql_store_result(conn);
                       if (mysql_error(conn)) {
                         write_logfile((char *) "Mysql error 'insert into videometadata'");
-                        printf("Mysql error : %s\n",mysql_error(conn));
+                        //printf("Mysql error : %s\n",mysql_error(conn));
                         //exit(0);
                       }
                     }
@@ -1590,11 +1590,28 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     //glPopMatrix();
   }
   if ((film_nr==0) || (this->filmoversigt_antal==0)) {
+    // show window
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBindTexture(GL_TEXTURE_2D,_textureId9_askbox);                            // _texturemovieinfobox
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glTranslatef(550, 350, 0.0f);                                               // pos
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);                         // draw bos
+    glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
+    glEnd();
+    glPopMatrix();
+
     sprintf(temptxt,"No info from %s backend.",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
-    xpos=600;
-    ypos=400;
+    xpos=700;
+    ypos=550;
     glTranslatef(xpos+10, ypos+40 ,0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glDisable(GL_TEXTURE_2D);

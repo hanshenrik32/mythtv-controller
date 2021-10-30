@@ -36,7 +36,7 @@
 
 // if defined the support will be enabled
 
-#define ENABLE_TIDAL
+//#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
 //
@@ -115,8 +115,6 @@ extern char __BUILD_DATE;
 extern char __BUILD_NUMBER;
 //
 
-
-
 #include "main.h"
 #include "myctrl_storagedef.h"
 #include "myth_saver.h"
@@ -134,9 +132,9 @@ extern char __BUILD_NUMBER;
 #ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
 #endif
-#ifdef ENABLE_TIDAL
+//#ifdef ENABLE_TIDAL
 #include "myctrl_tidal.h"
-#endif
+//#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -3231,7 +3229,7 @@ void display() {
         getstarttidintvguidefromarray = false;
       }
     }
-    // show oversigt over nye film
+    // show oversigt over nye film inden timeout
     if ((vis_nyefilm_oversigt) && (do_show_setup == false)) {
       if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
       if (fknapnr == 0) show_newmovietimeout--;
@@ -3305,7 +3303,7 @@ void display() {
       }
     }
     // spotify do the search after enter is pressed
-    if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) {
+    if ((vis_spotify_oversigt) && (!(visur)) && (do_show_spotify_search_oversigt==false)) {
       if ((keybufferopenwin) && (hent_spotify_search)) {
         hent_spotify_search=false;
         spotify_selected_startofset=0;                                          // icon show start ofset
@@ -3348,11 +3346,10 @@ void display() {
       }
     }
 
-
+    std::clock_t start;
+    start = std::clock();
     if (!(visur)) {
       // music view
-      std::clock_t start;
-      start = std::clock();
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
         show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
@@ -3427,6 +3424,8 @@ void display() {
         //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
       }
     }
+
+    if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
 
     //firsttimespotifyupdate=true;
     // show firsttime spotify update windows request
@@ -10092,7 +10091,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // or ask record tv program
               //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
               if (do_show_spotify_search_oversigt==false) {
-                if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag
+                if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
               } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
               else if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
               else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
@@ -14570,7 +14569,7 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     //tridal_oversigt.tridal_login_token();
     // in use tridal_oversigt.tridal_login_token2
-    tridal_oversigt.tridal_login_token2();
+    //tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 

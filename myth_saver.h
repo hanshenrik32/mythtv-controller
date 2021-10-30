@@ -25,7 +25,7 @@ class boxarray {
   private:
     void build_default_array();
     void set_new_textures(int mode,int type,GLuint newtexture);
-    struct boxpos matrix[11][11];
+    struct boxpos matrix[11][11];                                             // box matrix
     float tilt;
   public:
     boxarray();
