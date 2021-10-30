@@ -88,7 +88,7 @@ gitcompile:
 	mkdir  ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
 	fi
-	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 
 
 Debug: $(PROG)
