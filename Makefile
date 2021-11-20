@@ -75,6 +75,7 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	@if [ ! -f build-number.txt ]; then touch build-number.txt; fi
 	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
