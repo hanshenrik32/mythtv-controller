@@ -337,15 +337,23 @@ int tridal_class::tridal_login_token() {
   strcpy(newtoken,"");
   curl = curl_easy_init();
   if (curl) {
+
+    printf("login tidal ..\n");
+    // tidal_client_id
+    // tidal_secret_id
+
+    //give this errror {"status":400,"subStatus":1002,"userMessage":"username cannot be blank,password cannot be blank"}
+
+
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, "hanshenrik32@gmal.com");
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, "o60LbQGXJi5y");
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/login/username");          // /login/username
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidalhifi.com/v1/login/");          // /login/username
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);

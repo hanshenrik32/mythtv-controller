@@ -36,7 +36,7 @@
 
 // if defined the support will be enabled
 
-//#define ENABLE_TIDAL
+#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
 //
@@ -64,7 +64,7 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-
+#include "myctrl_tidal.h"
 
 // sound system include fmod
 #if defined USE_FMOD_MIXER
@@ -133,7 +133,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_spotify.h"
 #endif
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal.h"
+//#include "myctrl_tidal.h"
 //#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
@@ -149,7 +149,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 
 // tidal music class
 #ifdef ENABLE_TIDAL
-tridal_class tridal_oversigt;
+  tridal_class *tridal_oversigt;
 #endif
 
 char debuglogdata[1024];                                  // used by log system
@@ -14567,7 +14567,8 @@ int main(int argc, char** argv) {
     }
 
     #ifdef ENABLE_TIDAL
-    //tridal_oversigt.tridal_login_token();
+    tridal_oversigt = new tridal_class;
+    tridal_oversigt->tridal_login_token();
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");

@@ -7,7 +7,8 @@
 #include "json-parser/json.h"
 
 // web server
-//#include "mongoose-master/mongoose.h"
+
+#include "mongoose-master/mongoose.h"
 
 
 const int tidal_playlisttype=0;                         // playlist type
