@@ -36,8 +36,10 @@
 
 // if defined the support will be enabled
 
-#define ENABLE_TIDAL
+//#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
+
+
 
 //
 
@@ -64,8 +66,9 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
+#ifdef ENABLE_TIDAL
 #include "myctrl_tidal.h"
-
+#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"

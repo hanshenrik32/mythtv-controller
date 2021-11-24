@@ -318,6 +318,7 @@ int tridal_class::tridal_login_token2() {
 // ********************************************************************************************
 
 int tridal_class::tridal_login_token() {
+  static char tidaltoken_refresh[200];
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -335,28 +336,31 @@ int tridal_class::tridal_login_token() {
   char post_playlist_data[2048];
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
-  curl = curl_easy_init();
-  if (curl) {
 
-    printf("login tidal ..\n");
+  strcpy(tidaltoken_refresh,"abc");
+  curl = curl_easy_init();
+  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+
+    printf("login tidal ..**************************\n");
     // tidal_client_id
     // tidal_secret_id
 
-    //give this errror {"status":400,"subStatus":1002,"userMessage":"username cannot be blank,password cannot be blank"}
-
-
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, "hanshenrik32@gmal.com");
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, "o60LbQGXJi5y");
+    curl_easy_setopt(curl, CURLOPT_USERNAME, "OmDtrzFgyVVL6uW56OnFA2COiabqm");
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, "zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8");
+
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidalhifi.com/v1/login/");          // /login/username
+
+    //curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2");          // /login/username
+
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidalhifi.com/v1/login");          // /login/username  https://api.tidalhifi.com/v1/login/
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "TIDAL_ANDROID/686 okhttp/3.3.1");
@@ -369,12 +373,15 @@ int tridal_class::tridal_login_token() {
     // set type post
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
-    strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
     //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(data));
+
+    sprintf(post_playlist_data,"username=hanshenrik32@gmail.com&password=o60LbQGXJi5y");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
     res = curl_easy_perform(curl);
-    if(res != CURLE_OK) {
+    if(res != CURLE_OK) {                                                       // check if ok
       size_t len = strlen(errbuf);
       fprintf(stderr, "\nlibcurl: (%d) ", res);
       if(len)
@@ -410,6 +417,7 @@ int tridal_class::tridal_login_token() {
       printf("%s \n", response_string.c_str());
     }
     // always cleanup
+    printf("End curl login call.*******************\n");
     curl_easy_cleanup(curl);
   }
   return(httpCode);
@@ -752,8 +760,9 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
             system("cat tidal_users_playlist.json | grep total | tail -1 | awk {'print $3'} > tidal_users_playlist_antal.txt");
             json_file = fopen("tidal_users_playlist_antal.txt", "r");
             fscanf(json_file, "%s", temptxt);
-            if (strcmp(temptxt,"")!=0) tridal_oversigt.tridal_playlist_antal = atoi(temptxt);
-            else tridal_oversigt.tridal_playlist_antal = 0;
+            //if (strcmp(temptxt,"")!=0) tridal_oversigt.tridal_playlist_antal = atoi(temptxt);
+            if (strcmp(temptxt,"")!=0) tridal_playlist_antal = atoi(temptxt);
+            else tridal_playlist_antal = 0;
             fclose(json_file);
           }
           stat("tidal_users_playlist.txt", &filestatus);                              // get file info
@@ -766,7 +775,7 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
                 fscanf(json_file, "%s", file_contents);
                 // process playlist id
                 //tridal_oversigt.tridal_get_playlist(file_contents,force,1);
-                tridal_oversigt.clean_tridal_oversigt();
+                clean_tridal_oversigt();
                 loaded_antal++;
               }
               fclose(json_file);
@@ -776,12 +785,12 @@ int tridal_class::tridal_get_user_playlists(bool force,int startoffset) {
           tridal_playlistantal_loaded+=startoffset;
           // next loop
           // 50 is loaded on each loop until end
-          if ((startoffset+50)<tridal_oversigt.tridal_playlist_antal) {
+          if ((startoffset+50)<tridal_playlist_antal) {
             startoffset+=50;
           } else {
-            startoffset=tridal_oversigt.tridal_playlist_antal-startoffset;
+            startoffset=tridal_playlist_antal-startoffset;
           }
-          if (tridal_playlistantal_loaded>=tridal_oversigt.tridal_playlist_antal) tidalplaylistloader_done=true;
+          if (tridal_playlistantal_loaded>=tridal_playlist_antal) tidalplaylistloader_done=true;
         }
         if (remove("tidal_users_playlist.txt")!=0) fprintf(stdout,"Error remove user playlist file tidal_users_playlist.txt\n");
         // save data to mysql db
@@ -954,7 +963,7 @@ int tridal_class::tridal_resume_play() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/play";
@@ -1028,7 +1037,7 @@ int tridal_class::tridal_last_play2() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/last";
@@ -1103,7 +1112,7 @@ int tridal_class::tridal_next_play2() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/next";
@@ -1170,7 +1179,7 @@ int tridal_class::tridal_play_now_playlist(char *playlist_song,bool now) {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/play?device_id=";
@@ -1238,7 +1247,7 @@ int tridal_class::tridal_play_now_song(char *playlist_song,bool now) {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/play?device_id=";
@@ -1304,7 +1313,7 @@ int tridal_class::tridal_play_now_artist(char *playlist_song,bool now) {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/play?device_id=";
@@ -1372,7 +1381,7 @@ int tridal_class::tridal_play_now_album(char *playlist_song,bool now) {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me/player/play?device_id=";
@@ -1431,7 +1440,7 @@ int tridal_class::tridal_get_user_id() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=tridal_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
   url="https://api.tidal.com/v1/me";
@@ -2401,7 +2410,7 @@ void tridal_class::show_tridal_oversigt(GLuint normal_icon,GLuint song_icon,GLui
     if (this->search_loaded) {
       this->search_loaded=false;
       printf("Searech loaded done. Loading icons\n");
-      tridal_oversigt.load_tridal_iconoversigt();                       // load icons
+      load_tridal_iconoversigt();                       // load icons
     }
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
@@ -2672,7 +2681,7 @@ void tridal_class::show_tridal_search_oversigt(GLuint normal_icon,GLuint song_ic
     if (this->search_loaded) {
       this->search_loaded=false;
       printf("Search loaded done. Loading icons\n");
-      tridal_oversigt.load_tridal_iconoversigt();                       // load icons
+      load_tridal_iconoversigt();                       // load icons
     }
     // draw icons
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {

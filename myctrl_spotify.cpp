@@ -502,7 +502,7 @@ int spotify_class::spotify_refresh_token2() {
   if ((curl) && (strcmp(spotifytoken_refresh,"")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);                // spotify code
     curl_easy_setopt(curl, CURLOPT_PASSWORD, spotify_secret_id);
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
