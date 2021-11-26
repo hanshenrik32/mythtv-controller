@@ -36,7 +36,7 @@
 
 // if defined the support will be enabled
 
-//#define ENABLE_TIDAL
+#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
 
@@ -152,7 +152,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 
 // tidal music class
 #ifdef ENABLE_TIDAL
-  tridal_class *tridal_oversigt;
+  tidal_class *tidal_oversigt;
 #endif
 
 char debuglogdata[1024];                                  // used by log system
@@ -279,6 +279,7 @@ int spotify_key_selected=1;                                 // default music sel
 bool ask_open_dir_or_play = false;                        // ask open dir or play it ?
 bool ask_open_dir_or_play_aopen = false;                  // auto open dir
 bool ask_open_dir_or_play_spotify = false;                //
+bool ask_open_dir_or_play_tidal = false;                //
 bool do_swing_music_cover = true;                         // default swing music cover
 int music_selected_iconnr=0;                              // default valgt icon i music oversigt
 float _angle=0.00;                                        // bruges af 3d screen saver
@@ -320,6 +321,7 @@ bool vis_recorded_oversigt = false;                       // vis recorded oversi
 bool vis_tv_oversigt = false;                             // vis tv oversigt
 bool vis_radio_oversigt = false;                          // vis radio player
 bool vis_spotify_oversigt = false;                        // vis spotify player
+bool vis_tidal_oversigt = false;                          // vis tidal player if supported and enabled
 bool vis_old_recorded = false;                            //
 bool vis_tvrec_list = false;                              // show tv program need record
 bool saver_irq = false;                                   // er screen saver aktiv
@@ -346,6 +348,7 @@ bool do_show_tvgraber = false;                            // show tv graber/chan
 bool do_show_rss = false;                                 // show rss config
 bool use3deffect = false;                                 // use 3d scroll effect default no
 bool do_zoom_music_cover = false;                         // show music conver
+bool do_zoom_tidal = false;                               //
 bool do_zoom_radio = false;                               //
 bool do_zoom_spotify_cover = false;                       // show spotify cover
 bool do_zoom_stream = false;                              //
@@ -370,6 +373,7 @@ int sknapnr=0;                                            // stream button
 int mknapnr=0;                                            // music
 int tvknapnr=0;                                           // tv
 int spotifyknapnr=1;                                      // spotify
+int tidalknapnr=1;                                        // tidal support
 int fknapnr=0;                                            // movie
 int swknapnr=0;                                           //
 
@@ -422,6 +426,7 @@ bool global_use_internal_music_loader_system = false;     // use internal db for
 bool ask_tv_record = false;
 bool do_play_radio = false;
 bool do_play_spotify = false;
+bool do_play_tidal = false;
 GLint ctx, myFont;
 bool do_swing_movie_cover = false;                        // do anim
 bool vis_nyefilm_oversigt = true;                         // start med at vise nye film
@@ -712,6 +717,7 @@ GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
 GLuint radiooptions;                      //
 GLuint radiobutton;                       //
+GLuint tidalbutton;                       //
 GLuint spotifybutton;                     //
 GLuint spotify_askplay;                   //
 GLuint spotify_askopen;                   //
@@ -759,6 +765,7 @@ GLuint _texturesetupfont;                   //
 GLuint _texturekeyssetup;                   //
 GLuint _texturekeysrss;                     //
 GLuint _texturespotify;
+GLuint _texturetidal;
 GLuint spotify_icon_border;                 // spotify border icon for spotify icon
 GLuint _texturevideoplayersetup;            //
 GLuint _texturetvgrabersetup;               //
@@ -1457,6 +1464,7 @@ void load_config(char * filename) {
         fputs("streamfontsize=18\n",file);
         fputs("moviefontsize=18\n",file);
         fputs("spotifydefaultdevice=\n",file);
+        fputs("tidaldefaultdevice=\n",file);
         fclose(file);
       } else {
         fprintf(stderr,"Config file not writeble ");
@@ -2979,16 +2987,18 @@ void display() {
       iconspacey = 192;
     }
     // vis menu **********************************************************************
+    // main menu
     if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
-        // tv icon
+        //
         glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
         // tv icon or play info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt)|| (vis_spotify_oversigt)) {
-          glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show musicplay info
+        // play info icon
+        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
+          glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show music/radio/film/stream/spotify play info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -3031,7 +3041,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
         //film icon or pil up
-        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
+        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
           glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3123,7 +3133,7 @@ void display() {
           glEnd();
         }
         // exit button
-        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
+        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
           glBindTexture(GL_TEXTURE_2D, _textureexit);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3137,8 +3147,10 @@ void display() {
         }
         glPopMatrix();
     }
-    // radio stuf
+    // radio stuf / music / spotyfi / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
+      // Show tidal and spotify icons
+      #ifndef ENABLE_TIDAL
       // img radio button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, radiobutton);
@@ -3184,6 +3196,77 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+0, 0.0);
       glEnd();
       glPopMatrix();
+
+      #else
+
+      // img radio button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, radiobutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(80);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+0, 0.0);
+      glEnd();
+      glPopMatrix();
+      // img music button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, musicbutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(81);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+0, 0.0);
+      glEnd();
+      glPopMatrix();
+
+      // img spotify button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, spotifybutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(82);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+0, 0.0);
+      glEnd();
+
+      glPopMatrix();
+      // img tidal button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, tidalbutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(83);
+      glBegin(GL_QUADS);
+
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+0, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+200, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+0, 0.0);
+
+
+      glEnd();
+      glPopMatrix();
+
+
+      #endif
     }
 
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
@@ -3393,7 +3476,9 @@ void display() {
         if (do_select_device_to_play) {
           spotify_oversigt.select_device_to_play();
         }
-
+      } else if (vis_tidal_oversigt) {
+        // show Tidal overview
+        if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -3923,6 +4008,79 @@ void display() {
         glPopMatrix();
       }
     }
+
+
+
+
+
+
+
+
+    //
+    // tidal ask play or open playlist
+    //
+    if ((vis_tidal_oversigt) && (!(visur)) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
+      xof = 550;
+      yof = 500;
+      buttonsize = 200;
+      // ***************************************************************** play icon
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBindTexture(GL_TEXTURE_2D, spotify_askplay);						// texture9
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(20);                      				  // play icon nr
+      glBegin(GL_QUADS); // draw ask box
+      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+328-80, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+651-80, yof+328-80 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
+      glEnd();
+      glPopMatrix();
+      // if playlist or artist you can open it else only show play
+
+      if ((tidal_oversigt->get_tidal_type(tidalknapnr)==0) || (tidal_oversigt->get_tidal_type(tidalknapnr)==2)) {
+        // ***************************************************************** open icon
+        xof=550;
+        yof=200;
+        buttonsize=100;
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, spotify_askopen);						// texture9
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(21);                      				  // play icon nr
+        glBegin(GL_QUADS); // draw ask box
+        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof,yof+328-80, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+651-80, yof+328-80 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
+        glEnd();
+        glPopMatrix();
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // start play radio station
     if (vis_radio_oversigt) {
@@ -7138,7 +7296,41 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_spotify_oversigt = true;                                          // show spotify overview
           vis_radio_or_music_oversigt = false;
         }
+        #if defined(ENABLE_TIDAL)
+        // tidal
+        if ((GLubyte) names[i*4+3]==83) {
+          fundet = true;
+          vis_music_oversigt = false;
+          vis_radio_oversigt = false;
+          vis_spotify_oversigt = false;
+          vis_tidal_oversigt = true;                                          // show tidal overview
+          vis_radio_or_music_oversigt = false;
+        }
+        #endif
       }
+      #if defined(ENABLE_TIDAL)
+      // kun til mus/touch skærm (tidal oversigt)
+      if ((vis_tidal_oversigt)  && (!(fundet))) {
+        if ((GLubyte) names[i*4+3]==23) {
+          if (debugmode & 8) fprintf(stderr,"scroll down\n");
+          returnfunc = 1;
+          fundet = true;
+        }
+        // scroll up
+        if ((GLubyte) names[i*4+3]==24) {
+          if (debugmode & 8) fprintf(stderr,"scroll up\n");
+          returnfunc = 2;
+          fundet = true;
+        }
+        // show close radio info (27 need to move) 27 now is global exit
+        if ((GLubyte) names[i*4+3]==27) {
+          if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
+          do_zoom_tidal =! do_zoom_tidal;
+          fundet = true;
+        }
+      }
+      #endif
+
       // kun til mus/touch skærm (spotify oversigt)
       // luk show play radio
       // scroll down
@@ -7518,6 +7710,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (vis_spotify_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d\n",spotifyknapnr-1);
                 }
+                #ifdef ENABLE_TIDAL
+                if (vis_tidal_oversigt) {
+                  if (debugmode & 8) fprintf(stderr,"tidalknapnr = %d\n",tidalknapnr-1);
+                }
+                #endif
                 if (vis_stream_oversigt) {
                   if (debugmode & 4) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
                 }
@@ -14116,6 +14313,7 @@ void loadgfx() {
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
     spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
+    tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
@@ -14570,12 +14768,14 @@ int main(int argc, char** argv) {
     }
 
     #ifdef ENABLE_TIDAL
-    tridal_oversigt = new tridal_class;
-    tridal_oversigt->tridal_login_token();
+    tidal_oversigt = new tidal_class;
+    tidal_oversigt->tidal_login_token();
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
+
+
 
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
@@ -14729,6 +14929,9 @@ int main(int argc, char** argv) {
     if ((argc>1) && (strcmp(argv[1],"-f")==0)) vis_film_oversigt = true;
     if ((argc>1) && (strcmp(argv[1],"-s")==0)) vis_stream_oversigt = true;
     if ((argc>1) && (strcmp(argv[1],"-y")==0)) vis_spotify_oversigt = true;
+    #ifdef ENABLE_TIDAL
+    if ((argc>1) && (strcmp(argv[1],"-t")==0)) vis_tidal_oversigt = true;
+    #endif
     // select font from configfile (/etc/mythtv-controller.conf)
     aktivfont.selectfont(configfontname);
     printf("\nHardware           %s\n",(char *)glGetString(GL_RENDERER));                         // Display Renderer
