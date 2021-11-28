@@ -4066,20 +4066,7 @@ void display() {
         glEnd();
         glPopMatrix();
       }
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // start play radio station
@@ -14769,7 +14756,7 @@ int main(int argc, char** argv) {
 
     #ifdef ENABLE_TIDAL
     tidal_oversigt = new tidal_class;
-    tidal_oversigt->tidal_login_token();
+    tidal_oversigt->tidal_login_token2();
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");

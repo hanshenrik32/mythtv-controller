@@ -86,6 +86,8 @@ class tidal_class {
         bool tidal_update_loaded_begin;
         //
         char tidaltoken[512];                                                 // access_token
+        char tidaltoken2[512];                                                 // access_token2
+        char countryCode[512];                                                //        
         char tidaltoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal playlist in view
@@ -192,6 +194,9 @@ class tidal_class {
         int tidal_play_playlist(char *playlist);                               // play playlist
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
+
+        void gettoken();
+
 };
 
 

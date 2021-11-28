@@ -289,13 +289,13 @@ int tidal_class::tidal_login_token2() {
 //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
   // org
   try {
-    sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=emailadresse&password=passwordhere > tidal_access_token.txt");
+    sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=hanshenrik32@gmail.com&password=o60LbQGXJi5y > tidal_access_token.txt");
     int curl_error=system(sql);
     if (curl_error==0) {
       //curl_error=system(sed);
       if (curl_error==0) {
       }
-      //fprintf(stdout,"\n******** Got token ********\n");
+      fprintf(stdout,"\n******** Got token ********\n");
     }
   }
   catch (...) {
@@ -303,6 +303,45 @@ int tidal_class::tidal_login_token2() {
   }
 }
 
+
+// ************************************************************************************************************************
+// new code
+//
+// https://github.com/Frikilinux/tidal-dl-test/blob/2ed222f6e4f7f082345442a25fc1b399d8929879/TIDALDL-PY/tidal_dl/tidal.py
+// ************************************************************************************************************************
+
+
+
+void checkAuthStatus() {
+  char *data[12]={"clientid","device_code","grant_type"};
+  // authurl = https://auth.tidal.com/v1/oauth2
+  // URL =  https://api.tidalhifi.com/v1/
+  // # known API key for Fire Stick HD(MQA, Dolby Vision enabled)
+  // __API_KEY__ = {'clientId': 'aR7gUaTK1ihpXOEP', 'clientSecret': 'eVWBEkuL2FCjxgjOkR3yK0RYZEbcrMXRc2l8fU3ZCdE='}
+
+  //open(authurl+/token , data , clienttd, client secrect)
+  // if status = 200 ok
+  // if auth is ok
+  // userid
+  // countryCode
+  // access_token
+  // refresh_token
+  // expires_in
+}
+
+void verifyAccessToken() {
+  char *header[50]={"authorization: Bearer {}.format(accessToken"};
+  //open("https://api.tidal.com/v1/sessions" , data , clienttd, client secrect)
+  // if status = 200 ok
+}
+
+void tidal_class::gettoken() {
+  //get tidaltoken
+  // msg = requests.get( "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json", timeout=(20.05, 27.05))
+  // will return json
+  strcpy(tidaltoken,"wc8j_yBJd20zOmx0");
+  strcpy(tidaltoken2,"_DSTon1kC8pABnTw");
+}
 
 
 // *********************************************************************************************************************************
