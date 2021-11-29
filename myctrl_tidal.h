@@ -87,7 +87,7 @@ class tidal_class {
         //
         char tidaltoken[512];                                                 // access_token
         char tidaltoken2[512];                                                 // access_token2
-        char countryCode[512];                                                //        
+        char countryCode[512];                                                //
         char tidaltoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal playlist in view
@@ -133,7 +133,7 @@ class tidal_class {
         // used by webserver
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
-        struct mg_connection *c;                                                // connection struct
+        struct mg_connection *connection;                                    // connection struct
         // end webserver
         int load_tidal_iconoversigt();			                                    // load web gfx in to cache dir
         // in use
@@ -196,6 +196,11 @@ class tidal_class {
         void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
         void gettoken();
+
+
+        // web port
+        const char *s_http_port = "8002";
+        struct mg_serve_http_opts s_http_server_opts;
 
 };
 

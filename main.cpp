@@ -14788,8 +14788,7 @@ int main(int argc, char** argv) {
         fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc1);
         exit(-1);
       }
-    }
-    if (strncmp(configbackend,"mythtv",5)==0) {
+    } else if (strncmp(configbackend,"mythtv",5)==0) {
       // music loader
       if (configmythtvver>=0) {
         pthread_t loaderthread;

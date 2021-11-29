@@ -36,8 +36,8 @@
 #include "myctrl_tidal.h"
 
 // web port
-static const char *s_http_port = "8000";
-static struct mg_serve_http_opts s_http_server_opts;
+//static const char *s_http_port = "8002";
+//static struct mg_serve_http_opts s_http_server_opts;
 
 extern tidal_class tidal_oversigt;
 
@@ -122,6 +122,150 @@ extern bool stream_loadergfx_started_break;
 
 // ****************************************************************************************
 //
+// web server handler (internal function)
+//
+// ****************************************************************************************
+
+static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+  const char *p;
+  const char *pspace;
+  int n=0;
+  char user_token[1024];
+  char sql[2048];
+  struct http_message *hm = (struct http_message *) ev_data;
+  struct mg_serve_http_opts opts;
+  int curl_error;
+  char* file_contents=NULL;
+  size_t len;
+  int error;
+  FILE *tokenfile;
+  char *base64_code;
+  char data[512];
+  char token_string[512];
+  char token_refresh[512];
+  unsigned int codel;
+  strcpy(data,"");                                                            // clientid
+  strcat(data,":");
+  strcat(data,"");                                                            // secretid
+  char sed[]="cat tidal_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > tidal_access_token2.txt";
+  //calc base64
+  base64_code=b64_encode((const unsigned char *) data, 65);
+  *(base64_code+88)='\0';
+  switch (ev) {
+    case MG_EV_HTTP_REQUEST:
+      // Invoked when the full HTTP request is in the buffer (including body).
+      // from tidal servers
+      // is callback call
+      if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
+        if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
+        p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
+        // get sptify code from server
+        if (p) {
+          pspace=strchr(p,' ');
+          if (pspace) {
+            codel=(pspace-p);
+            strncpy(user_token,p+5,pspace-p);
+            *(user_token+(pspace-p))='\0';
+          }
+          user_token[codel-4]='\0';
+        }
+        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id,tidal_oversigt.tidal_secret_id);
+        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code);
+        //printf("sql curl : %s \n ",sql);
+        curl_error=system(sql);
+        if (curl_error==0) {
+          curl_error=system(sed);
+          if (curl_error==0) {
+          }
+          write_logfile((char *) "******** Got tidal token ********");
+          tokenfile=fopen("tidal_access_token2.txt","r");
+          error=getline(&file_contents,&len,tokenfile);
+          strcpy(token_string,file_contents);
+          token_string[strlen(token_string)-1]='\0';
+          error=getline(&file_contents,&len,tokenfile);
+          strcpy(token_refresh,file_contents);
+          token_refresh[strlen(token_refresh)-1]='\0';
+//          printf("token     %s\n",token_string);
+//          printf("ref token %s\n",token_refresh);
+          //  tidal_oversigt.tidal_set_token(token_string,token_refresh);   // save it for later use
+          fclose(tokenfile);
+          free(file_contents);
+          if (strcmp(token_string,"")!=0) {
+            //tidal_oversigt.tidal_get_user_id();                                   // get user id
+            //tidal_oversigt.active_tidal_device=tidal_oversigt.tidal_get_available_devices();
+            // set default tidal device if none
+            //if (tidal_oversigt.active_tidal_device==-1) tidal_oversigt.active_tidal_device=0;
+          }
+        }
+        //c->flags |= MG_F_SEND_AND_CLOSE;
+        mg_serve_http(c, (struct http_message *) ev_data, tidal_oversigt.s_http_server_opts);  /* Serve static content */
+      } else {
+        // else show normal indhold
+        memset(&opts, 0, sizeof(opts));
+        opts.document_root = ".";       // Serve files from the current directory
+        mg_serve_http(c, (struct http_message *) ev_data, tidal_oversigt.s_http_server_opts);
+      }
+      // We have received an HTTP request. Parsed request is contained in `hm`.
+      // Send HTTP reply to the client which shows full original request.
+      //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
+      //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
+      break;
+    case MG_EV_HTTP_REPLY:
+      fprintf(stdout,"***************************************** CALL BACK server reply ***************************************");
+      c->flags |= MG_F_CLOSE_IMMEDIATELY;
+      fwrite(hm->body.p, 1, hm->body.len, stdout);
+      putchar('\n');
+      break;
+    case MG_EV_CLOSE:
+      fprintf(stdout,"Server closed connection\n");
+  }
+}
+
+
+// ****************************************************************************************
+//
+// client handler
+// get JSON return from tidal
+//
+// ****************************************************************************************
+
+static int s_exit_flag = 0;
+//bool debug_json=false;
+
+
+static void tidal_ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
+  struct http_message *hm = (struct http_message *) ev_data;
+  int connect_status;
+  switch (ev) {
+      case MG_EV_CONNECT:
+        connect_status = *(int *) ev_data;
+        if (connect_status != 0) {
+          fprintf(stderr,"Error connecting %s\n", strerror(connect_status));
+          s_exit_flag = 1;
+        }
+        break;
+      case MG_EV_HTTP_REPLY:
+        fwrite(hm->message.p, 1, (int)hm->message.len, stdout);
+        fprintf(stdout,"Got reply client :\n%.*s\n", (int) hm->body.len, hm->body.p);
+        fprintf(stdout,"***************************************** CALL BACK **************************************************");
+        nc->flags |= MG_F_SEND_AND_CLOSE;
+        s_exit_flag = 1;
+        break;
+      case MG_EV_CLOSE:
+        if (s_exit_flag == 0) {
+          fprintf(stdout,"Server closed connection\n");
+          s_exit_flag = 1;
+        };
+        break;
+      default:
+        break;
+    }
+}
+
+
+
+// ****************************************************************************************
+//
 // Constructor tidal devices
 //
 // ****************************************************************************************
@@ -196,10 +340,10 @@ tidal_class::tidal_class() : antal(0) {
     type=0;
     searchtype=0;
     search_loaded=false;                                                        // load icobn gfx afload search is loaded done by thread.
-    tidal_aktiv_song_antal=0;                                                 //
+    tidal_aktiv_song_antal=0;                                                   //
     gfx_loaded=false;			                                                      // gfx loaded default false
-    tidal_is_playing=false;                                                   // is we playing any media
-    tidal_is_pause=false;                                                     // is player on pause
+    tidal_is_playing=false;                                                     // is we playing any media
+    tidal_is_pause=false;                                                       // is player on pause
     show_search_result=false;                                                   // are we showing search result in view
     antalplaylists=0;                                                           // antal playlists
     loaded_antal=0;                                                             // antal loaded
@@ -208,24 +352,24 @@ tidal_class::tidal_class() : antal(0) {
     int err = 0;
     strcpy(tidal_aktiv_song[0].release_date,"");
     // create web server
-//    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
+    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
-//    fprintf(stdout,"Starting web server on port %s\n", s_http_port);
-//    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                  // Create listening connection and add it to the event manager
-//    mg_set_protocol_http_websocket(this->c);                                  // make http protocol
+    fprintf(stdout,"Starting web server on port %s\n", s_http_port);            //
+    this->connection = mg_bind(&mgr, s_http_port, tidal_server_ev_handler);              // Create listening connection and add it to the event manager
+    mg_set_protocol_http_websocket(this->connection);                        // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-    active_tidal_device=-1;                                                    // active tidal device -1 = no dev is active
+    active_tidal_device=-1;                                                     // active tidal device -1 = no dev is active
     active_default_play_device=active_tidal_device;
-    aktiv_song_tidal_icon=0;                                                   //
+    aktiv_song_tidal_icon=0;                                                    //
     strcpy(tidaltoken,"");                                                      //
     strcpy(tidaltoken_refresh,"");                                              //
-    strcpy(tidal_client_id,"emailadresse");                           //
-    strcpy(tidal_secret_id,"");                                         //
+    strcpy(tidal_client_id,"emailadresse");                                     //
+    strcpy(tidal_secret_id,"");                                                 //
     strcpy(active_default_play_device_name,"");                                 // default device to play on
     strcpy(overview_show_band_name,"");                                         //
     strcpy(overview_show_cd_name,"");                                           //
-    tidal_device_antal=0;                                                      //
-    tidal_update_loaded_begin=false;                                           // true then we are update the stack data
+    tidal_device_antal=0;                                                       //
+    tidal_update_loaded_begin=false;                                            // true then we are update the stack data
 }
 
 // ****************************************************************************************
@@ -286,10 +430,10 @@ bool tidal_class::get_tidal_update_flag() {
 int tidal_class::tidal_login_token2() {
   char sql[1024];
   // https://api.tidalhifi.com/v1/login/username?token=kgsOOmYk3zShYrNP
-//sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+//sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id,tidal_oversigt.tidal_secret_id);
   // org
   try {
-    sprintf(sql,"curl -X POST  https://api.tidalhifi.com/v1/login/username?token=Imi5DLPIAVRmszdL&username=hanshenrik32@gmail.com&password=o60LbQGXJi5y > tidal_access_token.txt");
+    sprintf(sql,"curl -X POST 'https://api.tidalhifi.com/v1/login/username=hanshenrik32@gmail.com&password=o60LbQGXJi5y' > tidal_access_token.txt");
     int curl_error=system(sql);
     if (curl_error==0) {
       //curl_error=system(sed);
@@ -309,6 +453,16 @@ int tidal_class::tidal_login_token2() {
 //
 // https://github.com/Frikilinux/tidal-dl-test/blob/2ed222f6e4f7f082345442a25fc1b399d8929879/TIDALDL-PY/tidal_dl/tidal.py
 // ************************************************************************************************************************
+
+/*
+
+You have to store the token_type, session_id, access_token, and optionally the refresh_token from the session object after logging in, and then you can use them with the load_oauth_session() method later. I'm not fully sure how the expired tokens look yet, so you might want to use the expiry_time datetime object to check if the access token has expired, and use token_refresh() if it has.
+
+
+
+FWIW I was just able to log in to Tidal via a POST to https://api.tidalhifi.com/v1/login/username. I used this token: "GvFhCVAYp3n43EN3", which I believe is from the iOS app.
+
+*/
 
 
 
@@ -339,6 +493,7 @@ void tidal_class::gettoken() {
   //get tidaltoken
   // msg = requests.get( "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json", timeout=(20.05, 27.05))
   // will return json
+
   strcpy(tidaltoken,"wc8j_yBJd20zOmx0");
   strcpy(tidaltoken2,"_DSTon1kC8pABnTw");
 }
