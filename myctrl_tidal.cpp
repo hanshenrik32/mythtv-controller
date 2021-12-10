@@ -202,7 +202,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = ".";       // Serve files from the current directory
+        opts.document_root = "./tidal_web";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, tidal_oversigt.s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.
@@ -355,6 +355,7 @@ tidal_class::tidal_class() : antal(0) {
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
     fprintf(stdout,"Starting web server on port %s\n", s_http_port);            //
+    write_logfile((char *) "Starting web server on port 8002");
     this->connection = mg_bind(&mgr, s_http_port, tidal_server_ev_handler);              // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->connection);                        // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
