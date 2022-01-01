@@ -380,9 +380,9 @@ tidal_class::tidal_class() : antal(0) {
 // ****************************************************************************************
 
 tidal_class::~tidal_class() {
-    //mg_mgr_free(&mgr);                        // delete web server again
-    //mg_mgr_free(&client_mgr);                 // delete web client
-    clean_tidal_oversigt();                 // clean tidal class
+  mg_mgr_free(&mgr);                        // delete web server again
+  mg_mgr_free(&client_mgr);                 // delete web client
+  clean_tidal_oversigt();                 // clean tidal class
 }
 
 
@@ -449,6 +449,104 @@ int tidal_class::tidal_login_token2() {
 }
 
 
+// In use
+
+int tidal_class::tidal_login() {
+  static char tidaltoken_refresh[200];
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[2048];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(newtoken,"");
+
+  strcpy(tidaltoken_refresh,"abc");
+  curl = curl_easy_init();
+  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+
+    printf("Tidal login ..\n");
+    // tidal_client_id
+    // tidal_secret_id
+
+    // add userinfo + basic auth
+    //curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    //curl_easy_setopt(curl, CURLOPT_USERNAME, "OmDtrzFgyVVL6uW56OnFA2COiabqm");
+    //curl_easy_setopt(curl, CURLOPT_PASSWORD, "zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8");
+
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //
+    //curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2");          // /login/username
+
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/login/username");          // /login/username  https://api.tidalhifi.com/v1/login/
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "TIDAL_ANDROID/686 okhttp/3.3.1");
+
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "X-Tidal-Token kgsOOmYk3zShYrNP");
+    //chunk = curl_slist_append(chunk, base64_code);
+    errbuf[0] = 0;
+    // set type post
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
+    //strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+
+    sprintf(post_playlist_data,"username=hanshenrik32@gmail.com&password=o60LbQGXJi5y");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {                                                       // check if ok
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      fprintf(stdout,"tidal new token. \n");
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",(int) response_string.length());
+    } else if (httpCode == 405) {
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",(int) response_string.length());
+    } else {
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
+      printf("%s \n", response_string.c_str());
+    }
+    // always cleanup
+    printf("End curl login call.*******************\n");
+    curl_easy_cleanup(curl);
+  }
+  return(httpCode);
+}
+
+
 // ************************************************************************************************************************
 // new code
 //
@@ -484,17 +582,25 @@ void checkAuthStatus() {
   // expires_in
 }
 
+
+
 void verifyAccessToken() {
   char *header[50]={"authorization: Bearer {}.format(accessToken"};
   //open("https://api.tidal.com/v1/sessions" , data , clienttd, client secrect)
   // if status = 200 ok
 }
 
+
+
+// ***************************************************************************************************
+// first call this function
+// ***************************************************************************************************
+
+
 void tidal_class::gettoken() {
   //get tidaltoken
   // msg = requests.get( "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json", timeout=(20.05, 27.05))
   // will return json
-
   strcpy(tidaltoken,"wc8j_yBJd20zOmx0");
   strcpy(tidaltoken2,"_DSTon1kC8pABnTw");
 }
@@ -510,7 +616,8 @@ void tidal_class::gettoken() {
 // 3. https://listen.tidal.com/login
 // 4. https://api.tidal.com/v1       - aktiv
 //
-// ********************************************************************************************
+
+
 
 int tidal_class::tidal_login_token() {
   static char tidaltoken_refresh[200];
@@ -549,10 +656,9 @@ int tidal_class::tidal_login_token() {
     //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
-
     //curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2");          // /login/username
 
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidalhifi.com/v1/login");          // /login/username  https://api.tidalhifi.com/v1/login/
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2");          // /login/username  https://api.tidalhifi.com/v1/login/
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -561,7 +667,7 @@ int tidal_class::tidal_login_token() {
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "TIDAL_ANDROID/686 okhttp/3.3.1");
 
     /* Add a custom header */
-    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //chunk = curl_slist_append(chunk, base64_code);
     errbuf[0] = 0;
@@ -617,6 +723,125 @@ int tidal_class::tidal_login_token() {
   }
   return(httpCode);
 }
+
+
+
+
+
+// ***********************************************************************
+// check auth Status
+//
+
+
+int tidal_class::tidal_check_auth_status() {
+  static char tidaltoken_refresh[200];
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[2048];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(newtoken,"");
+
+  strcpy(tidaltoken_refresh,"abc");
+  curl = curl_easy_init();
+  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+
+    printf("login tidal ..**************************\n");
+    // tidal_client_id
+    // tidal_secret_id
+
+    // add userinfo + basic auth
+    //curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    //curl_easy_setopt(curl, CURLOPT_USERNAME, "OmDtrzFgyVVL6uW56OnFA2COiabqm");
+    //curl_easy_setopt(curl, CURLOPT_PASSWORD, "zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8");
+
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //
+    //curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2");          // /login/username
+
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");          // /login/username  https://api.tidalhifi.com/v1/login/
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "TIDAL_ANDROID/686 okhttp/3.3.1");
+
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //chunk = curl_slist_append(chunk, base64_code);
+    errbuf[0] = 0;
+    // set type post
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
+    //strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+
+    sprintf(post_playlist_data,"username=hanshenrik32@gmail.com&password=o60LbQGXJi5y");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {                                                       // check if ok
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      fprintf(stdout,"tidal new token. \n");
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",(int) response_string.length());
+
+      /*
+      if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
+        strncpy(newtoken,response_string.c_str()+17,180);
+        newtoken[181]='\0';
+        fprintf(stdout,"Token valid.\n");
+        strcpy(tidaltoken,newtoken);                                         // update tidal token
+      }
+      */
+    } else if (httpCode == 405) {
+      printf("%s \n", response_string.c_str());
+      printf("resp length %d \n",(int) response_string.length());
+    } else {
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      //if (strstr(response_string,"token")) fprintf(stderr,"Error Missing token.\n");
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
+      printf("%s \n", response_string.c_str());
+    }
+    // always cleanup
+    printf("End curl login call.*******************\n");
+    curl_easy_cleanup(curl);
+  }
+  return(httpCode);
+}
+
+
+
+
+
 
 
 // *****************************************************************************

@@ -110,10 +110,10 @@ class tidal_class {
         bool search_tidal_online_done;
         bool show_search_result;                                                // are ew showing search result in tidal view ?
         bool search_playlist_song;                                              // search type 1 for song 0 for playlist
-        char tidal_client_id[255];                                            // Client id
-        char tidal_secret_id[255];                                            // Secret id
-        GLuint aktiv_song_tidal_icon;                                         // loaded gfx info for playing
-        int active_tidal_device;                                              // active device then get tidal devices or -1
+        char tidal_client_id[255];                                              // Client id
+        char tidal_secret_id[255];                                              // Secret id
+        GLuint aktiv_song_tidal_icon;                                           // loaded gfx info for playing
+        int active_tidal_device;                                                // active device then get tidal devices or -1
         int active_default_play_device;                                         // active device or -1
         char active_default_play_device_name[256];                              // active device name
         char tidal_playlistname[256];
@@ -124,16 +124,16 @@ class tidal_class {
         void set_texture(int nr,GLuint idtexture);                              // set texture
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      // NOT in use
         bool startup_loaded;					                                          // load stream icons statios list
-        bool tidal_oversigt_loaded;                                           //
-        int tidal_oversigt_loaded_nr;                                         //
-        int tidal_oversigt_nowloading;				                                // denne tæller op når der loades gfx
+        bool tidal_oversigt_loaded;                                             //
+        int tidal_oversigt_loaded_nr;                                           //
+        int tidal_oversigt_nowloading;				                                  // denne tæller op når der loades gfx
         int type;                                                               // 0 = playlist 1 = songs 2 = Artist 3 =
         int searchtype;                                                         // 0 = artist, 1 = album, 2 = playlits, 3 = track
         int get_antal_rss_feeds_sources(MYSQL *conn);                           // get # of rss feeds from db
         // used by webserver
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
-        struct mg_connection *connection;                                    // connection struct
+        struct mg_connection *connection;                                       // connection struct
         // end webserver
         int load_tidal_iconoversigt();			                                    // load web gfx in to cache dir
         // in use
@@ -196,6 +196,8 @@ class tidal_class {
         void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
         void gettoken();
+        int tidal_check_auth_status();
+        int tidal_login();
 
 
         // web port
