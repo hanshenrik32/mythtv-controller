@@ -198,6 +198,7 @@ class tidal_class {
         void gettoken();
         int tidal_check_auth_status();
         int tidal_login();
+        int start_webserver();
 
 
         // web port

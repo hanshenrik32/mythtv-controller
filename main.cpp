@@ -14829,7 +14829,10 @@ int main(int argc, char** argv) {
 
     #ifdef ENABLE_TIDAL
     tidal_oversigt = new tidal_class;
-    tidal_oversigt->tidal_login();
+    if (tidal_oversigt) {
+      //tidal_oversigt->start_webserver();
+      //tidal_oversigt->tidal_login();
+    }
     //tidal_oversigt->tidal_login_token();
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();

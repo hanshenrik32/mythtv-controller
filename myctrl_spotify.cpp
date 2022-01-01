@@ -350,13 +350,6 @@ spotify_class::spotify_class() : antal(0) {
     int port_cnt, n;
     int err = 0;
     strcpy(spotify_aktiv_song[0].release_date,"");
-    // create web server
-    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
-    // start web server
-    write_logfile((char *) "Starting web server on port 80");
-    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
-    mg_set_protocol_http_websocket(this->c);                                    // make http protocol
-    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
     active_default_play_device=active_spotify_device;
     aktiv_song_spotify_icon=0;                                                  //
@@ -371,6 +364,7 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
     spotify_update_loaded_begin=false;                                          // true then we are update the stack data
+    start_webserver();
 }
 
 // ****************************************************************************************
@@ -384,6 +378,26 @@ spotify_class::~spotify_class() {
     mg_mgr_free(&client_mgr);                 // delete web client
     clean_spotify_oversigt();                 // clean spotify class
 }
+
+
+
+
+// ****************************************************************************************
+//
+// Start spotify web server
+//
+// ****************************************************************************************
+
+int spotify_class::start_webserver() {
+  // create web server
+  mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
+  // start web server
+  write_logfile((char *) "Starting web server on port 80");
+  this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
+  mg_set_protocol_http_websocket(this->c);                                    // make http protocol
+  //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
+}
+
 
 
 // ****************************************************************************************

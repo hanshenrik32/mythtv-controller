@@ -36,7 +36,7 @@
 #include "myctrl_tidal.h"
 
 // web port
-//static const char *s_http_port = "8002";
+static const char *ss_http_port = "8002";
 //static struct mg_serve_http_opts s_http_server_opts;
 
 extern tidal_class tidal_oversigt;
@@ -351,14 +351,6 @@ tidal_class::tidal_class() : antal(0) {
     int port_cnt, n;
     int err = 0;
     strcpy(tidal_aktiv_song[0].release_date,"");
-    // create web server
-    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
-    // start web server
-    fprintf(stdout,"Starting web server on port %s\n", s_http_port);            //
-    write_logfile((char *) "Starting web server on port 8002");
-    this->connection = mg_bind(&mgr, s_http_port, tidal_server_ev_handler);              // Create listening connection and add it to the event manager
-    mg_set_protocol_http_websocket(this->connection);                        // make http protocol
-    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_tidal_device=-1;                                                     // active tidal device -1 = no dev is active
     active_default_play_device=active_tidal_device;
     aktiv_song_tidal_icon=0;                                                    //
@@ -371,7 +363,9 @@ tidal_class::tidal_class() : antal(0) {
     strcpy(overview_show_cd_name,"");                                           //
     tidal_device_antal=0;                                                       //
     tidal_update_loaded_begin=false;                                            // true then we are update the stack data
+    start_webserver();
 }
+
 
 // ****************************************************************************************
 //
@@ -386,6 +380,27 @@ tidal_class::~tidal_class() {
 }
 
 
+// ****************************************************************************************
+//
+// Tidal web server for login and token
+//
+// ****************************************************************************************
+
+
+int tidal_class::start_webserver() {
+  // create web server
+  mg_mgr_init(&mgr, NULL);                                                      // Initialize event manager object
+  // start web server
+  fprintf(stdout,"Starting web server on port %s\n", ss_http_port);             //
+  write_logfile((char *) "Starting Tidal web server on port 8002");             //
+  this->connection = mg_bind(&mgr, ss_http_port, tidal_server_ev_handler);      // Create listening connection and add it to the event manager
+  if (this->connection) {
+    mg_set_protocol_http_websocket(this->connection);                           // make http protocol
+  } else {
+    write_logfile((char *) "Error starting Tidal web server on port 8002");     //
+  }
+  //mg_connect_http(&mgr, tidal_ev_handler, "", NULL, NULL);
+}
 
 // ****************************************************************************************
 // file writer
