@@ -2568,6 +2568,7 @@ void display() {
                           0.8,0.1,0.1};
 
 
+    static int barantal=45;
     struct timeb tb;
     struct tm* t;
     float clockVol=1000.0f, angle1min = M_PI / 30.0f,  minStart=4.9f,minEnd=5.0f, stepStart=4.8f,stepEnd=5.0f;
@@ -2871,6 +2872,7 @@ void display() {
         glRotatef(0.0f,0.0f,0.0f,0.0f);
         float high;
         xxofset = 40.0f;                            // start ofset
+        static int barantal=45;
         for(int xp=0;xp<45;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
@@ -3491,7 +3493,9 @@ void display() {
       #endif
       if (vis_tidal_oversigt) {
         // show Tidal overview
+        #ifdef ENABLE_TIDAL
         if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        #endif
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
@@ -4053,6 +4057,7 @@ void display() {
       glPopMatrix();
       // if playlist or artist you can open it else only show play
 
+      #ifdef ENABLE_TIDAL
       if ((tidal_oversigt->get_tidal_type(tidalknapnr)==0) || (tidal_oversigt->get_tidal_type(tidalknapnr)==2)) {
         // ***************************************************************** open icon
         xof=550;
@@ -4076,6 +4081,7 @@ void display() {
         glEnd();
         glPopMatrix();
       }
+      #endif
     }
 
 
