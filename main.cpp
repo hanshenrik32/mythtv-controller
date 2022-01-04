@@ -2919,7 +2919,7 @@ void display() {
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
           ypos = (-388)+((siz_y*(high*2))+2.0);
-          for(int yp=0;yp<1;yp++) {
+          for(auto yp=0;yp<1;yp++) {
             // front
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2942,7 +2942,7 @@ void display() {
           xpos = (-siz_x)*xxofset;
           ypos = (-432)+((siz_y*4)+2.0);
           high = sqrt(spectrum[xp]*4);
-          for(int yp=0;yp<high/2;yp++) {
+          for(auto yp=0;yp<high/2;yp++) {
             // front
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -4298,7 +4298,7 @@ void display() {
             if (debugmode & 2) fprintf(stderr,"Loading songs from id:%4d \n",do_play_music_aktiv_nr);
              // reset valgt liste
             bool eraktiv;
-            for(int t=0;t<dirmusic.numbersinlist();t++) {
+            for(auto t=0;t<dirmusic.numbersinlist();t++) {
               dirmusic.popsong(temptxt1,&eraktiv,t);
               do_play_music_aktiv_nr_select_array[t]=eraktiv;
             }
@@ -4873,7 +4873,7 @@ void display() {
       if ((y>0) && (ll>0)) {
         xxx = ((y/ll)*16);
       } else xxx=0;
-      for(int x=0;x<xxx;x++) {
+      for(auto x=0;x<xxx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
@@ -5396,7 +5396,7 @@ void display() {
       static bool build_frequencyOctaves=false;
       if (build_frequencyOctaves==false) {
         build_frequencyOctaves = true;
-        for(int zz=0;zz<sampleSize;zz++) {
+        for(auto zz=0;zz<sampleSize;zz++) {
           spectrum[zz] = 0.0f;
           spectrum_left[zz] = 0.0f;                                             // used for spectium
           spectrum_right[zz] = 0.0f;                                            // used for spectium

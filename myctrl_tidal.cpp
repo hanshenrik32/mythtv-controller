@@ -582,7 +582,7 @@ FWIW I was just able to log in to Tidal via a POST to https://api.tidalhifi.com/
 
 
 void checkAuthStatus() {
-  char *data[12]={"clientid","device_code","grant_type"};
+  //char *data[12]={"clientid","device_code","grant_type"};
   // authurl = https://auth.tidal.com/v1/oauth2
   // URL =  https://api.tidalhifi.com/v1/
   // # known API key for Fire Stick HD(MQA, Dolby Vision enabled)
