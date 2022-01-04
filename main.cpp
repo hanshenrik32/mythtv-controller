@@ -523,7 +523,8 @@ class dirmusictype {
     public:
         GLuint textureId;		             			// directorys texture
         int emtydirmusic() {
-            for(unsigned int i=0;i<listesize;i++) {			// reset all music info
+            // for(unsigned int i=0;i<listesize;i++) {			// reset all music info
+            for(auto i=0;i<listesize;i++) {			// reset all music info
               strcpy(songliste[i].name,"");
               songliste[i].songlength=0;
               strcpy(dirliste[i].dirname,"");
@@ -540,7 +541,8 @@ class dirmusictype {
             dirliste=new dirmusic_dirs_type[antal];
             songliste=new dirmusic_list_type[antal];
             emtydirmusic();
-            for(unsigned int i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
+            //for(unsigned int i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
+            for(auto i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
         }
 
         // destructor
@@ -1396,7 +1398,7 @@ void load_config(char * filename) {
     strcpy(confighostname,hostname);
     char *database = (char *) "mythconverg";			            // mythtv database name
     strcpy(configrecordpath,"");			                     		// default value (bliver fundet i mysql mythtv databasen)
-    for(i = 0; i < storagegroupantal; i++) {
+    for(auto i = 0; i < storagegroupantal; i++) {
       strcpy(configstoragerecord[i].path,"");
       strcpy(configstoragerecord[i].name,"");
     }
@@ -1416,7 +1418,7 @@ void load_config(char * filename) {
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
-    for(int t=0;t<12;t++) {
+    for(auto t=0;t<12;t++) {
       strcpy(configkeyslayout[t].cmdname,"");
       configkeyslayout[t].scrnr=0;
     }
@@ -1481,7 +1483,7 @@ void load_config(char * filename) {
     if (remoteHost) {
       addr_list = (struct in_addr **) remoteHost->h_addr_list;
       fprintf(stderr,"mediacenter server name is : %s\n", remoteHost->h_name);
-      for(i = 0; addr_list[i] != NULL; i++) {
+      for(auto i = 0; addr_list[i] != NULL; i++) {
         fprintf(stderr,"mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
       }
       strcpy(confighostname,hostname);
@@ -1492,7 +1494,7 @@ void load_config(char * filename) {
       if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
         fprintf(stderr,"Hostname : %s\n", remoteHost->h_name);
-        for(i = 0; addr_list[i] != NULL; i++) {
+        for(auto i = 0; addr_list[i] != NULL; i++) {
           fprintf(stderr,"Ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
         strcpy(confighostip,inet_ntoa(*addr_list[0]));
@@ -2568,6 +2570,7 @@ void display() {
                           0.8,0.1,0.1};
 
 
+
     static int barantal=45;
     struct timeb tb;
     struct tm* t;
@@ -2872,12 +2875,11 @@ void display() {
         glRotatef(0.0f,0.0f,0.0f,0.0f);
         float high;
         xxofset = 40.0f;                            // start ofset
-        static int barantal=45;
-        for(int xp=0;xp<45;xp++) {
+        for(int xp=0;xp<barantal;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
           high = sqrt(spectrum[xp]*8)*2;
-          for(int yp=0;yp<high;yp++) {
+          for(auto yp=0;yp<high;yp++) {
             // front
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1

@@ -170,7 +170,8 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
           user_token[codel-4]='\0';
         }
         //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id,tidal_oversigt.tidal_secret_id);
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code);
+        //old snprintf(sql,2045,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code);
+        snprintf(sql,2045,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id);
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
         if (curl_error==0) {
