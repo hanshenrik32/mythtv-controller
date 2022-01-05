@@ -1114,17 +1114,24 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+          // add to logfile
+          strcpy(temptxt,"Add playlist ");
+          strcat(temptxt,row[0]);
+          strcat(temptxt," Spotifyid ");
+          strcat(temptxt,row[1]);
+          write_logfile((char *) temptxt);
           if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
+            write_logfile("Error create playlist in db.");
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
         }
       }
-      write_logfile((char *) "process playlist done..");
+      write_logfile((char *) "Process playlist done..");
       mysql_close(conn);
     }
   }
   catch (...) {
-    write_logfile((char *) "Error process playlist");
+    write_logfile((char *) "Error process playlist from spotify.");
   }
   return(1);
 }

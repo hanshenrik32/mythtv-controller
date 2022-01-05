@@ -24,18 +24,44 @@ struct music_oversigt_type {
 };
 
 
+
 // class tempplate to music oversigt;
 // not in use for now.
 
-
-template <class T> class list {
+class music_oversigt_type1 {
   public:
-    list *insert(T val);
+    music_oversigt_type1 *insert();
   private:
-    list (T Linkalue,list * next);
-    T value;
-    list *ptrtonext;
+    unsigned int album_id;
+    unsigned int artist_id;
+    char album_name[256];			      // music name
+    int album_year;
+    unsigned int directory_id;			// dir id fra myth mysql database
+    unsigned int parent_id;         //
+    char album_coverfile[256];			// coverfilename
+    char album_path[256];	      		// path to cover
+    GLuint textureId;			        	// texture id hvis der findes en cover til musiken
+    char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
+    music_oversigt_type1 *ptrtonext;
 };
+
+
+class musicoversigt_class {
+  private:
+    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=2000;                                       // MAX cd er i oversigt
+    void clean_music_oversigt();
+    music_oversigt_type musicoversigt[100];
+  public:
+    int opdatere_music_oversigt_nodb();
+    int opdatere_music_oversigt(unsigned int directory_id);
+    int opdatere_music_oversigt_searchtxt1(char *searchtxt,int search_art);
+    int load_music_covergfx();
+    int save_music_oversigt_playlists(char *playlistname);
+    int load_music_oversigt_playlists(char *playlistname);
+    int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
+    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int music_key_selected);
+};
+
 
 
 // gfx loaded

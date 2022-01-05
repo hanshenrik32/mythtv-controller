@@ -34,6 +34,8 @@
 #include <pthread.h>                      // multi thread support
 
 
+using namespace std;
+
 // if defined the support will be enabled
 
 #define ENABLE_TIDAL
@@ -875,13 +877,11 @@ int hentmythtvver() {
 }
 
 
-// ********************************************************** sound system error handler
+// ********************************************************** sound system error handler for fmod
 
 
 #if defined USE_FMOD_MIXER
-
 // fmod error handler
-
 void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
   char file_path[1024];
   if (result != FMOD_OK) {
@@ -909,7 +909,7 @@ void ERRCHECK(FMOD_RESULT result,unsigned int songnr) {
 
 // ***********************************************************
 //
-// error handler
+// error handler sdl
 //
 // ***********************************************************
 
@@ -918,6 +918,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
     aktiv_playlist.m_play_playlist(file_path,songnr);
+    write_logfile("File play error :");
     fprintf(stderr,"File name %s error : %s\n",file_path,text);
   }
   vis_error=1;			// vis error
@@ -2571,6 +2572,8 @@ void display() {
 
 
 
+    clock_t start;
+
     static int barantal=45;
     struct timeb tb;
     struct tm* t;
@@ -2813,10 +2816,9 @@ void display() {
             mybox.loadboxpictures();
             _angle++;
             glPushMatrix();
-            std::clock_t start;
-            start = std::clock();
+            start = clock();
             mybox.show_music_3d(_angle,screensaverbox,screensaverbox,screensaverbox1);
-            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
             glPopMatrix();
             break;
         case SAVER3D2:
@@ -2825,17 +2827,17 @@ void display() {
             //glTranslatef(0.0f, 0.0f, -2.0f);
             //glEnable(GL_DEPTH_TEST);
             //glDisable(GL_BLEND);
-            start = std::clock();
+            start = clock();
             _angle++;
             mybox.settexture(musicoversigt);
             mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
-            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
             break;
         case PICTURE3D:
             // picture screen saver
-            start = std::clock();
+            start = clock();
             if (psaver==NULL) psaver=new picture_saver();
-            if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+            if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
             //glLoadIdentity();
             glPushMatrix();
             psaver->show_pictures();
@@ -3444,26 +3446,24 @@ void display() {
         }
       }
     }
-
-    std::clock_t start;
-    start = std::clock();
+    start = clock();
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
         show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_stream_oversigt) {
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_radio_oversigt) {
         radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
         // show radio options menu
@@ -3478,7 +3478,7 @@ void display() {
         } else {
           spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
         }
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
             // start webbroser to login on spotify
@@ -3502,7 +3502,7 @@ void display() {
         // show tv guide
         // take time on it
         aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -3513,12 +3513,12 @@ void display() {
           //aktivfont.selectfont(configfontname);
           aktiv_tv_oversigt.showandsetprginfo( tvvalgtrecordnr , tvsubvalgtrecordnr );
           glPopMatrix();
-          //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+          //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         }
         // show record program menu
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
 
       // show record tv programs in tv guide
@@ -3528,11 +3528,11 @@ void display() {
         aktiv_crecordlist.showtvreclist();
         write_logfile((char *) "show tv record wiew.");
         glPopMatrix();
-        //if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
     }
 
-    if (debugmode & 1) std::cout << "Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+    if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
 
     #ifdef ENABLE_SPOTIFY
     //firsttimespotifyupdate=true;
@@ -4035,6 +4035,7 @@ void display() {
     //
     // tidal ask play or open playlist
     //
+    #ifdef ENABLE_TIDAL
     if ((vis_tidal_oversigt) && (!(visur)) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
       xof = 550;
       yof = 500;
@@ -4058,8 +4059,6 @@ void display() {
       glEnd();
       glPopMatrix();
       // if playlist or artist you can open it else only show play
-
-      #ifdef ENABLE_TIDAL
       if ((tidal_oversigt->get_tidal_type(tidalknapnr)==0) || (tidal_oversigt->get_tidal_type(tidalknapnr)==2)) {
         // ***************************************************************** open icon
         xof=550;
@@ -4083,14 +4082,16 @@ void display() {
         glEnd();
         glPopMatrix();
       }
-      #endif
     }
+    #endif
 
 
     // start play radio station
+    // and stop old player of playing
     if (vis_radio_oversigt) {
       if ((do_play_radio) && (rknapnr>0) && (rknapnr<=radiooversigt.radioantal())) {
         // do we play now ?
+        // def code for FMOD and SDL MIXER
         #if defined USE_FMOD_MIXER
         if (snd) {
           // yes stop play
@@ -4098,16 +4099,18 @@ void display() {
           sound->release();                                                                       // stop last playing song
           dsp = 0;                                                                                  // reset uv
           ERRCHECK(result,0);
-          #if defined USE_SDL_MIXER
-          if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
-          sdlmusicplayer = NULL;
-          #endif
           snd = 0;                                // set play new flag
         }
         #endif
+        #if defined USE_SDL_MIXER
+        if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
+        sdlmusicplayer = NULL;
+        snd = 0;                                // set play new flag
+        #endif
+        write_logfile("Stop music player.");
         if (snd==0) {
           snd = 1;
-          sprintf(debuglogdata,"Play radio station nr %d url %s ",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
+          sprintf(debuglogdata,"Start play radio station nr %d url %s ",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
           write_logfile((char *) debuglogdata);
           if (snd == 0) {
               #if defined USE_FMOD_MIXER
@@ -9421,7 +9424,7 @@ void handlespeckeypress(int key,int x,int y) {
                     // jump to button of text
                     if (streamoversigt.antalstreams()>17) do_show_setup_select_linie=34; else do_show_setup_select_linie=0;
                     configrss_ofset=0;
-                    for(int i=configrss_ofset;i<3000-1;i++) {
+                    for(auto i=configrss_ofset;i<3000-1;i++) {
                       if (streamoversigt.get_stream_name(configrss_ofset)) {
                         configrss_ofset++;
                       }
