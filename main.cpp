@@ -667,6 +667,12 @@ wifinetdef wifinets;                            // wifi net class
 struct music_oversigt_type musicoversigt[MUSIC_OVERSIGT_TYPE_SIZE+1];
 
 // *************************************************************************************************
+
+// new music class
+
+musicoversigt_class musicoversigt1;
+
+// *************************************************************************************************
 // film oversigt type class
 film_oversigt_typem film_oversigt(FILM_OVERSIGT_TYPE_SIZE+1);
 
@@ -3452,6 +3458,7 @@ void display() {
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
         show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
+        //musicoversigt1.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,music_key_selected);
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
@@ -7981,7 +7988,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
               if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
                 // no update posible
-                fprintf(stderr,"No Music loaded/found by internal loader\n");
+                fprintf(stderr,"No Music loaded/found by internal loader.\n");
+                write_logfile("No Music loaded/found by internal loader.");
               }
             }
           }
@@ -13495,6 +13503,7 @@ void *datainfoloader_music(void *data) {
     // check if internal music db exist if yes do set global use it
     if (global_use_internal_music_loader_system_exist() == true) {
       if (debugmode % 2) fprintf(stderr,"******** Use global music database ********\n");
+      // set use global loader
       global_use_internal_music_loader_system = true;
     } else {
       if (debugmode & 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);

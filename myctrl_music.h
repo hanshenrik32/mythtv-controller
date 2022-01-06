@@ -25,13 +25,12 @@ struct music_oversigt_type {
 
 
 
-// class tempplate to music oversigt;
+// class for music oversigt;
 // not in use for now.
 
 class music_oversigt_type1 {
   public:
     music_oversigt_type1 *insert();
-  private:
     unsigned int album_id;
     unsigned int artist_id;
     char album_name[256];			      // music name
@@ -50,7 +49,7 @@ class musicoversigt_class {
   private:
     const unsigned int MAX_MUSIC_OVERSIGT_SIZE=2000;                                       // MAX cd er i oversigt
     void clean_music_oversigt();
-    music_oversigt_type musicoversigt[100];
+    music_oversigt_type1 musicoversigt[100];
   public:
     int opdatere_music_oversigt_nodb();
     int opdatere_music_oversigt(unsigned int directory_id);
@@ -61,7 +60,6 @@ class musicoversigt_class {
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
     void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int music_key_selected);
 };
-
 
 
 // gfx loaded

@@ -3372,6 +3372,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
   char artisid[1024];
   char filename[2048];
   char downloadfilenamelong[2048];
+  char debuglogdata[2048];
   int j;
   if (value == NULL) return;
   if (value->type != json_object) {
@@ -3420,7 +3421,10 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(downloadfilenamelong,"");
             // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
             // get name from url
-            if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
+            //if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
+            sprintf(debuglogdata,"# %d artist icon url found  : %s",antal,value->u.string.ptr);
+            write_logfile((char *) debuglogdata);
+
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3446,7 +3450,11 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
             stack[antal]->textureId=0;
             strcpy(downloadfilenamelong,"");
-            if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
+            //if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
+
+            sprintf(debuglogdata,"# %d artist icon url found  : %s",antal,value->u.string.ptr);
+            write_logfile((char *) debuglogdata);
+
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3792,9 +3800,12 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 // ****************************************************************************************
 
 void *load_spotify_web(void *data) {
-  if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
+  //if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
+  write_logfile("Start spotify loader thread");
+
   //streamoversigt.loadweb_stream_iconoversigt();
-  if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");
+  //if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");
+  write_logfile("Stop spotify loader thread");
 }
 
 
@@ -3868,9 +3879,9 @@ int spotify_class::load_spotify_iconoversigt() {
   }
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
+  if (gfx_loaded) write_logfile("Spotify download done."); else write_logfile("Spotify download error.");
   if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
-    else fprintf(stderr,"spotify download error. \n");
+    if (gfx_loaded) fprintf(stderr,"Spotify download done. \n"); else fprintf(stderr,"Spotify download error. \n");
   }
   gfx_loaded=true;
   return(1);
