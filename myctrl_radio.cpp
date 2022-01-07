@@ -602,7 +602,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             // write debug log
             sprintf(debuglogdata,"Contry code %d missing flag, File name %s",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             if (gfxlande[stack[i+sofset]->land]==0) {
-              sprintf(debuglogdata,"Contry code %d is missing filename.",stack[i+sofset]->land);
               if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
             } else if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
           }

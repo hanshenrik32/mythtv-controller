@@ -2319,7 +2319,7 @@ void boxarray::createboxpictures()
 
 int loadboxpic=1;
 
-void boxarray::loadboxpictures()
+int boxarray::loadboxpictures()
 
 {
     char debuglogdata[1024];
@@ -2334,6 +2334,7 @@ void boxarray::loadboxpictures()
     int x=0;
     int y=0;
     dp  = opendir(startpath);
+
     if (dp==NULL) {
       printf("Open dir error %s\n",startpath);
     }
@@ -2362,10 +2363,12 @@ void boxarray::loadboxpictures()
                     }
                   }
                 }
+              } else {
+                printf("Not posible to open dir for texture path=%s \n",startpath);
               }
             } else {
-              printf("Set default picture texture \n");
-              matrix[x][y].texture=matrix[x][y].pictexture;
+              //printf("Set default picture texture \n");
+              //matrix[x][y].texture=matrix[x][y].pictexture;
             }
             x++;
           }
@@ -2373,7 +2376,10 @@ void boxarray::loadboxpictures()
         }
       }
     }
-    if (dp) closedir(dp);
+    if (dp) {
+      closedir(dp);
+      return(1);
+    } else return(0);
 }
 
 // ****************************************************************************************
@@ -2415,7 +2421,7 @@ static bool music_3d_statup=true;
 
 // ****************************************************************************************
 //
-// working in use
+// working in use 3d box
 //
 // ****************************************************************************************
 
@@ -2441,6 +2447,11 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   if (music_3d_statup) {
     settexture(&musicoversigt);
   }
+
+  //
+  // Used to rotate all
+  // tilt
+
 
   if (rangle>90.0f) rangle=0.0f;
   glEnable(GL_TEXTURE_2D);
@@ -2477,11 +2488,11 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   i=0;
   rangle=25.0f;
   static float rangle1=0.0f;
-  //glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+  glRotatef(aangle, 0.0f, 0.0f, 1.0f);
   //rool_sinus();
   for(y=0;y<8;y++) {                                           // 11
     if ((y==0) || (y==4) || (y==8)) rool_sinus();
-    for(x=0;x<11;x++) {                                         // 11
+    for(x=0;x<BOX_MATRIX_ANTAL;x++) {                                         // 11
       glPushMatrix();
       //glDisable(GL_CULL_FACE);
       //glDisable(GL_DEPTH_TEST);
@@ -2591,6 +2602,12 @@ void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
     }
     rangle+=.1;
     if (rangle>360*10) rangle=0;
+
+    //
+    // Used to rotate all
+    // tilt
+
+
     n=0;
     for(y=0;y<11;y++) {
       if ((y==0) || (y==4) || (y==8)) rool_sinus();

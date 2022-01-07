@@ -23,8 +23,6 @@ struct music_oversigt_type {
   char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
 };
 
-
-
 // class for music oversigt;
 // not in use for now.
 
@@ -41,24 +39,27 @@ class music_oversigt_type1 {
     char album_path[256];	      		// path to cover
     GLuint textureId;			        	// texture id hvis der findes en cover til musiken
     char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
-    music_oversigt_type1 *ptrtonext;
 };
 
 
 class musicoversigt_class {
   private:
-    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=2000;                                       // MAX cd er i oversigt
+    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=200;                                       // MAX cd er i oversigt
+    unsigned int antal_music_oversigt;
     void clean_music_oversigt();
-    music_oversigt_type1 musicoversigt[100];
+    music_oversigt_type1 musicoversigt[200];
   public:
+    void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
     int opdatere_music_oversigt(unsigned int directory_id);
-    int opdatere_music_oversigt_searchtxt1(char *searchtxt,int search_art);
+    int opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art);
     int load_music_covergfx();
     int save_music_oversigt_playlists(char *playlistname);
     int load_music_oversigt_playlists(char *playlistname);
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-    void show_music_oversigt1(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int music_key_selected);
+    void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int music_key_selected);
+    int opdatere_music_oversigt_playlists();
+    ~musicoversigt_class();
 };
 
 

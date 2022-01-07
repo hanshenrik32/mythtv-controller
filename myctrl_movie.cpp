@@ -1272,10 +1272,12 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int xpos,ypos;
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
+    /*
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
     if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
       this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
     }
+    */
     if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
       movie_oversigt_loaded=true;
       movie_oversigt_loaded_done=1;

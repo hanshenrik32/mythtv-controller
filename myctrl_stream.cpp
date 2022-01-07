@@ -3442,9 +3442,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-
-
-
       // Alex og kaninhullet
       if (check_rss_feed_exist(conn,(char *) "How to FPV Per Lommel")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('How to FPV Per Lommel',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -3460,9 +3457,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
-
-
-
 
       // close mysql
       if (conn) mysql_close(conn);

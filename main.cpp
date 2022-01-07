@@ -2810,16 +2810,23 @@ void display() {
 */
             //glTranslatef(0.0f, 0.0f, -7.0f);
             //glEnable(GL_DEPTH_TEST);
-            printf("Saver3D \n");
             glDisable(GL_BLEND);
             // music gfx loaded
             // if not load before screen saver
+            /*
             if (!(music_oversigt_loaded)) {
                 music_oversigt_loaded=true;
                 load_music_covergfx(musicoversigt);
                 mybox.settexture(musicoversigt);
             }
-            mybox.loadboxpictures();
+            */
+            if (mybox.get_loaded_status()==false) {
+              // if not loaded load
+              if (mybox.loadboxpictures()==false) {
+                printf("Error loading textures\n");
+                write_logfile("Error loading textures.");
+              }
+            }
             _angle++;
             glPushMatrix();
             start = clock();
@@ -2883,6 +2890,7 @@ void display() {
         glRotatef(0.0f,0.0f,0.0f,0.0f);
         float high;
         xxofset = 40.0f;                            // start ofset
+        // create the bars
         for(int xp=0;xp<barantal;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-400)+((siz_y*2)+2.0);
@@ -2922,7 +2930,7 @@ void display() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor3f(1.0f, 1.0f, 1.0f);
-        for(int xp=0;xp<45;xp++) {
+        for(int xp=0;xp<barantal;xp++) {
           high = sqrt(uvmax_values[xp]*8)*2;
           //printf("xp =%2d high = %0.3f \n",xp,high*2);
           xpos = (-siz_x)*xxofset;
@@ -2946,7 +2954,7 @@ void display() {
         glBindTexture(GL_TEXTURE_2D,texturedot);
         //glBindTexture(GL_TEXTURE_2D,_textureuv1);
         xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<45;xp++) {
+        for(int xp=0;xp<barantal;xp++) {
           xpos = (-siz_x)*xxofset;
           ypos = (-432)+((siz_y*4)+2.0);
           high = sqrt(spectrum[xp]*4);
@@ -3390,10 +3398,22 @@ void display() {
         // hent søgte sange oversigt
         if ((keybufferopenwin) && (hent_music_search)) {				                // vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_music_search=false;
-          if (findtype==0)
-           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
-          else
-           opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
+          if (findtype==0) {
+            // new ver
+            musicoversigt1.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+            // old ver
+            opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
+         } else {
+            // new ver
+            musicoversigt1.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+            // old ver
+            opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
+          }
+
+          // new ver
+          musicoversigt1.opdatere_music_oversigt_icons(); 					            // load gfx icons
+
+          // old ver
           opdatere_music_oversigt_icons(); 					                            // load gfx icons
           keybuffer[0] = 0;
           keybufferindex = 0;
@@ -3457,8 +3477,10 @@ void display() {
       // music view
       if (vis_music_oversigt) {
         //load_music_covergfx(musicoversigt);
+
         show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        //musicoversigt1.show_music_oversigt1(_textureId_dir,_textureIdback,_textureId28,music_key_selected);
+        //musicoversigt1.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,music_key_selected);
+
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
@@ -5661,8 +5683,9 @@ void display() {
     //
     if (do_save_setup_rss) {
       if (debugmode) fprintf(stderr,"Saving rssdb to mysql\n");
+      write_logfile("Saving rssdb to mysql.");
       rssstreamoversigt.save_rss_data();                                        // save rss data in db
-      streamoversigt.loadrssfile(1);                                            // download rss files (1=force all)
+      streamoversigt.loadrssfile(1);                                            // download/update rss files (1=force all)
       do_save_setup_rss=false;
     }
     // do start movie player
@@ -6166,6 +6189,7 @@ void display() {
         xx = (float) y*17;
         valgtnr=6;
       } else y=0;
+
       if (valgtnr==0) xx=0;
       for(int x=0;x<xx;x++) {
         glDisable(GL_TEXTURE_2D);
@@ -7974,18 +7998,37 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             sprintf(debuglogdata,"Opdatere musicarray henter playlist oversigt");
             // write debug log
             write_logfile((char *) debuglogdata);
+
             // hent playlist oversigt
+            // new ver
+            musicoversigt1.opdatere_music_oversigt_playlists();	// hent list over mythtv playlistes
+
+            // old ver
             opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
           } else {
             // write debug log
             sprintf(debuglogdata,"Opdatere musicarray Henter oversigt dir id = %d ",musicoversigt[mknapnr-1].directory_id);
             write_logfile((char *) debuglogdata);
             // opdate fra mythtv-backend if avable
-            if ((opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id))>0) {
+
+            if (musicoversigt1.opdatere_music_oversigt(musicoversigt[mknapnr-1].directory_id)>0) {
+              musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+            }
+
+            if (opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id)>0) {
               opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra internpath
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
+
+              // mew ver
+              if (musicoversigt1.opdatere_music_oversigt_nodb()==0) {
+                // no update posible
+                fprintf(stderr,"No Music loaded/found by internal loader.\n");
+                write_logfile("No Music loaded/found by internal loader.");
+              }
+
+              // old ver
               if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
                 // no update posible
                 fprintf(stderr,"No Music loaded/found by internal loader.\n");
@@ -13223,6 +13266,10 @@ void update(int value) {
                         // do auto open
                         if ((antal_songs==0) && (musicoversigt[mknapnr].oversigttype==0)) {
                           // normalt dir (IKKE playlist)
+
+                          musicoversigt1.opdatere_music_oversigt(musicoversigt[mknapnr-1].directory_id);
+                          musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+
                           opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr].directory_id);
                           opdatere_music_oversigt_icons();                      // load icons
                           music_icon_anim_icon_ofset = 0;
@@ -13237,6 +13284,13 @@ void update(int value) {
                           if (antal_songs>0) ask_open_dir_or_play_aopen=0;			// skal vi spørge slå auto fra
                           else ask_open_dir_or_play_aopen=1;					// else ja autoopen
                           // hent liste over mythtv playlist
+
+
+                          // new ver
+                          musicoversigt1.opdatere_music_oversigt_playlists();
+
+
+                          // old ver
                           opdatere_music_oversigt_playlists(musicoversigt);			// vis alle playlister
                         }
                         if ((antal_songs>0) && (do_play_music_aktiv_nr)) {
@@ -13508,6 +13562,11 @@ void *datainfoloader_music(void *data) {
     } else {
       if (debugmode & 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
       // build new db (internal db loader)
+
+      // mew ver
+      musicoversigt1.opdatere_music_oversigt_nodb();
+
+      // old ver
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
       if (debugmode & 2) fprintf(stderr,"Done update db from datasource.\n");
       write_logfile((char *) "Done update db from datasource.");
@@ -13516,11 +13575,21 @@ void *datainfoloader_music(void *data) {
     // update music db from disk
     if ((do_update_music) || (do_update_music_now)) {
       // update the music db
+
+      // mew ver
+      musicoversigt1.opdatere_music_oversigt_nodb();
+
+      // old ver
       opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update
     }
     // load music db created by opdatere_music_oversigt_nodb function
+
+    musicoversigt1.opdatere_music_oversigt(0);
+    musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+    write_logfile((char *) "Music db loaded..");
+
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
       //opdatere_music_oversigt_icons(); 					                              // load gfx icons
       if (debugmode & 2) fprintf(stderr,"Music db loaded.\n");
@@ -13528,10 +13597,20 @@ void *datainfoloader_music(void *data) {
     }
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
+
+    // mew ver
+    musicoversigt1.opdatere_music_oversigt_nodb();
+
     // update music db from disk
+    // old
     if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
       if (debugmode & 2) fprintf(stderr,"No music db loaded\n");
     }
+
+    // new ver
+    musicoversigt1.opdatere_music_oversigt(0);
+
+    // old ver
     opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
@@ -14010,6 +14089,10 @@ void *xbmcdatainfoloader(void *data) {
   }
   // set use internal db for music
   global_use_internal_music_loader_system = true;
+
+  //new ver
+  sprintf(debuglogdata,"Numbers of music records loaded %d.", musicoversigt1.opdatere_music_oversigt(0));
+
   // load db
   // write debug log
   sprintf(debuglogdata,"Numbers of music records loaded %d.", opdatere_music_oversigt(musicoversigt,0));
