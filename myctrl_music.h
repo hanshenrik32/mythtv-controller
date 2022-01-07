@@ -44,10 +44,10 @@ class music_oversigt_type1 {
 
 class musicoversigt_class {
   private:
-    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=200;                                       // MAX cd er i oversigt
+    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
     void clean_music_oversigt();
-    music_oversigt_type1 musicoversigt[200];
+    music_oversigt_type1 musicoversigt[300+1];
   public:
     void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
@@ -57,9 +57,8 @@ class musicoversigt_class {
     int save_music_oversigt_playlists(char *playlistname);
     int load_music_oversigt_playlists(char *playlistname);
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-    void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int music_key_selected);
+    void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     int opdatere_music_oversigt_playlists();
-    ~musicoversigt_class();
 };
 
 

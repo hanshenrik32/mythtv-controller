@@ -3476,12 +3476,14 @@ void display() {
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
-        //load_music_covergfx(musicoversigt);
 
-        show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-        //musicoversigt1.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,music_key_selected);
+        // New ver
+        musicoversigt1.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
 
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+        // old ver
+        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
+
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
@@ -13586,10 +13588,12 @@ void *datainfoloader_music(void *data) {
     }
     // load music db created by opdatere_music_oversigt_nodb function
 
+    // New ver
     musicoversigt1.opdatere_music_oversigt(0);
     musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
     write_logfile((char *) "Music db loaded..");
 
+    // Old ver
     if (opdatere_music_oversigt(musicoversigt,0)>0) {
       //opdatere_music_oversigt_icons(); 					                              // load gfx icons
       if (debugmode & 2) fprintf(stderr,"Music db loaded.\n");
@@ -13598,7 +13602,7 @@ void *datainfoloader_music(void *data) {
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
 
-    // mew ver
+    // New ver
     musicoversigt1.opdatere_music_oversigt_nodb();
 
     // update music db from disk
