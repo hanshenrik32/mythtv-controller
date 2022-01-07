@@ -8013,17 +8013,19 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             write_logfile((char *) debuglogdata);
             // opdate fra mythtv-backend if avable
 
+            // New ver
             if (musicoversigt1.opdatere_music_oversigt(musicoversigt[mknapnr-1].directory_id)>0) {
               musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
             }
 
+            // Old ver
             if (opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr-1].directory_id)>0) {
               opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra internpath
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt[mknapnr-1].album_path);
 
-              // mew ver
+              // New ver
               if (musicoversigt1.opdatere_music_oversigt_nodb()==0) {
                 // no update posible
                 fprintf(stderr,"No Music loaded/found by internal loader.\n");
@@ -9492,6 +9494,7 @@ void handlespeckeypress(int key,int x,int y) {
                 break;
     }
     if (debugmode) {
+      if (vis_radio_oversigt) fprintf(stderr,"Radio_key_selected = %d  radio_select_iconnr = %d \n ",radio_key_selected,radio_select_iconnr);
       if (vis_music_oversigt) fprintf(stderr,"Music_key_selected = %d  music_select_iconnr = %d musicoversigt_antal= %d \n ",music_key_selected,music_select_iconnr,musicoversigt_antal);
       if (vis_film_oversigt) fprintf(stderr,"film_key_selected = %d  film_select_iconnr = %d filmoversigt_antal=%d \n ",film_key_selected,film_select_iconnr,film_oversigt.film_antal());
       if (do_show_tvgraber) fprintf(stderr,"line %2d of %2d ofset = %d \n",do_show_setup_select_linie,PRGLIST_ANTAL,tvchannel_startofset);

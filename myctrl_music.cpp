@@ -581,7 +581,7 @@ int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int dir
     // select the right db to update from
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
 
-    //clean_music_oversigt(musicoversigt);				// clear music oversigt
+    clean_music_oversigt(musicoversigt);				// clear music oversigt
 
     //if (debugmode & 2) printf("Opdatere music oversigt fra database : %s \n",database);
     sprintf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
@@ -1298,7 +1298,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
 
-  //clean_music_oversigt();                                               				// clear music oversigt
+  clean_music_oversigt();                                               				// clear music oversigt
 
   dirp=opendir(dirpath);
   if (dirp==NULL) {
@@ -1566,7 +1566,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
     // select the right db to update from
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
 
-    //clean_music_oversigt();
+    clean_music_oversigt();
 
     if (debugmode & 1) printf("Opdatere music oversigt fra database : %s \n",database);
     sprintf(debuglogdata,"Opdatere music oversigt fra database : %s ",database);
@@ -1684,7 +1684,7 @@ int musicoversigt_class::opdatere_music_oversigt_searchtxt(char *searchtxt,int s
     char tmptxt[512];
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
 
-    //clean_music_oversigt();
+    clean_music_oversigt();
 
     write_logfile((char *) "Opdatere music oversigt fra database.");
     i=0;
@@ -2014,21 +2014,20 @@ void musicoversigt_class::opdatere_music_oversigt_icons() {
 
 
 void musicoversigt_class::clean_music_oversigt() {
-    unsigned int i=0;
-    while (i<MUSIC_OVERSIGT_TYPE_SIZE-1) {
-      if (musicoversigt[i].album_name) {
-        strcpy(musicoversigt[i].album_name,"");
-        strcpy(musicoversigt[i].album_path,"");
-        strcpy(musicoversigt[i].album_coverfile,"");
-        musicoversigt[i].textureId=0;
-        musicoversigt[i].directory_id=0;                        // husk directory id
-        musicoversigt[i].parent_id=0;
-        musicoversigt[i].album_id=0;
-        musicoversigt[i].artist_id=0;
-        musicoversigt[i].oversigttype=0;
-      }
-      i++;
-    }
+  unsigned int i=0;
+  while (i<antal_music_oversigt) {
+    strcpy(musicoversigt[i].album_name,"");
+    strcpy(musicoversigt[i].album_path,"");
+    strcpy(musicoversigt[i].album_coverfile,"");
+    musicoversigt[i].textureId=0;
+    musicoversigt[i].directory_id=0;                        // husk directory id
+    musicoversigt[i].parent_id=0;
+    musicoversigt[i].album_id=0;
+    musicoversigt[i].artist_id=0;
+    musicoversigt[i].oversigttype=0;
+    i++;
+  }
+  antal_music_oversigt=0;
 }
 
 
