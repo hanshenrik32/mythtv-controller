@@ -13590,7 +13590,7 @@ void *datainfoloader_music(void *data) {
       do_update_music = false;                                                  // stop show music update
     }
     // load music db created by opdatere_music_oversigt_nodb function
-
+    // first time
     // New ver
     musicoversigt1.opdatere_music_oversigt(0);
     musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons

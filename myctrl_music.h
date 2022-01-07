@@ -1,14 +1,14 @@
 #ifndef MYCTRL_MUSIC
 #define MYCTRL_MUSIC
 
-
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
 //#include <irrKlang.h>
-
 //used in music oversigt
+
+// Old stuf
 
 struct music_oversigt_type {
   unsigned int album_id;
@@ -24,7 +24,6 @@ struct music_oversigt_type {
 };
 
 // class for music oversigt;
-// not in use for now.
 
 class music_oversigt_type1 {
   public:
@@ -42,6 +41,7 @@ class music_oversigt_type1 {
 };
 
 
+
 class musicoversigt_class {
   private:
     const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
@@ -49,22 +49,27 @@ class musicoversigt_class {
     void clean_music_oversigt();
     music_oversigt_type1 musicoversigt[300+1];
   public:
+    // load covers
     void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
     int opdatere_music_oversigt(unsigned int directory_id);
+    // bruges til at finde kunstnere eller sange hvis art >0
     int opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art);
+    // load all covers
     int load_music_covergfx();
     int save_music_oversigt_playlists(char *playlistname);
     int load_music_oversigt_playlists(char *playlistname);
+    // load playliste find_dir_id
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
+    // show playlistes
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
+    // henter playlist oversigt
     int opdatere_music_oversigt_playlists();
 };
 
 
 // gfx loaded
 static bool music_oversigt_loaded=false;
-
 const int COSTABLE_ANTAL=37;
 const unsigned int MUSIC_OVERSIGT_TYPE_SIZE=2000;                                       // MAX cd er i oversigt
 //int music_key_selected=1;
@@ -82,7 +87,6 @@ int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]);
 void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected);		// new ver
 // load playliste find_dir_id
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-void zoom_music_info();
 // load music covers
 int load_music_covergfx(music_oversigt_type musicoversigt[]);
 // check music exist internal db return true if exist
