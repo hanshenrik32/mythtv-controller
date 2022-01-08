@@ -410,6 +410,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   int n=0;
   int nn;
   char *tt;
+
   /*
   musicoversigt[0].textureId=0;
   musicoversigt[0].directory_id=0;			// husk directory id

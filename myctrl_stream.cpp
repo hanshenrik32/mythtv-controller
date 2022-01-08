@@ -893,21 +893,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // ok AK 24syv
-      if (check_rss_feed_exist(conn,(char *) "AK 24syv")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('AK 24syv',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error AK 24syv.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('AK 24syv',NULL,NULL,'AK 24syv',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3843145',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error AK 24syv.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
       // ok Best of YouTube
       if (check_rss_feed_exist(conn,(char *) "Best of YouTube (video)")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Best of YouTube (video)',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1399,37 +1384,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
-      // ok Den Korte Weekendavis
-      if (check_rss_feed_exist(conn,(char *) "Den Korte Weekendavis")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den Korte Weekendavis',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den Korte Weekendavis.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den Korte Weekendavis',NULL,NULL,'Den Korte Weekendavis',0,0,NULL,'http://arkiv.radio24syv.dk/audiopodcast/channel/10839671',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Den Korte Weekendavis.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
-      // virker ikke
-      // title skifter i rss file
-      if (check_rss_feed_exist(conn,(char *) "Radio24syv Nyheder")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Radio24syv Nyheder',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Radio24syv Nyheder.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Radio24syv Nyheder',NULL,NULL,'Radio24syv Nyheder',0,0,NULL,'http://arkiv.radio24syv.dk/audiopodcast/',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Radio24syv Nyheder.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
       // ok Selvsving
       if (check_rss_feed_exist(conn,(char *) "Selvsving")==0) {
         sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Selvsving',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -1516,21 +1470,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         mysql_free_result(res);
         if (mysql_query(conn,sqlselect)!=0) {
           printf("mysql insert error Vergecast.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
-      // ok Elektronista
-      if (check_rss_feed_exist(conn,(char *) "Elektronista")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Elektronista',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Elektronista.\n");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Elektronista',NULL,NULL,'Elektronista',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3843152',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Elektronista.\n");
           printf("SQL: %s\n",sqlselect);
         }
         rss_update=true;
@@ -2214,52 +2153,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // OK Do not work Radio24syv Dokumentar
-      if (check_rss_feed_exist(conn,(char *) "24syv Dokumentar")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Dokumentar',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Radio24syv Dokumentar.");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Dokumentar',NULL,NULL,'24syv Dokumentar',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/3887302',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Radio24syv Dokumentar.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
-      // Radio24syv Hadprædikanterne
-      if (check_rss_feed_exist(conn,(char *) "24syv Hadprædikanterne")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Hadprædikanterne',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert 24syv Hadprædikanterne.");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Hadprædikanterne',NULL,NULL,'24syv Hadprædikanterne',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/38971368',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error 24syv Hadprædikanterne.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
 
-      //  Radio24syv
-      if (check_rss_feed_exist(conn,(char *) "24syv Den Korte Radioavis")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('24syv Den Korte Radioavis',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert 24syv Den Korte Radioavis.");
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('24syv Den Korte Radioavis',NULL,NULL,'24syv Den Korte Radioavis',0,0,NULL,'https://arkiv.radio24syv.dk/audiopodcast/channel/10839671',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error 24syv Den Korte Radioavis.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        mysql_free_result(res);
-        rss_update=true;
-      }
 
       // OK Radiofortællinger
       if (check_rss_feed_exist(conn,(char *) "Radiofortællinger")==0) {
@@ -2343,21 +2237,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // OK Det, vi taler om
-      if (check_rss_feed_exist(conn,(char *) "Det, vi taler om")==0) {
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Det, vi taler om',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error insert Det, vi taler om.");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        sprintf(sqlselect,"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Det, vi taler om',NULL,NULL,'Det, vi taler om',0,0,NULL,'http://arkiv.radio24syv.dk/audiopodcast/channel/10327258',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error For Det, vi taler om.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        rss_update=true;
-      }
 
       // OK Stuff You Should Know
       if (check_rss_feed_exist(conn,(char *) "Stuff You Should Know")==0) {

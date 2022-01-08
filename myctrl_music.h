@@ -61,7 +61,7 @@ class musicoversigt_class {
     int load_music_oversigt_playlists(char *playlistname);
     // load playliste find_dir_id
     int get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-    // show playlistes
+    // show playlistes in opengl
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     // henter playlist oversigt
     int opdatere_music_oversigt_playlists();

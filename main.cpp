@@ -663,9 +663,14 @@ bool reset_recorded_texture = false;
 
 wifinetdef wifinets;                            // wifi net class
 
+// music oversigt struct
+// struct music_oversigt_type musicoversigt[MUSIC_OVERSIGT_TYPE_SIZE+1];
+
+// *************************************************************************************************
+
 // new music class
 
-musicoversigt_class musicoversigt1;
+musicoversigt_class musicoversigt;
 
 // *************************************************************************************************
 // film oversigt type class
@@ -1844,6 +1849,34 @@ int hent_mythtv_playlist(int playlistnr) {
 
 
 
+// ****************************************************************************************
+//
+// MUSIC stuf
+// Can have memory error
+// load dir icons after update.
+//
+// ****************************************************************************************
+
+/*
+void opdatere_music_oversigt_icons() {
+  unsigned int i;
+  char tmpfilename[200];
+  for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
+    musicoversigt[i].textureId=0;
+  }
+  i=0;
+  while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
+    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
+    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
+      // load covers file into opengl as textures (png/jpg)
+      musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
+    } else {
+      musicoversigt[i].textureId=0;
+    }
+    i++;
+  }
+}
+*/
 
 // ****************************************************************************************
 //
@@ -3369,18 +3402,18 @@ void display() {
           hent_music_search=false;
           if (findtype==0) {
             // new ver
-            musicoversigt1.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
             // old ver
             //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
          } else {
             // new ver
-            musicoversigt1.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
             // old ver
             //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
           }
 
           // new ver
-          musicoversigt1.opdatere_music_oversigt_icons(); 					            // load gfx icons
+         musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
 
           // old ver
           //opdatere_music_oversigt_icons(); 					                            // load gfx icons
@@ -3447,7 +3480,7 @@ void display() {
       if (vis_music_oversigt) {
 
         // New ver
-        musicoversigt1.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+       musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
 
         // old ver
         //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
@@ -3888,13 +3921,13 @@ void display() {
         glTranslatef(560.0f, 950.0f , 0.0f);							// pos
         glRasterPos2f(0.0f, 0.0f);
         // print dirid navn
-        strcpy(temptxt1,musicoversigt1.get_album_name(mknapnr-1));						// hent albun navn
+        strcpy(temptxt1,musicoversigt.get_album_name(mknapnr-1));						// hent albun navn
         if (strcmp(temptxt1,"")==0) strcpy(temptxt1,music_noartistfound[configland]);
         // check for maxlength
         if (strlen(temptxt1)>24) {
           strcpy(temptxt1,"..");
           //strcat(temptxt1,musicoversigt[mknapnr-1].album_name+(strlen(musicoversigt[mknapnr-1].album_name)-24));
-          strcat(temptxt1,musicoversigt1.get_album_name(mknapnr-1)+(strlen(musicoversigt1.get_album_name(mknapnr-1))-24));
+          strcat(temptxt1,musicoversigt.get_album_name(mknapnr-1)+(strlen(musicoversigt.get_album_name(mknapnr-1))-24));
 
         }
         sprintf(temptxt,music_nomberofsongs[configland],dirmusic.numbersinlist(),temptxt1);
@@ -3973,7 +4006,7 @@ void display() {
     }
     // save playlist to file
     if (save_ask_save_playlist) {
-      musicoversigt1.save_music_oversigt_playlists(playlistfilename);
+     musicoversigt.save_music_oversigt_playlists(playlistfilename);
       save_ask_save_playlist=false;
       ask_save_playlist=false;
       // reset keyboard buffer
@@ -4290,16 +4323,16 @@ void display() {
         do_play_music_cover=0;
         if (((do_zoom_music_cover==false) || (do_play_music_aktiv_play==0)) && (mknapnr!=0)) {
           // playliste funktion set start play
-          if (debugmode & 2) fprintf(stderr,"Type af sange nr %d som skal loades %d\n ",mknapnr-1,musicoversigt1.get_album_type(mknapnr-1));
-          if (musicoversigt1.get_album_type(mknapnr-1)==-1) {
+          if (debugmode & 2) fprintf(stderr,"Type af sange nr %d som skal loades %d\n ",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
+          if (musicoversigt.get_album_type(mknapnr-1)==-1) {
             if (debugmode & 2) fprintf(stderr,"Loading song from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);
-            if (hent_mythtv_playlist(musicoversigt1.get_directory_id(mknapnr-1))==0) {		// tilføj musik valgte til playliste + load af covers
-              fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt1.get_directory_id(mknapnr-1));
+            if (hent_mythtv_playlist(musicoversigt.get_directory_id(mknapnr-1))==0) {		// tilføj musik valgte til playliste + load af covers
+              fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt.get_directory_id(mknapnr-1));
               exit(2);
             }
             do_play_music_aktiv_table_nr = 1;						// sæt start play aktiv nr
           // normal cd cover browser funktion set start play
-          } else if (musicoversigt1.get_album_type(mknapnr-1)==0) {
+          } else if (musicoversigt.get_album_type(mknapnr-1)==0) {
             if (debugmode & 2) fprintf(stderr,"Loading songs from id:%4d \n",do_play_music_aktiv_nr);
              // reset valgt liste
             bool eraktiv;
@@ -7727,7 +7760,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 // give error
                 if (debugmode & 2) {
                   if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
-                    fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt1.get_album_type(mknapnr-1));
+                    fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
                   }
                 }
                 if (vis_tv_oversigt) {
@@ -7749,22 +7782,22 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 }
                 // any music buttons active
                 if ((mknapnr>0) && (vis_music_oversigt)) {
-                  if ((retfunc==0) && ((mknapnr-1==0) || (musicoversigt1.get_directory_id(mknapnr-1)!=0)) && (!(do_zoom_music_cover))) {
-                    if (musicoversigt1.get_album_type(mknapnr-1)==0) {
+                  if ((retfunc==0) && ((mknapnr-1==0) || (musicoversigt.get_directory_id(mknapnr-1)!=0)) && (!(do_zoom_music_cover))) {
+                    if (musicoversigt.get_album_type(mknapnr-1)==0) {
                       if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
-                      do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1); 	// set det aktiv dir id
-                      antal_songs=hent_antal_dir_songs(musicoversigt1.get_directory_id(mknapnr-1));    // loader antal dir/song i dir id
-                      if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d name %s \n",antal_songs,musicoversigt1.get_album_name(mknapnr-1));
-                      if ((antal_songs==0) || (musicoversigt1.get_directory_id(mknapnr-1)==0)) {
+                      do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1); 	// set det aktiv dir id
+                      antal_songs=hent_antal_dir_songs(musicoversigt.get_directory_id(mknapnr-1));    // loader antal dir/song i dir id
+                      if (debugmode & 2) fprintf(stderr,"Found numbers of songs:%2d name %s \n",antal_songs,musicoversigt.get_album_name(mknapnr-1));
+                      if ((antal_songs==0) || (musicoversigt.get_directory_id(mknapnr-1)==0)) {
                         ask_open_dir_or_play_aopen = true;
                       } else {
                         ask_open_dir_or_play_aopen = false;
                       }
                     } else {
                       // here
-                      if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt1.get_directory_id(mknapnr-1));
+                      if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
                       // playlist loader
-                      do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1);
+                      do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
                       if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
                       if (do_play_music_aktiv_nr>0) {
                         antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
@@ -7964,9 +7997,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if ((ask_open_dir_or_play_aopen) && (retfunc==0)) {
           ask_open_dir_or_play=false;
           ask_open_dir_or_play_aopen=false;
-          if (musicoversigt1.get_album_type(mknapnr-1)==-1) {
+          if (musicoversigt.get_album_type(mknapnr-1)==-1) {
             // write debug log
-            sprintf(debuglogdata,"Open/read playlist id %d ",musicoversigt1.get_directory_id(mknapnr-1));
+            sprintf(debuglogdata,"Open/read playlist id %d ",musicoversigt.get_directory_id(mknapnr-1));
             write_logfile((char *) debuglogdata);
             sprintf(debuglogdata,"Opdatere musicarray henter playlist oversigt");
             // write debug log
@@ -7974,25 +8007,25 @@ void handleMouse(int button,int state,int mousex,int mousey) {
 
             // hent playlist oversigt
             // new ver
-            musicoversigt1.opdatere_music_oversigt_playlists();	// hent list over mythtv playlistes
+           musicoversigt.opdatere_music_oversigt_playlists();	// hent list over mythtv playlistes
 
             // old ver
             //opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
           } else {
             // write debug log
-            sprintf(debuglogdata,"Opdatere musicarray Henter oversigt dir id = %d ",musicoversigt1.get_directory_id(mknapnr-1));
+            sprintf(debuglogdata,"Opdatere musicarray Henter oversigt dir id = %d ",musicoversigt.get_directory_id(mknapnr-1));
             write_logfile((char *) debuglogdata);
             // opdate fra mythtv-backend if avable
 
             // New ver
-            if (musicoversigt1.opdatere_music_oversigt(musicoversigt1.get_directory_id(mknapnr-1))>0) {
-              musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+            if (musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1))>0) {
+             musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
             } else {
               // opdatere music oversigt fra internpath
-              fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt1.get_album_path(mknapnr-1));
+              fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt.get_album_path(mknapnr-1));
 
               // New ver
-              if (musicoversigt1.opdatere_music_oversigt_nodb()==0) {
+              if (musicoversigt.opdatere_music_oversigt_nodb()==0) {
                 // no update posible
                 fprintf(stderr,"No Music loaded/found by internal loader.\n");
                 write_logfile("No Music loaded/found by internal loader.");
@@ -10584,10 +10617,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
                 mknapnr=music_key_selected;	                     	// hent valget
                 // normal dir
-                if (musicoversigt1.get_album_type(mknapnr-1)==0) {
+                if (musicoversigt.get_album_type(mknapnr-1)==0) {
                   if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
-                  if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt1.get_directory_id(mknapnr-1));
-                  do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1);
+                  if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
+                  do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
                   if (debugmode & 2) fprintf(stderr,"dir id %d  ",do_play_music_aktiv_nr);
                   if (do_play_music_aktiv_nr>0) {
                     antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
@@ -10604,9 +10637,9 @@ void handleKeypress(unsigned char key, int x, int y) {
                   //do_zoom_music_cover=true;
                 } else {
                   // playlist dir
-                  if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt1.get_directory_id(mknapnr-1));
+                  if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
                   // playlist loader
-                  do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1);
+                  do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
                   if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
                   if (do_play_music_aktiv_nr>0) {
 //                          antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
@@ -11787,10 +11820,10 @@ void update2(int value) {
               //mknapnr=music_key_selected;	                     	// hent valget
               mknapnr=music_select_iconnr+1;                                                        //
               // normal dir
-              if (musicoversigt1.get_album_type(mknapnr-1)==0) {
+              if (musicoversigt.get_album_type(mknapnr-1)==0) {
                 if (debugmode & 2) fprintf(stderr,"Normal dir id load.\n");
-                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr, musicoversigt1.get_directory_id(mknapnr-1));
-                do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1);
+                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
+                do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
                 if (debugmode & 2) fprintf(stderr,"dir id %d ",do_play_music_aktiv_nr);
                 if (do_play_music_aktiv_nr>0) {
                   antal_songs=hent_antal_dir_songs(do_play_music_aktiv_nr);
@@ -11805,9 +11838,9 @@ void update2(int value) {
                 //do_zoom_music_cover=true;
               } else {
                 // do playlist
-                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt1.get_directory_id(mknapnr-1));
+                if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
                 // playlist loader
-                do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr-1);
+                do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
                 if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
                 if (do_play_music_aktiv_nr>0) {
                             antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
@@ -13210,21 +13243,21 @@ void update(int value) {
 
                           // if (debugmode & 2) printf("Mouse pressed over %d husk knap= %d \n",mknapnr,husk_knapnr);
                           // ja hvis felts oversigttype=0
-                          if (musicoversigt1.get_album_type(mknapnr)==0) {
+                          if (musicoversigt.get_album_type(mknapnr)==0) {
                             //                            mknapnr=music_key_selected;
-                            do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr);		// set den aktive mappe dir id
-                            antal_songs=hent_antal_dir_songs(musicoversigt1.get_directory_id(mknapnr));		//
-                            if (debugmode & 2) fprintf(stderr,"Found numers of songs in :%4d dirid:%4d  named:%s \n",antal_songs,musicoversigt1.get_directory_id(mknapnr),musicoversigt1.get_album_name(mknapnr));
-                            if ((antal_songs==0) || (musicoversigt1.get_directory_id(mknapnr)==0)) {	// er der ingen sange i dir lav en auto open
+                            do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr);		// set den aktive mappe dir id
+                            antal_songs=hent_antal_dir_songs(musicoversigt.get_directory_id(mknapnr));		//
+                            if (debugmode & 2) fprintf(stderr,"Found numers of songs in :%4d dirid:%4d  named:%s \n",antal_songs,musicoversigt.get_directory_id(mknapnr),musicoversigt.get_album_name(mknapnr));
+                            if ((antal_songs==0) || (musicoversigt.get_directory_id(mknapnr)==0)) {	// er der ingen sange i dir lav en auto open
                               ask_open_dir_or_play_aopen = 1; 						// flag auto open
-                              if (musicoversigt1.get_directory_id(mknapnr)==0) antal_songs=0;
+                              if (musicoversigt.get_directory_id(mknapnr)==0) antal_songs=0;
                             } else {
                               ask_open_dir_or_play_aopen = 0;						// ingen auto open
                             }
                           } else {
                           // nej det er playlister
                           mknapnr = music_select_iconnr;
-                          do_play_music_aktiv_nr=musicoversigt1.get_directory_id(mknapnr);			// = playlistnr
+                          do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr);			// = playlistnr
                           if (debugmode & 2) fprintf(stderr,"playlist nr %d  ",do_play_music_aktiv_nr);
                           if (do_play_music_aktiv_nr>0) {
                             antal_songs=hent_antal_dir_songs_playlist(do_play_music_aktiv_nr);
@@ -13236,11 +13269,11 @@ void update(int value) {
                           }
                         }
                         // do auto open
-                        if ((antal_songs==0) && (musicoversigt1.get_album_type(mknapnr)==0)) {
+                        if ((antal_songs==0) && (musicoversigt.get_album_type(mknapnr)==0)) {
                           // normalt dir (IKKE playlist)
 
-                          musicoversigt1.opdatere_music_oversigt(musicoversigt1.get_directory_id(mknapnr-1));
-                          musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+                         musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1));
+                         musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
 
                           //opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr].directory_id);
                           //opdatere_music_oversigt_icons();                      // load icons
@@ -13248,17 +13281,17 @@ void update(int value) {
                           music_icon_anim_icon_ofsety = 0;
                           mknapnr = 0;
                           ask_open_dir_or_play_aopen = 1;
-                          if (debugmode & 2) fprintf(stderr,"Set Autoopen on dir id %d \n ", musicoversigt1.get_directory_id(mknapnr));
+                          if (debugmode & 2) fprintf(stderr,"Set Autoopen on dir id %d \n ",musicoversigt.get_directory_id(mknapnr));
                           music_key_selected = 1;		// reset cursor position
                           music_select_iconnr = 1;		// reset this to (beskriver hvor vi er på skærmen og ikke på listen som music_key_selected
-                        } else if (musicoversigt1.get_album_type(mknapnr)==-1) {
+                        } else if (musicoversigt.get_album_type(mknapnr)==-1) {
                           // playliste
                           if (antal_songs>0) ask_open_dir_or_play_aopen=0;			// skal vi spørge slå auto fra
                           else ask_open_dir_or_play_aopen=1;					// else ja autoopen
                           // hent liste over mythtv playlist
 
                           // new ver
-                          musicoversigt1.opdatere_music_oversigt_playlists();
+                         musicoversigt.opdatere_music_oversigt_playlists();
 
                           // old ver
                           //opdatere_music_oversigt_playlists(musicoversigt);			// vis alle playlister
@@ -13534,7 +13567,7 @@ void *datainfoloader_music(void *data) {
       // build new db (internal db loader)
 
       // mew ver
-      musicoversigt1.opdatere_music_oversigt_nodb();
+     musicoversigt.opdatere_music_oversigt_nodb();
 
       // old ver
       //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
@@ -13547,7 +13580,7 @@ void *datainfoloader_music(void *data) {
       // update the music db
 
       // mew ver
-      musicoversigt1.opdatere_music_oversigt_nodb();
+     musicoversigt.opdatere_music_oversigt_nodb();
 
       // old ver
       //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
@@ -13557,15 +13590,15 @@ void *datainfoloader_music(void *data) {
     // load music db created by opdatere_music_oversigt_nodb function
     // first time
     // New ver
-    if (musicoversigt1.opdatere_music_oversigt(0)>0) {
-      musicoversigt1.opdatere_music_oversigt_icons();                                  // load icons
+    if (musicoversigt.opdatere_music_oversigt(0)>0) {
+     musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       write_logfile((char *) "Music db loaded..");
     }
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
 
     // New ver
-    musicoversigt1.opdatere_music_oversigt_nodb();
+   musicoversigt.opdatere_music_oversigt_nodb();
 
     // update music db from disk
     // old
@@ -13574,7 +13607,7 @@ void *datainfoloader_music(void *data) {
     //}
 
     // new ver
-    musicoversigt1.opdatere_music_oversigt(0);
+   musicoversigt.opdatere_music_oversigt(0);
 
     // old ver
     //opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
@@ -14057,7 +14090,7 @@ void *xbmcdatainfoloader(void *data) {
   global_use_internal_music_loader_system = true;
 
   //new ver
-  sprintf(debuglogdata,"Numbers of music records loaded %d.", musicoversigt1.opdatere_music_oversigt(0));
+  sprintf(debuglogdata,"Numbers of music records loaded %d.",musicoversigt.opdatere_music_oversigt(0));
 
   // load db
   // write debug log
