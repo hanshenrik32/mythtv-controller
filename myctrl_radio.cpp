@@ -590,7 +590,10 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         if (stack[i+sofset]->land>0) {
           // gfxlandemask mask
           if (gfxlande[stack[i+sofset]->land]) {
-            glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);
+            glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);       //
+
+            //glBindTexture(GL_TEXTURE_2D,gfxlande[i+sofset]);
+
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(10+ xof, yof+10 , 0.0);
             glTexCoord2f(0, 1); glVertex3f(10+ xof,yof+30+10, 0.0);

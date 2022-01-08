@@ -631,14 +631,13 @@ int sock=0;                                     // lirc socket
 
 #if defined USE_FMOD_MIXER
 // *************************************************************************************************
-// setup fmod sound device
+// setup fmod sound device and program vars
 FMOD::System    *sndsystem;
 FMOD::Sound     *sound=0;
 FMOD::Channel   *channel=0;
 FMOD_RESULT     result;
 unsigned int    fmodversion;
 #endif
-
 bool            playing = 0;
 int             snd=0;
 
@@ -651,35 +650,30 @@ const int SAVER3D2=4;
 const int PICTURE3D=5;
 const int MUSICMETER=6;
 
-int urtype=1;                           // set default screen saver
+int urtype=1;                                   // set default screen saver
 
 // *************************************************************************************************
 
-recorded_overigt recordoversigt;       // optaget programer oversigt
+recorded_overigt recordoversigt;                // optaget programer oversigt
 bool reset_recorded_texture = false;
-
 
 // *************************************************************************************************
 
 wifinetdef wifinets;                            // wifi net class
 
-// music oversigt struct
-// struct music_oversigt_type musicoversigt[MUSIC_OVERSIGT_TYPE_SIZE+1];
-
 // *************************************************************************************************
 
-// new music class
-
-musicoversigt_class musicoversigt;
+musicoversigt_class musicoversigt;              // Music class
 
 // *************************************************************************************************
 // film oversigt type class
 film_oversigt_typem film_oversigt(FILM_OVERSIGT_TYPE_SIZE+1);
 
 // Screen saver box ********************************************************************************
-boxarray mybox;                         // 3D screen saver
-// *************************************************************************************************
 
+boxarray mybox;                                 // 3D screen saver
+
+// *************************************************************************************************
 
 // radio
 radiostation_class radiooversigt;         // lav top radio statio oversigt
@@ -748,8 +742,8 @@ GLuint texturedot1;                       //
 // loading window
 GLuint _textureIdloading;                 // loading window
 // setup menu textures
-GLuint setupupdatebutton;
-GLuint setuptexture;
+GLuint setupupdatebutton;                 //
+GLuint setuptexture;                      //
 GLuint setuptvgraberback;
 GLuint setupsoundback;
 GLuint setupsqlback;
@@ -3226,9 +3220,8 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+0, 0.0);
       glEnd();
       glPopMatrix();
-
       #else
-
+      // if Tidal defined (supported)
       // img radio button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, radiobutton);
@@ -3238,12 +3231,13 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(80);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+0-75, 0.0);
       glEnd();
       glPopMatrix();
+
       // img music button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, musicbutton);
@@ -3253,10 +3247,10 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(81);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+0-75, 0.0);
       glEnd();
       glPopMatrix();
 
@@ -3269,10 +3263,10 @@ void display() {
       glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glLoadName(82);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+0, 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+0-75, 0.0);
       glEnd();
 
       glPopMatrix();
@@ -3286,16 +3280,12 @@ void display() {
       glLoadName(83);
       glBegin(GL_QUADS);
 
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+0, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+200, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+200, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+0, 0.0);
-
-
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+0-75, 0.0);
       glEnd();
       glPopMatrix();
-
-
       #endif
     }
 
@@ -14689,13 +14679,13 @@ void load_lande_flags() {
     // 40-49
     // 50-59
     // 60-69
-    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu",(char *) "fr.pmg",(char *) "luxembourg.jpg",(char *) "nl.jpg",(char *) "usa.jpg",(char *) "de.jpg",(char *) "uk.jpg", //
-                   (char *) "ru.jpg",(char *) "israel.jpg",(char *) "Austria.jpg",(char *) "lebanon.jpg",(char *) "latvia.jpg",(char *) "",(char *) "Vietnam.jpg",(char *) "Saudi-Arabia.jpg",(char *) "as.jpg",(char *) "brazil.jpg", //
-                   (char *) "Egypt.jpg",(char *) "no.jpg",(char *) "pl.jpg",(char *) "se.jpg",(char *) "sw.jpg",(char *) "mexico.jpg",(char *) "be.jpg",(char *) "ca.jpg",(char *) "as.jpg",(char *) "ru.jpg", //
-                   (char *) "sp.jpg",(char *) "ae.jpg",(char *) "hu.jpg",(char *) "th.jpg",(char *) "gr.jpg",(char *) "bk.jpg",(char *) "nu.jpg",(char *) "in.jpg",(char *) "po.jpg",(char *) "ir.jpg", //
-                   (char *) "ks.jpg",(char *) "romania.jpg",(char *) "it.jpg",(char *) "fi.jpg",(char *) "bahrain.jpg",(char *) "dk.jpg",(char *) "chile.jpg",(char *) "chile.jpg",(char *) "Slovakia.jpg",(char *) "Ukraine.jpg", //
-                   (char *) "hu.jpg",(char *) "co.jpg",(char *) "do.jpg",(char *) "Azerbaijan.jpg",(char *) "Lithuania.jpg",(char *) "Andorra.jpg",(char *) "Estonia.jpg",(char *) "Tajikistan.jpg",(char *) "Turkey.jpg",(char *) "Mongolia.jpg", //
-                   (char *) "Belarus.jpg",(char *) "Slovenia.jpg",(char *) "Cyprus.jpg",(char *) "China.jpg",(char *) "Cambodia.jpg",(char *) "Indonesia.jpg",(char *) "Singapore.jpg",(char *) "Croatia.jpg",(char *) "Czech Republic.jpg",(char *) ""};
+    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu.png",(char *) "fr.png",(char *) "luxembourg.png",(char *) "nl.png",(char *) "usa.png",(char *) "de.png",(char *) "uk.png", //
+                   (char *) "ru.png",(char *) "israel.png",(char *) "Austria.png",(char *) "lebanon.png",(char *) "latvia.png",(char *) "",(char *) "Vietnam.png",(char *) "Saudi-Arabia.png",(char *) "as.png",(char *) "brazil.png", //
+                   (char *) "Egypt.png",(char *) "no.png",(char *) "pl.png",(char *) "se.png",(char *) "sw.png",(char *) "mexico.png",(char *) "be.png",(char *) "ca.png",(char *) "as.png",(char *) "ru.png", //
+                   (char *) "sp.png",(char *) "ae.jpg",(char *) "hu.png",(char *) "th.png",(char *) "gr.png",(char *) "bk.png",(char *) "nu.png",(char *) "in.png",(char *) "po.png",(char *) "ir.png", //
+                   (char *) "ks.png",(char *) "romania.png",(char *) "it.png",(char *) "fi.png",(char *) "bahrain.png",(char *) "dk.png",(char *) "chile.png",(char *) "chile.png",(char *) "Slovakia.png",(char *) "Ukraine.png", //
+                   (char *) "hu.png",(char *) "co.png",(char *) "do.png",(char *) "Azerbaijan.png",(char *) "Lithuania.png",(char *) "Andorra.png",(char *) "Estonia.png",(char *) "Tajikistan.png",(char *) "Turkey.png",(char *) "Mongolia.png", //
+                   (char *) "Belarus.png",(char *) "Slovenia.png",(char *) "Cyprus.png",(char *) "China.png",(char *) "Cambodia.png",(char *) "Indonesia.png",(char *) "Singapore.png",(char *) "Croatia.png",(char *) "Czech Republic.png",(char *) ""};
     i = 0;
     strcpy(path2,"");
     while(i < 69) {

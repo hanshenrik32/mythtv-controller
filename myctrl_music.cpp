@@ -281,9 +281,11 @@ bool global_use_internal_music_loader_system_exist() {
 }
 
 
+// *****************************************************************************
 //
+// load selected playlist from gui to play
 //
-//
+// *****************************************************************************
 
 
 void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
@@ -320,9 +322,13 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     if (res) {
       while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
         if (global_use_internal_music_loader_system) {
-          if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+          //if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+          sprintf(debuglogdata,"Found song song_id:%4s Artist id:%4s Filename:%40s",row[0],row[5],row[1]);
+          write_logfile((char *) debuglogdata);
         } else {
-          if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+          //if (debugmode & 2) printf("Found song song_id:%4s Artist id:%4s Filename:%40s \n",row[0],row[5],row[1]);
+          sprintf(debuglogdata,"Found song song_id:%4s Artist id:%4s Filename:%40s",row[0],row[5],row[1]);
+          write_logfile((char *) debuglogdata);
         }
         if (global_use_internal_music_loader_system) {
           strcpy(tmptxt,"");
@@ -426,7 +432,7 @@ int musicoversigt_class::get_music_pick_playlist(long find_dir_id,bool *music_li
 // ****************************************************************************************
 
 int musicoversigt_class::load_music_covergfx() {
-    unsigned int i=0; // hent alle music convers
+    unsigned int i=0;                                                           // hent alle music convers
     char tmpfilename[200];
     while (i<antal_music_oversigt-1) {
       strcpy(tmpfilename,"");
@@ -437,30 +443,37 @@ int musicoversigt_class::load_music_covergfx() {
       }
       i++;
     }
-    return(i);
+    return(i);                                                                  // return # of loaded images
 }
 
-
-
 char *musicoversigt_class::get_album_name(int nr) {
-  return(musicoversigt[nr].album_name);
+  if (nr<antal_music_oversigt) {
+    return(musicoversigt[nr].album_name);
+  } else return(0);
 }
 
 char musicoversigt_class::get_album_type(int nr) {
-  return(musicoversigt[nr].oversigttype);
+  if (nr<antal_music_oversigt) {
+    return(musicoversigt[nr].oversigttype);
+  } else return(0);
 }
 
 unsigned int musicoversigt_class::get_directory_id(int nr) {
-  return(musicoversigt[nr].directory_id);
+  if (nr<antal_music_oversigt) {
+    return(musicoversigt[nr].directory_id);
+  } else return(0);
 }
 
 char *musicoversigt_class::get_album_path(int nr) {
-  return(musicoversigt[nr].album_path);
+  if (nr<antal_music_oversigt) {
+    return(musicoversigt[nr].album_path);
+  } else return(0);
 }
 
-
 GLuint musicoversigt_class::get_textureId(int nr) {
-  return(musicoversigt[nr].textureId);
+  if (nr<antal_music_oversigt) {
+    return(musicoversigt[nr].textureId);
+  } else return(0);
 }
 
 // *****************************************************************************
