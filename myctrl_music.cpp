@@ -8,7 +8,7 @@
 #include <GL/glu.h>
 #include <string.h>
 #include <mysql.h>
-#include <GL/glc.h>
+#include <GL/glc.h>                                       // gltext
 #include <sys/types.h>                                    // listdir.c
 #include <dirent.h>
 #include <stdio.h>
@@ -458,6 +458,10 @@ char *musicoversigt_class::get_album_path(int nr) {
   return(musicoversigt[nr].album_path);
 }
 
+
+GLuint musicoversigt_class::get_textureId(int nr) {
+  return(musicoversigt[nr].textureId);
+}
 
 // *****************************************************************************
 //

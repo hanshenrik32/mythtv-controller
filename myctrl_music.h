@@ -8,26 +8,12 @@
 //#include <irrKlang.h>
 //used in music oversigt
 
-// Old stuf
-
-struct music_oversigt_type {
-  unsigned int album_id;
-  unsigned int artist_id;
-  char album_name[256];			      // music name
-  int album_year;
-  unsigned int directory_id;			// dir id fra myth mysql database
-  unsigned int parent_id;         //
-  char album_coverfile[256];			// coverfilename
-  char album_path[256];	      		// path to cover
-  GLuint textureId;			        	// texture id hvis der findes en cover til musiken
-  char oversigttype;				      // type =0 normal dir oversigt 1 = playlist
-};
 
 // class for music oversigt;
 
-class music_oversigt_type1 {
+class music_oversigt_type {
   public:
-    music_oversigt_type1 *insert();
+    music_oversigt_type *insert();
     unsigned int album_id;
     unsigned int artist_id;
     char album_name[256];			      // music name
@@ -47,7 +33,7 @@ class musicoversigt_class {
     const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
     void clean_music_oversigt();
-    music_oversigt_type1 musicoversigt[300+1];
+    music_oversigt_type musicoversigt[300+1];
   public:
     // load covers
     void opdatere_music_oversigt_icons();
@@ -69,6 +55,7 @@ class musicoversigt_class {
     char get_album_type(int nr);
     unsigned int get_directory_id(int nr);
     char *get_album_path(int nr);
+    GLuint get_textureId(int nr);
 
 };
 

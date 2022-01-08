@@ -39,7 +39,7 @@ class boxarray {
   public:
     boxarray();
     bool get_loaded_status() { return(matrix[0][0].pictexture); }             // return true if texture is loaded
-    void settexture(struct music_oversigt_type *musicoversigt);
+    void settexture();
     void show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3);
     //void show_music_3d_new(int aangle,GLuint textureId);
     void show_music_3d_2(float aangle,GLuint textureId);

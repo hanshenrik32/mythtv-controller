@@ -18,7 +18,7 @@ extern char configpicturepath[256];
 extern GLuint screensaverbox;
 extern GLuint newstuf_icon;
 extern int orgwinsizex,orgwinsizey;
-extern struct music_oversigt_type musicoversigt;
+extern musicoversigt_class musicoversigt;
 
 float sinofsetz[]={
 
@@ -2386,7 +2386,7 @@ int boxarray::loadboxpictures()
 // setter textures fra cd samling i mythtv
 // ****************************************************************************************
 
-void boxarray::settexture(struct music_oversigt_type *musicoversigt) {
+void boxarray::settexture() {
     int x,y;
     int n=0;
     GLuint textureid;
@@ -2394,9 +2394,9 @@ void boxarray::settexture(struct music_oversigt_type *musicoversigt) {
       for(x=0;x<11;x++) {
         bool fundettexture=false;
         while ((n<200) && (fundettexture==false)) {
-          if (musicoversigt[n].textureId!=0) {
+          if (musicoversigt.get_textureId(n)!=0) {
             fundettexture=true;
-            textureid=musicoversigt[n].textureId;
+            textureid=musicoversigt.get_textureId(n);
           } else textureid=0;
           n++;
           if (n==200) {
