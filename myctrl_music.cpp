@@ -1255,6 +1255,25 @@ int musicoversigt_class::load_music_covergfx() {
     return(i);
 }
 
+
+
+char *musicoversigt_class::get_album_name(int nr) {
+  return(musicoversigt[nr].album_name);
+}
+
+char musicoversigt_class::get_album_type(int nr) {
+  return(musicoversigt[nr].oversigttype);
+}
+
+unsigned int musicoversigt_class::get_directory_id(int nr) {
+  return(musicoversigt[nr].directory_id);
+}
+
+char *musicoversigt_class::get_album_path(int nr) {
+  return(musicoversigt[nr].album_path);
+}
+
+
 // *****************************************************************************
 //
 // Load/update music info to new db

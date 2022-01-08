@@ -65,6 +65,11 @@ class musicoversigt_class {
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     // henter playlist oversigt
     int opdatere_music_oversigt_playlists();
+    char *get_album_name(int nr);
+    char get_album_type(int nr);
+    unsigned int get_directory_id(int nr);
+    char *get_album_path(int nr);
+
 };
 
 

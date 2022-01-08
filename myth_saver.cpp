@@ -2445,7 +2445,7 @@ void boxarray::show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuin
   rotate=0;
 
   if (music_3d_statup) {
-    settexture(&musicoversigt);
+    //settexture(&musicoversigt);
   }
 
   //

@@ -410,15 +410,18 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
   int n=0;
   int nn;
   char *tt;
+  /*
   musicoversigt[0].textureId=0;
   musicoversigt[0].directory_id=0;			// husk directory id
   musicoversigt[0].parent_id=0;
   musicoversigt[0].album_id=0;
   musicoversigt[0].artist_id=0;
   musicoversigt[0].oversigttype=0;
+  */
   for(int i=0; i<argc; i++) {
     cr=false;
     if (i==0) {
+      /*
       musicoversigt[i].textureId=0;
       musicoversigt[i].directory_id=0;			// husk directory id
       musicoversigt[i].parent_id=0;
@@ -427,6 +430,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_music(void *data, int argc, char **argv
       musicoversigt[i].oversigttype=0;
       strcpy(musicoversigt[i].album_name,"");
       strcpy(musicoversigt[i].album_path,"");
+      */
     }
     if (strncmp("strPath",azColName[i],8)==0) {
       strcpy(artistname,argv[i]);
