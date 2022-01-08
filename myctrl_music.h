@@ -72,28 +72,12 @@ class musicoversigt_class {
 
 };
 
+void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
 
 // gfx loaded
 static bool music_oversigt_loaded=false;
 const int COSTABLE_ANTAL=37;
 const unsigned int MUSIC_OVERSIGT_TYPE_SIZE=2000;                                       // MAX cd er i oversigt
-//int music_key_selected=1;
-//void zoom_music_info();
-// used internt til music db
-int opdatere_music_oversigt_nodb(char *dirpath,music_oversigt_type musicoversigt[]);
-//void draw_musiccover();
-int opdatere_music_oversigt(music_oversigt_type musicoversigt[],unsigned int directory_id);
-// bruges til at finde kunstnere eller sange hvis art >0
-int opdatere_music_oversigt_searchtxt(music_oversigt_type musicoversigt[],char *searchtxt,int search_art);
-// henter playlist oversigt
-int opdatere_music_oversigt_playlists(music_oversigt_type musicoversigt[]);				// mythtv playlist
-int save_music_oversigt_playlists(music_oversigt_type musicoversigt[],char *playlistname);
-int load_music_oversigt_playlists(music_oversigt_type musicoversigt[]);
-void show_music_oversigt(music_oversigt_type *musicoversigt,GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,GLuint dirplaylist_icon_mask,int _mangley,int music_key_selected);		// new ver
-// load playliste find_dir_id
-void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array);
-// load music covers
-int load_music_covergfx(music_oversigt_type musicoversigt[]);
 // check music exist internal db return true if exist
 bool global_use_internal_music_loader_system_exist();
 

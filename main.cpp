@@ -663,11 +663,6 @@ bool reset_recorded_texture = false;
 
 wifinetdef wifinets;                            // wifi net class
 
-// music oversigt struct
-// struct music_oversigt_type musicoversigt[MUSIC_OVERSIGT_TYPE_SIZE+1];
-
-// *************************************************************************************************
-
 // new music class
 
 musicoversigt_class musicoversigt1;
@@ -1849,34 +1844,6 @@ int hent_mythtv_playlist(int playlistnr) {
 
 
 
-// ****************************************************************************************
-//
-// MUSIC stuf
-// Can have memory error
-// load dir icons after update.
-//
-// ****************************************************************************************
-
-/*
-void opdatere_music_oversigt_icons() {
-  unsigned int i;
-  char tmpfilename[200];
-  for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
-    musicoversigt[i].textureId=0;
-  }
-  i=0;
-  while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
-    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
-    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-      // load covers file into opengl as textures (png/jpg)
-      musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
-    } else {
-      musicoversigt[i].textureId=0;
-    }
-    i++;
-  }
-}
-*/
 
 // ****************************************************************************************
 //
