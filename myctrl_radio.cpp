@@ -449,7 +449,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
-bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
     static bool show_all_kode_errors=false;
     int buttonsize=200;
     int buttonsizey=180;

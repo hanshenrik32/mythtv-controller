@@ -725,7 +725,8 @@ GLuint tidalbutton;                       //
 GLuint spotifybutton;                     //
 GLuint spotify_askplay;                   //
 GLuint spotify_askopen;                   //
-GLuint spotify_search;                    //
+GLuint spotify_search;                    // button in spotify search
+GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
@@ -3145,7 +3146,7 @@ void display() {
         }
         // spotify online search button
         if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
-          glBindTexture(GL_TEXTURE_2D, spotify_search);
+          if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(5);
@@ -3488,7 +3489,7 @@ void display() {
         glPopMatrix();
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_radio_oversigt) {
-        radio_pictureloaded=radiooversigt.show_radio_oversigt1( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+        radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
         // show radio options menu
         if ((show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
@@ -3543,12 +3544,11 @@ void display() {
         recordoversigt.show_recorded_oversigt1(0,0);
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
-
       // show record tv programs in tv guide
-      if (vis_tvrec_list) {
+      if ((vis_tvrec_list) && (do_show_setup)) {
         // show tv record list
         glPushMatrix();
-        aktiv_crecordlist.showtvreclist();
+        //aktiv_crecordlist.showtvreclist();
         write_logfile((char *) "show tv record wiew.");
         glPopMatrix();
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
@@ -6913,7 +6913,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           if ((GLubyte) names[i*4+3]==27) {
             do_zoom_music_cover =! do_zoom_music_cover;
             ask_open_dir_or_play = false;
-            if (do_zoom_music_cover) write_logfile((char *) "Show music info."); else write_logfile((char *) "Show music info.");
+            if (do_zoom_music_cover) write_logfile((char *) "Show music info."); else write_logfile((char *) "Close music info.");
             fundet = true;
           }
         }
@@ -6945,7 +6945,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // open music dir or close window
           if ((GLubyte) names[i*4+3]==21) {
             // pressed close
-            if (debugmode) fprintf(stderr,"Close window again\n");
+            if (debugmode & 2) fprintf(stderr,"Close window again\n");
             ask_open_dir_or_play = false;				// flag luk vindue igen
             do_zoom_music_cover = false;
             mknapnr = 0;
@@ -7217,7 +7217,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             returnfunc = 5;
             fundet = true;
           }
-          // play song icon select (20) type 1
+          // play song icon select (20) type 2
           if (((GLubyte) names[i*4+3]==20) && (spotify_oversigt.type==2)) {
             fprintf(stderr,"play spotify artist. type 2\n");
             write_logfile((char *) "play spotify artist.");
@@ -14464,6 +14464,7 @@ void loadgfx() {
     spotify_askplay       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askplay");
     spotify_askopen       = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_askopen");
     spotify_search        = loadgfxfile(temapath,(char *) "buttons/",(char *) "search");
+    spotify_search_back   = loadgfxfile(temapath,(char *) "buttons/",(char *) "search_back");
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
@@ -14629,7 +14630,8 @@ void freegfx() {
     glDeleteTextures( 1, &onlinestream_empty1);     // stream default icons
     glDeleteTextures( 1, &musicbutton);             //
     glDeleteTextures( 1, &spotify_askopen);         //
-    glDeleteTextures( 1, &spotify_search);          //
+    glDeleteTextures( 1, &spotify_search);          // button in spotify nomal view
+    glDeleteTextures( 1, &spotify_search_back);     // back button in spotify search view
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
@@ -15110,6 +15112,7 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
+
     write_logfile((char *) "Exit program.");
     return(EXIT_SUCCESS);
 }

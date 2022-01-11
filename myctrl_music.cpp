@@ -332,14 +332,14 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
         }
         if (global_use_internal_music_loader_system) {
           strcpy(tmptxt,"");
-        } else strcpy(tmptxt,configmusicpath);          // set defult start path from internal or mythtv if exist
-        sprintf(tmptxt2,"%s",row[2]);                           // hent dir id
-        hent_dir_id(tmptxt1,parent_id,tmptxt2);         // hent path af tmptxt2 som er = dir_id
-        strcpy(tmptxt3,tmptxt);                         // temptxt3 er = path
-        strcat(tmptxt3,"mythcFront.jpg");                     // add filename til cover
-        strcat(tmptxt,row[1]);                                      // add filename til sang
+        } else strcpy(tmptxt,configmusicpath);                                  // set defult start path from internal or mythtv if exist
+        sprintf(tmptxt2,"%s",row[2]);                                           // hent dir id
+        hent_dir_id(tmptxt1,parent_id,tmptxt2);                                 // hent path af tmptxt2 som er = dir_id
+        strcpy(tmptxt3,tmptxt);                                                 // temptxt3 er = path
+        strcat(tmptxt3,"mythcFront.jpg");                                       // add filename til cover
+        strcat(tmptxt,row[1]);                                                  // add filename til sang
         if ((strcmp(tmptxt3,husk_tmptxt3)!=0) && (file_exists(tmptxt3))) {
-          texture=loadTexture(tmptxt3);                         // load texture
+          texture=loadTexture(tmptxt3);                                         // load texture
         } else {
           texture=0;
         }
@@ -350,14 +350,6 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     if (debugmode & 2) printf("Numbers in playlist=%d \n",aktiv_playlist.numbers_in_playlist());
     mysql_close(conn);
 }
-
-// *****************************************************************************
-// new
-//
-// *****************************************************************************
-
-
-
 
 // ****************************************************************************************
 //

@@ -129,7 +129,7 @@ installsound:
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	#remove old link
-	@rm /usr/lib/libfmod.so.10
+	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."

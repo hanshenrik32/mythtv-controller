@@ -176,8 +176,8 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         if (curl_error==0) {
           curl_error=system(sed);
           if (curl_error==0) {
-          }
-          write_logfile((char *) "******** Got spotify token ********");
+            write_logfile((char *) "******** Got spotify token ********");
+          } else write_logfile((char *) "******** No spotify token ********");
           tokenfile=fopen("spotify_access_token2.txt","r");
           error=getline(&file_contents,&len,tokenfile);
           strcpy(token_string,file_contents);
@@ -364,7 +364,9 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
     spotify_update_loaded_begin=false;                                          // true then we are update the stack data
+    #if defined ENABLE_SPOTIFY
     start_webserver();
+    #endif
 }
 
 // ****************************************************************************************
@@ -374,9 +376,13 @@ spotify_class::spotify_class() : antal(0) {
 // ****************************************************************************************
 
 spotify_class::~spotify_class() {
+    #if defined ENABLE_SPOTIFY
+    // web sever stuf
     mg_mgr_free(&mgr);                        // delete web server again
     mg_mgr_free(&client_mgr);                 // delete web client
+    // spotify free memory used.
     clean_spotify_oversigt();                 // clean spotify class
+    #endif
 }
 
 
@@ -392,7 +398,7 @@ int spotify_class::start_webserver() {
   // create web server
   mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
   // start web server
-  write_logfile((char *) "Starting web server on port 80");
+  write_logfile((char *) "Starting web server on port 8000");
   this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
   mg_set_protocol_http_websocket(this->c);                                    // make http protocol
   //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
@@ -2888,11 +2894,14 @@ void spotify_class::clean_spotify_oversigt() {
       if (stack[i]) {
         // crash
         if (stack[i]->textureId) {
+          //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+          /*
           if (&stack[i]->textureId) {
             if (&stack[i]->textureId) {
               //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
             }
           }
+          */
         }
         delete stack[i];
       }

@@ -37,7 +37,7 @@
 
 // web port
 static const char *ss_http_port = "8002";
-//static struct mg_serve_http_opts s_http_server_opts;
+static struct mg_serve_http_opts tidal_s_http_server_opts;
 
 extern tidal_class tidal_oversigt;
 
@@ -50,12 +50,10 @@ const int feed_url=2000;
 const char *tidal_json_path = "tidal_json/";
 const char *tidal_gfx_path = "tidal_gfx/";
 
-
 size_t tidal_curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);
     return size * nmemb;
 }
-
 
 
 // ****************************************************************************************
@@ -199,12 +197,12 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
           }
         }
         //c->flags |= MG_F_SEND_AND_CLOSE;
-        mg_serve_http(c, (struct http_message *) ev_data, tidal_oversigt.s_http_server_opts);  /* Serve static content */
+        mg_serve_http(c, (struct http_message *) ev_data, tidal_s_http_server_opts);  /* Serve static content */
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
         opts.document_root = "./tidal_web";       // Serve files from the current directory
-        mg_serve_http(c, (struct http_message *) ev_data, tidal_oversigt.s_http_server_opts);
+        mg_serve_http(c, (struct http_message *) ev_data, tidal_s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.
       // Send HTTP reply to the client which shows full original request.
@@ -270,6 +268,7 @@ static void tidal_ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 // Constructor tidal devices
 //
 // ****************************************************************************************
+
 
 tidal_device_def::tidal_device_def() {
   strcpy(id,"");

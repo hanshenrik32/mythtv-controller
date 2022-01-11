@@ -103,10 +103,10 @@ class film_oversigt_type {
 
 class film_oversigt_typem : vlc_controller {
   private:
-      unsigned int filmoversigtsize;			       // antal elementer i array MAX def
+      unsigned int filmoversigtsize;			                                      // antal elementer i array MAX def
       bool film_oversigt_loaded;
-      bool film_is_pause;                        // pause ?
-      unsigned int filmoversigt_antal;			  	 // loaded antal
+      bool film_is_pause;                                                       // pause ?
+      unsigned int filmoversigt_antal;			  	                                // loaded antal
       int volume;
       // load vlc stuf
 //      libvlc_instance_t *vlc_inst;              //
@@ -116,8 +116,8 @@ class film_oversigt_typem : vlc_controller {
   public:
       bool get_search_view() { return (show_search_view); }
       void set_search_view(bool val) { show_search_view=val; }
-      bool film_is_playing;                       // playing ?
-      film_oversigt_type *filmoversigt;           // all movie array to show in movie overview
+      bool film_is_playing;                                                     // playing ?
+      film_oversigt_type *filmoversigt;                                         // all movie array to show in movie overview
       void sortfilm(int type);
       unsigned int film_antal(void) { return(filmoversigt_antal); }
       void set_film_antal(unsigned int antal) { filmoversigt_antal=antal; }

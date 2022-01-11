@@ -199,12 +199,6 @@ class tidal_class {
         int tidal_check_auth_status();
         int tidal_login();
         int start_webserver();
-
-
-        // web port
-        const char *s_http_port = "8002";
-        struct mg_serve_http_opts s_http_server_opts;
-
 };
 
 
