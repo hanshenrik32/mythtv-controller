@@ -127,7 +127,7 @@ extern bool stream_loadergfx_started_break;
 //
 // ****************************************************************************************
 
-static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
   const char *pspace;
   int n=0;
@@ -177,24 +177,28 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           curl_error=system(sed);
           if (curl_error==0) {
             write_logfile((char *) "******** Got spotify token ********");
-          } else write_logfile((char *) "******** No spotify token ********");
-          tokenfile=fopen("spotify_access_token2.txt","r");
-          error=getline(&file_contents,&len,tokenfile);
-          strcpy(token_string,file_contents);
-          token_string[strlen(token_string)-1]='\0';
-          error=getline(&file_contents,&len,tokenfile);
-          strcpy(token_refresh,file_contents);
-          token_refresh[strlen(token_refresh)-1]='\0';
-//          printf("token     %s\n",token_string);
-//          printf("ref token %s\n",token_refresh);
-          spotify_oversigt.spotify_set_token(token_string,token_refresh);
-          fclose(tokenfile);
-          free(file_contents);
-          if (strcmp(token_string,"")!=0) {
-            spotify_oversigt.spotify_get_user_id();                                   // get user id
-            spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
-            // set default spotify device if none
-            if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
+          } else {
+            write_logfile((char *) "******** No spotify token ********");
+          }
+          if (curl_error==0) {
+            tokenfile=fopen("spotify_access_token2.txt","r");
+            error=getline(&file_contents,&len,tokenfile);
+            strcpy(token_string,file_contents);
+            token_string[strlen(token_string)-1]='\0';
+            error=getline(&file_contents,&len,tokenfile);
+            strcpy(token_refresh,file_contents);
+            token_refresh[strlen(token_refresh)-1]='\0';
+  //          printf("token     %s\n",token_string);
+  //          printf("ref token %s\n",token_refresh);
+            spotify_oversigt.spotify_set_token(token_string,token_refresh);
+            fclose(tokenfile);
+            free(file_contents);
+            if (strcmp(token_string,"")!=0) {
+              spotify_oversigt.spotify_get_user_id();                                   // get user id
+              spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+              // set default spotify device if none
+              if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
+            }
           }
         }
         //c->flags |= MG_F_SEND_AND_CLOSE;
@@ -211,7 +215,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
       break;
     case MG_EV_HTTP_REPLY:
-      fprintf(stdout,"***************************************** CALL BACK server reply ***************************************");
+      write_logfile((char *) "Other CALL BACK server reply");
       c->flags |= MG_F_CLOSE_IMMEDIATELY;
       fwrite(hm->body.p, 1, hm->body.len, stdout);
       putchar('\n');
@@ -253,6 +257,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
         break;
       case MG_EV_CLOSE:
         if (s_exit_flag == 0) {
+          write_logfile((char *) ""Server closed connection.");
           fprintf(stdout,"Server closed connection\n");
           s_exit_flag = 1;
         };
@@ -350,6 +355,13 @@ spotify_class::spotify_class() : antal(0) {
     int port_cnt, n;
     int err = 0;
     strcpy(spotify_aktiv_song[0].release_date,"");
+    // create web server
+    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
+    // start web server
+    write_logfile((char *) "Starting web server on port 8000");
+    this->c = mg_bind(&mgr, s_http_port, spotify_server_ev_handler);                    // Create listening connection and add it to the event manager
+    mg_set_protocol_http_websocket(this->c);                                    // make http protocol
+    //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
     active_default_play_device=active_spotify_device;
     aktiv_song_spotify_icon=0;                                                  //
@@ -364,9 +376,6 @@ spotify_class::spotify_class() : antal(0) {
     strcpy(overview_show_cd_name,"");                                           //
     spotify_device_antal=0;
     spotify_update_loaded_begin=false;                                          // true then we are update the stack data
-    #if defined ENABLE_SPOTIFY
-    start_webserver();
-    #endif
 }
 
 // ****************************************************************************************
@@ -376,34 +385,10 @@ spotify_class::spotify_class() : antal(0) {
 // ****************************************************************************************
 
 spotify_class::~spotify_class() {
-    #if defined ENABLE_SPOTIFY
-    // web sever stuf
     mg_mgr_free(&mgr);                        // delete web server again
     mg_mgr_free(&client_mgr);                 // delete web client
-    // spotify free memory used.
     clean_spotify_oversigt();                 // clean spotify class
-    #endif
 }
-
-
-
-
-// ****************************************************************************************
-//
-// Start spotify web server
-//
-// ****************************************************************************************
-
-int spotify_class::start_webserver() {
-  // create web server
-  mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
-  // start web server
-  write_logfile((char *) "Starting web server on port 8000");
-  this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
-  mg_set_protocol_http_websocket(this->c);                                    // make http protocol
-  //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
-}
-
 
 
 // ****************************************************************************************
@@ -522,7 +507,7 @@ int spotify_class::spotify_refresh_token2() {
   if ((curl) && (strcmp(spotifytoken_refresh,"")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);                // spotify code
+    curl_easy_setopt(curl, CURLOPT_USERNAME, spotify_client_id);
     curl_easy_setopt(curl, CURLOPT_PASSWORD, spotify_secret_id);
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
@@ -1120,24 +1105,17 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
-          // add to logfile
-          strcpy(temptxt,"Add playlist ");
-          strcat(temptxt,row[0]);
-          strcat(temptxt," Spotifyid ");
-          strcat(temptxt,row[1]);
-          write_logfile((char *) temptxt);
           if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
-            write_logfile("Error create playlist in db.");
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
         }
       }
-      write_logfile((char *) "Process playlist done..");
+      write_logfile((char *) "process playlist done..");
       mysql_close(conn);
     }
   }
   catch (...) {
-    write_logfile((char *) "Error process playlist from spotify.");
+    write_logfile((char *) "Error process playlist");
   }
   return(1);
 }
@@ -2894,14 +2872,11 @@ void spotify_class::clean_spotify_oversigt() {
       if (stack[i]) {
         // crash
         if (stack[i]->textureId) {
-          //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
-          /*
           if (&stack[i]->textureId) {
             if (&stack[i]->textureId) {
               //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
             }
           }
-          */
         }
         delete stack[i];
       }
@@ -3381,7 +3356,6 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
   char artisid[1024];
   char filename[2048];
   char downloadfilenamelong[2048];
-  char debuglogdata[2048];
   int j;
   if (value == NULL) return;
   if (value->type != json_object) {
@@ -3430,10 +3404,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             strcpy(downloadfilenamelong,"");
             // https://i.scdn.co/image/c717baedc02b00bae7707b6de69aad8800e76aaa
             // get name from url
-            //if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
-            sprintf(debuglogdata,"# %d artist icon url found  : %s",antal,value->u.string.ptr);
-            write_logfile((char *) debuglogdata);
-
+            if (debugmode & 4) printf("# %d artist icon url found  : %s \n",antal,value->u.string.ptr);
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3459,11 +3430,7 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (!(stack[antal])) stack[antal]=new (spotify_oversigt_type);
             stack[antal]->textureId=0;
             strcpy(downloadfilenamelong,"");
-            //if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
-
-            sprintf(debuglogdata,"# %d artist icon url found  : %s",antal,value->u.string.ptr);
-            write_logfile((char *) debuglogdata);
-
+            if (debugmode & 4) printf("# %d cd cover icon url found  : %s \n",antal,value->u.string.ptr);
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
@@ -3809,12 +3776,9 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
 // ****************************************************************************************
 
 void *load_spotify_web(void *data) {
-  //if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
-  write_logfile("Start spotify loader thread");
-
+  if (debugmode & 4) fprintf(stderr,"Start spotify loader thread\n");
   //streamoversigt.loadweb_stream_iconoversigt();
-  //if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");
-  write_logfile("Stop spotify loader thread");
+  if (debugmode & 4) fprintf(stderr,"Stop spotify loader thread\n");
 }
 
 
@@ -3888,9 +3852,9 @@ int spotify_class::load_spotify_iconoversigt() {
   }
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (gfx_loaded) write_logfile("Spotify download done."); else write_logfile("Spotify download error.");
   if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"Spotify download done. \n"); else fprintf(stderr,"Spotify download error. \n");
+    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
+    else fprintf(stderr,"spotify download error. \n");
   }
   gfx_loaded=true;
   return(1);
