@@ -4814,12 +4814,14 @@ void display() {
       glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
         strcpy(temptxt1,"playlist : ");
-        strcat(temptxt1,spotify_oversigt.spotify_playlistname);
+        glcRenderString(temptxt1);
+        strcpy(temptxt1,spotify_oversigt.spotify_playlistname);
         *(temptxt1+46)=0;
         glcRenderString(temptxt1);
       } else {
         strcpy(temptxt,"Artist   : ");
-        strcat(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
+        glcRenderString(temptxt);
+        strcpy(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
         *(temptxt+46)=0;
         glcRenderString(temptxt);
       }
@@ -4875,17 +4877,17 @@ void display() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+170 ,        555 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+170 ,     19+555 , 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+170+200,  19+555 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+170 ,        555-20 , 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+170 ,     19+555-20 , 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+170+200,  19+555-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555-20 , 0.0);
       glEnd();
       glPopMatrix();
-      // show playtime
+      // show playtime as gfx box
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 560.0f, 0.0f);
+      glTranslatef(520.0f, 540.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       sprintf(temptxt1,"playtime : ");
@@ -4894,7 +4896,7 @@ void display() {
       glPushMatrix();
       glColor3f(1.0f, 1.0f, 1.0f);
       int statuswxpos = 432;
-      int statuswypos = 557;
+      int statuswypos = 557-20;
       float y=spotify_oversigt.spotify_aktiv_song_msplay()/1000;
       float ll=spotify_oversigt.spotify_aktiv_song_mslength()/1000;
       int xxx;
@@ -4915,7 +4917,7 @@ void display() {
       glPushMatrix();
       glDisable(GL_TEXTURE_2D);
       glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 540.0f, 0.0f);
+      glTranslatef(520.0f, 560.0f, 0.0f);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       glcRenderString("Release  : ");
