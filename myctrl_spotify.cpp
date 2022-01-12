@@ -257,7 +257,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
         break;
       case MG_EV_CLOSE:
         if (s_exit_flag == 0) {
-          write_logfile((char *) ""Server closed connection.");
+          write_logfile((char *) "Server closed connection.");
           fprintf(stdout,"Server closed connection\n");
           s_exit_flag = 1;
         };
@@ -358,8 +358,8 @@ spotify_class::spotify_class() : antal(0) {
     // create web server
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
-    write_logfile((char *) "Starting web server on port 8000");
-    this->c = mg_bind(&mgr, s_http_port, spotify_server_ev_handler);                    // Create listening connection and add it to the event manager
+    write_logfile((char *) "Starting web server on port 8000");                 //
+    this->c = mg_bind(&mgr, s_http_port, spotify_server_ev_handler);            // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->c);                                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active
