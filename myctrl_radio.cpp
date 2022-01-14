@@ -449,7 +449,7 @@ int radiostation_class::opdatere_radio_oversigt(int radiosortorder) {
 extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
-bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
+bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_icon_mask,GLuint back_icon,GLuint dirplaylist_icon,int _mangley) {
     static bool show_all_kode_errors=false;
     int buttonsize=200;
     int buttonsizey=180;
@@ -590,7 +590,10 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
         if (stack[i+sofset]->land>0) {
           // gfxlandemask mask
           if (gfxlande[stack[i+sofset]->land]) {
-            glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);
+            glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);       //
+
+            //glBindTexture(GL_TEXTURE_2D,gfxlande[i+sofset]);
+
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(10+ xof, yof+10 , 0.0);
             glTexCoord2f(0, 1); glVertex3f(10+ xof,yof+30+10, 0.0);
@@ -602,7 +605,6 @@ bool radiostation_class::show_radio_oversigt1(GLuint normal_icon,GLuint normal_i
             // write debug log
             sprintf(debuglogdata,"Contry code %d missing flag, File name %s",stack[i+sofset]->land,gfxlande[stack[i+sofset]->land]);
             if (gfxlande[stack[i+sofset]->land]==0) {
-              sprintf(debuglogdata,"Contry code %d is missing filename.",stack[i+sofset]->land);
               if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
             } else if (show_all_kode_errors==false) write_logfile((char *) debuglogdata);
           }

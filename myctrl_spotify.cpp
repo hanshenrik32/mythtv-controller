@@ -127,7 +127,7 @@ extern bool stream_loadergfx_started_break;
 //
 // ****************************************************************************************
 
-static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *p;
   const char *pspace;
   int n=0;
@@ -176,25 +176,29 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         if (curl_error==0) {
           curl_error=system(sed);
           if (curl_error==0) {
+            write_logfile((char *) "******** Got spotify token ********");
+          } else {
+            write_logfile((char *) "******** No spotify token ********");
           }
-          write_logfile((char *) "******** Got spotify token ********");
-          tokenfile=fopen("spotify_access_token2.txt","r");
-          error=getline(&file_contents,&len,tokenfile);
-          strcpy(token_string,file_contents);
-          token_string[strlen(token_string)-1]='\0';
-          error=getline(&file_contents,&len,tokenfile);
-          strcpy(token_refresh,file_contents);
-          token_refresh[strlen(token_refresh)-1]='\0';
-//          printf("token     %s\n",token_string);
-//          printf("ref token %s\n",token_refresh);
-          spotify_oversigt.spotify_set_token(token_string,token_refresh);
-          fclose(tokenfile);
-          free(file_contents);
-          if (strcmp(token_string,"")!=0) {
-            spotify_oversigt.spotify_get_user_id();                                   // get user id
-            spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
-            // set default spotify device if none
-            if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
+          if (curl_error==0) {
+            tokenfile=fopen("spotify_access_token2.txt","r");
+            error=getline(&file_contents,&len,tokenfile);
+            strcpy(token_string,file_contents);
+            token_string[strlen(token_string)-1]='\0';
+            error=getline(&file_contents,&len,tokenfile);
+            strcpy(token_refresh,file_contents);
+            token_refresh[strlen(token_refresh)-1]='\0';
+  //          printf("token     %s\n",token_string);
+  //          printf("ref token %s\n",token_refresh);
+            spotify_oversigt.spotify_set_token(token_string,token_refresh);
+            fclose(tokenfile);
+            free(file_contents);
+            if (strcmp(token_string,"")!=0) {
+              spotify_oversigt.spotify_get_user_id();                                   // get user id
+              spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
+              // set default spotify device if none
+              if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
+            }
           }
         }
         //c->flags |= MG_F_SEND_AND_CLOSE;
@@ -211,7 +215,7 @@ static void server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
       //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
       break;
     case MG_EV_HTTP_REPLY:
-      fprintf(stdout,"***************************************** CALL BACK server reply ***************************************");
+      write_logfile((char *) "Other CALL BACK server reply");
       c->flags |= MG_F_CLOSE_IMMEDIATELY;
       fwrite(hm->body.p, 1, hm->body.len, stdout);
       putchar('\n');
@@ -253,6 +257,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
         break;
       case MG_EV_CLOSE:
         if (s_exit_flag == 0) {
+          write_logfile((char *) "Server closed connection.");
           fprintf(stdout,"Server closed connection\n");
           s_exit_flag = 1;
         };
@@ -353,8 +358,8 @@ spotify_class::spotify_class() : antal(0) {
     // create web server
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
-    write_logfile((char *) "Starting web server on port 80");
-    this->c = mg_bind(&mgr, s_http_port, server_ev_handler);                    // Create listening connection and add it to the event manager
+    write_logfile((char *) "Starting web server on port 8000");                 //
+    this->c = mg_bind(&mgr, s_http_port, spotify_server_ev_handler);            // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->c);                                    // make http protocol
     //mg_connect_http(&mgr, ev_handler, "", NULL, NULL);
     active_spotify_device=-1;                                                   // active spotify device -1 = no dev is active

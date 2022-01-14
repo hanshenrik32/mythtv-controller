@@ -3577,7 +3577,7 @@ void tv_oversigt::opdatere_tv_oversigt(char *mysqlhost,char *mysqluser,char *mys
 
         write_logfile((char *) sqlselect);
 
-        printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
+        //printf("SQL SELECT TV GUIDE : %s \n",sqlselect);
 
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
@@ -4488,7 +4488,7 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     case 4: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
     default:
-          snprintf(temprgtxt,65,"Prg name : %-20s",65,tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+          snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
   }
   glTranslatef(700,525, 0.0f);
   glScalef(20.0, 20.0,1);
@@ -4881,7 +4881,7 @@ void earlyrecorded::getrecordprogram(char *mysqlhost,char *mysqluser,char *mysql
 // ****************************************************************************************
 //
 // viser liste over tv programmer som skal optages.
-//
+// do not work
 // ****************************************************************************************
 
 void earlyrecorded::showtvreclist() {

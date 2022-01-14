@@ -78,7 +78,7 @@ film_oversigt_type::film_oversigt_type() {
     film_imdbnr=new char[20];           //
     category_name=new char[128];	      // from mythtv film type (tal = database)
     genre=new char[200];		            //
-    for(int n=0;n<20;n++) strcpy(cast[n],"");
+    for(auto n=0;n<20;n++) strcpy(cast[n],"");
     cover3d=false;
 }
 
@@ -408,6 +408,7 @@ void film_oversigt_typem::setcolume(int volume) {
 //type=0 by movie name
 //type=1 by id
 //type=2 by add date
+//default by movie name
 
 // ****************************************************************************************
 //
@@ -417,37 +418,51 @@ void film_oversigt_typem::sortfilm(int type) {
   bool swap=false;
   unsigned int i;
   unsigned int antal=get_film_antal();
-  if (type==0) {
-    do {
-      swap=false;
-      for(i=0;i<antal-1;i++) {
-        if (strcmp(filmoversigt[i].getfilmtitle(),filmoversigt[i+1].getfilmtitle())>0) {
-          filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
-          swap=true;
-        }
-      }
-    } while(swap);
-  } else if (type==1) {
-    do {
-      swap=false;
-      for(i=0;i<antal-1;i++) {
-        if (filmoversigt[i].getfilmnr()>filmoversigt[i+1].getfilmnr()) {
-          filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
-          swap=true;
-        }
-      }
-    } while(swap);
-  } else if (type==2) {
-    do {
-        swap=false;
-        for(i=0;i<antal-1;i++) {
-          if (strcmp(filmoversigt[i].getfilm_adddate(),filmoversigt[i+1].getfilm_adddate())>0) {
-            filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
-            swap=true;
+  switch (type) {
+      case 0:
+        do {
+          swap=false;
+          for(i=0;i<antal-1;i++) {
+            if (strcmp(filmoversigt[i].getfilmtitle(),filmoversigt[i+1].getfilmtitle())>0) {
+              filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
+              swap=true;
+            }
           }
-        }
-    } while(swap);
-  }
+        } while(swap);
+        break;
+      case 1:
+        do {
+          swap=false;
+          for(i=0;i<antal-1;i++) {
+            if (filmoversigt[i].getfilmnr()>filmoversigt[i+1].getfilmnr()) {
+              filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
+              swap=true;
+            }
+          }
+        } while(swap);
+        break;
+      case 2:
+        do {
+            swap=false;
+            for(i=0;i<antal-1;i++) {
+              if (strcmp(filmoversigt[i].getfilm_adddate(),filmoversigt[i+1].getfilm_adddate())>0) {
+                filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
+                swap=true;
+              }
+            }
+        } while(swap);
+        break;
+      default:
+        do {
+          swap=false;
+          for(i=0;i<antal-1;i++) {
+            if (strcmp(filmoversigt[i].getfilmtitle(),filmoversigt[i+1].getfilmtitle())>0) {
+              filmoversigt->swap_film(&filmoversigt[i],&filmoversigt[i+1]);
+              swap=true;
+            }
+          }
+        } while(swap);
+    }
 }
 
 
@@ -1257,10 +1272,12 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   int xpos,ypos;
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<6)) {
+    /*
     strcpy(tmpfilename,this->filmoversigt[movie_oversigt_loaded_nr].getfilmcoverfile());
     if ((file_exists(tmpfilename)) && (this->filmoversigt[movie_oversigt_loaded_nr].gettextureid()==0)) {
       this->filmoversigt[movie_oversigt_loaded_nr].settextureidfile(tmpfilename);
     }
+    */
     if (movie_oversigt_loaded_nr==(int) filmoversigt_antal) {
       movie_oversigt_loaded=true;
       movie_oversigt_loaded_done=1;
@@ -1607,7 +1624,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glEnd();
     glPopMatrix();
 
-    sprintf(temptxt,"No info from %s backend.",configbackend);
+    sprintf(temptxt,"No movie info from %s backend.",configbackend);
     strcat(temptxt,configmysqlhost);
     glPushMatrix();
     xpos=700;

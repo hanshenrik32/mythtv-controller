@@ -24,7 +24,7 @@
 #include "myctrl_readwebfile.h"
 
 extern film_oversigt_typem film_oversigt;
-extern music_oversigt_type musicoversigt[];
+//extern musicoversigt_class musicoversigt;
 extern int configxbmcver;
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
