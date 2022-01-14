@@ -4861,6 +4861,7 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
       sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
+      temptxt1[40]=0;
       glcRenderString(temptxt1);
       glPopMatrix();
 
@@ -5262,7 +5263,7 @@ void display() {
               glPushMatrix();
               glDisable(GL_TEXTURE_2D);
               // show song name
-              sprintf(temptxt,": %-30s",aktivsongname);
+              sprintf(temptxt," %-30s",aktivsongname);
               temptxt[22]=0;
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
@@ -5311,7 +5312,7 @@ void display() {
                         break;
                 default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
               }
-              sprintf(temptxt,": %s",radiooversigt.get_station_name(aktiv_radio_station));
+              sprintf(temptxt," %s",radiooversigt.get_station_name(aktiv_radio_station));
               temptxt[39]=0;
               glScalef(20,20, 1.0);
               glColor4f(1.0f,1.0f,1.0f,1.0f);
@@ -5357,7 +5358,7 @@ void display() {
               glTranslatef(1, 1, 0);
               glScalef(20,20, 1.0);                    // danish charset ttf
               glColor4f(1.0f,1.0f,1.0f,1.0f);
-              sprintf(temptxt,": %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
+              sprintf(temptxt," %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
               glcRenderString(temptxt);
               glPopMatrix();
               glPushMatrix();
@@ -5383,7 +5384,7 @@ void display() {
               glPushMatrix();
               // speed info
               frequency=192;
-              sprintf(temptxt,": %3.0f Kbits",frequency);
+              sprintf(temptxt," %3.0f Kbits",frequency);
               temptxt[40]=0;
               switch (screen_size) {
                 case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
@@ -5433,7 +5434,7 @@ void display() {
                 default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
               }
               // song status / loading
-              sprintf(temptxt,": %-20s",aktivsongstatus);
+              sprintf(temptxt," %-20s",aktivsongstatus);
               temptxt[40]=0;
               glColor4f(1.0f,1.0f,1.0f,1.0f);
               glRasterPos2f(120.f, 100.f);

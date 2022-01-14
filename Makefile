@@ -7,9 +7,9 @@ LDFLAGS=
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
 CONFIG_FILE= mythtv-controller.conf
-DESTDIR    = /usr/share/mythtv-controller
+DESTDIR    = /opt/mythtv-controller
 DESTDIRBIN = /usr/bin
-DESTIMG    = /usr/share/mythtv-controller/images
+DESTIMG    = /opt/mythtv-controller/images
 DESTLIBDIR = /usr/local/lib
 DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
@@ -130,7 +130,7 @@ installsound:
 	chmod 666 ~/.xmltv/*
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
-	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
+	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmodL.so.12.7 /usr/lib/libfmod.so.12
 	@echo "Done installing fmod32/64 version 4.44.41"
 	@echo "Sound system installed."
 
