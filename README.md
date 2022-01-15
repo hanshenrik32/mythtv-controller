@@ -15,8 +15,6 @@ mythtv-controller ver 39.4
 
 music struct moved to class
 
-
-
 mythtv-controller ver 39.0
 
 All log is moved to log file in you home directory.

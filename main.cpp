@@ -32,7 +32,8 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
-
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 using namespace std;
 
@@ -41,7 +42,9 @@ using namespace std;
 #define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
-
+// Set sound system used
+#define USE_SDL_MIXER 1
+//#define USE_FMOD_MIXER 1
 
 //
 
@@ -53,13 +56,11 @@ bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 bool stream_jump = false;
 
-// Set sound system used
-//#define USE_SDL_MIXER 1
-#define USE_FMOD_MIXER 1
 
-#if defined USE_SDL_MIXER
-#include <SDL_mixer.h>
-#endif
+//#if defined USE_SDL_MIXER
+//#include <SDL_mixer.h>
+//#endif
+
 #if defined __APPLE__ && defined __MACH__
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>

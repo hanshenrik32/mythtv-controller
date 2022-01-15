@@ -167,6 +167,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
           }
           user_token[codel-4]='\0';
         }
+        /*
         //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id,tidal_oversigt.tidal_secret_id);
         //old snprintf(sql,2045,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code);
         snprintf(sql,2045,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d redirect_uri=http://localhost:8002/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id);
@@ -196,6 +197,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
             //if (tidal_oversigt.active_tidal_device==-1) tidal_oversigt.active_tidal_device=0;
           }
         }
+        */
         //c->flags |= MG_F_SEND_AND_CLOSE;
         mg_serve_http(c, (struct http_message *) ev_data, tidal_s_http_server_opts);  /* Serve static content */
       } else {
