@@ -80,8 +80,6 @@ compile: $(PROG)
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
-#$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
-
 gitcompile:
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
