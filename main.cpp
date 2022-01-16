@@ -13723,7 +13723,7 @@ void *datainfoloader_movie(void *data) {
 void *datainfoloader_stream(void *data) {
   // write debug log
   write_logfile((char *) "loader thread starting - Loading stream info from rss feed.");
-  streamoversigt.loadrssfile(0);                                              // download rss files (())
+  //streamoversigt.loadrssfile(0);                                              // download rss files (())
   streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
   write_logfile((char *) "loader thread done loaded stream stations.");
   do_update_rss_show=false;

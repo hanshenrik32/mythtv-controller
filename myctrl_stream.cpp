@@ -272,7 +272,6 @@ int stream_class::loadrssfile(bool updaterssfile) {
   struct stat attr;
   const int updateinterval=86400;
   time(&timenow);
-  conn=mysql_init(NULL);
   // get homedir
   getuserhomedir(homedir);
   strcat(homedir,"/rss");
@@ -282,7 +281,9 @@ int stream_class::loadrssfile(bool updaterssfile) {
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
   //strcpy(sqlselect,"select * from internetcontentarticles");
+  conn=mysql_init(NULL);
   if (conn) {
+    conn=mysql_init(NULL);
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL IS NULL");
     mysql_query(conn,sqlselect);
@@ -369,7 +370,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
             }
           }
           // write log
-          sprintf(debuglogdata,"Podcast update %s ",row[0]);
+          snprintf(debuglogdata,50,"Podcast update %s ",row[0]);
           strncpy(streamudate_nowstring,row[0],30);
           streamudate_nowstring[30]=0;                                          // max length
           write_logfile((char *) debuglogdata);
@@ -805,7 +806,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char homedir[1024];
     // mysql vars
     bool rss_update=false;
-    MYSQL *conn;
+    MYSQL *conn=NULL;
     MYSQL_RES *res;
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
@@ -813,10 +814,21 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     int getart=0;
     bool loadstatus=true;
     bool dbexist=false;
+    bool dorss_update=false;
+    static time_t timenow;
+    static time_t lasttime=0;
     antal=0;
-    conn=mysql_init(NULL);
-    // Connect to database
-    if (conn) {
+    timenow=time(NULL);
+    if (antal_rss_streams()>0) {
+       if (lasttime==0) lasttime=timenow;
+    } else lasttime=0;                                                          // update now
+    if (timenow>lasttime+600) {
+      dorss_update=true;
+      lasttime=timenow;
+    } else dorss_update=false;
+    if (dorss_update) {
+      // Connect to database
+      conn=mysql_init(NULL);
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
         dbexist=false;
       }
