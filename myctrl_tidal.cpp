@@ -154,7 +154,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       // Invoked when the full HTTP request is in the buffer (including body).
       // from tidal servers
       // is callback call
-      if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
+      if (mg_strncmp( hm->uri,mg_mk_str_n("tidal_web/callback",9),9) == 0) {
         if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
@@ -203,7 +203,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = "./tidal_web";       // Serve files from the current directory
+        opts.document_root = "tidal_web";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, tidal_s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.

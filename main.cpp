@@ -105,6 +105,7 @@ int movie_oversigt_loaded_nr=0;                                                 
 bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
+bool tidal_oversigt_loaded_begin = false;                                      // true then spotify update is started
 
 #ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                                                         // fmod Sound device
@@ -493,7 +494,6 @@ GLuint canalnames;
 int tvstartxofset=0;
 // ************************************************************************************************
 extern mplaylist aktiv_playlist;                                                // music play list
-
 struct dirmusic_list_type {
     char name[200];
     unsigned int songlength;
@@ -840,9 +840,13 @@ unsigned int setupwlanselectofset=0;                                            
 
 const int TEMA_ANTAL=10;                                                        // numbers of tema
 
+char streamudate_nowstring[200];
+
+
 // define for use before function is created
 void *update_music_phread_loader();
 void *update_spotify_phread_loader();
+void *update_tidal_phread_loader();
 void *update_webserver_phread_loader();
 void *update_spotifyonline_phread_loader();
 void *webupdate_loader_spotify(void *data);
@@ -2452,6 +2456,7 @@ static bool do_update_xmltv     = false;                            // Start upd
 static bool do_update_music_now = false;                            // start the process to update music db from global dir
 static bool do_update_moviedb   = false;                            // set true to start thread on update movie db
 static bool do_update_spotify   = true;                             // set true to start thread on update spotify + run web server
+static bool do_update_tidal     = false;                             // set true to start thread on update spotify + run web server
 
 
 
@@ -6525,19 +6530,27 @@ void display() {
       update_music_phread_loader();
       do_update_music = false;
     }
+    // update spotify (in main)
     if (do_update_spotify) {
       fprintf(stderr,"Start phread spotify and web server.\n");
       update_spotify_phread_loader();                                           // update spotify view (load it)
       update_webserver_phread_loader();                                         //
       do_update_spotify = false;
     }
+    // update tidal (in main)
+    if (do_update_tidal) {
+      fprintf(stderr,"Start phread tidal and web server.\n");
+      update_tidal_phread_loader();                                           // update spotify view (load it)
+      //update_webserver_phread_loader();                                         //
+      do_update_tidal = false;
+    }
+
     //  don't wait!
     //  start processing buffered OpenGL routines
     //
     glFlush();
     //glfwPollEvents(); // do not exist in linux
     glutSwapBuffers();
-
 
 }
 // end display()
@@ -13738,6 +13751,28 @@ void *datainfoloader_spotify(void *data) {
   pthread_exit(NULL);
 }
 
+
+
+// ****************************************************************************************
+//
+// phread dataload tidal
+//
+// ****************************************************************************************
+
+void *datainfoloader_tidal(void *data) {
+  #ifdef ENABLE_TIDAL
+  tidal_oversigt_loaded_begin=true;
+  // write debug log
+  write_logfile((char *) "loader thread starting - Loading tidal info from db.");
+  tidal_oversigt->opdatere_tidal_oversigt(0);                                // update from db
+  //tidal_oversigt.set_search_loaded();                           // triger icon loader
+  write_logfile((char *) "loader thread done loaded tidal.");
+  tidal_oversigt_loaded_begin=false;
+  #endif
+  pthread_exit(NULL);
+}
+
+
 // ****************************************************************************************
 //
 // Phread datadb update from spotify (online)
@@ -13986,6 +14021,27 @@ void *update_webserver_phread_loader() {
     }
   }
 }
+
+// ****************************************************************************************
+//
+// tidal db loader.
+//
+// ****************************************************************************************
+
+void *update_tidal_phread_loader() {
+  #ifdef ENABLE_TIDAL
+  if (true) {
+    pthread_t loaderthread2;           // load spotify into db
+    int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_tidal,NULL);
+    if (rc2) {
+      fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+  }
+  #endif
+}
+
+
 
 
 //
@@ -14860,6 +14916,7 @@ int main(int argc, char** argv) {
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
+    strcpy(streamudate_nowstring,"");                                           // show update string/name from rss updater
     //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
     //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);

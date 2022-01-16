@@ -25,7 +25,7 @@
 //
 
 extern char debuglogdata[1024];                                  // used by log system
-
+extern char streamudate_nowstring[];
 extern char debuglogdata[1024];                                  // used by log system
 extern float configdefaultstreamfontsize;
 extern int tema;
@@ -368,6 +368,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
               haveupdated=true;
             }
           }
+          // write log
+          sprintf(debuglogdata,"Podcast update %s ",row[0]);
+          strncpy(streamudate_nowstring,row[0],30);
+          streamudate_nowstring[30]=0;                                          // max length
+          write_logfile((char *) debuglogdata);
         }
       }
       mysql_free_result(res);
@@ -4013,5 +4018,18 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glcRenderString("Please wait Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
+
+      // show rss update channel name
+      glPushMatrix();
+      xof=700;
+      yof=230;
+      glTranslatef(xof, yof ,0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glDisable(GL_TEXTURE_2D);
+      glScalef(22.0, 22.0, 1.0);
+      glcRenderString(streamudate_nowstring);
+      glEnable(GL_TEXTURE_2D);
+      glPopMatrix();
+
     }
 }

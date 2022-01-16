@@ -145,9 +145,13 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
   char token_string[512];
   char token_refresh[512];
   unsigned int codel;
+  #ifdef ENABLE_SPOTIFY
   strcpy(data,spotify_oversigt.spotify_client_id);
+  #endif
   strcat(data,":");
+  #ifdef ENABLE_SPOTIFY
   strcat(data,spotify_oversigt.spotify_secret_id);
+  #endif
   char sed[]="cat spotify_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
@@ -170,7 +174,9 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
           }
           user_token[codel-4]='\0';
         }
+        #ifdef ENABLE_SPOTIFY
         sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        #endif
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
         if (curl_error==0) {
@@ -190,14 +196,18 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
             token_refresh[strlen(token_refresh)-1]='\0';
   //          printf("token     %s\n",token_string);
   //          printf("ref token %s\n",token_refresh);
+            #ifdef ENABLE_SPOTIFY
             spotify_oversigt.spotify_set_token(token_string,token_refresh);
+            #endif
             fclose(tokenfile);
             free(file_contents);
             if (strcmp(token_string,"")!=0) {
+              #ifdef ENABLE_SPOTIFY
               spotify_oversigt.spotify_get_user_id();                                   // get user id
               spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
               // set default spotify device if none
               if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
+              #endif
             }
           }
         }
@@ -1061,8 +1071,10 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
             system("cat spotify_users_playlist.json | grep total | tail -1 | awk {'print $3'} > spotify_users_playlist_antal.txt");
             json_file = fopen("spotify_users_playlist_antal.txt", "r");
             fscanf(json_file, "%s", temptxt);
+            #ifdef ENABLE_SPOTIFY
             if (strcmp(temptxt,"")!=0) spotify_oversigt.spotify_playlist_antal = atoi(temptxt);
             else spotify_oversigt.spotify_playlist_antal = 0;
+            #endif
             fclose(json_file);
           }
           stat("spotify_users_playlist.txt", &filestatus);                              // get file info
@@ -1074,8 +1086,10 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
               while(!(feof(json_file))) {
                 fscanf(json_file, "%s", file_contents);
                 // process playlist id
+                #ifdef ENABLE_SPOTIFY
                 spotify_oversigt.spotify_get_playlist(file_contents,force,1);
                 spotify_oversigt.clean_spotify_oversigt();
+                #endif
                 loaded_antal++;
               }
               fclose(json_file);
@@ -1085,12 +1099,14 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           spotify_playlistantal_loaded+=startoffset;
           // next loop
           // 50 is loaded on each loop until end
+          #ifdef ENABLE_SPOTIFY
           if ((startoffset+50)<spotify_oversigt.spotify_playlist_antal) {
             startoffset+=50;
           } else {
             startoffset=spotify_oversigt.spotify_playlist_antal-startoffset;
           }
           if (spotify_playlistantal_loaded>=spotify_oversigt.spotify_playlist_antal) spotifyplaylistloader_done=true;
+          #endif
         }
         if (remove("spotify_users_playlist.txt")!=0) write_logfile((char *) "Error remove user playlist file spotify_users_playlist.txt");
         // save data to mysql db
@@ -1105,9 +1121,11 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+          #ifdef ENABLE_SPOTIFY
           if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
+          #endif
         }
       }
       write_logfile((char *) "process playlist done..");
@@ -2047,7 +2065,8 @@ int spotify_class::spotify_resume_play() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=spotify_oversigt.get_active_device_id();
+  char *devid;
+  devid=spotify_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/play";
@@ -2121,7 +2140,8 @@ int spotify_class::spotify_last_play2() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=spotify_oversigt.get_active_device_id();
+  char *devid;
+  devid=spotify_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/last";
@@ -2196,7 +2216,8 @@ int spotify_class::spotify_next_play2() {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  char *devid=spotify_oversigt.get_active_device_id();
+  char *devid;
+  devid=spotify_oversigt.get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/next";
