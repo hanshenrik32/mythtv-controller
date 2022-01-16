@@ -1,4 +1,4 @@
-husk imageconvert 
+husk imageconvert
 
 tv module to use in the future
 
@@ -10,11 +10,25 @@ if ypu wants to make the deb file you have to install debhelper
 
 https://www.imagemagick.org/Usage/thumbnails/#cut
 
-# mythtv-controller 
+# mythtv-controller
 # packs to install to compile on Ubuntu 10.xx/12.xx
 # Updated 01/11/2014
 # Updated 27/08/2017
 # Soon support for vdr recording
+
+
+If you wants to use the SDL mixer as player you can use this file formats
+
+SDL_mixer supports playing music and sound samples from the following formats:
+- WAVE/RIFF (.wav)
+- AIFF (.aiff)
+- VOC (.voc)
+- MOD (.mod .xm .s3m .669 .it .med and more) requiring libmikmod on system
+- MIDI (.mid) using timidity or native midi hardware
+- OggVorbis (.ogg) requiring ogg/vorbis libraries on system
+- MP3 (.mp3) requiring SMPEG or MAD library on system
+- FLAC (.flac) requiring the FLAC library on system - also any command-line player, which is not mixed by SDL_mixer...
+
 
 Version.
 
@@ -61,15 +75,15 @@ Howto install.
 
 The ease way is to download the deb version by dubble click on it.
 
-The source version install is like this. 
+The source version install is like this.
 
 This packets need to be installed on Ubuntu.
 
 Ver 12.xx
 
-g++ make libdevil-dev libcurl-ocaml-dev libsdl1.2-dev glutg3-dev 
-libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source dialog 
-imagemagick liblircclient-dev xmltv libglc-dev libical-dev unzip 
+g++ make libdevil-dev libcurl-ocaml-dev libsdl1.2-dev glutg3-dev
+libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source dialog
+imagemagick liblircclient-dev xmltv libglc-dev libical-dev unzip
 libical-dev unzip libical-dev lirc
 
 Do command to install packets.
@@ -120,7 +134,7 @@ screen saver types
 analog		- Analog clock
 digital		- Digital clock
 3D		- 3d cover
-3D2		- 
+3D2		-
 PICTURE3D	- Pictures in Photos directory in homedir
 none		- None screen saver
 MUSICMETER	- Music meter
@@ -129,7 +143,7 @@ MUSICMETER	- Music meter
 # First start is slow, if your mythtv is setup right. The program have to
 # convert some gfx/cdcover/dvdcover file to internal format.
 #
-# After start. First jump to F1 menu for setup. 
+# After start. First jump to F1 menu for setup.
 # Check the database setup for connect to mythtv backend.
 # After setup is okay.. restart the program to load the data from the mythtv
 # system the radio stations will be installed by the mythtv-controller
@@ -141,6 +155,3 @@ MUSICMETER	- Music meter
 # release under GPL
 # hanshenrik32@gmail.com
 #
-
-
-

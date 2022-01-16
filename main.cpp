@@ -32,19 +32,22 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
+// for music player if slected.
 #include <SDL.h>
 #include <SDL_mixer.h>
 
 using namespace std;
+
+extern char __BUILD_NUMBER;
 
 // if defined the support will be enabled
 
 #define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
-// Set sound system used
-#define USE_SDL_MIXER 1
-//#define USE_FMOD_MIXER 1
+// Set sound system used REMBER only one active.
+//#define USE_SDL_MIXER 1
+#define USE_FMOD_MIXER 1
 
 //
 
@@ -104,7 +107,7 @@ bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
 
 #ifdef USE_FMOD_MIXER
-FMOD::DSP* dsp = 0;                   // fmod Sound device
+FMOD::DSP* dsp = 0;                                                         // fmod Sound device
 #endif
 
 // screen saver uv stuf
@@ -138,9 +141,6 @@ extern char __BUILD_NUMBER;
 #ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
 #endif
-//#ifdef ENABLE_TIDAL
-//#include "myctrl_tidal.h"
-//#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"

@@ -70,10 +70,11 @@ all:
 
 compile: $(PROG)
 	@if ! test -d ~/.config/lirc/; then \
-	mkdir  ~/.config/lirc/; \
+	mkdir -p ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
 	fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	@if ! test -f $(BUILD_NUMBER_FILE); then echo 0 > $(BUILD_NUMBER_FILE); fi
 	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
