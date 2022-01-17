@@ -355,6 +355,7 @@ spotify_class::spotify_class() : antal(0) {
     search_playlist_song=0;
     int port_cnt, n;
     int err = 0;
+    search_type=0;                                                              // default artist
     strcpy(spotify_aktiv_song[0].release_date,"");
     // create web server
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
@@ -3821,8 +3822,11 @@ int spotify_class::load_spotify_iconoversigt() {
   char homedir[200];
   this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("spotify icon loader.\n");
+  write_logfile((char *) "Start spotify icon loader.");
   while(nr<=streamantal()) {
-    if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    //if (debugmode & 4) printf("Loading texture nr %-4d Title %40s  icon path %s\n",nr,stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    sprintf(debuglogdata,"Loading texture Title %40s  icon path %s ",stack[nr]->feed_name,stack[nr]->feed_gfx_url);
+    write_logfile((char *) debuglogdata);
     if ((stack[nr]) && (strcmp(stack[nr]->feed_gfx_url,"")!=0)) {
       if (stack[nr]->textureId==0) {
         // if url
@@ -3842,10 +3846,8 @@ int spotify_class::load_spotify_iconoversigt() {
   }
   // set loaded flag in class
   if (nr>0) this->gfx_loaded=true; else this->gfx_loaded=false;
-  if (debugmode & 4) {
-    if (gfx_loaded) fprintf(stderr,"spotify download done. \n");
-    else fprintf(stderr,"spotify download error. \n");
-  }
+  if (gfx_loaded) write_logfile((char *) "Spotify icon loader .");
+  else write_logfile((char *) "spotify download error.");
   gfx_loaded=true;
   return(1);
 }
@@ -4260,7 +4262,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // type of search
-    switch (searchtype) {
+    switch (spotify_oversigt.get_search_type()) {                                                // searchtype
       case 0: glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
               break;
       case 1: glBindTexture(GL_TEXTURE_2D,big_search_bar_albumm);

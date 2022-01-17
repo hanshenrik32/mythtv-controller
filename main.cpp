@@ -9386,8 +9386,19 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #ifdef ENABLE_SPOTIFY
                 if (vis_spotify_oversigt) {
+                  if (spotify_oversigt.get_search_type()==0) spotify_oversigt.set_search_type(1);
+                  else if (spotify_oversigt.get_search_type()==1) spotify_oversigt.set_search_type(2);
+                  else if (spotify_oversigt.get_search_type()==2) spotify_oversigt.set_search_type(3);
+                  else spotify_oversigt.set_search_type(0);
+                  sprintf(debuglogdata,"Spotify search type is %d ",spotify_oversigt.get_search_type());
+                  write_logfile(debuglogdata);
+                }
+
+                /*
+                if (vis_spotify_oversigt) {
                   spotify_oversigt.search_playlist_song=!spotify_oversigt.search_playlist_song;
                 }
+                */
                 #endif
                 // if indside tv overoview
                 if (vis_tv_oversigt) {
@@ -9437,8 +9448,20 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #ifdef ENABLE_SPOTIFY
                 if (vis_spotify_oversigt) {
+                  if (spotify_oversigt.get_search_type()==3) spotify_oversigt.set_search_type(2);
+                  else if (spotify_oversigt.get_search_type()==2) spotify_oversigt.set_search_type(1);
+                  else if (spotify_oversigt.get_search_type()==1) spotify_oversigt.set_search_type(0);
+                  else spotify_oversigt.set_search_type(3);
+                  sprintf(debuglogdata,"Spotify search type is %d ",spotify_oversigt.get_search_type());
+                  write_logfile(debuglogdata);
+                }
+                /*
+                if (vis_spotify_oversigt) {
                   spotify_oversigt.search_playlist_song=!spotify_oversigt.search_playlist_song;
                 }
+                */
+
+
                 #endif
                 if (vis_stream_oversigt) {
                   if (streamoversigt.streamantal()>0) {
@@ -13866,7 +13889,7 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt_loaded_begin=true;
       // clear old buffer and start search
       spotify_oversigt.clean_spotify_oversigt();
-      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,spotify_oversigt.get_search_type());
       // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
       write_logfile((char *) "Done Update spotify search result thread.");
       spotify_oversigt.search_spotify_online_done=true;
