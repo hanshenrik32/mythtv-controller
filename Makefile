@@ -40,7 +40,7 @@ endif
 
 ifeq ($(LBITS),64)
 	STDCLIB = /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+	LIBGL:= $(shell find /usr/lib/ -name 'libGL.so' | grep 'x86_64-linux-gnu/libGL.so')
 	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 else
 	STDCLIB = /usr/lib/i386-linux-gnu/libstdc++.so.6

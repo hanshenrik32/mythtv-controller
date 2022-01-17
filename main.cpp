@@ -13791,7 +13791,8 @@ void *webupdate_loader_spotify(void *data) {
     if ((spotify_oversigt.spotify_get_user_id()==404) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
       loadedspotify=true;
       spotify_update_loaded_begin=true;
-      spotify_oversigt.set_spotify_update_flag(true);
+      // start the loader
+      spotify_oversigt.set_spotify_update_flag(true);                             // set update is running flag
       // add default playlists from spotify
       // you have to call clean_spotify_oversigt after earch spodify_get_playlist
       spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,true);        // songs on repeat playlist
@@ -13802,7 +13803,7 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);        // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      // get user playlists
+      // get user playlists (download and install)
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // update the playback device list
@@ -13823,7 +13824,7 @@ void *webupdate_loader_spotify(void *data) {
     }
   }
   spotify_update_loaded_begin=false;
-  spotify_oversigt.set_spotify_update_flag(false);
+  spotify_oversigt.set_spotify_update_flag(false);                              // remove update flag
   firsttimespotifyupdate=false;                                                 // close firsttime update window after update
   #endif
   pthread_exit(NULL);
@@ -13863,10 +13864,11 @@ void *datainfoloader_webserver(void *data) {
       fprintf(stderr,"Update spotify search result thread.\n");
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
+      // clear old buffer and start search
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
       // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-      printf("Done Update spotify search result thread.\n");
+      write_logfile((char *) "Done Update spotify search result thread.");
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       spotify_oversigt.set_search_loaded();

@@ -37,10 +37,10 @@ class spotify_device_def {
 
 class spotify_oversigt_type {
   public:
-    char        feed_showtxt[80+1];			          // what to show in overview
-    char        feed_name[80+1];				          // playlist/song name
-    char        feed_artist[80+1];                // artist
-    char        feed_desc[80+1];				          // desc
+    char        feed_showtxt[180+1];			          // what to show in overview
+    char        feed_name[180+1];				          // playlist/song name
+    char        feed_artist[180+1];                // artist
+    char        feed_desc[180+1];				          // desc
     char        feed_gfx_url[1024+1];             //
     char        feed_release_date[40+1];				  //
     char        playlistid[100+1];                // playlist id
@@ -183,7 +183,7 @@ class spotify_class : vlc_controller {
         int streamantal() { return(antal-1); }                                  //
         void clean_spotify_oversigt();                                          // clear list
         int spotify_req_playlist();                                             //
-        int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
+        int spotify_get_user_playlists(bool force,int startoffset);             // get user playlist (list of playlist)
         int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);

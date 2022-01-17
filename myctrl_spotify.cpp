@@ -118,6 +118,7 @@ extern GLint cur_avail_mem_kb;
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
+extern char debuglogdata[];                                  // used by log system
 //extern bool spotify_oversigt_loaded_begin;
 
 
@@ -416,7 +417,9 @@ bool spotify_class::get_spotify_update_flag() {
 
 
 // ****************************************************************************************
+//
 // file writer
+//
 // ****************************************************************************************
 
 static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
@@ -972,7 +975,7 @@ bool spotify_class::spotify_check_spotifydb_empty() {
 // ****************************************************************************************
 //
 // Get users playlist
-// in use
+// in use first think to call after login
 // The default view
 //
 // ****************************************************************************************
@@ -1105,7 +1108,10 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           if (debugmode & 4) fprintf(stdout,"playlist %-60s Spotifyid %-20s \n",row[0],row[1]);
+          sprintf(debuglogdata,"playlist name %s id %-20s",row[0],row[1]);
+          write_logfile((char *) debuglogdata);
           if (spotify_oversigt.spotify_get_playlist(row[1],force,0)==1) {
+            write_logfile((char *) "Error create playlist ");
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
         }
@@ -1390,6 +1396,8 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 //
 // ****************************************************************************************
 
+
+
 int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
   int tt=0;
   bool dbexist=false;
@@ -1628,7 +1636,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             playlistexist=true;
           }
         }
-        // crete playlist
+        // create playlist if not exist
         if (!(playlistexist)) {
           //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
           sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
@@ -1636,9 +1644,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           res = mysql_store_result(conn);
         }
       }
-
     }
-    mysql_close(conn);
+    if (conn) mysql_close(conn);
   }
   return tt;
 }
@@ -2017,21 +2024,6 @@ int spotify_class::spotify_pause_play2() {
 }
 
 
-//
-// resume play
-//
-/*
-int spotify_class::spotify_resume_play2() {
-  int curl_error;
-  char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/play' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
-  curl_error=system(call);
-  if (WEXITSTATUS(curl_error)!=0) {
-    return 1;
-  }
-  return 0;
-}
-*/
 
 // ****************************************************************************************
 //
@@ -2813,8 +2805,6 @@ int spotify_class::spotify_get_access_token2() {
   }
   return(1);
 }
-
-
 
 
 
