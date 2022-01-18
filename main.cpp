@@ -1846,38 +1846,6 @@ int hent_mythtv_playlist(int playlistnr) {
 
 
 
-
-
-
-// ****************************************************************************************
-//
-// MUSIC stuf
-// Can have memory error
-// load dir icons after update.
-//
-// ****************************************************************************************
-
-/*
-void opdatere_music_oversigt_icons() {
-  unsigned int i;
-  char tmpfilename[200];
-  for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
-    musicoversigt[i].textureId=0;
-  }
-  i=0;
-  while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
-    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
-    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-      // load covers file into opengl as textures (png/jpg)
-      musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
-    } else {
-      musicoversigt[i].textureId=0;
-    }
-    i++;
-  }
-}
-*/
-
 // ****************************************************************************************
 //
 // hent antal af songs fra mythtv playlist database og fyld music play array
@@ -3398,22 +3366,11 @@ void display() {
         if ((keybufferopenwin) && (hent_music_search)) {				                // vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_music_search=false;
           if (findtype==0) {
-            // new ver
-           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-            // old ver
-            //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
-         } else {
-            // new ver
-           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-            // old ver
-            //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
+            musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
+          } else {
+            musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
           }
-
-          // new ver
-         musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
-
-          // old ver
-          //opdatere_music_oversigt_icons(); 					                            // load gfx icons
+          musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icon
           keybuffer[0] = 0;
           keybufferindex = 0;
           _angley = 0.0f;
@@ -3476,11 +3433,7 @@ void display() {
       // music view
       if (vis_music_oversigt) {
 
-        // New ver
-       musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
-        // old ver
-        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
+        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
 
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
@@ -13365,8 +13318,14 @@ void update(int value) {
                         if ((antal_songs==0) && (musicoversigt.get_album_type(mknapnr)==0)) {
                           // normalt dir (IKKE playlist)
 
-                         musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1));
-                         musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+                          // new ver2
+                          musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1));
+                          musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+
+
+                          // new ver
+                          //musicoversigt.opdatere_music_oversigt(musicoversigt.get_directory_id(mknapnr-1));
+                          //musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
 
                           //opdatere_music_oversigt(musicoversigt,musicoversigt[mknapnr].directory_id);
                           //opdatere_music_oversigt_icons();                      // load icons
@@ -13659,8 +13618,11 @@ void *datainfoloader_music(void *data) {
       if (debugmode & 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
       // build new db (internal db loader)
 
-      // mew ver
+      // mew ver 2
      musicoversigt.opdatere_music_oversigt_nodb();
+
+      // mew ver
+     //musicoversigt.opdatere_music_oversigt_nodb();
 
       // old ver
       //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
@@ -13671,27 +13633,21 @@ void *datainfoloader_music(void *data) {
     // update music db from disk
     if ((do_update_music) || (do_update_music_now)) {
       // update the music db
-
-      // mew ver
-     musicoversigt.opdatere_music_oversigt_nodb();
-
-      // old ver
-      //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
+      musicoversigt.opdatere_music_oversigt_nodb();
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update
     }
     // load music db created by opdatere_music_oversigt_nodb function
     // first time
-    // New ver
+
     if (musicoversigt.opdatere_music_oversigt(0)>0) {
      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       write_logfile((char *) "Music db loaded..");
     }
+
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
-
-    // New ver
-   musicoversigt.opdatere_music_oversigt_nodb();
+    musicoversigt.opdatere_music_oversigt_nodb();
 
     // update music db from disk
     // old
@@ -13699,11 +13655,7 @@ void *datainfoloader_music(void *data) {
     //   if (debugmode & 2) fprintf(stderr,"No music db loaded\n");
     //}
 
-    // new ver
    musicoversigt.opdatere_music_oversigt(0);
-
-    // old ver
-    //opdatere_music_oversigt(musicoversigt,0);                                   // load the db again
   }
   do_update_music=false;
   // write debug log
@@ -14227,7 +14179,6 @@ void *xbmcdatainfoloader(void *data) {
   // set use internal db for music
   global_use_internal_music_loader_system = true;
 
-  //new ver
   sprintf(debuglogdata,"Numbers of music records loaded %d.",musicoversigt.opdatere_music_oversigt(0));
 
   // load db
