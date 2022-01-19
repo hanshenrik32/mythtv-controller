@@ -41,12 +41,14 @@ struct stream_oversigt_type {
     long intnr;
 };
 
+
+
 class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         stream_oversigt_type *stack[maxantal];			                            // radio stack array
 
-        std::vector<stream_oversigt_type> stack1;                                 // vector array
+        //std::vector<stream_oversigt_type> stack1;                                 // vector array
 
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds

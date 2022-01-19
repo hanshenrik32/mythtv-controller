@@ -13478,6 +13478,7 @@ int init_sound_system(int devicenr) {
     char name[256];
     #if defined USE_FMOD_MIXER
     fprintf(stderr,"Setup FMOD soundsystem\n");
+    write_logfile((char *) "Setup FMOD soundsystem.");
     result = FMOD::System_Create(&sndsystem);
     ERRCHECK(result,0);
     result = sndsystem->getVersion(&fmodversion);
@@ -13564,8 +13565,6 @@ int init_sound_system(int devicenr) {
 }
 
 
-
-
 // ****************************************************************************************
 //
 // phread dataload check radio stations if it is online
@@ -13576,6 +13575,7 @@ void *radio_check_statusloader(void *data) {
   bool notdone=false;
   //pthread_mutex_lock(&count_mutex);
   fprintf(stderr,"loader thread starting - Start checkling radio status's thread\n");
+  write_logfile((char *) "loader thread starting - Start checkling radio status's thread.");
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
     do {
@@ -13588,9 +13588,9 @@ void *radio_check_statusloader(void *data) {
     } while (notdone);
   }
   fprintf(stderr,"radio thread done\n");
+  write_logfile((char *) "loader radio check thread done.");
   pthread_exit(NULL);
 }
-
 
 
 // ****************************************************************************************
@@ -13643,6 +13643,7 @@ void *datainfoloader_music(void *data) {
   write_logfile((char *) "loader thread done loaded music info.");
   pthread_exit(NULL);
 }
+
 
 
 // ****************************************************************************************
