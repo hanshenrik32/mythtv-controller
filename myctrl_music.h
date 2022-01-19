@@ -39,7 +39,7 @@ class musicoversigt_class {
   public:
     int opdatere_music_oversigt(unsigned int directory_id);
     int opdatere_music_oversigt_searchtxt(char *searchtxt,int search_art);
-    int opdatere_music_oversigt_nodb();
+    int opdatere_music_oversigt_nodb(char *musicpath);
     void show_music_oversigt(GLuint normal_icon,GLuint back_icon,GLuint dirplaylist_icon,int _mangley,int music_key_selected);
     void opdatere_music_oversigt_icons();
     // henter playlist oversigt

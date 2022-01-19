@@ -1418,8 +1418,7 @@ void load_config(char * filename) {
     strcpy(configfontname,"FreeMono");
     strcpy(configvideoplayer,"default");
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
-    strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
-    strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
+    strcpy(configdefaultmoviepath,"Movie");                   // default start movie dir
     strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");      // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
     configtvguidelastupdate=0;                                // default 0
@@ -3428,7 +3427,9 @@ void display() {
         }
       }
     }
+
     start = clock();
+
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
@@ -8043,7 +8044,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               fprintf(stderr,"nr %d path=%s\n",mknapnr-1,musicoversigt.get_album_path(mknapnr-1));
 
               // New ver
-              if (musicoversigt.opdatere_music_oversigt_nodb()==0) {
+              if (musicoversigt.opdatere_music_oversigt_nodb(configmusicpath)==0) {
                 // no update posible
                 fprintf(stderr,"No Music loaded/found by internal loader.\n");
                 write_logfile("No Music loaded/found by internal loader.");
@@ -13611,31 +13612,30 @@ void *datainfoloader_music(void *data) {
       // set use global loader
       global_use_internal_music_loader_system = true;
     } else {
-      sprintf(debuglogdata,"Search for music in : ",configdefaultmusicpath);
+      sprintf(debuglogdata,"Search for music in : ",configmusicpath);
       write_logfile((char *) debuglogdata);
-      musicoversigt.opdatere_music_oversigt_nodb();
+      musicoversigt.opdatere_music_oversigt_nodb(configmusicpath);
       write_logfile((char *) "Done update db from datasource.");
       global_use_internal_music_loader_system = true;
     }
     // update music db from disk
     if ((do_update_music) || (do_update_music_now)) {
       // update the music db
-      musicoversigt.opdatere_music_oversigt_nodb();
+      musicoversigt.opdatere_music_oversigt_nodb(configmusicpath);
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update
     }
     // load music db created by opdatere_music_oversigt_nodb function
     // first time
-
     if (musicoversigt.opdatere_music_oversigt(0)>0) {
-     musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       write_logfile((char *) "Music db loaded..");
     }
   } else {
-    sprintf(debuglogdata,"Search for music in : ",configdefaultmusicpath);
+    sprintf(debuglogdata,"Search for music in : ",configmusicpath);
     write_logfile((char *) debuglogdata);
     // update music db from disk
-    musicoversigt.opdatere_music_oversigt_nodb();
+    musicoversigt.opdatere_music_oversigt_nodb(configmusicpath);
     musicoversigt.opdatere_music_oversigt(0);
   }
   do_update_music=false;

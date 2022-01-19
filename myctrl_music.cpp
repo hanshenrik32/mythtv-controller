@@ -551,7 +551,7 @@ void musicoversigt_class::opdatere_music_oversigt_icons() {
 // *****************************************************************************
 
 
-int musicoversigt_class::opdatere_music_oversigt_nodb() {
+int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
   int parent;
   int dirid;
   int sub_dirid;
@@ -582,7 +582,12 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   MYSQL_ROW row2;
   MYSQL_ROW row3;
   int a;
-  const char *dirpath="/mnt/vol1/Music";
+
+  char dirpath[2000];
+
+  strcpy(dirpath,musicpath);                                                    // start dir
+  strcpy(dirpath,"/mnt/vol1/Music");                                                    // start dir
+
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
@@ -643,9 +648,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
       myoversigt.album_id=0;
       myoversigt.artist_id=0;
       myoversigt.oversigttype=-1;			// type -1 = playlist
-
       // musicoversigt.push_back(myoversigt);
-
       i++;
       if (dirp) {
         while(de = readdir(dirp)) {
@@ -677,6 +680,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
             }
           }
         }
+        if (dirp) closedir(dirp);
         // fill database music_albums from dir on music_directories
         strcpy(sqlselect,"select directory_id ,path ,parent_id from music_directories");
         if (conn) {
@@ -685,32 +689,36 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
           // loop dirs database names from root / (music dir start path)
           while ((row = mysql_fetch_row(res)) != NULL) {
             if (debugmode & 2) printf("Checking dir %s/%s \n",dirpath,row[1]);
+
+            sprintf(debuglogdata,"Checking dir %s/%s ",dirpath,row[1]);
+            write_logfile((char *) debuglogdata);
+
             dirid=atoi(row[0]);
             sprintf(checkdir,"%s/%s",dirpath,row[1]);
             dirp1=opendir(checkdir);
             // error handler
             if (dirp1==NULL) {
-              printf("Open dir error ->%s<-\n",dirpath);
-              return 1;
-              exit(0);
+              printf("Open sub dir error checkdir %s \n",checkdir);
+              //return 1;
+              //exit(0);
             }
             artistid=0;
             // hent atrist id
-            conn2=mysql_init(NULL);
-            if (conn2) {
-              mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-              // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
-              sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",row[1]);
-              mysql_query(conn2,sqlselect1);
-              res2 = mysql_store_result(conn2);
-              if (res2) {
-                while ((row2 = mysql_fetch_row(res2)) != NULL) {
-                  artistid=atol(row2[0]);
-                }
-              }
-              mysql_close(conn2);
-            }
             if (dirp1) {
+              conn2=mysql_init(NULL);
+              if (conn2) {
+                mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                // sprintf(sqlselect1,"insert into music_directories values(%d,'%s',%d)",0,de->d_name,parent);
+                sprintf(sqlselect1,"select artist_id from music_artists where artist_name like '%s'",row[1]);
+                mysql_query(conn2,sqlselect1);
+                res2 = mysql_store_result(conn2);
+                if (res2) {
+                  while ((row2 = mysql_fetch_row(res2)) != NULL) {
+                    artistid=atol(row2[0]);
+                  }
+                }
+                mysql_close(conn2);
+              }
               // loop the dir and create the music records and music_dir if mount in loop dir
               while(de = readdir(dirp1)) {
                 if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
@@ -758,41 +766,45 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                     // open found dir having the songs
                     sprintf(checkdir2,"%s/%s",checkdir,de->d_name);
                     if (debugmode & 2) printf("\t Checking sub dir %s \n",de->d_name);
+                    sprintf(debuglogdata,"        Checking sub dir %s ",de->d_name);
+                    write_logfile((char *) debuglogdata);
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
-                      printf("Open dir error ->%s<-\n",checkdir2);
-                      return 1;
-                      exit(0);
+                      printf("Open sub dir error checkdir2 %s \n",checkdir2);
+                      //return 1;
+                      //exit(0);
                     }
-                    // loop dir and update music songs db
-                    while(de2 = readdir(dirp2)) {
-                      if ((strcmp(de2->d_name,".")!=0) && (strcmp(de2->d_name,"..")!=0)) {
-                        // get file extention
-                        ext = strrchr(de2->d_name, '.');
-                        if (ext) strcpy(filetype,ext+1); else strcpy(filetype,"");
-                        if ((strcmp(filetype,"mp3")==0) || (strcmp(filetype,"flac")==0) || (strcmp(filetype,"wav")==0) || (strcmp(filetype,"ogg")==0)) {
-                          // add foumnd  path
-                          strcpy(songname,checkdir2);
-                          strcat(songname,"/");
-                          strcat(songname,de2->d_name);
-                          if (song_exist_in_db(songname,songname)) printf("SONG EXIST **********************************");
-                          sprintf(sqlselect1,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
-                                        (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
-                                        0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
-                          // show in music overview loader
-                          strcpy(music_db_update_loader,de->d_name);
-                          music_oversigt_loaded_nr++;
-                          conn1=mysql_init(NULL);
-                          if (conn1) {
-                            mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                            mysql_query(conn1,sqlselect1);
-                            res1 = mysql_store_result(conn1);
-                            mysql_close(conn1);
+                    if (dirp2) {
+                      // loop dir and update music songs db
+                      while(de2 = readdir(dirp2)) {
+                        if ((strcmp(de2->d_name,".")!=0) && (strcmp(de2->d_name,"..")!=0)) {
+                          // get file extention
+                          ext = strrchr(de2->d_name, '.');
+                          if (ext) strcpy(filetype,ext+1); else strcpy(filetype,"");
+                          if ((strcmp(filetype,"mp3")==0) || (strcmp(filetype,"flac")==0) || (strcmp(filetype,"wav")==0) || (strcmp(filetype,"ogg")==0)) {
+                            // add foumnd  path
+                            strcpy(songname,checkdir2);
+                            strcat(songname,"/");
+                            strcat(songname,de2->d_name);
+                            if (song_exist_in_db(songname,songname)) printf("SONG EXIST **********************************");
+                            sprintf(sqlselect1,"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
+                                          (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
+                                          0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
+                            // show in music overview loader
+                            strcpy(music_db_update_loader,de->d_name);
+                            music_oversigt_loaded_nr++;
+                            conn1=mysql_init(NULL);
+                            if (conn1) {
+                              mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                              mysql_query(conn1,sqlselect1);
+                              res1 = mysql_store_result(conn1);
+                              mysql_close(conn1);
+                            }
                           }
                         }
                       }
+                      closedir(dirp2);
                     }
-                    closedir(dirp2);
                   } else {
                     // it is a file
                     // get albumid
@@ -818,20 +830,19 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                   }
                   i++;  // next dir record
                 }
-              }
+              }  // end while
             }
             if (dirp1) closedir(dirp1);
           }
         }
       }
-      if (dirp) closedir(dirp);
     }
   }
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
   strcpy(music_db_update_loader,"");
   write_logfile("Music db updated.");
-  if (i) return 0; else return 1;
+  return i;
 }
 
 
@@ -1077,7 +1088,9 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   bool stop=false;
   char *base,*right_margin;
   int length;
+
   sofset=(_mangley/40)*8;
+
   while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && (i<musicoversigt.size()) ) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {
