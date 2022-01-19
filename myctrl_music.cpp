@@ -320,7 +320,7 @@ void get_music_pick_playlist(long find_dir_id,bool *music_list_select_array) {
     strcpy(husk_tmptxt3,"");
     strcpy(tmptxt3,"");
     if (res) {
-      while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST)) {
+      while (((row = mysql_fetch_row(res)) != NULL) && (i<MAX_IN_PLAYLIST-1)) {
         if (global_use_internal_music_loader_system) {
           sprintf(debuglogdata,"Found song song_id:%4s Artist id:%4s Filename:%40s",row[0],row[5],row[1]);
           write_logfile((char *) debuglogdata);
@@ -582,12 +582,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
   MYSQL_ROW row2;
   MYSQL_ROW row3;
   int a;
-
   char dirpath[2000];
-
-  strcpy(dirpath,musicpath);                                                    // start dir
-  strcpy(dirpath,"/mnt/vol1/Music");                                                    // start dir
-
+  strcpy(dirpath,musicpath);
+  strcpy(dirpath,"/mnt/vol1/Music");                                            // start dir
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
@@ -599,8 +596,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
     return 1;
   }
   conn=mysql_init(NULL);
-  // Connect to database
-  if (conn) {
+  // Connect to database if dir exist
+  if ((conn) && (dirp)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
     res = mysql_store_result(conn);
@@ -669,9 +666,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
               myoversigt.artist_id=0;
               myoversigt.oversigttype=0;
               parent_dir_id=0;
-
               //musicoversigt.push_back(myoversigt);
-
               // update artist db
               sprintf(sqlselect2,"insert into music_artists values (%d,'%s')",0,de->d_name);
               mysql_query(conn,sqlselect2);
@@ -699,7 +694,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
             // error handler
             if (dirp1==NULL) {
               printf("Open sub dir error checkdir %s \n",checkdir);
-              //return 1;
+              return 1;
               //exit(0);
             }
             artistid=0;
@@ -771,7 +766,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
                       printf("Open sub dir error checkdir2 %s \n",checkdir2);
-                      //return 1;
+                      return 1;
                       //exit(0);
                     }
                     if (dirp2) {
@@ -1221,13 +1216,6 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glPopMatrix();
   }
 }
-
-
-
-
-
-
-
 
 
 
