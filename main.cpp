@@ -8027,13 +8027,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             sprintf(debuglogdata,"Opdatere musicarray henter playlist oversigt");
             // write debug log
             write_logfile((char *) debuglogdata);
-
             // hent playlist oversigt
-            // new ver
-           musicoversigt.opdatere_music_oversigt_playlists();	// hent list over mythtv playlistes
-
-            // old ver
-            //opdatere_music_oversigt_playlists(musicoversigt);	// hent list over mythtv playlistes
+            musicoversigt.opdatere_music_oversigt_playlists();	// hent list over mythtv playlistes
           } else {
             // write debug log
             sprintf(debuglogdata,"Opdatere musicarray Henter oversigt dir id = %d ",musicoversigt.get_directory_id(mknapnr-1));
@@ -8053,6 +8048,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 fprintf(stderr,"No Music loaded/found by internal loader.\n");
                 write_logfile("No Music loaded/found by internal loader.");
               }
+
               /*
               // old ver
               if (opdatere_music_oversigt_nodb(musicoversigt[mknapnr].album_path,musicoversigt)==0) {
@@ -13603,7 +13599,7 @@ void *radio_check_statusloader(void *data) {
 // ****************************************************************************************
 
 void *datainfoloader_music(void *data) {
-  //pthread_mutex_lock(&count_mutex);
+  //pthread_mutex_lock(&count_mutex);/mnt/vol1/Music
   // write debug log
   write_logfile((char *) "loader thread starting - Loading music info.");
   if (strcmp(configbackend,"mythtv")==0) {
@@ -13615,18 +13611,9 @@ void *datainfoloader_music(void *data) {
       // set use global loader
       global_use_internal_music_loader_system = true;
     } else {
-      if (debugmode & 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
-      // build new db (internal db loader)
-
-      // mew ver 2
-     musicoversigt.opdatere_music_oversigt_nodb();
-
-      // mew ver
-     //musicoversigt.opdatere_music_oversigt_nodb();
-
-      // old ver
-      //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
-      if (debugmode & 2) fprintf(stderr,"Done update db from datasource.\n");
+      sprintf(debuglogdata,"Search for music in : ",configdefaultmusicpath);
+      write_logfile((char *) debuglogdata);
+      musicoversigt.opdatere_music_oversigt_nodb();
       write_logfile((char *) "Done update db from datasource.");
       global_use_internal_music_loader_system = true;
     }
@@ -13644,18 +13631,12 @@ void *datainfoloader_music(void *data) {
      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
       write_logfile((char *) "Music db loaded..");
     }
-
   } else {
-    if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
-    musicoversigt.opdatere_music_oversigt_nodb();
-
+    sprintf(debuglogdata,"Search for music in : ",configdefaultmusicpath);
+    write_logfile((char *) debuglogdata);
     // update music db from disk
-    // old
-    //if (opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt)==0) {
-    //   if (debugmode & 2) fprintf(stderr,"No music db loaded\n");
-    //}
-
-   musicoversigt.opdatere_music_oversigt(0);
+    musicoversigt.opdatere_music_oversigt_nodb();
+    musicoversigt.opdatere_music_oversigt(0);
   }
   do_update_music=false;
   // write debug log

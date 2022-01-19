@@ -29,8 +29,6 @@ class music_oversigt_type {
 };
 
 
-
-
 // vector version
 
 class musicoversigt_class {
@@ -52,8 +50,7 @@ class musicoversigt_class {
     char get_album_type(int nr);
     unsigned int get_directory_id(int nr);
     char *get_album_path(int nr);
-    GLuint get_textureId(int nr);
-    // load all covers
+    GLuint get_textureId(int nr);                                               // gbet cover textureid
     int save_music_oversigt_playlists(char *playlistname);
     int load_music_oversigt_playlists(char *playlistname);
 };
