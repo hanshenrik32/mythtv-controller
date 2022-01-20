@@ -2864,9 +2864,7 @@ void spotify_class::clean_spotify_oversigt() {
         // crash
         if (stack[i]->textureId) {
           if (&stack[i]->textureId) {
-            if (&stack[i]->textureId) {
-              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
-            }
+            //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
           }
         }
         delete stack[i];

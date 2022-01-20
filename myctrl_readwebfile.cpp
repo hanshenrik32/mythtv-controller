@@ -4,10 +4,14 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <unistd.h>
+#include <curl/curl.h>
 #include "myctrl_readwebfile.h"
 
+
+using namespace std;
 
                                                                 // 1  = wifi net
                                                                 // 2  = music
@@ -119,112 +123,6 @@ void get_host(char *hname,char *webpath,char *source) {
   }
 }
 
-// ****************************************************************************************
-//
-// downloader of file
-//
-// ****************************************************************************************
-
-int get_webfile(char *webpath,char *outfile) {
-    struct sockaddr_in servaddr;
-    struct hostent *hp;
-    int sock_id;
-    char message[2024] = {0};
-    int msglen;
-    char request[1000];
-    char *hostpointer;
-    char hostname[200];
-    char wpath[200];
-    char *lpos;
-    int webobjlength;
-    int i=0;
-    bool loaderror=false;
-    char tegn;
-    FILE *fil;
-    int error=0;
-    strcpy(hostname,"");
-    // return hostname
-    //  wpath = text after hostbname (path to file - domainname)
-    get_host(hostname,wpath,webpath);	// sample webpage http://www.dr.dk/image
-    // http 1.1
-    sprintf(request,"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n",wpath,hostname);
-    //Get a socket
-    if((sock_id = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-      fprintf(stderr,"Couldn't get a socket.\n");
-      exit(EXIT_FAILURE);
-    }
-    //book uses bzero which my man pages say is deprecated
-    //the man page said to use memset instead. :-)
-    memset(&servaddr,0,sizeof(servaddr));
-    //get address for google.com
-    if((hp = gethostbyname(hostname)) == NULL) {
-      fprintf(stderr,"Couldn't get an address.\n");
-      return(0);
-    }
-    //bcopy is deprecated also, using memcpy instead
-    memcpy((char *)&servaddr.sin_addr.s_addr, (char *)hp->h_addr, hp->h_length);
-    //fill int port number and type
-    servaddr.sin_port = htons(80);
-    servaddr.sin_family = AF_INET;
-    //make the connection
-    if(connect(sock_id, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
-      fprintf(stderr, "Couldn't connect.\n");
-      error=1;
-      loaderror=1;
-    }
-    if (!(error)) {
-      //send the request
-      send(sock_id,request,strlen(request),0);
-      //write(sock_id,request,strlen(request));
-    }
-    while((strcmp(message,"\r\n")) && (!(loaderror))) {
-      for(i = 0;strcmp(message + i - 2, "\r\n"); i++) {
-        read(sock_id,message+i,1);
-        message[i+1]=0;
-      }
-      lpos=strstr(message, "Content-Length:");
-      if (strstr(message, "Content-Length:")==message) {
-        webobjlength = atoi(strchr(lpos, ' ') + 1);
-      }
-      if (strstr(message, "Invalid URL")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"HTTP/1.0 400 Bad Request")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"302 Found")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"404 Not Found")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"Moved Parmanently")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-    }
-    if (!(loaderror)) {
-      fil=fopen(outfile,"w");
-      if (!(fil)) {
-        if (debugmode) fprintf(stderr," Open file for write error %s \n",outfile);
-        loaderror=true;							// not posible to save file
-      }
-      if (fil) {
-        for (i = 0;i < webobjlength; i++) {
-          read(sock_id, &tegn, 1);
-          fputc(tegn, fil);
-          putchar('\r');
-        }
-        fclose(fil);
-      }
-    }
-    close(sock_id);
-    if (!(loaderror)) return(1); else return(0);
-}
 
 
 // ****************************************************************************************
@@ -239,11 +137,12 @@ bool check_filename_ext(const char *filename) {
 }
 
 // ****************************************************************************************
-//
-// used to download images from web
+// Old not in use
+// used to download images from web and convert by ImageMagick to 320x320
 // more secure now use wget
 //
 // ****************************************************************************************
+
 
 int get_webfile2(char *webpath,char *outfile) {
   char command[2048];
@@ -258,4 +157,90 @@ int get_webfile2(char *webpath,char *outfile) {
     //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
     return (system(command));
   }
+}
+
+
+
+// ****************************************************************************************
+//
+// used by get_webfile3
+//
+// ****************************************************************************************
+
+
+size_t file_write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written = fwrite(ptr, size, nmemb, stream);
+    return written;
+}
+
+
+// ****************************************************************************************
+//
+// Used to convert image size
+//
+// ****************************************************************************************
+
+
+int convert_image(char *in_image,char *out_image) {
+    int result;
+    char command[2048];
+    strcpy(command,"/usr/bin/convert -thumbnail 'x320^' ");
+    strcat(command,in_image);
+    strcat (command," -> ");
+    strcat(command,out_image);
+    result=system(command);
+    return result;
+}
+
+
+// ****************************************************************************************
+//
+// Used to download images from web and convert by ImageMagick to 320x320
+//
+// download tempfile and convert to the real icon file saved in homedir/rss/images
+//
+// ****************************************************************************************
+
+int get_webfile(char *webpath,char *outfile) {
+  FILE *file;
+  std::string response_string;
+  CURLcode res;
+  CURL *curl;
+  char *base64_code;
+  char tdestfile[4096];
+  char tfilename[4096];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(tdestfile,"");
+  tmpnam(tfilename);
+  strcat(tdestfile,tfilename);
+  curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, webpath);
+    // send data to curl_writeFunction_file
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+    errbuf[0] = 0;
+    try {
+      file = fopen(tdestfile, "wb");
+      if (file) {
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+        // get file
+        res = curl_easy_perform(curl);
+        fclose(file);
+      }
+      if(res != CURLE_OK) {
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+      }
+    }
+    catch (...) {
+      printf("Error open file.\n");
+    }
+    curl_easy_cleanup(curl);
+    convert_image(tdestfile,outfile);
+    remove(tdestfile);                                                          // remove temp file again
+  }
+  return(1);
 }

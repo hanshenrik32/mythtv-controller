@@ -325,7 +325,7 @@ int xbmcsqlite::xbmc_load_sqldb_callback_movie(void *data, int argc, char **argv
       }
       // download file and save it same path as movile file
       if (!(file_exists(filetodownload))) {
-        if (get_webfile(moviecover,filetodownload)) {
+        if (get_webfile2(moviecover,filetodownload)!=-1) {
           if (debugmode & 512) printf("Downloading cover %s\n",movietitle);
         } else {
           if (debugmode & 512) printf("Error downloading file cover from %s\n",moviecover);

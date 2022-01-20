@@ -32,7 +32,7 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
-// for music player if slected.
+// for music player if selected.
 #include <SDL.h>
 #include <SDL_mixer.h>
 
@@ -96,19 +96,19 @@ bool stream_jump = false;
 
 extern float sinofsetz[];
 
-bool tv_guide_firsttime_update = false;                                           //
-int radio_oversigt_loaded_nr=0;                                                  //
-bool radio_oversigt_loaded_begin = false;                                         // true first time radio is loaded
-int radio_oversigt_antal=0;                                                      //
-int music_oversigt_loaded_nr=0;                                                  //
-int movie_oversigt_loaded_nr=0;                                                  //
+bool tv_guide_firsttime_update = false;                                         //
+int radio_oversigt_loaded_nr=0;                                                 //
+bool radio_oversigt_loaded_begin = false;                                       // true first time radio is loaded
+int radio_oversigt_antal=0;                                                     //
+int music_oversigt_loaded_nr=0;                                                 //
+int movie_oversigt_loaded_nr=0;                                                 //
 bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
-bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
-bool tidal_oversigt_loaded_begin = false;                                      // true then spotify update is started
+bool spotify_oversigt_loaded_begin = false;                                     // true then spotify update is started
+bool tidal_oversigt_loaded_begin = false;                                       // true then spotify update is started
 
 #ifdef USE_FMOD_MIXER
-FMOD::DSP* dsp = 0;                                                         // fmod Sound device
+FMOD::DSP* dsp = 0;                                                             // fmod Sound device
 #endif
 
 // screen saver uv stuf
@@ -14872,6 +14872,11 @@ int main(int argc, char** argv) {
     int dircreatestatus;
     Display *dpy = NULL;
     Window rootxwindow;
+
+
+    get_webfile("https://imagesvc.meredithcorp.io/v3/mm/image?q=85&c=sc&poi=face&w=2000&h=1000&url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F19%2F2018%2F02%2F13%2Ffield-image-gettyimages-451373991-2000.jpg","/tmp/image.jpg");
+
+
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     strcpy(streamudate_nowstring,"");                                           // show update string/name from rss updater

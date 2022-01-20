@@ -592,7 +592,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
   dirp=opendir(dirpath);
   if (dirp==NULL) {
     printf("Open dir error ->%s<-\n",dirpath);
-    write_logfile("Open dir error.");
+    write_logfile((char *) "Open dir error.");
     return 1;
   }
   conn=mysql_init(NULL);
@@ -836,7 +836,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
   strcpy(music_db_update_loader,"");
-  write_logfile("Music db updated.");
+  write_logfile((char *) "Music db updated.");
   return i;
 }
 

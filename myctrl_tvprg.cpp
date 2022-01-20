@@ -576,7 +576,7 @@ int tv_oversigt::parsexmltv(const char *filename) {
                     // download tv channel iconfile
                     // if not exist in images/tv_icons directory
                     if (!(file_exists(downloadfile))) {
-                      get_webfile(iconfile,downloadfile);
+                      get_webfile2(iconfile,downloadfile);
                     }
                   }
                 }
