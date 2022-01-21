@@ -20,6 +20,10 @@ extern GLuint newstuf_icon;
 extern int orgwinsizex,orgwinsizey;
 extern musicoversigt_class musicoversigt;
 
+extern float spectrum_left[];                                                      // used for spectium
+extern float spectrum_right[];                                                     // used for spectium
+
+
 float sinofsetz[]={
 
 4.00,4.00,4.00,4.00,4.00,4.00,4.00,4.00,3.99,3.99,3.99,3.99,3.99,3.98,3.98,3.98,3.97,3.97,3.97,3.96,
@@ -2607,6 +2611,113 @@ void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
     // Used to rotate all
     // tilt
 
+
+    n=0;
+    for(y=0;y<11;y++) {
+      if ((y==0) || (y==4) || (y==8)) rool_sinus();
+      for(x=0;x<11;x++) {
+        glPushMatrix();
+        zof=10*(sinofsetz[i]/2);	                                    		// GET FROM TABLE
+        i+=180*2;
+        //glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);      // -27
+        glTranslatef(matrix[x][y].xpos, matrix[x][y].ypos, matrix[x][y].zpos+zof);      // -27
+        glRotatef(angle, 0.0f, -1.0f, 0.0f);
+        angle+=9;
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+        //    glEnable(GL_CULL_FACE);
+        if (matrix[x][y].texture) {
+          //glEnable(GL_TEXTURE_2D);
+          glBindTexture(GL_TEXTURE_2D,matrix[x][y].texture);
+          //glBindTexture(GL_TEXTURE_2D,textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        } else {
+          // use default texture
+          glBindTexture(GL_TEXTURE_2D,textureId);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        glBegin(GL_QUADS);
+        //Back face
+            //    glColor3f(1.0f, 1.0f, 0.0f);
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Top face
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Bottom face
+        glNormal3f(0.0, -1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);                                                                    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        //Left face
+        glNormal3f(-1.0, 0.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, -1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        //Right face
+        glNormal3f(1.0, 0.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+        glTexCoord2f(1.0, -1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, -1.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        //Front face
+        glNormal3f(0.0, 1.0f, 0.0f);
+        glTexCoord2f(0.0, 0.0); glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(0.0, 1.0); glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 1.0); glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+        glTexCoord2f(1.0, 0.0); glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+        glEnd();
+        angle+=9.0f;
+        i+=180*2;
+        glPopMatrix();
+      }
+    }
+    glPopMatrix();
+}
+
+
+
+// ****************************************************************************************
+// For music
+// working in use
+// use spectrum_left and spectrum_right
+// *******mythtv-controller.log*********************************************************************************
+
+void boxarray::show_music_3d_music(float aangle,GLuint textureId) {
+    float BOX_SIZE=120.0f;
+    static float rangle=0.0f;
+    int x,y;
+    float angle=aangle;
+    float zof=0.0f;
+    int i=0;
+    int rotate=1;
+    glPushMatrix();
+    glColor4f(1.0f,1.0f,1.0f,1.0f);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+    glTranslatef(0.0f, 0.0f, -4.0f);
+    if (rotate) {
+      glRotatef(rangle, 0.0f, 0.0f, 1.0f);
+      glRotatef(-(rangle/10), 0.0f, 1.0f, 0.0f);
+    } else {
+      glRotatef(0, 0.0f, 0.0f, 1.0f);
+      glRotatef(0, 0.0f, 1.0f, 0.0f);
+    }
+    rangle+=.1;
+    if (rangle>360*10) rangle=0;
+
+    //
+    // Used to rotate all
+    // tilt
 
     n=0;
     for(y=0;y<11;y++) {

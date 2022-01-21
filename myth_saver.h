@@ -43,6 +43,7 @@ class boxarray {
     void show_music_3d(int aangle,GLuint textureId,GLuint textureId2,GLuint textureId3);
     //void show_music_3d_new(int aangle,GLuint textureId);
     void show_music_3d_2(float aangle,GLuint textureId);
+    void show_music_3d_music(float aangle,GLuint textureId);
     int loadboxpictures();
     void createboxpictures();
 };

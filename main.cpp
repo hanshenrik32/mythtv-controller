@@ -2794,7 +2794,7 @@ void display() {
               // if not loaded load
               if (mybox.loadboxpictures()==false) {
                 printf("Error loading textures\n");
-                write_logfile("Error loading textures.");
+                write_logfile("Error loading textures for screen saver.");
               }
             }
             _angle++;
@@ -2840,122 +2840,247 @@ void display() {
       float siz_x = 22.0f;                    // size 16
       float siz_y = 6.0f;                     // size 8
       if (snd) {
-        glPushMatrix();
-//        glTranslatef(100.0f, 100.0f, 0.0f);
-        glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
-        glRotatef(0,0.0f,1.0f,0.0f);
-        static float rr=0.0f;
-        uvypos =0;
-        winsizx = 16;
-        winsizy = 16;
-        xpos = (-16)*16;
-        ypos = 0.0f;
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glBindTexture(GL_TEXTURE_2D,texturedot);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glRotatef(0.0f,0.0f,0.0f,0.0f);
-        float high;
-        xxofset = 40.0f;                            // start ofset
-        // create the bars
-        for(int xp=0;xp<barantal;xp++) {
-          xpos = (-siz_x)*xxofset;
-          ypos = (-400)+((siz_y*2)+2.0);
-          high = sqrt(spectrum[xp]*8)*2;
-          for(auto yp=0;yp<high;yp++) {
-            // front
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-            // left
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            // right
-            glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            // back
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
-            glEnd();
-            ypos += (siz_y*2)+2.0;
+        if (configuvmeter==1) {
+          glPushMatrix();
+  //        glTranslatef(100.0f, 100.0f, 0.0f);
+          glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
+          glRotatef(0,0.0f,1.0f,0.0f);
+          static float rr=0.0f;
+          uvypos =0;
+          winsizx = 16;
+          winsizy = 16;
+          xpos = (-16)*16;
+          ypos = 0.0f;
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glColor3f(1.0f, 1.0f, 1.0f);
+          glBindTexture(GL_TEXTURE_2D,texturedot);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glRotatef(0.0f,0.0f,0.0f,0.0f);
+          float high;
+          xxofset = 40.0f;                            // start ofset
+          // create the bars
+          for(int xp=0;xp<barantal;xp++) {
+            xpos = (-siz_x)*xxofset;
+            ypos = (-400)+((siz_y*2)+2.0);
+            high = sqrt(spectrum[xp]*8)*2;
+            for(auto yp=0;yp<high;yp++) {
+              // front
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+              // left
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+              // right
+              glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+              // back
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+              glEnd();
+              ypos += (siz_y*2)+2.0;
+            }
+            xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
           }
-          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
-        }
-        //
-        // show max value
-        //
-        xxofset = 40.0f;                                                        // start ofset
-        glBindTexture(GL_TEXTURE_2D,texturedot1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        for(int xp=0;xp<barantal;xp++) {
-          high = sqrt(uvmax_values[xp]*8)*2;
-          //printf("xp =%2d high = %0.3f \n",xp,high*2);
-          xpos = (-siz_x)*xxofset;
-          ypos = (-388)+((siz_y*(high*2))+2.0);
-          for(auto yp=0;yp<1;yp++) {
-            // front
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-            glEnd();
-            ypos += (siz_y*2)+2.0;
+          //
+          // show max value
+          //
+          xxofset = 40.0f;                                                        // start ofset
+          glBindTexture(GL_TEXTURE_2D,texturedot1);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glColor3f(1.0f, 1.0f, 1.0f);
+          for(int xp=0;xp<barantal;xp++) {
+            high = sqrt(uvmax_values[xp]*8)*2;
+            //printf("xp =%2d high = %0.3f \n",xp,high*2);
+            xpos = (-siz_x)*xxofset;
+            ypos = (-388)+((siz_y*(high*2))+2.0);
+            for(auto yp=0;yp<1;yp++) {
+              // front
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+              glEnd();
+              ypos += (siz_y*2)+2.0;
+            }
+            xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
           }
-          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
-        }
-        //
-        // Mirror
-        //
-        glColor3f(0.4f, 0.4f, 0.4f);
-        glBindTexture(GL_TEXTURE_2D,texturedot);
-        //glBindTexture(GL_TEXTURE_2D,_textureuv1);
-        xxofset = 40.0f;                            // start ofset
-        for(int xp=0;xp<barantal;xp++) {
-          xpos = (-siz_x)*xxofset;
-          ypos = (-432)+((siz_y*4)+2.0);
-          high = sqrt(spectrum[xp]*4);
-          for(auto yp=0;yp<high/2;yp++) {
-            // front
-            glBegin(GL_QUADS);
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
-            // left
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            // right
-            glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
-            glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
-            // back
-            glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
-            glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
-            glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
-            glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
-            glEnd();
-            ypos -= (siz_y*2)+2.0;
+          //
+          // Mirror
+          //
+          glColor3f(0.4f, 0.4f, 0.4f);
+          glBindTexture(GL_TEXTURE_2D,texturedot);
+          //glBindTexture(GL_TEXTURE_2D,_textureuv1);
+          xxofset = 40.0f;                            // start ofset
+          for(int xp=0;xp<barantal;xp++) {
+            xpos = (-siz_x)*xxofset;
+            ypos = (-432)+((siz_y*4)+2.0);
+            high = sqrt(spectrum[xp]*4);
+            for(auto yp=0;yp<high/2;yp++) {
+              // front
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+              // left
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+              // right
+              glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+              glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 32.0f); // 3
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f); // 4
+              // back
+              glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 32.0f);
+              glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 32.0f);
+              glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 32.0f);
+              glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 32.0f);
+              glEnd();
+              ypos -= (siz_y*2)+2.0;
+            }
+            xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
           }
-          xxofset = xxofset-1.8f;    // mellem rum mellem hver søjle
+          glPopMatrix();
         }
-        glPopMatrix();
+        if (configuvmeter==2) {
+          //printf("Calling me \n");
+          glPushMatrix();
+          glEnable(GL_TEXTURE_2D);
+          glEnable(GL_BLEND);
+          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+          glColor3f(1.0f, 1.0f, 1.0f);
+          glBindTexture(GL_TEXTURE_2D,texturedot);                              // texturedot
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          int uvypos = 0;
+          int uvyypos = 0;
+          int high;
+          int qq;
+          // Draw uv lines   barantal
+          for(qq=0;qq<128;qq++) {
+            uvypos = 0;
+            uvyypos = 0;
+            high=sqrt(spectrum_left[qq]*8);
+            if (high>60) high = 60;
+            // draw 1 bar
+            for(i=0;i<high;i+=1) {
+              switch(i) {
+                  case 1:
+                  case 2:
+                  case 3:
+                  case 4:
+                          glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                          //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                          break;
+                  case 5:
+                  case 6:
+                  case 7:
+                  case 8:
+                  case 9:
+                  case 10:
+                  case 11:
+                  case 12:
+                  case 13:
+                  case 14:
+                        glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
+                        //glBindTexture(GL_TEXTURE_2D,_textureuv1_top);         //texturedot)
+                        break;
+                  case 15:
+                  case 16:
+                  case 17:
+                  case 18:
+                  case 19:
+                  case 20:
+                  case 21:
+                  case 22:
+                  case 23:
+                  case 24:
+                  default:
+                        glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                        //glBindTexture(GL_TEXTURE_2D,_textureuv1);         //texturedot);
+                        break;
+              }
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 +(qq*7), (orgwinsizey/2)+4 +uvypos, 0.0);
+              glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50 +(qq*7),  (orgwinsizey/2)+14+4+uvypos, 0.0);
+              glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+50+5 +(qq*7), (orgwinsizey/2)+14+4+uvypos , 0.0);
+              glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+50+5 +(qq*7),  (orgwinsizey/2)+4+uvypos, 0.0);
+              glEnd();
+              uvypos+=16;
+            }
+            high = sqrt(spectrum_right[qq]*8);
+            if (high > 60) high = 60;
+            for(i=0;i<high;i+=1) {
+              switch(i) {
+                  case 1:
+                  case 2:
+                  case 3:
+                  case 4:
+                          glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                          glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
+                          break;
+                  case 5:
+                  case 6:
+                  case 7:
+                  case 8:
+                  case 9:
+                  case 10:
+                  case 11:
+                  case 12:
+                  case 13:
+                  case 14:
+                          glColor4f(uvcolortable1[1],uvcolortable1[37],uvcolortable1[1],1.0);
+                          glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot)
+                          break;
+                  case 15:
+                  case 16:
+                  case 17:
+                  case 18:
+                  case 19:
+                  case 20:
+                  case 21:
+                  case 22:
+                  case 23:
+                  case 24:
+                  default:
+                          glColor4f(uvcolortable1[0],uvcolortable1[1],uvcolortable1[2],1.0);
+                          glBindTexture(GL_TEXTURE_2D,texturedot1);         //texturedot);
+                          break;
+              }
+              glBegin(GL_QUADS);
+              glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 +(qq*7),  (orgwinsizey/2)+4 -uvyypos, 0.0);
+              glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50 +(qq*7),  (orgwinsizey/2)+14+4-uvyypos, 0.0);
+              glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+50+5 +(qq*7), (orgwinsizey/2)+14+4-uvyypos , 0.0);
+              glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+50+5 +(qq*7), (orgwinsizey/2)+4-uvyypos, 0.0);
+              glEnd();
+              uvyypos+=16;
+            }
+          }
+          // done uv stuf
+          glPopMatrix();
+        }
+        if (configuvmeter==3) {
+          // show box music 3d
+          mybox.show_music_3d_music(_angle,screensaverbox);
+
+          //mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
+        }
       }
     }
     // end spectium
@@ -4072,7 +4197,6 @@ void display() {
     }
     #endif
 
-
     // start play radio station
     // and stop old player of playing
     if (vis_radio_oversigt) {
@@ -4087,17 +4211,20 @@ void display() {
           dsp = 0;                                                                                  // reset uv
           ERRCHECK(result,0);
           snd = 0;                                // set play new flag
+          write_logfile("Stop music player.");
         }
         #endif
         #if defined USE_SDL_MIXER
-        if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
+        if (sdlmusicplayer) {
+          Mix_FreeMusic(sdlmusicplayer);
+          write_logfile("Stop music player.");
+        }
         sdlmusicplayer = NULL;
         snd = 0;                                // set play new flag
         #endif
-        write_logfile("Stop music player.");
         if (snd==0) {
           snd = 1;
-          sprintf(debuglogdata,"Start play radio station nr %d url %s ",rknapnr-1,radiooversigt.get_stream_url(rknapnr-1));
+          sprintf(debuglogdata,"Start play radio station url %s ",radiooversigt.get_stream_url(rknapnr-1));
           write_logfile((char *) debuglogdata);
           if (snd == 0) {
               #if defined USE_FMOD_MIXER
@@ -5488,11 +5615,10 @@ void display() {
       }
     }
     #endif
-
     //
-    // show uv metter in music player
+    // show uv metter in music player NOT screen saver
     //
-    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
+    if (((snd) && (!(visur)) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
