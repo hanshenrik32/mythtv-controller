@@ -134,7 +134,7 @@ installsound:
 
 
 install:
-	@echo "Installing mythtv-controller ver 0.38.x in /usr/share/mythtv-controller."
+	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
 	@mkdir -p /usr/share/mythtv-controller/images/radiostations
 	@mkdir -p /usr/share/mythtv-controller/convert/hires
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi

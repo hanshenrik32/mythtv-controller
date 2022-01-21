@@ -947,6 +947,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
       antal_music_oversigt=0;
     }
     mysql_close(conn);
+    musicoversigt_antal=i;
   }
   return(i);
 }
@@ -1083,9 +1084,7 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
   bool stop=false;
   char *base,*right_margin;
   int length;
-
   sofset=(_mangley/40)*8;
-
   while((i<lmusicoversigt_antal) && (strcmp(musicoversigt[i+sofset].album_name,"")!=0) && (i<musicoversigt.size()) ) {
     // do new line (if not first line)
     if (((i % bonline)==0) && (i>0)) {

@@ -163,7 +163,7 @@ int get_webfile2(char *webpath,char *outfile) {
 
 // ****************************************************************************************
 //
-// used by get_webfile3
+// used by get_webfile
 //
 // ****************************************************************************************
 
@@ -195,8 +195,8 @@ int convert_image(char *in_image,char *out_image) {
 
 // ****************************************************************************************
 //
+// In use
 // Used to download images from web and convert by ImageMagick to 320x320
-//
 // download tempfile and convert to the real icon file saved in homedir/rss/images
 //
 // ****************************************************************************************

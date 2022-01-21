@@ -3433,9 +3433,7 @@ void display() {
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
-
         musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
@@ -3908,11 +3906,15 @@ void display() {
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
-          i++;
-          glTranslatef(5.0f, 0.0f, 0.0f);
+          glPopMatrix();
+          glPushMatrix();
+          glTranslatef(560.0f+560.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
+          i++;
         }
       }
     }
@@ -7784,11 +7786,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 // give error
                 if (debugmode & 2) {
                   if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
-                    fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
+                    //fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
                   }
                 }
                 if (vis_tv_oversigt) {
-                  if (debugmode & 8) fprintf(stderr,"tvknapnr = %d\n",tvknapnr-1);
+                  //if (debugmode & 8) fprintf(stderr,"tvknapnr = %d\n",tvknapnr-1);
                 }
                 if (vis_spotify_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d\n",spotifyknapnr-1);
@@ -7802,7 +7804,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   if (debugmode & 4) fprintf(stderr,"sknapnr = %d\n",sknapnr-1);
                 }
                 if (vis_tv_oversigt) {
-                  if (debugmode & 8) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
+                  //if (debugmode & 8) fprintf(stderr,"tv prg knapnr = %d\n",mknapnr-1);
                 }
                 // any music buttons active
                 if ((mknapnr>0) && (vis_music_oversigt)) {
@@ -7851,7 +7853,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if ((vis_radio_oversigt) && (retfunc==0)) {
                   if (rknapnr>0) {
                     do_play_radio = 1;						// select button do play
-                    if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
+                    //if (debugmode) fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                   }
                 }
                 #ifdef ENABLE_SPOTIFY
@@ -10747,7 +10749,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if ((vis_radio_oversigt) && (show_radio_options==false)) {
                 rknapnr=radio_select_iconnr;					// hent button
-                fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
+                //fprintf(stderr,"Set do_play_radio flag rknapnr=%d \n",rknapnr);
                 if (rknapnr>0) do_play_radio=1;					// start play
               }
               // opdatere radio oversigt igen efter vis radio options
@@ -12241,7 +12243,7 @@ void update(int value) {
                                             if ((vis_music_oversigt) && (!(ask_open_dir_or_play)) &&  (music_select_iconnr+5<musicoversigt_antal)) {
                                               if ((unsigned int) music_key_selected>=(unsigned int) ((numbers_cd_covers_on_line*3)+1)) {
                                                 do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
-                                                //_mangley+=(41.0f);						// scroll window down one icon
+                                                _mangley+=(41.0f);						// scroll window down one icon
                                                 music_select_iconnr += numbers_cd_covers_on_line;			// add to next line
                                               } else {
                                                 music_key_selected += numbers_cd_covers_on_line;
@@ -14872,11 +14874,6 @@ int main(int argc, char** argv) {
     int dircreatestatus;
     Display *dpy = NULL;
     Window rootxwindow;
-
-
-    get_webfile("https://imagesvc.meredithcorp.io/v3/mm/image?q=85&c=sc&poi=face&w=2000&h=1000&url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F19%2F2018%2F02%2F13%2Ffield-image-gettyimages-451373991-2000.jpg","/tmp/image.jpg");
-
-
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     strcpy(streamudate_nowstring,"");                                           // show update string/name from rss updater
