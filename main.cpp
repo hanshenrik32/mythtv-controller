@@ -8228,12 +8228,22 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           // scroll down
           //printf("music_icon_anim_icon_ofsety= %d  divide = %d  \n",music_icon_anim_icon_ofsety,musicoversigt_antal/numbers_cd_covers_on_line);
           if (((retfunc==2) || (button==4)) && ((_mangley/41.0f)+3<(int) (musicoversigt_antal/numbers_cd_covers_on_line)) && (music_icon_anim_icon_ofset==0)) { // scroll button
-            do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
-            _mangley+=(41.0f);				                      		// scroll window down one icon
-            music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
+
+            printf("mangley=%f antal= %ld \n ",(_mangley/41.0f),musicoversigt_antal);
+
+
+            if ((_mangley/41.0f)<musicoversigt_antal) {
+              do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
+              _mangley+=(41.0f);				                      		// scroll window down one icon
+              music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
+            }
           }
           // scroll up
           if (((retfunc==1) || (button==3)) && (_mangley>0)) {
+
+            printf("mangley=%f antal= %ld \n ",(_mangley/41.0f),musicoversigt_antal);
+
+
             do_music_icon_anim_icon_ofset=-1;			              // direction -1 = up 1 = down
             _mangley-=(41.0f);			                       			// scroll window up
             music_select_iconnr-=numbers_cd_covers_on_line;			// add to next line

@@ -464,7 +464,8 @@ int musicoversigt_class::opdatere_music_oversigt_playlists() {
     char database[256];
     music_oversigt_type myoversigt;
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
-    musicoversigt.clear();                                                       // clear old vector
+    musicoversigt.clear();
+    musicoversigt_antal=0;                                              // clear old vector
     write_logfile((char *) "Opdatere music oversigt fra database.");
     i=0;
     strcpy(sqlselect,"select playlist_id,playlist_name,last_accessed,length,songcount from music_playlist where hostname='' or playlist_name like 'default_playlist_storage'");
@@ -597,6 +598,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb(char *musicpath) {
   }
   conn=mysql_init(NULL);
   // Connect to database if dir exist
+  musicoversigt_antal=0;                                                        // reset antal
   if ((conn) && (dirp)) {
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
     mysql_query(conn,"set NAMES 'utf8'");
@@ -854,7 +856,7 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
   char convert_command[512];
   char sqlselect[512];
   char dirname[256];
-  unsigned int i;
+  unsigned int i=0;
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
@@ -865,6 +867,9 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
   music_oversigt_type myoversigt;
   if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
   musicoversigt.clear();                                                       // clear old vector
+  musicoversigt_antal=0;
+
+printf("Før antal fundet i music oversigt %ld \n ",musicoversigt_antal);
 
   if (directory_id==0) {
     strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
