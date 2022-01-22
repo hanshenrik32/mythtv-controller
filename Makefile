@@ -135,20 +135,20 @@ installsound:
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
-	@mkdir -p /usr/share/mythtv-controller/images/radiostations
-	@mkdir -p /usr/share/mythtv-controller/convert/hires
+	@mkdir -p /opt/mythtv-controller/images/radiostations
+	@mkdir -p /opt/mythtv-controller/convert/hires
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
-	@mkdir -p /usr/share/mythtv-controller/images/mythnetvision
-	@chmod 777 /usr/share/mythtv-controller/images/mythnetvision
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision
+	@chmod 777 /opt/mythtv-controller/images/mythnetvision
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
 	@cp -r xmltv_config $(DESTDIR)
 	@cp mythtv-controller $(DESTDIRBIN)
-	@cp mythtv-controller.png  /usr/share/mythtv-controller/mythtv-controller.png
+	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
-	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
+	@chmod 777 /opt/mythtv-controller/tema1 /opt/mythtv-controller/tema2 /opt/mythtv-controller/tema3 /opt/mythtv-controller/tema4 /opt/mythtv-controller/tema5 /opt/mythtv-controller/tema6 /opt/mythtv-controller/tema7 /opt/mythtv-controller/tema8 /opt/mythtv-controller/tema9 /opt/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \

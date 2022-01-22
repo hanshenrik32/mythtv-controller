@@ -5813,10 +5813,12 @@ void display() {
         glPopMatrix();
       }
       // do clean up after uv meters
+      // uv end
     }
     // load new team gfx files from config
     if (do_save_config) {
       do_save_config = false;
+      write_logfile("Save config.");
       if (save_config((char *) "/etc/mythtv-controller.conf")==0) {
         fprintf(stderr,"Error saving config file mythtv-controller.conf\n");
       } else fprintf(stderr,"Saving config ok.\n");
@@ -5824,8 +5826,9 @@ void display() {
       //rssstreamoversigt.save_rss_data();                                        // save rss data in db
       // load all new textures
       // free all loaded menu + icon gfx
-      //freegfx();                                                                // free gfx loaded
-      //loadgfx();                                                                // reload all menu + icon gfx
+      write_logfile("Reload tema.");
+      freegfx();                                                                // free gfx loaded
+      loadgfx();                                                                // reload all menu + icon gfx
     }
     //
     // show update if rss podcast
@@ -5843,9 +5846,9 @@ void display() {
       // non default player
       if (strcmp("default",configdefaultplayer)!=0)  {
         // write debug log
-        sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
+        sprintf(debuglogdata,"Start movie nr %d Player is /opt/mythtv-controller/startmovie.sh path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
         write_logfile((char *) debuglogdata);
-        strcpy(systemcommand,"/bin/sh /usr/bin/startmovie.sh ");
+        strcpy(systemcommand,"/bin/sh /opt/mythtv-controller/startmovie.sh ");
         strcat(systemcommand,"'");
         strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
         strcat(systemcommand,"'");
@@ -5859,10 +5862,10 @@ void display() {
         // if we play music/stream (radio) stop that before play movie stream (vlc)
         // stop music if play before start movie
         // write to log
-        write_logfile((char *) "Stop playing music/radio.");
         #if defined USE_FMOD_MIXER
         if ((sound) && (snd)) {
           // stop sound playing
+          write_logfile((char *) "Stop playing music/radio.");
           result=channel->stop();                         // stop fmod player
           // release sound system again
           result=sound->release();
@@ -5871,6 +5874,7 @@ void display() {
         }
         #endif
         #if defined USE_SDL_MIXER
+        write_logfile((char *) "Stop playing music/radio.");
         Mix_PauseMusic();
         Mix_FreeMusic(sdlmusicplayer);                  // stop SDL player
         sdlmusicplayer=NULL;
@@ -5906,6 +5910,7 @@ void display() {
       if (strcmp("default",configdefaultplayer)!=0) {
         // close non default player
         // neeed to be coded
+        // killall /opt/mythtv-controller/startmovie.sh
       } else {
         // close default player (vlc plugin)
         film_oversigt.stopmovie();
