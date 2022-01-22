@@ -366,7 +366,7 @@ bool vis_movie_sort_option = false;                       //
 
 bool vis_stream_oversigt = false;
 bool startstream = false;
-bool do_play_stream = false;
+bool do_play_stream = false;                              // player vi stream
 bool do_stop_stream = false;
 bool stopstream = false;
 
@@ -416,7 +416,6 @@ int screeny=1080;                                         // default screen size
 
 // xbmc/kodi db version files
 int kodiverfound=0;
-
 
 const float textcolor[3]={0.8f,0.8f,0.8f};
 const float selecttextcolor[3]={0.4f,0.4f,0.4f};
@@ -3078,7 +3077,6 @@ void display() {
         if (configuvmeter==3) {
           // show box music 3d
           mybox.show_music_3d_music(_angle,screensaverbox);
-
           //mybox.show_music_3d_2(_angle,screensaverbox);	//_textureId19
         }
       }
@@ -4210,7 +4208,7 @@ void display() {
           sound->release();                                                                       // stop last playing song
           dsp = 0;                                                                                  // reset uv
           ERRCHECK(result,0);
-          snd = 0;                                // set play new flag
+          snd=0;                                // set play new flag
           write_logfile("Stop music player.");
         }
         #endif
@@ -4220,7 +4218,7 @@ void display() {
           write_logfile("Stop music player.");
         }
         sdlmusicplayer = NULL;
-        snd = 0;                                // set play new flag
+        snd=0;                                // set play new flag
         #endif
         if (snd==0) {
           snd = 1;
@@ -4364,6 +4362,7 @@ void display() {
     }
     // stop music
     // if playing
+    // stream
     if (vis_stream_oversigt) {
       if ((do_play_stream) && (sknapnr>0) && (sknapnr<=streamoversigt.streamantal())) {
         #if defined USE_FMOD_MIXER
@@ -4380,6 +4379,7 @@ void display() {
         #endif
       }
     }
+    // music
     #if defined USE_FMOD_MIXER
     if ((snd) && (sound) && (channel)) {
       //result = sound->getOpenState(&openstate,&percent,&starving,false);
@@ -4406,7 +4406,7 @@ void display() {
           if (musicoversigt.get_album_type(mknapnr-1)==-1) {
             if (debugmode & 2) fprintf(stderr,"Loading song from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);
             if (hent_mythtv_playlist(musicoversigt.get_directory_id(mknapnr-1))==0) {		// tilføj musik valgte til playliste + load af covers
-              fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt.get_directory_id(mknapnr-1));
+              fprintf(stderr,"**** PLAYLIST LOAD ERROR **** \n No songs.Playlist id=%d\n",musicoversigt.get_directory_id(mknapnr-1));
               exit(2);
             }
             do_play_music_aktiv_table_nr = 1;						// sæt start play aktiv nr
@@ -4468,11 +4468,11 @@ void display() {
           } else {
               fprintf(stderr,"ERROR Loading song.....: '%s' \n\n",aktivplay_music_path);
               fprintf(stderr,"Please check music path is readable '%s' \n",configmusicpath);
+              write_logfile((char *) "Please check music path is readable .");
           }
         }
       }
     }
-    // ******************************************************************************************************************
     // ******************************************************************************************************************
     // ******************************************************************************************************************
     // show we player music
@@ -5616,9 +5616,9 @@ void display() {
     }
     #endif
     //
-    // show uv metter in music player NOT screen saver
+    // show uv metter NOT screen saver
     //
-    if (((snd) && (!(visur)) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
+    if ((snd==true) && (!(visur)) && (vis_uv_meter) && (configuvmeter)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
@@ -7062,13 +7062,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // we have a select mouse/touch element dirid
           // scroll down
           if ((GLubyte) names[i*4+3]==23) {
-            if (debugmode & 2) fprintf(stderr,"scroll down\n");
+            if (debugmode & 2) fprintf(stderr,"Music scroll down\n");
             returnfunc = 1;
             fundet = true;
           }
           // scroll up
           if ((GLubyte) names[i*4+3]==24) {
-            if (debugmode & 2) fprintf(stderr,"scroll up\n");
+            if (debugmode & 2) fprintf(stderr,"Music scroll up\n");
             returnfunc = 2;
             fundet = true;
           }
@@ -7853,7 +7853,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
 // ****************************************************************************************
 //
 // get selected icon
+// button==4 = scroll jul på mouse
 //
+
 // ****************************************************************************************
 
 int gl_select(int x,int y) {
@@ -8216,11 +8218,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             }
             */
         }
-        // do scroll up/down view mouse or screen button
+        // do scroll up/down my mouse jul view mouse or screen button
         if  (!(ask_open_dir_or_play)) {
           // scroll down
           //printf("music_icon_anim_icon_ofsety= %d  divide = %d  \n",music_icon_anim_icon_ofsety,musicoversigt_antal/numbers_cd_covers_on_line);
-          if (((retfunc==2) || (button==4)) && ((_mangley/41.0f)+2<(int) (musicoversigt_antal/numbers_cd_covers_on_line)) && (music_icon_anim_icon_ofset==0)) { // scroll button
+          if (((retfunc==2) || (button==4)) && ((_mangley/41.0f)+3<(int) (musicoversigt_antal/numbers_cd_covers_on_line)) && (music_icon_anim_icon_ofset==0)) { // scroll button
             do_music_icon_anim_icon_ofset=1;			             	// direction -1 = up 1 = down
             _mangley+=(41.0f);				                      		// scroll window down one icon
             music_select_iconnr+=numbers_cd_covers_on_line;			// add to next line
@@ -8477,7 +8479,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       if (vis_radio_oversigt) {
         // scroll down
         //printf("radio rangley= %d   \n",_rangley);
-        if (((retfunc==2) || (button==4)) && ((_rangley/41.0f)+4<(int) (radiooversigt_antal/numbers_radio_covers_on_line))) { // scroll button
+        if (((retfunc==2) || (button==4)) && ((_rangley/41.0f)+5<(int) (radiooversigt_antal/numbers_radio_covers_on_line))) { // scroll button
           //do_music_icon_anim_icon_ofset=1;				// direction -1 = up 1 = down
           _rangley+=(41.0f);						// scroll window down one icon
           radio_select_iconnr+=numbers_radio_covers_on_line;			// add to next line
@@ -8536,7 +8538,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           stream_select_iconnr = 0;
           _sangley = 0.0f;
         }
-        if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+4<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
+        if (((retfunc==2) || (button==4)) && ((_sangley/41.0f)+3<(int) (streamoversigt.streamantal()/numbers_stream_covers_on_line))) { // scroll button
           //do_music_icon_anim_icon_ofset=1;				                // direction -1 = up 1 = down
           _sangley+=(41.0f);						                            // scroll window down one icon
           stream_select_iconnr+=numbers_stream_covers_on_line;			// add to next line
