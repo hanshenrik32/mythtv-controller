@@ -5618,7 +5618,7 @@ void display() {
     //
     // show uv metter NOT screen saver
     //
-    if ((snd==true) && (!(visur)) && (vis_uv_meter) && (configuvmeter)) {
+    if ((snd==true) && (!(visur)) && (vis_uv_meter) && (configuvmeter) && (!(vis_spotify_oversigt)) && (!(vis_tv_oversigt))) {
       // draw uv meter
       int high = 2;
       int qq = 1;
