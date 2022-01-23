@@ -282,7 +282,7 @@ film_oversigt_typem::~film_oversigt_typem() {
 // ****************************************************************************************
 
 void film_oversigt_typem::resetallefilm() {
-     for(unsigned int i=0;i<filmoversigtsize-1;i++) {
+     for(auto i=0;i<filmoversigtsize-1;i++) {
        filmoversigt[i].resetfilm();			// back cover
     }
 

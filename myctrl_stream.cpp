@@ -778,8 +778,10 @@ int check_rss_feed_exist(MYSQL *conn,char *rssname) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         recexist=true;
       }
+    } else {
+        printf("mysql select count error. on title %s\n",rssname);
     }
-  }
+  } else printf("mysql select no db access.\n");
   return(recexist);
 }
 
@@ -3393,6 +3395,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
+        write_logfile((char *) "mysql insert error.");
         printf("mysql insert error.\n");
         printf("SQL %s \n",sqlselect);
       }
@@ -3434,9 +3437,13 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
                   mmm++;
                 }
-                getuserhomedir(homedir);                                                  // get homedir
-                strcpy(downloadfilenamelong,homedir);
-                strcat(downloadfilenamelong,"/rss/images/");
+                // create dir if not exist
+                getuserhomedir(homedir);
+                strcat(homedir,"/rss");
+                if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                strcat(homedir,"/images");
+                if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                strcat(downloadfilenamelong,"/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download gfx file and use as icon
