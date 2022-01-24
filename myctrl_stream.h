@@ -4,7 +4,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <vector>
 #include "myth_vlcplayer.h"
 
 const int feed_namelength=80;
@@ -41,15 +40,10 @@ struct stream_oversigt_type {
     long intnr;
 };
 
-
-
 class stream_class : vlc_controller {
     private:
         enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
         stream_oversigt_type *stack[maxantal];			                            // radio stack array
-
-        //std::vector<stream_oversigt_type> stack1;                                 // vector array
-
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises

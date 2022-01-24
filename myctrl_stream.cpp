@@ -25,7 +25,7 @@
 //
 
 extern char debuglogdata[1024];                                  // used by log system
-extern char streamudate_nowstring[];
+
 extern char debuglogdata[1024];                                  // used by log system
 extern float configdefaultstreamfontsize;
 extern int tema;
@@ -272,6 +272,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
   struct stat attr;
   const int updateinterval=86400;
   time(&timenow);
+  conn=mysql_init(NULL);
   // get homedir
   getuserhomedir(homedir);
   strcat(homedir,"/rss");
@@ -281,9 +282,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
   // Connect to database
   //strcpy(sqlselect,"select internetcontent.name,internetcontentarticles.path,internetcontentarticles.title,internetcontentarticles.description,internetcontentarticles.url,internetcontent.thumbnail,count(internetcontentarticles.feedtitle),internetcontent.thumbnail from internetcontentarticles left join internetcontent on internetcontentarticles.feedtitle=internetcontent.name group by internetcontentarticles.feedtitle");
   //strcpy(sqlselect,"select * from internetcontentarticles");
-  conn=mysql_init(NULL);
   if (conn) {
-    conn=mysql_init(NULL);
     mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
     strcpy(sqlselect,"select count(mediaURL) from internetcontentarticles where mediaURL IS NULL");
     mysql_query(conn,sqlselect);
@@ -369,11 +368,6 @@ int stream_class::loadrssfile(bool updaterssfile) {
               haveupdated=true;
             }
           }
-          // write log
-          snprintf(debuglogdata,50,"Podcast update %s ",row[0]);
-          strncpy(streamudate_nowstring,row[0],30);
-          streamudate_nowstring[30]=0;                                          // max length
-          write_logfile((char *) debuglogdata);
         }
       }
       mysql_free_result(res);
@@ -778,10 +772,8 @@ int check_rss_feed_exist(MYSQL *conn,char *rssname) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         recexist=true;
       }
-    } else {
-        printf("mysql select count error. on title %s\n",rssname);
     }
-  } else printf("mysql select no db access.\n");
+  }
   return(recexist);
 }
 
@@ -808,7 +800,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     char homedir[1024];
     // mysql vars
     bool rss_update=false;
-    MYSQL *conn=NULL;
+    MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
     char *database = (char *) "mythtvcontroller";
@@ -816,21 +808,10 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     int getart=0;
     bool loadstatus=true;
     bool dbexist=false;
-    bool dorss_update=false;
-    static time_t timenow;
-    static time_t lasttime=0;
     antal=0;
-    timenow=time(NULL);
-    if (antal_rss_streams()>0) {
-       if (lasttime==0) lasttime=timenow;
-    } else lasttime=0;                                                          // update now
-    if (timenow>lasttime+600) {
-      dorss_update=true;
-      lasttime=timenow;
-    } else dorss_update=false;
-    if (dorss_update) {
-      // Connect to database
-      conn=mysql_init(NULL);
+    conn=mysql_init(NULL);
+    // Connect to database
+    if (conn) {
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
         dbexist=false;
       }
@@ -3395,7 +3376,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
-        write_logfile((char *) "mysql insert error.");
         printf("mysql insert error.\n");
         printf("SQL %s \n",sqlselect);
       }
@@ -3437,13 +3417,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
                   mmm++;
                 }
-                // create dir if not exist
-                getuserhomedir(homedir);
-                strcat(homedir,"/rss");
-                if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                strcat(homedir,"/images");
-                if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                strcat(downloadfilenamelong,"/");
+                getuserhomedir(homedir);                                                  // get homedir
+                strcpy(downloadfilenamelong,homedir);
+                strcat(downloadfilenamelong,"/rss/images/");
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download gfx file and use as icon
@@ -3619,7 +3595,7 @@ int stream_class::loadweb_stream_iconoversigt() {
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+          loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
@@ -3719,8 +3695,7 @@ void *load_all_stream_gfx(void *data) {
                       strcat(downloadfilenamelong,downloadfilename);
                       filechange=strcmp(lastfile,downloadfilename);
                       if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                        sprintf(debuglogdata,"Downloading : %s ",tmpfilename);
-                        write_logfile((char *) debuglogdata);
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
                         loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                         nr++;
                       } else {
@@ -3737,8 +3712,7 @@ void *load_all_stream_gfx(void *data) {
                       strcat(downloadfilenamelong,downloadfilename);
                       filechange=strcmp(lastfile,downloadfilename);
                       if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                        sprintf(debuglogdata,"Downloading rss image : %s ",tmpfilename);
-                        write_logfile((char *) debuglogdata);
+                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
                         loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
                         nr++;
                       } else {
@@ -4039,18 +4013,5 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glcRenderString("Please wait Loading ...");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
-
-      // show rss update channel name
-      glPushMatrix();
-      xof=700;
-      yof=230;
-      glTranslatef(xof, yof ,0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(22.0, 22.0, 1.0);
-      glcRenderString(streamudate_nowstring);
-      glEnable(GL_TEXTURE_2D);
-      glPopMatrix();
-
     }
 }
