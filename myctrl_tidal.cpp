@@ -3005,7 +3005,6 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       xof+=(buttonsize+10);
     }
 
-
     // no records loaded error
     if ((i==0) && (antal_tidal_streams()==0)) {
       glEnable(GL_TEXTURE_2D);
@@ -3042,8 +3041,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       glcRenderString("           Tidal");
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
-
     }
+
 }
 
 

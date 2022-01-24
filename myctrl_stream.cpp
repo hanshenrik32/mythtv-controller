@@ -3447,7 +3447,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                 strcat(downloadfilenamelong,downloadfilename);
                 if (!(file_exists(downloadfilenamelong))) {
                   // download gfx file and use as icon
-                  if (get_webfile(tmpfilename,downloadfilenamelong)==-1) {
+                  if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                     //printf("Download error \n");
                     write_logfile((char *) "Image download error.");
                   } else strcpy(tmpfilename,"");
@@ -3529,7 +3529,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                       if (!(file_exists(downloadfilenamelong))) {
                         if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
                         // download gfx file and use as icon
-                        if (get_webfile(tmpfilename,downloadfilenamelong)==-1) {
+                        if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                           printf("Download error \n");
                         } else strcpy(tmpfilename,"");
                       }
@@ -3619,10 +3619,10 @@ int stream_class::loadweb_stream_iconoversigt() {
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
-          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
             //printf("File exist %s then set filename \n",downloadfilenamelong);
         }

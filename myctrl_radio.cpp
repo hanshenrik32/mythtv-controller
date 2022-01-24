@@ -56,6 +56,8 @@ extern int radio_oversigt_loaded_nr;
 extern int radio_oversigt_antal;
 
 
+static bool hentradioart=false;                                                 // hent første gang
+
 // ****************************************************************************************
 //
 // constructor
@@ -89,9 +91,9 @@ radiostation_class::~radiostation_class() {
 // ****************************************************************************************
 
 void radiostation_class::clean_radio_oversigt() {
-    startup_loaded=false;				// set radio station loaded in
+    startup_loaded=false;			                                                                // set radio station loaded to false again.
     for(auto i=0;i<antal;i++) {
-      if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	// delete radio texture
+      if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	                      // delete radio texture
     }
     antal=0;
 }
@@ -393,13 +395,13 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
         length=strlen(temptxt);
         width = 22;                                                             // normal 22 18 point font
         while(*base) {
-          if(length <= width) {
+          if(length <= width) {                                                 // hvis den kan være på 1 linje
             glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
             glcRenderString(base);
             pline++;
             break;
           }
-          right_margin = base+width;
+          right_margin = base+width;                                            //  opdel text
           while((!isspace(*right_margin)) && (stop==false)) {
             right_margin--;
             if (right_margin == base) {
@@ -414,35 +416,12 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
           if (stop) *(base+width)='\0';
           *right_margin = '\0';
           glcRenderString(base);
-          pline++;
+          pline++;                                                              // next line
           glTranslatef(xof,(yof-18)-pline*1.2f,0);
           length -= right_margin-base+1;                         // +1 for the space
           base = right_margin+1;
           if (pline>=2) break;
         }
-
-/*
-        float fontsiz=15.0f;
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef(xof,yof-18,0);
-        glScalef(fontsiz, fontsiz, 1.0);
-        strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
-        lastslash=strrchr(temptxt,'/');
-        if (lastslash) strcpy(temptxt,lastslash+1);
-        //float ytextofset=0.0f;
-        int ii,j,k,pos,ofs;
-        ii=pos=0;
-        char word[16000];
-        ofs=(strlen(temptxt)/2)*9;
-
-        //glTranslatef(1,10,0);
-        if (strlen(temptxt)<=14) glcRenderString(temptxt);
-        else {
-            temptxt[14]=0;
-            glcRenderString(temptxt);
-
-        }
-*/
         glPopMatrix();
         xof=xof+buttonsize+6;
         i++;
@@ -482,9 +461,6 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
 // skal vi opdatere sort type oversigt første gang
 //
 // ****************************************************************************************
-
-static bool hentradioart=false;
-
 
 void radiostation_class::show_radio_options() {
     int i;

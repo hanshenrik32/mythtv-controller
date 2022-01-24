@@ -7496,6 +7496,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_music_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt=false;
+          vis_tidal_oversigt = false;                                          // show tidal overview
         }
         // Music
         if ((GLubyte) names[i*4+3]==81) {
@@ -7504,6 +7505,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt = false;
+          vis_tidal_oversigt = false;                                          // show tidal overview
         } // spotify
         if ((GLubyte) names[i*4+3]==82) {
           fundet = true;
@@ -7511,6 +7513,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = true;                                          // show spotify overview
           vis_radio_or_music_oversigt = false;
+          vis_tidal_oversigt = false;                                          // show tidal overview
         }
         #if defined(ENABLE_TIDAL)
         // tidal
@@ -13866,8 +13869,8 @@ void *datainfoloader_tidal(void *data) {
   tidal_oversigt_loaded_begin=true;
   // write debug log
   write_logfile((char *) "loader thread starting - Loading tidal info from db.");
-  tidal_oversigt->opdatere_tidal_oversigt(0);                                // update from db
-  //tidal_oversigt.set_search_loaded();                           // triger icon loader
+  tidal_oversigt->opdatere_tidal_oversigt(0);                                   // update from db
+  //tidal_oversigt.set_search_loaded();                                         // triger icon loader
   write_logfile((char *) "loader thread done loaded tidal.");
   tidal_oversigt_loaded_begin=false;
   #endif

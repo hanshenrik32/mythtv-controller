@@ -117,15 +117,12 @@ clean:
 
 installsound:
 	@echo "Install fmod sound system ver 4.44.41"
-	#@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	mkdir -p $(DESTDIR)
 	cp $(FMODFILE) $(DESTDIR)
 	cd $(DESTDIR)
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	cp xmltv_config/*  ~/.xmltv/
-	chmod 666 ~/.xmltv/*
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmodL.so.12.7 /usr/lib/libfmod.so.12
@@ -136,7 +133,11 @@ installsound:
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
 	@mkdir -p /opt/mythtv-controller/images/radiostations
-	@mkdir -p /opt/mythtv-controller/convert/hires
+	@mkdir -p /opt/mythtv-controller/convert/hires	
+	if ! test -d ~/.xmltv then mkdir ~/.xmltv; fi
+	if ! test -d ~/rss/images then mkdir -p ~/rss/images; fi
+	cp xmltv_config/*  ~/.xmltv/
+	chmod 666 ~/.xmltv/*
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision
