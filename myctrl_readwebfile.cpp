@@ -125,40 +125,6 @@ void get_host(char *hname,char *webpath,char *source) {
 
 
 
-// ****************************************************************************************
-//
-// check if file is a image file of type jpg,png
-//
-// ****************************************************************************************
-
-bool check_filename_ext(const char *filename) {
-    const char *dot = strrchr(filename, '.');
-    if ((dot) && ((strcmp(dot,".jpg")==0) || (strcmp(dot,".png")))) return(1); else return(0);
-}
-
-// ****************************************************************************************
-// Old not in use
-// used to download images from web and convert by ImageMagick to 320x320
-// more secure now use wget
-//
-// ****************************************************************************************
-
-
-int get_webfile2(char *webpath,char *outfile) {
-  char command[2048];
-  // check file ext is image yes download
-  if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
-    strcpy(command,"wget \"");
-    strcat(command,webpath);
-    strcat(command,"\" -O- | convert -thumbnail 'x320^' - - > ");
-    strcat(command,outfile);
-    //strcat(command," 2>%1 ");
-    strcat(command," 2>> wget.log ");
-    //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
-    return (system(command));
-  }
-}
-
 
 
 // ****************************************************************************************
@@ -243,4 +209,39 @@ int get_webfile(char *webpath,char *outfile) {
     remove(tdestfile);                                                          // remove temp file again
   }
   return(1);
+}
+
+
+
+// ****************************************************************************************
+//
+// check if file is a image file of type jpg,png
+//
+// ****************************************************************************************
+
+bool check_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if ((dot) && ((strcmp(dot,".jpg")==0) || (strcmp(dot,".png")))) return(1); else return(0);
+}
+
+// ****************************************************************************************
+//
+// used to download images from web
+// more secure now use wget
+//
+// ****************************************************************************************
+
+int get_webfile2(char *webpath,char *outfile) {
+  char command[2048];
+  // check file ext is image yes download
+  if ((check_filename_ext(webpath)) && (strlen(webpath)<300)) {
+    strcpy(command,"wget \"");
+    strcat(command,webpath);
+    strcat(command,"\" -O- | convert -thumbnail 'x320^' - - > ");
+    strcat(command,outfile);
+    //strcat(command," 2>%1 ");
+    strcat(command," 2>> wget.log ");
+    //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
+    return (system(command));
+  }
 }
