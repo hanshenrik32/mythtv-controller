@@ -15020,6 +15020,11 @@ int main(int argc, char** argv) {
     int dircreatestatus;
     Display *dpy = NULL;
     Window rootxwindow;
+
+
+    get_webfile("https://asset.dr.dk/imagescaler01/www.dr.dk/drdkGlobal/spot/Images/fokusbaand/klassiker2022.jpg","/tmp/image.jpg");
+
+
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
     strcpy(streamudate_nowstring,"");                                           // show update string/name from rss updater

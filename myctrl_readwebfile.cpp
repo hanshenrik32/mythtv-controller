@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "myctrl_readwebfile.h"
+#include <curl/curl.h>
 
 
                                                                 // 1  = wifi net
@@ -119,112 +120,6 @@ void get_host(char *hname,char *webpath,char *source) {
   }
 }
 
-// ****************************************************************************************
-//
-// downloader of file
-//
-// ****************************************************************************************
-
-int get_webfile(char *webpath,char *outfile) {
-    struct sockaddr_in servaddr;
-    struct hostent *hp;
-    int sock_id;
-    char message[2024] = {0};
-    int msglen;
-    char request[1000];
-    char *hostpointer;
-    char hostname[200];
-    char wpath[200];
-    char *lpos;
-    int webobjlength;
-    int i=0;
-    bool loaderror=false;
-    char tegn;
-    FILE *fil;
-    int error=0;
-    strcpy(hostname,"");
-    // return hostname
-    //  wpath = text after hostbname (path to file - domainname)
-    get_host(hostname,wpath,webpath);	// sample webpage http://www.dr.dk/image
-    // http 1.1
-    sprintf(request,"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n",wpath,hostname);
-    //Get a socket
-    if((sock_id = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-      fprintf(stderr,"Couldn't get a socket.\n");
-      exit(EXIT_FAILURE);
-    }
-    //book uses bzero which my man pages say is deprecated
-    //the man page said to use memset instead. :-)
-    memset(&servaddr,0,sizeof(servaddr));
-    //get address for google.com
-    if((hp = gethostbyname(hostname)) == NULL) {
-      fprintf(stderr,"Couldn't get an address.\n");
-      return(0);
-    }
-    //bcopy is deprecated also, using memcpy instead
-    memcpy((char *)&servaddr.sin_addr.s_addr, (char *)hp->h_addr, hp->h_length);
-    //fill int port number and type
-    servaddr.sin_port = htons(80);
-    servaddr.sin_family = AF_INET;
-    //make the connection
-    if(connect(sock_id, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
-      fprintf(stderr, "Couldn't connect.\n");
-      error=1;
-      loaderror=1;
-    }
-    if (!(error)) {
-      //send the request
-      send(sock_id,request,strlen(request),0);
-      //write(sock_id,request,strlen(request));
-    }
-    while((strcmp(message,"\r\n")) && (!(loaderror))) {
-      for(i = 0;strcmp(message + i - 2, "\r\n"); i++) {
-        read(sock_id,message+i,1);
-        message[i+1]=0;
-      }
-      lpos=strstr(message, "Content-Length:");
-      if (strstr(message, "Content-Length:")==message) {
-        webobjlength = atoi(strchr(lpos, ' ') + 1);
-      }
-      if (strstr(message, "Invalid URL")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"HTTP/1.0 400 Bad Request")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"302 Found")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"404 Not Found")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-      if (strstr(message,"Moved Parmanently")) {
-        webobjlength = 0;
-        loaderror=true;
-      }
-    }
-    if (!(loaderror)) {
-      fil=fopen(outfile,"w");
-      if (!(fil)) {
-        if (debugmode) fprintf(stderr," Open file for write error %s \n",outfile);
-        loaderror=true;							// not posible to save file
-      }
-      if (fil) {
-        for (i = 0;i < webobjlength; i++) {
-          read(sock_id, &tegn, 1);
-          fputc(tegn, fil);
-          putchar('\r');
-        }
-        fclose(fil);
-      }
-    }
-    close(sock_id);
-    if (!(loaderror)) return(1); else return(0);
-}
 
 
 // ****************************************************************************************
@@ -258,4 +153,73 @@ int get_webfile2(char *webpath,char *outfile) {
     //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
     return (system(command));
   }
+}
+
+
+// ***************************************************************************************
+//
+// download file function for libcurl
+//
+// ***************************************************************************************
+
+
+static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+    size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+    return written;
+}
+
+
+// ***************************************************************************************
+//
+// download file
+//
+// ***************************************************************************************
+
+int convert_file_to_icons(char *outfile) {
+    char command[2048];
+    char tempname[2048];
+    char resultname[2048];
+    strcpy(command,"convert -thumbnail 'x320^' ");
+    strcat(command,outfile);                                                  //
+    strcat(command," > ");
+    strcat(command,tmpnam(tempname));
+    strcat(command,".jpg");
+    system(command);
+    strcpy(command,"mv ");
+    strcat(command,tempname);
+    strcat(command," ");
+    strcat(command,outfile);
+    //strcat(command," 2>%1 ");
+    //strcat(command," 2>> wget.log ");
+    return (system(command));
+}
+
+
+// ***************************************************************************************
+//
+// download file
+// call get_webfile(char *webpath,char *outfile)
+//
+// ***************************************************************************************
+
+int get_webfile(char *webpath,char *outfile) {
+    CURL *curl_handle;
+    static const char *filename = outfile;
+    FILE *file;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_handle = curl_easy_init();
+    curl_easy_setopt(curl_handle, CURLOPT_URL, webpath);
+    curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
+    /* open the file */
+    file = fopen(filename, "wb");
+    if (file) {
+      curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
+      curl_easy_perform(curl_handle);
+      fclose(file);
+    }
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
+    return 0;
 }
