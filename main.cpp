@@ -14910,13 +14910,13 @@ void load_lande_flags() {
     // 40-49
     // 50-59
     // 60-69
-    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu.png",(char *) "fr.png",(char *) "luxembourg.png",(char *) "nl.png",(char *) "usa.png",(char *) "de.png",(char *) "uk.png", //
-                   (char *) "ru.png",(char *) "israel.png",(char *) "Austria.png",(char *) "lebanon.png",(char *) "latvia.png",(char *) "",(char *) "Vietnam.png",(char *) "Saudi-Arabia.png",(char *) "as.png",(char *) "brazil.png", //
-                   (char *) "Egypt.png",(char *) "no.png",(char *) "pl.png",(char *) "se.png",(char *) "sw.png",(char *) "mexico.png",(char *) "be.png",(char *) "ca.png",(char *) "as.png",(char *) "ru.png", //
-                   (char *) "sp.png",(char *) "ae.jpg",(char *) "hu.png",(char *) "th.png",(char *) "gr.png",(char *) "bk.png",(char *) "nu.png",(char *) "in.png",(char *) "po.png",(char *) "ir.png", //
-                   (char *) "ks.png",(char *) "romania.png",(char *) "it.png",(char *) "fi.png",(char *) "bahrain.png",(char *) "dk.png",(char *) "chile.png",(char *) "chile.png",(char *) "Slovakia.png",(char *) "Ukraine.png", //
-                   (char *) "hu.png",(char *) "co.png",(char *) "do.png",(char *) "Azerbaijan.png",(char *) "Lithuania.png",(char *) "Andorra.png",(char *) "Estonia.png",(char *) "Tajikistan.png",(char *) "Turkey.png",(char *) "Mongolia.png", //
-                   (char *) "Belarus.png",(char *) "Slovenia.png",(char *) "Cyprus.png",(char *) "China.png",(char *) "Cambodia.png",(char *) "Indonesia.png",(char *) "Singapore.png",(char *) "Croatia.png",(char *) "Czech Republic.png",(char *) ""};
+    char *lande[]={(char *) "",(char *) "",(char *) "",(char *) "yu",(char *) "fr",(char *) "luxembourg",(char *) "nl",(char *) "usa",(char *) "de",(char *) "uk", //
+                   (char *) "ru",(char *) "israel",(char *) "Austria",(char *) "lebanon",(char *) "latvia",(char *) "",(char *) "Vietnam",(char *) "Saudi-Arabia",(char *) "as",(char *) "brazil", //
+                   (char *) "Egypt",(char *) "no",(char *) "pl",(char *) "se",(char *) "sw",(char *) "mexico",(char *) "be",(char *) "ca",(char *) "as",(char *) "ru", //
+                   (char *) "sp",(char *) "ae",(char *) "hu",(char *) "th",(char *) "gr",(char *) "bk",(char *) "nu",(char *) "in",(char *) "po",(char *) "ir", //
+                   (char *) "ks",(char *) "romania",(char *) "it",(char *) "fi",(char *) "bahrain",(char *) "dk.png",(char *) "chile",(char *) "chile",(char *) "Slovakia",(char *) "Ukraine", //
+                   (char *) "hu",(char *) "co",(char *) "do",(char *) "Azerbaijan",(char *) "Lithuania",(char *) "Andorra",(char *) "Estonia",(char *) "Tajikistan",(char *) "Turkey",(char *) "Mongolia", //
+                   (char *) "Belarus",(char *) "Slovenia",(char *) "Cyprus",(char *) "China",(char *) "Cambodia",(char *) "Indonesia",(char *) "Singapore",(char *) "Croatia",(char *) "Czech Republic",(char *) ""};
     i = 0;
     strcpy(path2,"");
     while(i < 69) {
@@ -15084,16 +15084,6 @@ int main(int argc, char** argv) {
       write_logfile((char *) debuglogdata);
       sprintf(debuglogdata,"Default player    =%s ",configdefaultplayer);
       write_logfile((char *) debuglogdata);
-      //fprintf(stderr,"Mythtv database version %d\n",configmythtvver);
-      //fprintf(stderr,"configmysqluser   =%s \n",configmysqluser);
-      //fprintf(stderr,"configmysqlhost   =%s \n",configmysqlhost);
-      //fprintf(stderr,"config movie path =%s \n",configmoviepath);
-      //fprintf(stderr,"config music path =%s \n",configmusicpath);
-      //fprintf(stderr,"config record path=%s \n",configrecordpath);
-      //fprintf(stderr,"config hostname   =%s \n",confighostname);
-      //fprintf(stderr,"config fontname   =%s \n",configfontname);
-      //fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
-      //fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (strncmp(configbackend,"xbmc",4)==0) {
       write_logfile((char *) "XBMC - Backend");
@@ -15115,15 +15105,6 @@ int main(int argc, char** argv) {
       write_logfile((char *) debuglogdata);
       sprintf(debuglogdata,"Default player    =%s ",configdefaultplayer);
       write_logfile((char *) debuglogdata);
-      //fprintf(stderr,"sqluser           =%s \n",configmysqluser);
-      //fprintf(stderr,"host              =%s \n",configmysqlhost);
-      //fprintf(stderr,"config movie path =%s \n",configmoviepath);
-      //fprintf(stderr,"config music path =%s \n",configmusicpath);
-      //fprintf(stderr,"config record path=%s \n",configrecordpath);
-      //fprintf(stderr,"config hostname   =%s \n",confighostname);
-      //fprintf(stderr,"config fontname   =%s \n",configfontname);
-      //fprintf(stderr,"Sound interface   =%s \n",configsoundoutport);
-      //fprintf(stderr,"Default player    =%s \n",configdefaultplayer);
     }
     if (debugmode) {
       fprintf(stderr,"Debug mode selected ");

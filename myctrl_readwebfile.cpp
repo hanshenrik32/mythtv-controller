@@ -135,6 +135,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 // ***************************************************************************************
 
 int convert_file_to_icons(char *outfile) {
+    int convertok;
     char command[2048];
     char tempname[2048];
     char resultname[2048];
@@ -143,7 +144,7 @@ int convert_file_to_icons(char *outfile) {
     strcat(command," > ");
     strcat(command,tmpnam(tempname));
     strcat(command,".jpg");
-    system(command);
+    convertok=system(command);
     try {
       rename(tempname, outfile);
     } catch (...) {
