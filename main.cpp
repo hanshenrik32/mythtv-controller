@@ -15164,7 +15164,6 @@ int main(int argc, char** argv) {
     #endif
 
 
-
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
       radiooversigt_antal = radiooversigt.opdatere_radio_oversigt(0);					// get numbers of radio stations

@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "myctrl_readwebfile.h"
 #include <curl/curl.h>
+#include <iostream>
+#include "myctrl_readwebfile.h"
 
 
                                                                 // 1  = wifi net
@@ -80,51 +81,9 @@ int get_webfilename(char *fname,char *webpath) {
 }
 
 
-
 // ****************************************************************************************
 //
-// web downloader ver .1 by hans-henrik
-//
-// return hostname ,webpath from source link eks. www.dr.dk/images/image1.png
-// return hname   = www.dr.dk
-// return webpath = /images/image1.png
-//
-// ****************************************************************************************
-
-void get_host(char *hname,char *webpath,char *source) {
-  int n=0;
-  int nn=0;
-  char tegn[5];
-  char tmptxt[1000];
-  char tmptxt2[1000];
-  strcpy(tmptxt2,"");
-  strcpy(tmptxt,source);
-  if ((strlen(source)>7) && (strncmp(source,"http://",7)==0)) strcpy(tmptxt,source+7); // remove http(s)://
-  else if ((strlen(source)>7) && (strncmp(source,"https://",8)==0)) strcpy(tmptxt,source+8); // remove http(s)://
-  else strcpy(tmptxt,"");
-  if (strchr(tmptxt,'/')>0) {
-    while((tmptxt[n]!='/') && (n<strlen(source))) {
-      n++;
-    }
-    tmptxt[n]=0;
-    strcpy(hname,tmptxt);
-    while(n<strlen(source)) {
-      if (strncmp(source,"http://",7)==0) tmptxt2[nn]=source[n+7];
-      else if (strncmp(source,"https://",8)==0) tmptxt2[nn]=source[n+8];
-      else tmptxt2[nn]=source[n];
-      nn++;
-      n++;
-    }
-    tmptxt2[nn]=0;
-    strcpy(webpath,tmptxt2);
-  }
-}
-
-
-
-// ****************************************************************************************
-//
-// check if file is a image file of type jpg,png
+// Check if file is a image file of type jpg,png
 //
 // ****************************************************************************************
 
@@ -185,13 +144,12 @@ int convert_file_to_icons(char *outfile) {
     strcat(command,tmpnam(tempname));
     strcat(command,".jpg");
     system(command);
-    strcpy(command,"mv ");
-    strcat(command,tempname);
-    strcat(command," ");
-    strcat(command,outfile);
-    //strcat(command," 2>%1 ");
-    //strcat(command," 2>> wget.log ");
-    return (system(command));
+    try {
+      rename(tempname, outfile);
+    } catch (...) {
+      printf("Error move file %s \n",outfile);
+    }
+    //return (system(command));
 }
 
 
@@ -212,14 +170,18 @@ int get_webfile(char *webpath,char *outfile) {
     curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1L);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
-    /* open the file */
-    file = fopen(filename, "wb");
-    if (file) {
-      curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
-      curl_easy_perform(curl_handle);
-      fclose(file);
+    try {
+      file = fopen(filename, "wb");
+      if (file) {
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, file);
+        curl_easy_perform(curl_handle);
+        fclose(file);
+      }
+      curl_easy_cleanup(curl_handle);
+      curl_global_cleanup();
+    } catch (...) {
+      printf("Error downloading file %s \n",outfile);
     }
-    curl_easy_cleanup(curl_handle);
-    curl_global_cleanup();
+    convert_file_to_icons(outfile);
     return 0;
 }

@@ -3595,7 +3595,7 @@ int stream_class::loadweb_stream_iconoversigt() {
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
