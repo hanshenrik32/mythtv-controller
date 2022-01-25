@@ -150,7 +150,6 @@ int convert_file_to_icons(char *outfile) {
     } catch (...) {
       printf("Error move file %s \n",outfile);
     }
-    //return (system(command));
 }
 
 

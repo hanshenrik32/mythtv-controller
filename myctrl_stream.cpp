@@ -76,7 +76,7 @@ extern bool stream_loadergfx_started_break;
 // constructor
 stream_class::stream_class() : antal(0) {
     int i;
-    for(i=0;i<maxantal;i++) stack[i]=0;
+    //for(i=0;i<maxantal;i++) stack[i]=0;
     stream_optionselect=0;							// selected line in stream options
     stream_oversigt_loaded=false;
     stream_oversigt_loaded_nr=0;
@@ -95,13 +95,13 @@ stream_class::~stream_class() {
 
 // return the name
 char *stream_class::get_stream_name(int nr) {
-  if (nr<antal) return (stack[nr]->feed_name); else return (NULL);
+  if (nr<antal) return (stack[nr].feed_name); else return (NULL);
 }
 
 
 // return the description
 char *stream_class::get_stream_desc(int nr) {
-  if (nr<antal) return (stack[nr]->feed_desc); else return (NULL);
+  if (nr<antal) return (stack[nr].feed_desc); else return (NULL);
 }
 
 // clean up number of created
@@ -109,7 +109,7 @@ char *stream_class::get_stream_desc(int nr) {
 void stream_class::clean_stream_oversigt() {
     startup_loaded=false;				// set radio station loaded in
     for(int i=1;i<antal;i++) {
-        if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete stream texture
+        if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	// delete stream texture
         //if (stack[i]) delete stack[i];							// delete radio station
     }
     antal=0;
@@ -121,7 +121,7 @@ void stream_class::clean_stream_oversigt() {
 
 // set en stream icon image
 void stream_class::set_texture(int nr,GLuint idtexture) {
-    stack[nr]->textureId=idtexture;
+    stack[nr].textureId=idtexture;
 }
 
 //
@@ -809,6 +809,9 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     bool loadstatus=true;
     bool dbexist=false;
     antal=0;
+
+    stream_oversigt_type stream;
+
     conn=mysql_init(NULL);
     // Connect to database
     if (conn) {
@@ -3344,7 +3347,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       if (!(dbexist)) loadrssfile(1);
     }
     //if (debugmode & 4) printf("* art = %s fpath=%s *\n",art,fpath);
+
     clean_stream_oversigt();                // clean old list
+    stack.clear();
+    antal=0;
+
     strcpy(lasttmpfilename,"");    					// reset
     write_logfile((char *) "loading rss/stream data.");
     //printf("art = %s tpath = %s \n",art,fpath);
@@ -3382,10 +3389,165 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       res = mysql_store_result(conn);
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (antal<maxantal)) {
-          //if (debugmode & 4) printf("Get info from stream nr %d %-20s\n",antal,row[2]);
+
+          printf("Get info from stream nr %d %-20s\n",antal,row[2]);
+
           if (antal<maxantal) {
-            stack[antal]=new (struct stream_oversigt_type);
-            if (stack[antal]) {
+            // new ver
+            strcpy(stream.feed_showtxt,"");
+            strcpy(stream.feed_name,"");
+            strcpy(stream.feed_desc,"");
+            strcpy(stream.feed_path,"");
+            strcpy(stream.feed_gfx_url,"");
+            strcpy(stream.feed_gfx_mythtv,"");
+            strcpy(stream.feed_streamurl,"");
+            stream.feed_group_antal=0;
+            stream.feed_path_antal=0;
+            stream.textureId=0;
+            stream.intnr=0;
+            stream.nyt=false;
+            // top level
+            if (getart==0) {
+              strncpy(stream.feed_showtxt,row[0],feed_pathlength);
+              strncpy(stream.feed_name,row[0],feed_namelength);
+              if (row[1]) strcpy(stream.feed_path,row[1]);
+              if (row[0]) stream.feed_group_antal=get_podcasttype_antal(row[0]);              // get antal
+                else stream.feed_group_antal=0;
+              if (row[3]) strncpy(stream.feed_desc,row[3],feed_desclength);
+              if (row[7]) strncat(tmpfilename,row[7],20);                                     // get image path
+              strcpy(stream.feed_gfx_mythtv,tmpfilename);            	       		              // icon file URL
+              if (row[9]) strcpy(tmpfilename,row[9]);
+              get_webfilenamelong(downloadfilename,tmpfilename);                              // get file name from url
+              // check filename
+              strcpy(downloadfilename1,downloadfilename);                 // back name before change
+              int mmm=0;
+              // find
+              while(mmm<strlen(downloadfilename)) {
+                if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                mmm++;
+              }
+              getuserhomedir(homedir);                                                  // get homedir
+              strcpy(downloadfilenamelong,homedir);
+              strcat(downloadfilenamelong,"/rss/images/");
+              strcat(downloadfilenamelong,downloadfilename);
+              if (!(file_exists(downloadfilenamelong))) {
+                // download gfx file and use as icon
+                if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
+                  //printf("Download error \n");
+                  write_logfile((char *) "Image download error.");
+                } else strcpy(tmpfilename,"");
+              }
+              // tmpfilename is now the bame of the icon
+              strncpy(stream.feed_gfx_mythtv,tmpfilename,200);	                // mythtv icon file
+              stack.push_back(stream);
+              antal++;
+            } else {
+              // if first create back button
+              if (antal==0) {
+                stream.textureId=_textureIdback;			                    // back icon
+                strcpy(stream.feed_showtxt,"BACK");
+                if (row[0]) strncpy(stream.feed_name,row[0],feed_namelength);
+                if (row[1]) strncpy(stream.feed_path,row[1],feed_pathlength);
+                //strcpy(stack[antal]->feed_streamurl,row[4]);
+                if (row[3]) strncpy(stream.feed_desc,row[3],feed_desclength);
+                if (row[5]) strncpy(stream.feed_gfx_url,row[5],feed_url);            // feed (db link) url
+                stream.feed_group_antal=0;
+                stream.intnr=0;	                               					// intnr=0 = back button type
+                stack.push_back(stream);
+                antal++;
+              }
+              // next rec
+              // clear struct
+              strcpy(stream.feed_showtxt,"");
+              strcpy(stream.feed_name,"");
+              strcpy(stream.feed_desc,"");
+              strcpy(stream.feed_path,"");
+              strcpy(stream.feed_gfx_url,"");
+              strcpy(stream.feed_gfx_mythtv,"");
+              strcpy(stream.feed_streamurl,"");
+              stream.feed_group_antal=0;
+              stream.feed_path_antal=0;
+              stream.textureId=0;
+              stream.intnr=0;
+              stream.nyt=false;
+
+              stream.intnr=1;
+              if (row[5]) strncpy(stream.feed_gfx_url,row[5],feed_url);
+              if (getart==1) {
+                // old ver used path from mysql
+                //if (row[1]) strncpy(stack[antal]->feed_showtxt,row[1],feed_pathlength);
+                if (row[2]) strncpy(stream.feed_showtxt,row[2],feed_pathlength);
+              } else {
+                if (row[2]) strncpy(stream.feed_showtxt,row[2],feed_pathlength);
+              }
+              if (row[1]) strncpy(stream.feed_path,row[1],feed_pathlength);		// path
+              if (row[2]) strncpy(stream.feed_name,row[0],feed_namelength);		// feedtitle
+              if (row[8]) strncpy(stream.feed_streamurl,row[8],feed_url);		  // save play url
+              switch(getart) {
+                case 0: if (row[9]) strcpy(tmpfilename,row[9]);
+                        break;
+                case 1: if (row[7]) strcpy(tmpfilename,row[7]);
+                        break;
+                case 2: if (row[5]) strcpy(tmpfilename,row[5]);
+                        break;
+              }
+              // test antal afspillinger this 0 set som new rss
+              if (row[9]) {
+                if (atoi(row[9])==0) stream.nyt=true; else stream.nyt=false;
+              }
+              if (strlen(tmpfilename)>7) {
+                if (strncmp(tmpfilename,"%SHAREDIR%",10)==0) {
+                  strcpy(tmpfilename,"/usr/share/mythtv");                            // mythtv path
+                  if (strlen(row[7])>10) {
+                    if (getart==1) {
+                      if (row[7]) strncat(tmpfilename,row[7]+10,100);
+                    }
+                    if (getart==2) {
+                      if (row[6]) strncat(tmpfilename,row[6]+10,100);
+                    }
+                  }
+                } else {
+                  // rss download
+                  // downloadfilename = name on file, from tmpfilename = full web url
+                  get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
+                  // check filename fro ? or = and replace to _
+                  strcpy(downloadfilename1,downloadfilename);                 // back name before change
+                  int mmm=0;
+                  while(mmm<strlen(downloadfilename)) {
+                    if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
+                    mmm++;
+                  }
+                  strcpy(lasttmpfilename,tmpfilename);			              // husk file name
+                  // save file in  user homedir rss/
+                  getuserhomedir(homedir);                                  // get homedir
+                  strcpy(downloadfilenamelong,homedir);
+                  strcat(downloadfilenamelong,"/rss/images/");
+                  strcat(downloadfilenamelong,downloadfilename);
+                  if (!(file_exists(downloadfilenamelong))) {
+                    if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                    // download gfx file and use as icon
+                    if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
+                      printf("Download error \n");
+                    } else strcpy(tmpfilename,"");
+                  }
+                  strcpy(tmpfilename,downloadfilenamelong);
+                }
+              } else strcpy(tmpfilename,"");
+              strncpy(stream.feed_gfx_mythtv,tmpfilename,200);	                // save icon file path in stack struct
+  //                          strcpy(stack[antal]->feed_streamurl,row[4]);	// stream url
+              if (row[3]) strncpy(stream.feed_desc,row[3],feed_desclength);
+              // no texture now
+              stream.textureId=0;
+              // opdatere group antal
+              if (getart==1) stream.feed_group_antal=atoi(row[6]); else stream.feed_group_antal=0;
+              stack.push_back(stream);
+              antal++;
+            }
+
+
+
+/*
+              // old
               strcpy(stack[antal]->feed_showtxt,"");          	        // show name
               strcpy(stack[antal]->feed_name,"");		        // mythtv db feedtitle
               strcpy(stack[antal]->feed_desc,"");                       // desc
@@ -3522,7 +3684,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   antal++;
                 }
               }
-            }
+*/
+//            }
           }
         }
         mysql_close(conn);
@@ -3580,10 +3743,10 @@ int stream_class::loadweb_stream_iconoversigt() {
   this->gfx_loaded=false;
   write_logfile((char *) "RSS stream graphic download start.");
   while(nr<antal) {
-    if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
+    if (strcmp(stack[nr].feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
       // return downloadfilename from stack[nr]->feed_gfx_mythtv
-      strcpy(tmpfilename,stack[nr]->feed_gfx_mythtv);
+      strcpy(tmpfilename,stack[nr].feed_gfx_mythtv);
       if (strncmp(tmpfilename,"http://",7)==0) {
         // download file from web
         // return dowloadfilebame = file downloaded name no path
@@ -3596,10 +3759,10 @@ int stream_class::loadweb_stream_iconoversigt() {
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
           loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+          strcpy(stack[nr].feed_gfx_mythtv,downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+          strcpy(stack[nr].feed_gfx_mythtv,downloadfilenamelong);
             //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
       } else if (strncmp(tmpfilename,"https://",8)==0) {
@@ -3612,10 +3775,10 @@ int stream_class::loadweb_stream_iconoversigt() {
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
           if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
           loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+          strcpy(stack[nr].feed_gfx_mythtv,downloadfilenamelong);
         } else {
           if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-          strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
+          strcpy(stack[nr].feed_gfx_mythtv,downloadfilenamelong);
         }
       }
       // set recordnr loaded info to update users view
@@ -3755,9 +3918,7 @@ void stream_class::playstream(char *url) {
 // ****************************************************************************************
 
 
-void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected)
-
-{
+void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
     int j,ii,k,pos;
     float buttonsizey=160.0f;                                                   // button size
     float buttonsizex=200.0f;                                                   // button size
@@ -3783,11 +3944,13 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     char *base,*right_margin;
     int length,width;
     int pline=0;
-
     if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
-      if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
-      else strcpy(gfxfilename,"");
+
+      //if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
+      //else strcpy(gfxfilename,"");
+      strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
+
       strcpy(gfxshortname,"");
       gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
       if (gfxshortnamepointer) {
@@ -3837,7 +4000,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     // calc start pos (ofset)
     sofset=(_sangley/40)*8;
     // draw icons
-    while((i<lstreamoversigt_antal) && (i+sofset<antal) && (stack[i+sofset]!=NULL)) {
+    while((i<lstreamoversigt_antal) && (i+sofset<antal)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
@@ -3850,7 +4013,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         buttonsizey=160.0f;
         buttonsizex=200.0f;
       }
-      if (stack[i+sofset]->textureId) {
+      if (stack[i+sofset].textureId) {
         // stream icon
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE, GL_ONE);
@@ -3867,7 +4030,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         // indsite draw icon rss gfx
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+        glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
@@ -3885,7 +4048,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         }
         glEnd();
         // show nyt icon note
-        if (stack[i+sofset]->nyt) {
+        if (stack[i+sofset].nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
           //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -3914,7 +4077,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
         glEnd();
         // show nyt icon note
-        if (stack[i+sofset]->nyt) {
+        if (stack[i+sofset].nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
           glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
           glBegin(GL_QUADS);
@@ -3927,7 +4090,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glPopMatrix();
       }
       // draw numbers in group
-      if (stack[i+sofset]->feed_group_antal>1) {
+      if (stack[i+sofset].feed_group_antal>1) {
         // show numbers in group
         glPushMatrix();
         glDisable(GL_TEXTURE_2D);
@@ -3937,7 +4100,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         glRasterPos2f(0.0f, 0.0f);
         glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
+        sprintf(temptxt,"Feeds %-4d",stack[i+sofset].feed_group_antal);
         glcRenderString(temptxt);
         glPopMatrix();
       }
@@ -3950,7 +4113,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
-      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+      strcpy(temptxt,stack[i+sofset].feed_showtxt);        // text to show
       base=temptxt;
       length=strlen(temptxt);
       width = 20;

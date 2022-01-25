@@ -868,9 +868,6 @@ int musicoversigt_class::opdatere_music_oversigt(unsigned int directory_id) {
   if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
   musicoversigt.clear();                                                       // clear old vector
   musicoversigt_antal=0;
-
-printf("Før antal fundet i music oversigt %ld \n ",musicoversigt_antal);
-
   if (directory_id==0) {
     strcpy(sqlselect,"select directory_id,path,parent_id from music_directories where parent_id=0 order by path");
     strcpy(myoversigt.album_name,"PLAYLIST");

@@ -366,7 +366,7 @@ tidal_class::tidal_class() : antal(0) {
     tidal_device_antal=0;                                                       //
     tidal_update_loaded_begin=false;                                            // true then we are update the stack data
     // create web server
-    mg_mgr_init(&mgr, NULL);                                                      // Initialize event manager object
+    mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
     // start web server
     write_logfile((char *) "Starting Tidal web server on port 8002");             //
     this->connection = mg_bind(&mgr, ss_http_port, tidal_server_ev_handler);      // Create listening connection and add it to the event manager

@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "myth_vlcplayer.h"
+#include <vector>
 
 const int feed_namelength=80;
 const int feed_desclength=200;
@@ -12,6 +13,7 @@ const int feed_pathlength=200;
 const int feed_url=400;
 
 
+/*
 // not in use for now.
 
 template<typename streamoversigt_type>
@@ -23,7 +25,7 @@ struct Data {
   streamoversigt_type *data;
 };
 
-
+*/
 
 struct stream_oversigt_type {
     char feed_showtxt[feed_namelength+1];			// show name
@@ -42,8 +44,9 @@ struct stream_oversigt_type {
 
 class stream_class : vlc_controller {
     private:
-        enum { maxantal=3000 };					                                        // MAX antal rss stream in wiew
-        stream_oversigt_type *stack[maxantal];			                            // radio stack array
+        enum { maxantal=30000 };					                                        // MAX antal rss stream in wiew
+        //stream_oversigt_type *stack[maxantal];			                            // radio stack array
+        std::vector<stream_oversigt_type> stack;
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
@@ -63,17 +66,17 @@ class stream_class : vlc_controller {
         int type;
         bool gfx_loaded;					                                              //
         void update_rss_nr_of_view(char *url);                                  // save rss to db file (struct)
-        void set_rss_new(int nr,bool ny) { if (nr<antal) stack[nr]->nyt=ny; }                 // set new flag
+        void set_rss_new(int nr,bool ny) { if (nr<antal) stack[nr].nyt=ny; }                 // set new flag
         char *get_stream_name(int nr);                                          // get name
         char *get_stream_desc(int nr);                                          // get desc
-        char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_mythtv); else return(0); }
-        char *get_stream_path(int nr) { if (nr<antal) return (stack[nr]->feed_path); }
-        char *get_stream_url(int nr) { if (nr<antal) return (stack[nr]->feed_streamurl); }
-        char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr]->feed_gfx_url); else return(0); }
-        unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_group_antal); }
-        unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr]->feed_path_antal); }
-        long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr]->intnr); }
-        GLuint get_texture(int nr) { if (nr<antal) return(stack[nr]->textureId); else return(0); }
+        char *get_stream_mythtvgfx_path(int nr) { if (nr<antal) return (stack[nr].feed_gfx_mythtv); else return(0); }
+        char *get_stream_path(int nr) { if (nr<antal) return (stack[nr].feed_path); }
+        char *get_stream_url(int nr) { if (nr<antal) return (stack[nr].feed_streamurl); }
+        char *get_stream_gfx_url(int nr) { if (nr<antal) return (stack[nr].feed_gfx_url); else return(0); }
+        unsigned int get_stream_groupantal(unsigned int nr) { if (nr<antal) return (stack[nr].feed_group_antal); }
+        unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr].feed_path_antal); }
+        long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr].intnr); }
+        GLuint get_texture(int nr) { if (nr<antal) return(stack[nr].textureId); else return(0); }
         //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         int antalstreams() { return antal; };
         int antal_rss_streams() { return antalrss_feeds; };
