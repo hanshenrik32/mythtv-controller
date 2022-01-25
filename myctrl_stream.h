@@ -45,7 +45,6 @@ struct stream_oversigt_type {
 class stream_class : vlc_controller {
     private:
         enum { maxantal=30000 };					                                        // MAX antal rss stream in wiew
-        //stream_oversigt_type *stack[maxantal];			                            // radio stack array
         std::vector<stream_oversigt_type> stack;
         int antal;					                       	                            // Antal streams
         int antalrss_feeds;                                                     // antal feeds
@@ -77,7 +76,6 @@ class stream_class : vlc_controller {
         unsigned int get_stream_pathantal(unsigned int nr) { if (nr<antal) return (stack[nr].feed_path_antal); }
         long get_stream_intnr(unsigned int nr) { if (nr<antal) return (stack[nr].intnr); }
         GLuint get_texture(int nr) { if (nr<antal) return(stack[nr].textureId); else return(0); }
-        //int get_antal_rss_feeds_sources(MYSQL *conn);                          // get # of rss feeds from db
         int antalstreams() { return antal; };
         int antal_rss_streams() { return antalrss_feeds; };
         int streams_loaded() { return stream_oversigt_loaded_nr; };
@@ -95,7 +93,6 @@ class stream_class : vlc_controller {
         void clean_stream_oversigt();
         int opdatere_stream_oversigt(char *art,char *fpath);
         int loadrssfile(bool updaterssfile);                                    // download file from web
-//        int opdatere_stream_oversigt(char *searchtxt);
         void playstream(char *url);
         float getstream_pos();
         void show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected);
