@@ -3,7 +3,7 @@
 
 void write_logfile(char *logentry);
 
-const char *SHOWVER={"0.39.1.2"};
+const char *SHOWVER={"0.39.5.1"};
 
 // debug modes
 // 1  = wifi net
@@ -133,22 +133,5 @@ void *datainfoloader_movie(void *data);
 void *xbmcdatainfoloader_movie(void *data);
 
 
-// start (button)
-//
-float uvcolortable2[]={0.8,0.0,0.8, \
-                      0.8,0.0,0.8, \
-                      0.7,0.0,0.7, \
-                      0.7,0.0,0.7, \
-                      0.4,0.0,0.6, \
-                      0.4,0.0,0.6, \
-                      0.4,0.0,0.5, \
-                      0.4,0.0,0.5, \
-                      0.4,0.0,0.4, \
-                      0.4,0.0,0.4, \
-                      0.4,0.0,0.3, \
-                      0.4,0.0,0.3, \
-                      0.8,0.0,0.1, \
-                      0.8,0.0,0.1};
-// (top of uv)
 
 #endif

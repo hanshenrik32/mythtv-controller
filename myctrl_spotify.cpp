@@ -3016,6 +3016,8 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                     getuserhomedir(downloadfilenamelong);
                     strcat(downloadfilenamelong,"/");
                     strcat(downloadfilenamelong,spotify_gfx_path);
+                    // create dir of now exist (homedir/spotify_gfx)
+                    if (!(file_exists(downloadfilenamelong))) mkdir(downloadfilenamelong,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
                     strcat(downloadfilenamelong,downloadfilename);
                     strcat(downloadfilenamelong,".jpg");
                     // download file
@@ -3027,46 +3029,6 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                   strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
                 }
                 strncpy(stack[antal]->playlistid,row[2],spotify_namelength);    //
-
-                /*
-                strncpy(downloadfilenamelong,row[2],spotify_pathlength);
-                //if (row[1]) strcpy(stack[antal]->feed_path,row[1]);
-                if (row[0]) stack[antal]->feed_group_antal=0;                             // get antal
-                else stack[antal]->feed_group_antal=0;
-                strcpy(downloadfilenamelong,row[2]);
-                if (file_exists(downloadfilenamelong)) {
-                  //stack[antal]->textureId=loadTexture (downloadfilenamelong);
-                }
-                */
-                /*
-                if (row[1]) {
-                  get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-                  getuserhomedir(downloadfilenamelong);
-                  strcat(downloadfilenamelong,"/datadisk/mythtv-controller-0.38/spotify_gfx/");
-                  strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
-                  strcat(downloadfilenamelong,".jpg");
-                  if (!(file_exists(downloadfilenamelong))) {
-                    // download file
-                    get_webfile2(stack[antal]->feed_gfx_url,downloadfilenamelong);
-                  }
-                  //texture=loadTexture ((char *) downloadfilenamelong);
-                  if (texture) stack[antal]->textureId=texture;
-                }
-                */
-/*
-                if (row[3]) strncpy(stack[antal]->feed_desc,row[3],spotify_desclength);
-                if (row[7]) strncat(tmpfilename,row[7],20);                               //
-                strcpy(stack[antal]->feed_gfx_mythtv,tmpfilename);            	       		// icon file
-                if (row[9]) strcpy(tmpfilename,row[9]);
-                get_webfilenamelong(downloadfilename,tmpfilename);          // get file name from url
-                // check filename
-                strcpy(downloadfilename1,downloadfilename);                 // back name before change
-                int mmm=0;
-                while(mmm<strlen(downloadfilename)) {
-                  if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
-                  mmm++;
-                }
-*/
                 antal++;
               }
               // load playlist songs

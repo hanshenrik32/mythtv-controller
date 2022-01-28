@@ -564,7 +564,7 @@ int countEntriesInDir(const char* dirname) {
     int n=0;
     dirent* d;
     DIR* dir = opendir(dirname);
-    if (dir == NULL) return 0;
+    if (dir == NULL) return -1;
     while((d = readdir(dir))!=NULL) n++;
     closedir(dir);
     return n;
@@ -576,6 +576,7 @@ int countEntriesInDir(const char* dirname) {
 // overloaded function in .h file
 // hent film oversigt
 // create if not exist (mythtv/internal)
+// used by the thread startup
 //
 // ****************************************************************************************
 
@@ -805,8 +806,11 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
               if (ext) {
                 film_ok=false;
                 if (strcmp(ext,".avi")==0) film_ok=true;
+                if (strcmp(ext,".AVI")==0) film_ok=true;
                 if (strcmp(ext,".mp4")==0) film_ok=true;
+                if (strcmp(ext,".MP4")==0) film_ok=true;
                 if (strcmp(ext,".mkv")==0) film_ok=true;
+                if (strcmp(ext,".MKV")==0) film_ok=true;
                 if (strcmp(ext,".iso")==0) film_ok=true;
                 if (strcmp(ext,".ISO")==0) film_ok=true;
                 if (film_ok) {
@@ -1156,7 +1160,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         write_logfile((char *) "Can not connect to mysql server.");
       }
     }
-    if (filmantal>0) this->filmoversigt_antal=filmantal-1; else this->filmoversigt_antal=0;
+    if (filmantal>0) {
+      this->filmoversigt_antal=filmantal-1;
+    } else {
+      // check movie dir exist if not -1 else 0
+      if (countEntriesInDir(configdefaultmoviepath)==-1) this->filmoversigt_antal=-1;
+      else this->filmoversigt_antal=0;
+    }
     if (conn) mysql_close(conn);
     return(filmantal);
 }
@@ -1235,8 +1245,13 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
         }
       }
     }
-    if (filmantal>0) this->filmoversigt_antal=filmantal; else this->filmoversigt_antal=0;
-    mysql_close(conn);
+    if (conn) mysql_close(conn);
+    if (filmantal>0) {
+      this->filmoversigt_antal=filmantal;
+    } else {
+      if (countEntriesInDir(configdefaultmoviepath)==-1) this->filmoversigt_antal=-1;
+      else this->filmoversigt_antal=0;
+    }
     return(filmantal);
 }
 
@@ -1289,7 +1304,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
   winsizy=200;
   xpos=220;
   ypos=700;
-  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {
+  while((i<lfilmoversigt_antal) && (i+sofset<filmoversigtsize)) {               // filmoversigtsize in class
     sofset=(_mangley/40)*8;
     if ((i+sofset)<filmoversigt_antal) {
       if (((i % bonline)==0) && (i>0)) {
@@ -1343,7 +1358,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
+      strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // movie navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
       glPushMatrix();
@@ -1471,7 +1486,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   winsizy=200;
   xpos=20;
   ypos=700;
-  while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize)) {
+  while((film_nr<lfilmoversigt_antal) && (film_nr+sofset<filmoversigtsize) && (filmoversigt_antal!=-1)) {
     sofset=(_mangley/40)*8;
     if ((film_nr+sofset)<filmoversigt_antal) {
       if (((film_nr % bonline)==0) && (film_nr>0)) {
@@ -1623,13 +1638,47 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
     glEnd();
     glPopMatrix();
-
-    sprintf(temptxt,"No movie info from %s backend.",configbackend);
-    strcat(temptxt,configmysqlhost);
     glPushMatrix();
-    xpos=700;
+    if (countEntriesInDir(configdefaultmoviepath)==2) {
+      sprintf(temptxt,"No files found in <%s>",configmoviepath);
+      xpos=650;
+    } else {
+      xpos=600;
+      sprintf(temptxt,"No movie info from %s backend.",configbackend);
+      strcat(temptxt,configmysqlhost);
+    }    
     ypos=550;
     glTranslatef(xpos+10, ypos+40 ,0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(20.0, 20.0, 1.0);
+    glcRenderString(temptxt);
+    glEnable(GL_TEXTURE_2D);
+    glPopMatrix();
+  }
+  // dir do not exist
+  if (filmoversigt_antal==-1) {
+    // show window
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBindTexture(GL_TEXTURE_2D,_textureId9_askbox);                            // _texturemovieinfobox
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glTranslatef(550, 350, 0.0f);                                               // pos
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);                         // draw bos
+    glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
+    glEnd();
+    glPopMatrix();
+    glPushMatrix();
+    sprintf(temptxt,"Directory not exist <%s>",configmoviepath);
+    xpos=600;
+    ypos=550;
+    glTranslatef(xpos+5, ypos+40 ,0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glDisable(GL_TEXTURE_2D);
     glScalef(20.0, 20.0, 1.0);

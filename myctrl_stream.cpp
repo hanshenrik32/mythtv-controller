@@ -3376,7 +3376,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-      antalrss_feeds=get_antal_rss_feeds_sources(conn);
+      antalrss_feeds=get_antal_rss_feeds_sources(conn);                                                           // get # of podcasts in a group
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       if (mysql_query(conn,sqlselect)!=0) {
@@ -3515,8 +3515,11 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   strcpy(downloadfilenamelong,homedir);
                   strcat(downloadfilenamelong,"/rss/images/");
                   strcat(downloadfilenamelong,downloadfilename);
+                  // download gfx file if not exist
                   if (!(file_exists(downloadfilenamelong))) {
                     if (debugmode & 4) printf("Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                    sprintf(debuglogdata,"Loading2 image %s realname %s \n",tmpfilename,downloadfilenamelong);
+                    write_logfile((char *) debuglogdata);
                     // download gfx file and use as icon
                     if (get_webfile2(tmpfilename,downloadfilenamelong)==-1) {
                       printf("RSS gfx download error \n");
@@ -3679,73 +3682,72 @@ void *load_all_stream_gfx(void *data) {
     // Connect to database
     try {
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
-          mysql_query(conn,"set NAMES 'utf8'");
-          res = mysql_store_result(conn);
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
-          write_logfile((char *) "Loading RSS gfx.");
-          if (res) {
-              while ((row = mysql_fetch_row(res)) != NULL) {
-                sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
-                mysql_query(conn,"set NAMES 'utf8'");
-                res1 = mysql_store_result(conn);
-                mysql_query(conn,sqlselect1);
-                res1 = mysql_store_result(conn);
-                if (res1) {
-                  antal=0;
-                  if (debugmode & 4) printf("Found : %40s ",row[1]);
-                  nr=0;
-                  while ((row1 = mysql_fetch_row(res1)) != NULL) {
-                    antal++;
-                    strcpy(tmpfilename,row1[5]);
-                    if (stream_loadergfx_started_break) break;
-                    // http
-                    if (strncmp(tmpfilename,"http://",7)==0) {
-                      strcpy(lastfile,downloadfilename);
-                      get_webfilename(downloadfilename,tmpfilename);
-                      getuserhomedir(homedir);                                                  // get home dir
-                      strcpy(downloadfilenamelong,homedir);
-                      strcat(downloadfilenamelong,"/rss/images/");
-                      strcat(downloadfilenamelong,downloadfilename);
-                      filechange=strcmp(lastfile,downloadfilename);
-                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                        nr++;
-                      } else {
-                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
-                      }
-                      total_antal++;
-                    // https
-                    } else if (strncmp(tmpfilename,"https://",8)==0) {
-                      strcpy(lastfile,downloadfilename);
-                      get_webfilename(downloadfilename,tmpfilename);
-                      getuserhomedir(homedir);
-                      strcpy(downloadfilenamelong,homedir);                                   // get home dir
-                      strcat(downloadfilenamelong,"/rss/images/");
-                      strcat(downloadfilenamelong,downloadfilename);
-                      filechange=strcmp(lastfile,downloadfilename);
-                      if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
-                        if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-                        loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
-                        nr++;
-                      } else {
-                        if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
-                      }
-                      total_antal++;
-                    }
-                  }
-                }
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        mysql_query(conn,sqlselect);
+        res = mysql_store_result(conn);
+        write_logfile((char *) "Loading RSS gfx.");
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            sprintf(sqlselect1,"select feedtitle,path,title,description,url,thumbnail,path,paththumb from internetcontentarticles where feedtitle like '%s' order by path,title asc",row[0]);
+            mysql_query(conn,"set NAMES 'utf8'");
+            res1 = mysql_store_result(conn);
+            mysql_query(conn,sqlselect1);
+            res1 = mysql_store_result(conn);
+            if (res1) {
+              antal=0;
+              //if (debugmode & 4) printf("Found : %40s ",row[1]);
+              nr=0;
+              while ((row1 = mysql_fetch_row(res1)) != NULL) {
+                antal++;
+                strcpy(tmpfilename,row1[5]);
                 if (stream_loadergfx_started_break) break;
+                // http
+                if (strncmp(tmpfilename,"http://",7)==0) {
+                  strcpy(lastfile,downloadfilename);
+                  get_webfilename(downloadfilename,tmpfilename);
+                  getuserhomedir(homedir);                                                  // get home dir
+                  strcpy(downloadfilenamelong,homedir);
+                  strcat(downloadfilenamelong,"/rss/images/");
+                  strcat(downloadfilenamelong,downloadfilename);
+                  filechange=strcmp(lastfile,downloadfilename);
+                  if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                    if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                    loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                    nr++;
+                  }
+                  total_antal++;
+                  // https
+                } else if (strncmp(tmpfilename,"https://",8)==0) {
+                  strcpy(lastfile,downloadfilename);
+                  get_webfilename(downloadfilename,tmpfilename);
+                  getuserhomedir(homedir);
+                  strcpy(downloadfilenamelong,homedir);                                   // get home dir
+                  strcat(downloadfilenamelong,"/rss/images/");
+                  strcat(downloadfilenamelong,downloadfilename);
+                  filechange=strcmp(lastfile,downloadfilename);
+                  if ((!(file_exists(downloadfilenamelong))) && (filechange)) {
+                    if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
+                    loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+                    nr++;
+                  } else {
+                    if (debugmode & 4) printf("nr %3d exist : %s \n",nr,tmpfilename);
+                  }
+                  total_antal++;
+                }
               }
-              if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
-              stream_loadergfx_started_break=false;
+            }
+            if (stream_loadergfx_started_break) break;
           }
-          if (conn) mysql_close(conn);
+          if (stream_loadergfx_started_break==false) stream_loadergfx_started_done=true;
+          stream_loadergfx_started_break=false;
+        }
+        if (conn) mysql_close(conn);
       }
     }
     catch (...) {
       printf("Error open mysql connection.\n");
+      write_logfile((char *) "Error open mysql connection.");
     }
     write_logfile((char *) "End gfx thread loader.");
 }
@@ -3760,7 +3762,7 @@ void *load_all_stream_gfx(void *data) {
 
 
 void stream_class::playstream(char *url) {
-    vlc_controller::playmedia(url);
+  vlc_controller::playmedia(url);
 }
 
 
@@ -3770,262 +3772,262 @@ void stream_class::playstream(char *url) {
 
 
 void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLuint empty_icon1,int _mangley,int stream_key_selected) {
-    int j,ii,k,pos;
-    float buttonsizey=160.0f;                                                   // button size
-    float buttonsizex=200.0f;                                                   // button size
-    float yof=orgwinsizey-(buttonsizey);                                        // start ypos
-    float xof=0.0f;
-    int lstreamoversigt_antal=9*6;
-    int i=0;                                                                    // data ofset in stack array
-    unsigned int sofset=0;
-    int bonline=8;                                                              // antal pr linie
-    float boffset;
-    char gfxfilename[200];
-    char downloadfilename[200];
-    char downloadfilenamelong[1024];
-    char *gfxshortnamepointer;
-    char gfxshortname[200];
-    char temptxt[200];
-    char word[200];
-    static char downloadfilename_last[1024];
-    int antal_loaded=0;
-    static int stream_oversigt_loaded_done=0;
-    GLuint texture;
-    static GLuint last_texture;
-    char *base,*right_margin;
-    int length,width;
-    int pline=0;
-    if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-    if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
+  int j,ii,k,pos;
+  float buttonsizey=160.0f;                                                   // button size
+  float buttonsizex=200.0f;                                                   // button size
+  float yof=orgwinsizey-(buttonsizey);                                        // start ypos
+  float xof=0.0f;
+  int lstreamoversigt_antal=9*6;
+  int i=0;                                                                    // data ofset in stack array
+  unsigned int sofset=0;
+  int bonline=8;                                                              // antal pr linie
+  float boffset;
+  char gfxfilename[200];
+  char downloadfilename[200];
+  char downloadfilenamelong[1024];
+  char *gfxshortnamepointer;
+  char gfxshortname[200];
+  char temptxt[200];
+  char word[200];
+  static char downloadfilename_last[1024];
+  int antal_loaded=0;
+  static int stream_oversigt_loaded_done=0;
+  GLuint texture;
+  static GLuint last_texture;
+  char *base,*right_margin;
+  int length,width;
+  int pline=0;
+  if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
+  if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
 
-      //if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
-      //else strcpy(gfxfilename,"");
-      strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
+    //if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
+    //else strcpy(gfxfilename,"");
+    strcpy(gfxfilename,stack[stream_oversigt_loaded_nr].feed_gfx_mythtv);
 
-      strcpy(gfxshortname,"");
-      gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
-      if (gfxshortnamepointer) {
-        strcpy(gfxshortname,gfxshortnamepointer);
-      }
-      // load texture if none loaded
-      // get_texture return 0 if not loaded
-      if (get_texture(stream_oversigt_loaded_nr)==0) {
-        if (strcmp(gfxfilename,"")!=0) {
-          // check om der findes en downloaded icon
-          strcpy(downloadfilenamelong,"");
-          strcat(downloadfilenamelong,gfxfilename);
-          if (strcmp(downloadfilename_last,gfxfilename)!=0) {
-            // check om filen findes i cache dir eller i mythtv netvision dir
-            if (file_exists(gfxfilename)) {
-              texture=loadTexture ((char *) gfxfilename);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-              last_texture=texture;
-              antal_loaded+=1;
-            } else if (file_exists(downloadfilenamelong)) {
-              // er det ikke samme texture som sidst loaded så load it
-              // else set last used
-              texture=loadTexture ((char *) downloadfilenamelong);
-              if (texture) set_texture(stream_oversigt_loaded_nr,texture);
-              last_texture=texture;
-              antal_loaded+=1;
-            } else texture=0;
-          } else {
-            if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+    strcpy(gfxshortname,"");
+    gfxshortnamepointer=strrchr(gfxfilename,'.');     // get last char = type of file
+    if (gfxshortnamepointer) {
+      strcpy(gfxshortname,gfxshortnamepointer);
+    }
+    // load texture if none loaded
+    // get_texture return 0 if not loaded
+    if (get_texture(stream_oversigt_loaded_nr)==0) {
+      if (strcmp(gfxfilename,"")!=0) {
+        // check om der findes en downloaded icon
+        strcpy(downloadfilenamelong,"");
+        strcat(downloadfilenamelong,gfxfilename);
+        if (strcmp(downloadfilename_last,gfxfilename)!=0) {
+          // check om filen findes i cache dir eller i mythtv netvision dir
+          if (file_exists(gfxfilename)) {
+            texture=loadTexture ((char *) gfxfilename);
+            if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+            last_texture=texture;
             antal_loaded+=1;
-          }
-          // husk last file name
-          strcpy(downloadfilename_last,downloadfilenamelong);
-        }
-      }
-      // down loading ?
-      if (stream_oversigt_loaded_nr==this->streamantal()) {
-        stream_oversigt_loaded=true;
-        stream_oversigt_loaded_done=true;
-      } else stream_oversigt_loaded_nr++;
-    }
-
-    if (!(gfx_loaded)) {
-      stream_oversigt_loaded_nr=0;
-      stream_oversigt_loaded=false;
-    }
-    // calc start pos (ofset)
-    sofset=(_sangley/40)*8;
-    // draw icons
-    while((i<lstreamoversigt_antal) && (i+sofset<antal)) {
-      if (((i % bonline)==0) && (i>0)) {
-        yof=yof-(buttonsizey+20);
-        xof=0;
-      }
-      // selected biger
-      if (i+1==(int) stream_key_selected) {
-        buttonsizey=170.0f;
-        buttonsizex=200.0f;
-      } else {
-        buttonsizey=160.0f;
-        buttonsizex=200.0f;
-      }
-      if (stack[i+sofset].textureId) {
-        // stream icon
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,empty_icon1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
-        glPushMatrix();
-        // indsite draw icon rss gfx
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        if (tema==5) {
-          glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+          } else if (file_exists(downloadfilenamelong)) {
+            // er det ikke samme texture som sidst loaded så load it
+            // else set last used
+            texture=loadTexture ((char *) downloadfilenamelong);
+            if (texture) set_texture(stream_oversigt_loaded_nr,texture);
+            last_texture=texture;
+            antal_loaded+=1;
+          } else texture=0;
         } else {
-          glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+          if (last_texture) set_texture(stream_oversigt_loaded_nr,last_texture);
+          antal_loaded+=1;
         }
-        glEnd();
-        // show nyt icon note
-        if (stack[i+sofset].nyt) {
-          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-          glEnd();
-        }
-        glPopMatrix();
-      } else {
-        // no draw default icon
-        glPushMatrix();
-        // indsite draw radio station icon
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D,empty_icon1);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glLoadName(100+i+sofset);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
-        glEnd();
-        // show nyt icon note
-        if (stack[i+sofset].nyt) {
-          glBindTexture(GL_TEXTURE_2D,newstuf_icon);
-          glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
-          glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
-          glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
-          glEnd();
-        }
-        glPopMatrix();
+        // husk last file name
+        strcpy(downloadfilename_last,downloadfilenamelong);
       }
-      // draw numbers in group
-      if (stack[i+sofset].feed_group_antal>1) {
-        // show numbers in group
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTranslatef(xof+22,yof+14,0);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        sprintf(temptxt,"Feeds %-4d",stack[i+sofset].feed_group_antal);
-        glcRenderString(temptxt);
-        glPopMatrix();
-      }
-      // show text of element
-      glPushMatrix();
-      pline=0;
-      glTranslatef(xof+20,yof-10,0);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      strcpy(temptxt,stack[i+sofset].feed_showtxt);        // text to show
-      base=temptxt;
-      length=strlen(temptxt);
-      width = 20;
-      bool stop=false;
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
-      }
-      glPopMatrix();
-      // next button
-      i++;
-      xof+=(buttonsizex+10);
     }
-    // no records loaded error
-    if ((i==0) && (antal_rss_streams()==0)) {
+    // down loading ?
+    if (stream_oversigt_loaded_nr==this->streamantal()) {
+      stream_oversigt_loaded=true;
+      stream_oversigt_loaded_done=true;
+    } else stream_oversigt_loaded_nr++;
+  }
+
+  if (!(gfx_loaded)) {
+    stream_oversigt_loaded_nr=0;
+    stream_oversigt_loaded=false;
+  }
+  // calc start pos (ofset)
+  sofset=(_sangley/40)*8;
+  // draw icons
+  while((i<lstreamoversigt_antal) && (i+sofset<antal)) {
+    if (((i % bonline)==0) && (i>0)) {
+      yof=yof-(buttonsizey+20);
+      xof=0;
+    }
+    // selected biger
+    if (i+1==(int) stream_key_selected) {
+      buttonsizey=170.0f;
+      buttonsizex=200.0f;
+    } else {
+      buttonsizey=160.0f;
+      buttonsizex=200.0f;
+    }
+    if (stack[i+sofset].textureId) {
+      // stream icon
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_ONE, GL_ONE);
-      //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-      glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+      glBindTexture(GL_TEXTURE_2D,empty_icon1);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
+      glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
       glEnd();
       glPushMatrix();
-      xof=700;
-      yof=260;
-      glTranslatef(xof, yof ,0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(22.0, 22.0, 1.0);
-      glcRenderString("Please wait Loading ...");
+      // indsite draw icon rss gfx
       glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+      glBindTexture(GL_TEXTURE_2D,stack[i+sofset].textureId);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      if (tema==5) {
+        glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+      } else {
+        glTexCoord2f(0, 0); glVertex3f( xof+20, yof+20, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+20,yof+buttonsizey-30, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-20, yof+buttonsizey-30 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-20, yof+20 , 0.0);
+      }
+      glEnd();
+      // show nyt icon note
+      if (stack[i+sofset].nyt) {
+        glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+        glEnd();
+      }
+      glPopMatrix();
+    } else {
+      // no draw default icon
+      glPushMatrix();
+      // indsite draw radio station icon
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glBindTexture(GL_TEXTURE_2D,empty_icon1);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+buttonsizex-10, yof+buttonsizey-20 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+buttonsizex-10, yof+10 , 0.0);
+      glEnd();
+      // show nyt icon note
+      if (stack[i+sofset].nyt) {
+        glBindTexture(GL_TEXTURE_2D,newstuf_icon);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( xof+10+130, yof+10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( xof+10+130,yof+66-20, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( xof+66-10+130, yof+66-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( xof+66-10+130, yof+10 , 0.0);
+        glEnd();
+      }
       glPopMatrix();
     }
+    // draw numbers in group
+    if (stack[i+sofset].feed_group_antal>1) {
+      // show numbers in group
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      //glBlendFunc(GL_ONE, GL_ONE);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glTranslatef(xof+22,yof+14,0);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+      sprintf(temptxt,"Feeds %-4d",stack[i+sofset].feed_group_antal);
+      glcRenderString(temptxt);
+      glPopMatrix();
+    }
+    // show text of element
+    glPushMatrix();
+    pline=0;
+    glTranslatef(xof+20,yof-10,0);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glDisable(GL_TEXTURE_2D);
+    strcpy(temptxt,stack[i+sofset].feed_showtxt);        // text to show
+    base=temptxt;
+    length=strlen(temptxt);
+    width = 20;
+    bool stop=false;
+    while(*base) {
+      // if text can be on line
+      if(length <= width) {
+        glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+        glcRenderString(base);
+        pline++;
+        break;
+      }
+      right_margin = base+width;
+      while((!isspace(*right_margin)) && (stop==false)) {
+        right_margin--;
+        if (right_margin == base) {
+          right_margin += width;
+          while(!isspace(*right_margin)) {
+            if (*right_margin == '\0') break;
+            else stop=true;
+            right_margin++;
+          }
+        }
+      }
+      if (stop) *(base+width)='\0';
+      *right_margin = '\0';
+      glcRenderString(base);
+      pline++;
+      glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
+      length -= right_margin-base+1;                         // +1 for the space
+      base = right_margin+1;
+      if (pline>=2) break;
+    }
+    glPopMatrix();
+    // next button
+    i++;
+    xof+=(buttonsizex+10);
+  }
+  // no records loaded error
+  if ((i==0) && (antal_rss_streams()==0)) {
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D,_textureIdloading);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0); glVertex3f((orgwinsizex/3), 200 , 0.0);
+    glTexCoord2f(0, 1); glVertex3f((orgwinsizex/3), 200+150, 0.0);
+    glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
+    glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
+    glEnd();
+    glPushMatrix();
+    xof=700;
+    yof=260;
+    glTranslatef(xof, yof ,0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glDisable(GL_TEXTURE_2D);
+    glScalef(22.0, 22.0, 1.0);
+    glcRenderString("Please wait Loading ...");
+    glEnable(GL_TEXTURE_2D);
+    glPopMatrix();
+  }
 }
