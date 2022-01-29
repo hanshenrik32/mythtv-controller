@@ -5,6 +5,15 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+
+const int DIGITAL=1;
+const int ANALOG=2;
+const int SAVER3D=3;
+const int SAVER3D2=4;
+const int PICTURE3D=5;
+const int MUSICMETER=6;
+
+
 const int MAXPRGLIST_ANTAL=200;
 const int MAXCHANNEL_ANTAL=400;
 
@@ -112,5 +121,8 @@ void show_setup_keys();
 void show_setup_tv_graber(int startofset);
 void show_setup_rss(unsigned int startofset);                                   // rss reader setup
 void show_wlan_networks(int valgtnr);
+
+void load_config(char * filename);
+int save_config(char * filename);
 
 #endif

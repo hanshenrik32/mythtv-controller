@@ -634,7 +634,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      // test fpom musik table exist
+      // test is musik table exist
       sprintf(sqlselect,"SHOW TABLES LIKE '%s.Videometadata'",database);
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
@@ -1646,7 +1646,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       xpos=600;
       sprintf(temptxt,"No movie info from %s backend.",configbackend);
       strcat(temptxt,configmysqlhost);
-    }    
+    }
     ypos=550;
     glTranslatef(xpos+10, ypos+40 ,0.0f);
     glRasterPos2f(0.0f, 0.0f);
