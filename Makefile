@@ -138,6 +138,7 @@ install:
 	@mkdir -p /opt/mythtv-controller/tidal_web
 	#if ! test -d ~/.xmltv then mkdir -p ~/.xmltv; fi
 	#if ! test -d ~/rss/images then mkdir -p ~/rss/images; fi
+	cp startup.sh /opt/mythtv-controller/
 	cp index.html /opt/mythtv-controller/web/
 	cp -r tidal_web/* /opt/mythtv-controller/tidal_web/
 	cp xmltv_config/*  ~/.xmltv/

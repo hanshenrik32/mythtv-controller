@@ -5,5 +5,5 @@ Version=0.38.4
 Name=Myhthtv-controller
 Comment=Touch screen Mediacenter
 Icon=/opt/mythtv-controller/mythtv-controller.png
-Exec=/usr/local/bin/mythtv-controller
+Exec=/opt/mythtv-controller/startup.sh
 
