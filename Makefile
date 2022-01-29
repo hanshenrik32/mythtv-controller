@@ -133,9 +133,13 @@ installsound:
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
 	@mkdir -p /opt/mythtv-controller/images/radiostations
-	@mkdir -p /opt/mythtv-controller/convert/hires	
+	@mkdir -p /opt/mythtv-controller/convert/hires
+	@mkdir -p /opt/mythtv-controller/web
+	@mkdir -p /opt/mythtv-controller/tidal_web
 	if ! test -d ~/.xmltv then mkdir ~/.xmltv; fi
 	if ! test -d ~/rss/images then mkdir -p ~/rss/images; fi
+	cp index.html /opt/mythtv-controller/web/
+	cp -r tidal_web/* /opt/mythtv-controller/tidal_web/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi

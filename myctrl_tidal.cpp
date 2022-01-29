@@ -203,7 +203,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = "tidal_web";       // Serve files from the current directory
+        opts.document_root = "/opt/mythtv-controller/tidal_web";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, tidal_s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.

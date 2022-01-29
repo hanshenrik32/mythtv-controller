@@ -4066,21 +4066,28 @@ void display() {
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
+        aktivfont.selectfont("DejaVu Sans");
         musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+        aktivfont.selectfont(configfontname);
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
         glPushMatrix();
-        //aktivfont.selectfont("DejaVu Sans");
+        aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
+        aktivfont.selectfont(configfontname);
         glPopMatrix();
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_stream_oversigt) {
         glPushMatrix();
+        aktivfont.selectfont("DejaVu Sans");
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
+        aktivfont.selectfont(configfontname);
         glPopMatrix();
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_radio_oversigt) {
+        aktivfont.selectfont("DejaVu Sans");
         radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
+        aktivfont.selectfont(configfontname);
         // show radio options menu
         if ((show_radio_options) && (!(visur))) {
           radiooversigt.show_radio_options();
@@ -4089,9 +4096,13 @@ void display() {
       #ifdef ENABLE_SPOTIFY
       if (vis_spotify_oversigt) {
         if (do_show_spotify_search_oversigt==false) {
+          aktivfont.selectfont("DejaVu Sans");
           spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+          aktivfont.selectfont(configfontname);
         } else {
+          aktivfont.selectfont("DejaVu Sans");
           spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+          aktivfont.selectfont(configfontname);
         }
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
@@ -4111,13 +4122,17 @@ void display() {
       if (vis_tidal_oversigt) {
         // show Tidal overview
         #ifdef ENABLE_TIDAL
-        if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        if (tidal_oversigt) {
+          aktivfont.selectfont("DejaVu Sans");
+          tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+          aktivfont.selectfont(configfontname);
+        }
         #endif
       } else if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
         aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
+        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -4145,9 +4160,6 @@ void display() {
         //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
     }
-
-    if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
-
     #ifdef ENABLE_SPOTIFY
     //firsttimespotifyupdate=true;
     // show firsttime spotify update windows request
@@ -4860,6 +4872,7 @@ void display() {
       #endif
       #if defined USE_SDL_MIXER
       #endif
+      // check if radio staions is online.
       if (!(check_radio_thread)) {
         check_radio_thread=true;
         pthread_t loaderthread;           // check radio status thread
@@ -14255,8 +14268,11 @@ void *radio_check_statusloader(void *data) {
     do {
       notdone=radiooversigt.check_radio_online(0);
     } while (notdone);
-  }
-  if (strcmp(configbackend,"xbmc")==0) {
+  } else if (strcmp(configbackend,"xbmc")==0) {
+    do {
+      notdone=radiooversigt.check_radio_online(0);
+    } while (notdone);
+  } else {
     do {
       notdone=radiooversigt.check_radio_online(0);
     } while (notdone);

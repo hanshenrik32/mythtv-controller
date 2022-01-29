@@ -207,7 +207,7 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
       } else {
         // else show normal indhold
         memset(&opts, 0, sizeof(opts));
-        opts.document_root = ".";       // Serve files from the current directory
+        opts.document_root = "/opt/mythtv-controller/web/";       // Serve files from the current directory
         mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
       }
       // We have received an HTTP request. Parsed request is contained in `hm`.
