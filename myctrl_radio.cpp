@@ -65,7 +65,7 @@ static bool hentradioart=false;                                                 
 // ****************************************************************************************
 
 radiostation_class::radiostation_class() : antal(0) {
-    for(auto i=0;i<radiooptionsmax;i++) {
+    for(int i=0;i<radiooptionsmax;i++) {
       strcpy(radiosortopt[i].radiosortopt,"");
       radiosortopt[i].antal=0;
     }
@@ -92,7 +92,7 @@ radiostation_class::~radiostation_class() {
 
 void radiostation_class::clean_radio_oversigt() {
     startup_loaded=false;			                                                                // set radio station loaded to false again.
-    for(auto i=0;i<antal;i++) {
+    for(int i=0;i<antal;i++) {
       if (stack[i].textureId) glDeleteTextures(1, &stack[i].textureId);	                      // delete radio texture
     }
     antal=0;

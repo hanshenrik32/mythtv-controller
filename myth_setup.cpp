@@ -623,7 +623,7 @@ void load_config(char * filename) {
     strcpy(confighostname,hostname);
     char *database = (char *) "mythconverg";			            // mythtv database name
     strcpy(configrecordpath,"");			                     		// default value (bliver fundet i mysql mythtv databasen)
-    for(auto i = 0; i < storagegroupantal; i++) {
+    for(int i = 0; i < storagegroupantal; i++) {
       strcpy(configstoragerecord[i].path,"");
       strcpy(configstoragerecord[i].name,"");
     }
@@ -642,7 +642,7 @@ void load_config(char * filename) {
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
-    for(auto t=0;t<12;t++) {
+    for(int t=0;t<12;t++) {
       strcpy(configkeyslayout[t].cmdname,"");
       configkeyslayout[t].scrnr=0;
     }
@@ -707,7 +707,7 @@ void load_config(char * filename) {
     if (remoteHost) {
       addr_list = (struct in_addr **) remoteHost->h_addr_list;
       fprintf(stderr,"mediacenter server name is : %s\n", remoteHost->h_name);
-      for(auto i = 0; addr_list[i] != NULL; i++) {
+      for(int i = 0; addr_list[i] != NULL; i++) {
         fprintf(stderr,"mediacenter server ip is  : %s\n", inet_ntoa(*addr_list[i]));
       }
       strcpy(confighostname,hostname);
@@ -718,7 +718,7 @@ void load_config(char * filename) {
       if (remoteHost) {
         addr_list = (struct in_addr **) remoteHost->h_addr_list;
         fprintf(stderr,"Hostname : %s\n", remoteHost->h_name);
-        for(auto i = 0; addr_list[i] != NULL; i++) {
+        for(int i = 0; addr_list[i] != NULL; i++) {
           fprintf(stderr,"Ip is  : %s\n", inet_ntoa(*addr_list[i]));
         }
         strcpy(confighostip,inet_ntoa(*addr_list[0]));

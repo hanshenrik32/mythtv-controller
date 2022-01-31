@@ -528,7 +528,7 @@ class dirmusictype {
         GLuint textureId;		             			// directorys texture
         int emtydirmusic() {
             // for(unsigned int i=0;i<listesize;i++) {			// reset all music info
-            for(auto i=0;i<listesize;i++) {			// reset all music info
+            for(int i=0;i<listesize;i++) {			// reset all music info
               strcpy(songliste[i].name,"");
               songliste[i].songlength=0;
               strcpy(dirliste[i].dirname,"");
@@ -546,7 +546,7 @@ class dirmusictype {
             songliste=new dirmusic_list_type[antal];
             emtydirmusic();
             //for(unsigned int i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
-            for(auto i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
+            for(int i=0;i<listesize;i++) songliste[i].aktiv = true;	// set play flag for all music
         }
 
         // destructor
@@ -2169,7 +2169,7 @@ void display() {
             xpos = (-siz_x)*xxofset;
             ypos = (-400)+((siz_y*2)+2.0);
             high = sqrt(spectrum[xp]*8)*2;
-            for(auto yp=0;yp<high;yp++) {
+            for(int yp=0;yp<high;yp++) {
               // front
               glBegin(GL_QUADS);
               glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2209,7 +2209,7 @@ void display() {
             //printf("xp =%2d high = %0.3f \n",xp,high*2);
             xpos = (-siz_x)*xxofset;
             ypos = (-388)+((siz_y*(high*2))+2.0);
-            for(auto yp=0;yp<1;yp++) {
+            for(int yp=0;yp<1;yp++) {
               // front
               glBegin(GL_QUADS);
               glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2232,7 +2232,7 @@ void display() {
             xpos = (-siz_x)*xxofset;
             ypos = (-432)+((siz_y*4)+2.0);
             high = sqrt(spectrum[xp]*4);
-            for(auto yp=0;yp<high/2;yp++) {
+            for(int yp=0;yp<high/2;yp++) {
               // front
               glBegin(GL_QUADS);
               glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2600,7 +2600,7 @@ void display() {
               xpos = (-siz_x)*xxofset;
               ypos = (-400)+((siz_y*2)+2.0);
               high = sqrt(spectrum[xp]*8)*2;
-              for(auto yp=0;yp<high;yp++) {
+              for(int yp=0;yp<high;yp++) {
                 // front
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2640,7 +2640,7 @@ void display() {
               //printf("xp =%2d high = %0.3f \n",xp,high*2);
               xpos = (-siz_x)*xxofset;
               ypos = (-388)+((siz_y*(high*2))+2.0);
-              for(auto yp=0;yp<1;yp++) {
+              for(int yp=0;yp<1;yp++) {
                 // front
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -2663,7 +2663,7 @@ void display() {
               xpos = (-siz_x)*xxofset;
               ypos = (-432)+((siz_y*4)+2.0);
               high = sqrt(spectrum[xp]*4);
-              for(auto yp=0;yp<high/2;yp++) {
+              for(int yp=0;yp<high/2;yp++) {
                 // front
                 glBegin(GL_QUADS);
                 glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
@@ -4205,7 +4205,7 @@ void display() {
             if (debugmode & 2) fprintf(stderr,"Loading songs from id:%4d \n",do_play_music_aktiv_nr);
              // reset valgt liste
             bool eraktiv;
-            for(auto t=0;t<dirmusic.numbersinlist();t++) {
+            for(int t=0;t<dirmusic.numbersinlist();t++) {
               dirmusic.popsong(temptxt1,&eraktiv,t);
               do_play_music_aktiv_nr_select_array[t]=eraktiv;
             }
@@ -4834,7 +4834,7 @@ void display() {
       if ((y>0) && (ll>0)) {
         xxx = ((y/ll)*16);
       } else xxx=0;
-      for(auto x=0;x<xxx;x++) {
+      for(int x=0;x<xxx;x++) {
         glDisable(GL_TEXTURE_2D);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
@@ -5369,7 +5369,7 @@ void display() {
       static bool build_frequencyOctaves=false;
       if (build_frequencyOctaves==false) {
         build_frequencyOctaves = true;
-        for(auto zz=0;zz<sampleSize;zz++) {
+        for(int zz=0;zz<sampleSize;zz++) {
           spectrum[zz] = 0.0f;
           spectrum_left[zz] = 0.0f;                                             // used for spectium
           spectrum_right[zz] = 0.0f;                                            // used for spectium
@@ -9486,7 +9486,7 @@ void handlespeckeypress(int key,int x,int y) {
                     // jump to button of text
                     if (streamoversigt.antalstreams()>17) do_show_setup_select_linie=34; else do_show_setup_select_linie=0;
                     configrss_ofset=0;
-                    for(auto i=configrss_ofset;i<3000-1;i++) {
+                    for(int i=configrss_ofset;i<3000-1;i++) {
                       if (streamoversigt.get_stream_name(configrss_ofset)) {
                         configrss_ofset++;
                       }
