@@ -141,9 +141,9 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
-#ifdef ENABLE_SPOTIFY
+//#ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
-#endif
+//#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
@@ -152,8 +152,8 @@ extern char __BUILD_NUMBER;
 extern rss_stream_class rssstreamoversigt;
 
 #ifdef ENABLE_SPOTIFY
-spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;           // do it first time thread
+  spotify_class spotify_oversigt;
+  static bool do_update_spotify_playlist = false;           // do it first time thread
 #endif
 
 // tidal music class
@@ -3592,7 +3592,7 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f( 640.0, 0.0, 0.0);
       glEnd();
       glPopMatrix();
-      if (film_oversigt.film_is_playing) {
+      if (film_oversigt.is_film_playing()) {
         strcpy(temptxt1,"Error playing movie.");
       } else {
         strcpy(temptxt1,"Fault playing.");
@@ -5695,12 +5695,12 @@ void display() {
         do_play_music_aktiv_table_nr=1;			// reset play start nr
         // write to log
         write_logfile((char *) "Stop playing media/wideo if any");
-        if (film_oversigt.film_is_playing) {
+        if (film_oversigt.is_film_playing()) {
           //write to debug log
           write_logfile((char *) "Stop playing last movie before start new");
           // stop playing (active movie)
           film_oversigt.softstopmovie();
-        }
+        } else film_oversigt.softstopmovie();
         // start movie
         if (film_oversigt.playmovie(fknapnr-1)==0) {
           vis_error = true;

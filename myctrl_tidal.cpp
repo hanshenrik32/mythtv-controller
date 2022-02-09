@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <string>
-#include <string.h>
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -36,7 +35,7 @@
 #include "myctrl_tidal.h"
 
 // web port
-static const char *ss_http_port = "8002";
+static const char *ss_http_port = "9000";
 static struct mg_serve_http_opts tidal_s_http_server_opts;
 
 extern tidal_class tidal_oversigt;
