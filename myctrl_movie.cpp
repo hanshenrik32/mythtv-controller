@@ -764,15 +764,19 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     strcat(coverfilename,"/");
                     strcat(coverfilename,moviefil->d_name);
                     strcat(coverfilename,"/");
-                    strcat(coverfilename,submoviefil->d_name);
-                    ext = strrchr(coverfilename, '.');
-                    if (ext) {
-                      *ext='\0';
-                    }
-                    strcat(coverfilename,".jpg");
+                    strcat(coverfilename,"cover.jpg");
                     if (!(file_exists(coverfilename))) {
-                      //printf("******* File eixts %s \n",coverfilename);
-                      //strcpy(coverfilename,"filetodownload");
+                      strcpy(coverfilename,"");
+                      strcat(coverfilename,configmoviepath);
+                      strcat(coverfilename,"/");
+                      strcat(coverfilename,moviefil->d_name);
+                      strcat(coverfilename,"/");
+                      strcat(coverfilename,submoviefil->d_name);
+                      ext = strrchr(coverfilename, '.');
+                      if (ext) {
+                        *ext='\0';
+                      }
+                      strcat(coverfilename,".jpg");
                     }
 
                     strcpy(moviepath1,moviefil->d_name);
@@ -882,14 +886,18 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   strcat(coverfilename,configmoviepath);
                   strcat(coverfilename,"/");
                   strcat(coverfilename,moviefil->d_name);
-                  ext = strrchr(coverfilename, '.');
-                  if (ext) {
-                    *ext='\0';
-                  }
-                  strcat(coverfilename,".jpg");
+                  strcat(coverfilename,"/");
+                  strcat(coverfilename,"cover.jpg");
                   if (!(file_exists(coverfilename))) {
-                    //printf("******* File eixts %s \n",coverfilename);
-                    //strcpy(coverfilename,"filetodownload");
+                    strcpy(coverfilename,"");
+                    strcat(coverfilename,configmoviepath);
+                    strcat(coverfilename,"/");
+                    strcat(coverfilename,moviefil->d_name);
+                    ext = strrchr(coverfilename, '.');
+                    if (ext) {
+                      *ext='\0';
+                    }
+                    strcat(coverfilename,".jpg");
                   }
 
                   // write debug log
