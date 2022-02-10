@@ -614,6 +614,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     char moviepath1[2000];
     char moviepathcheck[2000];
     char statfilename[2000];
+    char coverfilename[2000];
     bool fundet;
     // mysql vars
     MYSQL *conn;
@@ -732,7 +733,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
               perror("stat");
               exit(EXIT_FAILURE);
             }
-            // if dir
+            // if dir read subdir
             if ((statbuffer.st_mode & S_IFMT)==S_IFDIR) {
               // it a dir opendir and find files
               subdirp=opendir(statfilename);
@@ -741,6 +742,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                 ext = strrchr(submoviefil->d_name, '.');
                 if (ext) {
                   film_ok=false;
+                  // check file extension
                   if (strcmp(ext,".avi")==0) film_ok=true;
                   if (strcmp(ext,".mp4")==0) film_ok=true;
                   if (strcmp(ext,".mkv")==0) film_ok=true;
@@ -756,9 +758,27 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     // check for '\n' in the end of the string and remove it
                     if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
 
+                    // check if cover exist
+                    strcpy(coverfilename,"");
+                    strcat(coverfilename,configmoviepath);
+                    strcat(coverfilename,"/");
+                    strcat(coverfilename,moviefil->d_name);
+                    strcat(coverfilename,"/");
+                    strcat(coverfilename,submoviefil->d_name);
+                    ext = strrchr(coverfilename, '.');
+                    if (ext) {
+                      *ext='\0';
+                    }
+                    strcat(coverfilename,".jpg");
+                    if (!(file_exists(coverfilename))) {
+                      //printf("******* File eixts %s \n",coverfilename);
+                      //strcpy(coverfilename,"filetodownload");
+                    }
+
                     strcpy(moviepath1,moviefil->d_name);
                     strcat(moviepath1,"/");
                     strcat(moviepath1,submoviefil->d_name);
+                    // create full filename
                     strcpy(moviepathcheck,configmoviepath);
                     strcat(moviepathcheck,"/");
                     strcat(moviepathcheck,moviefil->d_name);                        // path
@@ -780,8 +800,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       }
                     }
                     // write debug log
-                    if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s'",movietitle);
-                    else sprintf(debuglogdata,"Checking/Insert movietitle '%s'",movietitle);
+                    if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle '%s' path: %s ",movietitle,moviepathcheck);
+                    else sprintf(debuglogdata,"Checking/Insert movietitle '%s' path: %s ",movietitle,moviepathcheck);
                     write_logfile((char *) debuglogdata);
                     // check if record exist (video file exist)
                     if ((fundet) && (del_rec_nr)) {
@@ -792,9 +812,16 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       }
                     }
                     if (!(fundet)) {
+
+
+//                      sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
+//                                                                (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
+//                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+
+
                       sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                                                 (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfilename);
                       recnr++;
                       mysql_query(conn,"set NAMES 'utf8'");
                       res = mysql_store_result(conn);
@@ -849,6 +876,22 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       del_rec_nr=atoi(row[0]);
                     }
                   }
+
+                  // check if cover exist
+                  strcpy(coverfilename,"");
+                  strcat(coverfilename,configmoviepath);
+                  strcat(coverfilename,"/");
+                  strcat(coverfilename,moviefil->d_name);
+                  ext = strrchr(coverfilename, '.');
+                  if (ext) {
+                    *ext='\0';
+                  }
+                  strcat(coverfilename,".jpg");
+                  if (!(file_exists(coverfilename))) {
+                    //printf("******* File eixts %s \n",coverfilename);
+                    //strcpy(coverfilename,"filetodownload");
+                  }
+
                   // write debug log
                   if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
                   else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
@@ -866,7 +909,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   if (!(fundet)) {
                     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                                               (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfilename);
                     recnr++;
                     fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
                     //mysql_query(conn,"set NAMES 'utf8'");
@@ -874,8 +917,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     mysql_query(conn,sqlselect);
                     res = mysql_store_result(conn);
                     if (mysql_error(conn)) {
-                      write_logfile((char *) "Mysql error.");
-                      printf("%s\n",mysql_error(conn));
+                      //write_logfile((char *) "Mysql error.");
+                      //printf("%s\n",mysql_error(conn));
                       //exit(0);
                     }
                   }
@@ -900,7 +943,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       mysql_query(conn,mainsqlselect);
       res = mysql_store_result(conn);
       i=0;
-      filhandle=fopen("filmcover_gfx.log","w");
+      filhandle=fopen("moviecover_gfx.log","w");
       if (res) {
         while (((row = mysql_fetch_row(res)) != NULL) && (i<FILM_OVERSIGT_TYPE_SIZE)) {
           is_db_updated_then_do_clean_up=true;
@@ -1085,6 +1128,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             }
           } else {
             sprintf(resl,"Movie Cover missing: %s \n",row[1]);
+            sprintf(debuglogdata,"Movie Cover missing: %s",row[1]);
+            write_logfile((char *) debuglogdata);
             fputs(resl,filhandle);
           }
           // set 3d cover
