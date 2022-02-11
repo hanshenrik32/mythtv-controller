@@ -7518,6 +7518,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           sprintf(debuglogdata,"Film selected=%d",fknapnr);                                 //
           write_logfile((char *) debuglogdata);
           fundet = true;
+          returnfunc = 0;
         }
       }
       // vis ny film oversigt
@@ -7892,9 +7893,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 #endif
                 // ved vis film oversigt
                 if ((vis_film_oversigt) & (retfunc==0)) {
-                  do_zoom_film_cover = true;
-                  do_zoom_film_aktiv_nr = fknapnr;
-                  do_swing_movie_cover = 1;
+                  if (fknapnr>0) {
+                    do_zoom_film_cover = true;
+                    do_zoom_film_aktiv_nr = fknapnr;                            // movie to show info about
+                    do_swing_movie_cover = 1;
+                  }
                 }
                 // ved vis tv oversigt
                 if ((vis_tv_oversigt) && (retfunc==0)) {

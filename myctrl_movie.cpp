@@ -758,6 +758,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     // check for '\n' in the end of the string and remove it
                     if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
 
+
                     // check if cover exist
                     strcpy(coverfilename,"");
                     strcat(coverfilename,configmoviepath);
@@ -778,6 +779,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       }
                       strcat(coverfilename,".jpg");
                     }
+
+
 
                     strcpy(moviepath1,moviefil->d_name);
                     strcat(moviepath1,"/");
@@ -899,7 +902,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     }
                     strcat(coverfilename,".jpg");
                   }
-
                   // write debug log
                   if (fundet) sprintf(debuglogdata,"Checking/Replace movietitle %s \n",movietitle);
                   else sprintf(debuglogdata,"Insert movietitle %s \n",movietitle);
@@ -1556,6 +1558,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         ypos=ypos-(winsizy+60);
       }
       if (film_nr+1==(int) film_key_selected) boffset+=10; else boffset=0;
+      // do media have a cover
       if (filmoversigt[film_nr+sofset].gettextureid()) {
         // print cover dvd
         //glDisable(GL_DEPTH_TEST);
@@ -1574,7 +1577,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 1); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))+winsizy+boffset , 0.0);
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
-        // print movie cover over
+        // show movie cover over
         glBindTexture(GL_TEXTURE_2D,filmoversigt[film_nr+sofset].gettextureid());
         glDisable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
