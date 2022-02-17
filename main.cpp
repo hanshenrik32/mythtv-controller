@@ -3213,7 +3213,9 @@ void display() {
     if ((vis_nyefilm_oversigt) && (do_show_setup == false)) {
       if (show_newmovietimeout == 0) vis_nyefilm_oversigt = false;
       if (fknapnr == 0) show_newmovietimeout--;
+      aktivfont.selectfont("DejaVu Sans");
       film_oversigt.show_minifilm_oversigt(0,0);
+      aktivfont.selectfont(configfontname);
     }
     // search movies
     if (vis_film_oversigt) {
