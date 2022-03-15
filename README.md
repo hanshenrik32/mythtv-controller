@@ -4,12 +4,17 @@
 =======
 # packs to install to compile on Ubuntu 10/12/14/16/18.xx/19.xx
 >>>>>>> bc698ece9a58d9f050ac11af077f3b4c3527ff35
-# Updated 04/20/2020
+# Updated 01/14/2022
 # 
 
 Version.
 
 <<<<<<< HEAD
+
+mythtv-controller ver 39.4
+
+music struct moved to class
+
 mythtv-controller ver 39.0
 
 All log is moved to log file in you home directory.
