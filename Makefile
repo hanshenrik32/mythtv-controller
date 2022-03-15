@@ -127,8 +127,8 @@ installsound:
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	cp xmltv_config/*  ~/.xmltv/
-	chmod 666 ~/.xmltv/*
+	#cp xmltv_config/*  ~/.xmltv/
+	#chmod 666 ~/.xmltv/*
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmodL.so.12.7 /usr/lib/libfmod.so.12
