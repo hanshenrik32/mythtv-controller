@@ -308,7 +308,7 @@ char aktivplay_music_path[1024];                          //
 bool hent_radio_search = false;                           // skal vi søge efter music
 bool hent_film_search = false;                            // skal vi søge efter film title
 bool hent_stream_search = false;                          // skal vi søge efter stream
-bool hent_spotify_search = false;                          // skal vi søge efter spotify stuf in local db
+bool hent_spotify_search = false;                         // skal vi søge efter spotify stuf in local db
 
 bool do_show_spotify_search_oversigt=false;
 bool hent_spotify_search_online=false;                    // skal vi starte search online
@@ -397,19 +397,19 @@ int PRGLIST_ANTAL=0;                                      // used in tvguide xml
 
 int music_select_iconnr;                                  // selected icon
 int spotify_select_iconnr;                                // selected icon
-int spotify_selected_startofset=0;                                 //
+int spotify_selected_startofset=0;                        //
 int antal_songs=0;                                        //
 
 int _sangley;                                             //
 int _mangley;                                             //
 int _angley;                                              //
-int _spangley;                                             //
+int _spangley;                                            //
 
 int music_icon_anim_icon_ofset=0;                         //
 int music_icon_anim_icon_ofsety=0;                        //
 
 
-int do_play_music_aktiv_nr=0;                           // den aktiv dirid som er trykket på
+int do_play_music_aktiv_nr=0;                             // den aktiv dirid som er trykket på
 
 
 int screenx=1920;                                         // default screen size
@@ -433,20 +433,20 @@ bool do_play_radio = false;
 bool do_play_spotify = false;
 bool do_play_tidal = false;
 GLint ctx, myFont;
-bool do_swing_movie_cover = false;                        // do anim
-bool vis_nyefilm_oversigt = true;                         // start med at vise nye film
+bool do_swing_movie_cover = false;                      // do anim
+bool vis_nyefilm_oversigt = true;                       // start med at vise nye film
 // stream
 stream_class streamoversigt;
 bool show_stream_options = false;
-bool startmovie = false;                  		// start play movie
+bool startmovie = false;                  		          // start play movie
 int sleep_ok=0;
 int sleeper=1;
 unsigned int percent;
 bool starving;
-char aktivsongname[40];                         	// song name
-char aktivartistname[40];                      		// navn på aktiv artist (som spilles)
-bool check_radio_thread = true;            			  	// DO NOT check radio station online status
-const unsigned int ERROR_TIMEOUT=120;                    // show error timeout
+char aktivsongname[40];                         	      // song name
+char aktivartistname[40];                               // navn på aktiv artist (som spilles)
+bool check_radio_thread = false;            			  	// DO NOT check radio station online status
+const unsigned int ERROR_TIMEOUT=120;                   // show error timeout
 int vis_error_timeout=ERROR_TIMEOUT;
 bool vis_error = false;
 int vis_error_flag=0;
@@ -457,7 +457,7 @@ unsigned int configrss_ofset=0;
 unsigned int realrssrecordnr=0;                         //
 int do_radio_icon_anim_icon_ofset=0;                    //
 int radio_icon_anim_icon_ofset=0;                       //
-unsigned int radiomoversigt_antal=0;                            // antal radio stationer
+unsigned int radiomoversigt_antal=0;                    // antal radio stationer
 int do_movie_icon_anim_icon_ofset=0;
 int film_select_iconnr=0;
 int movie_icon_anim_icon_ofset=0;
@@ -1694,6 +1694,46 @@ static bool do_update_tidal     = false;                             // set true
 
 
 
+// *****************************************************************************
+//
+// ask for file name to save playlist ( in music overview )
+//
+// *****************************************************************************
+
+void do_ask_save_playlist(char *keybuffer) {
+  int xof = 500;
+  int yof = 600;
+  glPushMatrix();
+  glEnable(GL_TEXTURE_2D);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+  glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBegin(GL_QUADS); // draw ask box
+  glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+  glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
+  glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
+  glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
+  glEnd(); //End quadrilateral coordinates
+  glPopMatrix();
+  glPushMatrix();
+  glDisable(GL_TEXTURE_2D);
+  glColor3f(1.0f, 1.0f, 1.0f);
+  glTranslatef(xof+20.0f,yof+10+5, 0.0f);
+  glRasterPos2f(0.0f, 0.0f);
+  glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+  //aktivfont.selectfont((char *) "Courier 10 Pitch");
+  glcRenderString("Playlist name :");
+  glcRenderString(keybuffer);
+  glPopMatrix();
+  glPushMatrix();
+  showcoursornow(330,460+5,strlen(keybuffer));
+  glPopMatrix();
+}
+
 
 
 // ****************************************************************************************
@@ -2856,6 +2896,61 @@ void display() {
         }
       } else {
         printf("saver no music \n");
+        float siz_x=128;
+        float siz_y=128;
+        float siz_z=128;
+        float xpos=0;                   // (orgwinsizex/2);
+        float ypos=0;                   // (orgwinsizey/2);
+        static float zrot=0;
+        glPushMatrix();
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(orgwinsizex/2,orgwinsizey/2,0.0f);
+        glRotatef(zrot, 1.0f, 1.0f, 0.0f);
+        zrot+=1.0f;
+        if (zrot>365.0f) zrot=0;
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,texturedot);                              // texturedot
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // front
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+        glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+        glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , 0.0f); // 3
+        glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , 0.0f); // 4
+        // left
+        glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+        glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+        glTexCoord2f(1, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , siz_z); // 3
+        glTexCoord2f(1, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , siz_z); // 4
+        // right
+        glTexCoord2f(0, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , 0.0f); // 1
+        glTexCoord2f(0, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , 0.0f); // 2
+        glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos) , siz_y+(ypos) , siz_z); // 3
+        glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos) ,-siz_y+(ypos) , siz_z); // 4
+        // back
+        glTexCoord2f(0, 0); glVertex3f((-siz_x)+(xpos) ,-siz_y+(ypos) , siz_z); // 1
+        glTexCoord2f(0, 1); glVertex3f((-siz_x)+(xpos) , siz_y+(ypos) , siz_z); // 2
+        glTexCoord2f(1, 1); glVertex3f((siz_x)+(xpos)  , siz_y+(ypos) , siz_z); // 3
+        glTexCoord2f(1, 0); glVertex3f((siz_x)+(xpos)  ,-siz_y+(ypos) , siz_z); // 4
+        // top
+        float zof=128.0f;
+        float xof=128.0f;
+        glTexCoord2f(0, 0); glVertex3f((-siz_x)+siz_x+xof, (-siz_y)+siz_y , 0.0); // 1
+        glTexCoord2f(0, 1); glVertex3f((-siz_x)+siz_x+xof, (-siz_y)+siz_y , siz_z); // 2
+        glTexCoord2f(1, 1); glVertex3f(-(siz_x)+xof, (-siz_y)+siz_y , siz_z); // 3
+        glTexCoord2f(1, 0); glVertex3f(-(siz_x)+xof, (-(siz_y))+siz_y, 0.0); // 4
+        // bund
+        /*
+        glTexCoord2f(0, 0); glVertex3f((-(siz_x))+siz_x+xof, (-(siz_y)) , 0.0+zof); // 1
+        glTexCoord2f(0, 1); glVertex3f((-(siz_x))+siz_x+xof, (-(siz_y)) , siz_z+zof); // 2
+        glTexCoord2f(1, 1); glVertex3f(-(siz_x)+xof, (-(siz_y)) , siz_z+zof); // 3
+        glTexCoord2f(1, 0); glVertex3f(-(siz_x)+xof, (-(siz_y)), 0.0+zof); // 4
+        */
+        glEnd();
+        glPopMatrix();
       }
     }
     // end spectium
@@ -3837,42 +3932,12 @@ void display() {
     //
     if (vis_music_oversigt) {
       if (ask_save_playlist) {
-        xof = 500;
-        yof = 600;
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-        glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBegin(GL_QUADS); // draw ask box
-        glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
-        glEnd(); //End quadrilateral coordinates
-        glPopMatrix();
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(xof+20.0f,yof+10+5, 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-        //aktivfont.selectfont((char *) "Courier 10 Pitch");
-        glcRenderString("Playlist name :");
-        glcRenderString(keybuffer);
-        glPopMatrix();
-        glPushMatrix();
-        showcoursornow(330,460+5,strlen(keybuffer));
-        glPopMatrix();
+        do_ask_save_playlist(keybuffer);
       }
     }
     // save playlist to file
     if (save_ask_save_playlist) {
-     musicoversigt.save_music_oversigt_playlists(playlistfilename);
+      musicoversigt.save_music_oversigt_playlists(playlistfilename);
       save_ask_save_playlist=false;
       ask_save_playlist=false;
       // reset keyboard buffer
@@ -4144,7 +4209,7 @@ void display() {
       // check if radio staions is online.
       if (!(check_radio_thread)) {
         check_radio_thread=true;
-        pthread_t loaderthread;           // check radio status thread
+        pthread_t loaderthread;                                                 // check radio status thread
         int rc=pthread_create(&loaderthread,NULL,radio_check_statusloader,NULL);
         if (rc) {
           fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);

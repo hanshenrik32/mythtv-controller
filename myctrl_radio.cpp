@@ -110,8 +110,11 @@ void radiostation_class::lastradiooptselect() {
     if (radiooptionsselect>0) radiooptionsselect--;
 }
 
-
+// *********************************************************************************
+//
 // set en radio icon image
+//
+// *********************************************************************************
 
 void radiostation_class::set_texture(int nr,GLuint idtexture) {
     stack[nr].textureId=idtexture;
@@ -217,6 +220,7 @@ int radiostation_class::load_radio_stations_gfx() {
 // show radio stations overview
 //
 // ****************************************************************************************
+
 extern int orgwinsizey;                                                         // screen size
 extern int orgwinsizex;
 
@@ -558,9 +562,12 @@ void radiostation_class::show_radio_options() {
 
 
 
+
+// *********************************************************************************
+//
+// opdatere list set numbers of aflytninger
 //
 // *********************************************************************************
-// opdatere list set numbers of aflytninger
 
 int radiostation_class::set_radio_popular(int stationid) {
     char sqlselect[512];
@@ -770,7 +777,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     bool cerror;
     struct timeval tv;
     fd_set myset;
-    write_logfile((char *) "Check radio stations.");
+    write_logfile((char *) "Check radio stations online...");
     if (check_radio_online_switch) {
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
@@ -799,16 +806,18 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 error=(init_sockaddr(&servername,ipadresse,port));
                 if ((error==0) && (cerror=connect(sock,(struct sockaddr *) &servername,sizeof (servername)))) {
                   if (cerror==0) {
-                    write_logfile((char *) "Station OK.");
+                    sprintf(debuglogdata,"Station : %-50s - hostname : %s port %d Ok",row[0],hostname,port);
                     radiook=true;
                   } else radiook=false;
                 } else {
-                  write_logfile((char *) "Station BAD.");
+                  sprintf(debuglogdata,"Checking Station : %-50s - hostname : %s port %d Fault",row[0],hostname,port);
                   radiook=false;
                 }
-                close (sock);
+                close(sock);
               }
               radiostation=atol(row[2]);
+            } else {
+              write_logfile((char *) "Radio station missing Hostname...");
             }
           }
           nn=0;
@@ -838,11 +847,6 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     }
     return(radiostation);		// we are done check all radio stations in database
 }
-
-
-// *************************** NEW *********************************************************
-
-
 
 
 // ****************************************************************************************
