@@ -151,8 +151,10 @@ install:
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
-	@cp mythtv-controller.desktop  ~/.local/share/applications
-	@cp mythtv-controller.desktop ~/Desktop
+	if test -e ~/.local/share/applications; then \
+         @cp mythtv-controller.desktop  ~/.local/share/applications; fi
+        if test -e ~/Desktop; then \
+         @cp mythtv-controller.desktop ~/Desktop; fi
 	@chmod 777 /opt/mythtv-controller/tema1 /opt/mythtv-controller/tema2 /opt/mythtv-controller/tema3 /opt/mythtv-controller/tema4 /opt/mythtv-controller/tema5 /opt/mythtv-controller/tema6 /opt/mythtv-controller/tema7 /opt/mythtv-controller/tema8 /opt/mythtv-controller/tema9 /opt/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
