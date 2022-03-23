@@ -150,15 +150,13 @@ install:
 	@cp mythtv-controller.png  /usr/share/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	if test -e ~/.local/share/applications; then \
-	  @cp mythtv-controller.desktop  ~/.local/share/applications;
-	fi
+	  @cp mythtv-controller.desktop  ~/.local/share/applications; fi
 	@cp mythtv-controller.desktop ~/Desktop
 	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \
-	  cp lirc/mythtv-controller* ~/.lirc/; 
-	fi
+	  cp lirc/mythtv-controller* ~/.lirc/; fi
 	# create random password
 	PASSWDDB="$(openssl rand -base64 12)"
 	# replace "-" with "_" for database username
