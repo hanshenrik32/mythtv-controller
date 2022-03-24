@@ -8,7 +8,7 @@ pipeline {
     }
 
   }
-  stage('compile') {
+  stages('compile') {
    steps {
     echo 'compile compile'
     sh 'make compile'
