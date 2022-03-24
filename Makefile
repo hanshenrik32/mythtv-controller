@@ -151,7 +151,7 @@ install:
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
-	if test -e ~/.local/share/applications; then \
+        if test -e ~/.local/share/applications; then \
          @cp mythtv-controller.desktop  ~/.local/share/applications; fi
         if test -e ~/Desktop; then \
          @cp mythtv-controller.desktop ~/Desktop; fi
