@@ -142,7 +142,7 @@ install:
 	cp -r tidal_web/* /opt/mythtv-controller/tidal_web/
 	cp xmltv_config/*  ~/.xmltv/
 	chmod 666 ~/.xmltv/*
-	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
+	f test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@mkdir -p /opt/mythtv-controller/images/mythnetvision
 	@chmod 777 /opt/mythtv-controller/images/mythnetvision
@@ -151,10 +151,10 @@ install:
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
-        if test -e ~/.local/share/applications; then \
-         @cp mythtv-controller.desktop  ~/.local/share/applications; fi
-        if test -e ~/Desktop; then \
-         @cp mythtv-controller.desktop ~/Desktop; fi
+	if test -e ~/.local/share/applications; then \
+	 @cp mythtv-controller.desktop  ~/.local/share/applications; fi
+	if test -e ~/Desktop; then \
+	 @cp mythtv-controller.desktop ~/Desktop; fi
 	@chmod 777 /opt/mythtv-controller/tema1 /opt/mythtv-controller/tema2 /opt/mythtv-controller/tema3 /opt/mythtv-controller/tema4 /opt/mythtv-controller/tema5 /opt/mythtv-controller/tema6 /opt/mythtv-controller/tema7 /opt/mythtv-controller/tema8 /opt/mythtv-controller/tema9 /opt/mythtv-controller/tema10
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
