@@ -17,8 +17,7 @@ pipeline {
     stage('Deploy') {
       steps {
         echo 'Deploying....'
-        sh 'make install'
-	sh 'mythtv-controller'
+        sh 'make install'	
       }
     }
   }
