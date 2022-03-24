@@ -7049,6 +7049,7 @@ struct file_upload_state {
 #endif /* MG_ENABLE_HTTP_STREAMING_MULTIPART */
 
 void mg_set_protocol_http_websocket(struct mg_connection *nc) {
+  if (nc)
   nc->proto_handler = mg_http_handler;
 }
 
