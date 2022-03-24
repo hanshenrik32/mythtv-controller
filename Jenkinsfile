@@ -20,7 +20,8 @@ pipeline {
       agent { label 'mcenter' }
       steps {
         echo 'Deploying....'
-        sh 'make install'	
+        sh 'make install'
+        sh 'sudo reboot now'
       }
     }
   }
