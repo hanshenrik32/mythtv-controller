@@ -18,8 +18,8 @@ pipeline {
       steps {
         echo 'Deploying....'
         sh 'make install'
+	sh 'mythtv-controller'
       }
     }
-
   }
 }
