@@ -1,13 +1,5 @@
 pipeline {
   agent any
-  stages {
-    stage('error') {
-      steps {
-        echo 'Build error'
-      }
-    }
-
-  }
   stages('compile') {
    steps {
     echo 'compile compile'
