@@ -86,7 +86,7 @@ $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 gitcompile:
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
-		cp lirc/* ~/.config/lirc/; \
+	 cp lirc/* ~/.config/lirc/; \
 	fi
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 
