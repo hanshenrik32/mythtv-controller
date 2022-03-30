@@ -33,7 +33,7 @@
 #include <iostream>
 #include <pthread.h>                      // multi thread support
 
-
+// type used
 using namespace std;
 
 // if defined the support will be enabled
