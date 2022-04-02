@@ -69,6 +69,7 @@ all:
 
 
 compile: $(PROG)
+<<<<<<< ours
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir -p ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
@@ -76,6 +77,15 @@ compile: $(PROG)
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if ! test -f $(BUILD_NUMBER_FILE); then echo 0 > $(BUILD_NUMBER_FILE); fi
 	@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
+=======
+	#@if ! test -d ~/.config/lirc/; then \
+	#mkdir  ~/.config/lirc/; \
+	#	cp lirc/* ~/.config/lirc/; \
+	#fi
+	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	#@if [ ! -f build-number.txt ]; then touch build-number.txt; fi
+	#@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
+>>>>>>> theirs
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
@@ -83,7 +93,7 @@ $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 gitcompile:
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
-		cp lirc/* ~/.config/lirc/; \
+	 cp lirc/* ~/.config/lirc/; \
 	fi
 	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 
@@ -123,6 +133,11 @@ installsound:
 	touch /etc/mythtv-controller.conf
 	chmod 777 /etc/mythtv-controller.conf
 	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
+<<<<<<< ours
+=======
+	#cp xmltv_config/*  ~/.xmltv/
+	#chmod 666 ~/.xmltv/*
+>>>>>>> theirs
 	#remove old link
 	if test -e /usr/lib/libfmod.so.10; then rm /usr/lib/libfmod.so.10; fi
 	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/core/lib/x86_64/libfmodL.so.12.7 /usr/lib/libfmod.so.12
@@ -152,10 +167,17 @@ install:
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
 	if test -e ~/.local/share/applications; then \
+<<<<<<< ours
 	 @cp mythtv-controller.desktop  ~/.local/share/applications; fi
 	if test -e ~/Desktop; then \
 	 @cp mythtv-controller.desktop ~/Desktop; fi
 	@chmod 777 /opt/mythtv-controller/tema1 /opt/mythtv-controller/tema2 /opt/mythtv-controller/tema3 /opt/mythtv-controller/tema4 /opt/mythtv-controller/tema5 /opt/mythtv-controller/tema6 /opt/mythtv-controller/tema7 /opt/mythtv-controller/tema8 /opt/mythtv-controller/tema9 /opt/mythtv-controller/tema10
+=======
+	  @cp mythtv-controller.desktop  ~/.local/share/applications; fi
+	 if test -e ~/Desktop; then \
+	  @cp mythtv-controller.desktop ~/Desktop; fi
+	@chmod 777 /usr/share/mythtv-controller/tema1 /usr/share/mythtv-controller/tema2 /usr/share/mythtv-controller/tema3 /usr/share/mythtv-controller/tema4 /usr/share/mythtv-controller/tema5 /usr/share/mythtv-controller/tema6 /usr/share/mythtv-controller/tema7 /usr/share/mythtv-controller/tema8 /usr/share/mythtv-controller/tema9 /usr/share/mythtv-controller/tema10
+>>>>>>> theirs
 	@if ! test -e ~/.lirc; then \
 	  mkdir -p ~/.lirc/; \
 	  mkdir ~/.lircrc; \

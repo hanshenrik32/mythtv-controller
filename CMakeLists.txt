@@ -6,9 +6,17 @@ project(mythtv-controller
   DESCRIPTION
     "Very nice project"
   LANGUAGES
+<<<<<<< ours
     C CXX
 )
 # Include the directory itself as a path to include directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #add_library(json-parser STATIC json-parser/json.c json-parser/json.c)
 add_executable(mythtv-controller main.cpp)
+=======
+    CXX
+)
+add_executable(mythtv-controller main.cpp)
+
+
+>>>>>>> theirs
