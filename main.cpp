@@ -3174,8 +3174,6 @@ void display() {
     }
     // radio stuf / music / spotyfi / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
-      // Show tidal and spotify icons
-      #ifndef ENABLE_TIDAL
       // img radio button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, radiobutton);
@@ -3221,73 +3219,6 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+0, 0.0);
       glEnd();
       glPopMatrix();
-      #else
-      // if Tidal defined (supported)
-      // img radio button
-      glPushMatrix();
-      glBindTexture(GL_TEXTURE_2D, radiobutton);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glLoadName(80);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+0-75, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+200-75, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+200-75, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+0-75, 0.0);
-      glEnd();
-      glPopMatrix();
-
-      // img music button
-      glPushMatrix();
-      glBindTexture(GL_TEXTURE_2D, musicbutton);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glLoadName(81);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+0-75, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+200-75, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+200-75, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+0-75, 0.0);
-      glEnd();
-      glPopMatrix();
-
-      // img spotify button
-      glPushMatrix();
-      glBindTexture(GL_TEXTURE_2D, spotifybutton);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glLoadName(82);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+0-75, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+200-75, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+200-75, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+0-75, 0.0);
-      glEnd();
-
-      glPopMatrix();
-      // img tidal button
-      glPushMatrix();
-      glBindTexture(GL_TEXTURE_2D, tidalbutton);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glLoadName(83);
-      glBegin(GL_QUADS);
-
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+0-75, 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+200-75, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+200-75, 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+0-75, 0.0);
-      glEnd();
-      glPopMatrix();
-      #endif
     }
 
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
@@ -4200,7 +4131,7 @@ void display() {
               fprintf(stderr,"Error load music. %s\n",aktivplay_music_path);
               ERRCHECK_SDL(Mix_GetError(),rknapnr);
             }
-            
+
             if (sdlmusicplayer) {
               radiooversigt.set_radio_popular(rknapnr-1);                             // set afspillings antal
               radiooversigt.set_radio_online(rknapnr-1,true);                         // station virker fint ok status igen
