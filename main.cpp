@@ -4200,6 +4200,7 @@ void display() {
               fprintf(stderr,"Error load music. %s\n",aktivplay_music_path);
               ERRCHECK_SDL(Mix_GetError(),rknapnr);
             }
+            
             if (sdlmusicplayer) {
               radiooversigt.set_radio_popular(rknapnr-1);                             // set afspillings antal
               radiooversigt.set_radio_online(rknapnr-1,true);                         // station virker fint ok status igen
