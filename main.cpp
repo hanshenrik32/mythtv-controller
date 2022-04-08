@@ -3172,6 +3172,7 @@ void display() {
         }
         glPopMatrix();
     }
+    
     // radio stuf / music / spotyfi / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
       // img radio button
