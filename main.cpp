@@ -42,9 +42,7 @@ using namespace std;
 #define ENABLE_SPOTIFY
 
 
-
 //
-
 // web server
 static bool runwebserver=true;
 bool do_open_spotifyplaylist=false;

@@ -68,6 +68,8 @@ all:
 	@echo "'sudo make install'        - Install mythtv-controller in /usr/share/mythtv-controller"
 	@echo "'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang libraries and headers"
 
+check: $(PROG)
+
 
 compile: $(PROG)
 	#@if ! test -d ~/.config/lirc/; then \
