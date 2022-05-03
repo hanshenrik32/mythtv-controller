@@ -71,6 +71,7 @@ binary:
 	cp mythtv-controller.desktop debian/usr/share/icons/hicolor/48x48/apps/
 	# sound system fmod
 	cp mythtv-controller.png fmodstudioapi20107linux.tar.gz mongoose-master.zip debian/mythtv-controller/opt/mythtv-controller/
+	mkdir -p debian/mythtv-controller/opt/mythtv-controller/
 	@chmod 644 debian/mythtv-controller/opt/mythtv-controller/fmodstudioapi20107linux.tar.gz
 	@chmod 644 debian/mythtv-controller/opt/mythtv-controller/mongoose-master.zip
 	@chmod -R 644 debian/mythtv-controller/opt/mythtv-controller/fmodstudioapi20107linux/*
