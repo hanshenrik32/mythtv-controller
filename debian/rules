@@ -62,7 +62,7 @@ binary:
 	mkdir -p debian/mythtv-controller/opt/mythtv-controller
 	chmod 755 debian/mythtv-controller/opt/mythtv-controller
 	mkdir -p debian/mythtv-controller/opt/mythtv-controller/images/radiostations
-	cp mythtv-controller debian/mythtv-controller/usr/bin
+	#cp mythtv-controller debian/mythtv-controller/usr/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/opt/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/opt/mythtv-controller/
 	# icon
