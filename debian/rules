@@ -50,10 +50,10 @@ clean:
 	@# Do nothning
 
 build:
-	@if ! test -d ~/.config/lirc/; then \
-        	mkdir  ~/.config/lirc/; \
-                cp lirc/* ~/.config/lirc/; \
-        fi
+	#@if ! test -d ~/.config/lirc/; then \
+        #	mkdir  ~/.config/lirc/; \
+        #        cp lirc/* ~/.config/lirc/; \
+        #fi
 	gcc -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 	@# Do nothning
 
