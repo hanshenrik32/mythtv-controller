@@ -50,10 +50,10 @@ clean:
 	@# Do nothning
 
 build:
-	@if ! test -d ~/.config/lirc/; then \
-        	mkdir  ~/.config/lirc/; \
-                cp lirc/* ~/.config/lirc/; \
-        fi
+	#@if ! test -d ~/.config/lirc/; then \
+        #	mkdir  ~/.config/lirc/; \
+        #        cp lirc/* ~/.config/lirc/; \
+        #fi
 	gcc -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 	@# Do nothning
 
@@ -62,7 +62,7 @@ binary:
 	mkdir -p debian/mythtv-controller/opt/mythtv-controller
 	chmod 755 debian/mythtv-controller/opt/mythtv-controller
 	mkdir -p debian/mythtv-controller/opt/mythtv-controller/images/radiostations
-	cp mythtv-controller debian/mythtv-controller/usr/bin
+	#cp mythtv-controller debian/mythtv-controller/usr/bin
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/opt/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/opt/mythtv-controller/
 	# icon
@@ -89,7 +89,7 @@ binary:
 	#if [ -f /root/.my.cnf ]; then mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"; fi
 	#if [ -f /root/.my.cnf ]; then mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"; fi
 	#if [ -f /root/.my.cnf ]; then mysql -e "FLUSH PRIVILEGES;"; fi
-	# If /root/.my.cnf doesn't exist then it'll ask for root password
+	#If /root/.my.cnf doesn't exist then it'll ask for root password
 	#if ! [ -f /root/.my.cnf ]; then echo "Please enter root user MySQL password!"; fi
 	#if ! [ -f /root/.my.cnf ]; then echo "Note: password will be hidden when typing"; fi
 	#if ! [ -f /root/.my.cnf ]; then /bin/bash -c read -sp rootpasswd; fi
