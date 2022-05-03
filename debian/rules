@@ -66,6 +66,7 @@ binary:
 	cp -r images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 debian/mythtv-controller/opt/mythtv-controller/
 	cp -r xmltv_config debian/mythtv-controller/opt/mythtv-controller/
 	# icon
+	mkdir -p debian/usr/share/applications/ debian/usr/share/icons/hicolor/48x48/apps/
 	cp mythtv-controller.desktop debian/usr/share/applications/
 	cp mythtv-controller.desktop debian/usr/share/icons/hicolor/48x48/apps/
 	# sound system fmod
