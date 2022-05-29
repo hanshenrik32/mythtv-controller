@@ -41,7 +41,6 @@ using namespace std;
 #define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
-
 //
 // web server
 static bool runwebserver=true;
@@ -132,9 +131,8 @@ extern char __BUILD_NUMBER;
 #include "myctrl_stream.h"
 #include "myctrl_recorded.h"
 #include "myctrl_mplaylist.h"
-#ifdef ENABLE_SPOTIFY
 #include "myctrl_spotify.h"
-#endif
+
 //#ifdef ENABLE_TIDAL
 //#include "myctrl_tidal.h"
 //#endif
@@ -14988,8 +14986,8 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     tidal_oversigt = new tidal_class;
     if (tidal_oversigt) {
-      //tidal_oversigt->start_webserver();
-      //tidal_oversigt->tidal_login();
+      tidal_oversigt->start_webserver();
+      tidal_oversigt->tidal_login();
     }
     //tidal_oversigt->tidal_login_token();
     // in use tridal_oversigt.tridal_login_token2
