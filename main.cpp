@@ -3173,7 +3173,7 @@ void display() {
         glPopMatrix();
     }
 
-    
+
 
     // radio stuf / music / spotyfi / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
@@ -7719,9 +7719,13 @@ int gl_select(int x,int y) {
     return(list_hits(hits, buff,x,y));	// return 1 = scroll up 2 = scroll down 0 = no scroll
 }
 
+
+
+
+
 // ****************************************************************************************
 //
-// ************* mouse handler ********************************************************************************************
+//               mouse handler 
 //
 // ****************************************************************************************
 
@@ -8216,7 +8220,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
-            printf("Loading view......\n");
+            printf("Loading spotify search view......\n");
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
@@ -9516,27 +9520,23 @@ void handleKeypress(unsigned char key, int x, int y) {
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
     if (key=='+') {
       #ifdef ENABLE_SPOTIFY
-      if (!(vis_spotify_oversigt)) {
-        if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
-        #if defined USE_FMOD_MIXER
-        if (sndsystem) channel->setVolume(configsoundvolume);
-        #endif
-        save_config((char *) "/etc/mythtv-controller.conf");
-        show_volume_info=true;					// show volume info window
-        vis_volume_timeout=80;
-      }
+      if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
+      #if defined USE_FMOD_MIXER
+      if (sndsystem) channel->setVolume(configsoundvolume);
+      #endif
+      save_config((char *) "/etc/mythtv-controller.conf");
+      show_volume_info=true;					// show volume info window
+      vis_volume_timeout=80;
       #endif
     }
     if (key=='-') {                               // volume down
-      if (!(vis_spotify_oversigt)) {
-        if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
-        #if defined USE_FMOD_MIXER
-        if (sndsystem) channel->setVolume(configsoundvolume);
-        #endif
-        save_config((char *) "/etc/mythtv-controller.conf");
-        show_volume_info=true;					// show volume info window
-        vis_volume_timeout=80;
-      }
+      if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
+      #if defined USE_FMOD_MIXER
+      if (sndsystem) channel->setVolume(configsoundvolume);
+      #endif
+      save_config((char *) "/etc/mythtv-controller.conf");
+      show_volume_info=true;					// show volume info window
+      vis_volume_timeout=80;
     }
     if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
       // rss setup windows is open
@@ -13731,7 +13731,7 @@ void *webupdate_loader_spotify(void *data) {
 
 // ****************************************************************************************
 //
-// phread dataload webserver
+// phread dataload webserver for spotify
 //
 // ****************************************************************************************
 
@@ -13750,8 +13750,7 @@ void *datainfoloader_webserver(void *data) {
       time(&lasttime);
       write_logfile((char *) "Update spotify token");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
-        //spotify_oversigt.spotify_refresh_token();       // old ver
-        spotify_oversigt.spotify_refresh_token2();        // new ver
+        spotify_oversigt.spotify_refresh_token();        // new ver
       }
     }
     // get time
@@ -13763,7 +13762,7 @@ void *datainfoloader_webserver(void *data) {
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
-      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0); //type 0 = earch artist name
       // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
       printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;

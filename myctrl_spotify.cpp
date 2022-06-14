@@ -425,67 +425,15 @@ static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream
 }
 
 
-// ****************************************************************************************
+
+// ********************************************************************************************
 //
-// Spotify refresh token
-// Not in use
-// ****************************************************************************************
-
-int spotify_class::spotify_refresh_token() {
-  int curl_error;
-  char doget[2048];
-  char data[4096];
-  char call[4096];
-  FILE *tokenfil;
-  char *base64_code;
-  char newtoken[1024];
-  strcpy(data,spotify_client_id);
-  strcat(data,":");
-  strcat(data,spotify_secret_id);
-  strcpy(newtoken,"");
-  //calc base64
-  base64_code=b64_encode((const unsigned char *) data, 65);
-  *(base64_code+88)='\0';
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=refresh_token -d refresh_token=%s https://accounts.spotify.com/api/token > spotify_refresh_token.txt", base64_code ,spotifytoken_refresh);
-    try {
-      curl_error=system(doget);
-      if (WEXITSTATUS(curl_error)==0) {
-        write_logfile((char *) "Ok Spotify new token.");
-        tokenfil=fopen("spotify_refresh_token.txt","rt");
-        if (tokenfil) {
-          fgets(data,4096,tokenfil);
-          if (strcmp(data,"")!=0) {
-            if (strncmp(data,"{\"access_token\":",16)==0) {
-              strncpy(newtoken,data+17,180);
-              newtoken[181]='\0';
-            }
-          }
-          strcpy(spotifytoken,newtoken);                                         // update spotify token
-          fclose(tokenfil);
-        }
-      } else {
-        write_logfile((char *) "Error Spotify renew token.");
-      }
-    }
-    catch (...) {
-      printf("Error system call.\n");
-    }
-  }
-  return 1;
-}
-
-
-
-
-// *********************************************************************************************************************************
-// In use
 // Refresh token
-// return http code
+// return http code (normal 200)
 //
 // ********************************************************************************************
 
-int spotify_class::spotify_refresh_token2() {
+int spotify_class::spotify_refresh_token() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
