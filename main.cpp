@@ -7725,7 +7725,7 @@ int gl_select(int x,int y) {
 
 // ****************************************************************************************
 //
-//               mouse handler 
+//               mouse handler
 //
 // ****************************************************************************************
 
@@ -8186,11 +8186,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
-            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
-            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-            spotify_oversigt.set_search_loaded();                           // triger icon loader
-            //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
-            spotifyknapnr=0;                                                  // reset selected
+            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0);  // type 0 = earch artist name
+            //spotify_oversigt.sort_stack_byname();
+
+            //spotify_oversigt.load_spotify_iconoversigt();                           // load icons
+            spotify_oversigt.set_search_loaded();                                     // triger icon loader
+            spotifyknapnr=0;                                                          // reset selected
             spotify_selected_startofset=0;
             strcpy(spotify_oversigt.overview_show_band_name,"");
           }
@@ -8223,7 +8224,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             printf("Loading spotify search view......\n");
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();                                              //
-            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
+            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  // type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
@@ -13762,8 +13763,9 @@ void *datainfoloader_webserver(void *data) {
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
-      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0); //type 0 = earch artist name
-      // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0); // type 0 = earch artist name
+      spotify_oversigt.sort_stack_byname();
+      // spotify_oversigt.load_spotify_iconoversigt();                          // load icons
       printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;

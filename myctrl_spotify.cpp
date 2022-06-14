@@ -3588,6 +3588,69 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 }
 
 
+void spotify_class::sort_stack_byname() {
+  int i,j;
+  struct spotify_oversigt_type tmp_stack;
+  for(i=0;i<antal;i++) {
+    for(j=0;j<i-1;j++) {
+      if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)>0) {
+
+        printf("Swap names %s \n",stack[j+1]->feed_name);
+
+        // save data
+        strcpy(tmp_stack.feed_showtxt,stack[j]->feed_showtxt);
+        strcpy(tmp_stack.feed_name,stack[j]->feed_name);
+        strcpy(tmp_stack.feed_artist,stack[j]->feed_artist);
+        strcpy(tmp_stack.feed_desc,stack[j]->feed_desc);
+        strcpy(tmp_stack.feed_gfx_url,stack[j]->feed_gfx_url);
+        strcpy(tmp_stack.feed_release_date,stack[j]->feed_release_date);
+        strcpy(tmp_stack.playlistid,stack[j]->playlistid);
+        strcpy(tmp_stack.playlisturl,stack[j]->playlisturl);
+        tmp_stack.feed_group_antal=stack[j]->feed_group_antal;
+        tmp_stack.feed_path_antal=stack[j]->feed_path_antal;
+        tmp_stack.nyt=stack[j]->nyt;
+        tmp_stack.textureId=stack[j]->textureId;
+        tmp_stack.intnr=stack[j]->intnr;
+        tmp_stack.type=stack[j]->type;
+
+        // swap data
+        strcpy(stack[j]->feed_showtxt,stack[j+1]->feed_showtxt);
+        strcpy(stack[j]->feed_name,stack[j+1]->feed_name);
+        strcpy(stack[j]->feed_artist,stack[j+1]->feed_artist);
+        strcpy(stack[j]->feed_desc,stack[j+1]->feed_desc);
+        strcpy(stack[j]->feed_gfx_url,stack[j+1]->feed_gfx_url);
+        strcpy(stack[j]->feed_release_date,stack[j+1]->feed_release_date);
+        strcpy(stack[j]->playlistid,stack[j+1]->playlistid);
+        strcpy(stack[j]->playlisturl,stack[j+1]->playlisturl);
+        stack[j]->feed_group_antal=stack[j+1]->feed_group_antal;
+        stack[j]->feed_path_antal=stack[j+1]->feed_path_antal;
+        stack[j]->nyt=stack[j+1]->nyt;
+        stack[j]->textureId=stack[j+1]->textureId;
+        stack[j]->intnr=stack[j+1]->intnr;
+        stack[j]->type=stack[j+1]->type;
+
+        strcpy(stack[j+1]->feed_showtxt,tmp_stack.feed_showtxt);
+        strcpy(stack[j+1]->feed_name,tmp_stack.feed_name);
+        strcpy(stack[j+1]->feed_artist,tmp_stack.feed_artist);
+        strcpy(stack[j+1]->feed_desc,tmp_stack.feed_desc);
+        strcpy(stack[j+1]->feed_gfx_url,tmp_stack.feed_gfx_url);
+        strcpy(stack[j+1]->feed_release_date,tmp_stack.feed_release_date);
+        strcpy(stack[j+1]->playlistid,tmp_stack.playlistid);
+        strcpy(stack[j+1]->playlisturl,tmp_stack.playlisturl);
+        stack[j+1]->feed_group_antal=tmp_stack.feed_group_antal;
+        stack[j+1]->feed_path_antal=tmp_stack.feed_path_antal;
+        stack[j+1]->nyt=tmp_stack.nyt;
+        stack[j+1]->textureId=tmp_stack.textureId;
+        stack[j+1]->intnr=tmp_stack.intnr;
+        stack[j+1]->type=tmp_stack.type;
+      }
+    }
+  }
+  printf("Sorted named\n");
+  for (i=0;i<antal;i++) printf("#%d Names %s \n",i,stack[i]->feed_name);
+  printf("\n");
+}
+
 
 // ****************************************************************************************
 // called from thread in main
@@ -3679,6 +3742,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   // if unable to read file
   if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
     fprintf(stderr, "Unable to read spotify spotify_search_result content of spotify_search_result.json\n");
+    write_logfile("Unable to read spotify spotify_search_result content of spotify_search_result.json");
     fclose(json_file);
     free(file_contents);                                                        //
     return 1;

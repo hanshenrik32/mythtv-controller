@@ -151,6 +151,7 @@ class spotify_class : vlc_controller {
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
+        void sort_stack_byname();
         // end webserver
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
         // in use
