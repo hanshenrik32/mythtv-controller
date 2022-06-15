@@ -3364,10 +3364,12 @@ void display() {
         spotifyknapnr=1;                                                        // reset pos
         spotify_oversigt_loaded_begin=true;
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
-          if (spotify_oversigt.search_playlist_song==0)                         //
-           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
-          else
-           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
+          if (spotify_oversigt.search_playlist_song==0) {                        //
+            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
+            spotify_oversigt.sort_stack_byname();
+          } else {
+            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
+          }
           //spotify_oversigt.load_spotify_iconoversigt();
           keybuffer[0] = 0;
           keybufferindex = 0;
@@ -8181,12 +8183,13 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (spotify_selected_startofset<0) spotify_selected_startofset=0;
             button=0;
           }
-          // back
+          // back button
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
             if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
             spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0);  // type 0 = earch artist name
+
             //spotify_oversigt.sort_stack_byname();
 
             //spotify_oversigt.load_spotify_iconoversigt();                           // load icons
@@ -8226,8 +8229,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  // type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
-            //spotify_oversigt.set_search_loaded();                           // triger icon loader
+            // Sort cd names
+            spotify_oversigt.sort_stack_byname();                               // sort dubliter
+            //spotify_oversigt.set_search_loaded();                             // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
+
             spotify_oversigt.set_search_loaded();
             printf("Done Loading view......\n");
             // reset select in spotify view
@@ -13764,7 +13770,7 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
       spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0); // type 0 = earch artist name
-      spotify_oversigt.sort_stack_byname();
+      //spotify_oversigt.sort_stack_byname();
       // spotify_oversigt.load_spotify_iconoversigt();                          // load icons
       printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;

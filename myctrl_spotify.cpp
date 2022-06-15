@@ -3588,15 +3588,22 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 }
 
 
+//******************************************************************************
+//
+// sort stack by name
+//
+// *****************************************************************************
+
 void spotify_class::sort_stack_byname() {
-  int i,j;
+  int i,j,antalfundet;
+  int t,jj;
+  bool done=true;
   struct spotify_oversigt_type tmp_stack;
-  for(i=0;i<antal;i++) {
-    for(j=0;j<i-1;j++) {
+  do {
+    done=true;
+    for(j=0;j<antal-1;j++) {
       if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)>0) {
-
-        printf("Swap names %s \n",stack[j+1]->feed_name);
-
+        done=false;
         // save data
         strcpy(tmp_stack.feed_showtxt,stack[j]->feed_showtxt);
         strcpy(tmp_stack.feed_name,stack[j]->feed_name);
@@ -3612,7 +3619,6 @@ void spotify_class::sort_stack_byname() {
         tmp_stack.textureId=stack[j]->textureId;
         tmp_stack.intnr=stack[j]->intnr;
         tmp_stack.type=stack[j]->type;
-
         // swap data
         strcpy(stack[j]->feed_showtxt,stack[j+1]->feed_showtxt);
         strcpy(stack[j]->feed_name,stack[j+1]->feed_name);
@@ -3628,7 +3634,7 @@ void spotify_class::sort_stack_byname() {
         stack[j]->textureId=stack[j+1]->textureId;
         stack[j]->intnr=stack[j+1]->intnr;
         stack[j]->type=stack[j+1]->type;
-
+        // restore saved
         strcpy(stack[j+1]->feed_showtxt,tmp_stack.feed_showtxt);
         strcpy(stack[j+1]->feed_name,tmp_stack.feed_name);
         strcpy(stack[j+1]->feed_artist,tmp_stack.feed_artist);
@@ -3645,15 +3651,105 @@ void spotify_class::sort_stack_byname() {
         stack[j+1]->type=tmp_stack.type;
       }
     }
-  }
-  printf("Sorted named\n");
-  for (i=0;i<antal;i++) printf("#%d Names %s \n",i,stack[i]->feed_name);
+  } while (done==false);
+
+  printf("Sorted named...\n");
+  for (j=0;j<antal;j++) printf("# %d Names %s \n",j,stack[j]->feed_name);
   printf("\n");
+
+  done=false;
+  j=0;
+  do {
+    printf("Undersøger %s j=%d  \n",stack[j]->feed_name,j);
+    if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)==0) {
+      printf("    Fundet dublet : %s j=%d \n",stack[j]->feed_name,j+1);
+      antalfundet=1;
+      while(strcmp(stack[j+antalfundet]->feed_name,stack[j+antalfundet+1]->feed_name)==0) {
+        antalfundet++;
+      }
+      done=true;
+    }
+    j++;
+    if (j>=antal-1) done=true;
+  } while(done==false);
+  printf("j=%d Antalfundet=%d \n",j,antalfundet);
+  if (antalfundet) {
+    t=j+antalfundet;
+    jj=j;
+    while(t<antal-1) {
+      strcpy(stack[jj]->feed_showtxt,stack[jj+antalfundet]->feed_showtxt);
+      strcpy(stack[jj]->feed_name,stack[jj+antalfundet]->feed_name);
+      strcpy(stack[jj]->feed_artist,stack[jj+antalfundet]->feed_artist);
+      strcpy(stack[jj]->feed_desc,stack[jj+antalfundet]->feed_desc);
+      strcpy(stack[jj]->feed_gfx_url,stack[jj+antalfundet]->feed_gfx_url);
+      strcpy(stack[jj]->feed_release_date,stack[jj+antalfundet]->feed_release_date);
+      strcpy(stack[jj]->playlistid,stack[jj+antalfundet]->playlistid);
+      strcpy(stack[jj]->playlisturl,stack[jj+antalfundet]->playlisturl);
+      stack[jj]->feed_group_antal=stack[jj+antalfundet]->feed_group_antal;
+      stack[jj]->feed_path_antal=stack[jj+antalfundet]->feed_path_antal;
+      stack[jj]->nyt=stack[jj+antalfundet]->nyt;
+      stack[jj]->textureId=stack[jj+antalfundet]->textureId;
+      stack[jj]->intnr=stack[jj+antalfundet]->intnr;
+      stack[jj]->type=stack[jj+antalfundet]->type;
+      jj++;
+      t++;
+    }
+  }
+
+  printf("New list...\n");
+  for (j=0;j<antal;j++) printf("# %d Names %s \n",j,stack[j]->feed_name);
+
+  /*
+  done=false;
+  do {
+    done=true;
+    j=0;
+    while(j<antal-1) {
+      printf("Undersøger %s j=%d  \n",stack[j]->feed_name,j);
+      if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)==0) {
+        printf("    Fundet dublet : %s j=%d \n",stack[j]->feed_name,j);
+        done=false;
+        antalfundet=0;
+        // find amtal dub
+        while(strcmp(stack[j+antalfundet]->feed_name,stack[j+antalfundet+1]->feed_name)==0) {
+          antalfundet++;
+        }
+        printf("j=%d   Antalfundet=%d \n",j,antalfundet);
+        if (antalfundet) {
+          i=j+1;
+          while((i<(antal-1)-antalfundet) && (i<antal-1)) {
+            if (stack[i]) {
+              strcpy(stack[i]->feed_showtxt,stack[i+antalfundet+1]->feed_showtxt);
+              strcpy(stack[i]->feed_name,stack[i+antalfundet+1]->feed_name);
+              strcpy(stack[i]->feed_artist,stack[i+antalfundet+1]->feed_artist);
+              strcpy(stack[i]->feed_desc,stack[i+antalfundet+1]->feed_desc);
+              strcpy(stack[i]->feed_gfx_url,stack[i+antalfundet+1]->feed_gfx_url);
+              strcpy(stack[i]->feed_release_date,stack[i+antalfundet+1]->feed_release_date);
+              strcpy(stack[i]->playlistid,stack[i+antalfundet+1]->playlistid);
+              strcpy(stack[i]->playlisturl,stack[i+antalfundet+1]->playlisturl);
+              stack[i]->feed_group_antal=stack[i+antalfundet+1]->feed_group_antal;
+              stack[i]->feed_path_antal=stack[i+antalfundet+1]->feed_path_antal;
+              stack[i]->nyt=stack[i+antalfundet+1]->nyt;
+              stack[i]->textureId=stack[i+antalfundet+1]->textureId;
+              stack[i]->intnr=stack[i+antalfundet+1]->intnr;
+              stack[i]->type=stack[i+antalfundet+1]->type;
+            }
+            i++;
+          }
+          if (antal>0) antal--; // remove one from the list
+          printf("                                                 antal=%d   \n",antal);
+        }
+      }
+      j++;
+    }
+  } while (done==false);
+  */
 }
 
 
 // ****************************************************************************************
-// called from thread in main
+//
+// called from thread in main (IN USE)
 //
 // search for playlist artist or song or album by type
 // 0 = artist (default)
