@@ -115,6 +115,7 @@ class spotify_class : vlc_controller {
         int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
+        bool do_cleanup_stack();
     public:
         bool set_search_loaded() { search_loaded=true; }
         int loaded_antal;                                                       // antal loaded i loader
