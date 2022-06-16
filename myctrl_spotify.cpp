@@ -425,67 +425,15 @@ static size_t file_write_data(void *ptr, size_t size, size_t nmemb, void *stream
 }
 
 
-// ****************************************************************************************
+
+// ********************************************************************************************
 //
-// Spotify refresh token
-// Not in use
-// ****************************************************************************************
-
-int spotify_class::spotify_refresh_token() {
-  int curl_error;
-  char doget[2048];
-  char data[4096];
-  char call[4096];
-  FILE *tokenfil;
-  char *base64_code;
-  char newtoken[1024];
-  strcpy(data,spotify_client_id);
-  strcat(data,":");
-  strcat(data,spotify_secret_id);
-  strcpy(newtoken,"");
-  //calc base64
-  base64_code=b64_encode((const unsigned char *) data, 65);
-  *(base64_code+88)='\0';
-  if (strcmp(spotifytoken,"")!=0) {
-    sprintf(doget,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=refresh_token -d refresh_token=%s https://accounts.spotify.com/api/token > spotify_refresh_token.txt", base64_code ,spotifytoken_refresh);
-    try {
-      curl_error=system(doget);
-      if (WEXITSTATUS(curl_error)==0) {
-        write_logfile((char *) "Ok Spotify new token.");
-        tokenfil=fopen("spotify_refresh_token.txt","rt");
-        if (tokenfil) {
-          fgets(data,4096,tokenfil);
-          if (strcmp(data,"")!=0) {
-            if (strncmp(data,"{\"access_token\":",16)==0) {
-              strncpy(newtoken,data+17,180);
-              newtoken[181]='\0';
-            }
-          }
-          strcpy(spotifytoken,newtoken);                                         // update spotify token
-          fclose(tokenfil);
-        }
-      } else {
-        write_logfile((char *) "Error Spotify renew token.");
-      }
-    }
-    catch (...) {
-      printf("Error system call.\n");
-    }
-  }
-  return 1;
-}
-
-
-
-
-// *********************************************************************************************************************************
-// In use
 // Refresh token
-// return http code
+// return http code (normal 200)
 //
 // ********************************************************************************************
 
-int spotify_class::spotify_refresh_token2() {
+int spotify_class::spotify_refresh_token() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -3640,9 +3588,148 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 }
 
 
+//******************************************************************************
+//
+// remove dub in the stack
+//
+// *****************************************************************************
+
+bool spotify_class:: do_cleanup_stack() {
+  int i,j,antalfundet;
+  int t,jj;
+  bool done=false;
+  bool swaped=false;
+  done=false;
+  jj=0;
+  j=0;
+  do {
+    // printf("Undersøger %s j=%d  \n",stack[j]->feed_name,j);
+    if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)==0) {
+      printf("    Fundet dublet : %s j=%d \n",stack[j]->feed_name,j+1);
+      antalfundet=1;
+      while((strcmp(stack[j+antalfundet]->feed_name,stack[j+antalfundet+1]->feed_name)==0) && (j+antalfundet<antal-1)) {
+        antalfundet++;
+      }
+      done=true;
+    }
+    j++;
+    if (j>=antal-1) done=true;
+  } while(done==false);
+  // printf("j=%d Antalfundet=%d \n",j,antalfundet);
+  if ((antalfundet) && ((jj+j+antalfundet)<antal)) {
+    t=j+antalfundet;
+    jj=j;
+    swaped=true;
+    while(t<antal-1) {
+      strcpy(stack[jj]->feed_showtxt,stack[jj+antalfundet]->feed_showtxt);
+      strcpy(stack[jj]->feed_name,stack[jj+antalfundet]->feed_name);
+      strcpy(stack[jj]->feed_artist,stack[jj+antalfundet]->feed_artist);
+      strcpy(stack[jj]->feed_desc,stack[jj+antalfundet]->feed_desc);
+      strcpy(stack[jj]->feed_gfx_url,stack[jj+antalfundet]->feed_gfx_url);
+      strcpy(stack[jj]->feed_release_date,stack[jj+antalfundet]->feed_release_date);
+      strcpy(stack[jj]->playlistid,stack[jj+antalfundet]->playlistid);
+      strcpy(stack[jj]->playlisturl,stack[jj+antalfundet]->playlisturl);
+      stack[jj]->feed_group_antal=stack[jj+antalfundet]->feed_group_antal;
+      stack[jj]->feed_path_antal=stack[jj+antalfundet]->feed_path_antal;
+      stack[jj]->nyt=stack[jj+antalfundet]->nyt;
+      stack[jj]->textureId=stack[jj+antalfundet]->textureId;
+      stack[jj]->intnr=stack[jj+antalfundet]->intnr;
+      stack[jj]->type=stack[jj+antalfundet]->type;
+      jj++;
+      t++;
+    }
+    antal--;
+  }
+  // printf("******************* j=%d \n",j);
+  return swaped;
+}
+
+
+//******************************************************************************
+//
+// sort stack by name
+//
+// *****************************************************************************
+
+
+void spotify_class::sort_stack_byname() {
+  int i,j,antalfundet;
+  int t,jj;
+  bool done=true;
+  bool totaldone=false;
+  struct spotify_oversigt_type tmp_stack;
+  do {
+    done=true;
+    for(j=0;j<antal-1;j++) {
+      if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)>0) {
+        done=false;
+        // save data
+        strcpy(tmp_stack.feed_showtxt,stack[j]->feed_showtxt);
+        strcpy(tmp_stack.feed_name,stack[j]->feed_name);
+        strcpy(tmp_stack.feed_artist,stack[j]->feed_artist);
+        strcpy(tmp_stack.feed_desc,stack[j]->feed_desc);
+        strcpy(tmp_stack.feed_gfx_url,stack[j]->feed_gfx_url);
+        strcpy(tmp_stack.feed_release_date,stack[j]->feed_release_date);
+        strcpy(tmp_stack.playlistid,stack[j]->playlistid);
+        strcpy(tmp_stack.playlisturl,stack[j]->playlisturl);
+        tmp_stack.feed_group_antal=stack[j]->feed_group_antal;
+        tmp_stack.feed_path_antal=stack[j]->feed_path_antal;
+        tmp_stack.nyt=stack[j]->nyt;
+        tmp_stack.textureId=stack[j]->textureId;
+        tmp_stack.intnr=stack[j]->intnr;
+        tmp_stack.type=stack[j]->type;
+        // swap data
+        strcpy(stack[j]->feed_showtxt,stack[j+1]->feed_showtxt);
+        strcpy(stack[j]->feed_name,stack[j+1]->feed_name);
+        strcpy(stack[j]->feed_artist,stack[j+1]->feed_artist);
+        strcpy(stack[j]->feed_desc,stack[j+1]->feed_desc);
+        strcpy(stack[j]->feed_gfx_url,stack[j+1]->feed_gfx_url);
+        strcpy(stack[j]->feed_release_date,stack[j+1]->feed_release_date);
+        strcpy(stack[j]->playlistid,stack[j+1]->playlistid);
+        strcpy(stack[j]->playlisturl,stack[j+1]->playlisturl);
+        stack[j]->feed_group_antal=stack[j+1]->feed_group_antal;
+        stack[j]->feed_path_antal=stack[j+1]->feed_path_antal;
+        stack[j]->nyt=stack[j+1]->nyt;
+        stack[j]->textureId=stack[j+1]->textureId;
+        stack[j]->intnr=stack[j+1]->intnr;
+        stack[j]->type=stack[j+1]->type;
+        // restore saved
+        strcpy(stack[j+1]->feed_showtxt,tmp_stack.feed_showtxt);
+        strcpy(stack[j+1]->feed_name,tmp_stack.feed_name);
+        strcpy(stack[j+1]->feed_artist,tmp_stack.feed_artist);
+        strcpy(stack[j+1]->feed_desc,tmp_stack.feed_desc);
+        strcpy(stack[j+1]->feed_gfx_url,tmp_stack.feed_gfx_url);
+        strcpy(stack[j+1]->feed_release_date,tmp_stack.feed_release_date);
+        strcpy(stack[j+1]->playlistid,tmp_stack.playlistid);
+        strcpy(stack[j+1]->playlisturl,tmp_stack.playlisturl);
+        stack[j+1]->feed_group_antal=tmp_stack.feed_group_antal;
+        stack[j+1]->feed_path_antal=tmp_stack.feed_path_antal;
+        stack[j+1]->nyt=tmp_stack.nyt;
+        stack[j+1]->textureId=tmp_stack.textureId;
+        stack[j+1]->intnr=tmp_stack.intnr;
+        stack[j+1]->type=tmp_stack.type;
+      }
+    }
+  } while (done==false);
+
+  printf("Sorted named...\n");
+  for (j=0;j<antal;j++) printf("# %d Names %s \n",j,stack[j]->feed_name);
+  printf("\n");
+  totaldone=false;
+  do {
+    totaldone=do_cleanup_stack();
+    if (totaldone) printf("Swaped \n");
+  } while (totaldone);
+
+  printf("New list...\n");
+  for (j=0;j<antal;j++) printf("# %d Names %s \n",j,stack[j]->feed_name);
+
+}
+
 
 // ****************************************************************************************
-// called from thread in main
+//
+// called from thread in main (IN USE)
 //
 // search for playlist artist or song or album by type
 // 0 = artist (default)
@@ -3731,6 +3818,7 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   // if unable to read file
   if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
     fprintf(stderr, "Unable to read spotify spotify_search_result content of spotify_search_result.json\n");
+    write_logfile("Unable to read spotify spotify_search_result content of spotify_search_result.json");
     fclose(json_file);
     free(file_contents);                                                        //
     return 1;

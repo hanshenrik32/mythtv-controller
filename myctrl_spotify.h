@@ -115,6 +115,7 @@ class spotify_class : vlc_controller {
         int download_user_playlist(char *spotifytoken,int startofset);          // download playlist(json) file from spotify
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
+        bool do_cleanup_stack();
     public:
         bool set_search_loaded() { search_loaded=true; }
         int loaded_antal;                                                       // antal loaded i loader
@@ -151,13 +152,13 @@ class spotify_class : vlc_controller {
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
         struct mg_connection *c;                                                // connection struct
+        void sort_stack_byname();
         // end webserver
         int load_spotify_iconoversigt();			                                  // load web gfx in to cache dir
         // in use
         void spotify_set_token(char *token,char *refresh);                      // set token in struct
         char *spotify_get_token() { return(spotifytoken); };                    // get token from struct
-        int spotify_refresh_token();                                            // refresh token on postify api
-        int spotify_refresh_token2();                                            // refresh token on postify api 2
+        int spotify_refresh_token();                                            // refresh token on postify api 2
         bool spotify_check_spotifydb_empty();
         int spotify_aktiv_song_msplay() { return( spotify_aktiv_song[0].progress_ms ); };                     //
         int spotify_aktiv_song_mslength() { return( spotify_aktiv_song[0].duration_ms ); };                   //
