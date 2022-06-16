@@ -145,11 +145,12 @@ extern char __BUILD_NUMBER;
 #include "readjpg.h"
 // #include "myth_picture.h"
 
-extern rss_stream_class rssstreamoversigt;
+extern rss_stream_class rssstreamoversigt;              // stream
 
 #ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;           // do it first time thread
+static bool do_update_spotify_playlist = false;         // do it first time thread
+bool global_use_spotify_local_player = true;            // defaule do not startup spotify player under boot
 #endif
 
 // tidal music class
@@ -157,7 +158,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
   tidal_class *tidal_oversigt;
 #endif
 
-char debuglogdata[1024];                                  // used by log system
+char debuglogdata[1024];                                // used by log system
 
 // struct used by keyboard config of functions keys
 
@@ -946,7 +947,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice,enablespotify};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1095,6 +1096,10 @@ int parse_config(char *filename) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
+            } else if (strncmp(buffer+n,"enablespotify",12)==0) {
+              command = true;
+              command_nr=enablespotify;
+              commandlength=12;
             } else command = false;
           }
           strcpy(value,"");
@@ -1263,7 +1268,12 @@ int parse_config(char *filename) {
               #ifdef ENABLE_SPOTIFY
               strcpy(spotify_oversigt.active_default_play_device_name,value);   //
               #endif
+            } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
+              if (strcmp(value,"yes")==0) global_use_spotify_local_player=true;
+              else if (strcmp(value,"no")==0) global_use_spotify_local_player=false;
+              else global_use_spotify_local_player=false;
             }
+
           }
         }
         strcpy(buffer,"");
@@ -1363,6 +1373,9 @@ int save_config(char * filename) {
       else sprintf(temp,"tvguidercolor=no\n");
       fputs(temp,file);
       #ifdef ENABLE_SPOTIFY
+      if (global_use_spotify_local_player) sprintf(temp,"enablespotify=yes\n");
+      else sprintf(temp,"enablespotify=no\n");
+      fputs(temp,file);
       sprintf(temp,"spotifydefaultdevice=%s\n",spotify_oversigt.get_device_name(spotify_oversigt.active_default_play_device));
       fputs(temp,file);
       #endif
@@ -8997,9 +9010,9 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
-                  // setup rss source window
+                  // setup spotify window
                   if (do_show_setup_spotify) {
-                    if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
+                    if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
                   }
                   // tv graber setup
                   if (do_show_tvgraber) {
@@ -14941,7 +14954,10 @@ int main(int argc, char** argv) {
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 
-
+    if (global_use_spotify_local_player) {
+      // start spotify player
+      system("spotify &");
+    }
 
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {

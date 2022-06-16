@@ -64,7 +64,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 // text render is glcRenderString for freetype font support
 //
 // ****************************************************************************************
-
+extern bool global_use_spotify_local_player;
 extern int spotifyknapnr;
 extern int spotify_select_iconnr;
 extern spotify_class spotify_oversigt;
@@ -3592,6 +3592,8 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 //
 // remove dub in the stack
 //
+// Used by sort_stack_byname()
+//
 // *****************************************************************************
 
 bool spotify_class:: do_cleanup_stack() {
@@ -4882,6 +4884,19 @@ void spotify_class::show_setup_spotify() {
     glcRenderString(spotify_secret_id);
     if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
     glPopMatrix();
+    // show(select play use spotify local (start spotify understartup))
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glTranslatef(520, 550, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (do_show_setup_select_linie==2) glColor4f(1.0f, 1.0f, 0.0f, 1.0f); else glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glScalef(15.0, 15.0, 1.0);
+    glcRenderString("Use Spotify client ");
+    if (global_use_spotify_local_player) glcRenderString("Yes "); else glcRenderString("No  ");
+    if ((keybuffer) && (do_show_setup_select_linie>=0)) showcoursornow(301,500-(do_show_setup_select_linie*50),strlen(keybuffer));
+    glPopMatrix();
+    //
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glTranslatef(520, 500, 0.0f);
