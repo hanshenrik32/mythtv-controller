@@ -150,7 +150,7 @@ extern rss_stream_class rssstreamoversigt;              // stream
 #ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
 static bool do_update_spotify_playlist = false;         // do it first time thread
-bool global_use_spotify_local_player = true;            // defaule do not startup spotify player under boot
+bool global_use_spotify_local_player = false;            // defaule do not startup spotify player under boot
 #endif
 
 // tidal music class
@@ -9973,10 +9973,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
             } else if (do_show_setup_spotify) {
-              if (key!=13) {
+              if ((key!=13) && (key!=32)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
+              if (key==32) {
+                  global_use_spotify_local_player=!global_use_spotify_local_player;
               }
             } else if (do_show_videoplayer) {
               // video player setting
@@ -10201,6 +10204,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                        break;
                case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
                        break;
+               case 2: break;
              }
          }
          #endif
@@ -10408,16 +10412,23 @@ void handleKeypress(unsigned char key, int x, int y) {
             case '*':
               // update spotify
               // or ask record tv program
-              //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
               #ifdef ENABLE_SPOTIFY
-              if (do_show_spotify_search_oversigt==false) {
-                if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
-              } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
+              if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
+                if (do_show_spotify_search_oversigt==false) {
+                  if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
+                } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
+              }
+              if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
+                if (do_show_spotify_search_oversigt) {
+                  spotify_oversigt.searchtype++;
+                  if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
+                }
+              }
               #endif
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
-              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
-              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
-              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
+              if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
+              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
+              if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
@@ -10425,14 +10436,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 tvknapnr=tvsubvalgtrecordnr;                                                   // set program nr
                 do_zoom_tvprg_aktiv_nr=tvknapnr;					                                     // husk den valgte aktiv tv prg
               }
-              #ifdef ENABLE_SPOTIFY
-              if (vis_spotify_oversigt) {
-                if (do_show_spotify_search_oversigt) {
-                  spotify_oversigt.searchtype++;
-                  if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
-                }
-              }
-              #endif
               break;
             case optionmenukey:                                                       // default o
               if (vis_film_oversigt) {
@@ -10568,17 +10571,14 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 13:
-              write_logfile((char *) "Start search....");
-              if (debugmode) {
-                if (vis_music_oversigt) {
-                  if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
-                  else fprintf(stderr,"Enter key pressed, update music list.\n");
-                } else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
-                else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
-                else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
-                else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
-                else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
-                else if (vis_spotify_oversigt) fprintf(stderr,"Enter key pressed in vis show spotify\n");
+              if (vis_radio_oversigt) write_logfile((char *) "Start search radio station....");
+              if (vis_stream_oversigt)  write_logfile((char *) "Start search stream ....");
+              if (vis_tv_oversigt)  write_logfile((char *) "Start search tv overview....");
+              if (vis_spotify_oversigt)  write_logfile((char *) "Start search spotify....");
+              if (ask_save_playlist)  write_logfile((char *) "Save music playlist....");
+              if (vis_music_oversigt) {
+                if (ask_save_playlist)  write_logfile((char *) "Save playlist key pressed, update music list.");
+                else write_logfile((char *) "Enter key pressed, update music list.");
               }
               // set save flag of playlist
               if (ask_save_playlist) {
@@ -15136,7 +15136,8 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
-
+    // kill spotify
+    if (global_use_spotify_local_player) system("/usr/bin/killall -9 spotify");
     write_logfile((char *) "Exit program.");
     return(EXIT_SUCCESS);
 }

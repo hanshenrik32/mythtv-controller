@@ -184,19 +184,18 @@ class spotify_class : vlc_controller {
         int streamantal() { return(antal-1); }                                  //
         void clean_spotify_oversigt();                                          // clear list
         int spotify_req_playlist();                                             //
-        int spotify_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
+        int spotify_get_user_playlists(bool force,int startoffset);             // get user playlist (list of playlist)
         int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist
-        int spotify_play_now_playlist2(char *playlist_name,bool now);            // play playlist
+        int spotify_play_now_playlist2(char *playlist_name,bool now);           // play playlist
         int spotify_play_now_song(char *playlist_song,bool now);                // play song
         int spotify_play_now_artist(char *playlist_song,bool now);              // play artist
         int spotify_play_now_album(char *playlist_song,bool now);               // play album
         int spotify_get_access_token2();                                        // new get token
         int spotify_get_available_devices();                                    // get list of devices
         int spotify_do_we_play();                                               // Do we play song now
-        int spotify_do_we_play2();                                              // Do we play song now
         int spotify_pause_play();                                               // Pause
         int spotify_pause_play2();                                              // Pause
         int spotify_resume_play();                                              // resume play

@@ -1829,82 +1829,6 @@ int spotify_class::spotify_do_we_play() {
 
 
 
-// ****************************************************************************************
-// Not IN USE
-// work
-// get active song playing
-// use curl + system
-// ****************************************************************************************
-
-int spotify_class::spotify_do_we_play2() {
-  bool find_length=true;
-  bool find_progress=true;
-  char call[4096];
-  FILE *json_file;
-  int file_size;
-  int curl_error;
-  ssize_t nread;
-  char *file_contents=NULL;
-  size_t stringlength=0;
-  char filename_song_playing[]="spotify_song_playing.json";
-  char sed[]="cat spotify_song_playing.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' > spotify_song_playing.txt";
-  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s ' > spotify_song_playing.json",spotifytoken);
-  curl_error=system(call);
-  if (curl_error>0) {
-    fprintf(stderr,"curl_error = %d \n",curl_error);
-    fprintf(stderr,"curl *%s* \n",call);
-  }
-  if (curl_error==0) {
-    curl_error=system(sed);                                                     // make info file (.txt)
-    strcpy(filename_song_playing,"spotify_song_playing.txt");
-    json_file = fopen(filename_song_playing, "rt");
-    if (json_file == NULL) {
-      fprintf(stderr, "Unable to open %s\n", filename_song_playing);
-      free(file_contents);
-      return 0;
-    }
-    spotify_aktiv_song_antal=0;
-    this->spotify_is_playing=true;                                                                  // set play flag
-    while ((nread = getline(&file_contents, &stringlength, json_file)) != -1) {
-      if (nread>4) {
-        if ((find_length) && (strncmp(file_contents,"duration_ms=",12)==0)) {
-          find_length=false;
-          spotify_aktiv_song[spotify_aktiv_song_antal].duration_ms=atol(file_contents+12);
-        }
-        if ((find_progress) && (strncmp(file_contents,"progress_ms=",12)==0)) {
-          find_progress=false;
-          spotify_aktiv_song[spotify_aktiv_song_antal].progress_ms=atol(file_contents+12);
-        }
-        if (strncmp(file_contents,"name=",5)==0) {
-          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].song_name,file_contents+5);
-        }
-        if (strncmp(file_contents,"release_date=",13)==0) {
-          strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].release_date,file_contents+13);
-        }
-        if (strncmp(file_contents,"url=https=//i.scdn.co/image/",28)==0) {
-          if (aktiv_song_spotify_icon==0) {
-            strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"https:");
-            strcat(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,file_contents+10);
-            //get_webfile2(spotify_aktiv_song[spotify_aktiv_song_antal].cover_image_url,"/spotify_gfx/gfx_icon.jpg");
-            //aktiv_song_spotify_icon=loadTexture("/spotify_gfx/gfx_icon.jpg");
-          }
-        }
-      }
-    }
-    // get artist name play
-    if (spotifyknapnr>0) strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,stack[spotifyknapnr-1]->feed_artist);
-    else strcpy(spotify_aktiv_song[spotify_aktiv_song_antal].artist_name,"Unknown");
-    free(file_contents);
-    fclose(json_file);
-  } else {
-    fprintf(stderr,"Error processs playing info\n");
-  }
-  return 1;
-}
-
-
-
-
 // *******************************************************************************************************
 //
 // work
@@ -2538,7 +2462,7 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
 // get user id from spotify api
 //
 // return 0 if fault
-// 200  on ok
+// 200 on ok
 //
 // ****************************************************************************************
 
@@ -2593,7 +2517,7 @@ int spotify_class::spotify_get_user_id() {
       curl_easy_cleanup(curl);
       curl_global_cleanup();
       if (httpCode == 200) {
-        return(200);
+        return(httpCode);
       }
     }
   }
@@ -2707,14 +2631,21 @@ int spotify_class::spotify_get_available_devices() {
         }
         this->spotify_device_antal=device_antal;
         if (conn) mysql_close(conn);
-        fprintf(stderr,"\n*****************\n");
+        fprintf(stderr,"\nPlay device list is updated ok\n");
+        write_logfile("Play device list is updated ok.");
       }
     }
   }
   // no device to use is found or no token
   if ( curl_exitcode == 22 ) {
     active_spotify_device=-1;
-    fprintf(stderr,"Error loading device list from spodify by api.\n");
+    fprintf(stderr,"Error loading device players info from spodify by api.\n");
+    write_logfile("Error loading device players info from spodify by api.");
+  }
+  // if global_use_spotify_local_player (do use local player (spotify this is running in the background))
+  // Set default local play always
+  if (global_use_spotify_local_player) {
+    set_default_device_to_play(1);
   }
   return active_spotify_device;
 }
