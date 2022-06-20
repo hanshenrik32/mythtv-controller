@@ -3419,11 +3419,8 @@ void display() {
       // music view
       if (vis_music_oversigt) {
 
-        // New ver
+        // New ver fast
        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
-        // old ver
-        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
 
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
@@ -3898,7 +3895,12 @@ void display() {
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
           i++;
-          glTranslatef(5.0f, 0.0f, 0.0f);
+          glPopMatrix();
+          glPushMatrix();
+          glTranslatef(560.0f+550.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          //glTranslatef(5.0f, 0.0f, 0.0f);
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
