@@ -51,6 +51,7 @@ extern int orgwinsizex;
 
 extern GLuint _textureId9_askbox;
 
+
 // ****************************************************************************************
 //
 // constructor
@@ -78,7 +79,7 @@ film_oversigt_type::film_oversigt_type() {
     film_imdbnr=new char[20];           //
     category_name=new char[128];	      // from mythtv film type (tal = database)
     genre=new char[200];		            //
-    for(auto n=0;n<20;n++) strcpy(cast[n],"");
+    for(int n=0;n<20;n++) strcpy(cast[n],"");
     cover3d=false;
 }
 
