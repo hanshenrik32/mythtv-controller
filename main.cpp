@@ -145,11 +145,12 @@ extern char __BUILD_NUMBER;
 #include "readjpg.h"
 // #include "myth_picture.h"
 
-extern rss_stream_class rssstreamoversigt;
+extern rss_stream_class rssstreamoversigt;              // stream
 
 #ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;           // do it first time thread
+static bool do_update_spotify_playlist = false;         // do it first time thread
+bool global_use_spotify_local_player = false;            // defaule do not startup spotify player under boot
 #endif
 
 // tidal music class
@@ -157,7 +158,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
   tidal_class *tidal_oversigt;
 #endif
 
-char debuglogdata[1024];                                  // used by log system
+char debuglogdata[1024];                                // used by log system
 
 // struct used by keyboard config of functions keys
 
@@ -946,7 +947,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice,enablespotify};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1095,6 +1096,10 @@ int parse_config(char *filename) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
+            } else if (strncmp(buffer+n,"enablespotify",12)==0) {
+              command = true;
+              command_nr=enablespotify;
+              commandlength=12;
             } else command = false;
           }
           strcpy(value,"");
@@ -1263,7 +1268,12 @@ int parse_config(char *filename) {
               #ifdef ENABLE_SPOTIFY
               strcpy(spotify_oversigt.active_default_play_device_name,value);   //
               #endif
+            } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
+              if (strcmp(value,"yes")==0) global_use_spotify_local_player=true;
+              else if (strcmp(value,"no")==0) global_use_spotify_local_player=false;
+              else global_use_spotify_local_player=false;
             }
+
           }
         }
         strcpy(buffer,"");
@@ -1363,6 +1373,9 @@ int save_config(char * filename) {
       else sprintf(temp,"tvguidercolor=no\n");
       fputs(temp,file);
       #ifdef ENABLE_SPOTIFY
+      if (global_use_spotify_local_player) sprintf(temp,"enablespotify=yes\n");
+      else sprintf(temp,"enablespotify=no\n");
+      fputs(temp,file);
       sprintf(temp,"spotifydefaultdevice=%s\n",spotify_oversigt.get_device_name(spotify_oversigt.active_default_play_device));
       fputs(temp,file);
       #endif
@@ -3406,11 +3419,8 @@ void display() {
       // music view
       if (vis_music_oversigt) {
 
-        // New ver
+        // New ver fast
        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
-        // old ver
-        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
 
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
@@ -3885,7 +3895,12 @@ void display() {
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
           i++;
-          glTranslatef(5.0f, 0.0f, 0.0f);
+          glPopMatrix();
+          glPushMatrix();
+          glTranslatef(560.0f+550.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          //glTranslatef(5.0f, 0.0f, 0.0f);
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
@@ -8997,9 +9012,9 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
-                  // setup rss source window
+                  // setup spotify window
                   if (do_show_setup_spotify) {
-                    if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
+                    if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
                   }
                   // tv graber setup
                   if (do_show_tvgraber) {
@@ -9960,10 +9975,13 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
             } else if (do_show_setup_spotify) {
-              if (key!=13) {
+              if ((key!=13) && (key!=32)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
+              }
+              if (key==32) {
+                  global_use_spotify_local_player=!global_use_spotify_local_player;
               }
             } else if (do_show_videoplayer) {
               // video player setting
@@ -10188,6 +10206,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                        break;
                case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
                        break;
+               case 2: break;
              }
          }
          #endif
@@ -10395,16 +10414,23 @@ void handleKeypress(unsigned char key, int x, int y) {
             case '*':
               // update spotify
               // or ask record tv program
-              //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
               #ifdef ENABLE_SPOTIFY
-              if (do_show_spotify_search_oversigt==false) {
-                if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
-              } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
+              if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
+                if (do_show_spotify_search_oversigt==false) {
+                  if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
+                } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
+              }
+              if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
+                if (do_show_spotify_search_oversigt) {
+                  spotify_oversigt.searchtype++;
+                  if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
+                }
+              }
               #endif
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
-              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
-              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
-              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
+              if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
+              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
+              if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
@@ -10412,14 +10438,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 tvknapnr=tvsubvalgtrecordnr;                                                   // set program nr
                 do_zoom_tvprg_aktiv_nr=tvknapnr;					                                     // husk den valgte aktiv tv prg
               }
-              #ifdef ENABLE_SPOTIFY
-              if (vis_spotify_oversigt) {
-                if (do_show_spotify_search_oversigt) {
-                  spotify_oversigt.searchtype++;
-                  if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
-                }
-              }
-              #endif
               break;
             case optionmenukey:                                                       // default o
               if (vis_film_oversigt) {
@@ -10555,17 +10573,14 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 13:
-              write_logfile((char *) "Start search....");
-              if (debugmode) {
-                if (vis_music_oversigt) {
-                  if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
-                  else fprintf(stderr,"Enter key pressed, update music list.\n");
-                } else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
-                else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
-                else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
-                else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
-                else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
-                else if (vis_spotify_oversigt) fprintf(stderr,"Enter key pressed in vis show spotify\n");
+              if (vis_radio_oversigt) write_logfile((char *) "Start search radio station....");
+              if (vis_stream_oversigt)  write_logfile((char *) "Start search stream ....");
+              if (vis_tv_oversigt)  write_logfile((char *) "Start search tv overview....");
+              if (vis_spotify_oversigt)  write_logfile((char *) "Start search spotify....");
+              if (ask_save_playlist)  write_logfile((char *) "Save music playlist....");
+              if (vis_music_oversigt) {
+                if (ask_save_playlist)  write_logfile((char *) "Save playlist key pressed, update music list.");
+                else write_logfile((char *) "Enter key pressed, update music list.");
               }
               // set save flag of playlist
               if (ask_save_playlist) {
@@ -14941,7 +14956,10 @@ int main(int argc, char** argv) {
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 
-
+    if (global_use_spotify_local_player) {
+      // start spotify player
+      system("spotify &");
+    }
 
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
@@ -15120,7 +15138,8 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
-
+    // kill spotify
+    if (global_use_spotify_local_player) system("/usr/bin/killall -9 spotify");
     write_logfile((char *) "Exit program.");
     return(EXIT_SUCCESS);
 }
