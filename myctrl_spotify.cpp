@@ -3523,7 +3523,7 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
 //
 // remove dub in the stack
 //
-// Used by sort_stack_byname()
+// Used by sort_stack_byname() internal
 //
 // *****************************************************************************
 
@@ -3538,7 +3538,7 @@ bool spotify_class:: do_cleanup_stack() {
   do {
     // printf("Undersøger %s j=%d  \n",stack[j]->feed_name,j);
     if (strcmp(stack[j]->feed_name,stack[j+1]->feed_name)==0) {
-      printf("    Fundet dublet : %s j=%d \n",stack[j]->feed_name,j+1);
+      printf(" Fundet dublet : %s j=%d \n",stack[j]->feed_name,j+1);
       antalfundet=1;
       while((strcmp(stack[j+antalfundet]->feed_name,stack[j+antalfundet+1]->feed_name)==0) && (j+antalfundet<antal-1)) {
         antalfundet++;

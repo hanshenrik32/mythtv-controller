@@ -3721,6 +3721,13 @@ void display() {
     //
     if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
       do_swing_music_cover = false;
+      static float z_rotate=0.0f;
+      static bool do_z_rotate=false;
+      if (do_z_rotate) z_rotate=z_rotate+1.0f;
+      if (z_rotate>180) {
+        do_z_rotate=false;
+        z_rotate=0.0f;
+      }
       if (do_swing_music_cover==false) {
         xof = 500;
         yof = 200;
@@ -3731,7 +3738,8 @@ void display() {
         glColor3f(1.0f, 1.0f, 1.0f);
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glRotatef(z_rotate, 0.0f, 0.0f, 1.0f);
+        //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -7053,6 +7061,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
               if ((spotify_oversigt.type==0) || (spotify_oversigt.type==1)) {
                 // update
+
+printf("loader now 7065 **********************************************\n");
+
                 spotify_selected_startofset=0;                                  // default selected in view
                 spotify_oversigt.opdatere_spotify_oversigt(0);                  // update view
                 //spotify_oversigt.load_spotify_iconoversigt();                   // load icons
@@ -7170,10 +7181,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // do update from root
           if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
             // update
+
+printf("loader now 7185 **********************************************\n");
+
             spotify_selected_startofset=0;
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view
             //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-            spotify_oversigt.set_search_loaded();                           // triger icon loader
+            spotify_oversigt.set_search_loaded();                               // triger icon loader
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
@@ -8132,6 +8146,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((( retfunc == 3 ) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             // write debug log
+
+printf("loader now 8150 **********************************************\n");
+
+
             sprintf(debuglogdata,"Open spotify playliste %s ", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             write_logfile((char *) debuglogdata);
             // opdate view from intnr id.
@@ -8200,6 +8218,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           }
           // back button
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
+
+printf("loader now 8216 **********************************************\n");
+
+
             if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
@@ -8260,16 +8282,20 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             ask_open_dir_or_play_spotify=false;                                                               // close widow again
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
-                case 0: fprintf(stderr,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 0: sprintf(debuglogdata,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                        write_logfile((char *) debuglogdata);
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
                         break;
-                case 1: fprintf(stderr,"button nr %d play Spotify artist song %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-2),spotify_oversigt.get_spotify_type(spotifyknapnr-2));
+                case 1: sprintf(debuglogdata,"button nr %d play Spotify artist song %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-2),spotify_oversigt.get_spotify_type(spotifyknapnr-2));
+                        write_logfile((char *) debuglogdata);
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-2 ), 1);
                         break;
-                case 2: fprintf(stderr,"button nr %d play Spotify artist name %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 2: sprintf(debuglogdata,"button nr %d play Spotify artist name %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                        write_logfile((char *) debuglogdata);
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
-                case 3: fprintf(stderr,"button nr %d play Spotify album %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                case 3: sprintf(debuglogdata,"button nr %d play Spotify album %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
+                        write_logfile((char *) debuglogdata);
                         // do not play the right album
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_album( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
