@@ -38,7 +38,7 @@ using namespace std;
 
 // if defined the support will be enabled
 
-#define ENABLE_TIDAL
+//#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
 //
