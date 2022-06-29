@@ -38,7 +38,7 @@ using namespace std;
 
 // if defined the support will be enabled
 
-//#define ENABLE_TIDAL
+#define ENABLE_TIDAL
 #define ENABLE_SPOTIFY
 
 //
@@ -3516,7 +3516,7 @@ void display() {
       if (vis_tidal_oversigt) {
         // show Tidal overview
         #ifdef ENABLE_TIDAL
-        if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        //if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
         #endif
       } else if (vis_tv_oversigt) {
         // show tv guide
@@ -4057,6 +4057,7 @@ void display() {
     // tidal ask play or open playlist
     //
     #ifdef ENABLE_TIDAL
+    /*
     if ((vis_tidal_oversigt) && (!(visur)) && (ask_open_dir_or_play_tidal) && (tidalknapnr>0)) {
       xof = 550;
       yof = 500;
@@ -4104,6 +4105,7 @@ void display() {
         glPopMatrix();
       }
     }
+    */
     #endif
 
 
@@ -14986,8 +14988,8 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     tidal_oversigt = new tidal_class;
     if (tidal_oversigt) {
-      tidal_oversigt->start_webserver();
-      tidal_oversigt->tidal_login();
+      //tidal_oversigt->start_webserver();
+      //tidal_oversigt->tidal_login();
     }
     //tidal_oversigt->tidal_login_token();
     // in use tridal_oversigt.tridal_login_token2
