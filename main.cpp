@@ -3516,7 +3516,8 @@ void display() {
       if (vis_tidal_oversigt) {
         // show Tidal overview
         #ifdef ENABLE_TIDAL
-        //if (tidal_oversigt) tidal_oversigt->show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        printf("Show tidal\n");
+        if (vis_tidal_oversigt) tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
         #endif
       } else if (vis_tv_oversigt) {
         // show tv guide
