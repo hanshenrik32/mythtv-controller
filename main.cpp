@@ -65,9 +65,9 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-#ifdef ENABLE_TIDAL
+//#ifdef ENABLE_TIDAL
 #include "myctrl_tidal.h"
-#endif
+//#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"
@@ -150,7 +150,7 @@ static bool do_update_spotify_playlist = false;           // do it first time th
 
 // tidal music class
 #ifdef ENABLE_TIDAL
-  tidal_class *tidal_oversigt;
+  tidal_class tidal_oversigt;
 #endif
 
 char debuglogdata[1024];                                  // used by log system
@@ -6528,6 +6528,9 @@ void display() {
       update_webserver_phread_loader();                                         //
       do_update_spotify = false;
     }
+    //#ifdef ENABLE_TIDAL
+    mg_mgr_poll(&tidal_oversigt.mgr, 50);
+    //#endif
     //  don't wait!
     //  start processing buffered OpenGL routines
     //
@@ -13806,6 +13809,9 @@ void *datainfoloader_webserver(void *data) {
   time(&nowdate);
   // run the webserver
   while((true) && (runwebserver)) {
+    #ifdef ENABLE_TIDAL
+    mg_mgr_poll(&tidal_oversigt.mgr, 50);
+    #endif
     #ifdef ENABLE_SPOTIFY
     mg_mgr_poll(&spotify_oversigt.mgr, 50);
     // run time server to update spotify token
@@ -14986,11 +14992,11 @@ int main(int argc, char** argv) {
     }
 
     #ifdef ENABLE_TIDAL
-    tidal_oversigt = new tidal_class;
-    if (tidal_oversigt) {
+    //tidal_oversigt = new tidal_class;
+    //if (tidal_oversigt) {
       //tidal_oversigt->start_webserver();
       //tidal_oversigt->tidal_login();
-    }
+    //}
     //tidal_oversigt->tidal_login_token();
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();
