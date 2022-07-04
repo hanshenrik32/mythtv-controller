@@ -2463,6 +2463,7 @@ void display() {
 
     // used by xmltv updater func
     static bool startwebbrowser=true;                                           // start web browser to enable login to spotify
+    static bool tidalstartwebbrowser=true;                                           // start web browser to enable login to spotify
     static bool getstarttidintvguidefromarray = true;
     static time_t today=0;
     static time_t lasttoday=0;
@@ -3513,13 +3514,20 @@ void display() {
         }
       }
       #endif
+      #ifdef ENABLE_TIDAL
       if (vis_tidal_oversigt) {
         // show Tidal overview
-        #ifdef ENABLE_TIDAL
         printf("Show tidal\n");
-        if (vis_tidal_oversigt) tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
-        #endif
-      } else if (vis_tv_oversigt) {
+        tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
+        //if (strcmp(tidal_oversigt.get_token(),"")==0) {
+          if (tidalstartwebbrowser) {
+            system("firefox localhost:8100");
+            tidalstartwebbrowser=false;
+          }
+        //}
+      }
+      #endif
+      if (vis_tv_oversigt) {
         // show tv guide
         // take time on it
         aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
