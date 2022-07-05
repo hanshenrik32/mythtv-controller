@@ -3521,7 +3521,7 @@ void display() {
         tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
         //if (strcmp(tidal_oversigt.get_token(),"")==0) {
           if (tidalstartwebbrowser) {
-            system("firefox localhost:8100");
+            system("firefox localhost:8100/tidal_web/");
             tidalstartwebbrowser=false;
           }
         //}
