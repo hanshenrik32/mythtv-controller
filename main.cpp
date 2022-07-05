@@ -248,7 +248,9 @@ int soundsystem=0;		      		                      	  // used sound system 1=FMOD
 int numbersofsoundsystems=0;                              // antal devices
 unsigned int musicoversigt_antal=0;                       // antal aktive sange
 unsigned int spotifycoversigt_antal=0;                    // antal aktive sange
+unsigned int tidalcoversigt_antal=0;                    // antal aktive sange
 bool firsttimespotifyupdate=true;                         // default show the option to update spotify db
+bool firsttimetidalupdate=true;                         // default show the option to update spotify db
 int do_zoom_music_cover_remove_timeout=0;
 int showtimeout=600;
 int orgwinsizex,orgwinsizey;
@@ -842,6 +844,7 @@ void *update_webserver_phread_loader();
 void *update_spotifyonline_phread_loader();
 void *webupdate_loader_spotify(void *data);
 bool spotify_update_loaded_begin=false;
+bool tidal_update_loaded_begin=false;
 
 // hent mythtv version and return it
 
@@ -13853,6 +13856,70 @@ void *datainfoloader_webserver(void *data) {
   }
   pthread_exit(NULL);
 }
+
+
+
+
+
+
+// ****************************************************************************************
+//
+// Phread datadb update from tidal (online)
+// add all the users play list to the system db to be show in tidaloversigt
+//
+// ****************************************************************************************
+
+void *webupdate_loader_tidal(void *data) {
+  #ifdef ENABLE_SPOTIFY
+  bool loadedtidal=false;
+  int tidal_user_id_check;
+  // write debug log
+  write_logfile((char *) "Loader thread starting - Loading tidal info from web.");
+  if (!(tidal_oversigt.get_tidal_update_flag())) {
+    // check if spotify user info is loaded.
+    if ((tidal_oversigt.tidal_get_user_id()==404) && (strcmp(tidal_oversigt.tidal_get_token(),"")!=0)) {
+      loadedtidal=true;
+      tidal_update_loaded_begin=true;
+      tidal_oversigt.set_tidal_update_flag(true);
+      // add default playlists from spotify
+      // you have to call clean_spotify_oversigt after earch spodify_get_playlist
+//      tidal_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,true);        // songs on repeat playlist
+//      tidal_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+      // get user playlists
+      tidal_oversigt.tidal_get_user_playlists(true,0);                        // get all playlist and update db (force update)
+      tidal_oversigt.clean_tidal_oversigt();                                  // clear old stuf
+      // update the playback device list
+      tidal_oversigt.active_tidal_device=tidal_oversigt.tidal_get_available_devices();
+      // update view from db
+      tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
+    }
+  }
+  // write debug log
+  if (loadedtidal) write_logfile((char *) "Loader thread done update tidal from web.");
+  else {
+    write_logfile((char *) "Loader thread done update tidal.");
+    if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) write_logfile((char *) "Error on tidal token.");
+    else {
+      tidal_user_id_check=tidal_oversigt.tidal_get_user_id();
+      sprintf(debuglogdata,"Error loading tidal user data. Error code %d",tidal_user_id_check);
+      write_logfile((char *) debuglogdata);
+    }
+  }
+  tidal_update_loaded_begin=false;
+  tidal_oversigt.set_tidal_update_flag(false);
+  firsttimetidalupdate=false;                                                 // close firsttime update window after update
+  #endif
+  pthread_exit(NULL);
+}
+
+
+
+
+
+
+
+
+
 
 // ****************************************************************************************
 //
