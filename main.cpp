@@ -99,6 +99,7 @@ int movie_oversigt_loaded_nr=0;                                                 
 bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
+bool tidal_oversigt_loaded_begin = false;                                      // true then spotify update is started
 
 #ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -307,6 +308,7 @@ bool hent_radio_search = false;                           // skal vi søge efter
 bool hent_film_search = false;                            // skal vi søge efter film title
 bool hent_stream_search = false;                          // skal vi søge efter stream
 bool hent_spotify_search = false;                          // skal vi søge efter spotify stuf in local db
+bool hent_tidal_search = false;                          // skal vi søge efter spotify stuf in local db
 
 bool do_show_spotify_search_oversigt=false;
 bool do_show_tidal_search_oversigt=false;
@@ -347,6 +349,7 @@ bool do_show_setup_font = false;                          // font setup view
 bool do_show_setup_keys = false;                          // show keys setup view
 bool do_show_setup_rss = false;                           // Setup rss posdcast view
 bool do_show_setup_spotify = false;                       // setup spotify menu
+bool do_show_setup_tidal = false;                         // setup tidal menu
 bool do_save_setup_rss = false;                           // update db flag to do it (call func)
 bool do_show_videoplayer = false;                         // show player config
 bool do_show_tvgraber = false;                            // show tv graber/channel view config
@@ -3348,7 +3351,7 @@ void display() {
       glPopMatrix();
     }
     //
-    if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
+    if ((vis_music_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
       show_newmovietimeout = 0;
       vis_nyefilm_oversigt = false;
       if ((vis_tv_oversigt) && (getstarttidintvguidefromarray == true)) {
@@ -6930,6 +6933,32 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
+
+
+      #ifdef ENABLE_TIDAL
+      if (vis_tidal_oversigt) {
+        if ((GLubyte) names[i*4+3]==5) {
+          strcpy(keybuffer,"");                                                 // reset text buffer
+          keybufferindex=0;                                                     //
+          tidal_selected_startofset=0;
+          ask_open_dir_or_play_tidal = false;
+          strcpy(tidal_oversigt.overview_show_band_name,"");
+          if (do_show_tidal_search_oversigt==true) {
+            do_show_tidal_search_oversigt=false;
+            tidal_oversigt_loaded_begin=true;                                 //
+            tidal_oversigt.opdatere_tidal_oversigt(0);                      // update view from root
+            tidal_oversigt.set_search_loaded();                               // triger icon loader
+            //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
+            tidal_oversigt_loaded_begin=false;                                //
+          } else {
+            do_show_tidal_search_oversigt=true;
+          }
+          write_logfile((char *) "Tidal search.");
+        }
+      }
+      #endif
+
+
       //
       // stream control
       //
@@ -7355,6 +7384,218 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
+
+
+
+      //
+      // tidal stuf offline search (only in local db)
+      //
+      #ifdef ENABLE_TIDAL
+      if (vis_tidal_oversigt) {
+        if (do_show_tidal_search_oversigt==false) {
+          if ((!(do_show_setup_tidal))  && (!(fundet))) {
+            if ((GLuint) names[i*4+3]>=100) {
+              tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
+              tidal_select_iconnr=tidalknapnr;
+              fundet = true;                                                    //
+              do_zoom_tidal_cover = false;                                    // close player status to ask about play other selected playlist/song
+              if (tidal_oversigt.type==0) {
+                ask_open_dir_or_play_tidal=true;
+              } else if (tidal_oversigt.type==1) {
+                ask_open_dir_or_play_tidal=true;
+              }
+            }
+            // works ok
+            // back icon to main playlist overview
+            // do update from root
+            if ((tidalknapnr==1) && (tidal_oversigt.show_search_result)) {
+              if ((tidal_oversigt.type==0) || (tidal_oversigt.type==1)) {
+                // update
+                tidal_selected_startofset=0;                                  // default selected in view
+                tidal_oversigt.opdatere_tidal_oversigt(0);                  // update view
+                //tidal_oversigt.load_tidal_iconoversigt();                   // load icons
+                tidal_oversigt.set_search_loaded();                           // triger icon loader
+                ask_open_dir_or_play_tidal = false;                           // close windows again
+                fundet = true;
+              }
+            }
+            // play playlist icon select (20) type 0
+            if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==0)) {
+              // write to debug log
+              sprintf(debuglogdata,"play tidal playlist.");
+              write_logfile((char *) debuglogdata);
+              do_select_device_to_play=true;
+              returnfunc = 4;
+              fundet = true;
+            }
+            // play song icon select (20) type 1
+            if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==1)) {
+              write_logfile((char *) "play tidal song.");
+              do_select_device_to_play=true;
+              returnfunc = 5;
+              fundet = true;
+            }
+            // open
+            if ((GLubyte) names[i*4+3]==21) {
+              write_logfile((char *) "(tidal) open playlist");
+              returnfunc = 3;
+              fundet = true;
+            }
+            // Stop play
+            if ((GLubyte) names[i*4+3]==9) {
+              write_logfile((char *) "tidal Stop play");
+              returnfunc = 5;                                                       //
+              fundet = true;
+            }
+            // Next
+            if ((GLubyte) names[i*4+3]==11) {
+              write_logfile((char *) "(tidal) Next song");
+              returnfunc = 6;                                                       //
+              fundet = true;
+            }
+            // last
+            if ((GLubyte) names[i*4+3]==10) {
+              write_logfile((char *) "(tidal) last song");
+              returnfunc = 7;                                                       //
+              fundet = true;
+            }
+            // scroll up
+            if ((GLubyte) names[i*4+3]==23) {
+              // write debug log
+              sprintf(debuglogdata,"scroll down tidal_selected_startofset = %d ",tidal_selected_startofset);
+              write_logfile((char *) debuglogdata);
+              if (tidal_selected_startofset+40<tidal_oversigt.streamantal()) {
+                tidal_selected_startofset+=8;
+                tidal_selected_startofset+=8;
+                returnfunc = 2;
+                fundet = true;
+              }
+            }
+            // scroll down
+            if ((GLubyte) names[i*4+3]==24) {
+              // write debug log
+              sprintf(debuglogdata,"scroll up tidal_selected_startofset = %d",tidal_selected_startofset);
+              write_logfile((char *) debuglogdata);
+              if ((tidal_selected_startofset+8)>8) tidal_selected_startofset-=8;
+              if (tidal_selected_startofset<0) tidal_selected_startofset=0;
+              returnfunc = 1;
+              fundet = true;
+            }
+            // show close spotify info (27 need to move) 27 now is global exit
+            if ((GLubyte) names[i*4+3]==27) {
+              // write debug log
+              write_logfile((char *) "Show/close tidal info\n");
+              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
+              fundet = true;
+            }
+          }
+        }
+        // online spotify stuf
+        if (do_show_tidal_search_oversigt==true) {
+          if ((!(do_show_setup_tidal))  && (!(fundet))) {
+            if ((GLuint) names[i*4+3]>=100) {
+              tidalknapnr = (GLuint) names[i*4+3]-99;				                    // hent spotify knap nr
+              tidal_select_iconnr=tidalknapnr;
+              fundet = true;
+              do_zoom_tidal_cover = false;                                      // close player status to ask about play other selected playlist/song
+              if (tidal_oversigt.type==0) {                                     // playlist type
+                ask_open_dir_or_play_tidal=true;
+              } else if (tidal_oversigt.type==1) {                              // song type
+                ask_open_dir_or_play_tidal=true;
+              } else if (tidal_oversigt.type==2) {                              // artist type
+                ask_open_dir_or_play_tidal=true;
+              }
+            }
+            if ((GLuint) names[i*4+3]==27) {
+              tidalknapnr=(GLuint) names[i*4+3];
+              if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
+              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
+              fundet = true;
+            }
+          }
+          // write debug log
+          #ifdef ENABLE_TIDAL
+          sprintf(debuglogdata,"tidalknapnr %d type=%d fundet %d",tidalknapnr,tidal_oversigt.get_tidal_type(tidalknapnr));
+          write_logfile((char *) debuglogdata);
+          #endif
+
+          // back button
+
+          // works ok
+          // back icon to main playlist overview
+          // do update from root
+          if ((tidalknapnr==1) && (tidal_oversigt.show_search_result)) {
+            // update
+            tidal_selected_startofset=0;
+            tidal_oversigt.opdatere_tidal_oversigt(0);                      // update view
+            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            tidal_oversigt.set_search_loaded();                           // triger icon loader
+            ask_open_dir_or_play_tidal = false;
+            fundet = true;
+          }
+
+          // play playlist icon select (20) type 0
+          if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==0)) {
+            fprintf(stderr,"play tidal playlist. type 0\n");
+            write_logfile((char *) "play tidal playlist.");
+            do_select_device_to_play=true;
+            returnfunc = 4;
+            fundet = true;
+          }
+          // play song icon select (20) type 1
+          if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==1)) {
+            fprintf(stderr,"play tidal song. type 1\n");
+            write_logfile((char *) "play tidal song.");
+            do_select_device_to_play=true;
+            returnfunc = 5;
+            fundet = true;
+          }
+          // play song icon select (20) type 2
+          if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==2)) {
+            fprintf(stderr,"play tidal artist. type 2\n");
+            write_logfile((char *) "play tidal artist.");
+            do_select_device_to_play=true;
+            returnfunc = 5;
+            fundet = true;
+          }
+          // open 6
+          if ((GLubyte) names[i*4+3]==21) {
+            fprintf(stderr,"open tidal artist type 2\n");
+            returnfunc = 6;
+            fundet = true;
+          }
+          // Stop play
+          if ((GLubyte) names[i*4+3]==9) {
+            fprintf(stderr,"(tidal) Stop play\n");
+            write_logfile((char *) "Stop tidal play.");
+            returnfunc = 5;                                                       //
+            fundet = true;
+          }
+          // next song
+          if ((GLubyte) names[i*4+3]==11) {
+            fprintf(stderr,"(tidal) Next song\n");
+            write_logfile((char *) "Next tidal song.");
+            returnfunc = 7;
+            fundet = true;
+          }
+          // last song
+          if ((GLubyte) names[i*4+3]==12) {
+            fprintf(stderr,"(tidal) last song\n");
+            write_logfile((char *) "Last tidal song.");
+            returnfunc = 7;                                                       //
+            fundet = true;
+          }
+        }
+      }
+      #endif
+
+
+
+
+
+
       //
       // spotify stuf
       // set default device to play on
@@ -7846,7 +8087,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           case GLUT_LEFT_BUTTON:
               if (state==GLUT_UP) {
                 retfunc=gl_select(mousex,screeny-mousey);	// hent den som er trykket på
-                // nu er mknapnr/fknapnr/rknapnr/spotifyknapnr=den som er trykket på bliver sat i gl_select
+                // nu er mknapnr/fknapnr/rknapnr/spotifyknapnr/tidalknapnr=den som er trykket på bliver sat i gl_select
                 // retfunc er !=0 hvis der er trykket på en knap up/down
                 // give error
                 if (debugmode & 2) {
@@ -7857,9 +8098,11 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 if (vis_tv_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"tvknapnr = %d\n",tvknapnr-1);
                 }
+                #ifdef ENABLE_SPOTIFY
                 if (vis_spotify_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"spotifyknapnr = %d\n",spotifyknapnr-1);
                 }
+                #endif
                 #ifdef ENABLE_TIDAL
                 if (vis_tidal_oversigt) {
                   if (debugmode & 8) fprintf(stderr,"tidalknapnr = %d\n",tidalknapnr-1);
@@ -8168,6 +8411,18 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   do_select_device_to_play=false;                                                           // close window
                 }
               }
+
+              if (vis_tidal_oversigt) {
+                // close ask play window again no selected icon right click
+                if ((ask_open_dir_or_play_tidal) && (state==GLUT_UP)) {
+                  ask_open_dir_or_play_tidal=false;
+                  do_zoom_tidal_cover=false;
+                } else if ((ask_open_dir_or_play_tidal==false) && (state==GLUT_UP)) {
+                  // show what we play or not show what we play
+                  do_zoom_tidal_cover=!do_zoom_tidal_cover;                                             // close/open window
+                  do_select_device_to_play=false;                                                           // close window
+                }
+              }
               break;
       }
       if (vis_music_oversigt) {
@@ -8457,13 +8712,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       }
       #endif
 
-
-
-
-
-
-
-
+      // Tidal stuf from here
 
       #ifdef ENABLE_TIDAL
       if ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt==false)) {
@@ -8664,33 +8913,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       }
       #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      // Tv guide stuf
       //
       // scroll tv guide up/down
       //
@@ -9038,6 +9261,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #endif
                 // tidal
+                #ifdef ENABLE_TIDAL
                 if ((vis_tidal_oversigt) && (!(ask_open_dir_or_play_tidal))) {
                   if (tidalknapnr>1) {
                     if (tidalknapnr==1) {
@@ -9056,6 +9280,7 @@ void handlespeckeypress(int key,int x,int y) {
                     }
                   }
                 }
+                #endif
                 // film/movie
                 if (vis_film_oversigt) {
                   if (film_key_selected>1) {
@@ -11163,6 +11388,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                 //_sangley=0.0f;
                 do_play_spotify=0;
                 //spotifyknapnr = the one to play
+              }
+              #endif
+              #ifdef ENABLE_TIDAL
+              if (vis_tidal_oversigt) {
+                hent_tidal_search = true;				      // start stream station search
+                tidalknapnr=tidal_select_iconnr;   // selected
+                tidal_key_selected=1;
+                tidal_select_iconnr=0;
+                //_sangley=0.0f;
+                do_play_tidal=0;
+                //tidalknapnr = the one to play
               }
               #endif
               // start music search
