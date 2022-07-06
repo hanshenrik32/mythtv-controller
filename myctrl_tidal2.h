@@ -157,6 +157,7 @@ class tidal_class {
         char *get_tidal_name(int nr);                                         // get record name
         char *get_tidal_playlistid(int nr);                                   // get id to play
         int tidal_play_now_playlist(char *playlist_song,bool now);
+        char *get_active_tidal_device_name();                                 //
 
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
