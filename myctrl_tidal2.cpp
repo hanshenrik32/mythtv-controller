@@ -67,6 +67,15 @@ extern GLuint newstuf_icon;
 extern GLuint empty_icon;
 
 
+/*
+__URL_PRE__ = 'https://api.tidalhifi.com/v1/'
+__AUTH_URL__ = 'https://auth.tidal.com/v1/oauth2'
+# known API key for Fire Stick HD(MQA, Dolby Vision enabled)
+__API_KEY__ = {'clientId': 'OmDtrzFgyVVL6uW56OnFA2COiabqm',
+               'clientSecret': 'zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8='}
+# __API_KEY__ = {'clientId': 'aR7gUaTK1ihpXOEP', 'clientSecret': 'eVWBEkuL2FCjxgjOkR3yK0RYZEbcrMXRc2l8fU3ZCdE='}
+*/
+
 
 // web port
 static const char *s_http_port = "8100";
@@ -166,13 +175,13 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
         process_array_token(value, depth+1);
         break;
       case json_integer:
-        //printf("int: %10" PRId64 "\n", value->u.integer);
+        printf("int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
-        if (tidal_debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
+        fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:
-        //printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+        printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
         if (process_token_token1) {
           process_token_token1=false;
         }
@@ -793,14 +802,6 @@ int tidal_download_image(char *imgurl,char *filename) {
 
 
 
-// ****************************************************************************************
-//
-//
-// ****************************************************************************************
-
-char tidal_class::*tidal_get_token() {
-  //return(ret);
-}
 
 // ****************************************************************************************
 //
@@ -1452,12 +1453,12 @@ int tidal_class::tidal_play_now_album(char *playlist_song,bool now) {
 
 
 // ****************************************************************************************
-// gettoken from Tidal
+//
 //
 // ****************************************************************************************
 
 
-int tidal_class::getToken() {
+int tidal_class::login() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -1470,6 +1471,61 @@ int tidal_class::getToken() {
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/login/username");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 1L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+      printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      process_value_token(value, 0,0);                                                        // fill tokenid1+2
+      json_value_free(value);                                                                 // json clean up
+    }
+  }
+  return(httpCode);
+
+
+}
+
+
+// ****************************************************************************************
+//
+// WORKS OK - In use
+// gettoken from Tidal
+//
+// ****************************************************************************************
+
+
+int tidal_class::gettoken() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,tidaltoken);
+  CURL *curl = curl_easy_init();
+
+printf("Get token  now\n\n");
+
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_URL, "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
@@ -1488,10 +1544,10 @@ int tidal_class::getToken() {
     // always cleanup
     curl_easy_cleanup(curl);
     if (httpCode == 200) {
-      //printf("%s \n", response_string.c_str());
+      printf("%s \n", response_string.c_str());
       //printf("resp length %d \n",response_string.length());
       value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
-      process_value_token(value, 0,0);                                                     // fill play info
+      process_value_token(value, 0,0);                                                        // fill tokenid1+2
       json_value_free(value);                                                                 // json clean up
     }
   }
@@ -1501,11 +1557,12 @@ int tidal_class::getToken() {
 
 // ****************************************************************************************
 //
+// Login
 //
 // ****************************************************************************************
 
 
-int tidal_class::spotify_refresh_token() {
+int gettoken1() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -1524,11 +1581,11 @@ int tidal_class::spotify_refresh_token() {
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
   curl = curl_easy_init();
-  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+  if ((curl) && (strcmp(newtoken,"12")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, "tidal_client_id");
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, "tidal_secret_id");
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
@@ -1547,14 +1604,15 @@ int tidal_class::spotify_refresh_token() {
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
-    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s&client_id=%s",tidaltoken_refresh,"");
+    // post__(__AUTH_URL__ + '/token', data, (__API_KEY__['clientId'], __API_KEY__['clientSecret']))
+    sprintf(post_playlist_data,"grant_type=refesh_token&client_id=%s&refresh_token=%s&scope=r_usr+w_usr+w_sub","OmDtrzFgyVVL6uW56OnFA2COiabqm","zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8=");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
       size_t len = strlen(errbuf);
       fprintf(stderr, "\nlibcurl: (%d) ", res);
-      if(len)
+      if (len)
         fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
       else
         fprintf(stderr, "%s\n", curl_easy_strerror(res));
@@ -1574,7 +1632,7 @@ int tidal_class::spotify_refresh_token() {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
         write_logfile((char *) "Spotify token valid.");
-        strcpy(tidaltoken,newtoken);                                         // update spotify token
+        // strcpy(tidaltoken,newtoken);                                         // update spotify token
       }
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);

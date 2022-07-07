@@ -134,20 +134,20 @@ class tidal_class {
         tidal_class();
         ~tidal_class();
         void tidal_set_token(char *token,char *refresh);
+        char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
         int tidal_get_user_id();
         int tidal_get_available_devices();
         char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };                   // get active dev id
         void clean_tidal_oversigt();
         void select_device_to_play();
-        char *tidal_get_token();                                                     // get token from struct
-        int getToken();                               // TEST
+        int gettoken();                               // TEST
         int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
         int tidal_get_user_playlists(bool force,int startoffset);
 
         void process_value_token(json_value* value, int depth,int x);
         void process_object_token(json_value* value, int depth);
         void process_array_token(json_value* value, int depth);
-      
+
 
         // check if done
         int tidal_do_we_play();                                               // Do we play song now
@@ -161,13 +161,17 @@ class tidal_class {
         int tidal_play_now_artist(char *playlist_song,bool now);              // play artist
         int tidal_play_now_album(char *playlist_song,bool now);               // play album
 
+        int refresh_token();
+        int login();
+
         char *get_tidal_name(int nr);                                         // get record name
         char *get_tidal_playlistid(int nr);                                   // get id to play
         int tidal_play_now_playlist(char *playlist_song,bool now);            //
         char *get_active_tidal_device_name();                                 //
-        int spotify_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
 };
 
 #endif
+
+int gettoken1();                               // TEST
