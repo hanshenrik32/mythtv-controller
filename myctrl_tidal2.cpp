@@ -66,9 +66,13 @@ extern GLuint _textureIdback;
 extern GLuint newstuf_icon;
 extern GLuint empty_icon;
 
+
+
 // web port
 static const char *s_http_port = "8100";
 static struct mg_serve_http_opts s_http_server_opts;
+
+
 
 
 size_t tidal_curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
@@ -90,6 +94,99 @@ static size_t tidal_file_write_data(void *ptr, size_t size, size_t nmemb, void *
   size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
   return written;
 }
+
+// ****************************************************************************************
+//
+// process types in file for process playlist files (songs)
+//
+// ****************************************************************************************
+
+bool process_token_token1=false;
+bool process_token_token2=false;
+bool tidal_debug_json=false;
+
+
+void tidal_class::process_object_token(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.object.length;
+  for (x = 0; x < length; x++) {
+    //print_depth_shift(depth);
+    //printf("x=%d depth=%d object[%d].name = %s  \n",x,depth, x, value->u.object.values[x].name);
+    if (strcmp(value->u.object.values[x].name,"token1")==0) {
+      process_token_token1=true;
+    }
+    if (strcmp(value->u.object.values[x].name , "token2" )==0) {
+      process_token_token2=true;
+    }
+    process_value_token(value->u.object.values[x].value, depth+1,x);
+  }
+}
+
+// *****************************************************************************************
+//
+// ****************************************************************************************
+
+void tidal_class::process_array_token(json_value* value, int depth) {
+  int length, x;
+  if (value == NULL) {
+    return;
+  }
+  length = value->u.array.length;
+  //printf("array found\n");
+  for (x = 0; x < length; x++) {
+    process_value_token(value->u.array.values[x], depth,x);
+  }
+}
+
+
+// ****************************************************************************************
+// xml parse tokendata
+//
+// IN USE
+//
+// ****************************************************************************************
+
+void tidal_class::process_value_token(json_value* value, int depth,int x) {
+    int j;
+    if (value == NULL) return;
+    if (value->type != json_object) {
+      //print_depth_shift(depth);
+    }
+    switch (value->type) {
+      case json_none:
+        if (tidal_debug_json) fprintf(stdout,"none\n");
+        break;
+      case json_object:
+        process_object_token(value, depth+1);
+        break;
+      case json_array:
+        process_array_token(value, depth+1);
+        break;
+      case json_integer:
+        //printf("int: %10" PRId64 "\n", value->u.integer);
+        break;
+      case json_double:
+        if (tidal_debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
+        break;
+      case json_string:
+        //printf("Value found = %s x = %d deepth = %d \n ",value->u.string.ptr,x,depth);
+        if (process_token_token1) {
+          process_token_token1=false;
+        }
+        if (process_token_token2) {
+          process_token_token2=false;
+        }
+        break;
+      case json_boolean:
+        if (tidal_debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
+        break;
+    }
+}
+
+
 
 
 
@@ -266,7 +363,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
 // ****************************************************************************************
 
 static int s_exit_flag = 0;
-bool tidal_debug_json=false;
+
 
 
 static void tidal_ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
@@ -455,7 +552,7 @@ int tidal_class::tidal_get_user_id() {
   CURLcode res;
   struct curl_slist *header = NULL;
   char *devid=NULL;
-  devid=tidal_oversigt->get_active_device_id();
+  devid=get_active_device_id();
   if (devid) {
     auth_kode="Authorization: Bearer ";
     auth_kode=auth_kode + tidaltoken;
@@ -505,7 +602,7 @@ int tidal_class::tidal_get_user_id() {
 
 // ****************************************************************************************
 //
-// Works
+//
 // get device list and have it in spotify class
 //
 // ****************************************************************************************
@@ -1242,6 +1339,7 @@ int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
 // ****************************************************************************************
 
 
+
 int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   std::string auth_kode;
   char response_string[8192];
@@ -1251,10 +1349,9 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   int httpCode;
   CURLcode res;
   struct curl_slist *header = NULL;
-  /*
-  char *devid=spotify_oversigt.get_active_device_id();
+  char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
-  auth_kode=auth_kode + spotifytoken;
+  auth_kode=auth_kode + tidaltoken;
   url="https://api.spotify.com/v1/me/player/play?device_id=";
   if (devid) url=url + devid;
   // use libcurl
@@ -1291,7 +1388,6 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
       return(1);
     }
   }
-  */
 }
 
 // ****************************************************************************************
@@ -1352,6 +1448,142 @@ int tidal_class::tidal_play_now_artist(char *playlist_song,bool now) {
 
 int tidal_class::tidal_play_now_album(char *playlist_song,bool now) {
 
+}
+
+
+// ****************************************************************************************
+// gettoken from Tidal
+//
+// ****************************************************************************************
+
+
+int tidal_class::getToken() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode;
+  CURLcode res;
+  json_char *json;
+  json_value *value;
+  struct curl_slist *chunk = NULL;
+  strcpy(auth_kode,"Authorization: Bearer ");
+  strcat(auth_kode,tidaltoken);
+  CURL *curl = curl_easy_init();
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
+    /* Add a custom header */
+    chunk = curl_slist_append(chunk, "Accept: application/json");
+    chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    chunk = curl_slist_append(chunk, auth_kode);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+    res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+    if (httpCode == 200) {
+      //printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      process_value_token(value, 0,0);                                                     // fill play info
+      json_value_free(value);                                                                 // json clean up
+    }
+  }
+  return(httpCode);
+}
+
+
+// ****************************************************************************************
+//
+//
+// ****************************************************************************************
+
+
+int tidal_class::spotify_refresh_token() {
+  std::size_t foundpos;
+  char auth_kode[1024];
+  std::string response_string;
+  std::string response_val;
+  int httpCode=0;
+  CURLcode res;
+  struct curl_slist *chunk = NULL;
+  char doget[2048];
+  char data[4096];
+  char call[4096];
+  CURL *curl;
+  FILE *tokenfil;
+  char *base64_code;
+  char newtoken[1024];
+  char post_playlist_data[1024];
+  char errbuf[CURL_ERROR_SIZE];
+  strcpy(newtoken,"");
+  curl = curl_easy_init();
+  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
+    // add userinfo + basic auth
+    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+    /* Add a custom header */
+    //chunk = curl_slist_append(chunk, "Accept: application/json");
+    //chunk = curl_slist_append(chunk, "Content-Type: application/json");
+    //chunk = curl_slist_append(chunk, base64_code);
+    errbuf[0] = 0;
+    // set type post
+    //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
+    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s&client_id=%s",tidaltoken_refresh,"");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) {
+      size_t len = strlen(errbuf);
+      fprintf(stderr, "\nlibcurl: (%d) ", res);
+      if(len)
+        fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
+      else
+        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+    }
+    // get respons code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+    }
+    if (httpCode == 200) {
+      write_logfile((char *) "Tidal new token.");
+      printf("%s \n", response_string.c_str());
+      //printf("resp length %d \n",response_string.length());
+      //value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
+      //process_value_playinfo(value, 0,0);                                                     // fill play info
+      if ((response_string.size()>12) && (response_string.compare(2,12,"access_token")==0)) {
+        strncpy(newtoken,response_string.c_str()+17,180);
+        newtoken[181]='\0';
+        write_logfile((char *) "Spotify token valid.");
+        strcpy(tidaltoken,newtoken);                                         // update spotify token
+      }
+    } else {
+      fprintf(stderr,"Error code httpCode %d \n. ",httpCode);
+      fprintf(stderr,"Curl error: %s\n", curl_easy_strerror(res));
+    }
+    // always cleanup
+    curl_easy_cleanup(curl);
+  }
+  return(httpCode);
 }
 
 // ****************************************************************************************
