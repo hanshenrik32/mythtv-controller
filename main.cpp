@@ -136,7 +136,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_spotify.h"
 
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal2.h"
+//#include "myctrl_tidal.h"
 //#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
@@ -11456,16 +11456,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               #ifdef ENABLE_TIDAL
               if (vis_tidal_oversigt) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
-                write_logfile((char *) "Start tidal update thread");
+                write_logfile((char *) "Start spotify update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
-                // get token from xml
-                tidal_oversigt.gettoken();
+                tidal_oversigt.gettoken();                
                 printf("Token = %s \n",tidal_oversigt.tidal_get_token());
-                //tidal_oversigt.refresh_token();
-                //refresh_token();
-                gettoken1();
-                printf("login \n");
-
               }
               #endif
 

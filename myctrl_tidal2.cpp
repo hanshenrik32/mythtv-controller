@@ -1,30 +1,5 @@
 //
 // All tidal functios
-
-
-/*
-define('NJB_VERSION', '1.07');
-define('NJB_DATABASE_VERSION', 51);
-define('NJB_IMAGE_SIZE', 300);
-define('NJB_IMAGE_QUALITY', 85);
-define('NJB_WINDOWS', strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
-define('NJB_SCRIPT', basename($_SERVER['SCRIPT_NAME']));
-define('NJB_HTTPS', (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off') ? true : false);
-//define('NJB_HTTPS', ($_SERVER['HTTPS'] == 'off' ? false : true));
-
-define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
-define('TIDAL_ALBUM_URL','https://listen.tidal.com/album/');
-define('TIDAL_ALBUM_URL_2','https://tidal.com/browse/album/');
-define('TIDAL_ARTIST_URL','https://listen.tidal.com/artist/');
-define('TIDAL_TRACK_URL','https://tidal.com/browse/track/');
-define('TIDAL_TRACK_STREAM_URL','audio.tidal.com');
-define('TIDAL_APP_ALBUM_URL','https://tidal.com/album/');
-define('TIDAL_APP_TRACK_URL','https://tidal.com/track/');
-define('TIDAL_MAX_CACHE_TIME', 21600); //6h in [s]
-define('TIDAL_TOKEN_VERIFY_URL', 'api.tidal.com');
-define('MPD_TIDAL_URL','tidal://track/');
-*/
-
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,7 +45,7 @@ const int feed_url=2000;
 
 
 extern int debugmode;
-extern tidal_class tidal_oversigt;
+extern tidal_class *tidal_oversigt;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
 extern char configmysqluser[256];                              //
 extern char configmysqlpass[256];                              //
@@ -93,19 +68,17 @@ extern GLuint empty_icon;
 
 
 /*
-1. POST -> https://api.tidal.com/v1/login/username
-  username: {username}
-  password: {password}
-  token: {client_id}
-
-2.
-
-__URL_PRE__ = 'https://api.tidalhifi.com/v1/'
-__AUTH_URL__ = 'https://auth.tidal.com/v1/oauth2'
-# known API key for Fire Stick HD(MQA, Dolby Vision enabled)
-__API_KEY__ = {'clientId': 'OmDtrzFgyVVL6uW56OnFA2COiabqm',
-               'clientSecret': 'zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8='}
-# __API_KEY__ = {'clientId': 'aR7gUaTK1ihpXOEP', 'clientSecret': 'eVWBEkuL2FCjxgjOkR3yK0RYZEbcrMXRc2l8fU3ZCdE='}
+define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
+define('TIDAL_ALBUM_URL','https://listen.tidal.com/album/');
+define('TIDAL_ALBUM_URL_2','https://tidal.com/browse/album/');
+define('TIDAL_ARTIST_URL','https://listen.tidal.com/artist/');
+define('TIDAL_TRACK_URL','https://tidal.com/browse/track/');
+define('TIDAL_TRACK_STREAM_URL','audio.tidal.com');
+define('TIDAL_APP_ALBUM_URL','https://tidal.com/album/');
+define('TIDAL_APP_TRACK_URL','https://tidal.com/track/');
+define('TIDAL_MAX_CACHE_TIME', 21600); //6h in [s]
+define('TIDAL_TOKEN_VERIFY_URL', 'api.tidal.com');
+define('MPD_TIDAL_URL','tidal://track/');
 */
 
 
@@ -294,7 +267,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
   const char *p;
   const char *pspace;
   int n=0;
-  char user_auth_token[1024];
+  char user_token[1024];
   char sql[2048];
   struct http_message *hm = (struct http_message *) ev_data;
   struct mg_serve_http_opts opts;
@@ -315,7 +288,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
 
   printf("Calling web server \n");
 
-  char sed[]="cat tidal_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > tidal_access_token2.txt";
+  char sed[]="cat tidal_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
   *(base64_code+88)='\0';
@@ -325,25 +298,22 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       // from spotify servers
       // is callback call
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
-        if (debugmode) fprintf(stdout,"Tidal got reply server : %s \n", (mg_str) hm->uri);
+        if (debugmode) fprintf(stdout,"Tidal Got reply server : %s \n", (mg_str) hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
         if (p) {
           pspace=strchr(p,' ');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_auth_token,p+5,pspace-p);
-            *(user_auth_token+(pspace-p))='\0';
+            strncpy(user_token,p+5,pspace-p);
+            *(user_token+(pspace-p))='\0';
           }
-          user_auth_token[codel-4]='\0';
+          user_token[codel-4]='\0';
         }
-        //sprintf(sql,"curl -X POST -H 'Authorization: Bearer %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
 
-        //sprintf(sql,"curl -X POST -H 'Authorization: Bearer %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=https://account.tidal.com/login/tidal/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt->tidal_client_id,tidal_oversigt->tidal_secret_id);
-
-        sprintf(sql,"curl -X GET -H 'Authorization: Bearer %s' https://api.tidal.com/v1/users/%s/loginToken?countryCode=045  > tidal_access_token.txt",tidal_oversigt.userid);
-        printf("Curl : %s \n ",sql);
+        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=https://account.tidal.com/login/tidal/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt->tidal_client_id,tidal_oversigt->tidal_secret_id);
 
         curl_error=system(sql);
         if (curl_error==0) {
@@ -394,7 +364,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
       putchar('\n');
       break;
     case MG_EV_CLOSE:
-      fprintf(stdout,"Server closed connection\n");
+      fprintf(stdout,"Tidal Server closed connection\n");
   }
 }
 
@@ -424,7 +394,7 @@ static void tidal_ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
       case MG_EV_HTTP_REPLY:
         fwrite(hm->message.p, 1, (int)hm->message.len, stdout);
         fprintf(stdout,"Got reply client :\n%.*s\n", (int) hm->body.len, hm->body.p);
-        fprintf(stdout,"***************************************** CALL BACK **************************************************");
+        fprintf(stdout,"***************************************** TIDAL CALL BACK **************************************************");
         nc->flags |= MG_F_SEND_AND_CLOSE;
         s_exit_flag = 1;
         break;
@@ -529,7 +499,7 @@ tidal_class::tidal_class() : antal(0) {
     int port_cnt, n;
     int err = 0;
     strcpy(tidal_aktiv_song[0].release_date,"");
-    write_logfile((char *) "Starting tidal web server on port 8100");                 //
+    write_logfile((char *) "Starting web server on port 8100");                 //
     printf("Starting tidal web server on port %s \n",s_http_port);
     // start web server
     // create web server
@@ -953,8 +923,8 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
             system("cat spotify_users_playlist.json | grep total | tail -1 | awk {'print $3'} > spotify_users_playlist_antal.txt");
             json_file = fopen("spotify_users_playlist_antal.txt", "r");
             fscanf(json_file, "%s", temptxt);
-            if (strcmp(temptxt,"")!=0) tidal_oversigt.tidal_playlist_antal = atoi(temptxt);
-            else tidal_oversigt.tidal_playlist_antal = 0;
+            if (strcmp(temptxt,"")!=0) tidal_oversigt->tidal_playlist_antal = atoi(temptxt);
+            else tidal_oversigt->tidal_playlist_antal = 0;
              fclose(json_file);
           }
           stat("spotify_users_playlist.txt", &filestatus);                              // get file info
@@ -966,8 +936,8 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
               while(!(feof(json_file))) {
                 fscanf(json_file, "%s", file_contents);
                 // process playlist id
-                tidal_oversigt.tidal_get_playlist(file_contents,force,1);
-                tidal_oversigt.clean_tidal_oversigt();
+                tidal_oversigt->tidal_get_playlist(file_contents,force,1);
+                tidal_oversigt->clean_tidal_oversigt();
                 loaded_antal++;
               }
               fclose(json_file);
@@ -977,12 +947,12 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
           tidal_playlistantal_loaded+=startoffset;
           // next loop
           // 50 is loaded on each loop until end
-          if ((startoffset+50)<tidal_oversigt.tidal_playlist_antal) {
+          if ((startoffset+50)<tidal_oversigt->tidal_playlist_antal) {
             startoffset+=50;
           } else {
-            startoffset=tidal_oversigt.tidal_playlist_antal-startoffset;
+            startoffset=tidal_oversigt->tidal_playlist_antal-startoffset;
           }
-          if (tidal_playlistantal_loaded>=tidal_oversigt.tidal_playlist_antal) tidalplaylistloader_done=true;
+          if (tidal_playlistantal_loaded>=tidal_oversigt->tidal_playlist_antal) tidalplaylistloader_done=true;
         }
         if (remove("tidal_users_playlist.txt")!=0) write_logfile((char *) "Error remove user playlist file tidal_users_playlist.txt");
         // save data to mysql db
@@ -997,7 +967,7 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
       if (res) {
         while ((row = mysql_fetch_row(res)) != NULL) {
           fprintf(stdout,"playlist %-60s Tidalid %-20s \n",row[0],row[1]);
-          if (tidal_oversigt.tidal_get_playlist(row[1],force,0)==1) {
+          if (tidal_oversigt->tidal_get_playlist(row[1],force,0)==1) {
             fprintf(stderr,"Error create playlist %s \n",row[1]);
           }
         }
@@ -1489,56 +1459,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,bool now) {
 
 // ****************************************************************************************
 //
-//
-// ****************************************************************************************
-
-
-int tidal_class::login() {
-  std::size_t foundpos;
-  char auth_kode[1024];
-  std::string response_string;
-  std::string response_val;
-  int httpCode;
-  CURLcode res;
-  json_char *json;
-  json_value *value;
-  struct curl_slist *chunk = NULL;
-  strcpy(auth_kode,"Authorization: Bearer ");
-  strcat(auth_kode,tidaltoken);
-  CURL *curl = curl_easy_init();
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.tidal.com/v1/login/username");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    curl_easy_setopt (curl, CURLOPT_VERBOSE, 1L);
-    /* Add a custom header */
-    chunk = curl_slist_append(chunk, "Accept: application/json");
-    chunk = curl_slist_append(chunk, "Content-Type: application/json");
-    chunk = curl_slist_append(chunk, auth_kode);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-    res = curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-    }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    if (httpCode == 200) {
-      printf("%s \n", response_string.c_str());
-      //printf("resp length %d \n",response_string.length());
-      value = json_parse((char *) response_string.c_str(),response_string.length());          // parser
-      process_value_token(value, 0,0);                                                        // fill tokenid1+2
-      json_value_free(value);                                                                 // json clean up
-    }
-  }
-  return(httpCode);
-
-
-}
-
-
-// ****************************************************************************************
-//
 // WORKS OK - In use
 // gettoken from Tidal
 //
@@ -1546,6 +1466,7 @@ int tidal_class::login() {
 
 
 int tidal_class::gettoken() {
+
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -1592,12 +1513,11 @@ printf("Get token  now\n\n");
 
 // ****************************************************************************************
 //
-// Login
 //
 // ****************************************************************************************
 
 
-int gettoken1() {
+int tidal_class::spotify_refresh_token() {
   std::size_t foundpos;
   char auth_kode[1024];
   std::string response_string;
@@ -1616,11 +1536,11 @@ int gettoken1() {
   char errbuf[CURL_ERROR_SIZE];
   strcpy(newtoken,"");
   curl = curl_easy_init();
-  if ((curl) && (strcmp(newtoken,"12")!=0)) {
+  if ((curl) && (strcmp(tidaltoken_refresh,"")!=0)) {
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, "tidal_client_id");
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, "tidal_secret_id");
+    curl_easy_setopt(curl, CURLOPT_USERNAME, tidal_client_id);
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, tidal_secret_id);
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "Accept: application/json");
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
@@ -1639,15 +1559,14 @@ int gettoken1() {
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
-    // post__(__AUTH_URL__ + '/token', data, (__API_KEY__['clientId'], __API_KEY__['clientSecret']))
-    sprintf(post_playlist_data,"grant_type=refesh_token&client_id=%s&refresh_token=%s&scope=r_usr+w_usr+w_sub","OmDtrzFgyVVL6uW56OnFA2COiabqm","zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8=");
+    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s&client_id=%s",tidaltoken_refresh,"");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
       size_t len = strlen(errbuf);
       fprintf(stderr, "\nlibcurl: (%d) ", res);
-      if (len)
+      if(len)
         fprintf(stderr, "%s%s", errbuf,((errbuf[len - 1] != '\n') ? "\n" : ""));
       else
         fprintf(stderr, "%s\n", curl_easy_strerror(res));
@@ -1667,7 +1586,7 @@ int gettoken1() {
         strncpy(newtoken,response_string.c_str()+17,180);
         newtoken[181]='\0';
         write_logfile((char *) "Spotify token valid.");
-        // strcpy(tidaltoken,newtoken);                                         // update spotify token
+        strcpy(tidaltoken,newtoken);                                         // update spotify token
       }
     } else {
       fprintf(stderr,"Error code httpCode %d \n. ",httpCode);

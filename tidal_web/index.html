@@ -1,11 +1,9 @@
 <script type="text/javascript">
-function loginStage1() {
- document.getElementById("username").innerHTML=encodeURI(username);
+function loginStage1(username) {
+ document.getElementById("token").innerHTML = "1234";
 }
-
 </script>
 <?
-$url='login.html'
 
 ?>
         <center><h2>Tidal login</h2></center>
@@ -20,21 +18,21 @@ $url='login.html'
                 <td class="space"></td>
                 <td>Username:</td>
                 <td class="space"></td>
-                <td><input type="text" name="username" value="" maxlength="255" class="login"></td>
+                <td><input type="text" name="username" value="" id="username" maxlength="255" class="login"></td>
                 <td class="space"></td>
         </tr>
         <tr>
                 <td></td>
                 <td>Password:</td>
                 <td></td>
-                <td><input type="password" name="password" class="login"></td>
+                <td><input type="password" name="password" class="login" id="password"></td>
                 <td></td>
         </tr>
 	<tr>
                 <td></td>
                 <td>client_id:</td>
                 <td></td>
-                <td><input type="text" name="token" class="login"></td>
+                <td><input type="text" name="token" default="work01" id="token" class="login"></td>
                 <td></td>
         </tr>
         <tr class="space"><td colspan="5"></td></tr>
