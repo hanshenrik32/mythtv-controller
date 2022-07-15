@@ -87,7 +87,7 @@ class tidal_class {
         //
         char tidaltoken[512];                                                 // access_token
         char tidaltoken2[512];                                                 // access_token2
-        char countryCode[512];                                                //
+        char countryCode[512];                                                //        
         char tidaltoken_refresh[512];                                         // refresh_token
         int antal;					                       	                            // Antal songs in playlist
         int antalplaylists;                                                     // antal playlist in view
@@ -97,6 +97,7 @@ class tidal_class {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
+        char userid[512];                                                //
         bool get_tidal_update_flag();
         void set_tidal_update_flag(bool flag);
         int loaded_antal;                                                       // antal loaded i loader

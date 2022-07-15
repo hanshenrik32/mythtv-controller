@@ -11456,7 +11456,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               #ifdef ENABLE_TIDAL
               if (vis_tidal_oversigt) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
-                write_logfile((char *) "Start spotify update thread");
+                write_logfile((char *) "Start tidal update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
                 // get token from xml
                 tidal_oversigt.gettoken();
@@ -11465,7 +11465,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                 //refresh_token();
                 gettoken1();
                 printf("login \n");
-
 
               }
               #endif
