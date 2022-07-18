@@ -233,6 +233,9 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   struct mg_serve_http_opts opts;
   struct http_message *hm = (struct http_message *) ev_data;
   CURL *curl = curl_easy_init();
+  strcpy(user_name,"");
+  strcpy(user_pass,"");
+  strcpy(user_token,"");
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
@@ -249,10 +252,10 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           if (pspace==NULL) pspace=strchr(p,'\n');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_name,p+5,pspace-p);
+            strncpy(user_name,p+9,pspace-p);
             *(user_name+(pspace-p))='\0';
           }
-          user_name[codel-4]='\0';
+          user_name[codel-9]='\0';
         }
         p = strstr( hm->uri.p , "password="); // mg_mk_str_n("code=",5));
         if (p) {
@@ -260,12 +263,10 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           if (pspace==NULL) pspace=strchr(p,'\n');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_pass,p+5,pspace-p);
+            strncpy(user_pass,p+9,pspace-p);
             *(user_pass+(pspace-p))='\0';
           }
-          user_pass[codel-4]='\0';
-          printf("Username found %s\n",user_name);
-          printf("password found %s\n",user_pass);
+          user_pass[codel-9]='\0';
         }
 
         p = strstr( hm->uri.p , "token="); // mg_mk_str_n("code=",5));
@@ -274,10 +275,10 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           if (pspace==NULL) pspace=strchr(p,'\n');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_pass,p+5,pspace-p);
+            strncpy(user_pass,p+6,pspace-p);
             *(user_pass+(pspace-p))='\0';
           }
-          user_token[codel-4]='\0';
+          user_token[codel-6]='\0';
           printf("Username found %s\n",user_name);
           printf("password found %s\n",user_pass);
           printf("token    found %s\n",user_token);
