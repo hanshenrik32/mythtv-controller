@@ -97,6 +97,7 @@ bool movie_oversigt_gfx_loading = false;
 bool show_status_update = false;
 bool spotify_oversigt_loaded_begin = false;                                      // true then spotify update is started
 bool tidal_oversigt_loaded_begin = false;                                      // true then spotify update is started
+bool global_use_spotify_local_player;
 
 #ifdef USE_FMOD_MIXER
 FMOD::DSP* dsp = 0;                   // fmod Sound device
@@ -14830,7 +14831,7 @@ void *datainfoloader_webserver(void *data) {
       write_logfile((char *) "Update spotify token");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
         //spotify_oversigt.spotify_refresh_token();       // old ver
-        spotify_oversigt.spotify_refresh_token2();        // new ver
+        //spotify_oversigt.spotify_refresh_token2();        // new ver
       }
     }
     // get time

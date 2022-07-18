@@ -97,6 +97,7 @@ class tidal_class {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
+        bool set_search_loaded() { search_loaded=true; }
         bool get_tidal_update_flag();
         void set_tidal_update_flag(bool flag);
         int loaded_antal;                                                       // antal loaded i loader
@@ -133,6 +134,7 @@ class tidal_class {
         // end webserver
         tidal_class();
         ~tidal_class();
+        int streamantal() { return(antal-1); }                                  //
         void tidal_set_token(char *token,char *refresh);
         char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
         int tidal_get_user_id();
@@ -143,6 +145,8 @@ class tidal_class {
         int gettoken();                               // TEST
         int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
         int tidal_get_user_playlists(bool force,int startoffset);
+        char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
+        char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
 
         void process_value_token(json_value* value, int depth,int x);
         void process_object_token(json_value* value, int depth);
@@ -168,6 +172,21 @@ class tidal_class {
         int spotify_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+
+
+        int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
+        int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
+        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[0].song_name ); };                       //
+        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
+        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[0].release_date ); };            //
+
+        int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
+        GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
+        int antal_tidal_streams() { return antalplaylists; };
+        char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
+        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
+
 };
 
 #endif
