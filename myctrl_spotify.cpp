@@ -158,16 +158,17 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
       // from spotify servers
-      // is callback call
+      // is callback call from by login page index.html or spotify_index.html (login/index.html have the callback url as callback from spotify )
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
         if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
+        // get code pointer ( uri.p = pointer to url )
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
         if (p) {
           pspace=strchr(p,' ');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_token,p+5,pspace-p);
+            strncpy(user_token,p+5,pspace-p);                                         // copy code from return url from server
             *(user_token+(pspace-p))='\0';
           }
           user_token[codel-4]='\0';

@@ -11458,7 +11458,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
                 write_logfile((char *) "Start spotify update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
-                tidal_oversigt.gettoken();                
+                tidal_oversigt.gettoken();
                 printf("Token = %s \n",tidal_oversigt.tidal_get_token());
               }
               #endif

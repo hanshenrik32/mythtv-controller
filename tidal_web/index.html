@@ -7,7 +7,7 @@ function loginStage1(username) {
 
 ?>
         <center><h2>Tidal login</h2></center>
-        <form action="https://api.tidal.com/v1/login/username" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
+        <form action="localhost:/login:8100" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
                 <input type="hidden" name="authenticate" value="validate">
                 <input type="hidden" name="hash1" value="">
                 <input type="hidden" name="hash2" value="">

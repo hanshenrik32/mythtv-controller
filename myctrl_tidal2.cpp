@@ -202,7 +202,9 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
 
 
 
+https://api.tidal.com/v1/login/username&username=hanshenrik32@gmail.com&password=hhpky83xbip&token=clientid
 
+https://api.tidal.com/v1/login/username%26username%3Dhanshenrik32%40gmail.com%26password%3Dhhpky83xbip%26token%3Dclientid
 
 // ****************************************************************************************
 // IN USE
@@ -219,10 +221,19 @@ static void new_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
   const char *returncode_pointer;
   struct mg_serve_http_opts opts;
   struct http_message *hm = (struct http_message *) ev_data;
+  CURL *curl = curl_easy_init();
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
-      printf("REQUEST Call \n");
+      printf("Tidal Return REQUEST Call \n");
+      //printf("str %s \n",hm->uri.p);
+      if (mg_strncmp( hm->uri,mg_mk_str_n("/tidal_web/",11),11) == 0) {
+        char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
+        printf("Encoded output %s \n", output);
+        printf("%s",(char *) hm->uri.p);
+        exit(0);
+
+      }
       if (mg_strncmp( hm->uri,mg_mk_str_n("/call",5),5) == 0) {
         // Get server return code
         returncode_pointer = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
@@ -250,6 +261,8 @@ static void new_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
     case MG_EV_CLOSE:
       fprintf(stdout,"Server closed connection\n");
   }
+  curl_easy_cleanup(curl);
+  curl_global_cleanup();
 }
 
 
@@ -286,8 +299,14 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
   //strcat(data,":");
   //strcat(data,spotify_oversigt.spotify_secret_id);
 
-  printf("Calling web server \n");
 
+  // OLD FROM
+  /*
+  <form action="https://api.tidal.com/v1/login/username" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
+  */
+  //
+  CURL *curl = curl_easy_init();
+  printf("TIDAL Calling web server \n");
   char sed[]="cat tidal_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
   //calc base64
   base64_code=b64_encode((const unsigned char *) data, 65);
@@ -295,8 +314,16 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
-      // from spotify servers
+      // from spotify servershm->uri.p
       // is callback call
+
+      if (mg_strncmp( hm->uri,mg_mk_str_n("/login",6),6) == 0) {
+        char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
+        printf("Encoded output %s \n", output);
+        printf("%s",(char *) hm->uri.p);
+        exit(0);
+      }
+
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
         if (debugmode) fprintf(stdout,"Tidal Got reply server : %s \n", (mg_str) hm->uri);
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
@@ -313,7 +340,7 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
         //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
 
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=https://account.tidal.com/login/tidal/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt->tidal_client_id,tidal_oversigt->tidal_secret_id);
+        sprintf(sql,"curl -X POST -H 'Authorization: Bearer %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=https://account.tidal.com/login/tidal/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt->tidal_client_id,tidal_oversigt->tidal_secret_id);
 
         curl_error=system(sql);
         if (curl_error==0) {
@@ -366,6 +393,8 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
     case MG_EV_CLOSE:
       fprintf(stdout,"Tidal Server closed connection\n");
   }
+  curl_easy_cleanup(curl);
+  curl_global_cleanup();
 }
 
 
