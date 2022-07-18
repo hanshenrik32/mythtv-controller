@@ -11425,7 +11425,6 @@ void handleKeypress(unsigned char key, int x, int y) {
               // update spotify
               // or ask record tv program
               #ifdef ENABLE_SPOTIFY
-<<<<<<< HEAD
               if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
                 if (do_show_spotify_search_oversigt==false) {
                   if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
@@ -11433,17 +11432,13 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
                 if (do_show_spotify_search_oversigt) {
-=======
               if (vis_spotify_oversigt) {
                 // Do we show search view if yes do
                 if (do_show_spotify_search_oversigt == true ) {
->>>>>>> tidal
                   spotify_oversigt.searchtype++;
                   if (spotify_oversigt.searchtype>3) spotify_oversigt.searchtype=0;
                 }
               }
-<<<<<<< HEAD
-=======
               if (vis_spotify_oversigt) {
                 if (do_show_spotify_search_oversigt == false) {
                   if (do_update_spotify_playlist == false) do_update_spotify_playlist=true;       // set update flag til true og start background update
@@ -11465,10 +11460,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if ((!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_tv_oversigt))) {
                 do_update_spotify_playlist=true;
               }
->>>>>>> tidal
               #endif
-
-
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
               if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
               if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
