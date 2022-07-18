@@ -1,3 +1,5 @@
+//#ifdef ENABLE_TIDAL
+
 //
 // Spotify settings/loaders
 //
@@ -156,16 +158,17 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
       // from spotify servers
-      // is callback call
+      // is callback call from by login page index.html or spotify_index.html (login/index.html have the callback url as callback from spotify )
       if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
         if (debugmode) fprintf(stdout,"Got reply server : %s \n", (mg_str) hm->uri);
+        // get code pointer ( uri.p = pointer to url )
         p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
         // get sptify code from server
         if (p) {
           pspace=strchr(p,' ');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_token,p+5,pspace-p);
+            strncpy(user_token,p+5,pspace-p);                                         // copy code from return url from server
             *(user_token+(pspace-p))='\0';
           }
           user_token[codel-4]='\0';
@@ -4554,58 +4557,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
 }
 
 
-
-size_t b64_encoded_size(size_t inlen) {
-	size_t ret;
-	ret = inlen;
-	if (inlen % 3 != 0)
-		ret += 3 - (inlen % 3);
-	ret /= 3;
-	ret *= 4;
-	return ret;
-}
-
-
-// ****************************************************************************************
-//
-// 64bits incoder
-//
-// ****************************************************************************************
-
-
-char *b64_encode(const unsigned char *in, size_t len) {
-  const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	char   *out;
-	size_t  elen;
-	size_t  i;
-	size_t  j;
-	size_t  v;
-	if (in == NULL || len == 0)
-		return NULL;
-	elen = b64_encoded_size(len);
-	out  = (char *) malloc(elen+1);
-	out[elen] = '\0';
-	for (i=0, j=0; i<len; i+=3, j+=4) {
-		v = in[i];
-		v = i+1 < len ? v << 8 | in[i+1] : v << 8;
-		v = i+2 < len ? v << 8 | in[i+2] : v << 8;
-		out[j]   = b64chars[(v >> 18) & 0x3F];
-		out[j+1] = b64chars[(v >> 12) & 0x3F];
-		if (i+1 < len) {
-			out[j+2] = b64chars[(v >> 6) & 0x3F];
-		} else {
-			out[j+2] = '=';
-		}
-		if (i+2 < len) {
-			out[j+3] = b64chars[v & 0x3F];
-		} else {
-			out[j+3] = '=';
-		}
-	}
-	return out;
-}
-
-
 // ****************************************************************************************
 //
 // ********************* show setup spotify stuf like dev and clientid/secrect ************
@@ -5150,3 +5101,5 @@ void spotify_class::set_default_device_to_play(int nr) {
    active_spotify_device=nr;
    active_default_play_device=nr;
 }
+
+//#endif

@@ -10,4 +10,8 @@ unsigned int hourtounixtime(int hour);
 
 void write_logfile(char *logentry);
 
+
+char *b64_encode(const unsigned char *in, size_t len);
+
+
 #endif

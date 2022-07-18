@@ -1,7 +1,7 @@
 /* vim: set et ts=4
  *
- * Copyright (C) 2015 Mirko Pasqualetti  All rights reserved.
- * https://github.com/udp/json-parser
+ * Copyright (C) 2015-2021 the json-parser authors  All rights reserved.
+ * https://github.com/json-parser/json-parser
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,11 +27,11 @@
  * SUCH DAMAGE.
  */
 
+#include "json.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#include "json.h"
 
 /*
  * Test for json.c
@@ -84,7 +84,6 @@ static void process_array(json_value* value, int depth)
 
 static void process_value(json_value* value, int depth)
 {
-        int j;
         if (value == NULL) {
                 return;
         }
@@ -95,6 +94,9 @@ static void process_value(json_value* value, int depth)
                 case json_none:
                         printf("none\n");
                         break;
+                case json_null:
+                        printf("null\n");
+                        break;
                 case json_object:
                         process_object(value, depth+1);
                         break;
@@ -102,7 +104,7 @@ static void process_value(json_value* value, int depth)
                         process_array(value, depth+1);
                         break;
                 case json_integer:
-                        printf("int: %10" PRId64 "\n", value->u.integer);
+                        printf("int: %10ld\n", (long)value->u.integer);
                         break;
                 case json_double:
                         printf("double: %f\n", value->u.dbl);
@@ -151,7 +153,7 @@ int main(int argc, char** argv)
                 return 1;
         }
         if ( fread(file_contents, file_size, 1, fp) != 1 ) {
-                fprintf(stderr, "Unable t read content of %s\n", filename);
+                fprintf(stderr, "Unable to read content of %s\n", filename);
                 fclose(fp);
                 free(file_contents);
                 return 1;

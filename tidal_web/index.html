@@ -1,163 +1,53 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Tidal Authorization.</title>
-    <link rel="stylesheet" href="https://my.tidal.com/assets/stylesheets/tidalStyleguide.css">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 600px;
-      }
-    </style>
-  </head>
+<script type="text/javascript">
+function loginStage1(username) {
+ document.getElementById("token").innerHTML = "1234";
+}
+</script>
+<?
 
-  <body>
-    <div class="container">
-      <div id="login">
-        <h1>Tidal login page.</h1>
-        <h3>Here you have to login on Tidal.</h3>
-        <a href="/login" class="btn btn-primary">Log in with Tidal</a>
-      </div>
-      <div id="loggedin">
-        <div id="user-profile">
-        </div>
-        <div id="oauth">
-        </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-      </div>
-    </div>
+?>
+        <center><h2>Tidal login</h2></center>
+        <form action="localhost:/login:8100" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
+                <input type="hidden" name="authenticate" value="validate">
+                <input type="hidden" name="hash1" value="">
+                <input type="hidden" name="hash2" value="">
+                <input type="hidden" name="sign" value="">
+        <table cellspacing="0" cellpadding="0" class="warning">
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td class="space"></td>
+                <td>Username:</td>
+                <td class="space"></td>
+                <td><input type="text" name="username" value="" id="username" maxlength="255" class="login"></td>
+                <td class="space"></td>
+        </tr>
+        <tr>
+                <td></td>
+                <td>Password:</td>
+                <td></td>
+                <td><input type="password" name="password" class="login" id="password"></td>
+                <td></td>
+        </tr>
+	<tr>
+                <td></td>
+                <td>client_id:</td>
+                <td></td>
+                <td><input type="text" name="token" default="work01" id="token" class="login"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td></td>
+                <td colspan="3" align="right"><input type="submit" value="login" class="button"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td></td>
+                <td colspan="3" class="line"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        </table>
+        </form>
 
-    <div col-4 col-centered-4 margin-bottom-0 wrapper-custom-bg padding-2 padding-left-sm-max-1 padding-right-sm-max-1 padding-top-sm-max-1 padding-bottom-sm-max-1>
-
-    <div class="header wrapper  padding-top-3 padding-bottom-1">
-        <div class="row">
-            <div class="col-5 col-centered-5 padding-left-sm-min-2 padding-right-sm-min-2 margin-bottom-0">
-                <div class="row padding-top-0 padding-bottom-2 margin-bottom-nudge">
-                    <center>
-                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iOTVweCIgaGVpZ2h0PSI0NnB4IiB2aWV3Qm94PSIwIDAgOTUgNDYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBvcGFjaXR5PSIwLjQ5ODY5NzkxNyI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc1My4wMDAwMDAsIC04NS4wMDAwMDApIiBmaWxsPSIjRkZGRkZGIj4KICAgICAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzIxLjAwMDAwMCwgNTQuMDAwMDAwKSI+CiAgICAgICAgICAgICAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMi44NDI2OTcsIDMwLjk4MzYwNykiPgogICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBwb2ludHM9IjUwLjcyMjY5NDUgNC4yNDcyMzI3OSA0Ni41ODU0NDE0IDguMzU3NzgzNjEgNDIuNDQ4MDEwMSA0LjI0NzIzMjc5IDQ2LjU4NTQ0MTQgMC4xMzY2ODE5NjcgNTAuNzIyNjk0NSA0LjI0NzIzMjc5Ij48L3BvbHlsaW5lPgogICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBwb2ludHM9IjUwLjcyMjY5NDUgMTIuNDY4NTExNSA0Ni41ODU0NDE0IDE2LjU3OTA2MjMgNDIuNDQ4MDEwMSAxMi40Njg1MTE1IDQ2LjU4NTQ0MTQgOC4zNTc5NjA2NiA1MC43MjI2OTQ1IDEyLjQ2ODUxMTUiPjwvcG9seWxpbmU+CiAgICAgICAgICAgICAgICAgICAgPHBvbHlsaW5lIHBvaW50cz0iNDIuNDQ4MDEwMSA0LjI0NzQwOTg0IDM4LjMxMDU3ODggOC4zNTgxMzc3IDM0LjE3MzE0NzUgNC4yNDc0MDk4NCAzOC4zMTA1Nzg4IDAuMTM2NjgxOTY3IDQyLjQ0ODAxMDEgNC4yNDc0MDk4NCI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICA8cG9seWxpbmUgcG9pbnRzPSI1OC45OTcyMDA3IDQuMjQ3NDA5ODQgNTQuODU5OTQ3NiA4LjM1ODEzNzcgNTAuNzIyMzM4MSA0LjI0NzQwOTg0IDU0Ljg1OTk0NzYgMC4xMzY2ODE5NjcgNTguOTk3MjAwNyA0LjI0NzQwOTg0Ij48L3BvbHlsaW5lPgogICAgICAgICAgICAgICAgICAgIDxwb2x5bGluZSBwb2ludHM9IjcuODkxMzYxMiA0NS4xNDc1NDEgNC40NTAzNjI3NSA0NS4xNDc1NDEgNC40NTAzNjI3NSAzMy4wMjEyNjU2IDAgMzMuMDIxMjY1NiAwIDMwLjA5MTI3ODcgMTIuMzQxNzI0IDMwLjA5MTI3ODcgMTIuMzQxNzI0IDMzLjAyMTI2NTYgNy44OTEzNjEyIDMzLjAyMTI2NTYgNy44OTEzNjEyIDQ1LjE0NzU0MSI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBwb2ludHM9IjIyLjYzODg3OTMgNDUuMTQ3NTQxIDI2LjEwMDE5MzQgNDUuMTQ3NTQxIDI2LjEwMDE5MzQgMzAuMDkxNDU1NyAyMi42Mzg4NzkzIDMwLjA5MTQ1NTciPjwvcG9seWdvbj4KICAgICAgICAgICAgICAgICAgICA8cG9seWxpbmUgcG9pbnRzPSI4Ny4xODM2NjMxIDQyLjE3NjMwMTYgOTMuMTY5OTkxNyA0Mi4xNzYzMDE2IDkzLjE2OTk5MTcgNDUuMTQ3NTQxIDgzLjcyMjM0OSA0NS4xNDc1NDEgODMuNzIyMzQ5IDMwLjA5MTI3ODcgODcuMTgzNjYzMSAzMC4wOTEyNzg3IDg3LjE4MzY2MzEgNDIuMTc2MzAxNiI+PC9wb2x5bGluZT4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNNDAuOTgxOTAxMyw0Mi4xOTY2NjIzIEw0My4xMjgyMjYxLDQyLjE5NjY2MjMgQzQ2LjAxNjA3MDEsNDIuMTk2NjYyMyA0Ny45NDE1OTY1LDQwLjQwNjY5NTEgNDcuOTQxNTk2NSwzNy41NTc5NzM4IEM0Ny45NDE1OTY1LDM0Ljg1MTc3NyA0NS45OTU3NTQ1LDMzLjAyMTI2NTYgNDMuMjEwMjAxMywzMy4wMjEyNjU2IEw0MC45ODE5MDEzLDMzLjAyMTI2NTYgTDQwLjk4MTkwMTMsNDIuMTk2NjYyMyBaIE0zNy42MjMwNTYzLDMwLjA5MTI3ODcgTDQzLjIzMDY5NTEsMzAuMDkxMjc4NyBDNDcuMzY3OTQ4MiwzMC4wOTEyNzg3IDUxLjQ4NDUyOTMsMzIuMjY3NTY3MiA1MS40ODQ1MjkzLDM3LjU3ODUxMTUgQzUxLjQ4NDUyOTMsNDIuNTg0MjIzIDQ3LjQ0OTc0NTIsNDUuMTQ3MTg2OSA0My40MzU0NTQ5LDQ1LjE0NzE4NjkgTDM3LjYyMzA1NjMsNDUuMTQ3MzYzOSBMMzcuNjIzMDU2MywzMC4wOTEyNzg3IEwzNy42MjMwNTYzLDMwLjA5MTI3ODcgWiI+PC9wYXRoPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik02NC4xMjQ5MjgxLDM5LjUwMTk3MzggTDY2LjQwNzc1OTUsMzMuNjEzMzE4IEw2OC42NjkyMDYsMzkuNTAxOTczOCBMNjQuMTI0OTI4MSwzOS41MDE5NzM4IFogTTcwLjY5NDE3MTgsNDUuMTQ3NTQxIEw3NC40OTg4OTA3LDQ1LjE0NzU0MSBMNjguMjU1OTQ0LDMwLjA5MTI3ODcgTDY0LjY4MjUzNzgsMzAuMDkxMjc4NyBMNTguMzc4Mjg3OSw0NS4xNDc1NDEgTDYyLjA4MDE4MTMsNDUuMTQ3NTQxIEw2My4xOTczNjA4LDQyLjE3NjY1NTcgTDY5LjU4Njk3MTksNDIuMTc2NjU1NyBMNzAuNjk0MTcxOCw0NS4xNDc1NDEgTDcwLjY5NDE3MTgsNDUuMTQ3NTQxIFoiPjwvcGF0aD4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg==" alt="TIDAL Logo" class="branded-logo-tidal">
-                    </center>
-                    <h1 class="margin-bottom-0 font-size-medium">Log In</h1>
-                    <h2 class="opacity-60 font-size-regular font-weight-normal margin-0" style="display:none;"></h2>
-                </div>
-                <div class="row no-margin-bottom">
-                    <div class="col-12 col-md-12 col-sm-12"><form novalidate="novalidate" _lpchecked="1"><div autocapitalize="none" spellcheck="false"><label for="email" class="form-select-label">
-                        Enter your email or username
-                        <!----></label> <input id="email" name="email" type="username" placeholder="Enter your email or username" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" required="required" maxlength="524288" minlength="4" value="" class="form-input custom-focus"> <div style="display:none;"></div></div> <button type="submit" disabled="disabled" rel="noopener noreferrer" id="recap-invisible" aria-label="Cannot continue. Please check any errors and required elements on the form." class="position-relative fullwidth btn-primary" data-v-40575bab=""><div class="text-center" data-v-40575bab=""><div data-v-40575bab="">Continue</div></div> <!----> <!----></button></form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-    
-    
-    
-    
-    
-    <div class="row">
-        <div class="col-5 col-centered-5"><p class="text-center padding-bottom-nudge padding-top-nudge font-size-small">or</p> <button type="button" rel="noopener noreferrer" twitter-error-message="Twitter login failed. Please try again. If the error persists, contact customer support." client-id="com.aspiro.TIDAL.client" redirect-uri="https://login.tidal.com/api/apple/return" nonce="d484759a-8f70-4b6f-bb72-1a136bed5596" oauth-client-string="H4sIAAAAAAAAAxVTh43EQAhsiRy-m8VA_yU8J1ta2UIzTFgdau8ZQMfGxcxuX4_-VCZU_wyoyGsQW1hIDMcq37dpDkwTPgXy0Rcy6O_zprT3vKgNYmlVx1egv8e8-dV0M9A2mjIUmfD6h1nMFLdAYTwZe7eFGbCA6Hr5cHtiBT3G-O4pz1bp-KiWEgZao1OndY7xvpbfW1uiw_gOlCKw19s-4fl0yB6v5Qdympb6JXqGgeC060HGfP6iA_HDbcKt4-qwlU3go1NtCKSz7Uv3_g6AtXFieaOXyj66UzQw-_sSTugTi-1T9ThMP6yM1xbEaLdfCPYr8UE4g4f3cgHJKkARWqtTeC8phWa7KNpgudH9nWkUjIS3vnPMwdaFaCkn7DL0I_ZzeBteONv5NiTeovqUaHzgM8CRnP0uRf32LBW2vDmjbDI7H8IVzJwbeACo25D2cn9Vso_oeiBvr0XHPfgCTsbVYK8bFJm11wsSVO_Nl1Bb9fBz-B70YChjfvJsWAz0hU3U3Pjg7aWlJv382qOm-Eyzbo8DEzwl50SlQDz4GPKpT-5yXQmOINYUWm77zC_Hr0bXFDzTe-icU6QHvGB5N6Hhi1Snm52nHwe5BVf72zNo8oefj7Xe5a4_cEBbXaib3W-dXXdE2e82XK2t4jK59h3r2blZ0f5d-Q77o6tdDqm_g76IlzWSISQiMuoiQNBykY-vp9uZdPV9dxvp_DhdPMRHamX8XdRt78jyjuHwutRshgpnrJv0H6bY2LDzAwAA" class="position-relative fullwidth login-facebook btn-secondary-outline" data-v-40575bab="">
-        <div class="text-center" data-v-40575bab="">
-        <div class="button-icons" data-v-40575bab=""><span class="reset-icon-position" data-v-5e688591="" data-v-40575bab=""><i class="tidal-icon" data-v-5e688591=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12.0611C22 6.50451 17.5229 2 12 2C6.47715 2 2 6.50451 2 12.0611C2 17.0828 5.65684 21.2452 10.4375 22V14.9694H7.89844V12.0611H10.4375V9.84452C10.4375 7.32296 11.9305 5.93012 14.2146 5.93012C15.3084 5.93012 16.4531 6.12663 16.4531 6.12663V8.60261H15.1922C13.95 8.60261 13.5625 9.37822 13.5625 10.1747V12.0611H16.3359L15.8926 14.9694H13.5625V22C18.3432 21.2452 22 17.0828 22 12.0611Z"></path></svg></i></span></div> 
-        <div data-v-40575bab="">Continue with Facebook</div></div> <!----> <!----></button>
-        <div event-data="[object Object]" facebook-error-message="Facebook login failed. Please try again. If the error persists, contact customer support." twitter-error-message="Twitter login failed. Please try again. If the error persists, contact customer support." restrictions="[object Object]" tidal-tracking="[object Object]" class="position-relative"><button type="button" rel="noopener noreferrer" id="appleid-signin" class="position-relative fullwidth apple-signin-btn btn-secondary-outline margin-top-1" data-v-40575bab="">
-        <div class="apple-copy-div">Continue with Apple</div></button> 
-        <div class="apple-icon"><svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" fill-rule="evenodd" d="M15.7942 0.5C15.7942 0.5 13.8761 0.50897 12.4961 2.32739C11.269 3.94469 11.5815 5.32809 11.5815 5.32809C11.5815 5.32809 13.2451 5.6158 14.7089 3.85706C16.0795 2.20975 15.7942 0.5 15.7942 0.5ZM12.8574 6.19397C12.4058 6.37597 12.0348 6.52552 11.7568 6.52552C11.409 6.52552 10.9848 6.36319 10.4934 6.17514C9.81674 5.91623 9.01267 5.60854 8.1051 5.60854C5.65845 5.60854 3.05 7.79921 3.05 11.9753C3.05 16.22 6.13178 21.5003 8.57118 21.5C8.95062 21.5 9.42056 21.3297 9.94158 21.1408C10.5897 20.9059 11.3169 20.6424 12.0473 20.6424C12.7022 20.6424 13.2701 20.8545 13.8305 21.0639C14.3765 21.2679 14.9154 21.4693 15.521 21.4693C18.1922 21.4693 20.17 15.9026 20.17 15.9026C20.17 15.9026 17.3408 14.8073 17.3408 11.6289C17.3408 8.8114 19.6118 7.65017 19.6118 7.65017C19.6118 7.65017 18.4506 5.5499 15.4989 5.5499C14.4554 5.5499 13.5591 5.91112 12.8574 6.19397Z"></path></svg></div></div><button type="button" rel="noopener noreferrer" facebook-error-message="Facebook login failed. Please try again. If the error persists, contact customer support." client-id="com.aspiro.TIDAL.client" redirect-uri="https://login.tidal.com/api/apple/return" nonce="d484759a-8f70-4b6f-bb72-1a136bed5596" oauth-client-string="H4sIAAAAAAAAAxVTh43EQAhsiRy-m8VA_yU8J1ta2UIzTFgdau8ZQMfGxcxuX4_-VCZU_wyoyGsQW1hIDMcq37dpDkwTPgXy0Rcy6O_zprT3vKgNYmlVx1egv8e8-dV0M9A2mjIUmfD6h1nMFLdAYTwZe7eFGbCA6Hr5cHtiBT3G-O4pz1bp-KiWEgZao1OndY7xvpbfW1uiw_gOlCKw19s-4fl0yB6v5Qdympb6JXqGgeC060HGfP6iA_HDbcKt4-qwlU3go1NtCKSz7Uv3_g6AtXFieaOXyj66UzQw-_sSTugTi-1T9ThMP6yM1xbEaLdfCPYr8UE4g4f3cgHJKkARWqtTeC8phWa7KNpgudH9nWkUjIS3vnPMwdaFaCkn7DL0I_ZzeBteONv5NiTeovqUaHzgM8CRnP0uRf32LBW2vDmjbDI7H8IVzJwbeACo25D2cn9Vso_oeiBvr0XHPfgCTsbVYK8bFJm11wsSVO_Nl1Bb9fBz-B70YChjfvJsWAz0hU3U3Pjg7aWlJv382qOm-Eyzbo8DEzwl50SlQDz4GPKpT-5yXQmOINYUWm77zC_Hr0bXFDzTe-icU6QHvGB5N6Hhi1Snm52nHwe5BVf72zNo8oefj7Xe5a4_cEBbXaib3W-dXXdE2e82XK2t4jK59h3r2blZ0f5d-Q77o6tdDqm_g76IlzWSISQiMuoiQNBykY-vp9uZdPV9dxvp_DhdPMRHamX8XdRt78jyjuHwutRshgpnrJv0H6bY2LDzAwAA" class="position-relative fullwidth btn-secondary-outline margin-top-1" data-v-40575bab="">
-        <div class="text-center" data-v-40575bab=""><div class="button-icons" data-v-40575bab=""><span class="reset-icon-position" data-v-5e688591="" data-v-40575bab=""><i class="tidal-icon" data-v-5e688591=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9.043038547039032,19.287382125854492 c7.056911468505859,0 10.915983200073242,-5.899184226989746 10.915983200073242,-11.014488220214844 c0,-0.16762952506542206 -0.0033659907057881355,-0.33450424671173096 -0.010995568707585335,-0.5004733800888062 c0.7490451335906982,-0.5463619232177734 1.4002522230148315,-1.228125810623169 1.9139771461486816,-2.0043842792510986 c-0.687484860420227,0.308088093996048 -1.4272549152374268,0.5157946944236755 -2.2033026218414307,0.6093834638595581 c0.7921298742294312,-0.47911393642425537 1.4002522230148315,-1.2374845743179321 1.6870344877243042,-2.1413705348968506 c-0.7414155006408691,0.4434143900871277 -1.5621936321258545,0.7659181952476501 -2.436079740524292,0.9395856857299805 C18.2096044421196,4.423229694366455 17.2125226855278,3.952569007873535 16.109228312969208,3.952569007873535 c-2.1189286708831787,0 -3.8371541500091553,1.7337313890457153 -3.8371541500091553,3.8709514141082764 c0,0.30386146903038025 0.03373470529913902,0.5991944074630737 0.09948372840881348,0.8826776146888733 C9.183065593242645,8.544454574584961 6.355632960796356,7.003940105438232 4.463571727275848,4.661579608917236 c-0.3297922611236572,0.5719479322433472 -0.519559383392334,1.2367298603057861 -0.519559383392334,1.9456645250320435 c0,1.3431493043899536 0.6773121953010559,2.528783082962036 1.7072303295135498,3.2223966121673584 c-0.6292158961296082,-0.019547952339053154 -1.220508098602295,-0.19404567778110504 -1.7375990152359009,-0.4843217134475708 c-0.0008975975797511637,0.016151590272784233 -0.0008975975797511637,0.0323786661028862 -0.0008975975797511637,0.0493604950606823 c0,1.8750957250595093 1.322684645652771,3.440291166305542 3.0780112743377686,3.7952499389648438 c-0.3221627175807953,0.08845644444227219 -0.6613048911094666,0.13615651428699493 -1.011367917060852,0.13615651428699493 c-0.24713851511478424,0 -0.48754504323005676,-0.02468024007976055 -0.7212195992469788,-0.06981417536735535 c0.48844268918037415,1.538025140762329 1.9047019481658936,2.657240867614746 3.584106683731079,2.688789129257202 c-1.3133348226547241,1.0383068323135376 -2.9674575328826904,1.6570491790771484 -4.764970779418945,1.6570491790771484 c-0.30959630012512207,0 -0.6149290800094604,-0.017812110483646393 -0.9152502417564392,-0.05358712747693062 c1.6980301141738892,1.0979315042495728 3.714034080505371,1.7388635873794556 5.880983829498291,1.7388635873794556"></path></svg></i></span></div> 
-        <div data-v-40575bab="">Continue with Twitter</div></div> <!----> <!----></button> <!----></div></div>
-    
-    
- 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <script id="oauth-template" type="text/x-handlebars-template">
-      <h2>oAuth info</h2>
-      <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
-      </dl>
-    </script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script>
-      (function() {
-        /**
-         * Obtains parameters from the hash of the URL
-         * @return Object
-         */
-        function getHashParams() {
-          var hashParams = {};
-          var e, r = /([^&;=]+)=?([^&;]*)/g,
-              q = window.location.hash.substring(1);
-          while ( e = r.exec(q)) {
-             hashParams[e[1]] = decodeURIComponent(e[2]);
-          }
-          return hashParams;
-        }
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile');
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
-        var params = getHashParams();
-        var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
-        if (error) {
-          alert('There was an error during the authentication');
-        } else {
-          if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
-            $.ajax({
-                url: 'https://api.tidal.com/v1/me',
-                headers: {
-                  'Authorization': 'Bearer ' + access_token
-                },
-                success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-                  $('#login').hide();
-                  $('#loggedin').show();
-                }
-            });
-          } else {
-              // render initial screen
-              $('#login').show();
-              $('#loggedin').hide();
-          }
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
-              }
-            }).done(function(data) {
-              access_token = data.access_token;
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
-              });
-            });
-          }, false);
-        }
-      })();
-    </script>
-  </body>
-</html>
