@@ -202,9 +202,9 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
 
 
 
-https://api.tidal.com/v1/login/username&username=hanshenrik32@gmail.com&password=hhpky83xbip&token=clientid
+// https://api.tidal.com/v1/login/username&username=hanshenrik32@gmail.com&password=hhpky83xbip&token=clientid
 
-https://api.tidal.com/v1/login/username%26username%3Dhanshenrik32%40gmail.com%26password%3Dhhpky83xbip%26token%3Dclientid
+// https://api.tidal.com/v1/login/username%26username%3Dhanshenrik32%40gmail.com%26password%3Dhhpky83xbip%26token%3Dclientid
 
 // ****************************************************************************************
 // IN USE
