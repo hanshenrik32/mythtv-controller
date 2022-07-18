@@ -66,9 +66,6 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-//#ifdef ENABLE_TIDAL
-#include "myctrl_tidal.h"
-//#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"
@@ -136,19 +133,18 @@ extern char __BUILD_NUMBER;
 #include "myctrl_spotify.h"
 
 //#ifdef ENABLE_TIDAL
-//#include "myctrl_tidal.h"
+#include "myctrl_tidal2.h"
 //#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
 #include "readjpg.h"
 // #include "myth_picture.h"
 
-extern rss_stream_class rssstreamoversigt;              // stream
+extern rss_stream_class rssstreamoversigt;
 
 #ifdef ENABLE_SPOTIFY
 spotify_class spotify_oversigt;
-static bool do_update_spotify_playlist = false;         // do it first time thread
-bool global_use_spotify_local_player = false;            // defaule do not startup spotify player under boot
+static bool do_update_spotify_playlist = false;           // do it first time thread
 #endif
 
 // tidal music class
@@ -157,7 +153,7 @@ bool global_use_spotify_local_player = false;            // defaule do not start
   static bool do_update_tidal_playlist = false;           // do it first time thread
 #endif
 
-char debuglogdata[1024];                                // used by log system
+char debuglogdata[1024];                                  // used by log system
 
 // struct used by keyboard config of functions keys
 
@@ -960,7 +956,7 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice,enablespotify};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1109,10 +1105,6 @@ int parse_config(char *filename) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
-            } else if (strncmp(buffer+n,"enablespotify",12)==0) {
-              command = true;
-              command_nr=enablespotify;
-              commandlength=12;
             } else command = false;
           }
           strcpy(value,"");
@@ -1281,12 +1273,7 @@ int parse_config(char *filename) {
               #ifdef ENABLE_SPOTIFY
               strcpy(spotify_oversigt.active_default_play_device_name,value);   //
               #endif
-            } else if (command_nr==spotifydefaultdevice) {                      // do now work for now
-              if (strcmp(value,"yes")==0) global_use_spotify_local_player=true;
-              else if (strcmp(value,"no")==0) global_use_spotify_local_player=false;
-              else global_use_spotify_local_player=false;
             }
-
           }
         }
         strcpy(buffer,"");
@@ -1386,9 +1373,6 @@ int save_config(char * filename) {
       else sprintf(temp,"tvguidercolor=no\n");
       fputs(temp,file);
       #ifdef ENABLE_SPOTIFY
-      if (global_use_spotify_local_player) sprintf(temp,"enablespotify=yes\n");
-      else sprintf(temp,"enablespotify=no\n");
-      fputs(temp,file);
       sprintf(temp,"spotifydefaultdevice=%s\n",spotify_oversigt.get_device_name(spotify_oversigt.active_default_play_device));
       fputs(temp,file);
       #endif
@@ -3210,11 +3194,10 @@ void display() {
         }
         glPopMatrix();
     }
-
-
-
     // radio stuf / music / spotyfi / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
+      // Show tidal and spotify icons
+      #ifndef ENABLE_TIDAL
       // img radio button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, radiobutton);
@@ -3260,6 +3243,73 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/3)-200)+0, 0.0);
       glEnd();
       glPopMatrix();
+      #else
+      // if Tidal defined (supported)
+      // img radio button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, radiobutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(80);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, (orgwinsizey-400)+0-75, 0.0);
+      glEnd();
+      glPopMatrix();
+
+      // img music button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, musicbutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(81);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0-200, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500-200, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glEnd();
+      glPopMatrix();
+
+      // img spotify button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, spotifybutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(82);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, (orgwinsizey-400)+0-75, 0.0);
+      glEnd();
+
+      glPopMatrix();
+      // img tidal button
+      glPushMatrix();
+      glBindTexture(GL_TEXTURE_2D, tidalbutton);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glLoadName(83);
+      glBegin(GL_QUADS);
+
+      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+0+400, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+200-75, 0.0);
+      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+500+400, ((orgwinsizey/2)-125)+0-75, 0.0);
+      glEnd();
+      glPopMatrix();
+      #endif
     }
 
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
@@ -3402,12 +3452,10 @@ void display() {
         spotifyknapnr=1;                                                        // reset pos
         spotify_oversigt_loaded_begin=true;
         if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
-          if (spotify_oversigt.search_playlist_song==0) {                        //
-            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
-            spotify_oversigt.sort_stack_byname();
-          } else {
-            spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
-          }
+          if (spotify_oversigt.search_playlist_song==0)                         //
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
+          else
+           spotify_oversigt.opdatere_spotify_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
           //spotify_oversigt.load_spotify_iconoversigt();
           keybuffer[0] = 0;
           keybufferindex = 0;
@@ -3444,8 +3492,11 @@ void display() {
       // music view
       if (vis_music_oversigt) {
 
-        // New ver fast
+        // New ver
        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
+
+        // old ver
+        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
 
         if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_film_oversigt) {
@@ -3753,13 +3804,6 @@ void display() {
     //
     if ((vis_music_oversigt) && (!(visur)) && (ask_open_dir_or_play) && (mknapnr>0)) {
       do_swing_music_cover = false;
-      static float z_rotate=0.0f;
-      static bool do_z_rotate=false;
-      if (do_z_rotate) z_rotate=z_rotate+1.0f;
-      if (z_rotate>180) {
-        do_z_rotate=false;
-        z_rotate=0.0f;
-      }
       if (do_swing_music_cover==false) {
         xof = 500;
         yof = 200;
@@ -3770,8 +3814,7 @@ void display() {
         glColor3f(1.0f, 1.0f, 1.0f);
         //glBlendFunc(GL_ONE, GL_ONE);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        glRotatef(z_rotate, 0.0f, 0.0f, 1.0f);
-        //glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+        glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
         glBindTexture(GL_TEXTURE_2D, _textureId9_askbox);						// texture9
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3935,12 +3978,7 @@ void display() {
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
           i++;
-          glPopMatrix();
-          glPushMatrix();
-          glTranslatef(560.0f+550.0f, 850.0f -ofset, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-          //glTranslatef(5.0f, 0.0f, 0.0f);
+          glTranslatef(5.0f, 0.0f, 0.0f);
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
@@ -4190,7 +4228,6 @@ void display() {
               fprintf(stderr,"Error load music. %s\n",aktivplay_music_path);
               ERRCHECK_SDL(Mix_GetError(),rknapnr);
             }
-
             if (sdlmusicplayer) {
               radiooversigt.set_radio_popular(rknapnr-1);                             // set afspillings antal
               radiooversigt.set_radio_online(rknapnr-1,true);                         // station virker fint ok status igen
@@ -7398,9 +7435,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
               if ((spotify_oversigt.type==0) || (spotify_oversigt.type==1)) {
                 // update
-
-printf("loader now 7065 **********************************************\n");
-
                 spotify_selected_startofset=0;                                  // default selected in view
                 spotify_oversigt.opdatere_spotify_oversigt(0);                  // update view
                 //spotify_oversigt.load_spotify_iconoversigt();                   // load icons
@@ -7518,13 +7552,10 @@ printf("loader now 7065 **********************************************\n");
           // do update from root
           if ((spotifyknapnr==1) && (spotify_oversigt.show_search_result)) {
             // update
-
-printf("loader now 7185 **********************************************\n");
-
             spotify_selected_startofset=0;
             spotify_oversigt.opdatere_spotify_oversigt(0);                      // update view
             //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-            spotify_oversigt.set_search_loaded();                               // triger icon loader
+            spotify_oversigt.set_search_loaded();                           // triger icon loader
             ask_open_dir_or_play_spotify = false;
             fundet = true;
           }
@@ -8299,13 +8330,9 @@ int gl_select(int x,int y) {
     return(list_hits(hits, buff,x,y));	// return 1 = scroll up 2 = scroll down 0 = no scroll
 }
 
-
-
-
-
 // ****************************************************************************************
 //
-//               mouse handler
+// ************* mouse handler ********************************************************************************************
 //
 // ****************************************************************************************
 
@@ -8794,10 +8821,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           if ((( retfunc == 3 ) || (button==3)) && (spotifyknapnr>0)) {
             ask_open_dir_or_play_spotify=false;
             // write debug log
-
-printf("loader now 8150 **********************************************\n");
-
-
             sprintf(debuglogdata,"Open spotify playliste %s ", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             write_logfile((char *) debuglogdata);
             // opdate view from intnr id.
@@ -8864,22 +8887,16 @@ printf("loader now 8150 **********************************************\n");
             if (spotify_selected_startofset<0) spotify_selected_startofset=0;
             button=0;
           }
-          // back button
+          // back
           if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
-
-printf("loader now 8216 **********************************************\n");
-
-
             if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
             spotify_oversigt.clean_spotify_oversigt();
             //printf("huskname %s \n",huskname  );
-            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0);  // type 0 = earch artist name
-
-            //spotify_oversigt.sort_stack_byname();
-
-            //spotify_oversigt.load_spotify_iconoversigt();                           // load icons
-            spotify_oversigt.set_search_loaded();                                     // triger icon loader
-            spotifyknapnr=0;                                                          // reset selected
+            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
+            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+            spotify_oversigt.set_search_loaded();                           // triger icon loader
+            //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+            spotifyknapnr=0;                                                  // reset selected
             spotify_selected_startofset=0;
             strcpy(spotify_oversigt.overview_show_band_name,"");
           }
@@ -8909,16 +8926,13 @@ printf("loader now 8216 **********************************************\n");
             //static char huskname[1024];
             strcpy(huskname,spotify_oversigt.get_spotify_name(spotifyknapnr-1));
             strcpy(spotify_oversigt.overview_show_band_name,huskname);
-            printf("Loading spotify search view......\n");
+            printf("Loading view......\n");
             // Ingen icons bliver loaded da det er url som staar i gfxlink og er IKKE downloaded
             spotify_oversigt.clean_spotify_oversigt();                                              //
-            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  // type 3 = tracks ()
+            if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
-            // Sort cd names
-            spotify_oversigt.sort_stack_byname();                               // sort dubliter
-            //spotify_oversigt.set_search_loaded();                             // triger icon loader
+            //spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
-
             spotify_oversigt.set_search_loaded();
             printf("Done Loading view......\n");
             // reset select in spotify view
@@ -8930,20 +8944,16 @@ printf("loader now 8216 **********************************************\n");
             ask_open_dir_or_play_spotify=false;                                                               // close widow again
             if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"")!=0) {
               switch (spotify_oversigt.get_spotify_type(spotifyknapnr-1)) {
-                case 0: sprintf(debuglogdata,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
-                        write_logfile((char *) debuglogdata);
+                case 0: fprintf(stderr,"button nr %d play Spotify playlist %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_playlist( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-1 ), 1);
                         break;
-                case 1: sprintf(debuglogdata,"button nr %d play Spotify artist song %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-2),spotify_oversigt.get_spotify_type(spotifyknapnr-2));
-                        write_logfile((char *) debuglogdata);
+                case 1: fprintf(stderr,"button nr %d play Spotify artist song %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-2),spotify_oversigt.get_spotify_type(spotifyknapnr-2));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_song( spotify_oversigt.get_spotify_playlistid( spotifyknapnr-2 ), 1);
                         break;
-                case 2: sprintf(debuglogdata,"button nr %d play Spotify artist name %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
-                        write_logfile((char *) debuglogdata);
+                case 2: fprintf(stderr,"button nr %d play Spotify artist name %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_artist( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
-                case 3: sprintf(debuglogdata,"button nr %d play Spotify album %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
-                        write_logfile((char *) debuglogdata);
+                case 3: fprintf(stderr,"button nr %d play Spotify album %s type = %d\n",spotifyknapnr-1,spotify_oversigt.get_spotify_name(spotifyknapnr-1),spotify_oversigt.get_spotify_type(spotifyknapnr-1));
                         // do not play the right album
                         spotify_player_start_status = spotify_oversigt.spotify_play_now_album( spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1) , 1);
                         break;
@@ -9979,9 +9989,9 @@ void handlespeckeypress(int key,int x,int y) {
                       if ((realrssrecordnr)<43) realrssrecordnr++;
                     }
                   }
-                  // setup spotify window
+                  // setup rss source window
                   if (do_show_setup_spotify) {
-                    if (do_show_setup_select_linie<2) do_show_setup_select_linie++;
+                    if (do_show_setup_select_linie<1) do_show_setup_select_linie++;
                   }
                   // tv graber setup
                   if (do_show_tvgraber) {
@@ -10552,23 +10562,27 @@ void handleKeypress(unsigned char key, int x, int y) {
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
     if (key=='+') {
       #ifdef ENABLE_SPOTIFY
-      if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
-      #if defined USE_FMOD_MIXER
-      if (sndsystem) channel->setVolume(configsoundvolume);
-      #endif
-      save_config((char *) "/etc/mythtv-controller.conf");
-      show_volume_info=true;					// show volume info window
-      vis_volume_timeout=80;
+      if (!(vis_spotify_oversigt)) {
+        if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
+        #if defined USE_FMOD_MIXER
+        if (sndsystem) channel->setVolume(configsoundvolume);
+        #endif
+        save_config((char *) "/etc/mythtv-controller.conf");
+        show_volume_info=true;					// show volume info window
+        vis_volume_timeout=80;
+      }
       #endif
     }
     if (key=='-') {                               // volume down
-      if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
-      #if defined USE_FMOD_MIXER
-      if (sndsystem) channel->setVolume(configsoundvolume);
-      #endif
-      save_config((char *) "/etc/mythtv-controller.conf");
-      show_volume_info=true;					// show volume info window
-      vis_volume_timeout=80;
+      if (!(vis_spotify_oversigt)) {
+        if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
+        #if defined USE_FMOD_MIXER
+        if (sndsystem) channel->setVolume(configsoundvolume);
+        #endif
+        save_config((char *) "/etc/mythtv-controller.conf");
+        show_volume_info=true;					// show volume info window
+        vis_volume_timeout=80;
+      }
     }
     if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
       // rss setup windows is open
@@ -10985,13 +10999,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
               }
             } else if (do_show_setup_spotify) {
-              if ((key!=13) && (key!=32)) {
+              if (key!=13) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';	// else input key text in buffer
-              }
-              if (key==32) {
-                  global_use_spotify_local_player=!global_use_spotify_local_player;
               }
             } else if (do_show_videoplayer) {
               // video player setting
@@ -11216,7 +11227,6 @@ void handleKeypress(unsigned char key, int x, int y) {
                        break;
                case 1: strcpy(spotify_oversigt.spotify_secret_id,keybuffer);
                        break;
-               case 2: break;
              }
          }
          #endif
@@ -11424,14 +11434,8 @@ void handleKeypress(unsigned char key, int x, int y) {
             case '*':
               // update spotify
               // or ask record tv program
+              //if ((do_update_spotify_playlist==false) && (spotify_oversigt_loaded_begin==false)) do_update_spotify_playlist=true;       // set update flag
               #ifdef ENABLE_SPOTIFY
-              if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
-                if (do_show_spotify_search_oversigt==false) {
-                  if (do_update_spotify_playlist==false) do_update_spotify_playlist=true;       // set update flag til true og start background update
-                } else if (vis_music_oversigt) do_zoom_music_cover=!do_zoom_music_cover;        // show/hide music info
-              }
-              if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-                if (do_show_spotify_search_oversigt) {
               if (vis_spotify_oversigt) {
                 // Do we show search view if yes do
                 if (do_show_spotify_search_oversigt == true ) {
@@ -11461,10 +11465,12 @@ void handleKeypress(unsigned char key, int x, int y) {
                 do_update_spotify_playlist=true;
               }
               #endif
+
+
               if (vis_radio_oversigt) do_zoom_radio=!do_zoom_radio;                      // show/hide music info
-              if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
-              if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
-              if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
+              else if (vis_film_oversigt) do_zoom_film_cover=!do_zoom_film_cover;             // film info
+              else if ((vis_stream_oversigt) && (sknapnr>0)) do_zoom_stream_cover=!do_zoom_stream_cover;  // stream info
+              else if ((vis_tv_oversigt) && (do_zoom_tvprg_aktiv_nr>0)) {                     // tv oversigt zoom
                 do_zoom_tvprg_aktiv_nr=0;
               } else if (vis_tv_oversigt) {
                 // spørg kan/skal vi optage den ?
@@ -11607,14 +11613,17 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               break;
             case 13:
-              if (vis_radio_oversigt) write_logfile((char *) "Start search radio station....");
-              if (vis_stream_oversigt)  write_logfile((char *) "Start search stream ....");
-              if (vis_tv_oversigt)  write_logfile((char *) "Start search tv overview....");
-              if (vis_spotify_oversigt)  write_logfile((char *) "Start search spotify....");
-              if (ask_save_playlist)  write_logfile((char *) "Save music playlist....");
-              if (vis_music_oversigt) {
-                if (ask_save_playlist)  write_logfile((char *) "Save playlist key pressed, update music list.");
-                else write_logfile((char *) "Enter key pressed, update music list.");
+              write_logfile((char *) "Start search....");
+              if (debugmode) {
+                if (vis_music_oversigt) {
+                  if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
+                  else fprintf(stderr,"Enter key pressed, update music list.\n");
+                } else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
+                else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
+                else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
+                else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
+                else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
+                else if (vis_spotify_oversigt) fprintf(stderr,"Enter key pressed in vis show spotify\n");
               }
               // set save flag of playlist
               if (ask_save_playlist) {
@@ -14798,7 +14807,7 @@ void *webupdate_loader_spotify(void *data) {
 
 // ****************************************************************************************
 //
-// phread dataload webserver for spotify
+// phread dataload webserver
 //
 // ****************************************************************************************
 
@@ -14820,7 +14829,8 @@ void *datainfoloader_webserver(void *data) {
       time(&lasttime);
       write_logfile((char *) "Update spotify token");
       if ((spotify_oversigt.spotify_get_token(),"")!=0) {
-        spotify_oversigt.spotify_refresh_token();        // new ver
+        //spotify_oversigt.spotify_refresh_token();       // old ver
+        spotify_oversigt.spotify_refresh_token2();        // new ver
       }
     }
     // get time
@@ -14832,9 +14842,8 @@ void *datainfoloader_webserver(void *data) {
       do_hent_spotify_search_online=false;
       spotify_oversigt_loaded_begin=true;
       spotify_oversigt.clean_spotify_oversigt();
-      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0); // type 0 = earch artist name
-      //spotify_oversigt.sort_stack_byname();
-      // spotify_oversigt.load_spotify_iconoversigt();                          // load icons
+      spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);
+      // spotify_oversigt.load_spotify_iconoversigt();                       // load icons
       printf("Done Update spotify search result thread.\n");
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
@@ -16090,10 +16099,7 @@ int main(int argc, char** argv) {
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
 
-    if (global_use_spotify_local_player) {
-      // start spotify player
-      system("spotify &");
-    }
+
 
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {
@@ -16272,8 +16278,7 @@ int main(int argc, char** argv) {
     Mix_Quit();
     #endif
     freegfx();                                                  // free gfx
-    // kill spotify
-    if (global_use_spotify_local_player) system("/usr/bin/killall -9 spotify");
+
     write_logfile((char *) "Exit program.");
     return(EXIT_SUCCESS);
 }
