@@ -240,7 +240,9 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
       printf("Tidal Return REQUEST Call \n");
+
       //printf("str %s \n",hm->uri.p);
+
       if (mg_strncmp( hm->uri,mg_mk_str_n("/tidal_web/",11),11) == 0) {
         char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
         //printf("Tidal Output %s \n", hm->uri.p);
@@ -272,18 +274,18 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
         p = strstr( hm->uri.p , "token="); // mg_mk_str_n("code=",5));
         if (p) {
           pspace=strchr(p,'&');
-          if (pspace==NULL) pspace=strchr(p,'\n');
+          if (pspace==NULL) pspace=strchr(p,'#');
           if (pspace) {
             codel=(pspace-p);
-            strncpy(user_pass,p+6,pspace-p);
-            *(user_pass+(pspace-p))='\0';
+            strncpy(user_token,p+6,pspace-p);
+            *(user_token+(pspace-p))='\0';
           }
           user_token[codel-6]='\0';
           printf("Username found %s\n",user_name);
           printf("password found %s\n",user_pass);
           printf("token    found %s\n",user_token);
         }
-
+        strcpy(user_token,"bakYq0nMtpuRYDtM");                                    // bakYq0nMtpuRYDtM
         strcpy(url_emcoded_user_name,"");
         strcpy(url_emcoded_user_pass,"");
         strcpy(url_emcoded_user_token,"");
@@ -298,7 +300,10 @@ static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
           if (encoded) strncpy(url_emcoded_user_token,encoded,1020);
           if (encoded) {
             if (strcmp(url_emcoded_user_name,"")!=0) {
-              sprintf(curlcommand,"curl -X POST -d 'username=%s&password=%s&token=%s' -H 'Content-Type: application/x-www-form-urlencoded' https://api.tidal.com/v1/login/username > tidal_access_token.txt",url_emcoded_user_name,url_emcoded_user_pass,"token");
+              sprintf(curlcommand,"curl -X POST -d 'username=%s&password=%s&token=%s' -H 'Content-Type: application/x-www-form-urlencoded' https://api.tidal.com/v1/login/username > tidal_access_token.txt",url_emcoded_user_name,url_emcoded_user_pass,url_emcoded_user_token);
+
+              printf("Curl command %s \n\n",curlcommand);
+
               curl_error=system(curlcommand);
             }
           }

@@ -663,6 +663,11 @@ const int MUSICMETER=6;
 int urtype=1;                                   // set default screen saver
 
 // *************************************************************************************************
+const char SOUNDUPKEY='+';
+const char SOUNDDOWNKEY='-';
+
+
+// *************************************************************************************************
 
 recorded_overigt recordoversigt;                // optaget programer oversigt
 bool reset_recorded_texture = false;
@@ -10563,7 +10568,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     saver_irq=true;                                     // stop screen saver
     char path[1024];
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
-    if (key=='+') {
+    if (key==SOUNDUPKEY) {
       #ifdef ENABLE_SPOTIFY
       if (!(vis_spotify_oversigt)) {
         if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
@@ -10576,7 +10581,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       #endif
     }
-    if (key=='-') {                               // volume down
+    if (key==SOUNDDOWNKEY) {                               // volume down
       if (!(vis_spotify_oversigt)) {
         if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
         #if defined USE_FMOD_MIXER
@@ -10587,7 +10592,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         vis_volume_timeout=80;
       }
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -10757,7 +10762,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           #ifdef ENABLE_SPOTIFY
           if ((vis_spotify_oversigt) && (keybufferindex==0)) {
             if (key=='D') {
-              do_select_device_to_play=true;
+              do_select_device_to_play=true;                                                                  // enable select dvice to play on
             }
           }
           if ((firsttimespotifyupdate==false) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
@@ -10765,7 +10770,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
                 //do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
-                if ((key!=13) && (key!='*')) {
+                if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10775,7 +10780,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             // do show search spodify oversigt online
             if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-              if ((key!=13) && (key!='*') &&  (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10787,7 +10792,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           #endif
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
-            if (key!=13) {
+            if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               keybuffer[keybufferindex]=key;
               keybufferindex++;
               keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10796,7 +10801,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
           // is ask for playlist file name use keybuffer to get filename
           if (ask_save_playlist) {
-            if (key!=13) {
+            if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               strcpy(playlistfilename,keybuffer);
               playlistfilename[keybufferindex]='\0';       // else input key text in buffer
@@ -10832,8 +10837,6 @@ void handleKeypress(unsigned char key, int x, int y) {
               channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
             }
           }
-
-
           // setup window
           if (do_show_setup) {
             if (do_show_setup_sound) {
