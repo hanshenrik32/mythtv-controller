@@ -97,6 +97,7 @@ class tidal_class {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
+        bool set_search_loaded() { search_loaded=true; }
         bool get_tidal_update_flag();
         void set_tidal_update_flag(bool flag);
         int loaded_antal;                                                       // antal loaded i loader
@@ -137,7 +138,6 @@ class tidal_class {
         char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
         int tidal_get_user_id();
         int tidal_get_available_devices();
-        char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };                   // get active dev id
         void clean_tidal_oversigt();
         void select_device_to_play();
         int gettoken();                               // TEST
@@ -168,6 +168,27 @@ class tidal_class {
         int spotify_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+
+
+        int auth_device_authorization();
+
+        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[0].song_name ); };                       //
+        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
+        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[0].release_date ); };            //
+
+        char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
+        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
+        int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
+        GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
+        int antal_tidal_streams() { return antalplaylists; };
+
+        int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
+        int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
+        char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
+        int streamantal() { return(antal-1); }                                  //
+        char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
+
 };
 
 #endif

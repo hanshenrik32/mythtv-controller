@@ -1,4 +1,4 @@
-C = gcc
+CC = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
 CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11

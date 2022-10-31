@@ -622,7 +622,7 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
 
 // ****************************************************************************************
 // Do work now
-// get user id from spotify api
+// get user id from tidal api
 //
 // return 0 if fault
 // 200  on ok
@@ -687,6 +687,83 @@ int tidal_class::tidal_get_user_id() {
   }
   return(httpCode);
 }
+
+// ****************************************************************************************
+// test test test
+// 1 . auth_device
+//
+// return -1 if fault
+// 200 on ok
+//
+// ****************************************************************************************
+
+
+
+int tidal_class::auth_device_authorization() {
+  static const char *userfilename = "tidal_user_id.txt";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode=-1;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=NULL;
+  sprintf((char *) post_playlist_data,"client_id: client_id&scope: r_usr+w_usr+w_sub");
+  devid=get_active_device_id();
+  if (devid) {
+    auth_kode="Authorization: Bearer ";
+    auth_kode=auth_kode + tidaltoken;
+    url="https://auth.tidal.com/v1/oauth2/device_authorization";
+    url=url + devid;
+    printf("auth device\n ");
+    // use libcurl
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl = curl_easy_init();
+    if ((curl) && (strlen(auth_kode.c_str())>0)) {
+      /* Add a custom header */
+      header = curl_slist_append(header, "Accept: application/json");
+      header = curl_slist_append(header, "Content-Type: application/json");
+      header = curl_slist_append(header, "charsets: utf-8");
+      //header = curl_slist_append(header, auth_kode.c_str());
+      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+      //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+      curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+      curl_easy_setopt(curl, CURLOPT_POST, 1);
+      // data to post
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+      // set type post/put
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); /* !!! */
+      userfile=fopen(userfilename,"w");
+      if (userfile) {
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+        res = curl_easy_perform(curl);
+        fclose(userfile);
+      }
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      if (httpCode == 200) {
+        return(200);
+      }
+    }
+  }
+  return(httpCode);
+}
+
+
+
 
 // ****************************************************************************************
 //
@@ -1454,8 +1531,10 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
+    // data to post
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
     res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {

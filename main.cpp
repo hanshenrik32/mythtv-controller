@@ -51,6 +51,7 @@ bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 bool stream_jump = false;
 
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -67,7 +68,7 @@ bool stream_jump = false;
 #endif
 
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal.h"
+#include "myctrl_tidal2.h"
 //#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
@@ -10109,7 +10110,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #endif
                 #ifdef ENABLE_TIDAL
-                // spotify stuf
+                // tidal stuf
                 if ((vis_tidal_oversigt) && (!(ask_open_dir_or_play_tidal))) {
                   // select play device
                   if (do_select_device_to_play) {
@@ -11459,7 +11460,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               #ifdef ENABLE_TIDAL
               if (vis_tidal_oversigt) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
-                write_logfile((char *) "Start spotify update thread");
+
+                tidal_oversigt.auth_device_authorization();
+
+                write_logfile((char *) "Start tidal update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
                 tidal_oversigt.gettoken();
                 printf("Token = %s \n",tidal_oversigt.tidal_get_token());
