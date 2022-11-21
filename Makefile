@@ -75,7 +75,7 @@ compile: $(PROG)
 #	mkdir  ~/.config/lirc/; \
 #		cp lirc/* ~/.config/lirc/; \
 #	fi
-#	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
@@ -126,8 +126,10 @@ install:
 	#@cp -r xmltv_config $(DESTDIR)
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
-	@cp mythtv-controller.desktop /usr/share/applications/
-	@cp mythtv-controller.desktop  ~/.local/share/applications
+	@if ! test -e ~/.local/share/applications; then \
+	 @cp mythtv-controller.desktop  ~/.local/share/applications
+	 @cp mythtv-controller.desktop /usr/share/applications/
+	fi
 	@cp mythtv-controller.desktop ~/Desktop
 	#@cp xmltv_config/*  ~/.xmltv/
 	#@chmod 666 ~/.xmltv/*
