@@ -3971,10 +3971,8 @@ void display() {
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
           ofset = 18*i;
           dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
-          pos=strrchr(temptxt,'/');
-          if (pos>0) strcpy(temptxt,pos+1);
-          pos=strrchr(temptxt,'.');
-          if (pos>0) temptxt[pos-temptxt]=0;
+          if (strrchr(temptxt,'/')) strcpy(temptxt,pos+1);
+          if (strrchr(temptxt,'.')) temptxt[pos-temptxt]=0;
           if (i<12) temptxt[54]=0; else temptxt[35]=0;
           sprintf(temptxt1,"%-45s",temptxt);
           temptxt1[45]='\0';
@@ -4603,12 +4601,12 @@ void display() {
         // hent song name
         aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
         pos=strrchr(temptxt,'/');
-        if (pos>0) {
+        if (strrchr(temptxt,'/')) {
           strcpy(temptxt1,pos+1);
           strcpy(temptxt,temptxt1);
         }
         pos=strrchr(temptxt,'.');
-        if (pos>0) {
+        if (strrchr(temptxt,'.')) {
           temptxt[pos-temptxt]='\0';
         }
         temptxt[40]=0;
@@ -4746,12 +4744,12 @@ void display() {
           glTranslatef(700.0f, 520.0f, 0.0f);
           aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr);
           pos=strrchr(temptxt,'/');
-          if (pos>0) {
+          if (strrchr(temptxt,'/')) {
             strcpy(temptxt1,pos+1);
             strcpy(temptxt,temptxt1);
           }
           pos=strrchr(temptxt,'.');
-          if (pos>0) temptxt[pos-temptxt]='\0';
+          if (strrchr(temptxt,'.')) temptxt[pos-temptxt]='\0';
           temptxt[40]=0;
           glRasterPos2f(0.0f, 0.0f);
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
