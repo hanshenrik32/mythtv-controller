@@ -2,7 +2,7 @@ CC = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
 CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
-LDFLAGS= 
+LDFLAGS=
 
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
@@ -70,11 +70,11 @@ all:
 
 compile: $(PROG)
 	@if ! test -f build-number.txt; then ouch build-number.txt; fi
-	
-	@if ! test -d ~/.config/lirc/; then \
-	mkdir  ~/.config/lirc/; \
-		cp lirc/* ~/.config/lirc/; \
-	fi
+
+	#@if ! test -d ~/.config/lirc/; then \
+	#mkdir  ~/.config/lirc/; \
+		#cp lirc/* ~/.config/lirc/; \
+	#fi
 	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 
@@ -88,7 +88,7 @@ Debug: $(PROG)
 
 mysqlfix:
 	echo 'sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"' > /etc/mysql/mysql.conf.d/mysqld.cnf
-	service mysql restart        
+	service mysql restart
 
 
 
@@ -117,13 +117,13 @@ installsound:
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
-	@mkdir -p /opt/mythtv-controller/images/radiostations	
+	@mkdir -p /opt/mythtv-controller/images/radiostations
 	@mkdir -p /opt/mythtv-controller/convert/hires
-	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
-	#@cp -r xmltv_config $(DESTDIR)	
+	#@cp -r xmltv_config $(DESTDIR)
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
 	@cp mythtv-controller.desktop /usr/share/applications/
@@ -146,7 +146,7 @@ install:
 	#    mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
 	#    mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -e "FLUSH PRIVILEGES;"
-	# If /root/.my.cnf doesn't exist then it'll ask for root password   
+	# If /root/.my.cnf doesn't exist then it'll ask for root password
 	#else
 	#    echo "Please enter root user MySQL password!"
 	#    echo "Note: password will be hidden when typing"
@@ -156,4 +156,3 @@ install:
 	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
 	#fi
-
