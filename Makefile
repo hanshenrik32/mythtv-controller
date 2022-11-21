@@ -134,10 +134,10 @@ install:
 	#@cp xmltv_config/*  ~/.xmltv/
 	#@chmod 666 ~/.xmltv/*
 	@chmod 777 /opt/mythtv-controller/tema*
-	@if ! test -e ~/.lirc; then \
-	  mkdir -p ~/.lirc/; \
-	  mkdir ~/.lircrc; \
-	  cp lirc/mythtv-controller* ~/.lirc/; fi
+#	@if ! test -e ~/.lirc; then \
+#	  mkdir -p ~/.lirc/; \
+#	  mkdir ~/.lircrc; \
+#	  cp lirc/mythtv-controller* ~/.lirc/; fi
 	# create random password
 	PASSWDDB="$(openssl rand -base64 12)"
 	# replace "-" with "_" for database username
