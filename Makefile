@@ -75,7 +75,7 @@ compile: $(PROG)
 #	mkdir  ~/.config/lirc/; \
 #		cp lirc/* ~/.config/lirc/; \
 #	fi
-	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+#	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
@@ -134,10 +134,10 @@ install:
 	#@cp xmltv_config/*  ~/.xmltv/
 	#@chmod 666 ~/.xmltv/*
 	@chmod 777 /opt/mythtv-controller/tema*
-#	@if ! test -e ~/.lirc; then \
-#	  mkdir -p ~/.lirc/; \
-#	  mkdir ~/.lircrc; \
-#	  cp lirc/mythtv-controller* ~/.lirc/; fi
+	@if ! test -e ~/.lirc; then \
+	  mkdir -p ~/.lirc/; \
+	  mkdir ~/.lircrc; \
+	  cp lirc/mythtv-controller* ~/.lirc/; fi
 	# create random password
 	PASSWDDB="$(openssl rand -base64 12)"
 	# replace "-" with "_" for database username
