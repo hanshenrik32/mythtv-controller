@@ -2494,6 +2494,7 @@ void display() {
     static int starttimer=0;                                                    // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];                             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
+    char songname_show_256[256];
     char temprgtxt[2000];
     int i;
     struct tm *timeinfo;
@@ -3970,11 +3971,16 @@ void display() {
         //aktivfont.selectfont("courier 10 Pitch");
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
           ofset = 18*i;
-          dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
-          if (strrchr(temptxt,'/')) strcpy(temptxt,pos+1);
-          if (strrchr(temptxt,'.')) temptxt[pos-temptxt]=0;
-          if (i<12) temptxt[54]=0; else temptxt[35]=0;
-          sprintf(temptxt1,"%-45s",temptxt);
+          dirmusic.popsong(songname_show_256,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
+          // new code
+          // get songname from file path
+          char *songname_show_256_temp;
+          songname_show_256_temp=(strrchr(songname_show_256,'/'));
+          if (songname_show_256_temp) {
+            strcpy(songname_show_256,songname_show_256_temp+1);
+          }
+          if (i<12) songname_show_256[54]=0; else songname_show_256[35]=0;
+          sprintf(temptxt1,"%-45s",songname_show_256);
           temptxt1[45]='\0';
           if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
            else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
@@ -3984,8 +3990,13 @@ void display() {
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
+          glPopMatrix();
           i++;
-          glTranslatef(5.0f, 0.0f, 0.0f);
+          glPushMatrix();
+          glTranslatef(560.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          glTranslatef(30.0f, 0.0f, 0.0f);
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
@@ -4758,7 +4769,7 @@ void display() {
         }
       }
     }
-    
+
     //
     // *************** Spotify show play stuf **********************************************************
     //
