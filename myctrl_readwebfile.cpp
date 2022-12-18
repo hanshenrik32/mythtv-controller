@@ -101,7 +101,7 @@ void get_host(char *hname,char *webpath,char *source) {
   if ((strlen(source)>7) && (strncmp(source,"http://",7)==0)) strcpy(tmptxt,source+7); // remove http(s)://
   else if ((strlen(source)>7) && (strncmp(source,"https://",8)==0)) strcpy(tmptxt,source+8); // remove http(s)://
   else strcpy(tmptxt,"");
-  if (strchr(tmptxt,'/')>0) {
+  if (strchr(tmptxt,'/')) {
     while((tmptxt[n]!='/') && (n<strlen(source))) {
       n++;
     }

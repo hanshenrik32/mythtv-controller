@@ -7,7 +7,7 @@ function loginStage1(username) {
 
 ?>
         <center><h2>Tidal login</h2></center>
-        <form action="http://localhost:8100/tidal_web/close.html" method="post" name="loginform" id="loginform">
+        <form action="localhost:/login:8100" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
                 <input type="hidden" name="authenticate" value="validate">
                 <input type="hidden" name="hash1" value="">
                 <input type="hidden" name="hash2" value="">
@@ -32,7 +32,7 @@ function loginStage1(username) {
                 <td></td>
                 <td>client_id:</td>
                 <td></td>
-                <td><input type="text" name="token" value="GvFhCVAYp3n43EN3" id="token" class="login"></td>
+                <td><input type="text" name="token" default="work01" id="token" class="login"></td>
                 <td></td>
         </tr>
         <tr class="space"><td colspan="5"></td></tr>

@@ -51,6 +51,7 @@ bool ask_save_playlist = false;
 bool save_ask_save_playlist = false;
 bool stream_jump = false;
 
+
 // Set sound system used
 //#define USE_SDL_MIXER 1
 #define USE_FMOD_MIXER 1
@@ -66,6 +67,12 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
+<<<<<<< HEAD
+=======
+//#ifdef ENABLE_TIDAL
+#include "myctrl_tidal2.h"
+//#endif
+>>>>>>> tidal
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"
@@ -659,6 +666,11 @@ const int PICTURE3D=5;
 const int MUSICMETER=6;
 
 int urtype=1;                                   // set default screen saver
+
+// *************************************************************************************************
+const char SOUNDUPKEY='+';
+const char SOUNDDOWNKEY='-';
+
 
 // *************************************************************************************************
 
@@ -2486,6 +2498,7 @@ void display() {
     static int starttimer=0;                                                    // show logo timeout
     bool do_play_music_aktiv_nr_select_array[1000];                             // array til at fortælle om sange i playlist askopendir er aktiv
     char temptxt[200];
+    char songname_show_256[256];
     char temprgtxt[2000];
     int i;
     struct tm *timeinfo;
@@ -3962,13 +3975,16 @@ void display() {
         //aktivfont.selectfont("courier 10 Pitch");
         while (((unsigned int) i<(unsigned int) dirmusic.numbersinlist()) && ((unsigned int) i<(unsigned int) dirmusiclistemax)) {	// er der nogle sange navne som skal vises
           ofset = 18*i;
-          dirmusic.popsong(temptxt,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
-          pos=strrchr(temptxt,'/');
-          if (pos>0) strcpy(temptxt,pos+1);
-          pos=strrchr(temptxt,'.');
-          if (pos>0) temptxt[pos-temptxt]=0;
-          if (i<12) temptxt[54]=0; else temptxt[35]=0;
-          sprintf(temptxt1,"%-45s",temptxt);
+          dirmusic.popsong(songname_show_256,&aktiv,i+do_show_play_open_select_line_ofset);				// hent sang info
+          // new code
+          // get songname from file path
+          char *songname_show_256_temp;
+          songname_show_256_temp=(strrchr(songname_show_256,'/'));
+          if (songname_show_256_temp) {
+            strcpy(songname_show_256,songname_show_256_temp+1);
+          }
+          if (i<12) songname_show_256[54]=0; else songname_show_256[35]=0;
+          sprintf(temptxt1,"%-45s",songname_show_256);
           temptxt1[45]='\0';
           if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
            else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
@@ -3978,8 +3994,13 @@ void display() {
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
           //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
+          glPopMatrix();
           i++;
-          glTranslatef(5.0f, 0.0f, 0.0f);
+          glPushMatrix();
+          glTranslatef(560.0f, 850.0f -ofset, 0.0f);
+          glRasterPos2f(0.0f, 0.0f);
+          glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+          glTranslatef(30.0f, 0.0f, 0.0f);
           if (aktiv==true) glcRenderString("[X]");
             else glcRenderString("[ ]");
           glPopMatrix();
@@ -4595,12 +4616,12 @@ void display() {
         // hent song name
         aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
         pos=strrchr(temptxt,'/');
-        if (pos>0) {
+        if (strrchr(temptxt,'/')) {
           strcpy(temptxt1,pos+1);
           strcpy(temptxt,temptxt1);
         }
         pos=strrchr(temptxt,'.');
-        if (pos>0) {
+        if (strrchr(temptxt,'.')) {
           temptxt[pos-temptxt]='\0';
         }
         temptxt[40]=0;
@@ -4738,12 +4759,12 @@ void display() {
           glTranslatef(700.0f, 520.0f, 0.0f);
           aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr);
           pos=strrchr(temptxt,'/');
-          if (pos>0) {
+          if (strrchr(temptxt,'/')) {
             strcpy(temptxt1,pos+1);
             strcpy(temptxt,temptxt1);
           }
           pos=strrchr(temptxt,'.');
-          if (pos>0) temptxt[pos-temptxt]='\0';
+          if (strrchr(temptxt,'.')) temptxt[pos-temptxt]='\0';
           temptxt[40]=0;
           glRasterPos2f(0.0f, 0.0f);
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
@@ -4752,6 +4773,7 @@ void display() {
         }
       }
     }
+
     //
     // *************** Spotify show play stuf **********************************************************
     //
@@ -10102,7 +10124,7 @@ void handlespeckeypress(int key,int x,int y) {
                 }
                 #endif
                 #ifdef ENABLE_TIDAL
-                // spotify stuf
+                // tidal stuf
                 if ((vis_tidal_oversigt) && (!(ask_open_dir_or_play_tidal))) {
                   // select play device
                   if (do_select_device_to_play) {
@@ -10561,7 +10583,7 @@ void handleKeypress(unsigned char key, int x, int y) {
     saver_irq=true;                                     // stop screen saver
     char path[1024];
     stream_loadergfx_started_break=true;		// break tread stream gfx loader
-    if (key=='+') {
+    if (key==SOUNDUPKEY) {
       #ifdef ENABLE_SPOTIFY
       if (!(vis_spotify_oversigt)) {
         if ((configsoundvolume+0.05)<1.0f) configsoundvolume+=0.05f;
@@ -10574,7 +10596,7 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       #endif
     }
-    if (key=='-') {                               // volume down
+    if (key==SOUNDDOWNKEY) {                               // volume down
       if (!(vis_spotify_oversigt)) {
         if ((configsoundvolume-0.05)>0) configsoundvolume-=0.05f;
         #if defined USE_FMOD_MIXER
@@ -10585,7 +10607,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         vis_volume_timeout=80;
       }
     }
-    if (((key!=27) && (key!='*') && (key!=13) && (key!='+') && (key!='-') && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
+    if (((key!=27) && (key!='*') && (key!=13) && (key!=SOUNDUPKEY) && (key!=SOUNDDOWNKEY) && (key!='S') && ((key!='U') && (vis_music_oversigt)) && ((vis_music_oversigt) || ((vis_radio_oversigt) && (key!=optionmenukey)) || (do_show_setup))) || (((do_show_tvgraber) || (do_show_setup_rss) || (do_show_setup) || ((vis_film_oversigt) && (key!=13))) && (key!=27)) || ((vis_spotify_oversigt) && (key!=13) && (key!='*')) && (key!=27)) {
       // rss setup windows is open
       if (do_show_setup_rss) {
         switch(do_show_setup_select_linie) {
@@ -10755,7 +10777,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           #ifdef ENABLE_SPOTIFY
           if ((vis_spotify_oversigt) && (keybufferindex==0)) {
             if (key=='D') {
-              do_select_device_to_play=true;
+              do_select_device_to_play=true;                                                                  // enable select dvice to play on
             }
           }
           if ((firsttimespotifyupdate==false) && (strcmp(spotify_oversigt.spotify_get_token(),"")!=0)) {
@@ -10763,7 +10785,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if ((vis_spotify_oversigt) && (!(do_show_spotify_search_oversigt))) {
               if ((do_select_device_to_play==false) && (do_zoom_spotify_cover==false)) {
                 //do_zoom_spotify_cover=!do_zoom_spotify_cover;                                             // close/open window
-                if ((key!=13) && (key!='*')) {
+                if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
                   keybuffer[keybufferindex]=key;
                   keybufferindex++;
                   keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10773,7 +10795,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             }
             // do show search spodify oversigt online
             if ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt)) {
-              if ((key!=13) && (key!='*') &&  (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10785,7 +10807,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           #endif
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
-            if (key!=13) {
+            if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               keybuffer[keybufferindex]=key;
               keybufferindex++;
               keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -10794,7 +10816,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           }
           // is ask for playlist file name use keybuffer to get filename
           if (ask_save_playlist) {
-            if (key!=13) {
+            if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
               strcpy(playlistfilename,keybuffer);
               playlistfilename[keybufferindex]='\0';       // else input key text in buffer
@@ -10830,8 +10852,6 @@ void handleKeypress(unsigned char key, int x, int y) {
               channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected=!channel_list[(do_show_setup_select_linie-1)+tvchannel_startofset].selected;
             }
           }
-
-
           // setup window
           if (do_show_setup) {
             if (do_show_setup_sound) {
@@ -11454,7 +11474,10 @@ void handleKeypress(unsigned char key, int x, int y) {
               #ifdef ENABLE_TIDAL
               if (vis_tidal_oversigt) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
-                write_logfile((char *) "Start spotify update thread");
+
+                tidal_oversigt.auth_device_authorization();
+
+                write_logfile((char *) "Start tidal update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
                 tidal_oversigt.gettoken();
                 printf("Token = %s \n",tidal_oversigt.tidal_get_token());

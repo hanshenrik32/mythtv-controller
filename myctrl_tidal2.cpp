@@ -216,23 +216,98 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
 //
 // ****************************************************************************************
 
-static void new_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
+  int curl_error;
+  char *encoded;
+  const char *p;
+  const char *pspace;
+  unsigned int codel;
   char user_token[1024];
+  char url_emcoded_user_token[1024];
+  char user_name[1024];
+  char url_emcoded_user_name[1024];
+  char user_pass[1024];
+  char url_emcoded_user_pass[1024];
+  char curlcommand[1024];
   const char *returncode_pointer;
   struct mg_serve_http_opts opts;
   struct http_message *hm = (struct http_message *) ev_data;
   CURL *curl = curl_easy_init();
+  strcpy(user_name,"");
+  strcpy(user_pass,"");
+  strcpy(user_token,"");
   switch (ev) {
     case MG_EV_HTTP_REQUEST:
       // Invoked when the full HTTP request is in the buffer (including body).
       printf("Tidal Return REQUEST Call \n");
+
       //printf("str %s \n",hm->uri.p);
+
       if (mg_strncmp( hm->uri,mg_mk_str_n("/tidal_web/",11),11) == 0) {
         char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
-        printf("Encoded output %s \n", output);
-        printf("%s",(char *) hm->uri.p);
-        exit(0);
+        //printf("Tidal Output %s \n", hm->uri.p);
+        //printf("%s",(char *) hm->uri.p);
+        //exit(0);
+        p = strstr( hm->uri.p , "username="); // mg_mk_str_n("code=",5));
+        if (p) {
+          pspace=strchr(p,'&');
+          if (pspace==NULL) pspace=strchr(p,'\n');
+          if (pspace) {
+            codel=(pspace-p);
+            strncpy(user_name,p+9,pspace-p);
+            *(user_name+(pspace-p))='\0';
+          }
+          user_name[codel-9]='\0';
+        }
+        p = strstr( hm->uri.p , "password="); // mg_mk_str_n("code=",5));
+        if (p) {
+          pspace=strchr(p,'&');
+          if (pspace==NULL) pspace=strchr(p,'\n');
+          if (pspace) {
+            codel=(pspace-p);
+            strncpy(user_pass,p+9,pspace-p);
+            *(user_pass+(pspace-p))='\0';
+          }
+          user_pass[codel-9]='\0';
+        }
 
+        p = strstr( hm->uri.p , "token="); // mg_mk_str_n("code=",5));
+        if (p) {
+          pspace=strchr(p,'&');
+          if (pspace==NULL) pspace=strchr(p,'#');
+          if (pspace) {
+            codel=(pspace-p);
+            strncpy(user_token,p+6,pspace-p);
+            *(user_token+(pspace-p))='\0';
+          }
+          user_token[codel-6]='\0';
+          printf("Username found %s\n",user_name);
+          printf("password found %s\n",user_pass);
+          printf("token    found %s\n",user_token);
+        }
+        strcpy(user_token,"bakYq0nMtpuRYDtM");                                    // bakYq0nMtpuRYDtM
+        strcpy(url_emcoded_user_name,"");
+        strcpy(url_emcoded_user_pass,"");
+        strcpy(url_emcoded_user_token,"");
+        if (p) {
+          encoded = curl_easy_escape(curl,user_name,strlen(user_name));
+          if (encoded) strncpy(url_emcoded_user_name,encoded,1020);
+          encoded = curl_easy_escape(curl,user_pass,strlen(user_pass));
+          if (encoded) strncpy(url_emcoded_user_pass,encoded,1020);
+          encoded = curl_easy_escape(curl,user_pass,strlen(user_pass));
+          if (encoded) strncpy(url_emcoded_user_pass,encoded,1020);
+          encoded = curl_easy_escape(curl,user_token,strlen(user_token));
+          if (encoded) strncpy(url_emcoded_user_token,encoded,1020);
+          if (encoded) {
+            if (strcmp(url_emcoded_user_name,"")!=0) {
+              sprintf(curlcommand,"curl -X POST -d 'username=%s&password=%s&token=%s' -H 'Content-Type: application/x-www-form-urlencoded' https://api.tidal.com/v1/login/username > tidal_access_token.txt",url_emcoded_user_name,url_emcoded_user_pass,url_emcoded_user_token);
+
+              printf("Curl command %s \n\n",curlcommand);
+
+              curl_error=system(curlcommand);
+            }
+          }
+        }
       }
       if (mg_strncmp( hm->uri,mg_mk_str_n("/call",5),5) == 0) {
         // Get server return code
@@ -261,15 +336,17 @@ static void new_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
     case MG_EV_CLOSE:
       fprintf(stdout,"Server closed connection\n");
   }
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
+  if (curl) {
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+  }
 }
 
 
 
 
 // ****************************************************************************************
-//
+// OLD NOT IN USE
 // web server handler (internal function)
 //
 // ****************************************************************************************
@@ -298,8 +375,6 @@ static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_da
   //strcpy(data,spotify_oversigt.spotify_client_id);
   //strcat(data,":");
   //strcat(data,spotify_oversigt.spotify_secret_id);
-
-
   // OLD FROM
   /*
   <form action="https://api.tidal.com/v1/login/username" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
@@ -409,36 +484,6 @@ static int s_exit_flag = 0;
 
 
 
-static void tidal_ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
-  struct http_message *hm = (struct http_message *) ev_data;
-  int connect_status;
-  switch (ev) {
-      case MG_EV_CONNECT:
-        connect_status = *(int *) ev_data;
-        if (connect_status != 0) {
-          fprintf(stderr,"Error connecting %s\n", strerror(connect_status));
-          s_exit_flag = 1;
-        }
-        break;
-      case MG_EV_HTTP_REPLY:
-        fwrite(hm->message.p, 1, (int)hm->message.len, stdout);
-        fprintf(stdout,"Got reply client :\n%.*s\n", (int) hm->body.len, hm->body.p);
-        fprintf(stdout,"***************************************** TIDAL CALL BACK **************************************************");
-        nc->flags |= MG_F_SEND_AND_CLOSE;
-        s_exit_flag = 1;
-        break;
-      case MG_EV_CLOSE:
-        if (s_exit_flag == 0) {
-          write_logfile((char *) "Server closed connection.");
-          fprintf(stdout,"Server closed connection\n");
-          s_exit_flag = 1;
-        };
-        break;
-      default:
-        break;
-    }
-}
-
 
 // ****************************************************************************************
 //
@@ -533,7 +578,7 @@ tidal_class::tidal_class() : antal(0) {
     // start web server
     // create web server
     mg_mgr_init(&mgr, NULL);                                                    // Initialize event manager object
-    c = mg_bind(&mgr, s_http_port, new_ev_handler); // old tidal_server_ev_handler);
+    c = mg_bind(&mgr, s_http_port, ev_handler);
     mg_set_protocol_http_websocket(c);
     active_tidal_device=-1;                                                   // active spotify device -1 = no dev is active
     active_default_play_device=active_tidal_device;
@@ -577,7 +622,7 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
 
 // ****************************************************************************************
 // Do work now
-// get user id from spotify api
+// get user id from tidal api
 //
 // return 0 if fault
 // 200  on ok
@@ -642,6 +687,83 @@ int tidal_class::tidal_get_user_id() {
   }
   return(httpCode);
 }
+
+// ****************************************************************************************
+// test test test
+// 1 . auth_device
+//
+// return -1 if fault
+// 200 on ok
+//
+// ****************************************************************************************
+
+
+
+int tidal_class::auth_device_authorization() {
+  static const char *userfilename = "tidal_user_id.txt";
+  FILE *userfile;
+  std::string auth_kode;
+  std::string response_string;
+  std::string url;
+  char post_playlist_data[4096];
+  int httpCode=-1;
+  CURLcode res;
+  struct curl_slist *header = NULL;
+  char *devid=NULL;
+  sprintf((char *) post_playlist_data,"client_id: client_id&scope: r_usr+w_usr+w_sub");
+  devid=get_active_device_id();
+  if (devid) {
+    auth_kode="Authorization: Bearer ";
+    auth_kode=auth_kode + tidaltoken;
+    url="https://auth.tidal.com/v1/oauth2/device_authorization";
+    url=url + devid;
+    printf("auth device\n ");
+    // use libcurl
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl = curl_easy_init();
+    if ((curl) && (strlen(auth_kode.c_str())>0)) {
+      /* Add a custom header */
+      header = curl_slist_append(header, "Accept: application/json");
+      header = curl_slist_append(header, "Content-Type: application/json");
+      header = curl_slist_append(header, "charsets: utf-8");
+      //header = curl_slist_append(header, auth_kode.c_str());
+      curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_file_write_data);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+      curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+      //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+      curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+      curl_easy_setopt(curl, CURLOPT_POST, 1);
+      // data to post
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+      // set type post/put
+      curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); /* !!! */
+      userfile=fopen(userfilename,"w");
+      if (userfile) {
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, userfile);
+        res = curl_easy_perform(curl);
+        fclose(userfile);
+      }
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+      if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+      }
+      // always cleanup
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      if (httpCode == 200) {
+        return(200);
+      }
+    }
+  }
+  return(httpCode);
+}
+
+
+
 
 // ****************************************************************************************
 //
@@ -1409,8 +1531,10 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
+    // data to post
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
+
     res = curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     if (res != CURLE_OK) {
