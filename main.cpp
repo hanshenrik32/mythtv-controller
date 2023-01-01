@@ -453,7 +453,7 @@ unsigned int percent;
 bool starving;
 char aktivsongname[40];                         	// song name
 char aktivartistname[40];                      		// navn på aktiv artist (som spilles)
-bool check_radio_thread = true;            			  	// DO NOT check radio station online status
+bool check_radio_thread = false;            			  	// DO NOT check radio station online status
 const unsigned int ERROR_TIMEOUT=120;                    // show error timeout
 int vis_error_timeout=ERROR_TIMEOUT;
 bool vis_error = false;
@@ -1200,14 +1200,17 @@ int parse_config(char *filename) {
                 showfps = false;
               }
             }
+            // set videt player program name (if default use vlc)
             else if (command_nr==setvideoplayer) {
               if (strcmp(value,"")==0) strcpy(value,"default");                               // set default player (internal vlc)
               strcpy(configvideoplayer,value);
             }
             // sound port
-            else if (command_nr==setsoundoutport) strcpy(configsoundoutport,value);
-            // screen saver timeout
+            else if (command_nr==setsoundoutport) {
+              strcpy(configsoundoutport,value);
+            }
             else if (command_nr==setscreensaver) {
+              // screen saver timeout
               strcpy(configscreensavertimeout,value);
               if (atoi(configscreensavertimeout)==0) strcpy(configscreensavertimeout,"30");
             }
@@ -1341,7 +1344,7 @@ int save_config(char * filename) {
       fputs(temp,file);
       sprintf(temp,"tema=%d\n",tema);
       fputs(temp,file);
-      sprintf(temp,"font=%s\n",configfontname);
+      sprintf(temp,"font=%s",configfontname);
       fputs(temp,file);
       sprintf(temp,"mouse=%s\n",configmouse);
       fputs(temp,file);
@@ -3988,7 +3991,6 @@ void display() {
           glTranslatef(560.0f, 850.0f -ofset, 0.0f);
           glRasterPos2f(0.0f, 0.0f);
           glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-          //aktivfont.selectfont("Courier 10 Pitch");
           glcRenderString(temptxt1);
           glPopMatrix();
           i++;
@@ -4307,16 +4309,14 @@ void display() {
       }
       // create radio station online check tread
       #endif
-      #if defined USE_SDL_MIXER
-      #endif
-      if (!(check_radio_thread)) {
-        check_radio_thread=true;
-        pthread_t loaderthread;           // check radio status thread
-        int rc=pthread_create(&loaderthread,NULL,radio_check_statusloader,NULL);
-        if (rc) {
-          fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
-          exit(-1);
-        }
+    }
+    if (!(check_radio_thread)) {
+      check_radio_thread=true;
+      pthread_t loaderthread;           // check radio status thread
+      int rc=pthread_create(&loaderthread,NULL,radio_check_statusloader,NULL);
+      if (rc) {
+        fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc);
+        exit(-1);
       }
     }
     // stop music
@@ -11330,7 +11330,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 ask_save_playlist=false;
               }
               // close setup windows again or close proram window.
-            if (do_show_setup) {
+              if (do_show_setup) {
                 if (do_show_tvgraber) {
                   // make new tv overview
                   // kill running graber
@@ -14613,6 +14613,7 @@ int init_sound_system(int devicenr) {
 void *radio_check_statusloader(void *data) {
   bool notdone=false;
   //pthread_mutex_lock(&count_mutex);
+  write_logfile((char *) "Start thread check radio stations.");
   fprintf(stderr,"loader thread starting - Start checkling radio status's thread\n");
   //pthread_mutex_unlock(&count_mutex);
   if (strcmp(configbackend,"mythtv")==0) {
@@ -14626,6 +14627,7 @@ void *radio_check_statusloader(void *data) {
     } while (notdone);
   }
   fprintf(stderr,"radio thread done\n");
+  write_logfile((char *) "Stop thread check radio stations.");
   pthread_exit(NULL);
 }
 

@@ -1015,6 +1015,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     int error=0;
     unsigned long radiostation=0;
     char sqlselect[512];
+    char sqlselect1[512];
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -1024,7 +1025,6 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
     bool cerror;
     struct timeval tv;
     fd_set myset;
-    write_logfile((char *) "Check radio stations.");
     if (check_radio_online_switch) {
       conn=mysql_init(NULL);
       strcpy(sqlselect,"select name,aktiv,intnr,stream_url from radio_stations where online=1 and aktiv=1 order by popular desc,name limit 1");
@@ -1034,6 +1034,7 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
         res = mysql_store_result(conn);
         if (res) {
           while ((row = mysql_fetch_row(res)) != NULL) {
+            write_logfile((char *) "Checking radio stations.");
             // port=80;
             strncpy(hostname,row[3],1000);
             strncpy(st_name,row[0],1000);
@@ -1063,32 +1064,38 @@ unsigned long radiostation_class::check_radio_online(unsigned int radioarrayid) 
                 close (sock);
               }
               radiostation=atol(row[2]);
+              // find radio station og disable
+              nn=0;
+              // find radio station
+              nfundet=false;
+              while ((nn<antal) && (nfundet==false)) {
+                if  (stack[nn]->station_name) {
+                  // if found set active again
+                  if (strcmp(stack[nn]->station_name,st_name)==0) {
+                    if (radiook) stack[nn]->online=1; else stack[nn]->online=0;
+                    nfundet=true;
+                  } else nn++;
+                } else nn++;
+              }
             }
           }
-          nn=0;
-          // find radio station
-          nfundet=false;
-          while ((nn<antal) && (nfundet==false)) {
-            if  (stack[nn]->station_name) {
-              // if found set active again
-              if (strcmp(stack[nn]->station_name,st_name)==0) {
-                stack[nn]->online=1;
-                nfundet=true;
-              } else nn++;
-            } else nn++;
-          }
         }
+        if (nfundet) printf("***** Radio station %d fundet %d \n",radiostation); else printf("***** Radio station not fundet\n");
         if ((conn) && (radiostation)) {
           if ((radiook) && (nfundet)) {
-            sprintf(sqlselect,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
+            sprintf(sqlselect1,"update radio_stations set online=1 where intnr=%ld \n",radiostation);
           } else {
-            sprintf(sqlselect,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
+            sprintf(sqlselect1,"update radio_stations set online=0,aktiv=0 where intnr=%ld \n",radiostation);
           }
-          mysql_query(conn,sqlselect);
-          res = mysql_store_result(conn);
+          if (conn) {
+            mysql_query(conn,sqlselect1);
+            res = mysql_store_result(conn);
+            write_logfile((char *) "Set acive flag for radio station.");
+          }
         }
       }
       if (conn) mysql_close(conn);
     }
+    printf("radiostation=%d\n",radiostation);
     return(radiostation);		// we are done check all radio stations in database
 }

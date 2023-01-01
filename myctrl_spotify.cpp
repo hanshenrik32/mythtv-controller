@@ -1002,16 +1002,23 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
   json_value* value;
   bool playlistexist;
   bool dbexist=false;
-  conn = mysql_init(NULL);
   loaded_antal=0;
   unsigned int spotify_playlistantal=0;
   unsigned int spotify_playlistantal_loaded=0;
   bool spotifyplaylistloader_done=false;
   try {
+    conn = mysql_init(NULL);
+    if (conn==NULL) {
+      fprintf(stderr,"Error opwn mysql connection.\n");
+      exit(1);
+    }
     if (conn) {
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
-         mysql_error(conn);
-         //exit(1);
+      if (!(mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0))) {
+         if (mysql_error(conn)) {
+           printf("ERROR OPEN MYSQL.\n");
+           fprintf(stderr, "Error: %s\n", mysql_error(conn));
+           //exit(1);
+         }
       }
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
@@ -1465,8 +1472,10 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             curl_easy_cleanup(curl);
             fclose(out_file);
             if (httpCode != 200) {
+              fprintf(stderr,"Playlist loader error\n");
               fprintf(stderr,"Spotify error %d \n",httpCode);
-              exit(1);
+              write_logfile((char *) "Spotify playlist loader error from web.");
+              //exit(1);
             }
           }
         }

@@ -1,5 +1,5 @@
 //
-// Setup/create default stream db 
+// Setup/create default stream db
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,26 +138,21 @@ const char *radio_station_setupsql="REPLACE INTO `radio_stations` (`name`, `besk
 ('P4 Esbjerg', '', 'http://live-icy.gss.dr.dk:8000/A/A15H.mp3', 'http://www.dr.dk/Regioner/Esbjerg/', 'DR-P4-Esbjerg-990.png', 0, 0, 0, 1, '2011-11-11', 18, 0, '2017-01-01 00:00:00', 1), \
 ('P6 Beat', '', 'http://live-icy.gss.dr.dk:8000/A/A29H.mp3', 'http://www.dr.dk/p6beat/', 'DR-P6-Beat.png', 0, 0, 0, 1, '2011-11-11', 19, 0, '2017-01-01 00:00:00', 1), \
 ('P7 Mix DK', '[Bitrate: 128]', 'http://live-icy.gss.dr.dk:8000/A/A21H.mp3', '', 'DR-P7-Mix.png', 40, 320, 64, 1, '2011-07-30', 20, 45, '2011-09-29 13:40:49', 1), \
-('Radio24syv', '', 'http://rrr.sz.xlcdn.com/?account=Radio24syv&file=ENC1_Web128&type=live&service=icecast&port=8000&output=pls', 'radio24syv', '', 0, 0, 0, 1, '2017-01-01', 21, 0, '2017-01-01 00:00:00', 1), \
 ('Radio 100', 'Med en god og varieret musikprofil, morsomme og intelligente v\xE6rter samt en seriøs nyhedsformidling har Radio 100 leveret kvalitetsradio til de danske radiolyttere hele døgnet siden den 15. november 2', 'http://onair.100fmlive.dk/100fm_live.mp3', '', '', 14, 128, 43, 1, '2011-07-31', 22, 45, '2011-10-09 16:13:11', 1), \
 ('N\xE6stved Lokal Radio', 'http://78.47.115.218:8007/stream.m3u', 'http://næstvedlokalradio.dk/', 'http://www.bgradio.bg/', '', 0, 0, 0, 1, '2017-01-01', 23, 0, '2017-01-01 00:00:00', 1), \
 ('Radio Aura DK', 'DK', 'http://icecast.xstream.dk:80/aura', '', 'Radio-Aura-1054.png', 40, 128, 46, 1, '2011-08-02', 26, 45, '2011-10-11 23:05:02', 1), \
 ('psyradio*fm', '[Bitrate: 128]', 'http://81.88.36.42:8020', '', '', 41, 128, 0, 1, '2011-08-11', 27, 8, '2011-10-20 15:37:44', 1), \
-('MAXXIMA', '', 'http://maxxima.mine.nu:8000/', '', 'Maxxima.png', 4, 0, 10, 1, '2011-08-02', 28, 4, '2011-10-02 02:25:35', 1), \
-('Bay Radio', '[Bitrate: 128]', 'http://icy-e-01.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 45, 320, 1, 1, '2011-07-31', 29, 45, '2011-09-17 18:06:22', 1), \
-('Heat radio UK', '[Bitrate: 128] Denne radio er mega cool og spiller meget godt og blandet musik fra england. ', 'http://ams01.egihosting.com:9108/', '', 'Heat-Radio.png', 3, 128, 242, 1, '2011-07-31', 30, 9, '2011-10-21 15:23:52', 1),  \
+('MAXXIMA', '', 'https://maxxima.mine.nu/maxxima.mp3', '', 'Maxxima.png', 4, 0, 10, 1, '2011-08-02', 28, 4, '2011-10-02 02:25:35', 1), \
+('Bay Radio', '[Bitrate: 128]', 'https://listen-nation.sharp-stream.com/tcbay.mp3', 'http://www.swanseabayradio.com/', '', 45, 320, 1, 1, '2011-07-31', 29, 45, '2011-09-17 18:06:22', 1), \
 ('181FM', '', 'http://uplink.181.fm:8068/', '', '181.fm.png', 0, 128, 1, 1, '2011-08-02', 31, 7, '2011-09-27 17:58:45', 1), \
 ('Energy 93 Eurodance', '', 'http://uplink.181.fm:8044/', '', '181.fm.png', 4, 0, 5, 1, '2011-08-02', 32, 7, '2011-10-07 16:02:00', 1), \
 ('Just Hiphop', '', 'http://stream.laut.fm:80/justhiphop', '', '', 5, 0, 2, 1, '2011-08-02', 33, 29, '2011-09-13 10:53:29', 1), \
-('Radio MRDJ', '[Bitrate: 128]', 'http://212.18.63.51:9000', '', '', 4, 128, 10, 1, '2011-08-11', 34, 61, NULL, 1), \
 ('Groove Salad', 'A nicely chilled plate of ambient/downtempo beats and grooves.', 'http://ice1.somafm.com/groovesalad-128-aac', '', '', 16, 128, 13, 1, '2011-07-31', 35, 7, '2011-10-07 15:58:57', 1), \
 ('Radio EFM', 'France', 'http://radioefm.ice.infomaniak.ch:80/radioefm-high.mp3', '', '', 12, 128, 6, 1, '2011-08-01', 36, 4, NULL, 1), \
 ('The voice DK', 'The voice denmark.', 'http://195.184.101.203/voice128', '', 'The-Voice-1049.png', 40, 64, 5, 1, '2011-08-01', 37, 45, '2011-09-11 00:08:02', 1), \
-('Private Investigations', '', 'http://listen.radionomy.com/private-investigations', '', '', 21, 0, 0, 1, '2011-08-02', 38, 7, NULL, 1), \
 ('Capital 95.8', '', 'http://media-ice.musicradio.com:80/CapitalMP3', '', '', 40, 192, 2, 1, '2011-08-05', 39, 9, NULL, 1), \
 ('French Kiss FM', '', 'http://stream.frenchkissfm.com:80', '', '', 4, 192, 3, 1, '2011-08-05', 40, 4, NULL, 1), \
 ('TechnoBase.FM', '', 'http://listen.technobase.fm/tunein-dsl-pls', 'http://TechnoBase.FM', '', 50, 192, 1, 0, '2011-08-05', 43, 8, NULL, 1), \
-('Hitparty fr', '', 'http://87.98.129.202:443', 'http://www.hitparty.fr/', 'hit-Party-Radio.png', 40, 192, 92, 1, '2011-08-05', 44, 4, '2011-10-18 18:33:39', 1), \
 ('Slow Radio', '(Love Songs & Easy Listening)', 'http://stream2.slowradio.com', 'http://en.slowradio.com/', '', 54, 192, 1, 1, '2011-08-05', 51, 4, NULL, 1), \
 ('AnimeNfo Radio', '[Bitrate: 192]', 'http://69.60.255.236:8000', '', '', 0, 192, 1, 1, '2011-08-10', 61, 27, '2011-09-01 22:42:06', 1), \
 ('Radio88 Szeged FM 95.4 ', '[Bitrate: 192]', 'http://88.151.99.22:8000', '', '', 30, 192, 0, 1, '2011-08-10', 74, 32, NULL, 1), \
