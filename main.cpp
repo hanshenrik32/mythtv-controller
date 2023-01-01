@@ -4775,266 +4775,298 @@ void display() {
     //
     #ifdef ENABLE_SPOTIFY
     if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
+      int textofset=140;
+      bool wedoplay=false;
       do_we_play_check=0;
       if (do_we_play_check==0) {
-        spotify_oversigt.spotify_do_we_play();
+        if (spotify_oversigt.spotify_do_we_play()==200) wedoplay=true;
       }
       do_we_play_check++;
       // check again ?
       if (do_we_play_check>50) do_we_play_check=0;
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      // window texture
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      glDisable(GL_DEPTH_TEST);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
-      glEnd();
-      // spotify play info icon
-      glEnable(GL_BLEND);
-      if (spotify_oversigt.get_texture(spotifyknapnr))
-        if (spotifyknapnr-1>0) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr-1));                        // get playlist conver icon
-      else
-        glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                              // else default icon
-
-      if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);        // set active icon
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+395 ,   370 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+395,200+370, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+370 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,370, 0.0);
-      glEnd();
-      // backward button
-      glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemlast);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(10);                        // 10 = forward(10)
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+50+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+50+100,320, 0.0);
-      glEnd();
-      // stop button
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemstop);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(9);                        // 9 = stop
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+150+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
-      glEnd();
-      // forward button
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,_texturemnext);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(11);                        // 10 = forward(10)
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
-      glEnd();
-
-      // play list name or artist name
-      // show playlist or artist name
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        strcpy(temptxt1,"playlist  ");
-        glcRenderString(temptxt1);
-      } else {
-        strcpy(temptxt,"Artist    ");
-        glcRenderString(temptxt);
-      }
-      glPopMatrix();
-
-
-      int textofset=140;
-
-      // show value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        strcpy(temptxt1,spotify_oversigt.spotify_playlistname);
-        *(temptxt1+46)=0;
-        glcRenderString(temptxt1);
-      } else {
-        strcpy(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
-        glcRenderString(temptxt);
-      }
-      glPopMatrix();
-
-      // show songname
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 620.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      glcRenderString("Songname ");
-      glPopMatrix();
-
-      // show songname value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 620.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
-      temptxt1[40]=0;
-      glcRenderString(temptxt1);
-      glPopMatrix();
-
-      // show artist
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 600.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        glcRenderString("Artist    ");
-      } else {
-        glcRenderString("Album     ");
-      }
-      glPopMatrix();
-
-      // show artist value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 600.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_artist_name());
-        glcRenderString(temptxt1);
-      } else {
-        //glcRenderString("Album");
-        //sprintf(temptxt1,"%s",(char *) );
-        //glcRenderString(temptxt1);
-      }
-      glPopMatrix();
-
-      // player device
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 580.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      // show active play device
-      glcRenderString("Player    ");
-      glPopMatrix();
-
-      // player device value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 580.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      // show active play device
-      if (spotify_oversigt.active_spotify_device>-1) {
-        glcRenderString(spotify_oversigt.get_active_spotify_device_name());
-      }
-      glPopMatrix();
-
-      // player play status background
-      glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      glBindTexture(GL_TEXTURE_2D,0);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+170 ,        555-20 , 0.0);
-      glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+170 ,     19+555-20 , 0.0);
-      glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+170+200,  19+555-20 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555-20 , 0.0);
-      glEnd();
-      glPopMatrix();
-      // show playtime as gfx box
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 540.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      sprintf(temptxt1,"playtime  ");
-      glcRenderString(temptxt1);
-      glPopMatrix();
-      glPushMatrix();
-      glColor3f(1.0f, 1.0f, 1.0f);
-      int statuswxpos = 432;
-      int statuswypos = 557-20;
-      float y=spotify_oversigt.spotify_aktiv_song_msplay()/1000;
-      float ll=spotify_oversigt.spotify_aktiv_song_mslength()/1000;
-      int xxx;
-      if ((y>0) && (ll>0)) {
-        xxx = ((y/ll)*16);
-      } else xxx=0;
-      for(int x=0;x<xxx;x++) {
-        glDisable(GL_TEXTURE_2D);
+      if (wedoplay==false) {
+        // window texture
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);
-        glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(15) , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos , 0.0);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
         glEnd();
+        // spotify play info icon
+        glEnable(GL_BLEND);
+        // text
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 640.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        glcRenderString("No song is playing.");
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslatef(420.0f+textofset, 600.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        glcRenderString("You have to pick playlist icon to start playing.");
+        glPopMatrix();
+      } else {
+        // window texture
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4) ,  300 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4),400+300, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
+        glEnd();
+        // spotify play info icon
+        glEnable(GL_BLEND);
+        if (spotify_oversigt.get_texture(spotifyknapnr))
+          if (spotifyknapnr-1>0) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.get_texture(spotifyknapnr-1));                        // get playlist conver icon
+        else
+          glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                              // else default icon
+
+        if (spotify_oversigt.aktiv_song_spotify_icon) glBindTexture(GL_TEXTURE_2D,spotify_oversigt.aktiv_song_spotify_icon);        // set active icon
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+395 ,   370 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+395,200+370, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+395+200,200+370 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+395+200,370, 0.0);
+        glEnd();
+        // backward button
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemlast);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(10);                        // 10 = forward(10)
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+50 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+50,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+50+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+50+100,320, 0.0);
+        glEnd();
+        // stop button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemstop);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(9);                        // 9 = stop
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+150 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+150,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+150+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+150+100,320, 0.0);
+        glEnd();
+        // forward button
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,_texturemnext);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(11);                        // 10 = forward(10)
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+250 ,  320 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+250,100+320, 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
+        glEnd();
+
+        // play list name or artist name
+        // show playlist or artist name
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 640.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
+          strcpy(temptxt1,"playlist  ");
+          glcRenderString(temptxt1);
+        } else {
+          strcpy(temptxt,"Artist    ");
+          glcRenderString(temptxt);
+        }
+        glPopMatrix();
+
+        // show value
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 640.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
+          strcpy(temptxt1,spotify_oversigt.spotify_playlistname);
+          *(temptxt1+46)=0;
+          glcRenderString(temptxt1);
+        } else {
+          strcpy(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
+          glcRenderString(temptxt);
+        }
+        glPopMatrix();
+
+        // show songname
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 620.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glcRenderString("Songname ");
+        glPopMatrix();
+
+        // show songname value
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 620.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
+        temptxt1[40]=0;
+        glcRenderString(temptxt1);
+        glPopMatrix();
+
+        // show artist
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 600.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
+          glcRenderString("Artist    ");
+        } else {
+          glcRenderString("Album     ");
+        }
+        glPopMatrix();
+
+        // show artist value
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 600.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
+          sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_artist_name());
+          glcRenderString(temptxt1);
+        } else {
+          //glcRenderString("Album");
+          //sprintf(temptxt1,"%s",(char *) );
+          //glcRenderString(temptxt1);
+        }
+        glPopMatrix();
+
+        // player device
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 580.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        // show active play device
+        glcRenderString("Player    ");
+        glPopMatrix();
+
+        // player device value
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 580.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);
+        // show active play device
+        if (spotify_oversigt.active_spotify_device>-1) {
+          glcRenderString(spotify_oversigt.get_active_spotify_device_name());
+        }
+        glPopMatrix();
+
+        // player play status background
+        glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D,0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor4f(0.7f, 0.41f, 1.0f, 0.6f);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f((orgwinsizex/4)+170 ,        555-20 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f((orgwinsizex/4)+170 ,     19+555-20 , 0.0);
+        glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+170+200,  19+555-20 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+170+200,     555-20 , 0.0);
+        glEnd();
+        glPopMatrix();
+        // show playtime as gfx box
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 540.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        sprintf(temptxt1,"playtime  ");
+        glcRenderString(temptxt1);
+        glPopMatrix();
+        glPushMatrix();
+        glColor3f(1.0f, 1.0f, 1.0f);
+        int statuswxpos = 432;
+        int statuswypos = 557-20;
+        float y=spotify_oversigt.spotify_aktiv_song_msplay()/1000;
+        float ll=spotify_oversigt.spotify_aktiv_song_mslength()/1000;
+        int xxx;
+        if ((y>0) && (ll>0)) {
+          xxx = ((y/ll)*16);
+        } else xxx=0;
+        for(int x=0;x<xxx;x++) {
+          glDisable(GL_TEXTURE_2D);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
+          glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);
+          glTexCoord2f(1, 1); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos+(15) , 0.0);
+          glTexCoord2f(1, 0); glVertex3f(statuswxpos+222+(10)+(x*12), statuswypos , 0.0);
+          glEnd();
+        }
+        glPopMatrix();
+
+        // updated date on spotify
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f, 560.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        glcRenderString("Release   ");
+        glPopMatrix();
+
+        // updated date on spotify value
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTranslatef(520.0f+textofset, 560.0f, 0.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+        sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
+        glcRenderString(temptxt1);
+        glPopMatrix();
       }
-      glPopMatrix();
-
-      // updated date on spotify
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 560.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      glcRenderString("Release   ");
-      glPopMatrix();
-
-      // updated date on spotify value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 560.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
-      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
-      glcRenderString(temptxt1);
-      glPopMatrix();
-
-
     }
     #endif
 
