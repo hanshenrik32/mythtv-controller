@@ -34,7 +34,9 @@ class musicoversigt_class {
     unsigned int antal_music_oversigt;
     void clean_music_oversigt();
     music_oversigt_type musicoversigt[300+1];
+    bool do_play;
   public:
+    bool play() { return(do_play);}    
     // load covers
     void opdatere_music_oversigt_icons();
     int opdatere_music_oversigt_nodb();
