@@ -209,6 +209,7 @@ class spotify_class : vlc_controller {
         int opdatere_spotify_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
         int opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type);        // search in db
         int opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,int type); // search online
+        bool do_we_play() { return (spotify_is_playing);}
         // show spotify playlist overview
         void show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
