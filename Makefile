@@ -20,6 +20,7 @@ LBITS := $(shell getconf LONG_BIT)
 
 BUILD_NUMBER_FILE=build-number.txt
 
+
 # check 64 bits ver
 # download from http://www.fmod.org/download/#StudioAPIDownloads
 
