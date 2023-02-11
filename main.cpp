@@ -67,12 +67,11 @@ bool stream_jump = false;
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-<<<<<<< HEAD
-=======
+
+
 //#ifdef ENABLE_TIDAL
 #include "myctrl_tidal2.h"
 //#endif
->>>>>>> tidal
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20107linux/api/core/inc/fmod.hpp"
@@ -11541,7 +11540,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (vis_tidal_oversigt) {
                 if (do_update_tidal_playlist==false) do_update_tidal_playlist=true;       // set update flag til true og start background update
 
-                tidal_oversigt.auth_device_authorization();
+                //tidal_oversigt.auth_device_authorization();
 
                 write_logfile((char *) "Start tidal update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader

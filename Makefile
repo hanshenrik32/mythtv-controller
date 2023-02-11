@@ -1,8 +1,8 @@
-CC = gcc
+C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
 CFLAGS = -Wformat-truncation -pthread -m64 -Wformat-overflow -std=c++11
-LDFLAGS=
+LDFLAGS= 
 
 PROG       = mythtv-controller
 EXECUTABLE = mythtv-controller
@@ -19,7 +19,6 @@ FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
 
 BUILD_NUMBER_FILE=build-number.txt
-
 
 # check 64 bits ver
 # download from http://www.fmod.org/download/#StudioAPIDownloads
@@ -52,7 +51,7 @@ endif
 
 OPTS = -I "/usr/include/GL" -I"/usr/include/libical"  -I"/usr/local/include/fmodex/" -I"/usr/include/lirc" -I"/usr/local/include" -I"/usr/include/SDL/" -I"/usr/local/lib/" -I"/usr/lib" -I"/usr/include/mysql" -I/usr/include/GL/ -L/usr/X11R6/lib  -L"/usr/lib" -L"/usr/lib/mysql" -L"/usr/lib/vlc" -lmysqlclient $(LIRCSOURCES) $(LIBICAL) $(LIBFMOD) $(STDCLIB) $(GLLIB) $(LIBGL) -lsqlite3 -lvlc -lfontconfig $(FREETYPELIB) $(LIBGLC) -lXrandr -I/usr/include/libxml2
 
-SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myth_vlcplayer.cpp myctrl_spotify.cpp myctrl_tidal2.cpp  mongoose-master/mongoose.c json-parser/json.c
+SRCS = main.cpp myctrl_readwebfile.cpp myctrl_stream.cpp myctrl_music.cpp myctrl_mplaylist.cpp myctrl_radio.cpp myth_setupsql.cpp  myctrl_recorded.cpp myctrl_movie.cpp myctrl_tvprg.cpp myth_setup.cpp utility.cpp readjpg.cpp loadpng.cpp myth_saver.cpp myth_picture.cpp myth_ttffont.cpp checknet.cpp dds_loader.cpp myctrl_xbmc.cpp myth_vlcplayer.cpp myctrl_spotify.cpp myctrl_tidal.cpp  mongoose-master/mongoose.c json-parser/json.c
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
@@ -70,54 +69,26 @@ all:
 
 
 compile: $(PROG)
-<<<<<<< HEAD
-	#@if ! test -d ~/.config/lirc/; then \
-	#mkdir  ~/.config/lirc/; \
-	#	cp lirc/* ~/.config/lirc/; \
-	#fi
-	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-	#@if [ ! -f build-number.txt ]; then touch build-number.txt; fi
-	#@echo $$(($$(cat build-number.txt) + 1)) > build-number.txt
-=======
 	@if ! test -f build-number.txt; then ouch build-number.txt; fi
-
-#	@if ! test -d ~/.config/lirc/; then \
-#	mkdir  ~/.config/lirc/; \
-#		cp lirc/* ~/.config/lirc/; \
-#	fi
-#	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	
+	@if ! test -d ~/.config/lirc/; then \
+	mkdir  ~/.config/lirc/; \
+		cp lirc/* ~/.config/lirc/; \
+	fi
+	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
->>>>>>> tidal
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
 	$(CC) $(CFLAGS) -march=native -O0 -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS) $(LDFLAGS)
 
 #$(CC) $(CFLAGS) -ggdb -o $(PROG) $(SRCS) $(OPTS) $(LIBS)
 
-gitcompile:
-	@if ! test -d ~/.config/lirc/; then \
-	mkdir  ~/.config/lirc/; \
-	 cp lirc/* ~/.config/lirc/; \
-	fi
-	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
-
-
-check:
-	@if ! test -d ~/.config/lirc/; then \
-        mkdir  ~/.config/lirc/; \
-                cp lirc/* ~/.config/lirc/; \
-        fi
-
-distcheck: $(PROG)
-	tar -zxvf $(FMODFILE) -C /opt/mythtv-controller/
-	@ln -s /opt/mythtv-controller/fmodstudioapi20107linux/api/lowlevel/lib/x86_64/libfmod.so.10.14 /usr/lib/libfmod.so.10
-
 
 Debug: $(PROG)
 
 mysqlfix:
 	echo 'sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"' > /etc/mysql/mysql.conf.d/mysqld.cnf
-	service mysql restart
+	service mysql restart        
 
 
 
@@ -146,19 +117,17 @@ installsound:
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
-	@mkdir -p /opt/mythtv-controller/images/radiostations
+	@mkdir -p /opt/mythtv-controller/images/radiostations	
 	@mkdir -p /opt/mythtv-controller/convert/hires
-	@mkdir -p /opt/mythtv-controller/images/mythnetvision
+	@mkdir -p /opt/mythtv-controller/images/mythnetvision	
 	@if test -e /etc/mythtv-controller.conf; then echo "mythtv-controller config exist. No update"; else cp $(CONFIG_FILE) ${ETCDIR}; fi
 	@chmod 777 /etc/mythtv-controller.conf
 	@cp -r -p images tema1 tema2 tema3 tema4 tema5 tema6 tema7 tema8 tema9 tema10 $(DESTDIR)
-	#@cp -r xmltv_config $(DESTDIR)
+	#@cp -r xmltv_config $(DESTDIR)	
 	@cp mythtv-controller $(DESTDIRBIN)
 	@cp mythtv-controller.png  /opt/mythtv-controller/mythtv-controller.png
-	@if ! test -e ~/.local/share/applications; then \
-	 @cp mythtv-controller.desktop  ~/.local/share/applications
-	 @cp mythtv-controller.desktop /usr/share/applications/
-	fi
+	@cp mythtv-controller.desktop /usr/share/applications/
+	@cp mythtv-controller.desktop  ~/.local/share/applications
 	@cp mythtv-controller.desktop ~/Desktop
 	#@cp xmltv_config/*  ~/.xmltv/
 	#@chmod 666 ~/.xmltv/*
@@ -177,7 +146,7 @@ install:
 	#    mysql -e "CREATE USER ${MAINDB}@localhost IDENTIFIED BY '${PASSWDDB}';"
 	#    mysql -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -e "FLUSH PRIVILEGES;"
-	# If /root/.my.cnf doesn't exist then it'll ask for root password
+	# If /root/.my.cnf doesn't exist then it'll ask for root password   
 	#else
 	#    echo "Please enter root user MySQL password!"
 	#    echo "Note: password will be hidden when typing"
@@ -187,3 +156,4 @@ install:
 	#    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${MAINDB}.* TO '${MAINDB}'@'localhost';"
 	#    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
 	#fi
+
