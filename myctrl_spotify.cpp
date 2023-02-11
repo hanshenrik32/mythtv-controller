@@ -4341,6 +4341,8 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       spotify_oversigt.load_spotify_iconoversigt();                       // load icons
     }
     // draw icons
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -4362,8 +4364,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( xof+10,yof+buttonsizey-20, 0.0);
@@ -4376,8 +4376,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         //glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
         glBegin(GL_QUADS);
         if (tema==5) {
@@ -4421,8 +4419,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         } else {
           if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,empty_icon);
         }
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(100+i+sofset);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( xof+10, yof+10, 0.0);
@@ -4540,8 +4536,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
         glBindTexture(GL_TEXTURE_2D,spotify_pil);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-60), 14 , 0.0);
         glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-60), 14+46, 0.0);
@@ -4607,6 +4601,8 @@ void spotify_class::show_setup_spotify() {
     static int spotify_device_antal=0;
     static bool first_time_update=true;
     char *database = (char *) "mythtvcontroller";
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     if (first_time_update) {
       first_time_update=false;
       conn = mysql_init(NULL);
@@ -4656,8 +4652,6 @@ void spotify_class::show_setup_spotify() {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(0.6f, 0.6f, 0.6f);
     glBindTexture(GL_TEXTURE_2D,setuprssback);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
     if (spotify_device_antal<4) {
       glTexCoord2f(0, 0); glVertex3f( (orgwinsizex/4)-50,100 , 0.0);
@@ -4689,8 +4683,6 @@ void spotify_class::show_setup_spotify() {
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(0.0f, 0.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D,_textureclose);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     if (spotify_device_antal<4) {
       winsizx=100;
       winsizy=100;
@@ -4721,8 +4713,6 @@ void spotify_class::show_setup_spotify() {
     glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
@@ -4741,8 +4731,6 @@ void spotify_class::show_setup_spotify() {
     glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D,setupkeysbar1);			// setupkeysbar1
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
     glTexCoord2f(0, 1); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2))+winsizy , 0.0);
@@ -4823,8 +4811,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[0].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[0].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(10);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4859,8 +4845,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[1].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[1].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(11);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4895,8 +4879,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[2].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[2].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(12);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4931,8 +4913,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[3].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[3].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(13);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -4968,8 +4948,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[4].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[4].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(14);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -5004,8 +4982,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[4].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[4].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(15);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -5041,8 +5017,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[5].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[5].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(16);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
@@ -5077,8 +5051,6 @@ void spotify_class::show_setup_spotify() {
       else if (strcmp(spotify_device[6].devtype,"Smartphone")==0) glBindTexture(GL_TEXTURE_2D,mobileplayer_icon);
       else if (strcmp(spotify_device[6].devtype,"Computer")==0) glBindTexture(GL_TEXTURE_2D,pcplayer_icon);
       else glBindTexture(GL_TEXTURE_2D,unknownplayer_icon);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glLoadName(17);                                                             // update button name
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(xpos+((orgwinsizex/2)-(1200/2)),ypos+((orgwinsizey/2)-(800/2)) , 0.0);
