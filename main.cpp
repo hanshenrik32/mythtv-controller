@@ -3059,19 +3059,28 @@ void display() {
         glDisable(GL_DEPTH_TEST);
         // tv icon or play info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        // play info icon
-        if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
-          glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show music/radio/film/stream/spotify play info
+
+        if (vis_radio_or_music_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(27);                                                           // Info icon nr 27
-        } else {                                                                    // else default tv
-          glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                         		// Tv texture icon
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-          glLoadName(1);                                                            // Tv guide icon nr 1
+          glLoadName(82);                                                           // Info icon nr 82 spotify
+        } else {
+            // play info icon
+            if ((vis_music_oversigt) || (vis_radio_oversigt) || (vis_film_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
+              glBindTexture(GL_TEXTURE_2D, _textureIdplayinfo);                         // default show music/radio/film/stream/spotify play info
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+              glLoadName(27);                                                           // Info icon nr 27
+            } else {                                                                    // else default tv
+              glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                        // Tv texture icon
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+              glLoadName(1);                                                            // Tv guide icon nr 1
+            }
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*1) , 0.0);
@@ -3079,23 +3088,32 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*1)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
         glEnd();
-        // movie stuf
-        if ((vis_film_oversigt) || (vis_stream_oversigt)) {
-          glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
+
+        if (vis_radio_or_music_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, tidalbutton);                         // tidal button
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(3); 			                                                  // film icon name 3
+          glLoadName(80);                                                           // Info icon nr 80 tidal
         } else {
-          if ((vis_music_oversigt) || (vis_radio_oversigt)) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                 //
+          // movie stuf
+          if ((vis_film_oversigt) || (vis_stream_oversigt)) {
+            glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+            glLoadName(3); 			                                                  // film icon name 3
           } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                      // music icon
+            if ((vis_music_oversigt) || (vis_radio_oversigt)) {
+              glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                 //
+            } else {
+              glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                      // music icon
+            }
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+            glLoadName(2); 			// Overwrite the first name in the buffer
           }
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(2); 			// Overwrite the first name in the buffer
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*2) , 0.0);
@@ -3103,23 +3121,33 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*2)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
-        //film icon or pil up
-        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
-          glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(23); 			// Overwrite the first name in the buffer
+
+
+        if (vis_radio_or_music_oversigt) {
+            glBindTexture(GL_TEXTURE_2D,radiobutton);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+            glLoadName(80); 			                                                  // radio icon name 80
         } else {
-          if ((vis_film_oversigt) || (vis_stream_oversigt)) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
-          } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// default film
-          }
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(3); 			// Overwrite the first name in the buffer
+            //film icon or pil up
+            if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
+              glBindTexture(GL_TEXTURE_2D, _textureIdpup);				// ved music filn radio stream  vis up icon
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+              glLoadName(23); 			// Overwrite the first name in the buffer
+            } else {
+              if ((vis_film_oversigt) || (vis_stream_oversigt)) {
+                glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
+              } else {
+                glBindTexture(GL_TEXTURE_2D, _textureIdfilm);				// default film
+              }
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+              glLoadName(3); 			// Overwrite the first name in the buffer
+            }
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*3) , 0.0);
@@ -3127,23 +3155,32 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*3)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
-        // recorded icon
-        if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
-          glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(24); 			                                                // load film icon name
+
+        if (vis_radio_or_music_oversigt) {
+            glBindTexture(GL_TEXTURE_2D,musicbutton);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+            glLoadName(81); 			                                                  // music icon name 81
         } else {
-          if (vis_recorded_oversigt) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
-          } else {
-            glBindTexture(GL_TEXTURE_2D, _textureIdrecorded);                              // music icon
-          }
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(4);                                                        //
+            // recorded icon
+            if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
+              glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+              glLoadName(24); 			                                                // load film icon name
+            } else {
+              if (vis_recorded_oversigt) {
+                glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
+              } else {
+                glBindTexture(GL_TEXTURE_2D, _textureIdrecorded);                              // music icon
+              }
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+              glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+              glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+              glLoadName(4);                                                        //
+            }
         }
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-(iconspacey*4) , 0.0);
@@ -3210,7 +3247,8 @@ void display() {
         }
         glPopMatrix();
     }
-    // radio stuf / music / spotyfi / tidal selector
+    /*
+    // radio stuf / music / spotify / tidal selector
     if ((vis_radio_or_music_oversigt) && (!(visur))) {				//
       // Show tidal and spotify icons
       #ifndef ENABLE_TIDAL
@@ -3244,6 +3282,7 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+500, ((orgwinsizey/2)-125)+0, 0.0);
       glEnd();
       glPopMatrix();
+
       // img spotify button
       glPushMatrix();
       glBindTexture(GL_TEXTURE_2D, spotifybutton);
@@ -3327,7 +3366,7 @@ void display() {
       glPopMatrix();
       #endif
     }
-
+    */
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
     // stream and movie stuf
