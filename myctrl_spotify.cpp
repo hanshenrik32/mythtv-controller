@@ -67,7 +67,7 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 //
 // ****************************************************************************************
 extern bool global_use_spotify_local_player;
-extern int spotifyknapnr;
+// extern int spotifyknapnr;
 extern int spotify_select_iconnr;
 extern spotify_class spotify_oversigt;
 extern GLuint _texturemovieinfobox;
