@@ -3095,6 +3095,12 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           glLoadName(80);                                                           // Info icon nr 80 tidal
+        } else if (vis_stream_or_movie_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, streambutton);                              // steam button
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+          glLoadName(80);                                                           // Info icon nr  stream
         } else {
           // movie stuf
           if ((vis_film_oversigt) || (vis_stream_oversigt)) {
@@ -3122,13 +3128,18 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
 
-
         if (vis_radio_or_music_oversigt) {
             glBindTexture(GL_TEXTURE_2D,radiobutton);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
             glLoadName(80); 			                                                  // radio icon name 80
+        } else if (vis_stream_or_movie_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, moviebutton);                              // steam button
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+          glLoadName(81);                                                           // Info icon nr movie
         } else {
             //film icon or pil up
             if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
@@ -3174,7 +3185,7 @@ void display() {
               if (vis_recorded_oversigt) {
                 glBindTexture(GL_TEXTURE_2D,_textureIdrecorded_aktiv);
               } else {
-                glBindTexture(GL_TEXTURE_2D, _textureIdrecorded);                              // music icon
+                glBindTexture(GL_TEXTURE_2D, _textureIdrecorded);                              // record icon
               }
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3188,6 +3199,32 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-(iconspacey*4)+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
+
+        if (vis_radio_or_music_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, _textureclose);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(29);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
+        }
+        if (vis_stream_or_movie_oversigt) {
+          glBindTexture(GL_TEXTURE_2D, _textureclose);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glLoadName(29);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
+        }
+
         //
         // show reset movie search oversigt
         //
@@ -3204,7 +3241,7 @@ void display() {
           glEnd();
         }
         if (vis_uv_meter==false) {
-          if ((!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_spotify_oversigt)) && (!(show_status_update))) {
+          if ((!(vis_stream_or_movie_oversigt)) && (!(vis_radio_or_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_film_oversigt))  && (!(vis_recorded_oversigt)) &&  (!(vis_stream_oversigt)) && (!(vis_radio_oversigt)) && (!(vis_spotify_oversigt)) && (!(show_status_update))) {
             // setup icon
             if (do_show_setup) glBindTexture(GL_TEXTURE_2D, _texturesetupmenu_select);
             else glBindTexture(GL_TEXTURE_2D, _texturesetupmenu);
@@ -3232,8 +3269,10 @@ void display() {
           glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
           glEnd();
         }
+
+
         // exit button
-        if ((!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
+        if ((!(vis_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
           glBindTexture(GL_TEXTURE_2D, _textureexit);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3369,6 +3408,7 @@ void display() {
     */
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
+
     // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
       // img
@@ -3402,6 +3442,7 @@ void display() {
       glEnd();
       glPopMatrix();
     }
+
     //
     if ((vis_music_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
       show_newmovietimeout = 0;
@@ -7309,6 +7350,20 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
 
+      if (vis_radio_or_music_oversigt) {
+        if ((GLubyte) names[i*4+3]==29) {
+          vis_radio_or_music_oversigt = ! vis_radio_or_music_oversigt;
+        }
+      }
+
+      if (vis_stream_or_movie_oversigt) {
+        if ((GLubyte) names[i*4+3]==29) {
+          vis_stream_or_movie_oversigt =! vis_stream_or_movie_oversigt;
+          fundet = true;
+        }
+      }
+
+
       // start/stop spotify online search view
       #ifdef ENABLE_SPOTIFY
       if (vis_spotify_oversigt) {
@@ -7355,7 +7410,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
 
       //
       // stream control
@@ -7443,6 +7497,12 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if (do_zoom_music_cover) write_logfile((char *) "Show music info."); else write_logfile((char *) "Close music info.");
             fundet = true;
           }
+          if ((GLubyte) names[i*4+3]==29) {
+            vis_music_oversigt =! vis_music_oversigt;
+            ask_open_dir_or_play = false;
+            fundet = true;
+          }
+
         }
         // Bruges til mus/touch skærm
         if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
@@ -7638,6 +7698,11 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               write_logfile((char *) "Show/close spotify info\n");
               if (ask_open_dir_or_play_spotify==false) do_zoom_spotify_cover =! do_zoom_spotify_cover;
               if (ask_open_dir_or_play_spotify) ask_open_dir_or_play_spotify=false;
+              fundet = true;
+            }
+            if ((GLubyte) names[i*4+3]==29) {
+              vis_spotify_oversigt =! vis_spotify_oversigt;
+              ask_open_dir_or_play_spotify=false;
               fundet = true;
             }
           }
@@ -8168,6 +8233,13 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             rknapnr = 0;
           }
         }
+        if (!(fundet)) {
+          if ((GLubyte) names[i*4+3]==29) {
+            vis_radio_oversigt =! vis_radio_oversigt;
+            fundet = true;
+          }
+        }
+
       } // radio overview
       // vælg skal der spilles film eller stream
       if ((vis_stream_or_movie_oversigt) && (!(fundet))) {
