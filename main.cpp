@@ -3408,7 +3408,7 @@ void display() {
     */
     //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
-
+    /*
     // stream and movie stuf
     if ((vis_stream_or_movie_oversigt) && (!(visur))) {
       // img
@@ -3442,7 +3442,7 @@ void display() {
       glEnd();
       glPopMatrix();
     }
-
+    */
     //
     if ((vis_music_oversigt) || (vis_tidal_oversigt) || (vis_spotify_oversigt) || (vis_film_oversigt) || (vis_recorded_oversigt) || (vis_tv_oversigt) || (vis_radio_or_music_oversigt) || (vis_stream_or_movie_oversigt)) {
       show_newmovietimeout = 0;
