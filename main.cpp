@@ -16134,9 +16134,9 @@ int main(int argc, char** argv) {
       }
     }
 
-    printf("\n***** Tidal login TOKEN %s \n *****",tidal_login("hanshenrik32@gmail.com","o60LbQGXJi5y"));
+    printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
     #ifdef ENABLE_TIDAL
-
+    
 
 
     //tidal_oversigt = new tidal_class;

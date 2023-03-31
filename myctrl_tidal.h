@@ -202,7 +202,7 @@ class tidal_class {
 };
 
 
-char *tidal_login(const char *username, const char *password);
+char *get_access_token(char *client_id, char *client_secret, char *username, char *password);
 
 int download_image(char *imgurl,char *filename);
 
