@@ -443,10 +443,270 @@ bool tidal_class::get_tidal_update_flag() {
 
 
 
+// This is a callback function used by CURL to write the response data
+size_t write_callback_login(char *ptr, size_t size, size_t nmemb, char **userdata) {
+    size_t response_size = size * nmemb;
+
+    // Allocate memory for the session token if it hasn't been allocated yet
+    if (*userdata == NULL) {
+        *userdata = (char *) malloc(response_size + 1);
+    }
+
+    // Copy the response data into the session token buffer
+    memcpy(*userdata, ptr, response_size);
+    (*userdata)[response_size] = '\0';
+
+    return response_size;
+}
+
+
+// NEW In use
+
+/*
+This function takes a username and password as input, sends a login request to the Tidal API using CURL,
+and returns a session token that can be used to access protected resources.
+You'll need to have the CURL library installed and linked to your program for this code to work.
+Additionally, you may need to modify the login request headers and body depending on the specific requirements of the Tidal API.
+*/
+
+
+// This is the URL for the Tidal API login endpoint
+#define LOGIN_URL "https://api.tidal.com/v1/login"
+
+// This function performs the login and returns a session token
+char *tidal_login(const char *username, const char *password) {
+    CURL *curl;
+    CURLcode res;
+    struct curl_slist *headers = NULL;
+    char *post_fields = NULL;
+    char *session_token = NULL;
+
+    // Initialize CURL
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+
+    // Set the login request headers
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+
+    // Build the login request body
+    asprintf(&post_fields, "username=%s&password=%s", username, password);
+
+    // Set the login request options
+    curl_easy_setopt(curl, CURLOPT_URL, LOGIN_URL);
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &session_token);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_login);
+
+    // Perform the login request
+    res = curl_easy_perform(curl);
+
+    // Check for errors
+    if (res != CURLE_OK) {
+        fprintf(stderr, "Failed to login to Tidal API: %s\n", curl_easy_strerror(res));
+        session_token = NULL;
+    }
+
+    // Clean up
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(post_fields);
+    return session_token;
+}
+
+
+/*
+#include <stdio.h>
+#include <curl/curl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+*/
+
+// This is the URL for the Tidal API playlist endpoint
+#define PLAYLIST_URL "https://api.tidal.com/v1/playlists/%d/tracks"
+
+// This is the maximum size of the response buffer
+#define BUFFER_SIZE 1024 * 1024
+
+// This function retrieves the playlist data for a given Tidal playlist ID
+char *get_playlist_data(int playlist_id, char *session_token) {
+    CURL *curl;
+    CURLcode res;
+    struct curl_slist *headers = NULL;
+    char *response_data = NULL;
+    long response_code = 0;
+    char *playlist_url_formatted;
+    asprintf(&playlist_url_formatted, PLAYLIST_URL, playlist_id);
+
+    // Initialize CURL
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+
+    // Set the request headers
+    headers = curl_slist_append(headers, "X-Tidal-SessionId: ");
+    headers = curl_slist_append(headers, session_token);
+
+    // Set the request options
+    curl_easy_setopt(curl, CURLOPT_URL, playlist_url_formatted);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_login);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+    // Perform the request
+    res = curl_easy_perform(curl);
+
+    // Get the response code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+    // Check for errors
+    if (res != CURLE_OK || response_code != 200) {
+        fprintf(stderr, "Failed to retrieve playlist data for playlist %d: %s\n", playlist_id, curl_easy_strerror(res));
+        response_data = NULL;
+    }
+
+    // Clean up
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(playlist_url_formatted);
+
+    return response_data;
+}
+
+// This function downloads the playlist tracks to the specified directory
+void download_playlist(int playlist_id, char *session_token, char *output_dir) {
+    char *playlist_data = get_playlist_data(playlist_id, session_token);
+    char *response = NULL;
+    char *file_url;
+    char *filename;
+    char *track_title;
+    FILE *file;
+    char buffer[BUFFER_SIZE];
+    long response_code = 0;
+    int track_index = 1;
+
+    // Parse the playlist data and download the tracks
+    char *token = strtok(playlist_data, "\n");
+    while (token != NULL) {
+        // Parse the track data
+        char *track_id = strtok(token, ",");
+        track_title = strtok(NULL, ",");
+        strtok(NULL, ","); // skip over artist data
+
+        // Build the track file URL
+        asprintf(&file_url, "https://resources.tidal.com/images/%s/1280x1280.jpg", track_id);
+
+        // Build the output file name
+        asprintf(&filename, "%s/%d - %s.jpg", output_dir, track_index, track_title);
+
+        // Download the file
+        CURL *curl;
+        CURLcode res;
+        struct curl_slist *headers = NULL;
+
+        // Initialize CURL
+        curl = curl_easy_init();
+        if (!curl) {
+            fprintf(stderr, "Failed to initialize CURL\n");
+            return;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+// This function plays the song using the retrieved stream URL
+void play_song(char *stream_url) {
+    // You'll need to implement your own audio playback code here
+    // This could involve using a library like OpenAL or SDL to play the audio data
+}
+
+// This is a callback function used by CURL to write the response data
+size_t write_callback(char *ptr, size_t size, size_t nmemb, char **userdata) {
+    size_t response_size = size * nmemb;
+
+    // Allocate memory for the stream URL if it hasn't been allocated yet
+    if (*userdata == NULL) {
+        *userdata = (char *) malloc(response_size + 1);
+    }
+
+    // Copy the response data into the stream URL buffer
+    memcpy(*userdata, ptr, response_size);
+    (*userdata)[response_size] = '\0';
+
+    return response_size;
+}
+
+
+
+// This is the URL for the Tidal API stream endpoint
+#define STREAM_URL "https://api.tidal.com/v1/tracks/%d/streamUrl"
+
+// This function retrieves the stream URL for a given Tidal track ID
+char *get_stream_url(int track_id, char *session_token) {
+    CURL *curl;
+    CURLcode res;
+    struct curl_slist *headers = NULL;
+    char *stream_url = NULL;
+
+    // Initialize CURL
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+
+    // Set the stream request headers
+    headers = curl_slist_append(headers, "X-Tidal-SessionId: ");
+    headers = curl_slist_append(headers, session_token);
+
+    // Build the stream request URL
+    char *stream_url_formatted;
+    asprintf(&stream_url_formatted, STREAM_URL, track_id);
+
+    // Set the stream request options
+    curl_easy_setopt(curl, CURLOPT_URL, stream_url_formatted);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &stream_url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+
+    // Perform the stream request
+    res = curl_easy_perform(curl);
+
+    // Check for errors
+    if (res != CURLE_OK) {
+        fprintf(stderr, "Failed to retrieve stream URL for track %d: %s\n", track_id, curl_easy_strerror(res));
+        stream_url = NULL;
+    }
+
+    // Clean up
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(stream_url_formatted);
+
+    return stream_url;
+}
+
+
+
+
 /*  read more here,
  https://github.com/yusufusta/php-tidal/blob/master/src/Tidal/TidalAPI.php */
 
-// In use
+// NOT In use
 
 int tidal_class::tidal_login_token2() {
   char sql[1024];

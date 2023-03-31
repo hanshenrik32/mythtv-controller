@@ -70,7 +70,7 @@ bool stream_jump = false;
 
 
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal2.h"
+#include "myctrl_tidal.h"
 //#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
@@ -16134,7 +16134,11 @@ int main(int argc, char** argv) {
       }
     }
 
+    printf("\n***** Tidal login TOKEN %s \n *****",tidal_login("hanshenrik32@gmail.com","o60LbQGXJi5y"));
     #ifdef ENABLE_TIDAL
+
+
+
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {
       //tidal_oversigt->start_webserver();

@@ -202,6 +202,8 @@ class tidal_class {
 };
 
 
+char *tidal_login(const char *username, const char *password);
+
 int download_image(char *imgurl,char *filename);
 
 void *load_tidal_web(void *data);
