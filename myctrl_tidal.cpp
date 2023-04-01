@@ -371,7 +371,6 @@ tidal_class::tidal_class() : antal(0) {
     mg_set_protocol_http_websocket(this->connection);
 
 
-
     strcpy(do_link_url,"");                                                     //
     strcpy(device_code,"");                                                     //
     strcpy(client_id,"");                                                       //
@@ -679,29 +678,6 @@ int tidal_class::do_link_tidal()  {
  https://github.com/yusufusta/php-tidal/blob/master/src/Tidal/TidalAPI.php */
 
 // NOT In use
-
-int tidal_class::tidal_login_token2() {
-  char sql[1024];
-  // https://api.tidalhifi.com/v1/login/username?token=kgsOOmYk3zShYrNP
-//sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt.tidal_client_id,tidal_oversigt.tidal_secret_id);
-  // org
-  try {
-    sprintf(sql,"curl -X POST 'https://api.tidalhifi.com/v1/login/username=hanshenrik32@gmail.com&password=o60LbQGXJi5y' > tidal_access_token.txt");
-    int curl_error=system(sql);
-    if (curl_error==0) {
-      //curl_error=system(sed);
-      if (curl_error==0) {
-      }
-      fprintf(stdout,"\n******** Got token ********\n");
-    }
-  }
-  catch (...) {
-    fprintf(stdout,"Error on system call.\n");
-  }
-}
-
-
-// In use
 
 int tidal_class::tidal_login() {
   static char tidaltoken_refresh[200];

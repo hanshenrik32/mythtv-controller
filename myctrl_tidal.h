@@ -145,8 +145,7 @@ class tidal_class {
         // in use
         void tidal_set_token(char *token,char *refresh);                       // set token in struct
         char *tidal_get_token() { return(tidaltoken); };                       // get token from struct
-        int tidal_login_token();                                               // login on tidal
-        int tidal_login_token2();                                              // GET TORKEN
+        int tidal_login_token();                                               // login on tidal        
         bool tidal_check_tidaldb_empty();
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
         int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
