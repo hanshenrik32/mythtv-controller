@@ -140,7 +140,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_spotify.h"
 
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal2.h"
+#include "myctrl_tidal.h"
 //#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
