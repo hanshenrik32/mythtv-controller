@@ -16133,11 +16133,28 @@ int main(int argc, char** argv) {
                 break;
       }
     }
+    //printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
+    char *tidal_token;
+    char do_link_url[200];
+    //tidal_token=get_access_token("8SEZWa4J1NVC5U5Y", "owUYDkxddz+9FpvGX24DlxECNtFEMBxipU0lBfrbq60=","hanshenrik32@gmail.com", "o60LbQGXJi5y");
 
-    printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
+    tidal_token=tidal_oversigt.get_dev_auth();                                      // make device ok
+    if (tidal_token) {
+      printf("\n***** Tidal login TOKEN %s \n *****",tidal_token);
+      if (strlen(tidal_token)>178) {
+        sleep(2);
+        tidal_token=tidal_oversigt.do_link_tidal();
+        //printf("LINK RESULT HEADERS %s \n ",tidal_token);
+        printf("Please open link %s \n",do_link_url);
+        sleep(2);
+        //tidal_token=tidal_oversigt.get_access_token(client_id,device_code,"","");
+      }
+      printf("** Tidal login TOKEN2 %s \n *****",tidal_token);
+    } else {
+      printf("\n***** NO Tidal TOKEN \n *****");
+    }
+
     #ifdef ENABLE_TIDAL
-    
-
 
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {

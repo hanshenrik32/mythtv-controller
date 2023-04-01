@@ -98,6 +98,12 @@ class tidal_class {
         int download_user_playlist(char *tidaltoken,int startofset);          // download playlist(json) file from tidal
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
+
+        //char *tidal_token;                                                        //// IN USE tidal.api calles cariables ************************
+        char do_link_url[200];
+        char device_code[200];
+        char client_id[200];
+        char device_url_code_link[2000];                                        // redirect link on auth
     public:
         bool set_search_loaded() { search_loaded=true; }
         int loaded_antal;                                                       // antal loaded i loader
@@ -118,7 +124,6 @@ class tidal_class {
         char active_default_play_device_name[256];                              // active device name
         char tidal_playlistname[256];
         char tidal_playlistid[256];
-        char client_id[120];                                                    // tidal client id
         char client_secret[120];                                                // tidal client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);                              // set texture
@@ -199,10 +204,19 @@ class tidal_class {
         int tidal_check_auth_status();
         int tidal_login();
         int start_webserver();
+
+
+
+        // used to login on tidal
+        char *get_dev_auth();                                                                               // stemp 1
+        char *do_link_tidal();                                                                              // stemp 2
+        char *get_access_token(char *client_id, char *device_code, char *username, char *password);         // stemp 3
 };
 
-
-char *get_access_token(char *client_id, char *client_secret, char *username, char *password);
+/// new test
+//char *do_link_tidal(char *device_url_code_link);
+//char *get_access_token(char *client_id, char *device_code, char *username, char *password);
+//char *get_dev_auth(char *client_id);
 
 int download_image(char *imgurl,char *filename);
 

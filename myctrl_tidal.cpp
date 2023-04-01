@@ -369,6 +369,9 @@ tidal_class::tidal_class() : antal(0) {
     write_logfile((char *) "Starting Tidal web server on port 8002");             //
     this->connection = mg_bind(&mgr, ss_http_port, tidal_server_ev_handler);      // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->connection);
+
+    strcpy(client_id,"7m7Ap0JC9j1cOM3n");                                       // tidal client id
+
 }
 
 
@@ -471,28 +474,27 @@ long write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     return realsize;
 }
 
+//
 // This function obtains an access token from the Tidal API using OAuth 2.0
-char *get_access_token(char *client_id, char *client_secret, char *username, char *password) {
+//
+
+char *tidal_class::get_access_token(char *client_id, char *device_code, char *username, char *password) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *headers = NULL;
     char *response_data = (char *) calloc(BUFFER_SIZE, sizeof(char));
     long response_code = 0;
-
     // Initialize CURL
     curl = curl_easy_init();
     if (!curl) {
         fprintf(stderr, "Failed to initialize CURL\n");
         return NULL;
     }
-
     // Set the request headers
     headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
-
     // Set the request data
     char *request_data_formatted;
-    asprintf(&request_data_formatted, "grant_type=password&client_id=%s&client_secret=%s&username=%s&password=%s", client_id, client_secret, username, password);
-
+    asprintf(&request_data_formatted, "scope=r_usr+w_usr+w_sub&client_id=%s&device_code=%s&grant_type=urn:ietf:params:oauth:grant-type:device_code", client_id,device_code);
     // Set the request options
     curl_easy_setopt(curl, CURLOPT_URL, TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -500,30 +502,162 @@ char *get_access_token(char *client_id, char *client_secret, char *username, cha
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_data);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-
     // Perform the request
     res = curl_easy_perform(curl);
-
     // Get the response code
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-
     // Check for errors
     if (res != CURLE_OK || response_code != 200) {
         fprintf(stderr, "Failed to obtain access token: %s\n", curl_easy_strerror(res));
         response_data = NULL;
     }
+    // Clean up
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(request_data_formatted);
+    return response_data;
+}
+
+// step 1
+
+#define DEVAUTH_URL "https://auth.tidal.com/v1/oauth2/device_authorization"
+
+char *tidal_class::get_dev_auth() {
+    CURL *curl;
+    CURLcode res;
+    struct curl_slist *headers = NULL;
+    char *response_data = (char *) calloc(BUFFER_SIZE, sizeof(char));
+    long response_code = 0;
+    // Initialize CURL
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+    // Set the request headers
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    // Set the request data
+    char *request_data_formatted;
+    asprintf(&request_data_formatted, "scope=r_usr+w_usr+w_sub&client_id=%s", client_id);
+    // Set the request options
+    curl_easy_setopt(curl, CURLOPT_URL, DEVAUTH_URL);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request_data_formatted);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    // Perform the request
+    res = curl_easy_perform(curl);
+    // Get the response code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+    // Check for errors
+    if ( response_code != 200 ) {
+        printf("response_code %d Failed to obtain access token: %s\n",response_code, curl_easy_strerror(res));
+        response_data = NULL;
+    }
+    // Clean up
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(request_data_formatted);
+
+    if (strlen(response_data)>178) {
+      strncpy(device_code,response_data+15,36);
+      device_code[36]=0;
+      strncpy(do_link_url,response_data+134,21);
+      do_link_url[20]=0;
+    }
+    return response_data;
+}
+
+
+
+// step 2 call url efter call af get_dev_auth()
+
+// internal func
+
+size_t write_header_func(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
+        //write(STDOUT_FILENO, ptr, size*nmemb);
+    size_t realsize = size * nmemb;
+    char *response_header = (char *) userdata;
+    //strncat(response_header, ptr, realsize);
+    return realsize;
+}
+
+char *tidal_class::do_link_tidal()  {
+
+    /*
+    CURL *curl;
+    CURLcode res;
+    struct curl_slist *headers = NULL;
+    char *response_data = (char *) calloc(BUFFER_SIZE, sizeof(char));
+    char *response_header = (char *) calloc(BUFFER_SIZE, sizeof(char));
+    long response_code = 0;
+    // Initialize CURL
+    curl = curl_easy_init();
+    if (!curl) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+    // Set the request headers
+    headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
+    // Set the request data
+    char *request_data_formatted;
+    asprintf(&request_data_formatted, "");
+    // Set the request options
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 5L);                         // follow header
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, write_header_func);
+    curl_easy_setopt(curl, CURLOPT_URL, device_url_code_link);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1);
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request_data_formatted);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_header_func);
+    // Perform the request
+    res = curl_easy_perform(curl);
+    // Get the response code
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+    // Check for errors
+    if ( response_code != 200 ) {
+        printf("response_code %d Failed verfiy link %s\n",response_code, curl_easy_strerror(res));
+        response_data = NULL;
+    }
+
 
     // Clean up
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
     free(request_data_formatted);
 
-    return response_data;
+    */
+
+    char redirect_url[2000];
+    char call[2000];
+    int curl_error;
+    //sprintf(call,"curl -f -X PUT '%s' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",device_url_code_link);
+    sprintf(call,"curl -L  -D /home/hans/header.log -o /dev/null '%s'",do_link_url);
+    curl_error=system(call);
+    if (curl_error==0) {
+      printf("Reading redirect request OK.\n");
+      FILE *fil;
+      char datatxt[10000];
+      fil=fopen("/home/hans/header.log","r");
+      if (fil) {
+        while(!(feof(fil))) {
+          fgets(datatxt,5000,fil);
+          if (strncmp(datatxt,"Location",8)==0) {
+            strcpy(redirect_url,"/usr/bin/google-chrome ");
+            strcat(redirect_url,datatxt);
+            printf("FUNDET ************ %s",datatxt);
+            system(redirect_url);
+          }
+        }
+        fclose(fil);
+      }
+    }
+
+    //return response_data;
 }
-
-
-
-
 
 
 /*  read more here,
