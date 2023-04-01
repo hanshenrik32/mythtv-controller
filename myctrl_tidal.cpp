@@ -370,7 +370,17 @@ tidal_class::tidal_class() : antal(0) {
     this->connection = mg_bind(&mgr, ss_http_port, tidal_server_ev_handler);      // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->connection);
 
+
+
+    strcpy(do_link_url,"");                                                     //
+    strcpy(device_code,"");                                                     //
+    strcpy(client_id,"");                                                       //
+    strcpy(client_secret,"");                                                   //
+    strcpy(client_platform,"");                                                 //
+    strcpy(device_url_code_link,"");                                            // redirect link on auth
+    strcpy(client_platform,"Fire TV");
     strcpy(client_id,"7m7Ap0JC9j1cOM3n");                                       // tidal client id
+    strcpy(client_secret,"vRAdA108tlvkJpTsGZS8rGZ7xTlbJ0qaZ2K9saEzsgY=");       // tidal client id
 
 }
 
@@ -456,7 +466,9 @@ The access token is returned as a string. Note that this function assumes that t
 
 */
 
+
 // This is the Tidal API endpoint for obtaining an access token
+
 #define TOKEN_URL "https://auth.tidal.com/v1/oauth2/token"
 
 // This is the maximum size of the response buffer
@@ -478,7 +490,9 @@ long write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 // This function obtains an access token from the Tidal API using OAuth 2.0
 //
 
-char *tidal_class::get_access_token(char *client_id, char *device_code, char *username, char *password) {
+// step 3
+
+char *tidal_class::get_access_token(char *username, char *password) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *headers = NULL;
@@ -509,6 +523,7 @@ char *tidal_class::get_access_token(char *client_id, char *device_code, char *us
     // Check for errors
     if (res != CURLE_OK || response_code != 200) {
         fprintf(stderr, "Failed to obtain access token: %s\n", curl_easy_strerror(res));
+        printf("RESULT : %s \n",response_data);
         response_data = NULL;
     }
     // Clean up
@@ -561,9 +576,9 @@ char *tidal_class::get_dev_auth() {
     free(request_data_formatted);
 
     if (strlen(response_data)>178) {
-      strncpy(device_code,response_data+15,36);
+      strncpy(device_code,response_data+15,36);                                 // gem device code
       device_code[36]=0;
-      strncpy(do_link_url,response_data+134,21);
+      strncpy(do_link_url,response_data+134,21);                                // gem redirect link
       do_link_url[20]=0;
     }
     return response_data;
@@ -584,7 +599,7 @@ size_t write_header_func(char *ptr, size_t size, size_t nmemb, void *userdata)
     return realsize;
 }
 
-char *tidal_class::do_link_tidal()  {
+int tidal_class::do_link_tidal()  {
 
     /*
     CURL *curl;
@@ -648,15 +663,15 @@ char *tidal_class::do_link_tidal()  {
           if (strncmp(datatxt,"Location",8)==0) {
             strcpy(redirect_url,"/usr/bin/google-chrome ");
             strcat(redirect_url,datatxt);
+            strcpy(device_url_code_link,datatxt);                               // gem redirect url
             printf("FUNDET ************ %s",datatxt);
             system(redirect_url);
           }
         }
         fclose(fil);
       }
-    }
-
-    //return response_data;
+      return 1;
+    } else return 0;
 }
 
 

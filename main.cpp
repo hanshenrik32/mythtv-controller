@@ -16143,11 +16143,11 @@ int main(int argc, char** argv) {
       printf("\n***** Tidal login TOKEN %s \n *****",tidal_token);
       if (strlen(tidal_token)>178) {
         sleep(2);
-        tidal_token=tidal_oversigt.do_link_tidal();
+        tidal_oversigt.do_link_tidal();
         //printf("LINK RESULT HEADERS %s \n ",tidal_token);
         printf("Please open link %s \n",do_link_url);
-        sleep(2);
-        //tidal_token=tidal_oversigt.get_access_token(client_id,device_code,"","");
+        sleep(20);
+        tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
       }
       printf("** Tidal login TOKEN2 %s \n *****",tidal_token);
     } else {
