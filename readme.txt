@@ -18,6 +18,9 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 
 Version.
 
+mythtv-controller ver 0.40.4
+
+Tidal api including startet.
 
 mythtv-controller ver 0.39.0
 

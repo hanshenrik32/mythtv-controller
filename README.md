@@ -9,7 +9,9 @@
 
 Version.
 
-<<<<<<< HEAD
+mythtv-controller ver 40.4
+
+tidal apt coding included.
 
 mythtv-controller ver 39.4
 
@@ -19,8 +21,6 @@ mythtv-controller ver 39.0
 
 All log is moved to log file in you home directory.
 
-=======
->>>>>>> bc698ece9a58d9f050ac11af077f3b4c3527ff35
 mythtv-controller ver 38.4
 
 Install dir movied to /opt/mythtv-controller

@@ -834,7 +834,7 @@ void verifyAccessToken() {
 // first call this function
 // ***************************************************************************************************
 
-
+/*
 void tidal_class::gettoken() {
   //get tidaltoken
   // msg = requests.get( "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json", timeout=(20.05, 27.05))
@@ -843,6 +843,7 @@ void tidal_class::gettoken() {
   strcpy(tidaltoken2,"_DSTon1kC8pABnTw");
 }
 
+*/
 
 // *********************************************************************************************************************************
 // NOT In use
@@ -887,8 +888,8 @@ int tidal_class::tidal_login_token() {
 
     // add userinfo + basic auth
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(curl, CURLOPT_USERNAME, "OmDtrzFgyVVL6uW56OnFA2COiabqm");
-    curl_easy_setopt(curl, CURLOPT_PASSWORD, "zxen1r3pO0hgtOC7j6twMo9UAqngGrmRiWpV7QC1zJ8");
+    curl_easy_setopt(curl, CURLOPT_USERNAME, "hanshenrik32@gmail.com");
+    curl_easy_setopt(curl, CURLOPT_PASSWORD, "o60LbQGXJi5y");
 
     /* Add a custom header */
     //chunk = curl_slist_append(chunk, "X-Tidal-Token:kgsOOmYk3zShYrNP");

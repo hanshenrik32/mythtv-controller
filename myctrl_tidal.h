@@ -145,7 +145,7 @@ class tidal_class {
         // in use
         void tidal_set_token(char *token,char *refresh);                       // set token in struct
         char *tidal_get_token() { return(tidaltoken); };                       // get token from struct
-        int tidal_login_token();                                               // login on tidal        
+        int tidal_login_token();                                               // login on tidal
         bool tidal_check_tidaldb_empty();
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
         int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
@@ -200,7 +200,7 @@ class tidal_class {
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
         void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
-        void gettoken();
+        //void gettoken();
         int tidal_check_auth_status();
         int tidal_login();
         int start_webserver();

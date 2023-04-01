@@ -11500,7 +11500,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
                 write_logfile((char *) "Start tidal update thread");
                 update_tidalonline_phread_loader();                                     // start thread loader
-                tidal_oversigt.gettoken();
+                //tidal_oversigt.gettoken();
                 printf("Token = %s \n",tidal_oversigt.tidal_get_token());
               }
               #endif
@@ -16135,21 +16135,20 @@ int main(int argc, char** argv) {
     }
     //printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
     char *tidal_token;
-    char do_link_url[200];
-    //tidal_token=get_access_token("8SEZWa4J1NVC5U5Y", "owUYDkxddz+9FpvGX24DlxECNtFEMBxipU0lBfrbq60=","hanshenrik32@gmail.com", "o60LbQGXJi5y");
-
     tidal_token=tidal_oversigt.get_dev_auth();                                      // make device ok
     if (tidal_token) {
-      printf("\n***** Tidal login TOKEN %s \n *****",tidal_token);
+      printf("\n***** Tidal login DEV AUTH %s \n *****",tidal_token);
       if (strlen(tidal_token)>178) {
         sleep(2);
         tidal_oversigt.do_link_tidal();
         //printf("LINK RESULT HEADERS %s \n ",tidal_token);
-        printf("Please open link %s \n",do_link_url);
+        printf("Please open link..\n");
         sleep(20);
         tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
+        //tidal_oversigt.tidal_login_token();
+
       }
-      printf("** Tidal login TOKEN2 %s \n *****",tidal_token);
+      printf("** Tidal login TOKEN %s \n *****",tidal_token);
     } else {
       printf("\n***** NO Tidal TOKEN \n *****");
     }
