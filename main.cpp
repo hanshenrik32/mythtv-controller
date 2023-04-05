@@ -16143,7 +16143,7 @@ int main(int argc, char** argv) {
         tidal_oversigt.do_link_tidal();
         //printf("LINK RESULT HEADERS %s \n ",tidal_token);
         printf("Please open link..\n");
-        sleep(20);
+        sleep(2);
         tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
         //tidal_oversigt.tidal_login_token();
 

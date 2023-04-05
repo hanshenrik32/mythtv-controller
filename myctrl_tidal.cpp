@@ -660,7 +660,7 @@ int tidal_class::do_link_tidal()  {
         while(!(feof(fil))) {
           fgets(datatxt,5000,fil);
           if (strncmp(datatxt,"Location",8)==0) {
-            strcpy(redirect_url,"/usr/bin/google-chrome ");
+            strcpy(redirect_url,"/usr/bin/google-chrome &");
             strcat(redirect_url,datatxt);
             strcpy(device_url_code_link,datatxt);                               // gem redirect url
             printf("FUNDET ************ %s",datatxt);

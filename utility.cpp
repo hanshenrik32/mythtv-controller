@@ -21,7 +21,7 @@ unsigned int hourtounixtime(int hour) {
 
 // ***********************************************************
 //
-// write to log file
+// write to log file in user home dir
 //
 // ***********************************************************
 
@@ -37,8 +37,17 @@ void write_logfile(char *logentry) {
   strcpy(filename,homedirpath);
   strcat(filename,"/");
   strcat(filename,"mythtv-controller.log");
-  logfile=fopen(filename,"a");
-  if (logfile==NULL) logfile=fopen("mythtv-controller.log","w");
+  logfile=fopen(filename,"r");
+  if (logfile==NULL) {
+    logfile=fopen(filename,"w");
+    fputs("                 __  .__     __                                       __                .__  .__                    \n",logfile);
+    fputs("  _____ ___.__._/  |_|  |___/  |____  __           ____  ____   _____/  |________  ____ |  | |  |   ___________     \n",logfile);
+    fputs(" /     <   |  |\\   __\\  |  \\   __\\  \\/ /  ______ _/ ___\\/  _ \\ /    \\   __\\_  __ \\/  _ \\|  | |  | _/ __ \\_  __\\    \n",logfile);
+    fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
+    fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
+    fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
+    fputs("Ver 0.40.x \n",logfile);
+  }
   if (logfile) {
     fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
     fputs(logentry,logfile);
