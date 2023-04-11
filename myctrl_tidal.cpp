@@ -879,8 +879,8 @@ int tidal_class::tidal_login() {
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",tidaltoken_refresh);
     //strcpy(data,"X-Tidal-Token:kgsOOmYk3zShYrNP");
     //curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
-
-    sprintf(post_playlist_data,"username=hanshenrik32@gmail.com&password=o60LbQGXJi5y");
+    sprintf(post_playlist_data,"username=emailadress&password=youpassword");
+    
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
 

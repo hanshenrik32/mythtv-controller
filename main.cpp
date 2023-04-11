@@ -16157,9 +16157,9 @@ int main(int argc, char** argv) {
         //
 
         sleep(2);
+        //tidal_token=tidal_oversigt.get_access_token("username","password");
+        tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
         
-        tidal_token=tidal_oversigt.get_access_token("username","password");
-
         //tidal_oversigt.tidal_login_token();
 
       }
