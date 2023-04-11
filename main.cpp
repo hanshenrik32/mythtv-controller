@@ -2626,9 +2626,13 @@ void display() {
     rawtime=time(NULL);                                 // hent now time
     int savertimeout=atoi(configscreensavertimeout);
     if ((rawtime1==0) || (saver_irq)) {                 // ur timer
-      rawtime1=rawtime+(60*savertimeout);             // x minuter hentet i config
-      visur = false;                                    // if (debug) printf("Start screen saver timer.\n");
-      saver_irq = false;                          // start screen saver
+      rawtime1=rawtime+(60*savertimeout);   // x minuter hentet i config
+      visur = false;                        // if (debug) printf("Start screen saver timer.\n");
+      saver_irq = false;                    // start screen saver
+    } else {
+      rawtime1=rawtime+(60*10);             // x minuter hentet i config
+      visur = false;                        // if (debug) printf("Start screen saver timer.\n");
+      saver_irq = false;                    // start screen saver
     }
     timeinfo = localtime(&rawtime);
     strftime(strhour,20,"%I",timeinfo);
@@ -5782,7 +5786,7 @@ void display() {
           #endif
         }
         if (vis_tv_oversigt) {
-          // F1 in tv_guide view
+          // F1 in tv_guide view (show tv guidde setup)
           if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   // tv graber
         }
         glPopMatrix();
@@ -16134,6 +16138,10 @@ int main(int argc, char** argv) {
       }
     }
     //printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
+
+
+    //tidal_login();
+
     char *tidal_token;
     tidal_token=tidal_oversigt.get_dev_auth();                                      // make device ok
     if (tidal_token) {
@@ -16143,8 +16151,15 @@ int main(int argc, char** argv) {
         tidal_oversigt.do_link_tidal();
         //printf("LINK RESULT HEADERS %s \n ",tidal_token);
         printf("Please open link..\n");
+
+        // link respons give in browser give this url
+        // return recirect to https://offer.tidal.com/login/tidal/return&response_type=code&state=66cf2af3-554a-4ad7-8921-0f81887bb0f4&geo=DK&campaignId=default
+        //
+
         sleep(2);
-        tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
+        
+        tidal_token=tidal_oversigt.get_access_token("username","password");
+
         //tidal_oversigt.tidal_login_token();
 
       }

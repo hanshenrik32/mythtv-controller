@@ -218,9 +218,13 @@ class tidal_class {
 //char *get_access_token(char *client_id, char *device_code, char *username, char *password);
 //char *get_dev_auth(char *client_id);
 
+int tidal_login();
+
 int download_image(char *imgurl,char *filename);
 
 void *load_tidal_web(void *data);
 char *b64_encode(const unsigned char *in, size_t len);
+
+
 
 #endif

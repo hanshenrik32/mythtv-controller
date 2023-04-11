@@ -19,6 +19,10 @@
 #include <curl/curl.h>
 #include <string>
 #include <string.h>
+
+#include <oauth.h>
+
+
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -455,6 +459,115 @@ bool tidal_class::get_tidal_update_flag() {
 
 
 
+
+
+
+
+
+
+
+/*
+Register your application with Tidal to obtain the necessary credentials, such as the
+client ID and secret. This can be done by creating a developer account on Tidal's website
+and following the instructions.
+
+Include the necessary libraries and headers in your C code to handle HTTP requests
+and OAuth authentication. You may consider using a library like libcurl to handle the
+HTTP requests and a library like liboauth to handle the OAuth authentication process.
+
+Construct the authorization URL by combining the authorization endpoint with the necessary query
+parameters, such as the client ID and redirect URI.
+
+Use libcurl to perform an HTTP GET request to the authorization URL.
+This will open a login page in the user's default web browser.
+
+After the user logs in, Tidal will redirect the user's browser to the redirect
+URI specified in your authorization request. Your C code should listen for this
+incoming HTTP request and extract the authorization code from the query parameters.
+
+Use the authorization code to request an access token from Tidal's token endpoint.
+This can be done by performing an HTTP POST request to the token endpoint with
+the necessary parameters, such as the client ID, secret, authorization code, and redirect URI.
+
+If the access token is successfully obtained, you can use it to make authenticated
+requests to Tidal's API. You may consider storing the access token securely for future use.
+
+Here's a sample code snippet that demonstrates how to obtain an access token using libcurl and liboauth:
+*/
+
+#define CLIENT_ID "7m7Ap0JC9j1cOM3n"
+#define CLIENT_SECRET "vRAdA108tlvkJpTsGZS8rGZ7xTlbJ0qaZ2K9saEzsgY="
+#define REDIRECT_URI "localhost://tidal_web"
+
+
+
+size_t write_callback2(char *ptr, size_t size, size_t nmemb, void *userdata) {
+    // Dummy callback function to discard response data
+    return size * nmemb;
+}
+
+int tidal_login() {
+    char *auth_url;
+    char *auth_code;
+    char *access_token;
+    char *access_token_secret;
+
+    // Construct the authorization URL
+
+    char *req_url;
+    //req_url=oauth_sign_url2("req_url",NULL,OA_HMAC,NULL,"key","sec",NULL,NULL);
+
+    //char *tt=oauth_encode_base64(16,(const unsigned char *) "01234343klrfjkl4jklgrjktl43jkrehrtj4htjrkeh4j3khrjghjkth43jk5h43jk5h43jkfhjk4rh43jrhjkrh43jkrh43jkrh4jkrhjkrh23jk");
+
+
+    //oauth_t *oauth = oauth_client_new(CLIENT_ID, CLIENT_SECRET, NULL, NULL);
+    //auth_url = oauth_getauthorizeurl(oauth, "https://auth.tidal.com/v1/oauth2/auth", REDIRECT_URI, "code", NULL, NULL);
+
+    // Perform the HTTP GET request to the authorization URL
+    CURL *curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, auth_url);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback2);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+
+    // Wait for the user to log in and obtain the authorization code
+    printf("Enter the authorization code: ");
+    scanf("%s", auth_code);
+
+    // Use the authorization code to request an access token
+    //oauth_token_t *access_token_struct = oauth_token_new(oauth);
+    //char *post_data = oauth_http_post_data(oauth, "https://auth.tidal.com/v1/oauth2/token", auth_code, REDIRECT_URI, "authorization_code", NULL);
+    char *post_data;
+
+
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, "https://auth.tidal.com/v1/oauth2/token");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback2);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    //access_token_struct = oauth_token_parse(oauth, post_data, strlen(post_data));
+    //access_token = strdup(access_token_struct->oauth_token);
+    //access_token_secret = strdup(access_token_struct->oauth_token_secret);
+
+    // Use the access token to make authenticated requests to Tidal's API
+
+    // Clean up resources
+    free(auth_url);
+    free(auth_code);
+    free(access_token);
+    free(access_token_secret);
+    free(post_data);
+    //oauth_token_free(access_token_struct);
+    //oauth_client_free(oauth);
+
+    return 0;
+}
+
+
+
+
 // NEW In use
 
 /*
@@ -532,7 +645,13 @@ char *tidal_class::get_access_token(char *username, char *password) {
     return response_data;
 }
 
+
+
 // step 1
+//
+//
+//
+
 
 #define DEVAUTH_URL "https://auth.tidal.com/v1/oauth2/device_authorization"
 
@@ -567,6 +686,7 @@ char *tidal_class::get_dev_auth() {
     // Check for errors
     if ( response_code != 200 ) {
         printf("response_code %d Failed to obtain access token: %s\n",response_code, curl_easy_strerror(res));
+        if (response_data) free(response_data);
         response_data = NULL;
     }
     // Clean up
@@ -660,10 +780,11 @@ int tidal_class::do_link_tidal()  {
         while(!(feof(fil))) {
           fgets(datatxt,5000,fil);
           if (strncmp(datatxt,"Location",8)==0) {
-            strcpy(redirect_url,"/usr/bin/google-chrome &");
-            strcat(redirect_url,datatxt);
+            strcpy(redirect_url,"/usr/bin/google-chrome ");
+            strcat(redirect_url,datatxt+9);
             strcpy(device_url_code_link,datatxt);                               // gem redirect url
             printf("FUNDET ************ %s",datatxt);
+            printf("CMD COMMAND %s\n",redirect_url);
             system(redirect_url);
           }
         }
@@ -673,6 +794,28 @@ int tidal_class::do_link_tidal()  {
     } else return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// NOT IN USE
 
 /*  read more here,
  https://github.com/yusufusta/php-tidal/blob/master/src/Tidal/TidalAPI.php */
@@ -829,21 +972,6 @@ void verifyAccessToken() {
 }
 
 
-
-// ***************************************************************************************************
-// first call this function
-// ***************************************************************************************************
-
-/*
-void tidal_class::gettoken() {
-  //get tidaltoken
-  // msg = requests.get( "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json", timeout=(20.05, 27.05))
-  // will return json
-  strcpy(tidaltoken,"wc8j_yBJd20zOmx0");
-  strcpy(tidaltoken2,"_DSTon1kC8pABnTw");
-}
-
-*/
 
 // *********************************************************************************************************************************
 // NOT In use
