@@ -2604,6 +2604,11 @@ void display() {
 
     clock_t start;
 
+    const int start_search_action_waittime=4;
+    struct tm* t1;
+    static time_t lasttime1=0;
+    static time_t nowdate1;
+
     static int barantal=45;
     struct timeb tb;
     struct tm* t;
@@ -3119,7 +3124,7 @@ void display() {
             if (vis_radio_oversigt) {
               glBindTexture(GL_TEXTURE_2D, radiobutton);                        // radio icon
             } else if (vis_music_oversigt) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdmusic);               // music icon aktiv
+              glBindTexture(GL_TEXTURE_2D,_textureIdmusic);                     // music icon
             } else if (vis_spotify_oversigt) {
               glBindTexture(GL_TEXTURE_2D, spotifybutton);                      // spotify icon
             } else if (vis_tidal_oversigt) {
@@ -3138,6 +3143,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*2) , 0.0);
         glEnd();
 
+        // 3 icon in menu
         if (vis_radio_or_music_oversigt) {
             glBindTexture(GL_TEXTURE_2D,radiobutton);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3177,6 +3183,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*3) , 0.0);
         glEnd();
 
+        // 4 icon in menu
         if (vis_radio_or_music_oversigt) {
             glBindTexture(GL_TEXTURE_2D,musicbutton);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3210,30 +3217,25 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*4) , 0.0);
         glEnd();
 
+        // 5 icon in menu
         if (vis_radio_or_music_oversigt) {
           glBindTexture(GL_TEXTURE_2D, _textureclose);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(29);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
-          glEnd();
         }
         if (vis_stream_or_movie_oversigt) {
           glBindTexture(GL_TEXTURE_2D, _textureclose);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(29);
-          glBegin(GL_QUADS);
-          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
-          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
-          glEnd();
         }
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+        glEnd();
 
         //
         // show reset movie search oversigt
@@ -3418,10 +3420,6 @@ void display() {
     //
     // auto search spotify online
     //
-    const int start_search_action_waittime=4;
-    struct tm* t1;
-    static time_t lasttime1=0;
-    static time_t nowdate1;
     time(&nowdate1);
     if (do_show_spotify_search_oversigt) {
       if ((search_spotify_string_changed) && (difftime(nowdate1, lasttime1)>start_search_action_waittime)) {
