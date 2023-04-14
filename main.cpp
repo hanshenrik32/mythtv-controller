@@ -3124,7 +3124,7 @@ void display() {
             if (vis_radio_oversigt) {
               glBindTexture(GL_TEXTURE_2D, radiobutton);                        // radio icon
             } else if (vis_music_oversigt) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdmusic);                     // music icon
+              glBindTexture(GL_TEXTURE_2D, musicbutton);                     // music icon
             } else if (vis_spotify_oversigt) {
               glBindTexture(GL_TEXTURE_2D, spotifybutton);                      // spotify icon
             } else if (vis_tidal_oversigt) {
