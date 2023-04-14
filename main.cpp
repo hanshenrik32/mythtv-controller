@@ -3064,6 +3064,7 @@ void display() {
         // tv icon or play info icon
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
+        // top icon in menu
         if (vis_radio_or_music_oversigt) {
           glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3079,7 +3080,7 @@ void display() {
               glColor4f(1.0f, 1.0f, 1.0f,1.0f);
               glLoadName(27);                                                           // Info icon nr 27
             } else {                                                                    // else default tv
-              glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                        // Tv texture icon
+              glBindTexture(GL_TEXTURE_2D, _textureIdtv);		                            // Tv texture icon
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
               glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
               glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -3093,18 +3094,19 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
         glEnd();
 
+        // 2 icon in menu
         if (vis_radio_or_music_oversigt) {
           glBindTexture(GL_TEXTURE_2D, tidalbutton);                         // tidal button
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(80);                                                           // Info icon nr 80 tidal
+          glLoadName(80);                                                       // Info icon nr 80 tidal
         } else if (vis_stream_or_movie_oversigt) {
-          glBindTexture(GL_TEXTURE_2D, streambutton);                              // steam button
+          glBindTexture(GL_TEXTURE_2D, streambutton);                           // steam button
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-          glLoadName(80);                                                           // Info icon nr  stream
+          glLoadName(80);                                                       // Info icon nr  stream
         } else {
           // movie stuf
           if ((vis_film_oversigt) || (vis_stream_oversigt)) {
@@ -3112,13 +3114,17 @@ void display() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-            glLoadName(3); 			                                                  // film icon name 3
+            glLoadName(3); 			                                                // film icon name 3
           } else {
-            if ((vis_music_oversigt) || (vis_radio_oversigt)) {
-              glBindTexture(GL_TEXTURE_2D,_textureIdmusic_aktiv);                 //
-            } else {
-              glBindTexture(GL_TEXTURE_2D, _textureIdmusic);                      // music icon
-            }
+            if (vis_radio_oversigt) {
+              glBindTexture(GL_TEXTURE_2D, radiobutton);                        // radio icon
+            } else if (vis_music_oversigt) {
+              glBindTexture(GL_TEXTURE_2D,_textureIdmusic);               // music icon aktiv
+            } else if (vis_spotify_oversigt) {
+              glBindTexture(GL_TEXTURE_2D, spotifybutton);                      // spotify icon
+            } else if (vis_tidal_oversigt) {
+              glBindTexture(GL_TEXTURE_2D, tidalbutton);                        // tidal icon
+            } else glBindTexture(GL_TEXTURE_2D, _textureIdmusic);               // default icon
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -16159,7 +16165,7 @@ int main(int argc, char** argv) {
         sleep(2);
         //tidal_token=tidal_oversigt.get_access_token("username","password");
         tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
-        
+
         //tidal_oversigt.tidal_login_token();
 
       }
