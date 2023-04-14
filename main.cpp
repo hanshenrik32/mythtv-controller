@@ -3114,7 +3114,13 @@ void display() {
           glLoadName(80);                                                       // Info icon nr  stream
         } else {
           // movie stuf
-          if ((vis_film_oversigt) || (vis_stream_oversigt)) {
+          if (vis_stream_oversigt) {
+            glBindTexture(GL_TEXTURE_2D, streambutton);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+            glLoadName(3); 			                                                // film icon name 3
+          } else if (vis_film_oversigt) {
             glBindTexture(GL_TEXTURE_2D,_textureIdfilm_aktiv);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3223,19 +3229,26 @@ void display() {
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(29);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
+
         }
         if (vis_stream_or_movie_oversigt) {
           glBindTexture(GL_TEXTURE_2D, _textureclose);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           glLoadName(29);
+          glBegin(GL_QUADS);
+          glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
+          glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+          glEnd();
         }
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
-        glEnd();
 
         //
         // show reset movie search oversigt
@@ -3367,22 +3380,12 @@ void display() {
         if ((keybufferopenwin) && (hent_music_search)) {				                // vi har søgt og skal reset view ofset til 0 = start i 3d visning.
           hent_music_search=false;
           if (findtype==0) {
-            // new ver
            musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-            // old ver
-            //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 0 );	// find det som der søges kunster
          } else {
-            // new ver
-           musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
-            // old ver
-            //opdatere_music_oversigt_searchtxt( musicoversigt , keybuffer , 1 );  // find det som der søges efter sange navn
+            musicoversigt.opdatere_music_oversigt_searchtxt(keybuffer , 0);
           }
-
-          // new ver
-         musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
-
-          // old ver
-          //opdatere_music_oversigt_icons(); 					                            // load gfx icons
+          // update icons (load)
+          musicoversigt.opdatere_music_oversigt_icons(); 					            // load gfx icons
           keybuffer[0] = 0;
           keybufferindex = 0;
           _angley = 0.0f;
@@ -3440,25 +3443,17 @@ void display() {
     if (!(visur)) {
       // music view
       if (vis_music_oversigt) {
-
         // New ver
-       musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
-
-        // old ver
-        //show_music_oversigt(musicoversigt,_textureId_dir,_textureIdback,_textureId28,0,_mangley,music_key_selected);
-
-        if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+        musicoversigt.show_music_oversigt(_textureId_dir,_textureIdback,_textureId28,_mangley,music_key_selected);
       } else if (vis_film_oversigt) {
         glPushMatrix();
         //aktivfont.selectfont("DejaVu Sans");
         film_oversigt.show_film_oversigt(_fangley,fknapnr);
         glPopMatrix();
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_stream_oversigt) {
         glPushMatrix();
         streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
         glPopMatrix();
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       } else if (vis_radio_oversigt) {
         radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
         // show radio options menu
@@ -3473,7 +3468,6 @@ void display() {
         } else {
           spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
         }
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
           if (startwebbrowser) {
             // start webbroser to login on spotify
@@ -3504,7 +3498,6 @@ void display() {
         // show tv guide
         // take time on it
         aktiv_tv_oversigt.show_fasttv_oversigt( tvvalgtrecordnr , tvsubvalgtrecordnr , do_update_xmltv_show );
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
         //
         // show tv program info about selected program in tv guide
         //
@@ -3515,12 +3508,10 @@ void display() {
           //aktivfont.selectfont(configfontname);
           aktiv_tv_oversigt.showandsetprginfo( tvvalgtrecordnr , tvsubvalgtrecordnr );
           glPopMatrix();
-          //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
         }
         // show record program menu
       } else if (vis_recorded_oversigt) {
         recordoversigt.show_recorded_oversigt1(0,0);
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
       // show record tv programs in tv guide
       if ((vis_tvrec_list) && (do_show_setup)) {
@@ -3529,11 +3520,9 @@ void display() {
         //aktiv_crecordlist.showtvreclist();
         write_logfile((char *) "show tv record wiew.");
         glPopMatrix();
-        //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       }
     }
-
-    if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+    //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
 
     #ifdef ENABLE_SPOTIFY
     //firsttimespotifyupdate=true;
