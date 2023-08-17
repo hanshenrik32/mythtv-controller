@@ -173,7 +173,7 @@ static void spotify_server_ev_handler(struct mg_connection *c, int ev, void *ev_
           }
           user_token[codel-4]='\0';
         }
-        sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
+        snprintf(sql,sizeof(sql),"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
         //printf("sql curl : %s \n ",sql);
         curl_error=system(sql);
         if (curl_error==0) {
@@ -478,7 +478,7 @@ int spotify_class::spotify_refresh_token() {
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
-    sprintf(post_playlist_data,"grant_type=refresh_token&refresh_token=%s",spotifytoken_refresh);
+    snprintf(post_playlist_data,sizeof(post_playlist_data),"grant_type=refresh_token&refresh_token=%s",spotifytoken_refresh);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -752,7 +752,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           //if (debug_json) printf("Name found = %s id %s \n", value->u.string.ptr,playlistid);
           strcpy(playlistname,value->u.string.ptr);
           playlistexist=false;
-          sprintf(sql,"select id from mythtvcontroller.spotifycontentplaylist where playlistname like '%s' limit 1", playlistname );
+          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontentplaylist where playlistname like '%s' limit 1", playlistname );
           try {
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
@@ -764,7 +764,7 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
             // if not exist create playlist
             if (!(playlistexist)) {
               //printf("Song name insert : %s \n", playlistname );
-              sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",playlistname,playlistgfx,playlistid);
               mysql_query(conn,sql);
               res = mysql_store_result(conn);
             }
@@ -838,7 +838,7 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
     // set type post
     //curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     //sprintf(post_playlist_data,"{\"grant_type\":\"refresh_token\",\"refresh_token\":%s}",spotifytoken_refresh);
-    sprintf(post_playlist_data,"limit=50&offset=%d",startofset);
+    snprintf(post_playlist_data,sizeof(post_playlist_data),"limit=50&offset=%d",startofset);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     outfile=fopen("spotify_users_playlist.json","wb");
@@ -979,21 +979,21 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         }
       }
       if (dbexist==false) {
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile((char *) "mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify songs)
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile((char *) "mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify playlists)
-        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile((char *) "mysql create table error.");
           fprintf(stdout,"SQL : %s\n",sql);
@@ -1006,7 +1006,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
         // 50 is the max
         //download_user_playlist(spotifytoken,startoffset);
         while (spotifyplaylistloader_done==false) {
-          sprintf(doget,"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
+          snprintf(doget,sizeof(doget),"curl -X GET 'https://api.spotify.com/v1/me/playlists?limit=50&offset=%d' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_users_playlist.json",startoffset,spotifytoken);
           curl_error=system(doget);
           if (curl_error!=0) {
             fprintf(stderr,"Curl error get user playlists\n");
@@ -1056,7 +1056,7 @@ int spotify_class::spotify_get_user_playlists(bool force,int startoffset) {
           write_logfile((char *) "Error downloading user playlist");
           exit(0);
       }
-      sprintf(sql,"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
+      snprintf(sql,sizeof(sql),"select playlistname,playlistid from mythtvcontroller.spotifycontentplaylist");
       write_logfile((char *) "process playlist ......");
       mysql_query(conn,sql);
       res = mysql_store_result(conn);
@@ -1394,7 +1394,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       // always here
       if (do_curl) {
         curl = curl_easy_init();
-        sprintf(doget,"https://api.spotify.com/v1/playlists/%s",playlist);
+        snprintf(doget,sizeof(doget),"https://api.spotify.com/v1/playlists/%s",playlist);
         if (curl) {
           curl_easy_setopt(curl, CURLOPT_URL, doget);
           curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
@@ -1428,7 +1428,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           }
         }
       } else {
-        sprintf(doget,"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
+        snprintf(doget,sizeof(doget),"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
         curl_error=system(doget);
         if (curl_error!=0) {
           fprintf(stderr,"Curl error get playlist \n");
@@ -1478,21 +1478,21 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       // create db if not exist
       if (!(dbexist)) {
         if (dbexist==false) {
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
             write_logfile((char *) "mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify songs)
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
             write_logfile((char *) "mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
           }
           res = mysql_store_result(conn);
           // create db (spotify playlists)
-          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
           if (mysql_query(conn,sql)!=0) {
             write_logfile((char *) "mysql create table error.");
             fprintf(stdout,"SQL : %s\n",sql);
@@ -1524,7 +1524,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           // check if playlist exist
           playlistexist=false;
           refid = 0;
-          sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
+          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
           if (res) {
@@ -1535,7 +1535,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           }
           // crete playlist
           if (!(playlistexist)) {
-            sprintf(sql,"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
+            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
             res=mysql_store_result(conn);
             /*
@@ -1545,7 +1545,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             */
 
             if (refid==0) {
-              sprintf(sql,"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
+              snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
               mysql_query(conn,sql);
               res=mysql_store_result(conn);
               if (res) {
@@ -1557,7 +1557,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           }
           if (stack[tt+1]) {                                                    // if (stack[tt+1]) {
             playlistexist=false;
-            sprintf(sql,"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
+            snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
             if (res) {
@@ -1569,7 +1569,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             // insert record created if not exist ( song name )
             //
             if (playlistexist==false) {
-              sprintf(sql,"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
               mysql_query(conn,sql);
               mysql_store_result(conn);
             }
@@ -1579,7 +1579,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       }
       // create playlist if needed
       if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
-        sprintf(sql,"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
+        snprintf(sql,sizeof(sql),"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
         mysql_query(conn,sql);
         res = mysql_store_result(conn);
         playlistexist=false;
@@ -1591,7 +1591,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         // crete playlist
         if (!(playlistexist)) {
           //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
-          sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
+          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
         }
@@ -1851,7 +1851,7 @@ int spotify_class::spotify_do_we_play() {
 int spotify_class::spotify_pause_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
+  snprintf(call,sizeof(call),"curl -f -X PUT 'https://api.spotify.com/v1/me/player/pause' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error!=0) {
     return 1;
@@ -1980,7 +1980,7 @@ int spotify_class::spotify_resume_play() {
 int spotify_class::spotify_last_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
+  snprintf(call,sizeof(call),"curl -f -X POST 'https://api.spotify.com/v1/me/player/last' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (WEXITSTATUS(curl_error)!=0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
@@ -2056,7 +2056,7 @@ int spotify_class::spotify_last_play2() {
 int spotify_class::spotify_next_play() {
   int curl_error;
   char call[4096];
-  sprintf(call,"curl -f -X POST 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
+  snprintf(call,sizeof(call),"curl -f -X POST 'https://api.spotify.com/v1/me/player/next' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s'",spotifytoken);
   curl_error=system(call);
   if (curl_error==0) {
     fprintf(stderr,"curl_error %d \n",curl_error);
@@ -2316,7 +2316,7 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
+    snprintf(post_playlist_data,sizeof(post_playlist_data),"{\"uris\":[\"spotify:track:%s\"]}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -2382,7 +2382,7 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:artist:%s\"}",playlist_song);
+    snprintf(post_playlist_data,sizeof(post_playlist_data),"{\"context_uri\":\"spotify:artist:%s\"}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -2450,7 +2450,7 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     // set type post/put
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT"); /* !!! */
-    sprintf(post_playlist_data,"{\"context_uri\":\"spotify:album:%s\"}",playlist_song);
+    snprintf(post_playlist_data,sizeof(post_playlist_data),"{\"context_uri\":\"spotify:album:%s\"}",playlist_song);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
     res = curl_easy_perform(curl);
@@ -2558,7 +2558,7 @@ int spotify_class::spotify_get_available_devices() {
   bool dbexist;
   char *database = (char *) "mythtvcontroller";
   char call_sed[]="cat spotify_device_list.json | sed 's/\\\\\\\\\\\//\\//g' | sed 's/[{\\\",}]//g' | sed 's/ //g' | sed 's/:/=/g' | tail -n +6 > spotify_device_list.txt";
-  sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotifytoken);
+  snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/me/player/devices' -H 'Accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > spotify_device_list.json 2>&1",spotifytoken);
   curl_exitcode=system(call);
   //get json file
   if (WEXITSTATUS(curl_exitcode)==0) {
@@ -2624,7 +2624,7 @@ int spotify_class::spotify_get_available_devices() {
             fprintf(stderr,"Device is active : %d \n",spotify_device[t].is_active);
             fprintf(stderr,"Device type      : %s \n",spotify_device[t].devtype);
             fprintf(stderr,"Device id        : %s \n\n",spotify_device[t].id);
-            sprintf(sql,"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
+            snprintf(sql,sizeof(sql),"select dev_id from mythtvcontroller.spotify_device where dev_id like '%s' limit 1",spotify_device[t].id);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
             dbexist=false;
@@ -2635,7 +2635,7 @@ int spotify_class::spotify_get_available_devices() {
             }
             // create if not exist
             if (dbexist==false) {
-              sprintf(sql,"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotify_device values ('%s',%d,'%s','%s',0)",spotify_device[t].name,spotify_device[t].is_active,spotify_device[t].devtype,spotify_device[t].id);
               mysql_query(conn,sql);
               res = mysql_store_result(conn);
             }
@@ -2871,11 +2871,11 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
       show_search_result=false;
-      sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by playlistname");
+      snprintf(sqlselect,sizeof(sqlselect),"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by playlistname");
       getart = 0;
     } else {
       show_search_result=true;
-      sprintf(sqlselect,"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
+      snprintf(sqlselect,sizeof(sqlselect),"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
@@ -3058,13 +3058,13 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
 
     // find records after type (0 = root, else = refid)
     if (type == playlisttype ) {
-      sprintf(sqlselect,"select playlistname,paththumb,playlistid,id from spotifycontentplaylist where playlistname like '");
+      snprintf(sqlselect,sizeof(sqlselect),"select playlistname,paththumb,playlistid,id from spotifycontentplaylist where playlistname like '");
       strcat(sqlselect,"%");
       strcat(sqlselect,keybuffer);
       strcat(sqlselect,"%'");
       getart = 0;
     } else {
-      sprintf(sqlselect,"select name,paththumb,player,playlistid,id from spotifycontentarticles where name like '");
+      snprintf(sqlselect,sizeof(sqlselect),"select name,paththumb,player,playlistid,id from spotifycontentarticles where name like '");
       strcat(sqlselect,"%");
       strcat(sqlselect,keybuffer);
       strcat(sqlselect,"%'");
@@ -3728,19 +3728,19 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt_online(char *keybuffer,in
   curl_error=0;
   switch(type) {
             // search artist name
-    case 0: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 0: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search album name
-    case 1: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 1: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=album&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search playlist name
-    case 2: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 2: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=playlist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // search track/song name
-    case 3: sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    case 3: snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=track&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
             // default search artist name
-    default:sprintf(call,"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
+    default:snprintf(call,sizeof(call),"curl -f -X GET 'https://api.spotify.com/v1/search?q=%s&type=artist&limit=50' -H \"Content-Type: application/json\" -H 'Authorization: Bearer %s' > spotify_search_result.json",searchstring,spotifytoken);
             break;
   }
   curl_error=system(call);

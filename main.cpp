@@ -1,4 +1,6 @@
 //
+// music i Display() linje 4281
+//
 // main code
 //
 #include <stdlib.h>
@@ -712,7 +714,7 @@ GLuint _textureId12; 	                    // background 1
 GLuint _textureId12_1; 	                  // background 2
 GLuint _textureId14; 	                    // pause knap
 GLuint _texture_nocdcover; 	              // cdnocover big icon
-GLuint _textureId20; 	                    // mask movie options box
+// GLuint _textureId20; 	                    // mask movie options box
 GLuint _textureId22; 	                    // move options box
 GLuint _textureId23; 	                    // movie options box
 GLuint _textureId24; 	                    // movie options box
@@ -875,7 +877,7 @@ int hentmythtvver() {
 //    int i;
     // mysql stuf
     strcpy(txtversion,"");
-    sprintf(sqlselect,"select data from settings where value like 'DBSchemaVer'");
+    snprintf(sqlselect,sizeof(sqlselect),"select data from settings where value like 'DBSchemaVer'");
     // mysql stuf
     char *database = (char *) "mythconverg";
     conn=mysql_init(NULL);
@@ -936,7 +938,7 @@ void ERRCHECK_SDL(char *text,unsigned int songnr) {
   char file_path[1024];
   if (vis_music_oversigt) {
     aktiv_playlist.m_play_playlist(file_path,songnr);
-    write_logfile("File play error :");
+    write_logfile((char *) "File play error :");
     fprintf(stderr,"File name %s error : %s\n",file_path,text);
   }
   vis_error=1;			// vis error
@@ -15589,7 +15591,7 @@ void loadgfx() {
     // mask for knap
     _textureId14         	= loadgfxfile(temapath,(char *) "images/",(char *) "stor_knap3_2_pause");
     _texture_nocdcover   	= loadgfxfile(temapath,(char *) "images/",(char *) "nocdcover");
-    _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
+    // _textureId20         	= loadgfxfile(temapath,(char *) "images/",(char *) "lillecoverdefault");
     _textureId22         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox1");
     _textureId23         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox2");
     _textureId24         	= loadgfxfile(temapath,(char *) "images/",(char *) "recordedbox3");
@@ -15763,7 +15765,7 @@ void freegfx() {
     glDeleteTextures( 1, &_textureIdback_other);		// other background
     glDeleteTextures( 1, &_textureId14);	          // pause knap
     glDeleteTextures( 1, &_texture_nocdcover);      // hvis ingen texture (music cover) set default (box2.bmp)
-    glDeleteTextures( 1, &_textureId20);		        // bruges af 3d screen saver (lille logo)
+    // glDeleteTextures( 1, &_textureId20);		        // bruges af 3d screen saver (lille logo)
     glDeleteTextures( 1, &_textureId22);		        // bruges ved recorded programs
     glDeleteTextures( 1, &_textureId23);	          // bruges ved recorded programs
     glDeleteTextures( 1, &_textureId24);			      // bruges ved recorded programs
