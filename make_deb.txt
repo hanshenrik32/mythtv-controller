@@ -1,0 +1,4 @@
+more info https://www.youtube.com/watch?v=nhoRyd2CEVs
+# make it ready
+dh_make -e hanshenrik32@gmail.com -c gpl3 -f mythtv-controller-0.38.1.tgz
+
