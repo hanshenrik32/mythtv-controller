@@ -1,5 +1,6 @@
 //
-// music i Display() linje 4281
+// music i Display() linje 6784
+// music start play linje 4288
 //
 // main code
 //
@@ -4285,11 +4286,11 @@ void display() {
     strcpy(aktivsongstatus,"Playing");
     #endif
     //
-    // alt music er her under player
+    // alt play music er her under player
     //
     if (do_play_music_cover) {
-      musicoversigt.play_songs();
-      // play list
+      musicoversigt.play_songs(true);                                   // set play flag in class
+      // start play list
       if (do_find_playlist) {
         do_find_playlist=false;                                     // sluk func igen
         do_play_music_cover=0;
@@ -4308,6 +4309,9 @@ void display() {
             if (debugmode & 2) fprintf(stderr,"Loading songs from id:%4d \n",do_play_music_aktiv_nr);
              // reset valgt liste
             bool eraktiv;
+            //
+            // fill playlist array med song to play
+            //
             for(int t=0;t<dirmusic.numbersinlist();t++) {
               dirmusic.popsong(temptxt1,&eraktiv,t);
               do_play_music_aktiv_nr_select_array[t]=eraktiv;
@@ -4318,12 +4322,13 @@ void display() {
             }
             if (debugmode & 2) fprintf(stderr,"Set aktiv playlist nr to start ved nr 1\n");
           }
+          // startplaying
           if (do_play_music_aktiv_table_nr>0) {
             #if defined USE_FMOD_MIXER
             if (snd==0) {
                 // aktiv_playlist = class to control music to play
                 // (indenholder array til playliste samt hvor mange der er i playliste)
-               aktiv_playlist.m_play_playlist(aktivplay_music_path,0);			// hent første sang
+               aktiv_playlist.m_play_playlist(aktivplay_music_path,0);			// hent første sang i playlist
                if (strcmp(configsoundoutport,"STREAM")!=0) {
                  result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
                  ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -5851,7 +5856,7 @@ void display() {
     //
     // show uv metter in music player
     //
-    if (((snd) && (visur==false) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
+    if (((snd) && (visur==false) && (show_uv) && (vis_uv_meter) && (configuvmeter) && ((radio_pictureloaded) && (vis_radio_oversigt))) || (vis_music_oversigt) || (vis_radio_or_music_oversigt)) {
       // draw uv meter
       int high = 2;
       int qq = 1;
@@ -6117,7 +6122,7 @@ void display() {
         #endif
         // clean music playlist
         aktiv_playlist.clean_playlist();                // clean play list (reset) play list
-        do_play_music_aktiv_table_nr=1;			// reset play start nr
+        do_play_music_aktiv_table_nr=1;			            // reset play start nr
         // write to log
         write_logfile((char *) "Stop playing media/wideo if any");
         if (film_oversigt.film_is_playing) {
@@ -6275,7 +6280,7 @@ void display() {
       }
     }
     //
-    // show movie info
+    // show new movie info
     //
     if (((vis_nyefilm_oversigt) || (vis_film_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
       do_zoom_film_aktiv_nr=fknapnr-1;
@@ -6507,7 +6512,7 @@ void display() {
     // show status of all the thread loaders
     //
     #ifdef ENABLE_SPOTIFY
-    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin==true) && (radio_oversigt_loaded_done==false) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_spotify_playlist) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
+    if ((strcmp(music_db_update_loader,"")>0) || ((radio_oversigt_loaded_begin) && (!(radio_oversigt_loaded_done)) && (vis_radio_oversigt)) || (spotify_oversigt.get_spotify_update_flag()) || (do_update_spotify_playlist) || (do_update_rss_show) || (movie_oversigt_gfx_loading) && (movie_oversigt_loaded_nr<film_oversigt.film_antal())) {
       show_status_update=true;
       // show loader status in the right button corner.
       int statuswxpos = 1470;
@@ -6642,10 +6647,13 @@ void display() {
       #if defined USE_SDL_MIXER
       if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);	// stop music and free music
       #endif
-      snd = 0;
-      do_zoom_music_cover = false;
+      snd = 0;                                            // clear sound device
+      do_zoom_music_cover = false;                        // close window again
       aktiv_playlist.clean_playlist();                    // clean play list (reset) play list
       do_play_music_aktiv_table_nr = 1;             			// reset play start nr
+      musicoversigt.play_songs(false);                    // set no play flag in musicoversigt class
+      show_uv=false;
+      vis_uv_meter=false;
     }
     // stop radio
     if (do_stop_radio) {
@@ -6668,6 +6676,7 @@ void display() {
     if (!(do_stop_music_all)) {
     #endif
         // vent på sang er færdig
+        // eller start ny sang
         //saver_irq=true;						// stop screen saver at starte timeout når vi spiller music
         #if defined USE_FMOD_MIXER
         result = channel->isPlaying(&playing);
@@ -6678,8 +6687,10 @@ void display() {
         #if defined USE_SDL_MIXER
         playing = Mix_Playing(0);
         #endif
-        if (playing==false) {		//snd->isFinished()
-            // hent next aktiv song
+        if (playing==false) {
+            //
+            // next aktiv song
+            //
             musicoversigt.update_afspillinger_music_song(aktivplay_music_path);				// Set aktive sang antal played +1 og set dagsdato til lastplayed mysql felt
             if (do_play_music_aktiv_table_nr<aktiv_playlist.numbers_in_playlist()) {			// er der flere sange i playliste
               do_play_music_aktiv_table_nr++;								// auto next song
@@ -7346,6 +7357,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             returnfunc = 2;
             fundet = true;
           }
+          // zoom music cover
           if ((GLubyte) names[i*4+3]==27) {
             do_zoom_music_cover =! do_zoom_music_cover;
             ask_open_dir_or_play = false;
@@ -7362,7 +7374,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         // Bruges til mus/touch skærm
         if ((!(fundet)) && (!(do_zoom_music_cover)) && (!(ask_open_dir_or_play))) {		// hvis vi ikke har en aaben dirid så er det muligt at vælge dirid
           // we have a select mouse/touch element dirid
-          if ((GLuint) names[i*4+3]>=100) {
+          if ((GLuint) names[i*4+3]>=100) {                                         //i*4+3
             mknapnr=(GLuint) names[i*4+3]-99;				// hent music knap nr
             if (debugmode & 2) fprintf(stderr,"music selected=%u  \n",mknapnr);
             fundet = true;
@@ -7373,7 +7385,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           mknapnr = mknapnr+(_mangley/41)*8;
         }
         //
-        // hvis vis ask_open_dir_or_play window
+        // hvis vis ask_open_dir_or_play window (select songs to play)
         //
         if ((!(fundet)) && (ask_open_dir_or_play) && (!(do_zoom_music_cover))) {
           // play button
@@ -7431,7 +7443,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // stop song
           if ((GLubyte) names[i*4+3]==9) {
-            do_stop_music = 1;
+            do_stop_music = 1;                                                  // stop play
             fundet = true;
           }
           // play song
@@ -7908,10 +7920,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
-
-
-
 
 
       //
@@ -13351,7 +13359,7 @@ void update(int value) {
                                             }
                                             break;
 
-                                    case 3:
+                                    case 3:   // Music
                                             if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
                                                 if ((int) (do_show_play_open_select_line+do_show_play_open_select_line_ofset)<dirmusic.numbersinlist()-1) {
                                                     if (do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
@@ -13369,7 +13377,7 @@ void update(int value) {
                                                 }
                                             }
                                             break;
-                                    case 4:
+                                    case 4:   // Music
                                             if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
                                                 if ((int) (do_show_play_open_select_line+do_show_play_open_select_line_ofset)<dirmusic.numbersinlist()-1) {
                                                     if (do_show_play_open_select_line<19) do_show_play_open_select_line++; else do_show_play_open_select_line_ofset++;
@@ -13741,9 +13749,6 @@ void update(int value) {
                         if ((vis_radio_oversigt) && (show_radio_options)) {
                             radiooversigt.lastradiooptselect();
                         }
-
-
-
                         // stream
                         if ((vis_stream_oversigt) && (show_stream_options==false)) {
                             switch(screen_size) {
@@ -16245,7 +16250,7 @@ int main(int argc, char** argv) {
       exit(-1);
     }
     // Load the VLC engine
-//    vlc_inst = libvlc_new(5,opt);
+//    musicvlc_inst = libvlc_new(5,opt);
 /*
     vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
     // Create a media player playing environement

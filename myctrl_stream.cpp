@@ -3667,6 +3667,62 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
+
+
+      // Hemmeligheder
+      if (check_rss_feed_exist(conn,(char *) "Ubegribeligt")==0) {
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Hemmeligheder',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error How to FPV Per Lommel Podcast.\n");
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Hemmeligheder',NULL,NULL,'Hemmeligheder',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/hemmeligheder-2.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error How to FPV Per Lommel.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
+      // Hjernekassen på P1
+      if (check_rss_feed_exist(conn,(char *) "Hjernekassen på P1")==0) {
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Hjernekassen på P1',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error How to FPV Per Lommel Podcast.\n");
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Hjernekassen på P1',NULL,NULL,'Hjernekassen på P1',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/hjernekassen-pa-p1.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error How to FPV Per Lommel.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+      // Verdens bedste film
+      if (check_rss_feed_exist(conn,(char *) "Hjernekassen på P1")==0) {
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Verdens bedste film',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error How to FPV Per Lommel Podcast.\n");
+        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Verdens bedste film',NULL,NULL,'Verdens bedste film',0,0,NULL,'https://api.dr.dk/podcasts/v1/feeds/verdens-bedste-film-radio.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
+        res = mysql_store_result(conn);
+        mysql_free_result(res);
+        if (mysql_query(conn,sqlselect)!=0) {
+          printf("mysql insert error How to FPV Per Lommel.\n");
+          printf("SQL: %s\n",sqlselect);
+        }
+        rss_update=true;
+      }
+
+
+
+
+
+
       // close mysql
       if (conn) mysql_close(conn);
       // download new rrs files we just insert in db

@@ -58,7 +58,7 @@ class musicoversigt_class {
     unsigned int get_directory_id(int nr);
     char *get_album_path(int nr);
     GLuint get_textureId(int nr);
-    int play_songs() { do_play=true; }
+    int play_songs(bool setplay) { do_play=setplay; }
     int update_afspillinger_music_song(char *filename);
 };
 
