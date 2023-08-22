@@ -4151,8 +4151,8 @@ void display() {
           if (strcmp(radiooversigt.get_stream_url(rknapnr-1),"")!=0) {
             strcpy(aktivplay_music_path,radiooversigt.get_stream_url(rknapnr-1));
             // write debug log
-            //sprintf(debuglogdata,"play radio path = %s ",aktivplay_music_path);
-            //write_logfile(debuglogdata);
+            sprintf(debuglogdata,"play radio path = %s ",aktivplay_music_path);
+            write_logfile(debuglogdata);
             // fmod player
             #if defined USE_FMOD_MIXER
             // set big sound buffer to stop lag
@@ -7814,7 +7814,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             // show close spotify info (27 need to move) 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               // write debug log
-              write_logfile((char *) "Show/close tidal info\n");
+              write_logfile((char *) "Show/close tidal info");
               if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
               if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
               fundet = true;

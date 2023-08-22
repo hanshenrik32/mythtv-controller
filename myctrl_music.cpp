@@ -611,6 +611,16 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
       res = mysql_store_result(conn);
     }
     if (true) {
+      /*
+      strcpy(sqlselect,"drop table music_directories");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+
+      strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
+      mysql_query(conn,sqlselect);
+      res = mysql_store_result(conn);
+      */
+
       //create table music_directories(directory_id int,path text, parent_id int);
       //create table music_albums(album_id  int, artist_id int, album_name   varchar(255) ,year int, compilation int);
       strcpy(musicoversigt[0].album_name,"PLAYLIST");
@@ -734,7 +744,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       }
                     }
                     // open found dir having the songs
-                    snprintf(debuglogdata,4090,"\t Checking sub dir %s \n",de->d_name);
+                    snprintf(debuglogdata,4090,"\t Checking sub dir %s ",de->d_name);
                     write_logfile((char *) debuglogdata);
                     // make path
                     snprintf(checkdir2,sizeof(checkdir2),"%s/%s",checkdir,de->d_name);                    
@@ -810,6 +820,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
   strcpy(music_db_update_loader,"");
+  write_logfile("Done update music directory ");
   if (i) return 0; else return 1;
 }
 
