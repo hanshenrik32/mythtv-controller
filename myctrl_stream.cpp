@@ -303,10 +303,9 @@ int stream_class::loadrssfile(bool updaterssfile) {
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
         stream_rssparse_nowloading++;
-        
         printf("Get rss file %10s antal streams %d \n",row[0],antal_rss_streams());
         // antalrss_feeds++;
-        snprintf(temptxt,sizeof(temptxt),"Get rss file on stream title %10s ",row[0]);
+        snprintf(temptxt,sizeof(temptxt),"Get rss feed title %10s ",row[0]);
         write_logfile(temptxt);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
           getuserhomedir(homedir);                                          // get user homedir
