@@ -306,11 +306,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
         
         printf("Get rss file %10s antal streams %d \n",row[0],antal_rss_streams());
         // antalrss_feeds++;
-        
-        snprintf(temptxt,sizeof(temptxt),"Get rss file on stream title %10s \n",row[0]);
-        
+        snprintf(temptxt,sizeof(temptxt),"Get rss file on stream title %10s ",row[0]);
         write_logfile(temptxt);
-
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
           getuserhomedir(homedir);                                          // get user homedir
           strcpy(totalurl,"wget -U Netscape --timeout=10 '");
@@ -1894,22 +1891,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
-      // do not work
-      // GeekBeat.TV
-      if (check_rss_feed_exist(conn,(char *) "GeekBeat.TV")==0) {
-        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('GeekBeat.TV',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error. %s \n","GeekBeat.TV");
-        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('GeekBeat.TV',NULL,NULL,'GeekBeat.TV',0,0,NULL,'http://feeds.feedburner.com/caliextralarge?format=xml',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error GeekBeat.TV.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
       // OK tilbage til mars dr1 podcast
       if (check_rss_feed_exist(conn,(char *) "Tilbage til Mars")==0) {
         snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Tilbage til Mars',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -2185,7 +2166,7 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         rss_update=true;
       }
 
-      // Shitstorm dainsh podcast
+      // Ok Shitstorm dainsh podcast
       if (check_rss_feed_exist(conn,(char *) "Shitstorm")==0) {
         snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Shitstorm',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
         res = mysql_store_result(conn);
@@ -3095,21 +3076,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       }
 
 
-      //
-      if (check_rss_feed_exist(conn,(char *) "Den sorte boks - podcast")==0) {
-        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Den sorte boks - podcast',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) printf("mysql insert error Den sorte boks - podcast.\n");
-        snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontentarticles (feedtitle,path,paththumb,title,season,episode,description,url,type,thumbnail,mediaURL,author,date,time,rating,filesize,player,playerargs,download,downloadargs,width,height,language,podcast,downloadable,customhtml,countries) VALUES ('Den sorte boks - podcast','Den sorte boks - podcast',0,0,NULL,'https://www.dr.dk/mu/feed/den-sorte-boks-podcast.xml?format=podcast',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
-        res = mysql_store_result(conn);
-        mysql_free_result(res);
-        if (mysql_query(conn,sqlselect)!=0) {
-          printf("mysql insert error Den sorte boks - podcast.\n");
-          printf("SQL: %s\n",sqlselect);
-        }
-        rss_update=true;
-      }
 
 
 

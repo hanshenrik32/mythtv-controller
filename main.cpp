@@ -1342,13 +1342,13 @@ int save_config(char * filename) {
       else fputs("None\n",file);
       sprintf(temp,"screensize=%d\n",screen_size);
       fputs(temp,file);
-      sprintf(temp,"tema=%d\n",tema);
+      sprintf(temp,"tema=%d \n",tema);
       fputs(temp,file);
-      sprintf(temp,"font=%s\n",configfontname);
+      sprintf(temp,"font=%s \n",configfontname);
       fputs(temp,file);
-      sprintf(temp,"mouse=%s\n",configmouse);
+      sprintf(temp,"mouse=%s \n",configmouse);
       fputs(temp,file);
-      sprintf(temp,"use3d=%s\n",configuse3deffect);
+      sprintf(temp,"use3d=%s \n",configuse3deffect);
       fputs(temp,file);
       sprintf(temp,"land=%d\n",configland);
       fputs(temp,file);
@@ -11679,19 +11679,17 @@ void handleKeypress(unsigned char key, int x, int y) {
                 }
               }
               break;
-            case 13:
-              write_logfile((char *) "Start search....");
-              if (debugmode) {
-                if (vis_music_oversigt) {
-                  if (ask_save_playlist) fprintf(stderr,"Save playlist key pressed, update music list.\n");
-                  else fprintf(stderr,"Enter key pressed, update music list.\n");
-                } else if (vis_radio_oversigt) fprintf(stderr,"Enter key pressed, play radio station.\n");
-                else if (vis_stream_oversigt) fprintf(stderr,"Enter key pressed, update stream view.\n");
-                else if (do_show_setup_network) fprintf(stderr,"Enter key pressed in set network\n");
-                else if (vis_tv_oversigt) fprintf(stderr,"Enter key pressed in vis tv oversigt\n");
-                else if (do_show_tvgraber) fprintf(stderr,"Enter key pressed in vis show tvgraber\n");
-                else if (vis_spotify_oversigt) fprintf(stderr,"Enter key pressed in vis show spotify\n");
-              }
+            case 13:           
+              if (vis_music_oversigt) {
+                if (ask_save_playlist) write_logfile("Save playlist key pressed, update music list.\n");
+                else write_logfile("Enter key pressed, update music list.\n");
+              } else if (vis_radio_oversigt) write_logfile("Enter key pressed, play radio station.\n");
+              else if (vis_stream_oversigt) write_logfile("Enter key pressed, update stream view.\n");
+              else if (do_show_setup_network) write_logfile("Enter key pressed in set network\n");
+              else if (vis_tv_oversigt) write_logfile("Enter key pressed in vis tv oversigt\n");
+              else if (do_show_tvgraber) write_logfile("Enter key pressed in vis show tvgraber\n");
+              else if (vis_spotify_oversigt) write_logfile("Enter key pressed in vis show spotify\n");
+              write_logfile("Start search....");
               // set save flag of playlist
               if (ask_save_playlist) {
                 save_ask_save_playlist = true;
@@ -11748,6 +11746,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 music_icon_anim_icon_ofset=0;                   // reset to first icon
                 music_icon_anim_icon_ofsety=0;
               }
+              // start music 
               if ((vis_music_oversigt) && (!(do_zoom_music_cover)) && ((ask_save_playlist==false))) {
                 mknapnr=music_key_selected;	                     	// hent valget
                 // normal dir

@@ -1,8 +1,6 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-void write_logfile(char *logentry);
-
 const char *SHOWVER={"0.39.1.2"};
 
 // debug modes

@@ -544,6 +544,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   char sqlselect2[4096];
   char checkdir[4096];
   char checkdir2[4096];
+  char debuglogdata[4096];
+
   MYSQL *conn;
   MYSQL *conn1;
   MYSQL *conn2;
@@ -622,7 +624,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
       musicoversigt[0].oversigttype=-1;			// type -1 = playlist
       i++;
       if (dirp) {
-        //printf("Loading directory %s\n",dirpath);
+        printf("Music update/Loading directory %s\n",dirpath);
+        write_logfile("update/Loading directory ");
         // create db over all dirs in start path
         while(de = readdir(dirp)) {
           if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0) && (strcmp(de->d_name,"@eaDir")!=0)) {
@@ -657,7 +660,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
           res = mysql_store_result(conn);
           // loop dirs database names from root / (music dir start path)
           while ((row = mysql_fetch_row(res)) != NULL) {
-            if (debugmode & 2) printf("Checking dir %s/%s \n",dirpath,row[1]);
+            // log info
+            snprintf(debuglogdata,4090,"Checking dir %s/%s ",dirpath,row[1]);
+            write_logfile((char *) debuglogdata);
             dirid=atoi(row[0]);
             snprintf(checkdir,sizeof(checkdir),"%s/%s",dirpath,row[1]);
             dirp1=opendir(checkdir);
@@ -729,8 +734,10 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       }
                     }
                     // open found dir having the songs
-                    snprintf(checkdir2,sizeof(checkdir2),"%s/%s",checkdir,de->d_name);
-                    if (debugmode & 2) printf("\t Checking sub dir %s \n",de->d_name);
+                    snprintf(debuglogdata,4090,"\t Checking sub dir %s \n",de->d_name);
+                    write_logfile((char *) debuglogdata);
+                    // make path
+                    snprintf(checkdir2,sizeof(checkdir2),"%s/%s",checkdir,de->d_name);                    
                     dirp2=opendir(checkdir2);
                     if (dirp2==NULL) {
                       printf("Open dir error ->%s<-\n",checkdir2);
