@@ -4289,6 +4289,24 @@ void display() {
     // alt play music er her under player
     //
     if (do_play_music_cover) {
+      // do we play radio or other songs?
+      #if defined USE_FMOD_MIXER
+      if (snd) {
+        // yes stop play
+        // stop old playing
+        sound->release();                                                                       // stop last playing song
+        dsp = 0;                                                                                  // reset uv
+        ERRCHECK(result,0);
+        snd = 0;                                // set play new flag
+      }
+      #endif
+      // if sdl music
+      // stop play
+      #if defined USE_SDL_MIXER
+      if (sdlmusicplayer) Mix_FreeMusic(sdlmusicplayer);
+      sdlmusicplayer = NULL;
+      snd = 0;                                // set play new flag
+      #endif
       musicoversigt.play_songs(true);                                   // set play flag in class
       // start play list
       if (do_find_playlist) {
@@ -16240,6 +16258,8 @@ int main(int argc, char** argv) {
         }
       }
     }
+    // Normal in use
+    /*
     // stream loader
     pthread_t loaderthread2;           // the load
     int rc2;
@@ -16248,6 +16268,11 @@ int main(int argc, char** argv) {
       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
+    */
+
+
+
+
     // Load the VLC engine
 //    musicvlc_inst = libvlc_new(5,opt);
 /*
