@@ -590,42 +590,39 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
     //
     // if database not exist do dir scan and create tables for music
     //
-    if (!(dbexist)) {
-      write_logfile((char *) "Creating database for music.");
-      strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-      strcpy(sqlselect,"create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))");
-      mysql_query(conn,sqlselect);
-      res = mysql_store_result(conn);
-    }
+    write_logfile((char *) "Creating database for music if not exist.");
+    strcpy(sqlselect,"create table IF NOT EXISTS music_directories(directory_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,path text, parent_id int)");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    strcpy(sqlselect,"create table IF NOT EXISTS music_albums(album_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_id int, album_name varchar(255) ,year int, compilation int)");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    strcpy(sqlselect,"create table IF NOT EXISTS music_songs(song_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,filename text,name varchar(255),track int, artist_id int, album_id int, genre_id int,year int,length int,numplays int,rating int,lastplay datetime, date_entered  datetime, date_modified datetime,format varchar(4), mythdigest varchar(255) ,size int,description  varchar(255), comment varchar(255), disc_count int, disc_number int, track_count  int, start_time int, stop_time int, eq_preset varchar(255),relative_volume int, sample_rate int, bitrate int,bpm int, directory_id int)");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    strcpy(sqlselect,"create table IF NOT EXISTS music_artists(artist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, artist_name varchar(255))");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    strcpy(sqlselect,"create table IF NOT EXISTS music_genres(genre_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, genre varchar(255))");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    strcpy(sqlselect,"create table IF NOT EXISTS music_playlist(playlist_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, playlist_name varchar(255),playlist_songs text,last_accessed datetime,length int,songcount int,hostname varchar(64))");
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+
     if (true) {
       //create table music_directories(directory_id int,path text, parent_id int);
       //create table music_albums(album_id  int, artist_id int, album_name   varchar(255) ,year int, compilation int);
+      // Empty musicdb
       strcpy(sqlselect,"TRUNCATE table music_songs");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"TRUNCATE table music_directories");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
       strcpy(sqlselect,"TRUNCATE table music_albums");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-
 
       strcpy(musicoversigt[0].album_name,"PLAYLIST");
       strcpy(musicoversigt[0].album_path,"");
@@ -662,26 +659,24 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                 }              
                 mysql_close(conn2);
               }
-              if (dirfindes == false) {
-                snprintf(sqlselect,sizeof(sqlselect),"insert into music_directories(directory_id,path,parent_id) values(%d,'%s',%d)",0,de->d_name,0);  //
-                mysql_query(conn,sqlselect);
-                res = mysql_store_result(conn);
-                strcpy(musicoversigt[i].album_name,de->d_name);
-                strcpy(musicoversigt[i].album_path,"");
-                //strcat(musicoversigt[i].album_path,"/");
-                strcat(musicoversigt[i].album_path,de->d_name);
-                // strcpy(musicoversigt[i].album_coverfile,icon_file);
-                musicoversigt[i].directory_id=i;			// husk directory id
-                musicoversigt[i].parent_id=0;
-                musicoversigt[i].album_id=0;
-                musicoversigt[i].artist_id=0;
-                musicoversigt[i].oversigttype=0;
-                parent_dir_id=0;
-                // update artist db
-                snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
-                mysql_query(conn,sqlselect2);
-                res = mysql_store_result(conn);
-              }
+              snprintf(sqlselect,sizeof(sqlselect),"insert into music_directories(directory_id,path,parent_id) values(%d,'%s',%d)",0,de->d_name,0);  //
+              mysql_query(conn,sqlselect);
+              res = mysql_store_result(conn);
+              strcpy(musicoversigt[i].album_name,de->d_name);
+              strcpy(musicoversigt[i].album_path,"");
+              //strcat(musicoversigt[i].album_path,"/");
+              strcat(musicoversigt[i].album_path,de->d_name);
+              // strcpy(musicoversigt[i].album_coverfile,icon_file);
+              musicoversigt[i].directory_id=i;			// husk directory id
+              musicoversigt[i].parent_id=0;
+              musicoversigt[i].album_id=0;
+              musicoversigt[i].artist_id=0;
+              musicoversigt[i].oversigttype=0;
+              parent_dir_id=0;
+              // update artist db
+              snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
+              mysql_query(conn,sqlselect2);
+              res = mysql_store_result(conn);
               i++;
             }
           }
@@ -729,32 +724,10 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                   if (de->d_type==DT_DIR) {
                     conn2=mysql_init(NULL);
                     if (conn2) {
-
-                      dirfindes=false;
-                      conn3=mysql_init(NULL);
-                      if (conn3) {
-                        mysql_real_connect(conn3, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                        snprintf(sqlselect1,sizeof(sqlselect1),"select album_id from music_albums where album_name like '%s'",de->d_name);
-                        mysql_query(conn3,sqlselect1);
-                        res3 = mysql_store_result(conn3);
-                        if (res3) {
-                          while ((row3 = mysql_fetch_row(res3)) != NULL) {
-                            dirfindes=true;
-
-                            printf("***** Album findes %s \n",de->d_name);
-
-                          }
-                        }              
-                        mysql_close(conn3);
-                      }
-
-                      //if (!(dirfindes)) {
-                        mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                        snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_albums(album_id,artist_id,album_name,year,compilation) values(%d,%d,'%s',%d,%d)",0,artistid,de->d_name,0,0);
-                        mysql_query(conn2,sqlselect1);
-                        res2 = mysql_store_result(conn2);
-                      //}
-
+                      mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                      snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_albums(album_id,artist_id,album_name,year,compilation) values(%d,%d,'%s',%d,%d)",0,artistid,de->d_name,0,0);
+                      mysql_query(conn2,sqlselect1);
+                      res2 = mysql_store_result(conn2);
                       // husk last dir vi kommer fra
                       parent_dir_id=atoi(row[0]);
                       // create dir id for subdir
@@ -809,21 +782,19 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                           strcpy(songname,checkdir2);
                           strcat(songname,"/");
                           strcat(songname,de2->d_name);
-                          //if (!(song_exist_in_db(songname,songname))) {
-                            snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
-                                          (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
-                                          0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
-                            // show in music overview loader
-                            strcpy(music_db_update_loader,de->d_name);
-                            music_oversigt_loaded_nr++;
-                            conn1=mysql_init(NULL);
-                            if (conn1) {
-                              mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                              mysql_query(conn1,sqlselect1);
-                              res1 = mysql_store_result(conn1);
-                              mysql_close(conn1);
-                            }
-                          //}
+                          snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
+                                        (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
+                                        0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "2012-01-01 00:00:00",   "2012-01-01 00:00:00","2012-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,sub_dirid);
+                          // show in music overview loader
+                          strcpy(music_db_update_loader,de->d_name);
+                          music_oversigt_loaded_nr++;
+                          conn1=mysql_init(NULL);
+                          if (conn1) {
+                            mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                            mysql_query(conn1,sqlselect1);
+                            res1 = mysql_store_result(conn1);
+                            mysql_close(conn1);
+                          }
                         }
                       }
                     }
@@ -838,17 +809,15 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       strcpy(songname,checkdir);
                       strcat(songname,"/");
                       strcat(songname,de->d_name);
-                      if (!(song_exist_in_db(songname,songname))) {
-                        snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
-                                                                    (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
-                                                                    0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "1970-01-01 00:00:00",   "1970-01-01 00:00:00","1970-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,dirid);
-                        conn1=mysql_init(NULL);
-                        if (conn1) {
-                          mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
-                          mysql_query(conn1,sqlselect1);
-                          res1 = mysql_store_result(conn1);
-                          mysql_close(conn1);
-                        }
+                      snprintf(sqlselect1,sizeof(sqlselect1),"insert into music_songs(song_id,filename,  name,    track, artist_id, album_id, genre_id, year, length, numplays, rating, lastplay,             date_entered,           date_modified,          format , mythdigest, size , description, comment, disc_count, disc_number, track_count, start_time, stop_time, eq_preset, relative_volume, sample_rate, bitrate, bpm, directory_id) values \
+                                                                  (%d,    '%s',      '%s',    %d,    %d,        %d,       %d,       %d,    %d,     %d,      %d,     '%s',                 '%s',                   '%s',                   '%s',    '%s',        %d,   '%s',        '%s',    %d,         %d,          %d,          %d,          %d,        '%s',       %d,             %d,          %d,      %d,     %d)", \
+                                                                  0,      songname,songname,0,    artistid,  albumid,   0,        0,     0,      0,       0,     "1970-01-01 00:00:00",   "1970-01-01 00:00:00","1970-01-01 00:00:00",  "",      "",          0,    "",          "",      0,          0,           0,           0,           0,         "",         0,              0,           0,       0,dirid);
+                      conn1=mysql_init(NULL);
+                      if (conn1) {
+                        mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
+                        mysql_query(conn1,sqlselect1);
+                        res1 = mysql_store_result(conn1);
+                        mysql_close(conn1);
                       }
                     }
                   }
