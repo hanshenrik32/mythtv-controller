@@ -186,6 +186,9 @@ class spotify_class : vlc_controller {
         int spotify_req_playlist();                                             //
         int spotify_get_user_playlists(bool force,int startoffset);             // get user playlist (list of playlist)
         int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
+
+        int spotify_get_likedsongs(const char *playlist,bool force,bool create_playlistdb);
+
         int spotify_get_user_id();
         int spotify_play_playlist(char *songarray);
         int spotify_play_now_playlist(char *playlist_song,bool now);            // play playlist

@@ -487,10 +487,17 @@ int musicoversigt_class::load_music_covergfx() {
     return(i);                                                                  // return # of loaded images
 }
 
+
+// ************************************************************************
+//
+// get info from db
+//
+// ************************************************************************
+
 char *musicoversigt_class::get_album_name(int nr) {
-  if (nr<antal_music_oversigt) {
+  if (nr<=antal_music_oversigt) {
     return(musicoversigt[nr].album_name);
-  } else return(0);
+  } else return {};
 }
 
 char musicoversigt_class::get_album_type(int nr) {
@@ -500,19 +507,19 @@ char musicoversigt_class::get_album_type(int nr) {
 }
 
 unsigned int musicoversigt_class::get_directory_id(int nr) {
-  if (nr<antal_music_oversigt) {
+  if (nr<=antal_music_oversigt) {
     return(musicoversigt[nr].directory_id);
   } else return(0);
 }
 
 char *musicoversigt_class::get_album_path(int nr) {
-  if (nr<antal_music_oversigt) {
+  if (nr<=antal_music_oversigt) {
     return(musicoversigt[nr].album_path);
   } else return(0);
 }
 
 GLuint musicoversigt_class::get_textureId(int nr) {
-  if (nr<antal_music_oversigt) {
+  if (nr<=antal_music_oversigt) {
     return(musicoversigt[nr].textureId);
   } else return(0);
 }
@@ -652,7 +659,6 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                 if (res2) {
                   while ((row2 = mysql_fetch_row(res2)) != NULL) {
                     dirfindes=true;
-
                     printf("***** DIR Fundet %s \n",de->d_name);
 
                   }
@@ -678,10 +684,13 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               mysql_query(conn,sqlselect2);
               res = mysql_store_result(conn);
               i++;
+
+              printf("%20s checket %d \n" , de->d_name, i );
+
             }
           }
         }
-        // fill database music_albums from dir on music_directories
+        // fill database music_albums from dir from music_directories
         strcpy(sqlselect,"select directory_id ,path ,parent_id from music_directories");
         if (conn) {
           mysql_query(conn,sqlselect);
@@ -720,7 +729,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               while(de = readdir(dirp1)) {
                 if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0)) {
                   // if dir
-                  // opret i album db
+                  // opret i album dmknapnr =b
                   if (de->d_type==DT_DIR) {
                     conn2=mysql_init(NULL);
                     if (conn2) {

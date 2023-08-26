@@ -8446,7 +8446,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 // give error
                 if (debugmode & 2) {
                   if ((vis_music_oversigt) && (vis_tv_oversigt==false) && (vis_stream_oversigt==false) && (vis_radio_oversigt==false)) {
-                    fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
+                    //fprintf(stderr,"mknapnr = %d type = %d \n",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
                   }
                 }
                 if (vis_tv_oversigt) {
@@ -8482,7 +8482,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         ask_open_dir_or_play_aopen = false;
                       }
                     } else {
-                      // here
+                      // here playlist load
                       if (debugmode & 2) fprintf(stderr,"mknapnr=%d Playlist loader af playlist id %d \n",mknapnr,musicoversigt.get_directory_id(mknapnr-1));
                       // playlist loader
                       do_play_music_aktiv_nr=musicoversigt.get_directory_id(mknapnr-1);
@@ -14861,7 +14861,12 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+
+
+      spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
+      spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists
+      
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // update the playback device list
