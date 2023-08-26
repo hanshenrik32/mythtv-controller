@@ -618,9 +618,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
     res = mysql_store_result(conn);
 
     if (true) {
-      //create table music_directories(directory_id int,path text, parent_id int);
-      //create table music_albums(album_id  int, artist_id int, album_name   varchar(255) ,year int, compilation int);
-      // Empty musicdb
+      // Empty old musicdb, and build new.
       strcpy(sqlselect,"TRUNCATE table music_songs");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
@@ -648,8 +646,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
         while(de = readdir(dirp)) {
           if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0) && (strcmp(de->d_name,"@eaDir")!=0)) {
             // if dir
-            if (de->d_type==DT_DIR) {
-              dirfindes=false;
+            if (de->d_type==DT_DIR) {  
+              printf("Checking directory %20s \n" , de->d_name);
+                dirfindes=false;
               conn2=mysql_init(NULL);
               if (conn2) {
                 mysql_real_connect(conn2, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
@@ -660,11 +659,11 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                   while ((row2 = mysql_fetch_row(res2)) != NULL) {
                     dirfindes=true;
                     printf("***** DIR Fundet %s \n",de->d_name);
-
                   }
                 }              
                 mysql_close(conn2);
               }
+              
               snprintf(sqlselect,sizeof(sqlselect),"insert into music_directories(directory_id,path,parent_id) values(%d,'%s',%d)",0,de->d_name,0);  //
               mysql_query(conn,sqlselect);
               res = mysql_store_result(conn);
@@ -683,10 +682,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               snprintf(sqlselect2,sizeof(sqlselect2),"insert into music_artists values (%d,'%s')",0,de->d_name);
               mysql_query(conn,sqlselect2);
               res = mysql_store_result(conn);
-              i++;
-
-              printf("%20s checket %d \n" , de->d_name, i );
-
+              i++; 
             }
           }
         }
@@ -698,8 +694,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
           // loop dirs database names from root / (music dir start path)
           while ((row = mysql_fetch_row(res)) != NULL) {
             // log info
-            snprintf(debuglogdata,4090,"Checking dir %s/%s ",dirpath,row[1]);
-            write_logfile((char *) debuglogdata);
+            // snprintf(debuglogdata,4090,"Checking dir %s/%s ",dirpath,row[1]);
+            // write_logfile((char *) debuglogdata);
             dirid=atoi(row[0]);
             snprintf(checkdir,sizeof(checkdir),"%s/%s",dirpath,row[1]);
             dirp1=opendir(checkdir);
@@ -770,8 +766,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                       }
                     }
                     // open found dir having the songs
-                    snprintf(debuglogdata,4090,"\t Checking sub dir %s ",de->d_name);
-                    write_logfile((char *) debuglogdata);
+                    // snprintf(debuglogdata,4090,"\t Checking sub dir %s ",de->d_name);
+                    // write_logfile((char *) debuglogdata);
                     // make path
                     snprintf(checkdir2,sizeof(checkdir2),"%s/%s",checkdir,de->d_name);                    
                     dirp2=opendir(checkdir2);
