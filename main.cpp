@@ -11679,6 +11679,7 @@ void handleKeypress(unsigned char key, int x, int y) {
 
               if ((vis_film_oversigt) && (!(do_update_moviedb))) {
                 do_update_moviedb = true;                                           // set update flag
+                                                                                    // bliver sikket cleared in thread
                 pthread_t loaderthread1;                                          // loader thread
                 // start multi thread and update movie overview
                 // movie loader
@@ -14733,12 +14734,13 @@ void *datainfoloader_music(void *data) {
     // update music db from disk
     if ((do_update_music) || (do_update_music_now)) {
       // update the music db
-
-      // mew ver
-     musicoversigt.opdatere_music_oversigt_nodb();
-
-      // old ver
-      //opdatere_music_oversigt_nodb(configdefaultmusicpath,musicoversigt);
+      musicoversigt.opdatere_music_oversigt_nodb();
+      
+      // new test
+      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
+      
+      
+      
       do_update_music_now = false;                                              // do not call update any more
       do_update_music = false;                                                  // stop show music update
     }
@@ -14747,7 +14749,7 @@ void *datainfoloader_music(void *data) {
     // New ver
     if (musicoversigt.opdatere_music_oversigt(0)>0) {
      musicoversigt.opdatere_music_oversigt_icons();                                  // load icons
-      write_logfile((char *) "Music db loaded..");
+      write_logfile((char *) "Music db+icons loaded..");
     }
   } else {
     if (debugmode % 2) fprintf(stderr,"Search for music in :%s\n",configdefaultmusicpath);
