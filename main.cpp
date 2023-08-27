@@ -3649,8 +3649,7 @@ void display() {
       }
     }
     
-    printf("snd=%d playstatus %d  do_zoom_music_cover=%d  ask_open_dir_or_play=%d  \n",snd, musicoversigt.play_songs_status() , do_zoom_music_cover, ask_open_dir_or_play );
-    
+       
     
     // show volume value
     if (show_volume_info) {
