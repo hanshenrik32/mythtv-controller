@@ -117,7 +117,7 @@ class spotify_class : vlc_controller {
         bool search_loaded;
         bool do_cleanup_stack();
     public:
-        bool set_search_loaded() { search_loaded=true; }
+        bool set_search_loaded() { search_loaded=true; return(1); }
         int loaded_antal;                                                       // antal loaded i loader
         unsigned int spotify_playlist_antal;
         void settextureidfile(int nr,char *filename);

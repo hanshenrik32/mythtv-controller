@@ -61,6 +61,23 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 }
 
 
+// flags
+bool process_playinfo_tracks=false;
+bool process_playinfo_playlist=false;
+bool process_playinfo_songs=false;
+bool process_playinfo_href=false;
+bool process_playinfo_description=false;
+bool process_playinfo_image=false;
+bool process_playinfo_name=false;
+bool process_playinfo_items=false;
+bool process_playinfo_artist=false;
+bool process_playinfo_track_nr=false;
+bool process_playinfo_date=false;
+bool process_playinfo_progress_ms=false;
+bool process_playinfo_duration_ms=false;
+bool playinfo_json_debug=false;
+
+
 // ****************************************************************************************
 //
 // text render is glcRenderString for freetype font support
@@ -1871,25 +1888,6 @@ int spotify_class::spotify_get_likedsongs(const char *playlist,bool force,bool c
   return tt;
 }
 
-
-
-
-// *****  ****************************************************************************************************************************
-
-bool process_playinfo_tracks=false;
-bool process_playinfo_playlist=false;
-bool process_playinfo_songs=false;
-bool process_playinfo_href=false;
-bool process_playinfo_description=false;
-bool process_playinfo_image=false;
-bool process_playinfo_name=false;
-bool process_playinfo_items=false;
-bool process_playinfo_artist=false;
-bool process_playinfo_track_nr=false;
-bool process_playinfo_date=false;
-bool process_playinfo_progress_ms=false;
-bool process_playinfo_duration_ms=false;
-bool playinfo_json_debug=false;
 
 
 // ****************************************************************************************

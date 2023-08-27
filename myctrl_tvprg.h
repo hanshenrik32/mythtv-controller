@@ -101,7 +101,7 @@ class tv_oversigt {
         time_t hentprgstartklint(int kanalnr,int prgnr);                                                      //
         int parsexmltv(const char *filename);                                                                 // parse and update db from tvguide.xml file from users homedir
         time_t getlastupdate() { return lastupdated; }                                                        //
-        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; }                                     //
+        time_t setlastupdate(time_t timestamp) { lastupdated=timestamp; return(timestamp); }                                     //
         void cleartvguide();                                                                                  // drop db in backend
         int find_start_pointinarray(int selectchanel);
         unsigned long getprogram_endunixtume(int selectchanel,int selectprg);

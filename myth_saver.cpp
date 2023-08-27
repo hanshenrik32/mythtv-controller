@@ -1824,6 +1824,9 @@ float sinofsetz[]={
 1.75,1.73,1.71,1.69,1.67,1.65,1.63,1.61,1.59,1.57,1.55,1.53,1.51,1.49,1.47,1.45};
 
 
+
+
+
 // ****************************************************************************************
 // define layout
 // default layout
@@ -1841,7 +1844,7 @@ void boxarray::build_default_array() {
   for(y=0;y<11;y++) {
     for(x=0;x<11;x++) {
       matrix[x][y].xpos=(x*180.0f)+(sizx/2);
-      matrix[x][y].ypos=(y*140.0f)+(sizy/2)+(sinofsetz[i*40]*7);
+      matrix[x][y].ypos=(y*140.0f)+(sizy/2)+(sinofsetz[i*20]*14); // *7
       matrix[x][y].zpos=0.0f;
       matrix[x][y].sizex=bsizex;
       matrix[x][y].sizey=bsizey;
@@ -1871,6 +1874,54 @@ boxarray::boxarray() {
     }
     build_default_array();
 }
+
+
+
+// *************************************************************************************
+// 
+// rool y pos
+//
+// *************************************************************************************
+
+
+
+void boxarray::roll_array() {
+  int x,y;
+  int i=0;
+  float sizx=120.0f;            // space
+  float sizy=120.0f;            // space
+  float sizz=120.0f;            // space
+  float bsizex=120.0f;          // box size
+  float bsizey=120.0f;          // box size
+  float bsizez=120.0f;          // box size
+  float huskypos;
+  huskypos=matrix[0][1].ypos;
+  for(y=0;y<11;y++) {
+    for(x=0;x<11;x++) {
+      matrix[x][y].xpos=(x*180.0f)+(sizx/2);
+      if (y==1) matrix[x][y].ypos=matrix[x][y+1].ypos;
+      matrix[x][y].zpos=sinofsetz[x*y];
+      matrix[x][y].sizex=bsizex;
+      matrix[x][y].sizey=bsizey;
+      matrix[x][y].sizez=bsizez;
+      i++;
+    }
+    huskypos=matrix[10][1].ypos=huskypos;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // type 0 = set to music texture
@@ -2607,6 +2658,9 @@ void boxarray::show_music_3d_2(float aangle,GLuint textureId) {
     // Used to rotate all
     // tilt
 
+
+    // rool y pos in sin
+    roll_array();
 
     n=0;
     for(y=0;y<11;y++) {

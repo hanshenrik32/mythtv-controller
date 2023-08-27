@@ -97,7 +97,7 @@ class tidal_class {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
-        bool set_search_loaded() { search_loaded=true; }
+        bool set_search_loaded() { search_loaded=true; return(1); }
         bool get_tidal_update_flag();
         void set_tidal_update_flag(bool flag);
         int loaded_antal;                                                       // antal loaded i loader

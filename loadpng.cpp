@@ -38,5 +38,6 @@ GLuint save_texture_dds(ILuint image,char *filename) {
     strcpy(temp,filename);
     strcat(temp,".dds");
     ilSave(IL_DDS,temp);
+    return {};
 }
 

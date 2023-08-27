@@ -526,7 +526,7 @@ GLuint musicoversigt_class::get_textureId(int nr) {
 
 // *****************************************************************************
 //
-// Load/update music info to new db
+// Load/update music info to new db mythtvcontroller
 //
 // *****************************************************************************
 
@@ -720,6 +720,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
               }
               mysql_close(conn2);
             }
+            // loop over checkdir
             if (dirp1) {
               // loop the dir and create the music records and music_dir if mount in loop dir
               while(de = readdir(dirp1)) {
@@ -848,7 +849,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
 // ****************************************************************************************
 //
 // update_music_oversigt
-// update list pr dir id from mythtv-backend or internal loader
+// update list pr dir id from mythtv-backend or internal dbloader
 //
 // ****************************************************************************************
 
