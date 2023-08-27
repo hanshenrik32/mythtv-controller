@@ -25,7 +25,7 @@ unsigned int hourtounixtime(int hour) {
 //
 // ***********************************************************
 
-void write_logfile(char *logentry) {
+int write_logfile(char *logentry) {
   char homedirpath[1024];
   char filename[2048];
   time_t nutid;
@@ -33,6 +33,7 @@ void write_logfile(char *logentry) {
   time(&nutid);                                                            // get time
   tid=localtime(&nutid);                                                   // fillout struct
   FILE *logfile;
+  bool fileok=false;
   getuserhomedir(homedirpath);
   strcpy(filename,homedirpath);
   strcat(filename,"/");
@@ -47,15 +48,19 @@ void write_logfile(char *logentry) {
     fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
     fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
     fputs("Ver 0.40.x \n",logfile);
+	fileok=true;
+	fclose(logfile);
   }
   if (logfile) {
+	logfile=fopen(filename,"a");
     fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
     fputs(logentry,logfile);
     fputs("\n",logfile);
     fclose(logfile);
   } else {
-    printf("Error write to logfile...\n");
+    printf("Error write to logfile... %s\n",filename);
   }
+  if (fileok) return(0); else return(1); 
 }
 
 

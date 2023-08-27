@@ -1,9 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-void write_logfile(char *logentry);
-
-const char *SHOWVER={"0.39.1.2"};
+const char *SHOWVER={"0.40.7"};
 
 // debug modes
 // 1  = wifi net
@@ -25,12 +23,12 @@ const char *SHOWVER={"0.39.1.2"};
 //
 
 //
-// xmltv update interval in sec
+// xmltv and rss update interval in sec
 // default 2 * 60 min
 // value in minute
 //
-const int doxmltvupdateinterval=60*60*2;
-const int dorssupdateinterval=60*60;
+const int doxmltvupdateinterval=60*60*2;                                                    // xml tv update interval
+const int dorssupdateinterval=60*60;                                                        // rss update interval
 
 // max string length search spotify stuf
 const int search_string_max_length=15;

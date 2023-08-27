@@ -45,6 +45,7 @@ class boxarray {
     void show_music_3d_2(float aangle,GLuint textureId);
     int loadboxpictures();
     void createboxpictures();
+    void roll_array();
 };
 
 

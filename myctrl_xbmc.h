@@ -872,6 +872,7 @@ private:
   static int xbmc_load_sqldb_callback_version(void *data, int argc, char **argv, char **azColName) {
     configxbmcver=75;
     printf("XBMC - version loader \n");
+    return(1);
   }
 
 
@@ -885,11 +886,13 @@ public:
       fprintf(stderr, "XBMC - open SQL error: \n");
       sqlitedb_obj=0;
     }
+    return(1);
   }
 
   int closesqldb() {
     return(sqlite3_close(sqlitedb_obj));
     sqlitedb_obj=NULL;
+    return(1);
   }
   //
   // constructor

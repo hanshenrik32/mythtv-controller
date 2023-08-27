@@ -3141,6 +3141,7 @@ int txmltvgraber_updateconfigfile() {
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(filename,".conf");
   //sysresult=system(filename);
+  return(1);
 }
 
 
@@ -3473,6 +3474,7 @@ int load_channel_list_from_tvguide() {
       mysql_close(conn);
     }
   } else write_logfile((char *) "Error connect to mysql.");
+  return(1);
 }
 
 
