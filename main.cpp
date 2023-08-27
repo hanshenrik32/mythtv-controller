@@ -3649,7 +3649,7 @@ void display() {
       }
     }
     
-    printf("snd=%d playstatus %d  do_zoom_music_cover=%d  ask_open_dir_or_play=%d  \n",snd, musicoversigt.play_songs_status() , do_zoom_music_cover, ask_open_dir_or_play );
+    // printf("snd=%d playstatus %d  do_zoom_music_cover=%d  ask_open_dir_or_play=%d  \n",snd, musicoversigt.play_songs_status() , do_zoom_music_cover, ask_open_dir_or_play );
     
     
     // show volume value
@@ -4409,7 +4409,7 @@ void display() {
         /*
         if (!(musicoversigt.play())) {
         */
-        if (!(snd)) {
+        if (!(snd) && (do_stop_music==false)) {
           // background
           glPushMatrix();
           glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
@@ -15139,7 +15139,6 @@ void *update_spotify_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15161,7 +15160,6 @@ void *update_spotifyonline_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15183,7 +15181,6 @@ void *update_tidalonline_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15202,7 +15199,6 @@ void *update_webserver_phread_loader() {
       exit(-1);
     }
   }
-  return(0);
 }
 
 

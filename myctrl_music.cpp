@@ -565,10 +565,14 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   MYSQL_ROW row2;
   MYSQL_ROW row3;
   int a;
-  char *dirpath="/mnt/vol1/Music/";
-
-  strcpy(configmusicpath,dirpath);
-
+  char *dirpath;
+  dirpath=(char *) malloc(4096);
+  strcpy(dirpath,"/home/hans/Music/");
+  /*
+  if (strcmp(configmusicpath,"")==0) {
+    printf("No music patch ni config file\nUSe default homedir/Music");        
+  } else strcpy(dirpath,configmusicpath);
+  */
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
@@ -840,6 +844,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   }
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
+  free(dirpath);  
+
   strcpy(music_db_update_loader,"");
   write_logfile("Done update music directory ");
   if (i) return 0; else return 1;
