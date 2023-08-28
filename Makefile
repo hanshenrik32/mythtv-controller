@@ -79,7 +79,7 @@ compile: $(PROG)
 		cp lirc/* ~/.config/lirc/; \
 		mkdir -p ~/.xmltv/; \
 	fi
-	@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
+	#@if test -e ~/.xmltv; then echo "xmltv config exist. No update"; else cp xmltv_config/* ~/.xmltv/; fi
 	@if test -e build-number.txt; then echo $$(($$(cat build-number.txt) + 1)) > build-number.txt; fi
 
 $(PROG): $(SRCS) $(BUILD_NUMBER_FILE)
