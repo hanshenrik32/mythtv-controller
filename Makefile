@@ -70,7 +70,10 @@ all:
 
 compile: $(PROG)
 	@if ! test -f build-number.txt; then touch build-number.txt; fi
-	
+	tar -zxvf json-parser.tar.gz
+	cd json-parser \
+	./configure \
+	make
 	@if ! test -d ~/.config/lirc/; then \
 	mkdir  ~/.config/lirc/; \
 		cp lirc/* ~/.config/lirc/; \
