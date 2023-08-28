@@ -570,7 +570,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   strcpy(dirpath,"/home/hans/Music/");
   /*
   if (strcmp(configmusicpath,"")==0) {
-    printf("No music patch ni config file\nUSe default homedir/Music");        
+    printf("No music patch in config file\nUSe default homedir/Music");        
   } else strcpy(dirpath,configmusicpath);
   */
   char filetype[10];
