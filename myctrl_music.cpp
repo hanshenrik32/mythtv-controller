@@ -650,8 +650,16 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
         while(de = readdir(dirp)) {
           if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0) && (strcmp(de->d_name,"@eaDir")!=0)) {
             // if dir
+            
+            //if (directory_empty(de->d_name)==true) {
+            //  printf("Dir empty %s \n",de->d_name);
+            //  exit(1);
+            //}
+
             if (de->d_type==DT_DIR) {  
+              
               printf("Checking directory %20s \n" , de->d_name);
+
                 dirfindes=false;
               conn2=mysql_init(NULL);
               if (conn2) {
@@ -806,6 +814,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                             mysql_close(conn1);
                           }
                         }
+                        printf("\t Update dir/music song %20s \n" ,checkdir2, de2->d_name);
                       }
                     }
                     closedir(dirp2);
@@ -827,8 +836,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                         mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
                         mysql_query(conn1,sqlselect1);
                         res1 = mysql_store_result(conn1);
-                        mysql_close(conn1);
+                        mysql_close(conn1);  
                       }
+                      printf("\t Update music song %20s \n", de->d_name);
                     }
                   }
                   i++;  // next dir record

@@ -2,6 +2,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <dirent.h>
+
+
 // used to get home dir
 // #include <unistd.h>
 #include <pwd.h>
@@ -146,6 +149,24 @@ int gotoxy(int x, int y) {
 	printf("%s", essq);
 
 	return 0;
+}
+
+
+//
+// check if dir is empty
+//
+
+bool directory_empty(char *path) {
+	unsigned int antal=0;
+	struct dirent *dirname=NULL;
+	DIR *dirp=NULL;
+	dirp=opendir(path);
+	if (dirp!=NULL) {
+		while(dirname = readdir(dirp)) {
+			antal++;
+		}
+	}
+	if (antal>0) return(false); else return(true);
 }
 
 
