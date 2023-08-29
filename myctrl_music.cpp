@@ -1238,10 +1238,13 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glDisable(GL_TEXTURE_2D);
     length=strlen(temptxt);
     base=temptxt;
+    // print artist/song name
+    const float xInitial = (width / 5) - (strlen(base) / 4);
+    const float xTranslation=1.0f-(strlen(base)/1.6f)+2;
     while(*base) {
       // if text can be on line
       if(length <= width) {
-        glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+        glTranslatef(xInitial,0.0f,0.0f);
         glcRenderString(base);
         pline++;
         break;
@@ -1262,11 +1265,12 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
       *right_margin = '\0';
       glcRenderString(base);
       pline++;
-      glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
+      glTranslatef(xTranslation,-pline*1.2f,0.0f);
       length -= right_margin-base+1;                         // +1 for the space
       base = right_margin+1;
       if (pline>=2) break;
     }
+
     glEnable(GL_TEXTURE_2D);
     glPopMatrix();
     xof+=210;

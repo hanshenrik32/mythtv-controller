@@ -1119,7 +1119,8 @@ int parse_config(char *filename) {
           }
           strcpy(value,"");
           if (command) {
-            while((n<strlen(buffer)) && (!(valueok))) {
+            long bufferlength=strlen(buffer);
+            while((n<bufferlength) && (!(valueok))) {
               if ((buffer[n]!=10) && (buffer[n]!='=')) {
                 if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
                   valueok = true;
@@ -6518,10 +6519,13 @@ void display() {
       glcRenderString(movie_description[configland]);
       glPopMatrix();
       //
+      // write beskrivelse
+      //
       glPushMatrix();
       int sted=0;
       float linof=0.0f;
-      while((sted<(int) strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle)) && (linof>-60.0f)) {
+      float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
+      while((sted<(int) subtitlelength) && (linof>-60.0f)) {
         strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
         temptxt[45]='\0';
         glPushMatrix();
