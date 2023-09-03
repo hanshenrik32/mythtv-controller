@@ -1,4 +1,4 @@
-husk imageconvert 
+You need imageconvert/imagemagic to enable the icon update.
 
 tv module to use in the future
 
