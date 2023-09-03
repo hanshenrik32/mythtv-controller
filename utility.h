@@ -10,7 +10,7 @@ unsigned int hourtounixtime(int hour);
 
 int write_logfile(char *logentry);
 
-
+bool directory_empty(char *path);
 char *b64_encode(const unsigned char *in, size_t len);
 
 

@@ -1166,6 +1166,9 @@ void spotify_class::process_object_playlist(json_value* value, int depth) {
       process_image=true;
     }
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
+
+      //printf("Process name \n");
+
       process_name=true;
     }
     if (strcmp(value->u.object.values[x].name , "id" )==0) {
@@ -1216,6 +1219,7 @@ void spotify_class::process_array_playlist(json_value* value, int depth) {
 
 void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
     std::string artist="";
+    char tempname[1024];
     int j;
     if (value == NULL) return;
     if (value->type != json_object) {
@@ -1306,7 +1310,10 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           // get playlist name OK
           if (( depth == 2 ) && ( x == 7 )) {
             //printf("playlist name %-30s \n",value->u.string.ptr);
+            // write to log file
             strcpy(spotify_playlistname , value->u.string.ptr);
+            sprintf(tempname,"Spotify playlistname : %s", value->u.string.ptr);
+            write_logfile(tempname);
           }
           // get playlist id
           if ((depth==2) && (x==5)) {
@@ -1522,6 +1529,9 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
       // create db spotify playlist process data
       // insert all record in db
       tt = 0;
+      //
+      // loop over songs in playlist and update db
+      //
       while(tt<antalplaylists) {
         if (stack[tt]) {
           //if (debugmode & 4) fprintf(stdout,"Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
@@ -1551,17 +1561,13 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
               playlistexist=true;
             }
           }
-          // crete playlist
+          //
+          // create playlist in db
+          //
           if (!(playlistexist)) {
             snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
             mysql_query(conn,sql);
             res=mysql_store_result(conn);
-            /*
-            sprintf(sql,"insert into mythtvcontroller.spotifycontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt+1]->feed_gfx_url,playlist, 0 );
-            mysql_query(conn,sql);
-            res=mysql_store_result(conn);
-            */
-
             if (refid==0) {
               snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
               mysql_query(conn,sql);
@@ -1573,7 +1579,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
               }
             }
           }
-          if (stack[tt+1]) {                                                    // if (stack[tt+1]) {
+          if (stack[tt+1]) {
             playlistexist=false;
             snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
             mysql_query(conn,sql);

@@ -225,6 +225,8 @@ char avalible_device[10][256];			                    // sound system devises lis
 char configsoundoutport[256];			                    	// sound output port (hdmi/spdif/analog)
 char configclosemythtvfrontend[256];		              	// close mythtvfront end on startup
 char configaktivescreensavername[256];			            // screen saver name
+bool configbackend_openspotify_player=true;             // load spotify play on startup.
+char configbackend_starred_playlistname[1024];          // load spotify play on startup .
 char configdvale[256];			                         		// kan vi gå i dvale (mythtv kontrol) gen lock file
 char configmouse[256];			                         		// mouse enable
 storagedef configstoragerecord[storagegroupantal];    	// storage array (for recorded programs)
@@ -966,7 +968,9 @@ int parse_config(char *filename) {
     FILE *fil;
     int n,nn;
     enum commands {setmysqlhost, setmysqluser, setmysqlpass, setsoundsystem, setsoundoutport, setscreensaver, setscreensavername,setscreensize, \
-                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath,setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize,streamfontsize,moviefontsize,spotifydefaultdevice};
+                   settema, setfont, setmouse, setuse3d, setland, sethostname, setdebugmode, setbackend, setscreenmode, setvideoplayer,setconfigdefaultmusicpath, \
+                   setconfigdefaultmoviepath,setuvmetertype,setvolume,settvgraber,tvgraberupdate,tvguidercolor,tvguidefontsize,radiofontsize,musicfontsize, \
+                   streamfontsize,moviefontsize,spotifydefaultdevice,starred_playlistname,startspotifyonboot};
     int commandlength;
     char value[200];
     bool command = false;
@@ -1115,11 +1119,22 @@ int parse_config(char *filename) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
-            } else command = false;
+            } else if (strncmp(buffer+n,"starred_playlistname",19)==0) {
+              command = true;
+              command_nr=starred_playlistname;
+              commandlength=20;
+            } else if (strncmp(buffer+n,"startspotifyonboot",19)==0) {
+              command = true;
+              command_nr=startspotifyonboot;
+              commandlength=18;
+            } else {
+              command = false;
+            }
           }
           strcpy(value,"");
           if (command) {
-            while((n<strlen(buffer)) && (!(valueok))) {
+            long bufferlength=strlen(buffer);
+            while((n<bufferlength) && (!(valueok))) {
               if ((buffer[n]!=10) && (buffer[n]!='=')) {
                 if ((*(buffer+n)!='=') && (*(buffer+n)!=' ') && (*(buffer+n)!=10) && (*(buffer+n)!='\'') && (*(buffer+n)!=13)) {
                   valueok = true;
@@ -1286,6 +1301,15 @@ int parse_config(char *filename) {
               #ifdef ENABLE_SPOTIFY
               strcpy(spotify_oversigt.active_default_play_device_name,value);   //
               #endif
+            } else if (command_nr==starred_playlistname) {
+              strcpy(configbackend_starred_playlistname,value);                 // star playlist in spotify
+            } else if (command_nr==startspotifyonboot) {
+              // check if command is enable by yes in config
+              if (strcmp(value,"yes")==0) {
+                configbackend_openspotify_player=true;
+              } else {
+                configbackend_openspotify_player=false;
+              }
             }
           }
         }
@@ -1389,13 +1413,22 @@ int save_config(char * filename) {
       sprintf(temp,"spotifydefaultdevice=%s\n",spotify_oversigt.get_device_name(spotify_oversigt.active_default_play_device));
       fputs(temp,file);
       #endif
+      sprintf(temp,"starred_playlistname=%s\n",configbackend_starred_playlistname);
+      fputs(temp,file);
+      if (configbackend_openspotify_player) {
+        sprintf(temp,"startspotifyonboot=yes\n");
+        fputs(temp,file);
+      } else {
+        sprintf(temp,"startspotifyonboot=no\n");
+        fputs(temp,file);
+      }
       fclose(file);
     } else error = true;
     file = fopen("mythtv-controller.keys", "w");
     if (file) {
       fwrite(configkeyslayout,sizeof(configkeytype)*12,1,file);
       fclose(file);
-    } else error = true;
+    }
     return(!(error));
 }
 
@@ -1438,8 +1471,13 @@ void load_config(char * filename) {
     strcpy(configdefaultmusicpath,"Music");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
     strcpy(configdefaultmoviepath,"Movie");                   // default start music dir
-    strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");      // default tv guide tv_grab_uk_tvguide
+    strcpy(configbackend_tvgraber,"tv_grab_eu_dotmedia");     // default tv guide tv_grab_uk_tvguide
     strcpy(configbackend_tvgraberland,"");                    // default tv guide tv_grab_uk_tvguide other command
+    strcpy(configbackend_starred_playlistname,"");                          // default spotify starred playlist
+    
+    configbackend_openspotify_player=false;                   // default openspotify player local to play on.
+    strcpy(configbackend_starred_playlistname,"");
+
     configtvguidelastupdate=0;                                // default 0
     configsoundvolume=1.0f;
     configuvmeter=1;                                          // default uv meter type
@@ -1496,6 +1534,7 @@ void load_config(char * filename) {
         fputs("moviefontsize=18\n",file);
         fputs("spotifydefaultdevice=\n",file);
         fputs("tidaldefaultdevice=\n",file);
+        fputs("starred_playlistname=yes\n",file);         // default
         fclose(file);
       } else {
         fprintf(stderr,"Config file not writeble ");
@@ -3649,7 +3688,12 @@ void display() {
       }
     }
     
+<<<<<<< HEAD
        
+=======
+    // printf("snd=%d playstatus %d  do_zoom_music_cover=%d  ask_open_dir_or_play=%d  \n",snd, musicoversigt.play_songs_status() , do_zoom_music_cover, ask_open_dir_or_play );
+    
+>>>>>>> tidal
     
     // show volume value
     if (show_volume_info) {
@@ -4408,7 +4452,7 @@ void display() {
         /*
         if (!(musicoversigt.play())) {
         */
-        if (!(snd)) {
+        if (!(snd) && (do_stop_music==false)) {
           // background
           glPushMatrix();
           glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
@@ -6517,10 +6561,13 @@ void display() {
       glcRenderString(movie_description[configland]);
       glPopMatrix();
       //
+      // write beskrivelse
+      //
       glPushMatrix();
       int sted=0;
       float linof=0.0f;
-      while((sted<(int) strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle)) && (linof>-60.0f)) {
+      float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
+      while((sted<(int) subtitlelength) && (linof>-60.0f)) {
         strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
         temptxt[45]='\0';
         glPushMatrix();
@@ -14883,21 +14930,34 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,true);     // Your discovery weekly tunes
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DWZQZGknjUJWV",1,true);     // dansk dancehall
-      spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+      spotify_oversigt.clean_spotify_oversigt();                                 // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
 
-
+      
+      if (strcmp(configbackend_starred_playlistname,"")==0) {
+        // get my (develober/creator of mythtv-controller) stared playlist
+        spotify_oversigt.spotify_get_playlist("6ccXCXn0TpMBLSuV4aTpAm",1,true);     // starred
+        spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+      } else {
+        // get config starred playlist.
+        spotify_oversigt.spotify_get_playlist(configbackend_starred_playlistname,1,true);     // starred
+        spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+      }
       spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      // get user playlists
-      
+      // get user playlists      
       spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // update the playback device list
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
       // update view from db
       spotify_oversigt.opdatere_spotify_oversigt(0);                              // reset spotify overview to default
+      // load gfx
+      // crash
+      //spotify_oversigt.load_spotify_iconoversigt();
+
+
     }
   }
   // write debug log
@@ -15138,7 +15198,6 @@ void *update_spotify_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15160,7 +15219,6 @@ void *update_spotifyonline_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15182,7 +15240,6 @@ void *update_tidalonline_phread_loader() {
     }
   }
   #endif
-  return(0);
 }
 
 
@@ -15201,7 +15258,6 @@ void *update_webserver_phread_loader() {
       exit(-1);
     }
   }
-  return(0);
 }
 
 
@@ -16245,6 +16301,10 @@ int main(int argc, char** argv) {
     //tridal_oversigt.tridal_login_token2();
 //    tridal_oversigt.tridal_play_playlist("742185f0-fc32-4865-870a-c251a20dc160");
     #endif
+
+    if (configbackend_openspotify_player) {
+      system("/snap/bin/spotify &");
+    }
 
     // Create radio mysql database if not exist
     if (create_radio_oversigt()) {

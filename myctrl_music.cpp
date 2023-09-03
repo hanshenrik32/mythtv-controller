@@ -565,10 +565,14 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   MYSQL_ROW row2;
   MYSQL_ROW row3;
   int a;
-  char *dirpath="/mnt/vol1/Music/";
-
-  strcpy(configmusicpath,dirpath);
-
+  char *dirpath;
+  dirpath=(char *) malloc(4096);
+  strcpy(dirpath,"/home/hans/Music/");
+  /*
+  if (strcmp(configmusicpath,"")==0) {
+    printf("No music patch in config file\nUSe default homedir/Music");        
+  } else strcpy(dirpath,configmusicpath);
+  */
   char filetype[10];
   char songname[1024];
   int dbexist=0;                                                                // use to check db exist
@@ -646,8 +650,16 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
         while(de = readdir(dirp)) {
           if ((strcmp(de->d_name,".")!=0) && (strcmp(de->d_name,"..")!=0) && (strcmp(de->d_name,"@eaDir")!=0)) {
             // if dir
+            
+            //if (directory_empty(de->d_name)==true) {
+            //  printf("Dir empty %s \n",de->d_name);
+            //  exit(1);
+            //}
+
             if (de->d_type==DT_DIR) {  
+              
               printf("Checking directory %20s \n" , de->d_name);
+
                 dirfindes=false;
               conn2=mysql_init(NULL);
               if (conn2) {
@@ -802,6 +814,7 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                             mysql_close(conn1);
                           }
                         }
+                        printf("\t Update dir/music song %20s \n" ,checkdir2, de2->d_name);
                       }
                     }
                     closedir(dirp2);
@@ -823,8 +836,9 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
                         mysql_real_connect(conn1, configmysqlhost,configmysqluser, configmysqlpass, dbname, 0, NULL, 0);
                         mysql_query(conn1,sqlselect1);
                         res1 = mysql_store_result(conn1);
-                        mysql_close(conn1);
+                        mysql_close(conn1);  
                       }
+                      printf("\t Update music song %20s \n", de->d_name);
                     }
                   }
                   i++;  // next dir record
@@ -840,6 +854,8 @@ int musicoversigt_class::opdatere_music_oversigt_nodb() {
   }
   musicoversigt_antal=i-1;
   if (conn) mysql_close(conn);
+  free(dirpath);  
+
   strcpy(music_db_update_loader,"");
   write_logfile("Done update music directory ");
   if (i) return 0; else return 1;
@@ -1222,10 +1238,13 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glDisable(GL_TEXTURE_2D);
     length=strlen(temptxt);
     base=temptxt;
+    // print artist/song name
+    const float xInitial = (width / 5) - (strlen(base) / 4);
+    const float xTranslation=1.0f-(strlen(base)/1.6f)+2;
     while(*base) {
       // if text can be on line
       if(length <= width) {
-        glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+        glTranslatef(xInitial,0.0f,0.0f);
         glcRenderString(base);
         pline++;
         break;
@@ -1246,11 +1265,12 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
       *right_margin = '\0';
       glcRenderString(base);
       pline++;
-      glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
+      glTranslatef(xTranslation,-pline*1.2f,0.0f);
       length -= right_margin-base+1;                         // +1 for the space
       base = right_margin+1;
       if (pline>=2) break;
     }
+
     glEnable(GL_TEXTURE_2D);
     glPopMatrix();
     xof+=210;
