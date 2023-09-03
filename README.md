@@ -10,12 +10,12 @@ if ypu wants to make the deb file you have to install debhelper
 
 https://www.imagemagick.org/Usage/thumbnails/#cut
 
-# mythtv-controller 
-# packs to install to compile on Ubuntu 10.xx/22.xx
-# Updated 03/09/2023
-# Updated 27/08/2017
-# Updated 01/11/2014
-# Soon support for vdr recording(not fixed)
+ mythtv-controller
+ packs to install to compile on Ubuntu 10.xx/22.xx
+ Updated 03/09/2023
+ Updated 27/08/2017
+ Updated 01/11/2014
+ Soon support for vdr recording(not fixed)
 
 Version.
 
@@ -93,8 +93,6 @@ Do command to install packets.
 
 sudo sh apt-get.sh
 
-
-
 You can install them by 'sudo sh apt-get.sh' when you have downloaded and
 untar the install file.
 
@@ -132,18 +130,18 @@ none		- None screen saver
 MUSICMETER	- Music meter
 
 
-# First start is slow, if your mythtv is setup right. The program have to
-# convert some gfx/cdcover/dvdcover file to internal format.
-#
-# After start. First jump to F1 menu for setup. 
-# Check the database setup for connect to mythtv backend.
-# After setup is okay.. restart the program to load the data from the mythtv
-# system the radio stations will be installed by the mythtv-controller
-# program.
-#
-# Se install.txt for arch linux install.
-#
-# Programmed by Hans-Henrik Grüner-Pedersen
-# release under GPL
-# hanshenrik32@gmail.com
-#
+First start is slow, if your mythtv is setup right. The program have to
+convert some gfx/cdcover/dvdcover file to internal format.
+
+After start. First jump to F1 menu for setup.
+Check the database setup for connect to mythtv backend.
+After setup is okay.. restart the program to load the data from the mythtv
+system the radio stations will be installed by the mythtv-controller
+program.
+
+Se install.txt for arch linux install.
+
+ Programmed by Hans-Henrik Grüner-Pedersen
+ release under GPL
+ hanshenrik32@gmail.com
+
