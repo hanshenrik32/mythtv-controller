@@ -1,4 +1,4 @@
-husk imageconvert 
+You need imageconvert/imagemagic to enable the icon update.
 
 tv module to use in the future
 
@@ -10,14 +10,20 @@ if ypu wants to make the deb file you have to install debhelper
 
 https://www.imagemagick.org/Usage/thumbnails/#cut
 
-# mythtv-controller 
-# packs to install to compile on Ubuntu 10.xx/12.xx
-# Updated 01/11/2014
-# Updated 27/08/2017
-# Soon support for vdr recording
+ mythtv-controller
+ packs to install to compile on Ubuntu 10.xx/22.xx
+ Updated 03/09/2023
+ Updated 27/08/2017
+ Updated 01/11/2014
+ Soon support for vdr recording(not fixed)
 
 Version.
 
+mythtv-controller ver 0.40.7
+
+New logfile mythtv-controller.log in homedir.
+Spotify loader fixed.
+Not able to select last icon in music overview fixed.
 
 mythtv-controller ver 0.39.0
 
@@ -25,7 +31,7 @@ tty default log is now write to logfile mythtv-controller.log
 
 mythtv-controller ver 0.38.4
 
-install dir move to /opt/mythtv-cotroller
+install dir move to /opt/mythtv-controller
 
 mythtv-controller ver 0.38.1
 
@@ -87,8 +93,6 @@ Do command to install packets.
 
 sudo sh apt-get.sh
 
-
-
 You can install them by 'sudo sh apt-get.sh' when you have downloaded and
 untar the install file.
 
@@ -126,18 +130,18 @@ none		- None screen saver
 MUSICMETER	- Music meter
 
 
-# First start is slow, if your mythtv is setup right. The program have to
-# convert some gfx/cdcover/dvdcover file to internal format.
-#
-# After start. First jump to F1 menu for setup. 
-# Check the database setup for connect to mythtv backend.
-# After setup is okay.. restart the program to load the data from the mythtv
-# system the radio stations will be installed by the mythtv-controller
-# program.
-#
-# Se install.txt for arch linux install.
-#
-# Programmed by Hans-Henrik Grüner-Pedersen
-# release under GPL
-# hanshenrik32@gmail.com
-#
+First start is slow, if your mythtv is setup right. The program have to
+convert some gfx/cdcover/dvdcover file to internal format.
+
+After start. First jump to F1 menu for setup.
+Check the database setup for connect to mythtv backend.
+After setup is okay.. restart the program to load the data from the mythtv
+system the radio stations will be installed by the mythtv-controller
+program.
+
+Se install.txt for arch linux install.
+
+ Programmed by Hans-Henrik Grüner-Pedersen
+ release under GPL
+ hanshenrik32@gmail.com
+
