@@ -166,7 +166,7 @@ class spotify_class : vlc_controller {
         char *spotify_aktiv_artist_name() { return( spotify_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
         char *spotify_aktiv_song_release_date() { return( spotify_aktiv_song[0].release_date ); };            //
         char *get_active_device_id() { return(spotify_device[active_spotify_device].id); };                   // get active dev id
-        char *get_active_spotify_device_name();                                 //
+        char *get_active_spotify_device_name();                                 // 
         char *get_device_id(int nr) { return(spotify_device[nr].id); };         // get active dev id
         char *get_device_name(int nr) { return(spotify_device[nr].name); };     // get active dev id
         int get_spotify_intnr(int nr);                                          //
