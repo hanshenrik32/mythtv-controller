@@ -18,6 +18,11 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 
 Version.
 
+mythtv-controller ver 0.40.7
+
+New logfile mythtv-controller.log in homedir.
+Spotify loader fixed.
+Not able to select last icon in music overview fixed.
 
 mythtv-controller ver 0.39.0
 
@@ -25,7 +30,7 @@ tty default log is now write to logfile mythtv-controller.log
 
 mythtv-controller ver 0.38.4
 
-install dir move to /opt/mythtv-cotroller
+install dir move to /opt/mythtv-controller
 
 mythtv-controller ver 0.38.1
 
