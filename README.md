@@ -11,10 +11,11 @@ if ypu wants to make the deb file you have to install debhelper
 https://www.imagemagick.org/Usage/thumbnails/#cut
 
 # mythtv-controller 
-# packs to install to compile on Ubuntu 10.xx/12.xx
-# Updated 01/11/2014
+# packs to install to compile on Ubuntu 10.xx/22.xx
+# Updated 03/09/2023
 # Updated 27/08/2017
-# Soon support for vdr recording
+# Updated 01/11/2014
+# Soon support for vdr recording(not fixed)
 
 Version.
 
