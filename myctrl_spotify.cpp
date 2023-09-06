@@ -1592,7 +1592,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             //
             // insert record created if not exist ( song name )
             //
-            if (playlistexist==false) {
+            if (playlistexist==false) {              
               snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt+1]->feed_name , stack[tt+1]->feed_gfx_url,downloadfilenamelong, stack[tt+1]->playlisturl, playlist , stack[tt+1]->feed_artist , 0 );
               mysql_query(conn,sql);
               mysql_store_result(conn);
@@ -1612,7 +1612,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
             playlistexist=true;
           }
         }
-        // crete playlist
+        // crete playlist if not exist
         if (!(playlistexist)) {
           //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
           snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
@@ -1620,7 +1620,6 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           res = mysql_store_result(conn);
         }
       }
-
     }
     mysql_close(conn);
   }
@@ -2636,7 +2635,7 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + spotifytoken;
   url="https://api.spotify.com/v1/me/player/play?device_id=";
-  url=url + devid;
+  url=url + devid;                                                                // set device to play
   // use libcurl
   curl_global_init(CURL_GLOBAL_ALL);
   CURL *curl = curl_easy_init();
@@ -3136,8 +3135,10 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
         while ((row = mysql_fetch_row(res)) != NULL) dbexist=true;
       }
     }
+    
     // clear old view
     clean_spotify_oversigt();
+
     strcpy(lasttmpfilename,"");
     if (debugmode & 4) {
       fprintf(stderr,"loading spotify data.\n");
@@ -3145,15 +3146,16 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
     // find records after type (0 = root, else = refid)
     if (refid == NULL) {
       show_search_result=false;
-      snprintf(sqlselect,sizeof(sqlselect),"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by playlistname");
+      snprintf(sqlselect,sizeof(sqlselect),"select playlistname,paththumb,playlistid,id from spotifycontentplaylist order by id DESC");
       getart = 0;
     } else {
       show_search_result=true;
-      snprintf(sqlselect,sizeof(sqlselect),"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id",refid);
+      snprintf(sqlselect,sizeof(sqlselect),"select name,gfxfilename,player,playlistid from spotifycontentarticles where playlistid='%s' order by id DESC",refid);
       getart = 1;
     }
     this->type = getart;					                                                 // husk sql type
     if (debugmode & 4) fprintf(stderr,"spotify loader started... \n");
+    write_logfile("spotify db loader started.");    
     conn=mysql_init(NULL);
     // Connect to database
     if (mysql_real_connect(conn, configmysqlhost,configmysqluser,configmysqlpass, database, 0, NULL, 0)) {
@@ -3275,11 +3277,17 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
         mysql_close(conn);
       } else {
         if (debugmode & 4) fprintf(stderr,"No spotify data loaded \n");
+        write_logfile("No spotify data loaded from db.");
+        write_logfile("Please check that the db exist.");
       }
       antalplaylists=antal;
       return(antal);
-    } else fprintf(stderr,"Failed to update Spotify db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+    } else  {
+      fprintf(stderr,"Failed to update Spotify db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+      write_logfile("Failed to update Spotify db, can not connect to database.");
+    }
     if (debugmode & 4) fprintf(stderr,"Spotify loader done... \n");
+    write_logfile("spotify db loader done.");    
     return(0);
 }
 

@@ -1119,14 +1119,14 @@ int parse_config(char *filename) {
               command = true;
               command_nr=spotifydefaultdevice;
               commandlength=19;
-            } else if (strncmp(buffer+n,"starred_playlistname",19)==0) {
+            } else if (strncmp(buffer+n,"starred_playlistname",20)==0) {
               command = true;
               command_nr=starred_playlistname;
-              commandlength=20;
-            } else if (strncmp(buffer+n,"startspotifyonboot",19)==0) {
+              commandlength=19;
+            } else if (strncmp(buffer+n,"startspotifyonboot",18)==0) {
               command = true;
               command_nr=startspotifyonboot;
-              commandlength=18;
+              commandlength=17;
             } else {
               command = false;
             }
@@ -1534,7 +1534,8 @@ void load_config(char * filename) {
         fputs("moviefontsize=18\n",file);
         fputs("spotifydefaultdevice=\n",file);
         fputs("tidaldefaultdevice=\n",file);
-        fputs("starred_playlistname=yes\n",file);         // default
+        fputs("starred_playlistname=starred\n",file);       // default name for starred play list in spotify
+        fputs("startspotifyonboot=yes\n",file);         // default
         fclose(file);
       } else {
         fprintf(stderr,"Config file not writeble ");
@@ -16349,7 +16350,7 @@ int main(int argc, char** argv) {
       }
     }
     // Normal in use
-    /*
+    
     // stream loader
     pthread_t loaderthread2;           // the load
     int rc2;
@@ -16358,10 +16359,7 @@ int main(int argc, char** argv) {
       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
       exit(-1);
     }
-    */
-
-
-
+    
 
     // Load the VLC engine
 //    musicvlc_inst = libvlc_new(5,opt);
