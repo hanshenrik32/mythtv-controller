@@ -91,8 +91,7 @@ int write_logfile(char *logentry) {
 
 // get user homedir
 
-int getuserhomedir(char *homedir) {  
-  printf("**************************** Get users homedir ****************************** \n");
+int getuserhomedir(char *homedir) {    
   struct passwd *pw = getpwuid(getuid());
   if (homedir) strcpy(homedir,pw->pw_dir);
   return(1);
