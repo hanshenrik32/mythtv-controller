@@ -43,7 +43,7 @@ const int tidal_namelength=80;
 const int tidal_desclength=2000;
 const int feed_url=2000;
 
-
+extern char localuserhomedir[4096];                                                         // get in main
 extern int debugmode;
 extern tidal_class *tidal_oversigt;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -1239,7 +1239,8 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
               if (row[1]) {
                 if (strncmp(row[1],"http",4)==0) {
                   get_webfilename(downloadfilename,row[1]);
-                  getuserhomedir(downloadfilenamelong);
+                  //getuserhomedir(downloadfilenamelong);
+                  strcpy(downloadfilenamelong,localuserhomedir);
                   strcat(downloadfilenamelong,"/");
                   strcat(downloadfilenamelong,tidal_gfx_path);
                   strcat(downloadfilenamelong,downloadfilename);

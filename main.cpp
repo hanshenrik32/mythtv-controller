@@ -858,6 +858,10 @@ unsigned int setupwlanselectofset=0;                                            
 
 const int TEMA_ANTAL=10;                                                        // numbers of tema
 
+
+char localuserhomedir[4096];
+
+
 // define for use before function is created
 void *update_music_phread_loader();
 void *update_spotify_phread_loader();
@@ -12049,7 +12053,8 @@ void handleKeypress(unsigned char key, int x, int y) {
                   // remove config dat file
                   fprintf(stderr,"* Delete old tvguide *\n");
                   fprintf(stderr,"* Update new tvguide *\n");
-                  getuserhomedir(path);
+                  strcpy(path,localuserhomedir);
+                  //getuserhomedir(path);
                   strcat(path,"/tvguide_channels.dat");
                   unlink(path);                                                 // delete file
                   hent_tv_channels=false;
@@ -15328,7 +15333,7 @@ void *xbmcdatainfoloader(void *data) {
   if ((allokay) && (strcmp(configbackend,"xbmc")==0) && (!(dbexist))) {
     if (debugmode & 2) fprintf(stderr,"XBMC - Loader starting.....\n");
     // get user homedir
-    getuserhomedir(userhomedir);
+    strcpy(userhomedir,localuserhomedir);
     strcat(userhomedir,"/.kodi/userdata/Database/");
     dirp=opendir(userhomedir);                                // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
@@ -15369,7 +15374,8 @@ void *xbmcdatainfoloader(void *data) {
         }
       }
     }
-    getuserhomedir(userhomedir);
+    //getuserhomedir(userhomedir);
+    strcpy(userhomedir,localuserhomedir);
     strcpy(videohomedirpath,userhomedir);
     strcpy(musichomedirpath,userhomedir);
     switch (kodiverfound) {
@@ -15519,7 +15525,8 @@ void *xbmcdatainfoloader_movie(void *data) {
   }
   if (allokay) {
     // get user homedir
-    getuserhomedir(userhomedir);
+    //getuserhomedir(userhomedir);
+    strcpy(userhomedir,localuserhomedir);
     strcat(userhomedir,"/.kodi/userdata/Database");
     dirp=opendir(userhomedir);                                                          // "~/.kodi/userdata/Database/");
     if (dirp==NULL) {
@@ -15562,7 +15569,8 @@ void *xbmcdatainfoloader_movie(void *data) {
       }
     }
     // check/get user homedir
-    getuserhomedir(userhomedir);
+    //getuserhomedir(userhomedir);
+    strcpy(userhomedir,localuserhomedir);
     strcpy(videohomedirpath,userhomedir);
     // add kodi dir ro db files
     switch (kodiverfound) {
@@ -16128,6 +16136,8 @@ int main(int argc, char** argv) {
     Window rootxwindow;
     strcpy(playlistfilename,"playlist");
     strcpy(movie_search_name,"");                                               // used then search for movies in movie view
+    strcpy(localuserhomedir,"");
+    getuserhomedir(localuserhomedir);
     //printf("Build date  : %lu\n", (unsigned long) & __BUILD_DATE);
     //printf("Build number: %lu\n", (unsigned long) & __BUILD_NUMBER);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
@@ -16424,7 +16434,7 @@ int main(int argc, char** argv) {
     //XFlush(dpy);
     //sleep(10);
      // Sleep long enough to see the window.
-    
+
     InitGL();
     glutInitDisplayMode (GLUT_RGBA | GLUT_DOUBLE); // (GLUT_SINGLE | GLUT_RGB);
     // set screen size

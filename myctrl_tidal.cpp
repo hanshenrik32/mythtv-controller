@@ -120,6 +120,7 @@ extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
 //extern bool tidal_oversigt_loaded_begin;
+extern char localuserhomedir[4096];                                 // homedir
 
 
 // ****************************************************************************************
@@ -2639,7 +2640,9 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
                 if (row[1]) {
                   if (strncmp(row[1],"http",4)==0) {
                     get_webfilename(downloadfilename,row[1]);
-                    getuserhomedir(downloadfilenamelong);
+                    //getuserhomedir(downloadfilenamelong);
+                    strcpy(downloadfilenamelong,localuserhomedir);
+
                     strcat(downloadfilenamelong,"/");
                     strcat(downloadfilenamelong,tidal_gfx_path);
                     strcat(downloadfilenamelong,downloadfilename);
@@ -2831,7 +2834,8 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type) {
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              getuserhomedir(downloadfilenamelong);
+              //getuserhomedir(downloadfilenamelong);
+              strcpy(downloadfilenamelong,localuserhomedir);
               strcat(downloadfilenamelong,"/");
               strcpy(downloadfilenamelong,tidal_gfx_path);
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
@@ -3004,7 +3008,8 @@ int tidal_class::load_tidal_iconoversigt() {
         if (strncmp("http",stack[nr]->feed_gfx_url,4)==0) {
           imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
           if ((imagenamepointer) && (strlen(imagenamepointer)<1990)) {
-            getuserhomedir(tmpfilename);
+            //getuserhomedir(tmpfilename);
+            strcpy(tmpfilename,localuserhomedir);
             strcat(tmpfilename,"/tidal_gfx/");
             strcat(tmpfilename,imagenamepointer+1);
             strcat(tmpfilename,".jpg");

@@ -137,6 +137,8 @@ extern GLint cur_avail_mem_kb;
 extern bool stream_loadergfx_started;
 extern bool stream_loadergfx_started_done;
 extern bool stream_loadergfx_started_break;
+extern char localuserhomedir[4096];                                    // user homedir set in main
+
 //extern bool spotify_oversigt_loaded_begin;
 
 
@@ -754,7 +756,8 @@ void spotify_class::playlist_process_value(json_value* value, int depth,int x,MY
           get_webfilenamelong(filename,value->u.string.ptr);
           strcpy(downloadfilenamelong,value->u.string.ptr);
           if (strcmp(filename,"")!=0) {
-            getuserhomedir(downloadfilenamelong);
+            //getuserhomedir(downloadfilenamelong);
+            strcpy(downloadfilenamelong,localuserhomedir);
             strcat(downloadfilenamelong,"/");
             strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
@@ -1384,7 +1387,9 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
   char auth_kode[1024];
-  getuserhomedir(homedir);
+  //getuserhomedir(homedir);
+  strcpy(homedir,localuserhomedir);
+
   strcpy(playlistfilename,homedir);
   strcat(playlistfilename,"/");
   strcat(playlistfilename,spotify_json_path);
@@ -1538,7 +1543,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            getuserhomedir(downloadfilenamelong);
+            //getuserhomedir(downloadfilenamelong);
+            strcpy(downloadfilenamelong,localuserhomedir);
             strcat(downloadfilenamelong,"/");
             strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
@@ -1649,7 +1655,8 @@ int spotify_class::spotify_get_likedsongs(const char *playlist,bool force,bool c
   char *database = (char *) "mythtvcontroller";
   char playlistfilename[2048];
   char auth_kode[1024];
-  getuserhomedir(homedir);
+  //getuserhomedir(homedir);
+  strcpy(homedir,localuserhomedir);
   strcpy(playlistfilename,homedir);
   strcat(playlistfilename,"/");
   strcat(playlistfilename,spotify_json_path);
@@ -1800,7 +1807,8 @@ int spotify_class::spotify_get_likedsongs(const char *playlist,bool force,bool c
           // download gfx file to tmp dir
           get_webfilename(filename,stack[tt]->feed_gfx_url);
           if (strcmp(filename,"")) {
-            getuserhomedir(downloadfilenamelong);
+            //getuserhomedir(downloadfilenamelong);
+            strcpy(downloadfilenamelong,localuserhomedir);
             strcat(downloadfilenamelong,"/");
             strcat(downloadfilenamelong,spotify_gfx_path);
             strcat(downloadfilenamelong,filename);
@@ -3191,7 +3199,8 @@ int spotify_class::opdatere_spotify_oversigt(char *refid) {
                 if (row[1]) {
                   if (strncmp(row[1],"http",4)==0) {
                     get_webfilename(downloadfilename,row[1]);
-                    getuserhomedir(downloadfilenamelong);
+                    //getuserhomedir(downloadfilenamelong);
+                    strcpy(downloadfilenamelong,localuserhomedir);
                     strcat(downloadfilenamelong,"/");
                     strcat(downloadfilenamelong,spotify_gfx_path);
                     strcat(downloadfilenamelong,downloadfilename);
@@ -3387,7 +3396,8 @@ int spotify_class::opdatere_spotify_oversigt_searchtxt(char *keybuffer,int type)
               strcpy(downloadfilename,"");
               strcpy(downloadfilenamelong,"");
               get_webfilename(downloadfilename,stack[antal]->feed_gfx_url);
-              getuserhomedir(downloadfilenamelong);
+              //getuserhomedir(downloadfilenamelong);
+              strcpy(downloadfilenamelong,localuserhomedir);
               strcat(downloadfilenamelong,"/");
               strcpy(downloadfilenamelong,spotify_gfx_path);
               strcat(downloadfilenamelong,downloadfilename);          // now file path + filename
@@ -3581,7 +3591,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
-                getuserhomedir(downloadfilenamelong);
+                //getuserhomedir(downloadfilenamelong);
+                strcpy(downloadfilenamelong,localuserhomedir);
                 strcat(downloadfilenamelong,"/");
                 strcat(downloadfilenamelong,spotify_gfx_path);
                 strcat(downloadfilenamelong,filename);
@@ -3607,7 +3618,8 @@ void spotify_class::search_process_value(json_value* value, int depth,int x,int 
             if (strncmp("https://i.scdn.co/image/",value->u.string.ptr,24)==0) {
               strcpy(filename,value->u.string.ptr+24);
               if (strcmp(value->u.string.ptr,"")) {
-                getuserhomedir(downloadfilenamelong);
+                //getuserhomedir(downloadfilenamelong);
+                strcpy(downloadfilenamelong,localuserhomedir);
                 strcat(downloadfilenamelong,"/");
                 strcat(downloadfilenamelong,spotify_gfx_path);
                 strcat(downloadfilenamelong,filename);
@@ -4154,7 +4166,8 @@ int spotify_class::load_spotify_iconoversigt() {
         if (strncmp("http",stack[nr]->feed_gfx_url,4)==0) {
           imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
           if ((imagenamepointer) && (strlen(imagenamepointer)<1990)) {
-            getuserhomedir(tmpfilename);
+            //getuserhomedir(tmpfilename);
+            strcpy(tmpfilename,localuserhomedir);
             strcat(tmpfilename,"/spotify_gfx/");
             strcat(tmpfilename,imagenamepointer+1);
             strcat(tmpfilename,".jpg");
@@ -4352,6 +4365,9 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       spotify_oversigt.load_spotify_iconoversigt();                       // load icons
     }
     // draw icons
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -4366,8 +4382,8 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
       }
       if (stack[i+sofset]->textureId) {
         // stream icon
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //  glEnable(GL_TEXTURE_2D);
+        //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         // glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
         glBindTexture(GL_TEXTURE_2D,spotify_icon_border);                               // normal icon then the spotify have icon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

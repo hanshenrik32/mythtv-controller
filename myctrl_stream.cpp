@@ -25,9 +25,10 @@
 // text render is glcRenderString for freetype font support
 //
 
-extern char debuglogdata[1024];                                  // used by log system
+extern char localuserhomedir[4096];                                    // user homedir set in main
+extern char debuglogdata[1024];                                 // used by log system
 
-extern char debuglogdata[1024];                                  // used by log system
+extern char debuglogdata[1024];                                 // used by log system
 extern float configdefaultstreamfontsize;
 extern int tema;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -276,7 +277,9 @@ int stream_class::loadrssfile(bool updaterssfile) {
   time(&timenow);
   conn=mysql_init(NULL);
   // get homedir
-  getuserhomedir(homedir);
+  //getuserhomedir(homedir);
+  strcpy(homedir,localuserhomedir);
+
   strcat(homedir,"/rss");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   strcat(homedir,"/images");
@@ -308,7 +311,8 @@ int stream_class::loadrssfile(bool updaterssfile) {
         snprintf(temptxt,sizeof(temptxt),"Get rss feed title %10s ",row[0]);
         write_logfile(temptxt);
         if ((row[3]) && (strcmp(row[3],"")!=0)) {
-          getuserhomedir(homedir);                                          // get user homedir
+          //getuserhomedir(homedir);                                          // get user homedir
+          strcpy(homedir,localuserhomedir);
           strcpy(totalurl,"wget -U Netscape --timeout=10 '");
           if (row[7]) strcat(totalurl,row[7]); else if (row[3]) strcat(totalurl,row[3]);
           strcat(totalurl,"' -o '");
@@ -3844,8 +3848,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
-
-
       // Orientering Udsyn
       if (check_rss_feed_exist(conn,(char *) "Orientering Udsyn")==0) {
         snprintf(sqlselect,sizeof(sqlselect),"REPLACE INTO mythtvcontroller.internetcontent(name,thumbnail,type,author,description,commandline,version,updated,search,tree,podcast,download,host) VALUES ('Orientering Udsyn',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL)");
@@ -3861,9 +3863,6 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
         }
         rss_update=true;
       }
-
-
-
 
       // close mysql
       if (conn) mysql_close(conn);
@@ -3946,7 +3945,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                   if ((downloadfilename[mmm]=='?') || (downloadfilename[mmm]=='&') || (downloadfilename[mmm]=='=')) downloadfilename[mmm]='_';
                   mmm++;
                 }
-                getuserhomedir(homedir);                                                  // get homedir
+                //getuserhomedir(homedir);                                                  // get homedir
+                strcpy(homedir,localuserhomedir);
                 strcpy(downloadfilenamelong,homedir);
                 strcat(downloadfilenamelong,"/rss/images/");
                 strcat(downloadfilenamelong,downloadfilename);
@@ -4027,7 +4027,8 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
                       }
                       strcpy(lasttmpfilename,tmpfilename);			              // husk file name
                       // save file in  user homedir rss/
-                      getuserhomedir(homedir);                                  // get homedir
+                      //getuserhomedir(homedir);                                  // get homedir
+                      strcpy(homedir,localuserhomedir);
                       strcpy(downloadfilenamelong,homedir);
                       strcat(downloadfilenamelong,"/rss/images/");
                       strcat(downloadfilenamelong,downloadfilename);
@@ -4119,7 +4120,9 @@ int stream_class::loadweb_stream_iconoversigt() {
         get_webfilename(downloadfilename,tmpfilename);
         // add download path
         // add download filename to class opbject
-        getuserhomedir(downloadfilenamelong);
+        //getuserhomedir(downloadfilenamelong);
+        strcpy(downloadfilenamelong,localuserhomedir);
+
         strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
@@ -4134,7 +4137,9 @@ int stream_class::loadweb_stream_iconoversigt() {
       } else if (strncmp(tmpfilename,"https://",8)==0) {
         //strcpy(lastfile,downloadfilename);
         get_webfilename(downloadfilename,tmpfilename);
-        getuserhomedir(downloadfilenamelong);
+        //getuserhomedir(downloadfilenamelong);
+        strcpy(downloadfilenamelong,localuserhomedir);
+
         // build path
         strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);

@@ -60,6 +60,7 @@ extern int sinusofset;
 extern GLint cur_avail_mem_kb;
 extern int orgwinsizey;
 extern int orgwinsizex;
+extern char localuserhomedir[4096];
 
 
 

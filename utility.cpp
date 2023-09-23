@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 
 // used to get home dir
@@ -11,6 +12,7 @@
 #include <unistd.h>
 #include "utility.h"
 #include <time.h>                       // have strftime
+
 
 unsigned int hourtounixtime(int hour) {
   time_t nutid;
@@ -31,8 +33,11 @@ unsigned int hourtounixtime(int hour) {
 int write_logfile(char *logentry) {
   char homedirpath[1024];
   char filename[2048];
+  char temptxt[4096];
   time_t nutid;
   struct tm *tid;
+  struct stat st;
+  int filestatus;
   time(&nutid);                                                            // get time
   tid=localtime(&nutid);                                                   // fillout struct
   FILE *logfile;
@@ -41,6 +46,20 @@ int write_logfile(char *logentry) {
   strcpy(filename,homedirpath);
   strcat(filename,"/");
   strcat(filename,"mythtv-controller.log");
+  // check log file size
+  // rotate old logfile if size > 200mb    
+  filestatus=stat(filename, &st);
+  // if file exist
+  if ((filestatus==0) && (st.st_size>209715200)) {  
+	strcpy(temptxt,"rm ");
+	strcat(temptxt,homedirpath);
+	strcat(temptxt,"/");
+	strcat(temptxt,"mythtv-controller.log ");
+	strcat(temptxt,homedirpath);
+	strcat(temptxt,"/");
+	strcat(temptxt,"mythtv-controller.log.old");
+	system(temptxt);
+  }
   logfile=fopen(filename,"r");
   if (logfile==NULL) {
     logfile=fopen(filename,"w");
@@ -56,10 +75,13 @@ int write_logfile(char *logentry) {
   }
   if (logfile) {
 	logfile=fopen(filename,"a");
-    fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
-    fputs(logentry,logfile);
-    fputs("\n",logfile);
-    fclose(logfile);
+    if ((tid) && (logfile)) {
+		fprintf(logfile,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
+    	fputs(logentry,logfile);
+    	fputs("\n",logfile);
+    	fclose(logfile);
+	}
+	fileok=true;
   } else {
     printf("Error write to logfile... %s\n",filename);
   }
@@ -69,9 +91,10 @@ int write_logfile(char *logentry) {
 
 // get user homedir
 
-int getuserhomedir(char *homedir) {
+int getuserhomedir(char *homedir) {  
+  printf("**************************** Get users homedir ****************************** \n");
   struct passwd *pw = getpwuid(getuid());
-  strcpy(homedir,pw->pw_dir);
+  if (homedir) strcpy(homedir,pw->pw_dir);
   return(1);
 }
 

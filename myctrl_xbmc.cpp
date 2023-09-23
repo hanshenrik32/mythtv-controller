@@ -5,6 +5,7 @@
 #include <string.h>
 #include <libxml/parser.h>
 
+extern char localuserhomedir[4096];
 extern char configdefaultmusicpath[256];                      // internal db for music
 extern int debugmode;
 extern char *dbname;                                           // internal database name in mysql (music,movie,radio)
@@ -24,7 +25,9 @@ int xbmcsqlite::getxmlfilepath() {
   char path[1024];
   xmlDoc *document;
   xmlNode *root, *first_child, *node;
-  getuserhomedir(userhomedir);
+  //getuserhomedir(userhomedir);
+  strcpy(userhomedir,localuserhomedir);
+
   strcpy(path,userhomedir);
   //strcat(path,"/.kodi/userdata/sources.xml");
   strcat(path,"/tvguide.xml");

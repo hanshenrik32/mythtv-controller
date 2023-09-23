@@ -26,7 +26,7 @@
 #include "myctrl_readwebfile.h"
 #include "readjpg.h"
 
-
+extern char localuserhomedir[4096];                                             // user homedir
 extern channel_list_struct channel_list[];                                      // channel_list array used in setup graber
 
 extern char debuglogdata[1024];                                // used by log system
@@ -360,7 +360,9 @@ int tv_oversigt::saveparsexmltvdb() {
   int n=0;
   FILE *dbfil;
   char writefilename[1024];
-  getuserhomedir(writefilename);
+  //getuserhomedir(writefilename);
+  strcpy(writefilename,localuserhomedir);
+
   strcat(writefilename,"/");
   strcat(writefilename,tvguidedbfilename);
   dbfil=fopen(writefilename,"w");                                             //tvguidedb.dat
@@ -385,7 +387,8 @@ int tv_oversigt::loadparsexmltvdb() {
   int n=0;
   FILE *dbfil;
   char writefilename[1024];
-  getuserhomedir(writefilename);
+  //getuserhomedir(writefilename);
+  strcpy(writefilename,localuserhomedir);
   strcat(writefilename,"/");
   strcat(writefilename,tvguidedbfilename);
   dbfil=fopen(writefilename,"r");                                             // tvguidedb.dat
@@ -529,7 +532,9 @@ int tv_oversigt::parsexmltv(const char *filename) {
       mkdir("images/tv_icons",0777);
     }
     //  add user homedir and open file
-    getuserhomedir(userhomedir);
+    //getuserhomedir(userhomedir);
+    strcpy(userhomedir,localuserhomedir);
+
     strcpy(path,userhomedir);
     strcat(path,"/");
     strcat(path,filename);                                                      // add filename to xmlfile name

@@ -36,6 +36,7 @@ extern float configdefaultmoviefontsize;
 extern int configuvmeter;
 extern int debugmode;
 extern int vis_nyefilm_oversigt;
+extern char localuserhomedir[4096];
 
 // controll rss
 //
@@ -2911,7 +2912,9 @@ int txmltvgraber_createconfig() {
   int sysresult;
   // delete old config from dir
   strcpy(exebuffer,"rm ");
-  getuserhomedir(path);
+  //getuserhomedir(path);
+  strcpy(path,localuserhomedir);
+
   strcat(path,"/.xmltv/");
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(exebuffer,path);
@@ -3073,13 +3076,17 @@ int txmltvgraber_updateconfigfile() {
   int sysresult;
   int cnr;
   // source file
-  getuserhomedir(filename);                                                 // get user homedir
+  //getuserhomedir(filename);                                                 // get user homedir
+  strcpy(filename,localuserhomedir);
+
   strcat(filename,"/.xmltv/");
   strcat(filename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
   strcat(filename,".conf");
   // create new config file
   // dest file
-  getuserhomedir(outfilename);                                                 // get user homedir
+  //getuserhomedir(outfilename);                                                 // get user homedir
+  strcpy(outfilename,localuserhomedir);
+
   strcat(outfilename,"/tmp_");
   strcat(outfilename,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]); // grabber name
   strcat(outfilename,".conf");
@@ -3131,7 +3138,8 @@ int txmltvgraber_updateconfigfile() {
   fclose(filin);
   fclose(filout);
   // copy new config file to xmltv homedir ~/.xmltv
-  getuserhomedir(path);                                                     // get user homedir
+  //getuserhomedir(path);                                                     // get user homedir
+  strcpy(path,localuserhomedir);
   strcpy(filename,"cp ");
   strcat(filename,path);
   strcat(filename,"/tmp_");
@@ -3180,7 +3188,8 @@ int channel_configfile::readgraber_configfile() {
   bool errors=false;
   FILE *fil;
   int line=0;
-  getuserhomedir(path);
+  //getuserhomedir(path);
+  strcpy(path,localuserhomedir);
   strcat(path,"/.xmltv/");
   strcat(path,aktiv_tv_graber.grabercmd[aktiv_tv_graber.graberaktivnr]);
   strcat(path,".conf");
@@ -3280,7 +3289,8 @@ int load_channel_list_from_graber() {
                             "tv_grab_eu_egon","tv_grab_dk_dr","tv_grab_se_tvzon","tv_grab_ar","tv_grab_fr_kazer","tv_grab_uk_tvguide","tv_grab_zz_sdjson"};
 
   write_logfile((char *) "Get channel list file from tv graber sub system.");
-  getuserhomedir(userhomedir);
+  //getuserhomedir(userhomedir);
+  strcpy(userhomedir,localuserhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/tvguide_channels.txt");
   // Er der en aktiv tv graber
@@ -3491,7 +3501,8 @@ bool save_channel_list() {
   char filename[1024];
   unsigned int cnr=0;
   bool errors=false;
-  getuserhomedir(userhomedir);                                                // get user homedir
+  //getuserhomedir(userhomedir);                                                // get user homedir
+  strcpy(userhomedir,localuserhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                     // add the filename
@@ -3529,7 +3540,8 @@ int load_channel_list() {
   unsigned int cnr=0;
   bool errors=false;
   PRGLIST_ANTAL=0;
-  getuserhomedir(userhomedir);
+  //getuserhomedir(userhomedir);
+  strcpy(userhomedir,localuserhomedir);
   strcpy(filename,userhomedir);
   strcat(filename,"/");
   strcat(filename,tvguide_dat_filename);                                        // filename
