@@ -1,0 +1,51 @@
+<script type="text/javascript">
+</script>
+<?
+$url='login.html'
+
+?>
+        <center><h2>Tidal login</h2></center>
+        <form action="https://api.tidal.com/v1/login/username" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
+                <input type="hidden" name="authenticate" value="validate">
+                <input type="hidden" name="hash1" value="">
+                <input type="hidden" name="hash2" value="">
+                <input type="hidden" name="sign" value="">
+        <table cellspacing="0" cellpadding="0" class="warning">
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td class="space"></td>
+                <td>Username:</td>
+                <td class="space"></td>
+                <td><input type="text" name="username" value="" maxlength="255" class="login"></td>
+                <td class="space"></td>
+        </tr>
+        <tr>
+                <td></td>
+                <td>Password:</td>
+                <td></td>
+                <td><input type="password" name="password" class="login"></td>
+                <td></td>
+        </tr>
+	<tr>
+                <td></td>
+                <td>client_id:</td>
+                <td></td>
+                <td><input type="text" name="token" class="login"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td></td>
+                <td colspan="3" align="right"><input type="submit" value="login" class="button"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        <tr>
+                <td></td>
+                <td colspan="3" class="line"></td>
+                <td></td>
+        </tr>
+        <tr class="space"><td colspan="5"></td></tr>
+        </table>
+        </form>
+

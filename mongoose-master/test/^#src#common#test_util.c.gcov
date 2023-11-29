@@ -1,0 +1,107 @@
+        -:    0:Source:../src/common/test_util.c
+        -:    0:Programs:3
+        -:    1:/*
+        -:    2: * Copyright (c) 2014-2018 Cesanta Software Limited
+        -:    3: * All rights reserved
+        -:    4: *
+        -:    5: * Licensed under the Apache License, Version 2.0 (the ""License"");
+        -:    6: * you may not use this file except in compliance with the License.
+        -:    7: * You may obtain a copy of the License at
+        -:    8: *
+        -:    9: *     http://www.apache.org/licenses/LICENSE-2.0
+        -:   10: *
+        -:   11: * Unless required by applicable law or agreed to in writing, software
+        -:   12: * distributed under the License is distributed on an ""AS IS"" BASIS,
+        -:   13: * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   14: * See the License for the specific language governing permissions and
+        -:   15: * limitations under the License.
+        -:   16: */
+        -:   17:
+        -:   18:#include "common/test_util.h"
+        -:   19:
+        -:   20:#include <ctype.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <stdlib.h>
+        -:   23:#include <string.h>
+        -:   24:#ifndef _WIN32
+        -:   25:#include <sys/time.h>
+        -:   26:#else
+        -:   27:#include <windows.h>
+        -:   28:#endif
+        -:   29:
+        -:   30:int num_tests = 0;
+        -:   31:
+    #####:   32:static char *_escape(const char *s, size_t n) {
+        -:   33:  size_t i, j;
+    #####:   34:  char *res = (char *) malloc(n * 4 + 1);
+    #####:   35:  for (i = j = 0; s[i] != '\0' && i < n; i++) {
+    #####:   36:    if (!iscntrl((int) s[i])) {
+    #####:   37:      res[j++] = s[i];
+        -:   38:    } else {
+    #####:   39:      j += sprintf(res + j, "\\x%02x", s[i]);
+        -:   40:    }
+        -:   41:  }
+    #####:   42:  res[j] = '\0';
+    #####:   43:  return res;
+        -:   44:}
+        -:   45:
+    #####:   46:void _strfail(const char *a, const char *e, int len) {
+        -:   47:  char *ae, *ee;
+    #####:   48:  if (len < 0) {
+    #####:   49:    len = strlen(a);
+    #####:   50:    if (strlen(e) > (size_t) len) len = strlen(e);
+        -:   51:  }
+    #####:   52:  ae = _escape(a, len);
+    #####:   53:  ee = _escape(e, len);
+    #####:   54:  printf("Expected: %s\nActual  : %s\n", ee, ae);
+    #####:   55:  free(ae);
+    #####:   56:  free(ee);
+    #####:   57:}
+        -:   58:
+      132:   59:int _assert_streq(const char *actual, const char *expected) {
+      132:   60:  if (strcmp(actual, expected) != 0) {
+    #####:   61:    _strfail(actual, expected, -1);
+    #####:   62:    return 0;
+        -:   63:  }
+      132:   64:  return 1;
+        -:   65:}
+        -:   66:
+      132:   67:int _assert_streq_nz(const char *actual, const char *expected) {
+      132:   68:  size_t n = strlen(expected);
+      132:   69:  if (strncmp(actual, expected, n) != 0) {
+    #####:   70:    _strfail(actual, expected, n);
+    #####:   71:    return 0;
+        -:   72:  }
+      132:   73:  return 1;
+        -:   74:}
+        -:   75:
+        -:   76:#if MG_ENABLE_POLL_UNTIL
+     2104:   77:int c_str_ne(void *a, void *b) {
+     2104:   78:  int r = strcmp((const char *) a, (const char *) b);
+     2104:   79:  return r;
+        -:   80:}
+        -:   81:
+      416:   82:int c_int_ne(void *a, void *b) {
+      416:   83:  return *((int *) a) != (intptr_t) b;
+        -:   84:}
+        -:   85:
+     5151:   86:int c_int_eq(void *a, void *b) {
+     5151:   87:  return *((int *) a) == (intptr_t) b;
+        -:   88:}
+        -:   89:
+      103:   90:void poll_until(struct mg_mgr *mgr, double timeout, int (*cond)(void *, void *),
+        -:   91:                void *cond_arg1, void *cond_arg2) {
+        -:   92:  int i;
+      103:   93:  double start = cs_time();
+      103:   94:  while (cs_time() - start < timeout) {
+     7671:   95:    mg_mgr_poll(mgr, 2);
+     7671:   96:    if (cond != NULL && cond(cond_arg1, cond_arg2)) {
+        -:   97:      /* A few more cycles to test for overshoots. */
+      606:   98:      for (i = 0; i < 5; i++) {
+      505:   99:        mg_mgr_poll(mgr, 2);
+        -:  100:      }
+      101:  101:      return;
+        -:  102:    }
+        -:  103:  }
+        -:  104:}
+        -:  105:#endif
