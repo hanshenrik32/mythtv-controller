@@ -4851,20 +4851,22 @@ void display() {
     }
   }
 
+
+
   //
   // *************** Spotify show play stuf **********************************************************
   //
   #ifdef ENABLE_SPOTIFY
   if ((vis_spotify_oversigt) && (do_zoom_spotify_cover) && (!(visur))) {
     int textofset=140;
-    bool wedoplay=false;
+    static bool wedoplay=false;
     do_we_play_check=0;
     if (do_we_play_check==0) {
-      if (spotify_oversigt.spotify_do_we_play()==200) wedoplay=true;
+      if (spotify_oversigt.spotify_do_we_play()==200) wedoplay=true; else wedoplay=false;
     }
     do_we_play_check++;
     // check again ?
-    if (do_we_play_check>50) do_we_play_check=0;
+    if (do_we_play_check>10) do_we_play_check=0;
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
     if (wedoplay==false) {
       // window texture
@@ -15163,6 +15165,7 @@ int check_radio_stations_icons() {
 // ****************************************************************************************
 
 int main(int argc, char** argv) {
+    const char *build_str = __DATE__;
     pthread_t loaderthread;           // the load
     pthread_t loaderthread1;           // the load
     int dircreatestatus;
@@ -15187,8 +15190,10 @@ int main(int argc, char** argv) {
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
       fputs("Ver 0.40.x \n",logfile);
     }
+    printf("Build date %s\n",build_str);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
     sprintf(debuglogdata,"Mythtv-controller Version %s",SHOWVER);
+    printf("Build date %s\n",build_str);
     write_logfile(logfile,(char *) debuglogdata);
     if (argc>1) {
       //if (strcmp(argv[1],"-f")==0) full_screen=1;
