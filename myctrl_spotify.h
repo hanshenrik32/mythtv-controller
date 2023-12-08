@@ -116,7 +116,11 @@ class spotify_class : vlc_controller {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
         bool do_cleanup_stack();
+        bool anim_viewer;
+        float anim_angle;
     public:
+        bool do_amin_in_viewer() { return(anim_viewer); }
+        bool reset_amin_in_viewer();
         bool set_search_loaded() { search_loaded=true; return(1); }
         int loaded_antal;                                                       // antal loaded i loader
         unsigned int spotify_playlist_antal;
@@ -184,7 +188,7 @@ class spotify_class : vlc_controller {
         int streamantal() { return(antal-1); }                                  //
         void clean_spotify_oversigt();                                          // clear list
         int spotify_req_playlist();                                             //
-        int spotify_get_user_playlists(bool force,int startoffset);             // get user playlist (list of playlist)
+        int spotify_get_user_playlists(bool force,int startoffset);             // get (download) user playlist (list of playlist)
         int spotify_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
 
         int spotify_get_likedsongs(const char *playlist,bool force,bool create_playlistdb);

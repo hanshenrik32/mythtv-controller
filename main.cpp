@@ -3529,6 +3529,7 @@ void display() {
     #ifdef ENABLE_SPOTIFY
     if (vis_spotify_oversigt) {
       if (do_show_spotify_search_oversigt==false) {
+        //spotify_oversigt.reset_amin_in_viewer();
         spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
       } else {
         spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
@@ -3546,7 +3547,7 @@ void display() {
       if (do_select_device_to_play) {
         spotify_oversigt.select_device_to_play();
       }
-    }
+    } else spotify_oversigt.reset_amin_in_viewer();
     #endif
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) {
@@ -7392,7 +7393,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
       // start/stop spotify online search view
       #ifdef ENABLE_SPOTIFY
       if (vis_spotify_oversigt) {
-        if ((GLubyte) names[i*4+3]==5) {
+        if ((GLubyte) names[i*4+3]==5) {                                        //
           strcpy(keybuffer,"");                                                 // reset text buffer
           keybufferindex=0;                                                     //
           spotify_selected_startofset=0;
@@ -8762,6 +8763,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_play_spotify=0;
                         do_open_spotifyplaylist=0;
                         fprintf(stderr,"Set stop play spotify flag\n");
+                        write_logfile(logfile,(char *) "Set stop play spotify flag");
                       }
                     }
                     // next play  online
@@ -8769,6 +8771,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       do_play_spotify=0;
                       do_open_spotifyplaylist=1;
                       fprintf(stderr,"Set next play spotify flag\n");
+                      write_logfile(logfile,(char *) "Set next play spotify flag");
                       spotify_oversigt.spotify_next_play();
                     }
                     // last play online
@@ -8776,6 +8779,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       do_play_spotify=0;
                       do_open_spotifyplaylist=1;
                       fprintf(stderr,"Set last play spotify flag\n");
+                      write_logfile(logfile,(char *) "Set last play spotify flag");
                       spotify_oversigt.spotify_last_play();
                     }
                   }
@@ -8793,6 +8797,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_play_tidal=1;
                         do_open_tidalplaylist=0;
                         fprintf(stderr,"Set do_play_tidal flag tidalknapnr=%d \n",tidalknapnr);
+                        write_logfile(logfile,(char *) "Set last play tidal flag");
                       }
                     }
                     // stop play
@@ -8829,6 +8834,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_play_tidal=1;
                         do_open_tidalplaylist=0;
                         fprintf(stderr,"Set do_play_tidal flag tidalknapnr=%d \n",tidalknapnr);
+                        write_logfile(logfile,(char *) "Set play tidal.");
                       }
                     }
                     // open
@@ -8845,6 +8851,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                         do_play_tidal=0;
                         do_open_tidalplaylist=0;
                         fprintf(stderr,"Set stop play tidal flag\n");
+                        write_logfile(logfile,(char *) "Set stop play tidal flag");
                       }
                     }
                     // next play  online
@@ -8852,6 +8859,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       do_play_tidal=0;
                       do_open_tidalplaylist=1;
                       fprintf(stderr,"Set next play tidal flag\n");
+                      write_logfile(logfile,(char *) "Set next play tidal flag");
                       tidal_oversigt.tidal_next_play();
                     }
                     // last play online
@@ -8859,6 +8867,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                       do_play_tidal=0;
                       do_open_tidalplaylist=1;
                       fprintf(stderr,"Set last play tidal flag\n");
+                      write_logfile(logfile,(char *) "Set last play tidal flag");
                       tidal_oversigt.tidal_last_play();
                     }
                   }
@@ -13927,7 +13936,9 @@ void *datainfoloader_spotify(void *data) {
   spotify_oversigt_loaded_begin=true;
   // write debug log
   write_logfile(logfile,(char *) "loader thread starting - Loading spotify info from db.");
+
   spotify_oversigt.opdatere_spotify_oversigt(0);                                // update from db
+
   spotify_oversigt.set_search_loaded();                           // triger icon loader
   // spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(keybuffer,0);   //
   // spotify_oversigt.load_spotify_iconoversigt();
@@ -13959,6 +13970,7 @@ void *webupdate_loader_spotify(void *data) {
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
+      
       // you have to call clean_spotify_oversigt after earch spodify_get_playlist
       spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,true);     // songs on repeat playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
@@ -13968,7 +13980,7 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.clean_spotify_oversigt();                                 // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      
+
       if (strcmp(configbackend_starred_playlistname,"")==0) {
         // get my (develober/creator of mythtv-controller) stared playlist
         spotify_oversigt.spotify_get_playlist("6ccXCXn0TpMBLSuV4aTpAm",1,true);     // starred
@@ -13976,7 +13988,7 @@ void *webupdate_loader_spotify(void *data) {
       } else {
         // get config starred playlist.
         spotify_oversigt.spotify_get_playlist(configbackend_starred_playlistname,1,true);     // starred
-        spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
+        spotify_oversigt.clean_spotify_oversigt();                                            // clear old stuf
       }
       spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
