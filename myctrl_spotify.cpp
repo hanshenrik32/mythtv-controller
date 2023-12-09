@@ -4535,7 +4535,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
 
 // ****************************************************************************************
 //
-// show search/create playlist spotify overview
+// show search/create playlist spotify overview (new ver)
 //
 // ****************************************************************************************
 
@@ -4544,7 +4544,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     int j,ii,k,pos;
     int buttonsize=200;                                                         // button size
     float buttonsizey=180.0f;                                                   // button size
-    float yof=orgwinsizey-(buttonsizey*2);                                        // start ypos orgwinsizey-(buttonsizey)
+    float yof=orgwinsizey-(buttonsizey);                                        // start ypos
     float xof=0.0f;
     int lstreamoversigt_antal=8*4;
     int i=0;                                                                    // data ofset in stack array
@@ -4565,10 +4565,19 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     char *base,*right_margin;
     int length,width;
     int pline=0;
+    static bool cursor=true;
+    float yof_top=orgwinsizey-(buttonsizey*1)+20;                                    // start ypos
+    float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
     static time_t rawtime;
     static time_t last_rawtime=0;
-    static bool cursor=true;
-
+    rawtime=time(NULL);                                                         // hent now time
+    if (last_rawtime==0) {
+      last_rawtime=rawtime;
+    }
+    if (rawtime>(last_rawtime+1)) {
+      cursor=!cursor;
+      last_rawtime=rawtime;
+    }
     // last loaded filename
     if (spotify_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     // load icons
@@ -4580,11 +4589,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     // draw icons
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glTranslatef(0,0,0.0f);
-
-    float yof_top=orgwinsizey-(buttonsizey*1)+20;                                    // start ypos
-    float xof_top=((orgwinsizex-buttonsize)/2)-(1200/2);
+    // type of search
     switch (searchtype) {
       case 0: glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
               break;
@@ -4598,7 +4603,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     glLoadName(0);
     glBegin(GL_QUADS); 
     glTexCoord2f(0, 0); glVertex3f( xof_top+10, yof_top+10, 0.0);
@@ -4607,33 +4611,17 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     glTexCoord2f(1, 0); glVertex3f( xof_top+1200-10, yof_top+10 , 0.0);
     glEnd();
 
-    rawtime=time(NULL);                                                         // hent now time
-    if (last_rawtime==0) {
-      last_rawtime=rawtime;
-    }
-    if (rawtime>(last_rawtime+1)) {
-      cursor=!cursor;
-      last_rawtime=rawtime;
-    }
-
-    glTranslatef(xof_top+40,yof_top+50,0);
+    glPushMatrix();
+    glTranslatef(xof+210+(buttonsize/2),yof+70,0);
     glDisable(GL_TEXTURE_2D);
     glScalef(120, 120, 1.0);
-    glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
-    glRasterPos2f(0.0f, 0.0f);
     if (strcmp(searchstring,"")!=0) glcRenderString(searchstring);
-    // cursor
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     if (cursor) glcRenderString("_"); else glcRenderString(" ");
+    glPopMatrix();
 
-    if (this->search_loaded) {
-      this->search_loaded=false;
-      printf("Searech loaded done. Loading icons\n");
-      spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-    }
 
-    glTranslatef(0,0,0.0f);
-
+    // start pos
+    glTranslatef(0,-buttonsizey,0.0f);
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
@@ -4688,11 +4676,11 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         }
         glEnd();        
         glPopMatrix();
-
       } else {
         // no draw default icon
         glPushMatrix();
         glTranslatef(xof+20,yof-10,0);
+        // glTranslatef(xof+20+(buttonsize/2),yof-10,0);
         glEnable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if ((i+sofset)==0) {
@@ -4787,39 +4775,10 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       i++;
       xof+=(buttonsize+10);
     }
-    bool vis_band_name=true;
-    if (vis_band_name) {
-      if (strcmp(overview_show_band_name,"")!=0) {
-        glPushMatrix();
-        glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glBindTexture(GL_TEXTURE_2D,spotify_pil);
-        glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f(((orgwinsizex/2)-60), 14 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f(((orgwinsizex/2)-60), 14+46, 0.0);
-        glTexCoord2f(1, 1); glVertex3f(((orgwinsizex/2)-60)+60, 14+46 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f(((orgwinsizex/2)-60)+60, 14 , 0.0);
-        glEnd();
-        glPopMatrix();
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef((orgwinsizex/2)-(130+(strlen(overview_show_band_name)*10)), 30 ,0.0f);
-        glScalef(22.0, 22.0, 1.0);
-        glcRenderString(overview_show_band_name);
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(((orgwinsizex/2)+30), 30 ,0.0f);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(22.0, 22.0, 1.0);
-        glcRenderString("Collection");
-        glPopMatrix();
-      }
-    }
 }
 
-/*
-void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
+
+void spotify_class::show_spotify_search_oversigt_old(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring) {
   int j,ii,k,pos;
   int buttonsize=200;                                                         // button size
   float buttonsizey=180.0f;                                                   // button size
@@ -5120,9 +5079,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
     }
   }
 }
-*/
-
-
 
 
 

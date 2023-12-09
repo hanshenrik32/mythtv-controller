@@ -3527,12 +3527,16 @@ void display() {
       }
     }
     #ifdef ENABLE_SPOTIFY
+    if ((vis_spotify_oversigt) && ((do_show_spotify_search_oversigt==true))) {
+      spotify_oversigt.reset_amin_in_viewer();
+    }
     if (vis_spotify_oversigt) {
       if (do_show_spotify_search_oversigt==false) {
         //spotify_oversigt.reset_amin_in_viewer();
         spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
       } else {
         spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
+        //spotify_oversigt.show_spotify_search_oversigt_old( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
       }
       //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
       if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
