@@ -3471,6 +3471,7 @@ void display() {
         //spotify_oversigt.load_spotify_iconoversigt();
         keybuffer[0] = 0;
         keybufferindex = 0;
+        //spotify_oversigt.reset_amin_in_viewer();                              // reset anim
       }
       spotify_oversigt_loaded_begin=false;
     }
@@ -3528,7 +3529,7 @@ void display() {
     }
     #ifdef ENABLE_SPOTIFY
     if ((vis_spotify_oversigt) && ((do_show_spotify_search_oversigt==true))) {
-      spotify_oversigt.reset_amin_in_viewer();
+      //spotify_oversigt.reset_amin_in_viewer();
     }
     if (vis_spotify_oversigt) {
       if (do_show_spotify_search_oversigt==false) {
@@ -3551,7 +3552,7 @@ void display() {
       if (do_select_device_to_play) {
         spotify_oversigt.select_device_to_play();
       }
-    } else spotify_oversigt.reset_amin_in_viewer();
+    } else if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
     #endif
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) {
@@ -4871,7 +4872,7 @@ void display() {
     }
     do_we_play_check++;
     // check again ?
-    if (do_we_play_check>10) do_we_play_check=0;
+    if (do_we_play_check>50) do_we_play_check=0;
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
     if (wedoplay==false) {
       // window texture
@@ -7410,6 +7411,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             spotify_oversigt.set_search_loaded();                               // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
             spotify_oversigt_loaded_begin=false;                                //
+            //spotify_oversigt.reset_amin_in_viewer();
           } else {
             do_show_spotify_search_oversigt=true;
           }
@@ -9209,6 +9211,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
+
+            // spotify_oversigt.reset_amin_in_viewer();                              // reset anim
+
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
             spotify_oversigt.set_search_loaded();                                                     // triger icon loader
@@ -14072,6 +14077,9 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       spotify_oversigt.set_search_loaded();
+
+      spotify_oversigt.reset_amin_in_viewer();                              // reset anim
+
       //spotify_oversigt.type=2;
     }
     #endif

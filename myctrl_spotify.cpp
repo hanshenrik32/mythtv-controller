@@ -351,6 +351,7 @@ spotify_oversigt_type::spotify_oversigt_type() {
 
 spotify_class::spotify_class() : antal(0) {
     anim_viewer=true;                                                        // lav anim når view åbnes
+    anim_viewer_search=true;
     for(int i=0;i<maxantal;i++) stack[i]=0;
     stream_optionselect=0;							                                        // selected line in stream options
     spotify_oversigt_loaded=false;
@@ -4325,7 +4326,9 @@ void spotify_class::select_device_to_play() {
 // ****************************************************************************************
 
 bool spotify_class::reset_amin_in_viewer() {
+  //printf("************** RESET ANIM ************************************* \n ");
   anim_viewer=true;
+  anim_viewer_search=true;
   anim_angle=180.0f;
 }
 
@@ -4639,9 +4642,9 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glPushMatrix();
         if (anim_angle>360) {
           anim_angle=0.0f;
-          anim_viewer=false;
+          anim_viewer_search=false;
         } else {
-          if (anim_viewer) anim_angle+=0.16; else anim_angle=0.0f;
+          if (anim_viewer_search) anim_angle+=0.16; else anim_angle=0.0f;
         }
         glTranslatef(xof+20+(buttonsize/2),yof-10,0);
         glRotatef(anim_angle,0.0f,1.0f,0.0f);
@@ -4698,7 +4701,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
         glTexCoord2f(0, 1); glVertex3f( 10,buttonsizey-20, 0.0);
         glTexCoord2f(1, 1); glVertex3f( buttonsize-10, buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsize-10, 10 , 0.0);
-        glEnd();        
+        glEnd();
         if (stack[i+sofset]->nyt) {
           glBindTexture(GL_TEXTURE_2D,newstuf_icon);
           glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -4709,21 +4712,6 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
           glTexCoord2f(1, 0); glVertex3f( 66-10+130, 10 , 0.0);
           glEnd();
         }
-        glPopMatrix();
-      }
-      // draw numbers in group
-      if (stack[i+sofset]->feed_group_antal>1) {
-        // show numbers in group
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTranslatef(xof+22,yof+14,0);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        sprintf(temptxt,"Feeds %-4d",stack[i+sofset]->feed_group_antal);
-        glcRenderString(temptxt);
         glPopMatrix();
       }
       // show text of element

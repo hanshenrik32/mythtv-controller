@@ -117,6 +117,7 @@ class spotify_class : vlc_controller {
         bool search_loaded;
         bool do_cleanup_stack();
         bool anim_viewer;
+        bool anim_viewer_search;
         float anim_angle;
     public:
         bool do_amin_in_viewer() { return(anim_viewer); }
