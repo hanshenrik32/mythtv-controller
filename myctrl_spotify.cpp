@@ -4394,7 +4394,7 @@ void spotify_class::show_spotify_oversigt(GLuint normal_icon,GLuint song_icon,GL
         // stream icon
         glPushMatrix();
         if (anim_angle>360) {
-          anim_angle=0.0f;
+          anim_angle=180.0f;
           anim_viewer=false;
         } else {
           if (anim_viewer) anim_angle+=0.16; else anim_angle=0.0f;

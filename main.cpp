@@ -3471,7 +3471,6 @@ void display() {
         //spotify_oversigt.load_spotify_iconoversigt();
         keybuffer[0] = 0;
         keybufferindex = 0;
-        //spotify_oversigt.reset_amin_in_viewer();                              // reset anim
       }
       spotify_oversigt_loaded_begin=false;
     }
@@ -3528,20 +3527,16 @@ void display() {
       }
     }
     #ifdef ENABLE_SPOTIFY
-    if ((vis_spotify_oversigt) && ((do_show_spotify_search_oversigt==true))) {
-      //spotify_oversigt.reset_amin_in_viewer();
-    }
     if (vis_spotify_oversigt) {
       if (do_show_spotify_search_oversigt==false) {
-        //spotify_oversigt.reset_amin_in_viewer();
         spotify_oversigt.show_spotify_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , spotify_selected_startofset , spotifyknapnr );
       } else {
         spotify_oversigt.show_spotify_search_oversigt( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
-        //spotify_oversigt.show_spotify_search_oversigt_old( onlineradio , _textureId_song , _textureId_dir , _textureIdback , spotify_selected_startofset , spotifyknapnr ,keybuffer);
       }
-      //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
-      if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {
+      if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      if (strcmp(spotify_oversigt.spotify_get_token(),"")==0) {        
         if (startwebbrowser) {
+          write_logfile(logfile,(char *) "start webbrowser to login on spotify.");
           // start webbroser to login on spotify
           system("firefox localhost:8000");
           startwebbrowser=false;
@@ -7411,7 +7406,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             spotify_oversigt.set_search_loaded();                               // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                     // update icons
             spotify_oversigt_loaded_begin=false;                                //
-            //spotify_oversigt.reset_amin_in_viewer();
           } else {
             do_show_spotify_search_oversigt=true;
           }
@@ -9211,8 +9205,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             spotify_oversigt.clean_spotify_oversigt();                                              //
             if (huskname) spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,3);  //type 3 = tracks ()
             else spotify_oversigt.opdatere_spotify_oversigt(0);
-
-            // spotify_oversigt.reset_amin_in_viewer();                              // reset anim
 
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
             //spotify_oversigt.load_spotify_iconoversigt();                                           // load icons
@@ -14077,9 +14069,7 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       spotify_oversigt.set_search_loaded();
-
       spotify_oversigt.reset_amin_in_viewer();                              // reset anim
-
       //spotify_oversigt.type=2;
     }
     #endif
