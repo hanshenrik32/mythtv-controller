@@ -3553,6 +3553,7 @@ void display() {
     if (vis_tidal_oversigt) {
       // show Tidal overview
       tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );     
+      /*
       if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) {
         if (tidalstartwebbrowser) {
           // start webbroser to login on tidal.
@@ -3560,6 +3561,7 @@ void display() {
           tidalstartwebbrowser=false;
         }
       }
+      */
     }
     #endif
     if (vis_tv_oversigt) {
@@ -15312,38 +15314,17 @@ int main(int argc, char** argv) {
                 break;
       }
     }
-    //printf("\n***** Tidal login TOKEN %s \n *****",get_access_token("client_id", "client_secret","hanshenrik32@gmail.com", "o60LbQGXJi5y"));
 
-    // test
-    //tidal_login();
-
-    char *tidal_token=NULL;
-    //tidal_token=tidal_oversigt.get_dev_auth();                                      // make device ok
-    if (tidal_token) {
-      printf("\n***** Tidal login DEV AUTH %s \n *****",tidal_token);
-      if (strlen(tidal_token)>178) {
-        sleep(2);
-        //tidal_oversigt.do_link_tidal();
-        //printf("LINK RESULT HEADERS %s \n ",tidal_token);
-        printf("Please open link..\n");
-
-        // link respons give in browser give this url
-        // return recirect to https://offer.tidal.com/login/tidal/return&response_type=code&state=66cf2af3-554a-4ad7-8921-0f81887bb0f4&geo=DK&campaignId=default
-        //
-
-        sleep(2);
-        //tidal_token=tidal_oversigt.get_access_token("hanshenrik32@gmail.com","o60LbQGXJi5y");
-        //tidal_token=tidal_oversigt.get_access_token("username","password");
-
-        //tidal_oversigt.tidal_login_token();
-
-      }
-      printf("** Tidal login TOKEN %s \n *****",tidal_token);
-    } else {
-      printf("\n***** NO Tidal TOKEN \n *****");
-    }
 
     #ifdef ENABLE_TIDAL
+
+
+    bool tidalok;
+    tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
+    if (tidalok) {
+      tidal_oversigt.get_users_album("251380836");
+      printf("Tidal loaded OK \n");
+    }
 
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {

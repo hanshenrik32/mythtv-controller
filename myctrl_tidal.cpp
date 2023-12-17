@@ -376,8 +376,6 @@ tidal_class::tidal_class() : antal(0) {
     write_logfile(logfile,(char *) "Starting Tidal web server on port 8100");             //
     this->connection = mg_bind(&mgr, ss_http_port, tidal_server_ev_handler);      // Create listening connection and add it to the event manager
     mg_set_protocol_http_websocket(this->connection);
-
-
     strcpy(do_link_url,"");                                                     //
     strcpy(device_code,"");                                                     //
     strcpy(client_id,"");                                                       //
@@ -512,18 +510,17 @@ size_t write_callback2(char *ptr, size_t size, size_t nmemb, void *userdata) {
 }
 
 int tidal_login() {
+    /*
     char *auth_url;
     char *auth_code;
     char *access_token;
     char *access_token_secret;
 
     // Construct the authorization URL
-
     char *req_url;
     //req_url=oauth_sign_url2("req_url",NULL,OA_HMAC,NULL,"key","sec",NULL,NULL);
 
     //char *tt=oauth_encode_base64(16,(const unsigned char *) "01234343klrfjkl4jklgrjktl43jkrehrtj4htjrkeh4j3khrjghjkth43jk5h43jk5h43jkfhjk4rh43jrhjkrh43jkrh43jkrh4jkrhjkrh23jk");
-
 
     //oauth_t *oauth = oauth_client_new(CLIENT_ID, CLIENT_SECRET, NULL, NULL);
     //auth_url = oauth_getauthorizeurl(oauth, "https://auth.tidal.com/v1/oauth2/auth", REDIRECT_URI, "code", NULL, NULL);
@@ -567,10 +564,11 @@ int tidal_login() {
     //oauth_token_free(access_token_struct);
     //oauth_client_free(oauth);
 
+
+    */
+  
     return 0;
 }
-
-
 
 
 // NEW In use
@@ -798,22 +796,6 @@ int tidal_class::do_link_tidal()  {
       return 1;
     } else return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1104,7 +1086,7 @@ int tidal_class::tidal_login_token() {
 // ***********************************************************************
 // check auth Status
 //
-
+// ***********************************************************************
 
 int tidal_class::tidal_check_auth_status() {
   static char tidaltoken_refresh[200];
@@ -1618,7 +1600,7 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
 // *********************************************************************************************************************************
 // do we play ?
 // return http code
-// Work in use
+//
 // ********************************************************************************************
 
 int tidal_class::tidal_do_we_play() {
@@ -1673,7 +1655,6 @@ int tidal_class::tidal_do_we_play() {
 
 // *******************************************************************************************************
 //
-// work
 // pause play
 //
 // ****************************************************************************************
@@ -1697,7 +1678,6 @@ int tidal_class::tidal_pause_play() {
 
 // ****************************************************************************************
 //
-// work ( need testing )
 // pause play
 //
 // ****************************************************************************************
@@ -1873,7 +1853,6 @@ int tidal_class::tidal_last_play2() {
 
 // ****************************************************************************************
 //
-// work
 // next play
 //
 // ****************************************************************************************
@@ -1951,7 +1930,7 @@ int tidal_class::tidal_next_play2() {
 // ****************************************************************************************
 
 // ****************************************************************************************
-// Works
+//
 // Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
 // ****************************************************************************************
@@ -2019,7 +1998,6 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
 
 // ****************************************************************************************
 //
-// work
 // play song
 // Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
@@ -2084,7 +2062,6 @@ int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
 
 // ****************************************************************************************
 //
-// work
 // play artist
 // Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes
@@ -2154,7 +2131,6 @@ int tidal_class::tidal_play_now_artist(char *playlist_song,bool now) {
 
 // ****************************************************************************************
 //
-// work
 // play album
 // Optional. tidal URI of the context to play. Valid contexts are albums, artists, playlists.
 // error codes

@@ -51,7 +51,7 @@ class tidal_oversigt_type {
     GLuint      textureId;                        // gfx icon loaded
     long        intnr;
     char        type;
-    tidal_oversigt_type();                      // constructor
+    tidal_oversigt_type();                        // constructor
 };
 
 //
@@ -158,9 +158,7 @@ class tidal_class {
         int tidal_resume_play();                                              // resume play
         int tidal_last_play();                                                // play last song
         int tidal_next_play();                                                // play next song
-        int tidal_play_now_song(char *playlist_song,bool now);                // play song
         int get_tidal_playlistid();
-        int load_tidal_iconoversigt();
         int tidal_play_now_artist(char *playlist_song,bool now);              // play artist
         int tidal_play_now_album(char *playlist_song,bool now);               // play album
 
@@ -190,8 +188,20 @@ class tidal_class {
         int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
         char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
 
+        // works
+        int load_tidal_iconoversigt();
+        void print_depth_shift(int depth);
+        void playlist_print_depth_shift(int depth);
+        int get_access_token(char *loginbase64);                                                        // get token
+        int get_users_album(char *albumid);
+        void process_value_playlist(json_value* value, int depth,int x);
+        void process_object_playlist(json_value* value, int depth);
+        void process_array_playlist(json_value* value, int depth);
 
+        int tidal_play_now_song(char *playlist_song,bool now);                // play song
 
 };
+
+int tidal_download_image(char *imgurl,char *filename);
 
 #endif
