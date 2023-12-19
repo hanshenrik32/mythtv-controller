@@ -15322,7 +15322,7 @@ int main(int argc, char** argv) {
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {
       tidal_oversigt.get_users_album("251380836");
-      //tidal_oversigt.get_users_album("f9075c2c-efe5-45ed-a68e-f3a1ef36ec8e");
+      tidal_oversigt.get_users_album("216326176");
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal loaded OK \n");
     }

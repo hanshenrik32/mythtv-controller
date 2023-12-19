@@ -872,7 +872,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
                     for(int n=0;n<strlen(downloadfilenamelong);n++) {
                       if (downloadfilenamelong[n]=='/') downloadfilenamelong[n]=='_';
                     }
-                    // tidal_download_image(value->u.string.ptr,downloadfilenamelong);
+                    tidal_download_image(value->u.string.ptr,downloadfilenamelong);
                     // strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
                     strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
                     stack[antal]->type=1;
@@ -1055,6 +1055,9 @@ int tidal_class::get_users_album(char *albumid) {
   unsigned int tidal_playlistantal_loaded=0;
   bool tidalplaylistloader_done=false;
   dbexist=false;
+
+  clean_tidal_oversigt();
+
   try {
     if (conn) {
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
@@ -1165,24 +1168,25 @@ int tidal_class::get_users_album(char *albumid) {
           // insert record created if not exist ( song name )
           //
           snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url ,stack[tt]->feed_gfx_url, stack[tt]->playlisturl, albumid , stack[tt]->feed_artist , 0 );
-          fprintf(stdout,"SQL : %s\n",sql);
+          
+          //fprintf(stdout,"SQL : %s\n",sql);
+
           if (mysql_query(conn,sql)!=0) {
             write_logfile(logfile,(char *) "mysql create table error.");
             fprintf(stdout,"Error SQL : %s\n",sql);
           }
-          printf("Record created SQL : %s \n",sql);
+          //printf("Record created SQL : %s \n",sql);
           mysql_store_result(conn);
           // skip if exist in overview
           if (playlistexist==false) {
             snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)",  stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url, albumid, 0);
-            fprintf(stdout,"SQL : %s\n",sql);
+            //fprintf(stdout,"SQL : %s\n",sql);
             if (mysql_query(conn,sql)!=0) {
               write_logfile(logfile,(char *) "mysql create table error.");
               fprintf(stdout,"Error SQL : %s\n",sql);
             }
             //printf("Record created SQL : %s \n",sql);
             mysql_store_result(conn);
-
           }
         }
       }
@@ -1512,32 +1516,34 @@ int tidal_download_image(char *imgurl,char *filename) {
   CURL *curl;
   char *base64_code;
   char errbuf[CURL_ERROR_SIZE];
-  curl = curl_easy_init();
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, imgurl);
-    // send data to curl_writeFunction_file
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
-    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
-    errbuf[0] = 0;
-    try {
-      file = fopen(filename, "wb");
-      if (file) {
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-        // get file
-        res = curl_easy_perform(curl);
-        fclose(file);
+  if (!(file_exists(filename))) {
+    curl = curl_easy_init();
+    if (curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, imgurl);
+      // send data to curl_writeFunction_file
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE,0L);
+      curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); // <-- ssl don't forget this
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); // <-- ssl and this
+      errbuf[0] = 0;
+      try {
+        file = fopen(filename, "wb");
+        if (file) {
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+          // get file
+          res = curl_easy_perform(curl);
+          fclose(file);
+        }
+        if(res != CURLE_OK) {
+          fprintf(stderr, "%s\n", curl_easy_strerror(res));
+        }
       }
-      if(res != CURLE_OK) {
-        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+      catch (...) {
+        printf("Error write file.\n");
       }
+      curl_easy_cleanup(curl);
     }
-    catch (...) {
-      printf("Error write file.\n");
-    }
-    curl_easy_cleanup(curl);
   }
   return(1);
 }
