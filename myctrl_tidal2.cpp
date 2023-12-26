@@ -866,11 +866,15 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
                     get_webfilename(downloadfilename,value->u.string.ptr);
                     strcpy(downloadfilenamelong,localuserhomedir);
                     strcat(downloadfilenamelong,"/tidal_gfx/");
-                    strcat(downloadfilenamelong,stack[antal]->feed_showtxt);                              // add artist name to filename
+                    
+                    //strcat(downloadfilenamelong,stack[antal]->feed_showtxt);                              // add artist name to filename
+                    strcat(downloadfilenamelong,tidal_playlistid);
+
                     strcat(downloadfilenamelong,"_");
                     strcat(downloadfilenamelong,downloadfilename);
                     for(int n=0;n<strlen(downloadfilenamelong);n++) {
                       if (downloadfilenamelong[n]=='/') downloadfilenamelong[n]=='_';
+                      if (downloadfilenamelong[n]==' ') downloadfilenamelong[n]=='_';
                     }
                     tidal_download_image(value->u.string.ptr,downloadfilenamelong);
                     // strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
@@ -952,6 +956,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
         //if (debug_json) fprintf(stdout,"bool: %d\n", value->u.boolean);
         break;
     }
+    if (antal>0) antalplaylists=antal-1; else antalplaylists=0;
 }
 
 
@@ -1005,6 +1010,7 @@ countryCode=countryCode
 
 
 play playlist https://listen.tidal.com/playlist/{playlistid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+play playalbum https://listen.tidal.com/album/{playlistid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 
 eks https://listen.tidal.com/playlist/f9075c2c-efe5-45ed-a68e-f3a1ef36ec8e
 
@@ -1024,7 +1030,7 @@ char* replace_char(char* str, char find, char replace) {
 
 // ******************************************************************************************************
 //
-// get albumid in use
+// get/download to db albumid (json file)
 //
 // ******************************************************************************************************
 
@@ -1054,11 +1060,10 @@ int tidal_class::get_users_album(char *albumid) {
   unsigned int tidal_playlistantal=0;
   unsigned int tidal_playlistantal_loaded=0;
   bool tidalplaylistloader_done=false;
+  bool playlistsongexist=false;
   dbexist=false;
-
-  clean_tidal_oversigt();
-
   try {
+    clean_tidal_oversigt();
     if (conn) {
       if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)) {
          mysql_error(conn);
@@ -1116,10 +1121,15 @@ int tidal_class::get_users_album(char *albumid) {
       fclose(json_file);
     }
     json = (json_char*) file_contents;
-    value = json_parse(file_contents,file_size);                                  // parser
-    process_value_playlist(value, 0,0);                                           // fill stack array
-    json_value_free(value);                                                       // json clean up
-    if (file_contents) free(file_contents);                                       // free memory again
+    try {
+      value = json_parse(file_contents,file_size);                                  // parser
+      process_value_playlist(value, 0,0);                                           // fill stack array
+      json_value_free(value);                                                       // json clean up    
+      if (file_contents) free(file_contents);                                       // free memory again
+    }
+    catch (...) {
+      write_logfile(logfile,(char *) "error process json file.");
+    }
     int tt=0;
     while(tt<antalplaylists) {
       if (stack[tt]) {
@@ -1165,27 +1175,38 @@ int tidal_class::get_users_album(char *albumid) {
             }
           }
           //
-          // insert record created if not exist ( song name )
-          //
-          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url ,stack[tt]->feed_gfx_url, stack[tt]->playlisturl, albumid , stack[tt]->feed_artist , 0 );
-          
-          //fprintf(stdout,"SQL : %s\n",sql);
-
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile(logfile,(char *) "mysql create table error.");
-            fprintf(stdout,"Error SQL : %s\n",sql);
+          // check if exist
+          //  
+          playlistsongexist=false;      
+          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.tidalcontentarticles where name like '%s' and paththumb like '%s' and gfxfilename like '%s' and player like '%s' and playlistid like '%s' and artist like '%s')", stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url ,stack[tt]->feed_gfx_url, stack[tt]->playlisturl, albumid , stack[tt]->feed_artist);
+          mysql_query(conn,sql);
+          res = mysql_store_result(conn);
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              playlistsongexist=true;
+            }
           }
-          //printf("Record created SQL : %s \n",sql);
-          mysql_store_result(conn);
-          // skip if exist in overview
-          if (playlistexist==false) {
+          //
+          // insert record created if not exist ( song name )
+          //  
+          if (playlistsongexist==false) {
+            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url ,stack[tt]->feed_gfx_url, stack[tt]->playlisturl, albumid , stack[tt]->feed_artist , 0 );
+            if (mysql_query(conn,sql)!=0) {
+              write_logfile(logfile,(char *) "mysql create table error.");
+              fprintf(stdout,"Error SQL : %s\n",sql);
+            }
+            mysql_store_result(conn);
+          }
+          //
+          // insert record created playlist if not exist ( song name )
+          //  
+          if (playlistexist==false) {            
             snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)",  stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url, albumid, 0);
             //fprintf(stdout,"SQL : %s\n",sql);
             if (mysql_query(conn,sql)!=0) {
               write_logfile(logfile,(char *) "mysql create table error.");
               fprintf(stdout,"Error SQL : %s\n",sql);
             }
-            //printf("Record created SQL : %s \n",sql);
             mysql_store_result(conn);
           }
         }
@@ -2078,24 +2099,38 @@ char *tidal_class::get_tidal_playlistid(int nr) {
 
 // ****************************************************************************************
 //
-// play song do not work for now
+// play song.
 //
 // ****************************************************************************************
 
 int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
   char curlstring[8192];
-  sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/play/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' -H 'Content-Type: application/vnd.tidal.v1+json'",playlist_song,tidaltoken);
-  system(curlstring);
-  return(1);
+  int error;
+  //https://listen.tidal.com/playlist/f9075c2c-efe5-45ed-a68e-f3a1ef36ec8e
+  //https://listen.tidal.com/album/
+
+  //sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' -H 'Content-Type: application/vnd.tidal.v1+json'",playlist_song,tidaltoken);
+
+  sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  printf("%s \n",curlstring);
+  error=system(curlstring);
+  if (error==0) return(1); else return(0);
+  
 }
 
 
 // ****************************************************************************************
 //
+// Play functios track.
 //
 // ****************************************************************************************
 
+/*
+eks
 
+/bin/curl -v 'https://listen.tidal.com/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDMxOTAxNjksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.IEHjsNsu358r2I5ISJt57wYwlSW9xOFTpgwky_8zvkz9u42U3_qH1iOh6YDxaOZYbUwKfUrj6tBRn2lxm1H8Xw'
+
+*/
 
 int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   std::string auth_kode;
@@ -2109,6 +2144,13 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   char *devid=get_active_device_id();
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
+  char curlstring[8192];
+  int error;
+  sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  printf("%s \n",curlstring);
+  error=system(curlstring);
+
+  /*
   url="https://api.spotify.com/v1/me/player/play?device_id=";
   if (devid) url=url + devid;
   // use libcurl
@@ -2147,6 +2189,8 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
       return(1);
     }
   }
+  */
+ if (error==0) return(1); else return(0);
 }
 
 // ****************************************************************************************

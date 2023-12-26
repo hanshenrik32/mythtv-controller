@@ -9324,6 +9324,15 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), 1);
               }
+              if (tidal_player_start_status == 0 ) {
+                fprintf(stderr,"tidal start play return ok.\n");
+              } else {
+                printf("Error start plying tidal song \n");
+                do_play_tidal_cover=false;
+                do_zoom_tidal_cover=false;                                       // show we play
+                // error start playing
+              }
+              /*
               //do_select_device_to_play=false;
               if (tidal_player_start_status == 0 ) fprintf(stderr,"tidal start play return ok.\n");
                 else fprintf(stderr,"tidal start play return value %d \n ",tidal_player_start_status);
@@ -9338,8 +9347,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_zoom_tidal_cover=false;                                       // show we play
                 // error start playing
               }
+              */
             } else {
-              printf("Error tidal playid i smissing.\n");
+              printf("Error tidal playid i missing.\n");
             }
           }
         }
@@ -15323,6 +15333,12 @@ int main(int argc, char** argv) {
     if (tidalok) {
       tidal_oversigt.get_users_album("251380836");
       tidal_oversigt.get_users_album("216326176");
+      tidal_oversigt.get_users_album("92082111");         // like it on top
+
+      tidal_oversigt.get_users_album("63326520");         // Trilogy
+      tidal_oversigt.get_users_album("281528263");        // Ev1gt&alt1d
+      tidal_oversigt.get_users_album("332235639");
+
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal loaded OK \n");
     }
