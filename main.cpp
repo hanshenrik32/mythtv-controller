@@ -13995,25 +13995,19 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       */
-
       if (strcmp(configbackend_starred_playlistname,"")==0) {
         // get my (develober/creator of mythtv-controller) stared playlist
-        
-        /*
         spotify_oversigt.spotify_get_playlist("6ccXCXn0TpMBLSuV4aTpAm",1,true);
         spotify_oversigt.clean_spotify_oversigt();
-        */
       } else {
         // get config starred playlist.
-        /*
         spotify_oversigt.spotify_get_playlist(configbackend_starred_playlistname,0,true);
         spotify_oversigt.clean_spotify_oversigt();
-        */
       }
       //spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
       //spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists      
-      spotify_oversigt.spotify_get_user_playlists(true,1);                        // get all playlist and update db (force update)
+      spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // update the playback device list
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();

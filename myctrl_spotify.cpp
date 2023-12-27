@@ -1238,9 +1238,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:
-        
         //printf("x = %d deep = %d string value: %s\n",x ,depth, value->u.string.ptr);
-
         if ((process_description) && (depth==11) && (x==7)) {
           if (!(stack[antal])) {
             antal++;
@@ -1264,17 +1262,14 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
         }
         // gfx url
         if ( process_image ) {
-          //printf(" spotify_playlistname %s Process_image ***** depth=%d x=%d url = %s  *********** \n",spotify_playlistname,depth,x,value->u.string.ptr);
           // get playlist cover
-
-          if (( depth == 5 ) && ( x == 1 )) {
-            // get covver file url
+          if (( depth == 5 ) && ( x == 0 )) {
+            // get covver file url OK
             strcpy(playlistgfx_top,value->u.string.ptr);
           }
           // get song cover
           if (( depth == 14 ) && ( x == 1 )) {
             if (stack[antal]) {
-              //printf("antal %d process gfx url %s \n",antal,value->u.string.ptr);
               strcpy( stack[antal]->feed_gfx_url , value->u.string.ptr );                           //
               strcpy(playlistgfx,value->u.string.ptr);
             }
@@ -1295,23 +1290,17 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
             exit(0);
           }
           */
-          if ((x==4) && (depth==2)) {
-            //printf("playlist id %s \n",value->u.string.ptr);
-            //strcpy(spotify_playlistid , value->u.string.ptr);
-          }
-
           process_uri=false;
         }
         if ( process_id ) {
           // get playlist id OK
-          if (( depth == 2 ) && ( x == 4 )) {
-            //printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
-            printf("antal %d playlist id %s \n",antal,value->u.string.ptr);
+          if (( depth == 2 ) && ( x == 4 )) {            
+            printf("playlist id %s \n",value->u.string.ptr);
             strcpy(spotify_playlistid , value->u.string.ptr);
           }
           process_id=false;
         }
-        if ( process_name ) {          
+        if ( process_name ) {
           if (( x == 1 ) && ( depth == 11 )) {
             //printf("x = %d deep = %d string value: %s\n",x ,depth, value->u.string.ptr);
             //printf(" *********************************************** New record antal %d (song) antalplaylists %d \n",antal,antalplaylists);
@@ -1335,25 +1324,17 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
           }
           // get playlist id OK
           if ((x==4) && (depth==2)) {
-            printf("playlist id %s \n",value->u.string.ptr);
-            //strcpy(spotify_playlistid , value->u.string.ptr);
-          }
-
-          // get playlist url OK
-          if ((x==4) && (depth==2)) {
             //printf("playlist id %s \n",value->u.string.ptr);
             //strcpy(spotify_playlistid , value->u.string.ptr);
           }
-
           // get playlist name OK
           if ( ( x == 7 ) && ( depth == 2 )) {
-            printf("playlist name %-30s playlist id %s \n",value->u.string.ptr,spotify_playlistid);
+            //printf("playlist name %-30s playlist id %s \n",value->u.string.ptr,spotify_playlistid);
             // write to log file
             strcpy(spotify_playlistname , value->u.string.ptr);
             sprintf(tempname,"Spotify playlistname : %s", value->u.string.ptr);
             write_logfile(logfile,(char *) tempname);
           }
-
           // get Song id OK
           if ((x==14) && (depth==9 )) {
             if (stack[antal]) {
@@ -1417,7 +1398,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,spotifytoken);
   char sql[8594];
-  char doget[4096];
+  char url[4096];
   char filename[4096];
   char downloadfilenamelong[4096];
   FILE *json_file;
@@ -1435,54 +1416,43 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   CURLcode curl_res;
   struct curl_slist *chunk = NULL;
   FILE *out_file;
-  bool do_curl=true;
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
-      // always here
-      if (do_curl) {
-        curl = curl_easy_init();
-        snprintf(doget,sizeof(doget),"https://api.spotify.com/v1/playlists/%s",playlist);
-        if (curl) {
-          curl_easy_setopt(curl, CURLOPT_URL, doget);
-          curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
-          curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-          curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
-          /* Add a custom header */
-          chunk = curl_slist_append(chunk, "Accept: application/json");
-          chunk = curl_slist_append(chunk, "Content-Type: application/json");
-          chunk = curl_slist_append(chunk, auth_kode);
-          out_file = fopen(playlistfilename, "wb");
-          if (out_file) {
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-            //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
-            // set type post/put
-            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
-            curl_res = curl_easy_perform(curl);
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-            fputs(response_string.c_str(),out_file);
-            if (curl_res != CURLE_OK) {
-              fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
-            }
-            // always cleanup
-            curl_easy_cleanup(curl);
-            fclose(out_file);
-            if (httpCode != 200) {
-              fprintf(stderr,"Playlist loader error\n");
-              fprintf(stderr,"Spotify error %d \n",httpCode);
-              write_logfile(logfile,(char *) "Spotify playlist loader error from web.");
-              //exit(1);
-            }
+      curl = curl_easy_init();
+      snprintf(url,sizeof(url),"https://api.spotify.com/v1/playlists/%s",playlist);
+      if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+        /* Add a custom header */
+        chunk = curl_slist_append(chunk, "Accept: application/json");
+        chunk = curl_slist_append(chunk, "Content-Type: application/json");
+        chunk = curl_slist_append(chunk, auth_kode);
+        out_file = fopen(playlistfilename, "wb");
+        if (out_file) {
+          curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+          //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
+          // set type post/put
+          curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+          curl_res = curl_easy_perform(curl);
+          curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+          fputs(response_string.c_str(),out_file);
+          if (curl_res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
+          }
+          // always cleanup
+          curl_easy_cleanup(curl);
+          fclose(out_file);
+          if (httpCode != 200) {
+            fprintf(stderr,"Playlist loader error\n");
+            fprintf(stderr,"Spotify error %d \n",httpCode);
+            write_logfile(logfile,(char *) "Spotify playlist loader error from web.");
+            //exit(1);
           }
         }
       } else {
-        snprintf(doget,sizeof(doget),"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
-        curl_error=system(doget);
-        if (curl_error!=0) {
-          write_logfile(logfile,(char *) "Spotify playlist error loading from web.");
-          fprintf(stderr,"Curl error get playlist %s \n",playlist);
-          fprintf(stderr,"Curl error %s \n",doget);
-          //return 1;
-        }
+        write_logfile(logfile,(char *) "Curl lib is missing.");
       }
     }
   }
@@ -1640,7 +1610,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         }
         // crete playlist if not exist
         if (!(playlistexist)) {
-          printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
+          //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
           snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
