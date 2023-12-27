@@ -184,6 +184,7 @@ class tidal_class {
         char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
         char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
 
+
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
         int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
         char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id

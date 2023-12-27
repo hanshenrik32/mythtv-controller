@@ -586,9 +586,11 @@ tidal_class::tidal_class() : antal(0) {
     printf("Starting tidal web server on port %s \n",s_http_port);
     // start web server
     // create web server
+    /*
     mg_mgr_init(&mgr, NULL);                                                  // Initialize event manager object
     c = mg_bind(&mgr, s_http_port, ev_handler);                               // setup http req handler
-    mg_set_protocol_http_websocket(c);                                        //s
+    mg_set_protocol_http_websocket(c);                                        //
+    */
     active_tidal_device=-1;                                                   // active tidal device -1 = no dev is active
     active_default_play_device=active_tidal_device;                           //
     aktiv_song_tidal_icon=0;                                                  //
@@ -1927,10 +1929,8 @@ int tidal_class::tidal_get_playlist(const char *playlist,bool force,bool create_
 //bool do_select_device_to_play;
 
 void tidal_class::select_device_to_play() {
-
-// temp global
-   static bool do_select_device_to_play;
-
+   // temp global
+  static bool do_select_device_to_play;
   static float select_device_to_playfader=1.0;
   static int playfader_timer=500;
   float yof=orgwinsizey/2+50;                                        // start ypos
@@ -2109,9 +2109,9 @@ int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
   //https://listen.tidal.com/playlist/f9075c2c-efe5-45ed-a68e-f3a1ef36ec8e
   //https://listen.tidal.com/album/
 
-  //sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' -H 'Content-Type: application/vnd.tidal.v1+json'",playlist_song,tidaltoken);
-
-  sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  // old
+  // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
   printf("%s \n",curlstring);
   error=system(curlstring);
   if (error==0) return(1); else return(0);
@@ -2128,7 +2128,12 @@ int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
 /*
 eks
 
-/bin/curl -v 'https://listen.tidal.com/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDMxOTAxNjksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.IEHjsNsu358r2I5ISJt57wYwlSW9xOFTpgwky_8zvkz9u42U3_qH1iOh6YDxaOZYbUwKfUrj6tBRn2lxm1H8Xw'
+/bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDMxOTAxNjksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.IEHjsNsu358r2I5ISJt57wYwlSW9xOFTpgwky_8zvkz9u42U3_qH1iOh6YDxaOZYbUwKfUrj6tBRn2lxm1H8Xw'
+
+
+
+// sample
+https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 */
 
@@ -2146,7 +2151,9 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   auth_kode=auth_kode + tidaltoken;
   char curlstring[8192];
   int error;
-  sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  // old
+  // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+  sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
   printf("%s \n",curlstring);
   error=system(curlstring);
 
@@ -2346,6 +2353,7 @@ printf("Get token  now\n\n");
 
 // ****************************************************************************************
 //
+// NOT in use.
 //
 // ****************************************************************************************
 
