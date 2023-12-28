@@ -9164,17 +9164,21 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             button=0;
           }
           // back
-          if (((spotifyknapnr-1)==0) && (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0)) {
-            if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
-            spotify_oversigt.clean_spotify_oversigt();
-            //printf("huskname %s \n",huskname  );
-            spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
-            //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
-            spotify_oversigt.set_search_loaded();                           // triger icon loader
-            //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
-            spotifyknapnr=0;                                                  // reset selected
-            spotify_selected_startofset=0;
-            strcpy(spotify_oversigt.overview_show_band_name,"");
+          if ((spotifyknapnr-1)==0) {
+            if (spotify_oversigt.get_spotify_name(spotifyknapnr-1)!=NULL) {
+              if (strcmp(spotify_oversigt.get_spotify_name(spotifyknapnr-1),"Back")==0) {
+                if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
+                spotify_oversigt.clean_spotify_oversigt();
+                //printf("huskname %s \n",huskname  );
+                spotify_oversigt.opdatere_spotify_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
+                //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+                spotify_oversigt.set_search_loaded();                           // triger icon loader
+                //spotify_oversigt.opdatere_spotify_oversigt(0);                  // reset spotify overview
+                spotifyknapnr=0;                                                  // reset selected
+                spotify_selected_startofset=0;
+                strcpy(spotify_oversigt.overview_show_band_name,"");
+              }
+            }
           }
         }
         if (do_zoom_spotify_cover) {
@@ -14007,7 +14011,7 @@ void *webupdate_loader_spotify(void *data) {
       //spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
       //spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists      
-      spotify_oversigt.spotify_get_user_playlists(true,0);                        // get all playlist and update db (force update)
+      spotify_oversigt.spotify_get_user_playlists(true,1);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // update the playback device list
       spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();

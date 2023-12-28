@@ -937,7 +937,7 @@ bool spotify_class::spotify_check_spotifydb_empty() {
 // ****************************************************************************************
 //
 // Get users playlist
-// in use
+// NOT in use
 // The default view
 //
 // ****************************************************************************************
@@ -1367,7 +1367,7 @@ void spotify_class::process_value_playlist(json_value* value, int depth,int x) {
 
 // ****************************************************************************************
 //
-// work
+// in use work.
 // get songs from playlist (any public user)
 // write to spotify_playlist_{spotifyid}.json
 // and update db from that file all the songs in playlist
@@ -1388,7 +1388,6 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   char auth_kode[1024];
   //getuserhomedir(homedir);
   strcpy(homedir,localuserhomedir);
-
   strcpy(playlistfilename,homedir);
   strcat(playlistfilename,"/");
   strcat(playlistfilename,spotify_json_path);
@@ -1416,43 +1415,54 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   CURLcode curl_res;
   struct curl_slist *chunk = NULL;
   FILE *out_file;
+  bool use_curl=true;
   if ((!(file_exists(playlistfilename))) || (force))  {
-    if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
-      curl = curl_easy_init();
-      snprintf(url,sizeof(url),"https://api.spotify.com/v1/playlists/%s",playlist);
-      if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
-        /* Add a custom header */
-        chunk = curl_slist_append(chunk, "Accept: application/json");
-        chunk = curl_slist_append(chunk, "Content-Type: application/json");
-        chunk = curl_slist_append(chunk, auth_kode);
-        out_file = fopen(playlistfilename, "wb");
-        if (out_file) {
-          curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
-          //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
-          // set type post/put
-          curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
-          curl_res = curl_easy_perform(curl);
-          curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-          fputs(response_string.c_str(),out_file);
-          if (curl_res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
-          }
-          // always cleanup
-          curl_easy_cleanup(curl);
-          fclose(out_file);
-          if (httpCode != 200) {
-            fprintf(stderr,"Playlist loader error\n");
-            fprintf(stderr,"Spotify error %d \n",httpCode);
-            write_logfile(logfile,(char *) "Spotify playlist loader error from web.");
-            //exit(1);
+    if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {     
+      if (use_curl) {
+        curl = curl_easy_init();
+        snprintf(url,sizeof(url),"https://api.spotify.com/v1/playlists/%s",playlist);
+        if (curl) {
+          curl_easy_setopt(curl, CURLOPT_URL, url);
+          curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+          curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
+          curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+          /* Add a custom header */
+          chunk = curl_slist_append(chunk, "Accept: application/json");
+          chunk = curl_slist_append(chunk, "Content-Type: application/json");
+          chunk = curl_slist_append(chunk, auth_kode);
+          out_file = fopen(playlistfilename, "wb");
+          if (out_file) {
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
+            //curl_easy_setopt(curl, CURLOPT_WRITEDATA, out_file);
+            // set type post/put
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET"); /* !!! */
+            curl_res = curl_easy_perform(curl);
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            fputs(response_string.c_str(),out_file);
+            if (curl_res != CURLE_OK) {
+              fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(curl_res));
+            }
+            // always cleanup
+            curl_easy_cleanup(curl);
+            fclose(out_file);
+            if (httpCode != 200) {
+              fprintf(stderr,"Playlist loader error\n");
+              fprintf(stderr,"Spotify error %d \n",httpCode);
+              write_logfile(logfile,(char *) "Spotify playlist loader error from web.");
+              //exit(1);
+            }
           }
         }
       } else {
         write_logfile(logfile,(char *) "Curl lib is missing.");
+      }
+    } else {
+      snprintf(url,sizeof(url),"curl -X 'GET' 'https://api.spotify.com/v1/playlists/%s' -H 'Content-Type: application/json' -H 'Authorization: Bearer %s' > %s",playlist,spotifytoken,playlistfilename);
+      curl_error=system(url);
+      if (curl_error!=0) {
+        write_logfile(logfile,(char *) "Spotify playlist error loading from web.");
+        fprintf(stderr,"Curl error get playlist %s \n",playlist);
+        fprintf(stderr,"Curl error %s \n",url);
       }
     }
   }
