@@ -1154,7 +1154,6 @@ int tidal_class::get_users_album(char *albumid) {
         //
         // create playlist in db
         //
-
         replace_char(stack[tt]->feed_gfx_url, '\'', '_');
         replace_char(stack[tt]->feed_showtxt, '\'', '_');
 
@@ -1236,6 +1235,10 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
   strcpy(tidaltoken,token);
   strcpy(tidaltoken_refresh,refresh);
 }
+
+
+
+
 
 // ****************************************************************************************
 // Do work now
@@ -1607,7 +1610,6 @@ void tidal_class::set_tidal_update_flag(bool flag) {
 // ****************************************************************************************
 //
 // Get users playlist NOT in use
-// in use
 // The default view
 //
 // ****************************************************************************************
@@ -2478,6 +2480,14 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       glColor4f(0.8f, 0.8f, 0.8f,1.0f);
     }
     if (stack[i+sofset]->textureId) {
+      // icon anim
+      if (anim_angle>360) {
+        anim_angle=180.0f;
+        anim_viewer=false;
+      } else {
+        if (anim_viewer) anim_angle+=0.16; else anim_angle=0.0f;
+      }
+      
       // stream icon
       glEnable(GL_TEXTURE_2D);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

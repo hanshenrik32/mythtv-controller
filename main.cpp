@@ -13987,9 +13987,8 @@ void *webupdate_loader_spotify(void *data) {
       spotify_update_loaded_begin=true;
       spotify_oversigt.set_spotify_update_flag(true);
       // add default playlists from spotify
-      
       // you have to call clean_spotify_oversigt after earch spodify_get_playlist
-      /*
+      
       spotify_oversigt.spotify_get_playlist("37i9dQZF1EpfknyBUWzyB7",1,true);     // songs on repeat playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZEVXcU9Ndp82od6b",1,true);     // Your discovery weekly tunes
@@ -13998,7 +13997,7 @@ void *webupdate_loader_spotify(void *data) {
       spotify_oversigt.clean_spotify_oversigt();                                 // clear old stuf
       spotify_oversigt.spotify_get_playlist("37i9dQZF1DX60OAKjsWlA2",1,true);     // hot Hits dk playlist
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
-      */
+      
       if (strcmp(configbackend_starred_playlistname,"")==0) {
         // get my (develober/creator of mythtv-controller) stared playlist
         spotify_oversigt.spotify_get_playlist("6ccXCXn0TpMBLSuV4aTpAm",1,true);
@@ -14008,8 +14007,6 @@ void *webupdate_loader_spotify(void *data) {
         spotify_oversigt.spotify_get_playlist(configbackend_starred_playlistname,0,true);
         spotify_oversigt.clean_spotify_oversigt();
       }
-      //spotify_oversigt.spotify_get_playlist("",1,true);     // hot Hits dk playlist
-      //spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
       // get user playlists      
       spotify_oversigt.spotify_get_user_playlists(true,1);                        // get all playlist and update db (force update)
       spotify_oversigt.clean_spotify_oversigt();                                  // clear old stuf
@@ -15334,15 +15331,13 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     bool tidalok;
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
-    if (tidalok) {
+    if (tidalok) {   
       tidal_oversigt.get_users_album("251380836");
       tidal_oversigt.get_users_album("216326176");
       tidal_oversigt.get_users_album("92082111");         // like it on top
-
       tidal_oversigt.get_users_album("63326520");         // Trilogy
       tidal_oversigt.get_users_album("281528263");        // Ev1gt&alt1d
       tidal_oversigt.get_users_album("332235639");
-
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal loaded OK \n");
     }
