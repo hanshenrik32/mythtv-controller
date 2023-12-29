@@ -10,6 +10,7 @@
 
 #include "mongoose-master/mongoose.h"
 
+
 const int tidal_playlisttype=0;                         // playlist type
 const int tidal_songlisttype=1;                         // song list type
 
@@ -50,7 +51,7 @@ class tidal_oversigt_type {
     GLuint      textureId;                        // gfx icon loaded
     long        intnr;
     char        type;
-    tidal_oversigt_type();                      // constructor
+    tidal_oversigt_type();                        // constructor
 };
 
 //
@@ -93,25 +94,14 @@ class tidal_class {
         bool tidal_is_playing;                                                // do we play ?
         bool tidal_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
-        int get_search_result_online(char *searchstring,int type);
-        int download_user_playlist(char *tidaltoken,int startofset);          // download playlist(json) file from tidal
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
-
-        //char *tidal_token;                                                        //// IN USE tidal.api calles cariables ************************
-        char do_link_url[200];
-        char device_code[200];                                                  //
-        char client_id[200];                                                    //
-        char client_secret[200];                                                //
-        char client_platform[200];                                              //
-        char device_url_code_link[2000];                                        // redirect link on auth
     public:
         bool set_search_loaded() { search_loaded=true; return(1); }
+        bool get_tidal_update_flag();
+        void set_tidal_update_flag(bool flag);
         int loaded_antal;                                                       // antal loaded i loader
         unsigned int tidal_playlist_antal;
-        void settextureidfile(int nr,char *filename);
-        void set_tidal_update_flag(bool flag);
-        bool get_tidal_update_flag();
         char overview_show_band_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         char overview_show_cd_name[81];                                         // name of the band show in overview then you search on band and play songs from it
         bool search_tidal_online_done;
@@ -125,6 +115,8 @@ class tidal_class {
         char active_default_play_device_name[256];                              // active device name
         char tidal_playlistname[256];
         char tidal_playlistid[256];
+        char client_id[120];                                                    // tidal client id
+        char client_secret[120];                                                // tidal client secret
         int stream_optionselect;				                                        // bruges til valgt af stream type som skal vises
         void set_texture(int nr,GLuint idtexture);                              // set texture
         int opdatere_stream_gfx(int nr,char *gfxpath);		                      // NOT in use
@@ -138,92 +130,79 @@ class tidal_class {
         // used by webserver
         struct mg_mgr mgr;                                                      // web server
         struct mg_mgr client_mgr;                                               // web server client
-        struct mg_connection *connection;                                       // connection struct
+        struct mg_connection *c;                                                // connection struct
         // end webserver
-        int load_tidal_iconoversigt();			                                    // load web gfx in to cache dir
-        // in use
-        void tidal_set_token(char *token,char *refresh);                       // set token in struct
-        char *tidal_get_token() { return(tidaltoken); };                       // get token from struct
-        int tidal_login_token();                                               // login on tidal
-        bool tidal_check_tidaldb_empty();
-        int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
-        int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
-        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[0].song_name ); };                       //
-        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
-        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[0].release_date ); };            //
-        char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
-        char *get_active_tidal_device_name();                                 //                         //
-        char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
-        char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
-        int get_tidal_intnr(int nr);                                          //
-        char *get_tidal_playlistid(int nr);                                   // get id to play
-        char *get_tidal_name(int nr);                                         // get record name
-        char *get_tidal_desc(int nr);                                         // get record desc
-        char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
-        char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
-        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
-        int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
-        GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
-        int antal_tidal_streams() { return antalplaylists; };
         tidal_class();
         ~tidal_class();
         int streamantal() { return(antal-1); }                                  //
-        void clean_tidal_oversigt();                                          // clear list
-        int tidal_req_playlist();                                             //
-        int tidal_get_user_playlists(bool force,int startoffset);                             // get user playlist (list of playlist)
-        int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
+        void tidal_set_token(char *token,char *refresh);
+        char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
         int tidal_get_user_id();
-        int tidal_play_now_playlist(char *playlist_song,bool now);            // play playlist
-        int tidal_play_now_playlist2(char *playlist_name,bool now);            // play playlist
-        int tidal_play_now_song(char *playlist_song,bool now);                // play song
-        int tidal_play_now_artist(char *playlist_song,bool now);              // play artist
-        int tidal_play_now_album(char *playlist_song,bool now);               // play album
-        int tidal_get_access_token2();                                        // new get token
-        int tidal_get_available_devices();                                    // get list of devices
+        int tidal_get_available_devices();
+        void clean_tidal_oversigt();
+        void select_device_to_play();
+        int gettoken();                               // TEST
+        int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
+        int tidal_get_user_playlists(bool force,int startoffset);
+        char *get_device_id(int nr) { return(tidal_device[nr].id); };         // get active dev id
+        char *get_device_name(int nr) { return(tidal_device[nr].name); };     // get active dev id
+
+        void process_value_token(json_value* value, int depth,int x);
+        void process_object_token(json_value* value, int depth);
+        void process_array_token(json_value* value, int depth);
+
+
+        // check if done
         int tidal_do_we_play();                                               // Do we play song now
         int tidal_pause_play();                                               // Pause
-        int tidal_pause_play2();                                              // Pause
         int tidal_resume_play();                                              // resume play
         int tidal_last_play();                                                // play last song
-        int tidal_last_play2();                                               // new play last song
         int tidal_next_play();                                                // play next song
-        int tidal_next_play2();                                               // play next song
-        void select_device_to_play();                                           // show device list to play on
-        void set_default_device_to_play(int nr);                                // set default device list to play on
-        void show_setup_tidal();                                              //
-        int opdatere_tidal_oversigt(char *refid);                             // update from db from refid - if refid=0 then from root.
-        int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);        // search in db
-        int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type); // search online
-        // show tidal playlist overview
-        int tidal_play_playlist(char *playlist);                               // play playlist
+        int get_tidal_playlistid();
+        int tidal_play_now_artist(char *playlist_song,bool now);              // play artist
+        int tidal_play_now_album(char *playlist_song,bool now);               // play album
+
+        char *get_tidal_name(int nr);                                         // get record name
+        char *get_tidal_playlistid(int nr);                                   // get id to play
+        int tidal_play_now_playlist(char *playlist_song,bool now);            //
+        char *get_active_tidal_device_name();                                 //
+        int tidal_refresh_token();
+        int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
-        void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
-        //void gettoken();
-        int tidal_check_auth_status();
-        int tidal_login();
-        int start_webserver();
+        int auth_device_authorization();
+
+        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[0].song_name ); };                       //
+        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
+        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[0].release_date ); };            //
 
 
+        int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
+        GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
+        int antal_tidal_streams() { return antalplaylists; };
+        char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
+        char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
+        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
 
-        // used to login on tidal
-        char *get_dev_auth();                                                                               // stemp 1
-        int do_link_tidal();                                                                              // stemp 2
-        char *get_access_token(char *username, char *password);                                             // stemp 3
+
+        int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
+        int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
+        char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
+
+        // works
+        int load_tidal_iconoversigt();
+        void print_depth_shift(int depth);
+        void playlist_print_depth_shift(int depth);
+        int get_access_token(char *loginbase64);                                                        // get token
+        int get_users_album(char *albumid);
+        void process_value_playlist(json_value* value, int depth,int x);
+        void process_object_playlist(json_value* value, int depth);
+        void process_array_playlist(json_value* value, int depth);
+
+        int tidal_play_now_song(char *playlist_song,bool now);                // play song
+
 };
 
-/// new test
-//char *do_link_tidal(char *device_url_code_link);
-//char *get_access_token(char *client_id, char *device_code, char *username, char *password);
-//char *get_dev_auth(char *client_id);
-
-int tidal_login();
-
-int download_image(char *imgurl,char *filename);
-
-void *load_tidal_web(void *data);
-char *b64_encode(const unsigned char *in, size_t len);
-
-
+int tidal_download_image(char *imgurl,char *filename);
 
 #endif

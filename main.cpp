@@ -734,13 +734,13 @@ GLuint _textureIdback; 	                  //
 GLuint _errorbox;	                        //
 GLuint _textureIdreset_search;            // used in movie vi
 GLuint _textureexit;                      // exit button
-GLuint big_search_bar_playlist;                    // big search bar used by sporify search
-GLuint big_search_bar_track;                    // big search bar used by sporify search
-GLuint big_search_bar_albumm;                    // big search bar used by sporify search
-GLuint big_search_bar_artist;                    // big search bar used by sporify search
+GLuint big_search_bar_playlist;           // big search bar used by sporify search
+GLuint big_search_bar_track;              // big search bar used by sporify search
+GLuint big_search_bar_albumm;             // big search bar used by sporify search
+GLuint big_search_bar_artist;             // big search bar used by sporify search
 
 // radio view icons
-GLuint onlineradio;                       //
+GLuint onlineradio;                       // default radio icon
 GLuint onlineradio_empty;                 //
 GLuint onlineradio192;                    //
 GLuint onlineradio320;                    //
@@ -762,7 +762,7 @@ GLuint onlinestream_empty1;               // stream default icon
 GLuint moviebutton;                       //
 
 GLuint gfxlandemask;                      //
-GLuint gfxlande[80];                      //
+GLuint gfxlande[80];                      // gfx lande array
 GLuint texturedot;                        //
 GLuint texturedot1;                       //
 // loading window
@@ -1530,7 +1530,7 @@ void load_config(char * filename) {
         strcat(temptxt,"\n");
         fputs(temptxt,file);
         fputs("screensize=3\n",file);
-        fputs("tema=3\n",file);
+        fputs("tema=2\n",file);
         fputs("font=FreeMono\n",file);
         fputs("mouse=1\n",file);
         fputs("use3d=yes\n",file);
@@ -15332,7 +15332,6 @@ int main(int argc, char** argv) {
 
 
     #ifdef ENABLE_TIDAL
-    
     bool tidalok;
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {

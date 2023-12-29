@@ -788,13 +788,17 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
       case json_object:
         process_object_playlist(value, depth+1);
         break;
-      case json_array:
+      case json_array:      
         process_array_playlist(value, depth+1);
         break;
       case json_integer:
+        //
+        // not in use
         //if (debug_json) fprintf(stdout,"int: %10" PRId64 "\n", value->u.integer);
         break;
       case json_double:
+        //
+        // not in use
         //if (debug_json) fprintf(stdout,"double: %f\n", value->u.dbl);
         break;
       case json_string:

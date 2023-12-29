@@ -1415,6 +1415,7 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   CURLcode curl_res;
   struct curl_slist *chunk = NULL;
   FILE *out_file;
+  long filecreatedate;
   bool use_curl=true;
   if ((!(file_exists(playlistfilename))) || (force))  {
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {     
@@ -1469,166 +1470,172 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
   if (file_exists(playlistfilename)) {
     stat(playlistfilename, &filestatus);                                          // get file info
     file_size = filestatus.st_size;                                               // get filesize
-    file_contents = (char*) malloc(filestatus.st_size);
-    json_file = fopen(playlistfilename, "rt");
-    if (json_file == NULL) {
-      fprintf(stderr, "Unable to open %s\n", playlistfilename);
-      free(file_contents);                                                        //
-      return 1;
-    }
-    if (fread(file_contents, file_size, 1, json_file ) != 1 ) {
-      fprintf(stderr, "Unable to read spotify playlist content of %s\n", playlistfilename);
+    filecreatedate=filestatus.st_mtime;                                           // get file create date
+    // if file is new (< 1 day old do not process)
+    if ((filecreatedate+86400<time(NULL)) || (force)) {
+      file_contents = (char*) malloc(filestatus.st_size);                           // allow mem for the buffer
+      json_file = fopen(playlistfilename, "rt");
+      if (json_file == NULL) {
+        fprintf(stderr, "Unable to open %s\n", playlistfilename);
+        free(file_contents);                                                        //
+        return 1;
+      }
+      if (fread(file_contents, file_size, 1, json_file ) != 1 ) {                   // read file in
+        fprintf(stderr, "Unable to read spotify playlist content of %s\n", playlistfilename);
+        fclose(json_file);
+        free(file_contents);                                                        //
+        return 1;
+      }
       fclose(json_file);
-      free(file_contents);                                                        //
-      return 1;
-    }
-    fclose(json_file);
-    json = (json_char*) file_contents;
-    value = json_parse(json,file_size);                                           // parser
-    // parse from root
-    process_value_playlist(value, 0,0);                                           // fill stack array
-    json_value_free(value);                                                       // json clean up
-    free(file_contents);                                                          //
-    conn = mysql_init(NULL);
-    // Connect to database
-    if (conn) {
-      if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
-        dbexist = false;
-      }
-      mysql_query(conn,"set NAMES 'utf8'");
-      res = mysql_store_result(conn);
-      // test about table exist
-      mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
-      res = mysql_store_result(conn);
-      if (res) {
-        while ((row = mysql_fetch_row(res)) != NULL) {
-          dbexist = true;
+      json = (json_char*) file_contents;
+      value = json_parse(json,file_size);                                           // parser
+      // parse from root
+      process_value_playlist(value, 0,0);                                           // fill stack array
+      json_value_free(value);                                                       // json clean up
+      free(file_contents);                                                          //
+      conn = mysql_init(NULL);
+      // Connect to database
+      if (conn) {
+        if (mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0)==0) {
+          dbexist = false;
         }
-      }
-      // create db if not exist
-      if (!(dbexist)) {
-        if (dbexist==false) {
-          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile(logfile,(char *) "mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
+        mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);
+        // test about table exist
+        mysql_query(conn,"SELECT feedtitle from mythtvcontroller.spotifycontentarticles limit 1");
+        res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            dbexist = true;
           }
-          res = mysql_store_result(conn);
-          // create db (spotify songs)
-          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile(logfile,(char *) "mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
-          }
-          res = mysql_store_result(conn);
-          // create db (spotify playlists)
-          snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-          if (mysql_query(conn,sql)!=0) {
-            write_logfile(logfile,(char *) "mysql create table error.");
-            fprintf(stdout,"SQL : %s\n",sql);
-          }
-          // create db if not exist
-          res = mysql_store_result(conn);
         }
-      }
-      // create db spotify playlist process data
-      // insert all record in db
-      tt = 0;
-      //
-      // loop over songs in playlist array and update db
-      //
-      while(tt<antalplaylists) {
-        if (stack[tt]) {
-          //if (debugmode & 4) fprintf(stdout,"Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
-          // download gfx file to tmp dir
-          get_webfilename(filename,stack[tt]->feed_gfx_url);
-          if (strcmp(filename,"")) {
-            //getuserhomedir(downloadfilenamelong);
-            strcpy(downloadfilenamelong,localuserhomedir);
-            strcat(downloadfilenamelong,"/");
-            strcat(downloadfilenamelong,spotify_gfx_path);
-            strcat(downloadfilenamelong,filename);
-            strcat(downloadfilenamelong,".jpg");
-            if (!(file_exists(downloadfilenamelong))) {
-              // download icon image
-              download_image(stack[tt]->feed_gfx_url,downloadfilenamelong);
-              //get_webfile2(stack[tt]->feed_gfx_url,downloadfilenamelong);
+        // create db if not exist
+        if (!(dbexist)) {
+          if (dbexist==false) {
+            snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+            if (mysql_query(conn,sql)!=0) {
+              write_logfile(logfile,(char *) "mysql create table error.");
+              fprintf(stdout,"SQL : %s\n",sql);
             }
-          }
-          // check if playlist exist
-          playlistexist=false;
-          refid = 0;
-          snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              refid=atoi(row[0]);
-              playlistexist=true;
+            res = mysql_store_result(conn);
+            // create db (spotify songs)
+            snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+            if (mysql_query(conn,sql)!=0) {
+              write_logfile(logfile,(char *) "mysql create table error.");
+              fprintf(stdout,"SQL : %s\n",sql);
             }
+            res = mysql_store_result(conn);
+            // create db (spotify playlists)
+            snprintf(sql,sizeof(sql),"CREATE TABLE IF NOT EXISTS mythtvcontroller.spotifycontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+            if (mysql_query(conn,sql)!=0) {
+              write_logfile(logfile,(char *) "mysql create table error.");
+              fprintf(stdout,"SQL : %s\n",sql);
+            }
+            // create db if not exist
+            res = mysql_store_result(conn);
           }
-          //
-          // create playlist in db
-          //
-          if (!(playlistexist)) {
-            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt]->feed_gfx_url,playlist, 0 );
-            mysql_query(conn,sql);
-            res=mysql_store_result(conn);
-            if (refid==0) {
-              snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
-              mysql_query(conn,sql);
-              res=mysql_store_result(conn);
-              if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                  refid=atoi(row[0]);
-                }
+        }
+        // create db spotify playlist process data
+        // insert all record in db
+        tt = 0;
+        //
+        // loop over songs in playlist array and update db
+        //
+        while(tt<antalplaylists) {
+          if (stack[tt]) {
+            //if (debugmode & 4) fprintf(stdout,"Track nr #%2d Name %40s url %s  gfx url %s \n",tt,stack[tt]->feed_name,stack[tt]->playlisturl,stack[tt]->feed_gfx_url);
+            // download gfx file to tmp dir
+            get_webfilename(filename,stack[tt]->feed_gfx_url);
+            if (strcmp(filename,"")) {
+              //getuserhomedir(downloadfilenamelong);
+              strcpy(downloadfilenamelong,localuserhomedir);
+              strcat(downloadfilenamelong,"/");
+              strcat(downloadfilenamelong,spotify_gfx_path);
+              strcat(downloadfilenamelong,filename);
+              strcat(downloadfilenamelong,".jpg");
+              if (!(file_exists(downloadfilenamelong))) {
+                // download icon image
+                download_image(stack[tt]->feed_gfx_url,downloadfilenamelong);
+                //get_webfile2(stack[tt]->feed_gfx_url,downloadfilenamelong);
               }
             }
-          }
-          if (stack[tt+1]) {
+            // check if playlist exist
             playlistexist=false;
-            snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
+            refid = 0;
+            snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
             if (res) {
               while ((row = mysql_fetch_row(res)) != NULL) {
+                refid=atoi(row[0]);
                 playlistexist=true;
               }
             }
             //
-            // insert record created if not exist ( song name )
+            // create playlist in db
             //
-            if (playlistexist==false) {              
-              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt]->feed_name , stack[tt]->feed_gfx_url,downloadfilenamelong, stack[tt]->playlisturl, playlist , stack[tt]->feed_artist , 0 );
+            if (!(playlistexist)) {
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontent (name,paththumb,playid,id) values ('%s','%s','%s',%d)", spotify_playlistname , stack[tt]->feed_gfx_url,playlist, 0 );
               mysql_query(conn,sql);
-              mysql_store_result(conn);
+              res=mysql_store_result(conn);
+              if (refid==0) {
+                snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontent where name like '%s' limit 1", spotify_playlistname);
+                mysql_query(conn,sql);
+                res=mysql_store_result(conn);
+                if (res) {
+                  while ((row = mysql_fetch_row(res)) != NULL) {
+                    refid=atoi(row[0]);
+                  }
+                }
+              }
+            }
+            if (stack[tt+1]) {
+              playlistexist=false;
+              snprintf(sql,sizeof(sql),"select id from mythtvcontroller.spotifycontentarticles where name like '%s' limit 1", stack[tt+1]->feed_name );
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+              if (res) {
+                while ((row = mysql_fetch_row(res)) != NULL) {
+                  playlistexist=true;
+                }
+              }
+              //
+              // insert record created if not exist ( song name )
+              //
+              if (playlistexist==false) {              
+                snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentarticles (name,paththumb,gfxfilename,player,playlistid,artist,id) values ('%s','%s','%s','%s','%s','%s',%d)", stack[tt]->feed_name , stack[tt]->feed_gfx_url,downloadfilenamelong, stack[tt]->playlisturl, playlist , stack[tt]->feed_artist , 0 );
+                mysql_query(conn,sql);
+                mysql_store_result(conn);
+              }
             }
           }
+          tt++;
         }
-        tt++;
-      }
-      // create playlist if needed check if exist
-      if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
-        snprintf(sql,sizeof(sql),"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
-        mysql_query(conn,sql);
-        res = mysql_store_result(conn);
-        playlistexist=false;
-        if (res) {
-          while ((row = mysql_fetch_row(res)) != NULL) {
-            playlistexist=true;
-          }
-        }
-        // crete playlist if not exist
-        if (!(playlistexist)) {
-          //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
-          snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
+        // create playlist if needed check if exist
+        if ((create_playlistdb) && (strcmp(spotify_playlistname,"")!=0)) {
+          snprintf(sql,sizeof(sql),"select playlistid from mythtvcontroller.spotifycontentplaylist where playlistid like '%s' limit 1",spotify_playlistid);
           mysql_query(conn,sql);
           res = mysql_store_result(conn);
+          playlistexist=false;
+          if (res) {
+            while ((row = mysql_fetch_row(res)) != NULL) {
+              playlistexist=true;
+            }
+          }
+          // crete playlist if not exist
+          if (!(playlistexist)) {
+            //printf("save playlist : %s cover file %s \n", spotify_playlistname, playlistgfx_top );
+            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.spotifycontentplaylist values ('%s','%s','%s',0)",spotify_playlistname,playlistgfx_top,spotify_playlistid);
+            mysql_query(conn,sql);
+            res = mysql_store_result(conn);
+          }
         }
       }
+      mysql_close(conn);  
     }
-    mysql_close(conn);  
-  }  
+  } else {
+    printf("Error loading spotify playlist file.\n");
+  }
   return tt;
 }
 
