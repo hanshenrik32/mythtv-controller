@@ -97,6 +97,7 @@ class tidal_class {
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
     public:
+        bool reset_amin_in_viewer();
         bool anim_viewer;
         bool anim_viewer_search;
         float anim_angle;

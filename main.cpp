@@ -68,10 +68,6 @@ FILE *logfile=NULL;                   // global logfile
 #include <GL/glc.h>                     // glc true type font system
 #endif
 
-
-#if defined ENABLE_TIDAL
-#include "myctrl_tidal2.h"
-#endif
 // sound system include fmod
 #if defined USE_FMOD_MIXER
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
@@ -140,7 +136,7 @@ extern char __BUILD_NUMBER;
 #include "myctrl_spotify.h"
 
 //#ifdef ENABLE_TIDAL
-#include "myctrl_tidal.h"
+#include "myctrl_tidal2.h"
 //#endif
 #include "checknet.h"
 #include "myth_ttffont.h"
@@ -370,23 +366,17 @@ bool do_zoom_radio = false;                               //
 bool do_zoom_spotify_cover = false;                       // show spotify cover
 bool do_zoom_tidal_cover = false;                         // show tidal cover
 bool do_zoom_stream = false;                              //
-
 bool show_wlan_select = false;                            //
-
 bool do_zoom_film_cover = false;                          //
 bool do_zoom_stream_cover = false;                        // show played cover
 bool vis_movie_options = false;                           //
 bool vis_movie_sort_option = false;                       //
-
 bool vis_stream_oversigt = false;
 bool startstream = false;
 bool do_play_stream = false;
-
 bool do_stop_stream = false;
 bool stopstream = false;
-
 bool do_pause_stream = false;                             // pause play
-
 int rknapnr=0;                                            // buttons vars
 int sknapnr=0;                                            // stream button
 int mknapnr=0;                                            // music
@@ -405,28 +395,21 @@ GLuint stream_playing_icon=0;                             //
 int stream_key_selected=1;                                //
 int stream_select_iconnr=0;                               //
 int do_zoom_tvprg_aktiv_nr=0;                             //
-
 int PRGLIST_ANTAL=0;                                      // used in tvguide xml program selector
-
 int music_select_iconnr;                                  // selected icon
 int spotify_select_iconnr=0;                              // selected icon
 int spotify_selected_startofset=0;                        // used by viewer
 int tidal_selected_startofset=0;                          // used by viewer
 int tidal_select_iconnr;                                  // selected icon
 int antal_songs=0;                                        //
-
 int _sangley;                                             //
 int _mangley;                                             //
 int _angley;                                              //
 int _spangley;                                             //
-
 int music_icon_anim_icon_ofset=0;                         //
 int music_icon_anim_icon_ofsety=0;                        //
-
 int spotify_icon_anim_icon_ofset=0;                         //
-
 int do_play_music_aktiv_nr=0;                           // den aktiv dirid som er trykket på
-
 
 int screenx=1920;                                         // default screen size
 int screeny=1080;                                         // default screen size
@@ -503,9 +486,9 @@ Uint16 audio_format=MIX_DEFAULT_FORMAT;
 int audio_channels;
 int sdlmusic;
 #endif
-// ************************************************************************************************
-tv_oversigt     aktiv_tv_oversigt;
-tv_graber_config  aktiv_tv_graber;
+// ************************************* TV Stuf ***************************************************
+tv_oversigt aktiv_tv_oversigt;
+tv_graber_config aktiv_tv_graber;
 earlyrecorded aktiv_crecordlist;
 GLuint tvoversigt;
 GLuint canalnames;
@@ -3123,7 +3106,6 @@ void display() {
       glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-(iconspacey*1) , 0.0);
       glEnd();
     
-      
       // Icon 2
 
       if (vis_radio_or_music_oversigt) {
@@ -3140,6 +3122,12 @@ void display() {
         glLoadName(80);                                                           // Info icon nr stream
       } else if (vis_spotify_oversigt) {
         glBindTexture(GL_TEXTURE_2D, spotifybutton);                         // default show music/radio/film/stream/spotify play info
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        glLoadName(2);                                                           // Info icon nr 82 spotify
+      } else if (vis_tidal_oversigt) { 
+        glBindTexture(GL_TEXTURE_2D, tidalbutton);                               // default show music/radio/film/stream/spotify play info
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -3247,7 +3235,7 @@ void display() {
           glLoadName(81); 			                                                  // music icon name 81
       } else {
           // recorded icon
-          if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt)) {
+          if ((vis_music_oversigt) || (vis_film_oversigt) || (vis_radio_oversigt) || (vis_stream_oversigt) || (vis_spotify_oversigt) || (vis_tidal_oversigt)) {
             glBindTexture(GL_TEXTURE_2D,_textureIdpdown);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -3296,7 +3284,7 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
         glEnd();
-      }
+      } 
 
       //
       // show reset movie search oversigt
@@ -3547,21 +3535,17 @@ void display() {
       if (do_select_device_to_play) {
         spotify_oversigt.select_device_to_play();
       }
-    } else if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
+    } else {
+      if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
+    }
     #endif
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) {
-      // show Tidal overview
+      // show Tidal overview      
       tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );     
-      /*
-      if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) {
-        if (tidalstartwebbrowser) {
-          // start webbroser to login on tidal.
-          system("firefox localhost:8100/tidal_web/");                  // old 8100
-          tidalstartwebbrowser=false;
-        }
-      }
-      */
+      cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+    } else {
+        tidal_oversigt.reset_amin_in_viewer();
     }
     #endif
     if (vis_tv_oversigt) {
@@ -3597,7 +3581,7 @@ void display() {
     }
   }
 
-  if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+  //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
 
   #ifdef ENABLE_SPOTIFY
   //firsttimespotifyupdate=true;
@@ -14125,8 +14109,8 @@ void *webupdate_loader_tidal(void *data) {
       tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
     }
     */
+    tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
   }
-  tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
 
   // write debug log
   if (loadedtidal) write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
