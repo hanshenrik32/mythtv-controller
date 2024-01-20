@@ -1140,7 +1140,57 @@ int musicoversigt_class::save_music_oversigt_playlists(char *playlistname) {
 // ****************************************************************************************
 
 int musicoversigt_class::load_music_oversigt_playlists(char *playlistname) {
-  return(0);
+  bool fault;
+  char sqlselect[8192];
+  char temptxt[2048];
+  unsigned int i;
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char database[256];
+
+  std::string playlistarray_string;
+  std::string songid;
+  int pos=0;
+
+  strcpy(database,dbname);
+  //clean_music_oversigt(musicoversigt);
+  write_logfile(logfile,(char *) "load music playlist.");
+  i=0;
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  if (conn) {   
+    snprintf(sqlselect,sizeof(sqlselect),"select playlist_id,playlist_name,playlist_songs,last_accessed,length,songcount,hostname from music_playlist where playlist_name like '%s'",playlistname);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    playlistarray_string=row[2];    // playlist string have id's
+    while((pos=playlistarray_string.find(' ')) != std::string::npos) {
+      songid=playlistarray_string.substr(0,pos);
+      printf("SONGID = %s \n",songid);
+      playlistarray_string.erase(0,pos+1);
+    }   
+
+    /*
+    while (i<aktiv_playlist.numbers_in_playlist()) {
+      sprintf(temptxt,"%d",aktiv_playlist.get_songid(i));
+      strcat(sqlselect,temptxt);
+      strcat(sqlselect," ");
+      i++;
+    }        	// end while
+    
+    snprintf(temptxt,sizeof(temptxt),"','%s',%d,%d,'%s')","2018-01-01 00:00:00",0,aktiv_playlist.numbers_in_playlist(),"");
+    strcat(sqlselect,temptxt);
+    mysql_query(conn,sqlselect);
+    res = mysql_store_result(conn);
+    if (res) fault=false;
+    */
+  }
+  mysql_close(conn);
+  return(!(fault));
 }
 
 // ****************************************************************************************
@@ -1315,11 +1365,11 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
 
 void musicoversigt_class::opdatere_music_oversigt_icons() {
   unsigned int i;
-  char tmpfilename[200];
+  char tmpfilename[2000];
   for(i=0;i<antal_music_oversigt;i++) {
     musicoversigt[i].textureId=0;
   }
-  i=0;
+    i=0;
   while (i<antal_music_oversigt) {
     strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
     if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {

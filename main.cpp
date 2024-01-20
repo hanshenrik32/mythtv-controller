@@ -1871,36 +1871,6 @@ int hent_mythtv_playlist(int playlistnr) {
 
 
 
-
-// ****************************************************************************************
-//
-// MUSIC stuf
-// Can have memory error
-// load dir icons after update.
-//
-// ****************************************************************************************
-
-/*
-void opdatere_music_oversigt_icons() {
-  unsigned int i;
-  char tmpfilename[200];
-  for(i=0;i<MUSIC_OVERSIGT_TYPE_SIZE;i++) {
-    musicoversigt[i].textureId=0;
-  }
-  i=0;
-  while (i<MUSIC_OVERSIGT_TYPE_SIZE) {
-    strncpy(tmpfilename,musicoversigt[i].album_coverfile,200);
-    if ((strcmp(tmpfilename,"")!=0) && (file_exists(tmpfilename))) {
-      // load covers file into opengl as textures (png/jpg)
-      musicoversigt[i].textureId = loadTexture((char *) tmpfilename);
-    } else {
-      musicoversigt[i].textureId=0;
-    }
-    i++;
-  }
-}
-*/
-
 // ****************************************************************************************
 //
 // hent antal af songs fra mythtv playlist database og fyld music play array
@@ -4379,9 +4349,10 @@ void display() {
       do_play_music_cover=0;
       if (((do_zoom_music_cover==false) || (do_play_music_aktiv_play==0)) && (mknapnr!=0)) {
         // playliste funktion set start play
-        if (debugmode & 2) fprintf(stderr,"Type af sange nr %d som skal loades %d\n ",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
+        fprintf(stderr,"Type af sange nr %d som skal loades %d\n ",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
         if (musicoversigt.get_album_type(mknapnr-1)==-1) {
-          if (debugmode & 2) fprintf(stderr,"Loading song from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);
+          if (debugmode & 2) fprintf(stderr,"Loading songs from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);          
+          write_logfile(logfile,"Loading songs from mythtv playlist.");
           if (hent_mythtv_playlist(musicoversigt.get_directory_id(mknapnr-1))==0) {		// tilføj musik valgte til playliste + load af covers
             fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt.get_directory_id(mknapnr-1));
             exit(2);        // STOP program
@@ -4411,15 +4382,17 @@ void display() {
           #if defined USE_FMOD_MIXER
           if (snd==0) {
               // aktiv_playlist = class to control music to play
-              // (indenholder array til playliste samt hvor mange der er i playliste)
-              
+              // (indenholder array til playliste samt hvor mange der er i playliste) 
+              // aktivplay_music_path = string til den sang som skal spilles nu
               aktiv_playlist.m_play_playlist(aktivplay_music_path,0);			// hent første sang i playlist
-
               printf("aktivplay_music_path = %s \n",aktivplay_music_path);
-
               if (strcmp(configsoundoutport,"STREAM")!=0) {
                 result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
+              } else if (strcmp(configsoundoutport,"int")!=0) {
+                // load playlist
+                //musicoversigt.load_music_oversigt_playlists("test");
+                result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);                
               } else {
                 sprintf(aktivplay_music_path,"http://%s/mythweb/music/stream?i=%d",configmysqlhost,aktiv_playlist.get_songid(do_play_music_aktiv_table_nr-1));
                 result = sndsystem->createSound(aktivplay_music_path,FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
@@ -7543,7 +7516,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // play button
           if ((GLubyte) names[i*4+3]==20) {
             ask_open_dir_or_play = false;                                         // flag luk vindue igen
-            do_play_music_cover = 1;                                              // der er trykket på cover play det
+            do_play_music_cover = 1;                                              // der er trykket på play button (play det nu)
             do_zoom_music_cover = false;                                          // ja den skal spilles lav zoom cover info window
             do_find_playlist = true;                                              // find de sange som skal indsættes til playlist (og load playlist andet sted)
             fundet = true;
@@ -15311,7 +15284,7 @@ int main(int argc, char** argv) {
       }
     }
 
-
+    //tidal_oversigt = new tidal_class;
     #ifdef ENABLE_TIDAL
     bool tidalok;
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
