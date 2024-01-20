@@ -15283,22 +15283,16 @@ int main(int argc, char** argv) {
                 break;
       }
     }
-
-    //tidal_oversigt = new tidal_class;
+    
     #ifdef ENABLE_TIDAL
     bool tidalok;
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
-      tidal_oversigt.get_users_album("251380836");
-      tidal_oversigt.get_users_album("216326176");
-      tidal_oversigt.get_users_album("92082111");         // like it on top
-      tidal_oversigt.get_users_album("63326520");         // Trilogy
-      tidal_oversigt.get_users_album("281528263");        // Ev1gt&alt1d
-      tidal_oversigt.get_users_album("332235639");
+      // load from file
+      tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal loaded OK \n");
     }
-    
 
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {

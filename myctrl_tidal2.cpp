@@ -1043,6 +1043,33 @@ int tidal_class::get_access_token(char *loginbase64) {
 
 
 
+// ****************************************************************************************
+//
+// get uers playlist from file tidal_playlists.txt
+//
+// ****************************************************************************************
+
+
+int tidal_class::get_playlist_from_file(char *filename) {
+  FILE *fp;
+  char *playlisttxt=NULL;
+  ssize_t read;
+  size_t len=0;
+  bool readok=false;
+  fp=fopen("tidal_playlists.txt","r");
+  if (fp) {
+    readok=true;
+    while ((read = getline(&playlisttxt , &len, fp)) != -1) {
+      playlisttxt[strcspn(playlisttxt,"\n")]=0;                                   // remove \n from string
+      get_users_album((char *) playlisttxt);
+    }
+    fclose(fp);
+  }
+  if (playlisttxt) free(playlisttxt);
+  if (readok) return(1); else return(0);
+}
+
+
 
 // ****************************************************************************************
 //

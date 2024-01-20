@@ -205,6 +205,7 @@ class tidal_class {
         void process_array_playlist(json_value* value, int depth);
 
         int tidal_play_now_song(char *playlist_song,bool now);                // play song
+        int get_playlist_from_file(char *filename);                           // read/import playlists from file
 
 };
 
