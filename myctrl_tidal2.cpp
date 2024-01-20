@@ -1056,7 +1056,7 @@ int tidal_class::get_playlist_from_file(char *filename) {
   ssize_t read;
   size_t len=0;
   bool readok=false;
-  fp=fopen("tidal_playlists.txt","r");
+  fp=fopen(filename,"r");
   if (fp) {
     readok=true;
     while ((read = getline(&playlisttxt , &len, fp)) != -1) {
