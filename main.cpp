@@ -15286,12 +15286,16 @@ int main(int argc, char** argv) {
     
     #ifdef ENABLE_TIDAL
     bool tidalok;
+    // login tidal
     tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
+      // login ok load playlistes from file
       // load from file
       tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       tidal_oversigt.opdatere_tidal_oversigt(0);
-      printf("Tidal loaded OK \n");
+      printf("Tidal file load from tidal_playlists.txt OK.\n");
+    } else {
+      printf("Unable to find file tidal_playlists.txt \n");
     }
 
     //tidal_oversigt = new tidal_class;
