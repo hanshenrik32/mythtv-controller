@@ -15298,6 +15298,12 @@ int main(int argc, char** argv) {
       printf("Unable to find file tidal_playlists.txt \n");
     }
 
+    tidal_oversigt.tidal_get_artists_all_albums("1566");
+    
+    // works
+    // tidal_oversigt.tidal_get_album_by_artist("1566");
+
+
     //tidal_oversigt = new tidal_class;
     //if (tidal_oversigt) {
       //tidal_oversigt->start_webserver();

@@ -206,6 +206,20 @@ class tidal_class {
 
         int tidal_play_now_song(char *playlist_song,bool now);                // play song
         int get_playlist_from_file(char *filename);                           // read/import playlists from file
+        
+        // download album by artist id
+        int tidal_get_album_by_artist(char *artistid);
+        // download albums items
+        int tidal_get_album_items(char *albumid);
+
+        // download all albums by artist id
+        int tidal_get_artists_all_albums(char *artistid);
+
+        // used by tidal_get_artists_all_albums
+        void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
+        // used by process_tidal_get_artists_all_albums to process json files
+        void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
+        void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
 
 };
 
