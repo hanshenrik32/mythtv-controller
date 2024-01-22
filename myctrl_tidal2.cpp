@@ -1081,7 +1081,7 @@ char* replace_char(char* str, char find, char replace) {
 //
 // works and in use
 //
-// get/download to db albumid (json file)
+// get/download to db albumid (json file) (process data in json file to db)
 //
 // ******************************************************************************************************
 
@@ -1291,7 +1291,7 @@ int tidal_class::get_users_album(char *albumid) {
 
 // ****************************************************************************************
 // NEW function works
-// get allbum by artistid
+// get allbum by artistid (download json file)
 //
 // return 0 if fault
 // 200 on ok
@@ -1356,7 +1356,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 
 // ****************************************************************************************
 // NEW function works
-// get/download album items
+// get/download album items (download json file)
 //
 // return 0 if fault
 // ok http return code
@@ -1364,7 +1364,6 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 // ****************************************************************************************
 
 int tidal_class::tidal_get_album_items(char *albumid) {
-  //static const char *userfilename = "tidal_users_album.json";
   std::string userfilename;
   FILE *userfile;
   std::string auth_kode;
@@ -1483,6 +1482,11 @@ void tidal_class::process_array_playlist_tidal_get_artists_all_albums(json_value
 }
 
 
+// ****************************************************************************************
+//
+// sub stuf
+//
+// ****************************************************************************************
 
 void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int depth,int x) {
     std::string artist="";
@@ -1663,8 +1667,8 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
 
 
 // ****************************************************************************************
-// NEW function works
-// get/download all albums items from artistid
+// NEW function works (download wrong songs )
+// get/download all albums items from artistid nad make playlist of it.
 //
 // return 0 if fault
 // ok http return code
@@ -1746,8 +1750,14 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
               fprintf(stdout,"Error SQL : %s\n",sql);
             }
             mysql_store_result(conn);
+
+            // some error here
             printf("Downloading album %s \n",stack[recnr]->playlistid);
-            tidal_get_album_items(stack[recnr]->playlistid);                          // download album json file
+            
+            // download json file
+            tidal_get_album_items(stack[recnr]->playlistid);                 // download album json file
+            // download data
+            get_users_album(stack[recnr]->playlistid);                       // download  album stuf (data)
 
           }
           recnr++;
@@ -1927,7 +1937,7 @@ int tidal_class::auth_device_authorization() {
 
 // ****************************************************************************************
 //
-//
+// do NOT work
 // get device list and have it in tidal class
 //
 // ****************************************************************************************
@@ -2149,7 +2159,7 @@ void tidal_class::set_tidal_update_flag(bool flag) {
 
 // ****************************************************************************************
 //
-// IN USE
+// IN USE (old test)
 // Get users playlist NOT in use
 // The default view
 //
@@ -2404,7 +2414,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
                   strcat(downloadfilenamelong,tidal_gfx_path);
                   strcat(downloadfilenamelong,downloadfilename);
                   strcat(downloadfilenamelong,".jpg");
-                  // download file
+                  // download file if not exist
                   if (!(file_exists(downloadfilenamelong))) {
                     tidal_download_image(row[1],downloadfilenamelong);
                     //get_webfile2(row[1],downloadfilenamelong);                // download file
@@ -3055,7 +3065,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         anim_angle=180.0f;
         anim_viewer=false;
       } else {
-        if (anim_viewer) anim_angle+=1.40; else anim_angle=0.0f;
+        if (anim_viewer) anim_angle+=0.20; else anim_angle=0.0f;
       }
       glTranslatef(xof+20+(buttonsize/2),yof-10,0);
       glRotatef(anim_angle,0.0f,1.0f,0.0f);
