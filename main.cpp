@@ -15300,6 +15300,10 @@ int main(int argc, char** argv) {
 
     tidal_oversigt.tidal_get_artists_all_albums("1566");
     
+    tidal_oversigt.tidal_get_artists_all_albums("1567");
+
+    tidal_oversigt.opdatere_tidal_oversigt(0);
+    
     // works
     // tidal_oversigt.tidal_get_album_by_artist("1566");
 

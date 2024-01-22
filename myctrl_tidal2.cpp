@@ -1696,7 +1696,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
   // download artist json file
   tidal_get_album_by_artist(artistid);
 
-  // process json file after create file name
+  // process json artist file after create file name
   // tidal_artist_playlist_$artistid.json have the data
   tidal_artis_playlist_file = "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
@@ -1721,14 +1721,13 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
       if (file_contents) free(file_contents);                                       // free memory again
       json_value_free(value);                                                       // json clean up
       // the array is ready
-
       conn=mysql_init(NULL);
       if (conn) {
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         mysql_query(conn,"set NAMES 'utf8'");
         res = mysql_store_result(conn);
         //
-        // create playlist in db if not exist
+        // create all playlists in db if not exist
         //        
         while(recnr<antalplaylists) {
           // check if exist
@@ -1750,15 +1749,9 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
               fprintf(stdout,"Error SQL : %s\n",sql);
             }
             mysql_store_result(conn);
-
-            // some error here
-            printf("Downloading album %s \n",stack[recnr]->playlistid);
-            
-            // download json file
-            tidal_get_album_items(stack[recnr]->playlistid);                 // download album json file
-            // download data
-            get_users_album(stack[recnr]->playlistid);                       // download  album stuf (data)
-
+            printf("Downloading album + json file %s \n",stack[recnr]->playlistid);
+            // download data 
+            get_users_album(stack[recnr]->playlistid);                          // downloader json file + update db
           }
           recnr++;
         }
