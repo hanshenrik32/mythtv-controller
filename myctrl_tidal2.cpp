@@ -777,7 +777,7 @@ void tidal_class::process_object_playlist(json_value* value, int depth) {
 // ****************************************************************************************
 //
 // json parser start call function for process playlist
-// do the data progcessing from json (value)
+// do the data progcessing from get_users_albumjson (value)
 //
 // ****************************************************************************************
 
@@ -1083,6 +1083,8 @@ char* replace_char(char* str, char find, char replace) {
 //
 // get/download to db albumid (json file) (process data in json file to db)
 //
+// return true on ok 0 on error
+//
 // ******************************************************************************************************
 
 
@@ -1114,6 +1116,7 @@ int tidal_class::get_users_album(char *albumid) {
   bool playlistsongexist=false;
   dbexist=false;
   std::string json_album_file_name;
+  int tt=0;
   try {
     clean_tidal_oversigt();
     if (conn) {
@@ -1198,7 +1201,7 @@ int tidal_class::get_users_album(char *albumid) {
     catch (...) {
       write_logfile(logfile,(char *) "error process json file.");
     }
-    int tt=0;
+    tt=0;
     while(tt<antalplaylists) {
       if (stack[tt]) {
         // check if playlist exist
@@ -1282,7 +1285,7 @@ int tidal_class::get_users_album(char *albumid) {
     }
     mysql_close(conn);
   }
-  return(1);
+  if (antalplaylists) return(1); else return(0);
 }
 
 
@@ -1358,7 +1361,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 // NEW function works
 // get/download album items (download json file)
 //
-// return 0 if fault
+// return 0 if faulttidal_get_album_items
 // ok http return code
 //
 // ****************************************************************************************
@@ -1418,6 +1421,7 @@ int tidal_class::tidal_get_album_items(char *albumid) {
 // *********************************************************************************************************
 
 bool tidal_process_resource=false;
+bool tidal_process_imagecover=false;
 
 // ****************************************************************************************
 //
@@ -1433,7 +1437,7 @@ void tidal_class::process_object_playlist_tidal_get_artists_all_albums(json_valu
   length = value->u.object.length;
   for (x = 0; x < length; x++) {
     // print_depth_shift(depth);
-    //printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
+    // printf("x=%d depth=%d object[%d].name = %s     \n ",x,depth, x, value->u.object.values[x].name);
     if (strcmp(value->u.object.values[x].name , "href" )==0) {
       tidal_process_href=true;
     }
@@ -1445,7 +1449,7 @@ void tidal_class::process_object_playlist_tidal_get_artists_all_albums(json_valu
     }
     // ok
     if (strcmp(value->u.object.values[x].name , "imageCover" )==0) {
-      tidal_process_image=true;
+      tidal_process_imagecover=true;
     }
     if (strcmp(value->u.object.values[x].name , "name" )==0) {
       tidal_process_name=true;
@@ -1523,44 +1527,54 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
         break;
       case json_string:
         // printf("string: %s\n", value->u.string.ptr);
+
         // 1.
         if (tidal_process_resource) {
-          tidal_process_resource=false;          
           antalplaylists++;
           antal++;
           stack[antal]=new (struct tidal_oversigt_type);
           printf("New record *********************************************** \n");
           printf("antal %d antalplaylists %d \n",antal,antalplaylists);
+          tidal_process_resource=false;
         }
 
-        if (( tidal_process_title ) && (depth==7) && (x==2)){
-          printf("antal %d - title string: %s\n",antal, value->u.string.ptr);
-          if (stack[antal]) {
-            strcpy( stack[antal]->feed_showtxt , value->u.string.ptr );
+        if ( tidal_process_title ) {
+          if ((depth==7) && (x==2)) {
+            printf("Set Title string: %s\n", value->u.string.ptr);         
+            if (stack[antal]) {
+              strcpy( stack[antal]->feed_showtxt , value->u.string.ptr );
+            }
+            iconnr=0;                                                                       // reset gfx icon download counter
           }
-          iconnr=0;                                                                       // reset gfx icon download counter
           tidal_process_title=false;
         }
+
         if ( tidal_process_image ) {
           // get playlist cover
           if (( depth == 12 ) && ( x == 0 )) {
             // get covver file url
-            printf("image string: %s\n", value->u.string.ptr);
-            strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);
-          }
-          if (( depth == 13 ) && ( x == 1 )) {
+            printf("Set Image string: %s\n", value->u.string.ptr);
             if (stack[antal]) {
-              printf("process gfx url %s \n",value->u.string.ptr);
-              strcpy(stack[antal]->feed_gfx_url , value->u.string.ptr );
+              strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);
             }
           }
+          /*
+          if (( depth == 13 ) && ( x == 1 )) {
+            if (stack[antal]) {
+              printf("Set gfx url %s \n",value->u.string.ptr);
+              strcpy(stack[antal]->¤ , value->u.string.ptr );
+            }
+          }
+          */
           tidal_process_image = false;
         }
         // ok
         // get artist picture
         // 3.
         if ( tidal_process_url ) {
+          //printf("x=%d depth=%d   \n ",x,depth, x);
           if (( depth == 13 ) && ( x == 0 )) {
+            /*
             if (iconnr==5) {
               printf("img url %s\n", value->u.string.ptr);
               if (stack[antal]) {
@@ -1594,19 +1608,60 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
               }
             }
             iconnr++;
+            */
           }
           tidal_process_url=false;
         }
-        // OK in use
+        //
+        // ok image cover stuf
+        //
+        if ( tidal_process_imagecover ) {
+          if (( depth == 10 ) && ( x == 0 )) {
+            // printf("image cover x=%d depth=%d   \n ",x,depth, x);
+            printf("img cover url %s\n", value->u.string.ptr);
+            if (iconnr==2) {
+              printf("Set cover url %s\n", value->u.string.ptr);
+              if (stack[antal]) {
+                // strcpy( stack[antal]->playlisturl , value->u.string.ptr );                           // playlist url
+                if (strcmp(stack[antal]->feed_gfx_url,"")==0) {                    
+                  // check dir exist else create
+                  if (!(file_exists("~/tidal_gfx"))) {
+                    dircreatestatus = mkdir("~/tidal_gfx", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                  }
+                  // get file name from url
+                  get_webfilename(downloadfilename,value->u.string.ptr);
+                  strcpy(downloadfilenamelong,localuserhomedir);
+                  strcat(downloadfilenamelong,"/tidal_gfx/");
+                  
+                  //strcat(downloadfilenamelong,stack[antal]->feed_showtxt);                              // add artist name to filename
+                  strcat(downloadfilenamelong,tidal_playlistid);
+
+                  strcat(downloadfilenamelong,"_");
+                  strcat(downloadfilenamelong,downloadfilename);
+                  for(int n=0;n<strlen(downloadfilenamelong);n++) {
+                    if (downloadfilenamelong[n]=='/') downloadfilenamelong[n]=='_';
+                    if (downloadfilenamelong[n]==' ') downloadfilenamelong[n]=='_';
+                  }
+                  tidal_download_image(value->u.string.ptr,downloadfilenamelong);
+                  strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
+                  stack[antal]->type=1;                                                           // playlist type
+                }
+              }
+            }
+            iconnr++;
+          }
+          tidal_process_imagecover=false;
+        }
+        // OK in use id
         if ( tidal_process_id ) {
           // get artist id
           if (( depth == 7 ) && ( x == 0 )) {
-            printf("playlist id %s \n",value->u.string.ptr);
+            printf("Set Playlist id %s \n",value->u.string.ptr);
             strcpy(tidal_playlistid , value->u.string.ptr);
-            stpcpy(stack[antal]->playlistid, value->u.string.ptr);
           }
+            stpcpy(stack[antal]->playlistid, value->u.string.ptr);
           if (( depth == 10 ) && ( x == 0 )) {
-            printf("Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
+            printf("Set Process id %s depth = %d x = %d\n",value->u.string.ptr,depth,x);
             printf("artistid id %s \n",value->u.string.ptr);
             // strcpy(tidal_playlistid , value->u.string.ptr);
             // stpcpy(stack[antal]->playlistid, value->u.string.ptr);  
@@ -1617,27 +1672,26 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
         if ( tidal_process_name ) {
           // get album name
           if (( depth == 6 ) && ( x == 2 )) {
-            printf("antal %d playlist name %-30s \n",antal,value->u.string.ptr);
-            if (antal==0) {
-              stack[antal]=new (tidal_oversigt_type);
-            }
+            printf("Set Playlist name %-30s \n",antal,value->u.string.ptr);
             if (stack[antal]) {
               strcpy(tidal_playlistname , value->u.string.ptr);
             }
             tidal_process_name=false;
           }
+          
           //
           // get artis name ok
           //
           if ((depth==9) && (x==1)) {
             if (stack[antal]) {
-              printf("process_artist name %s \n", value->u.string.ptr);
+              printf("Set artist name %s \n", value->u.string.ptr);
               strcpy( stack[antal]->feed_artist , value->u.string.ptr );
             }
           }
           // 
           // get Song name
           //
+          /*
           if ((depth==9) && (x==12)) {
             if (antal==0) {
               stack[antal]=new (tidal_oversigt_type);
@@ -1648,6 +1702,7 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
             }
             tidal_process_name=false;
           }
+          */
         }
         // get tracknr
         if (tidal_process_track_nr) {
@@ -1692,10 +1747,12 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
   char *database = (char *) "mythtvcontroller";
   bool playlistexist;
   int recnr=0;
+  bool dbexist=false;
+  int create_new_record_antal;
 
-  // download artist json file
+  // download artist album json file
   tidal_get_album_by_artist(artistid);
-
+  
   // process json artist file after create file name
   // tidal_artist_playlist_$artistid.json have the data
   tidal_artis_playlist_file = "tidal_artist_playlist_";
@@ -1725,43 +1782,80 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
       if (conn) {
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         mysql_query(conn,"set NAMES 'utf8'");
+        res = mysql_store_result(conn);        
+        mysql_query(conn,"SELECT feedtitle from mythtvcontroller.tidalcontentarticles limit 1");
         res = mysql_store_result(conn);
+        if (res) {
+          while ((row = mysql_fetch_row(res)) != NULL) {
+            dbexist = true;
+          }
+        }
+        if (dbexist==false) {
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"SQL : %s\n",sql);
+          }
+          res = mysql_store_result(conn);
+          // create db (spotify songs)
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"SQL : %s\n",sql);
+          }
+          res = mysql_store_result(conn);
+          // create db (spotify playlists)
+          sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+          if (mysql_query(conn,sql)!=0) {
+            write_logfile(logfile,(char *) "mysql create table error.");
+            fprintf(stdout,"SQL : %s\n",sql);
+          }
+          res = mysql_store_result(conn);
+        }
         //
         // create all playlists in db if not exist
-        //        
-        while(recnr<antalplaylists) {
-          // check if exist
-          playlistexist = false;
-          snprintf(sql,sizeof(sql),"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '%s'",  stack[recnr]->playlistid);
-          mysql_query(conn,sql);
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              playlistexist = true;
-            }
-          }
-          if ( playlistexist == false ) {            
-            snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, 0);
+        //  
+        // Husk antal
+        recnr=0;
+        create_new_record_antal=antalplaylists;
+        if (stack[recnr]) {
+          while(recnr<create_new_record_antal) {
+            // check if exist
+            playlistexist = false;
+            strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
+            strcat(sql,stack[recnr]->playlistid);
+            strcat(sql,"'");
             mysql_query(conn,sql);
             res = mysql_store_result(conn);
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
-              fprintf(stdout,"Error SQL : %s\n",sql);
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                playlistexist = true;
+              }
             }
-            mysql_store_result(conn);
-            printf("Downloading album + json file %s \n",stack[recnr]->playlistid);
-            // download data 
-            get_users_album(stack[recnr]->playlistid);                          // downloader json file + update db
+            if ( playlistexist == false ) {            
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, 0);
+              mysql_query(conn,sql);
+              res = mysql_store_result(conn);
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
+                fprintf(stdout,"Error SQL : %s\n",sql);
+              }
+              mysql_store_result(conn);
+              printf("Downloading album + json file %s  nr %d \n",stack[recnr]->playlistid,recnr);
+              // Download playlist json file + update db from the downloaded json file.
+              get_users_album(stack[recnr]->playlistid);
+            }
+            recnr++;
           }
-          recnr++;
         }
+        antalplaylists=create_new_record_antal;
       }
     }
     catch (...) {
       printf("Error write file.\n");
     }
   }
-
+  // sample
   //get_users_album("012345");
 }
 
@@ -2803,13 +2897,15 @@ int tidal_class::load_tidal_iconoversigt() {
         // if url
         if (strncmp("http",stack[nr]->feed_gfx_url,4)==0) {
           imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
-          if ((imagenamepointer) && (strlen(imagenamepointer)<1990)) {
-            //getuserhomedir(tmpfilename);
-            strcpy(tmpfilename,localuserhomedir);
-            strcat(tmpfilename,"/tidal_gfx/");
-            strcat(tmpfilename,imagenamepointer+1);
-            strcat(tmpfilename,".jpg");
-            stack[nr]->textureId=loadTexture (tmpfilename);
+          if (imagenamepointer) {
+            if (strlen(imagenamepointer)<1990) {
+              //getuserhomedir(tmpfilename);
+              strcpy(tmpfilename,localuserhomedir);
+              strcat(tmpfilename,"/tidal_gfx/");
+              strcat(tmpfilename,imagenamepointer+1);
+              strcat(tmpfilename,".jpg");
+              stack[nr]->textureId=loadTexture (tmpfilename);
+            }
           }
         } else if (stack[nr]->textureId==NULL) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
       }

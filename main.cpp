@@ -3476,7 +3476,7 @@ void display() {
       glPushMatrix();
       streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
       glPopMatrix();
-      if (debugmode & 1) cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      //if (debugmode & 1) cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_radio_oversigt) {
       radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
       // show radio options menu
@@ -3513,7 +3513,7 @@ void display() {
     if (vis_tidal_oversigt) {
       // show Tidal overview      
       tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );     
-      cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      //cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else {
         tidal_oversigt.reset_amin_in_viewer();
     }
@@ -15291,18 +15291,20 @@ int main(int argc, char** argv) {
     if (tidalok) {   
       // login ok load playlistes from file
       // load from file
-      tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+
+      tidal_oversigt.tidal_get_artists_all_albums("29893");
+
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal file load from tidal_playlists.txt OK.\n");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
     }
-
-    tidal_oversigt.tidal_get_artists_all_albums("1566");
     
-    tidal_oversigt.tidal_get_artists_all_albums("1567");
 
-    tidal_oversigt.opdatere_tidal_oversigt(0);
+    // tidal_oversigt.tidal_get_artists_all_albums("29893");         // Dire straits
+    // tidal_oversigt.tidal_get_artists_all_albums("1567");
+    //tidal_oversigt.opdatere_tidal_oversigt(0);
     
     // works
     // tidal_oversigt.tidal_get_album_by_artist("1566");
