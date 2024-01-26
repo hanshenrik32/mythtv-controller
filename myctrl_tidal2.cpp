@@ -1833,8 +1833,6 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
             }
             if ( playlistexist == false ) {            
               snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,id) values ('%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, 0);
-              mysql_query(conn,sql);
-              res = mysql_store_result(conn);
               if (mysql_query(conn,sql)!=0) {
                 write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
                 fprintf(stdout,"Error SQL : %s\n",sql);
