@@ -3116,13 +3116,22 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   char *base,*right_margin;
   int length,width;
   int pline=0;
+  static bool timefirsttime=false;
+  struct timeval lasttime;
+  struct timeval tim;
+  if (timefirsttime==false) {
+    timefirsttime=true;
+    tim.tv_usec=0;
+    lasttime.tv_usec=0;
+  }
+
   // last loaded filename
   if (tidal_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
   // load icons
   if (this->search_loaded) {
     this->search_loaded=false;
     printf("Searech loaded done. Loading icons\n");
-    //spotify_oversigt.load_spotify_iconoversigt();                       // load icons
+    //tidal_oversigt.load_spotify_iconoversigt();                       // load icons
   }
   // draw icons
   glEnable(GL_TEXTURE_2D);
@@ -3148,12 +3157,26 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       }
       // stream icon
       glPushMatrix();
+
       if (anim_angle>360) {
         anim_angle=180.0f;
         anim_viewer=false;
       } else {
-        if (anim_viewer) anim_angle+=0.20; else anim_angle=0.0f;
+        if (anim_viewer) {
+          gettimeofday(&tim,NULL);
+          if (lasttime.tv_usec==0) {
+            lasttime.tv_usec=tim.tv_usec;
+          } else {
+            if (tim.tv_usec>(lasttime.tv_usec+10)) {
+              anim_angle+=1.20;
+            } else {
+              anim_viewer=false;
+              anim_angle=0.0f;
+            }
+          }
+        } else anim_angle=0.0f;
       }
+
       glTranslatef(xof+20+(buttonsize/2),yof-10,0);
       glRotatef(anim_angle,0.0f,1.0f,0.0f);
       glEnable(GL_TEXTURE_2D);
