@@ -572,6 +572,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
         } else {
           // default icon
           glPushMatrix();
+
           if (stack[i+sofset]->online) glColor4f(1.0f, 1.0f, 1.0f,1.0f); else glColor4f(.3f, .3f, .3f, 1.0f);
           glEnable(GL_TEXTURE_2D);
           glBlendFunc(GL_ONE, GL_ONE);
@@ -595,7 +596,6 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
             glBindTexture(GL_TEXTURE_2D,gfxlande[stack[i+sofset]->land]);       //
 
             //glBindTexture(GL_TEXTURE_2D,gfxlande[i+sofset]);
-
             glBegin(GL_QUADS);
             glTexCoord2f(0, 0); glVertex3f(10+ xof, yof+10 , 0.0);
             glTexCoord2f(0, 1); glVertex3f(10+ xof,yof+30+10, 0.0);

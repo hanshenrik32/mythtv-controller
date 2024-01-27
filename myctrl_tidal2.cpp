@@ -1156,6 +1156,13 @@ int tidal_class::get_users_album(char *albumid) {
         fprintf(stdout,"SQL : %s\n",sql);
       }
       res = mysql_store_result(conn);
+      // create db (tidal artist table)
+      sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentartist (artistname varchar(255),paththumb text,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+      if (mysql_query(conn,sql)!=0) {
+        write_logfile(logfile,(char *) "mysql create table error.");
+        fprintf(stdout,"SQL : %s\n",sql);
+      }
+      res = mysql_store_result(conn);
     }
   }
   catch (...) {
@@ -2339,6 +2346,13 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
           fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
+        // create db (tidal artist table)
+        sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentartist (artistname varchar(255),paththumb text,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        if (mysql_query(conn,sql)!=0) {
+          write_logfile(logfile,(char *) "mysql create table error.");
+          fprintf(stdout,"SQL : %s\n",sql);
+        }
+        res = mysql_store_result(conn);
       }
       // download all playlist (name + id) in one big file NOT songs
       // if we have a token
@@ -3252,7 +3266,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       // show text of element
       glPushMatrix();
       pline=0;
-      glTranslatef(xof+20,yof-10,0);
+      glTranslatef(xof+20,yof-20,0);
       glDisable(GL_TEXTURE_2D);
       glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
