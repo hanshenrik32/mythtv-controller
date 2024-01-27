@@ -15294,6 +15294,7 @@ int main(int argc, char** argv) {
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
       tidal_oversigt.tidal_get_artists_all_albums("29893");
+      tidal_oversigt.tidal_get_artists_all_albums("1567");
 
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal file load from tidal_playlists.txt OK.\n");
