@@ -1886,6 +1886,8 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid) {
   }
   // sample
   //get_users_album("012345");
+  if (create_new_record_antal==0) write_logfile(logfile,(char *) "Tidal can not download artist json file.");
+  return(create_new_record_antal);
 }
 
 
