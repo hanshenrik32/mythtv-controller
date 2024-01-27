@@ -4602,7 +4602,7 @@ void spotify_class::show_spotify_search_oversigt(GLuint normal_icon,GLuint song_
       printf("Searech loaded done. Loading icons\n");
       spotify_oversigt.load_spotify_iconoversigt();                       // load icons
     }
-    // draw icons
+    // draw top
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // type of search

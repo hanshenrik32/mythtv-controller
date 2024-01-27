@@ -174,6 +174,7 @@ class tidal_class {
         int tidal_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+        void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
 
         int auth_device_authorization();
 
@@ -221,6 +222,8 @@ class tidal_class {
         void process_array_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
         void process_object_playlist_tidal_get_artists_all_albums(json_value* value, int depth);
 
+        int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
+        int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
 };
 
 int tidal_download_image(char *imgurl,char *filename);
