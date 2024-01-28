@@ -96,6 +96,15 @@ class tidal_class {
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
         bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool search_loaded;
+
+
+        // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
+        void process_object_tidal_search_result(json_value* value, int depth);
+        void process_array_tidal_search_result(json_value* value, int depth);
+        // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
+        void process_tidal_search_result(json_value* value, int depth,int x);
+        // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
+
     public:
         bool reset_amin_in_viewer();
         bool anim_viewer;
@@ -174,7 +183,7 @@ class tidal_class {
         int tidal_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
         void show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
-        void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected);
+        void show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon,GLuint empty_icon,GLuint backicon,int sofset,int stream_key_selected,char *searchstring);
 
         int auth_device_authorization();
 

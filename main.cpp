@@ -322,6 +322,7 @@ bool search_spotify_string_changed=false;
 
 bool do_hent_tidal_search_online=false;                   // skal vi starte search online (do it)
 bool search_tidal_string_changed=false;
+bool hent_tidal_search_online=false;                      // skal vi starte search online
 
 int do_music_icon_anim_icon_ofset=0;                  	  // sin scrool ofset for show fast music
 int do_spotify_icon_anim_icon_ofset=0;                  	// sin scrool ofset for show fast spotify
@@ -3476,6 +3477,30 @@ void display() {
   }
   #endif
 
+  #ifdef ENABLE_TIDAL
+  const int tidal_start_search_action_waittime=4;
+  struct tm* t2;
+  static time_t lasttime2=0;
+  static time_t nowdate2;
+  time(&nowdate2);
+  if (do_show_tidal_search_oversigt) {
+    if ((search_tidal_string_changed) && (difftime(nowdate2, lasttime2)>tidal_start_search_action_waittime)) {
+      time(&lasttime2);
+      hent_tidal_search_online=true;
+      search_tidal_string_changed=false;
+    }
+    if (hent_tidal_search_online) {
+      hent_tidal_search_online=false;
+      if (keybufferindex>=2) {
+        // start the search online
+        do_hent_tidal_search_online=true;
+        //keybufferindex=1;
+      }
+    }
+  }
+  #endif
+
+
   // tidal
   #ifdef ENABLE_TIDAL
   // tidal do the search after enter is pressed
@@ -3483,11 +3508,11 @@ void display() {
     if ((keybufferopenwin) && (hent_tidal_search)) {
       hent_tidal_search=false;
     }
-    if (keybufferindex>0) {		                                       				// er der kommet noget i keyboard buffer
+    if (keybufferindex>0) {		                                       			// er der kommet noget i keyboard buffer
       if (tidal_oversigt.search_playlist_song==0)                         //
-        tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,0);	  // find det som der søges playlist navn
+        tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,0);	  // find do searcg for artist
       else
-        tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,1);   // find det som der søges efter sange navn
+        tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,1);   // find do search for song name
       //tidal_oversigt.load_tidal_iconoversigt();
       keybuffer[0] = 0;
       keybufferindex = 0;
@@ -3495,9 +3520,6 @@ void display() {
     tidal_oversigt_loaded_begin=false;
   }
   #endif
-
-
-
 
  
   start = clock();
@@ -3559,7 +3581,7 @@ void display() {
         tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
       } else {
         // show Tidal search
-        tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
+        tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
       }
       //cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else {
@@ -7035,9 +7057,6 @@ void display() {
   }
   if (do_update_tidal_playlist) {
   }
-  //#ifdef ENABLE_TIDAL
-  mg_mgr_poll(&tidal_oversigt.mgr, 50);
-  //#endif
   //  don't wait!
   //  start processing buffered OpenGL routines
   //
@@ -7893,8 +7912,6 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-
-
 
       //
       // tidal stuf offline search (only in local db)
@@ -11081,6 +11098,27 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
           }
+
+          // tidal stuf
+          if ((vis_tidal_oversigt) && (keybufferindex==0)) {
+            if (key=='D') {
+              do_select_device_to_play=true;                                                                  // enable select dvice to play on
+            }
+          }
+
+          // do show search tidal oversigt online
+          if ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt)) {
+            if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
+              keybuffer[keybufferindex]=key;
+              keybufferindex++;
+              keybuffer[keybufferindex]='\0';       // else input key text in buffer
+              // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              search_tidal_string_changed=true;
+            }
+          }
+
+
+
           #endif
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
@@ -11937,6 +11975,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               else if (vis_tv_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis tv oversigt\n");
               else if (do_show_tvgraber) write_logfile(logfile,(char *) "Enter key pressed in vis show tvgraber\n");
               else if (vis_spotify_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis show spotify\n");
+              else if (vis_tidal_oversigt) write_logfile(logfile,(char *) "Enter key pressed in vis show tidal\n");
               write_logfile(logfile,(char *) "Start search....");
               // set save flag of playlist
               if (ask_save_playlist) {
