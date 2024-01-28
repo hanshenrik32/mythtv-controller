@@ -14148,7 +14148,9 @@ void *datainfoloader_webserver(void *data) {
       fprintf(stderr,"Update spotify search result thread.\n");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
+      // clear old view
       tidal_oversigt.clean_tidal_oversigt();
+      // update from search
       tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);
 
       // tidal_oversigt.load_spotify_iconoversigt();                       // load icons
@@ -14159,8 +14161,6 @@ void *datainfoloader_webserver(void *data) {
       tidal_oversigt.reset_amin_in_viewer();                              // reset anim
     }
     #endif
-
-
   }
   pthread_exit(NULL);
 }

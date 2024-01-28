@@ -2521,9 +2521,6 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
   return(0);
 }
 
-
-
-
 // ****************************************************************************************
 //
 // get songs from playlist (any public user)
@@ -2729,7 +2726,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
 
                   // stack[antal]->textureId=loadTexture (downloadfilenamelong);
                   printf("GFX FILE NAME %s \n ",stack[antal]->feed_gfx_url);
-                  stack[antal]->type=1;                                                           // playlist type
+                  stack[antal]->type=2;                                                           // playlist type
               }
             }
             iconnr++;
@@ -2833,7 +2830,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
   MYSQL *conn;
   MYSQL_RES *mysql_res;
   MYSQL_ROW mysql_row;
-
+  search_loaded=false;
   /*
   auth_kode="Authorization: Bearer ";
   auth_kode=auth_kode + tidaltoken;
@@ -2925,6 +2922,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
       }
     }
   }
+  search_loaded=true;
   return(httpCode);
 }
 
@@ -3252,7 +3250,6 @@ int tidal_class::load_tidal_iconoversigt() {
   char tmpfilename[2000];
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
-  char homedir[200];
   this->gfx_loaded=false;                                                           // set loaded flag to false
   if (debugmode & 4) printf("tidal icon loader.\n");
   while(nr<=streamantal()) {
@@ -3264,7 +3261,6 @@ int tidal_class::load_tidal_iconoversigt() {
           imagenamepointer=strrchr(stack[nr]->feed_gfx_url,'\/');
           if (imagenamepointer) {
             if (strlen(imagenamepointer)<1990) {
-              //getuserhomedir(tmpfilename);
               strcpy(tmpfilename,localuserhomedir);
               strcat(tmpfilename,"/tidal_gfx/");
               strcat(tmpfilename,imagenamepointer+1);
@@ -3272,7 +3268,11 @@ int tidal_class::load_tidal_iconoversigt() {
               stack[nr]->textureId=loadTexture (tmpfilename);
             }
           }
-        } else if (stack[nr]->textureId==NULL) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+        } else {
+          if (stack[nr]->textureId==NULL) {
+            stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+          }
+        }
       }
     }
     nr++;
@@ -3686,6 +3686,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static bool cursor=true;
   static time_t rawtime;
   static time_t last_rawtime=0;
+  static bool gfx_loaded=false;
   rawtime=time(NULL);                                                         // hent now time
   if (timefirsttime==false) {
     timefirsttime=true;
@@ -3703,13 +3704,6 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
 
   // last loaded filename
   if (tidal_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
-  // load icons
-  if (this->search_loaded) {
-    this->search_loaded=false;
-    printf("Searech loaded done. Loading icons\n");
-    // load_tidal_iconoversigt();
-  }
-
   // top
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -3750,9 +3744,10 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glTranslatef(0,0,0.0f);
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
-    if ((!(texture_loaded)) && (this->search_loaded)) {
+    if ((texture_loaded==false) && (this->search_loaded) && (gfx_loaded==false) ) {
       load_tidal_iconoversigt();
       texture_loaded=true;
+      gfx_loaded=true;
     }
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
