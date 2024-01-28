@@ -2119,7 +2119,7 @@ void tidal_class::clean_tidal_oversigt() {
       if (stack[i]) {
         // crash
         if (stack[i]->textureId) {
-              //if (&stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
+          // if (stack[i]->textureId) glDeleteTextures(1, &stack[i]->textureId);	// delete spotify texture
         }
         delete stack[i];
       }
@@ -2908,6 +2908,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
         // the array is ready
+        /*
         conn=mysql_init(NULL);
         if (conn) {
           mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
@@ -2917,6 +2918,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
 
           mysql_close(conn);
         }
+        */
       } catch (...) {
         write_logfile(logfile,(char *) "error process json file.");
       }
@@ -3495,12 +3497,6 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   // last loaded filename
   if (tidal_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
   // load icons
-  if (this->search_loaded) {
-    this->search_loaded=false;
-    printf("Searech loaded done. Loading icons\n");
-    //tidal_oversigt.load_spotify_iconoversigt();                       // load icons
-  }
-  // draw icons
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glTranslatef(0,0,0.0f);

@@ -3577,7 +3577,7 @@ void display() {
     #ifdef ENABLE_TIDAL
     if (vis_tidal_oversigt) {
       if (do_show_tidal_search_oversigt==false) {
-        // show Tidal overview      
+        // show Tidal overview
         tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
       } else {
         // show Tidal search
@@ -14148,7 +14148,7 @@ void *datainfoloader_webserver(void *data) {
       fprintf(stderr,"Update spotify search result thread.\n");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
-      // clear old view
+      // clear old
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
       tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);
