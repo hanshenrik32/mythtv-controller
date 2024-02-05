@@ -106,6 +106,8 @@ class tidal_class {
         // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
 
     public:
+        bool texture_loaded;
+
         bool reset_amin_in_viewer();
         bool anim_viewer;
         bool anim_viewer_search;
@@ -233,8 +235,9 @@ class tidal_class {
 
         int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
+        void set_textureloaded(bool set);
 };
 
-int tidal_download_image(char *imgurl,char *filename);
+int tidal_download_image(char *imgurl,char *filename);      // not in use
 
 #endif

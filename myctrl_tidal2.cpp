@@ -602,6 +602,7 @@ tidal_class::tidal_class() : antal(0) {
     antalplaylists=0;                                                           // antal playlists
     loaded_antal=0;                                                             // antal loaded
     search_playlist_song=0;
+    texture_loaded=false;
     int port_cnt, n;
     int err = 0;
     //strcpy(tidal_aktiv_song[0].release_date,"");
@@ -640,6 +641,12 @@ tidal_class::~tidal_class() {
   mg_mgr_free(&mgr);                                             // delete web server again
   mg_mgr_free(&client_mgr);                                      // delete web client
   clean_tidal_oversigt();                                          // clean tidal class
+}
+
+
+
+void tidal_class::set_textureloaded(bool set) {
+  texture_loaded=set; 
 }
 
 
@@ -899,7 +906,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
                     strcat(downloadfilenamelong,"_");
                     strcat(downloadfilenamelong,downloadfilename);
                     for(int n=0;n<strlen(downloadfilenamelong);n++) {
-                      if (downloadfilenamelong[n]=='/') downloadfilenamelong[n]=='_';
+                      //if (downloadfilenamelong[n]=='/') downloadfilenamelong[n]=='_';
                       if (downloadfilenamelong[n]==' ') downloadfilenamelong[n]=='_';
                     }
                     tidal_download_image(value->u.string.ptr,downloadfilenamelong);
@@ -987,7 +994,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
 
 
 
-// IN USE IN MAIN
+// IN USE IN MAIN startup
 // ****************************************************************************************
 //
 // get users token (works and in use)
@@ -3481,7 +3488,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   static int stream_oversigt_loaded_done=0;
   GLuint texture;
   static GLuint last_texture;
-  static bool texture_loaded=false;
+  //static bool texture_loaded=false;
   char *base,*right_margin;
   int length,width;
   int pline=0;

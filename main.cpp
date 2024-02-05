@@ -3578,6 +3578,7 @@ void display() {
     if (vis_tidal_oversigt) {
       if (do_show_tidal_search_oversigt==false) {
         // show Tidal overview
+        tidal_oversigt.set_textureloaded(false);
         tidal_oversigt.show_tidal_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr );       
       } else {
         // show Tidal search
@@ -9124,9 +9125,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             sprintf(debuglogdata,"Open spotify playliste %s ", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             write_logfile(logfile,(char *) debuglogdata);
             // opdate view from intnr id.
+            
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
+
             spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
+
             spotifyknapnr=0;                                                    // reset select
             spotify_selected_startofset=0;                                      //
             strcpy(spotify_oversigt.overview_show_band_name,"");
