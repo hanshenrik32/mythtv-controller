@@ -9401,21 +9401,21 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             button=0;
           }
           // back
-          if (((tidalknapnr-1)==0) && (strcmp(tidal_oversigt.get_tidal_name(tidalknapnr-1),"Back")==0)) {
-            if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
-            tidal_oversigt.clean_tidal_oversigt();
-            //printf("huskname %s \n",huskname  );
+          if (((tidalknapnr-1)==0) && (tidal_oversigt.get_tidal_name(tidalknapnr-1))) {
+            if (strcmp(tidal_oversigt.get_tidal_name(tidalknapnr-1),"Back")==0) {
+              if ( debugmode & 4 ) fprintf(stderr,"Back button from search \n");
+              tidal_oversigt.clean_tidal_oversigt();
+              //printf("huskname %s \n",huskname  );
+              //temp disabled used in prod
+              //tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
 
-            //temp disabled used in prod
-            //tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(huskname,0); //type 3 = tracks ()
-
-
-            //tidal_oversigt.load_tidal_iconoversigt();                       // load icons
-            tidal_oversigt.set_search_loaded();                           // triger icon loader
-            //tidal_oversigt.opdatere_tidal_oversigt(0);                  // reset tidal overview
-            tidalknapnr=0;                                                  // reset selected
-            tidal_selected_startofset=0;
-            strcpy(tidal_oversigt.overview_show_band_name,"");
+              //tidal_oversigt.load_tidal_iconoversigt();                   // load icons
+              tidal_oversigt.set_search_loaded();                           // triger icon loader
+              //tidal_oversigt.opdatere_tidal_oversigt(0);                  // reset tidal overview
+              tidalknapnr=0;                                                // reset selected
+              tidal_selected_startofset=0;
+              strcpy(tidal_oversigt.overview_show_band_name,"");
+            }
           }
         }
         if (do_zoom_tidal_cover) {
