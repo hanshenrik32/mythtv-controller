@@ -50,7 +50,7 @@ class tidal_oversigt_type {
     bool        nyt;                              //
     GLuint      textureId;                        // gfx icon loaded
     long        intnr;
-    char        type;
+    char        type;                             // 0 = playlist, 1 = artist song, 2 = play artist, 3 = play album
     tidal_oversigt_type();                        // constructor
 };
 
@@ -175,8 +175,8 @@ class tidal_class {
         int tidal_last_play();                                                // play last song
         int tidal_next_play();                                                // play next song
         int get_tidal_playlistid();
-        int tidal_play_now_artist(char *playlist_song,bool now);              // play artist
-        int tidal_play_now_album(char *playlist_song,bool now);               // play album
+        int tidal_play_now_artist(char *artistid,bool now);                   // play artist
+        int tidal_play_now_album(char *albumid,bool now);                     // play album
 
         char *get_tidal_name(int nr);                                         // get record name
         char *get_tidal_playlistid(int nr);                                   // get id to play
@@ -219,11 +219,12 @@ class tidal_class {
         int tidal_play_now_song(char *playlist_song,bool now);                // play song
         int get_playlist_from_file(char *filename);                           // read/import playlists from file
         
+
+        //  in use from here and down.
         // download album by artist id
         int tidal_get_album_by_artist(char *artistid);
         // download albums items
         int tidal_get_album_items(char *albumid);
-
         // download all albums by artist id
         int tidal_get_artists_all_albums(char *artistid);
 

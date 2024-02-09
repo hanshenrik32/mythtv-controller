@@ -20,6 +20,15 @@
 #include <string>
 #include <algorithm>
 #include <string.h>
+
+
+// sound system include fmod
+
+#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
+#include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod_errors.h"
+
+
+
 // json parser
 #include "json-parser/json.h"
 // global def
@@ -75,6 +84,9 @@ extern GLuint big_search_bar_playlist;                    // big search bar used
 extern GLuint big_search_bar_track;                    // big search bar used by sporify search
 extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
 extern GLuint big_search_bar_artist;                    // big search bar used by sporify search
+
+
+extern float configsoundvolume;                           // default sound volume
 
 /*
 define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
@@ -993,14 +1005,16 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
 }
 
 
+// Secret 
+// vxOmFp39rweIVD2rb20qmpETsoAECwhGUdnPIPSXq4g=
+
+
 
 // IN USE IN MAIN startup
 // ****************************************************************************************
 //
 // get users token (works and in use)
 //
-// ****************************************************************************************
-// clientid Nq5WQmVhv2L7QWQO
 
 int tidal_class::get_access_token(char *loginbase64) {
   // lib curl stuf
@@ -1019,7 +1033,7 @@ int tidal_class::get_access_token(char *loginbase64) {
       fclose(tokenfil);
       printf("Tidal token read OK.\n");
       write_logfile(logfile,(char *) "Tidal token read OK");
-    }    
+    }
   }
   if (error) return(0); else return(1);
 }
@@ -1091,7 +1105,7 @@ char* replace_char(char* str, char find, char replace) {
 
 // ******************************************************************************************************
 //
-// works and in use
+// works and in use (Retrieve album details by TIDAL album id.)
 //
 // get/download to db albumid (json file) (process data in json file to db)
 //
@@ -1305,6 +1319,9 @@ int tidal_class::get_users_album(char *albumid) {
 
 // ****************************************************************************************
 // NEW function works
+//
+// Retrieve a list of albums by TIDAL artist id.
+//
 // get allbum by artistid (download json file)
 //
 // return 0 if fault
@@ -1371,6 +1388,11 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
 // ****************************************************************************************
 // NEW function works
 // get/download album items (download json file)
+//
+// Retrieve a list of album items - tracks & videos - 
+// by TIDAL album id. This endpoint require additional pagination-related properties: 
+// 'offset' and 'limit'. The 'items' property in the response might contain both tracks and videos that can be distinguished 
+// by the 'artifactType' property.
 //
 // return 0 if faulttidal_get_album_items
 // ok http return code
@@ -3153,6 +3175,13 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 */
 
+
+extern FMOD::System    *sndsystem;
+extern FMOD::Sound     *sound;
+extern FMOD::Channel   *channel;
+extern int fmodbuffersize;
+
+
 int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   std::string auth_kode;
   char response_string[8192];
@@ -3167,11 +3196,32 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   auth_kode=auth_kode + tidaltoken;
   char curlstring[8192];
   int error;
+  std::string sysstring;
+  int result;
+  
   // old
   // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
+
+  /*
   sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
   printf("%s \n",curlstring);
   error=system(curlstring);
+  */
+
+  // download stuf to be played
+  sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
+  sysstring = sysstring + playlist_song;
+  error=system(sysstring.c_str());
+  // then downloaded play the stuf
+  if (sndsystem) {
+    result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+    result = sndsystem->createSound("songs path", FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+    if (result==FMOD_OK) {
+      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+      if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
+    }
+  }
+  
 
   /*
   // spotify as sample to do curl api call
@@ -3230,6 +3280,7 @@ char *tidal_class::get_active_tidal_device_name() {
 // ****************************************************************************************
 //
 //
+//
 // ****************************************************************************************
 
 
@@ -3238,6 +3289,7 @@ int tidal_class::tidal_do_we_play() {
 }
 
 // ****************************************************************************************
+//
 //
 //
 // ****************************************************************************************
@@ -3249,6 +3301,7 @@ int tidal_class::tidal_pause_play() {
 
 // ****************************************************************************************
 //
+// load icons texture
 //
 // ****************************************************************************************
 
@@ -3304,17 +3357,28 @@ int tidal_class::load_tidal_iconoversigt() {
 //
 // ****************************************************************************************
 
-int tidal_class::tidal_play_now_artist(char *playlist_song,bool now) {
-
+int tidal_class::tidal_play_now_artist(char *artistid,bool now) {
+  int error;
+  std::string sysstring;
+  // download stuf to be played
+  sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/artist/";
+  sysstring = sysstring + artistid;
+  error=system(sysstring.c_str());
 }
 
 // ****************************************************************************************
 //
+// play album
 //
 // ****************************************************************************************
 
-int tidal_class::tidal_play_now_album(char *playlist_song,bool now) {
-
+int tidal_class::tidal_play_now_album(char *albumid,bool now) {
+  int error;
+  std::string sysstring;
+  // download stuf to be played
+  sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
+  sysstring = sysstring + albumid;
+  error=system(sysstring.c_str());
 }
 
 
