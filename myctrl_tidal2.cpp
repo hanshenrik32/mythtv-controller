@@ -3524,6 +3524,8 @@ int tidal_class::tidal_refresh_token() {
   return(httpCode);
 }
 
+
+
 // ****************************************************************************************
 //
 // Show tidal view
@@ -3552,7 +3554,6 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   static int stream_oversigt_loaded_done=0;
   GLuint texture;
   static GLuint last_texture;
-  //static bool texture_loaded=false;
   char *base,*right_margin;
   int length,width;
   int pline=0;
@@ -3564,7 +3565,6 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
     tim.tv_usec=0;
     lasttime.tv_usec=0;
   }
-
   // last loaded filename
   if (tidal_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
   // load icons
@@ -3573,11 +3573,15 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   glTranslatef(0,0,0.0f);
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
-    if (!(texture_loaded)) {
-      load_tidal_iconoversigt();
-      texture_loaded=true;
-    }
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
+
+      // load texture
+      if (stack[i+sofset]->textureId==0) {
+        if (file_exists(stack[i+sofset]->feed_gfx_url)) {
+          stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+        }
+      }
+      
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
         xof=0;
@@ -3708,6 +3712,22 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       i++;
       xof+=(buttonsize+10);
     }
+  } else {
+      // No tidal account
+      glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+      glRotatef(anim_angle,0.0f,1.0f,0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize*4), 10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize*4),buttonsizey*4, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
+      glEnd();
+      glcRenderString("No tidal account enabled.");
   }
 }
 

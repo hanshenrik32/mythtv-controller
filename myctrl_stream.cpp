@@ -4248,8 +4248,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
     const int n=9;
     float da=1.5707963267948966192313216916398/float(n);
     int loop;
-
-
     if (stream_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
     if ((this->streamantal()) && (stream_oversigt_loaded==false) && (this->stream_oversigt_loaded_nr<this->streamantal())) {
       if (stack[stream_oversigt_loaded_nr]) strcpy(gfxfilename,stack[stream_oversigt_loaded_nr]->feed_gfx_mythtv);
@@ -4291,7 +4289,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
           strcpy(downloadfilename_last,downloadfilenamelong);
         }     
       }
-      // down loading ?
+      // downloading ?
       if (stream_oversigt_loaded_nr==this->streamantal()) {
         stream_oversigt_loaded=true;
         stream_oversigt_loaded_done=true;
