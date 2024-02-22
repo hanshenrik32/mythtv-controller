@@ -226,7 +226,7 @@ class tidal_class {
         // download albums items
         int tidal_get_album_items(char *albumid);
         // download all albums by artist id
-        int tidal_get_artists_all_albums(char *artistid);
+        int tidal_get_artists_all_albums(char *artistid,bool force);
 
         // used by tidal_get_artists_all_albums
         void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
