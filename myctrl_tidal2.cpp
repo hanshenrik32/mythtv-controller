@@ -3574,143 +3574,163 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
-
       // load texture
-      if (stack[i+sofset]->textureId==0) {
-        if (file_exists(stack[i+sofset]->feed_gfx_url)) {
-          stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+      
+      if (this->texture_loaded==false) {
+        if (stack[i+sofset]->textureId==0) {        
+          if (file_exists(stack[i+sofset]->feed_gfx_url)) {
+            stack[i+sofset]->textureId=loadTexture ((char *) stack[i+sofset]->feed_gfx_url);
+          }
         }
       }
       
-      if (((i % bonline)==0) && (i>0)) {
-        yof=yof-(buttonsizey+20);
-        xof=0;
-      }
-      if (i+1==(int) stream_key_selected) {
-        buttonsizey=200.0f;
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      } else {
-        buttonsizey=180.0f;
-        glColor4f(0.8f, 0.8f, 0.8f,1.0f);
-      }
-      // stream icon
-      glPushMatrix();
-
-      if (anim_angle>360) {
-        anim_angle=180.0f;
-        anim_viewer=false;
-      } else {
-        if (anim_viewer) {
-          gettimeofday(&tim,NULL);
-          if (lasttime.tv_usec==0) {
-            lasttime.tv_usec=tim.tv_usec;
-          } else {
-            if (tim.tv_usec>(lasttime.tv_usec+100)) {
-              anim_angle+=0.50;
-            } else {
-              anim_viewer=false;
-              anim_angle=0.0f;
-            }
-          }
-        } else anim_angle=0.0f;
-      }
-
-      glTranslatef(xof+20+(buttonsize/2),yof-10,0);
-      glRotatef(anim_angle,0.0f,1.0f,0.0f);
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(100+i+sofset);
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
-      glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-      glEnd();                
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      if (stack[i+sofset]->textureId) {
-        if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdback);
-          } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        } else {
-          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
-        }        
-      } else {
-        if ((i+sofset)==0) {
-          if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
-            glBindTexture(GL_TEXTURE_2D,_textureIdback);            
-          } else glBindTexture(GL_TEXTURE_2D,normal_icon);
-        } else {
-          if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
+      if (true) {
+        if (((i % bonline)==0) && (i>0)) {
+          yof=yof-(buttonsizey+20);
+          xof=0;
         }
-      }
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glLoadName(100+i+sofset);
-      glBegin(GL_QUADS);
-      if (tema==5) {
+        if (i+1==(int) stream_key_selected) {
+          buttonsizey=200.0f;
+          glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        } else {
+          buttonsizey=180.0f;
+          glColor4f(0.8f, 0.8f, 0.8f,1.0f);
+        }
+        // stream icon
+        glPushMatrix();
+
+        if (anim_angle>360) {
+          anim_angle=180.0f;
+          anim_viewer=false;
+        } else {
+          if (anim_viewer) {
+            gettimeofday(&tim,NULL);
+            if (lasttime.tv_usec==0) {
+              lasttime.tv_usec=tim.tv_usec;
+            } else {
+              if (tim.tv_usec>(lasttime.tv_usec+100)) {
+                anim_angle+=0.50;
+              } else {
+                anim_viewer=false;
+                anim_angle=0.0f;
+              }
+            }
+          } else anim_angle=0.0f;
+        }
+
+        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+        glRotatef(anim_angle,0.0f,1.0f,0.0f);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
         glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
         glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
         glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
-      } else {
-        glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
-        glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
-        glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
-      }
-      glEnd();        
-      glPopMatrix();
-      // show text of element
-      glPushMatrix();
-      pline=0;
-      glTranslatef(xof+20,yof-20,0);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      base=temptxt;
-      length=strlen(temptxt);                               // get length
-      width = 19;                                           // max length to show
-      bool stop=false;                                      // done
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
+        glEnd();                
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if (stack[i+sofset]->textureId) {
+          if ((i+sofset)==0) {
+            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+              glBindTexture(GL_TEXTURE_2D,_textureIdback);
+            } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+          } else {
+            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+          }        
+        } else {
+          if ((i+sofset)==0) {
+            if (strcmp(stack[i+sofset]->feed_showtxt,"Back")==0) {
+              glBindTexture(GL_TEXTURE_2D,_textureIdback);            
+            } else glBindTexture(GL_TEXTURE_2D,normal_icon);
+          } else {
+            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,normal_icon);
           }
         }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
-        //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        if (tema==5) {
+          glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize/2), 10, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize/2),buttonsizey-20, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize/2), buttonsizey-20 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize/2), 10 , 0.0);
+        } else {
+          glTexCoord2f(0, 0); glVertex3f( 12-(buttonsize/2), 12, 0.0);
+          glTexCoord2f(0, 1); glVertex3f( 12-(buttonsize/2),buttonsizey-22, 0.0);
+          glTexCoord2f(1, 1); glVertex3f( buttonsize-12-(buttonsize/2), buttonsizey-22 , 0.0);
+          glTexCoord2f(1, 0); glVertex3f( buttonsize-12-(buttonsize/2), 12 , 0.0);
+        }
+        glEnd();        
+        glPopMatrix();
+        // show text of element
+        glPushMatrix();
+        pline=0;
+        glTranslatef(xof+20,yof-20,0);
+        glDisable(GL_TEXTURE_2D);
+        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
+        glRasterPos2f(0.0f, 0.0f);
+        glDisable(GL_TEXTURE_2D);
+        strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
+        base=temptxt;
+        length=strlen(temptxt);                               // get length
+        width = 19;                                           // max length to show
+        bool stop=false;                                      // done
+        while(*base) {
+          // if text can be on line
+          if(length <= width) {
+            glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
+            glcRenderString(base);
+            pline++;
+            break;
+          }
+          right_margin = base+width;
+          while((!isspace(*right_margin)) && (stop==false)) {
+            right_margin--;
+            if (right_margin == base) {
+              right_margin += width;
+              while(!isspace(*right_margin)) {
+                if (*right_margin == '\0') break;
+                else stop=true;
+                right_margin++;
+              }
+            }
+          }
+          if (stop) *(base+width)='\0';
+          *right_margin = '\0';
+          glcRenderString(base);
+          pline++;
+          glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
+          //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
+          length -= right_margin-base+1;                         // +1 for the space
+          base = right_margin+1;
+          if (pline>=2) break;
+        }
+        glPopMatrix();
+        // next button
+        i++;
+        xof+=(buttonsize+10);
+      } else {
+        glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+        glRotatef(anim_angle,0.0f,1.0f,0.0f);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glLoadName(100+i+sofset);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize*4), 10, 0.0);
+        glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize*4),buttonsizey*4, 0.0);
+        glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
+        glEnd();
+        glcRenderString("Loading textures.");
+
       }
-      glPopMatrix();
-      // next button
-      i++;
-      xof+=(buttonsize+10);
     }
   } else {
       // No tidal account

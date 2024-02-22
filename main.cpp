@@ -9653,7 +9653,7 @@ void handlespeckeypress(int key,int x,int y) {
     fnumbersoficonline=8;	  // antal i film oversigt
     rnumbersoficonline=8;   // antal i radio oversigt
     snumbersoficonline=8;   // antal i stream/spotify oversigt
-    tnumbersoficonline=9;   // antal i tidal oversigt
+    tnumbersoficonline=8;   // antal i tidal oversigt
     MOVIE_CS=46.0f;					// movie dvd cover side
     MOVIE_CS=46.0f;					// movie dvd cover side
     MOVIE_CS=46.0f;					// movie dvd cover side
