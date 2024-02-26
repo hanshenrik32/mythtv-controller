@@ -14193,8 +14193,7 @@ void *webupdate_loader_tidal(void *data) {
       loadedtidal=true;
       tidal_update_loaded_begin=true;
       tidal_oversigt.set_tidal_update_flag(true);
-      // add default playlists from spotify
-      // you have to call clean_spotify_oversigt after earch spodify_get_playlist
+      // add default playlists from tidal
       // get user playlists
 
       // temp disable use in prod
@@ -14202,10 +14201,10 @@ void *webupdate_loader_tidal(void *data) {
       tidal_oversigt.clean_tidal_oversigt();                                  // clear old stuf
       tidal_oversigt.active_tidal_device=tidal_oversigt.tidal_get_available_devices();
       // update view from db
-      tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
+      tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset tidal overview to default
     }
     */
-    tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset spotify overview to default
+    tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset tidal overview to default
   }
 
   // write debug log

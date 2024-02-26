@@ -573,7 +573,6 @@ tidal_oversigt_type::tidal_oversigt_type() {
 
 
 
-
 // ****************************************************************************************
 //
 // used by icon anim
@@ -1142,6 +1141,7 @@ int tidal_class::get_users_album(char *albumid) {
   bool playlistsongexist=false;
   dbexist=false;
   std::string json_album_file_name;
+  std::string logdata;
   int tt=0;
   try {
     clean_tidal_oversigt();
@@ -1303,6 +1303,9 @@ int tidal_class::get_users_album(char *albumid) {
               fprintf(stdout,"Error SQL : %s\n",sql);
             }
             mysql_store_result(conn);
+            logdata="TIDAL Update album id ";
+            logdata=logdata + albumid;
+            write_logfile(logfile,(char *) logdata.c_str());
           }
         }
       }
@@ -1714,8 +1717,9 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
 //
 // ****************************************************************************************
 
-
+//
 // fast file exist test func
+//
 
 inline bool file_exists(const std::string& name) {
   struct stat buffer;   
@@ -1724,6 +1728,7 @@ inline bool file_exists(const std::string& name) {
 
 
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
+  std::string logdata;
   struct stat filestatus;
   long file_size;
   char *file_contents;
@@ -1841,6 +1846,10 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                 printf("Downloading album + json file %s  nr %d \n",stack[recnr]->playlistid,recnr);
                 // Download playlist json file + update db from the downloaded json file.
                 // get_users_album(stack[recnr]->playlistid);
+                logdata="TIDAL Update playlist id ";
+                logdata=logdata + stack[recnr]->playlistid;
+                write_logfile(logfile,(char *) logdata.c_str());
+
               }
               recnr++;
             }
@@ -1890,6 +1899,7 @@ int tidal_class::tidal_get_user_id() {
   std::string auth_kode;
   std::string response_string;
   std::string url;
+  std::string logdata;
   char post_playlist_data[4096];
   int httpCode=0;
   CURLcode res;
@@ -1935,9 +1945,9 @@ int tidal_class::tidal_get_user_id() {
       // always cleanup
       curl_easy_cleanup(curl);
       curl_global_cleanup();
-      if (httpCode == 200) {
-        return(200);
-      }
+      if (httpCode == 200) logdata="TIDAL login ok"; else logdata="TIDAL login fault";
+      write_logfile(logfile,(char *) logdata.c_str());
+      if (httpCode == 200) return(200);
     }
   }
   return(httpCode);
@@ -2174,7 +2184,7 @@ void tidal_class::clean_tidal_oversigt() {
 // *********************************************************************************************************************************
 // Download image
 // sample call
-// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/hans/file.jpg");
+// download_image("https://i.scdn.co/image/ab67616d0000b2737bded29598acbe1e2f4b4437","/home/hans/image_filename.jpg");
 // ********************************************************************************************
 
 int tidal_download_image(char *imgurl,char *filename) {
