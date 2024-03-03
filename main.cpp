@@ -3586,7 +3586,7 @@ void display() {
         // show Tidal search
         tidal_oversigt.show_tidal_search_oversigt( _textureId_dir , _textureId_song , _textureIdback , _textureIdback , tidal_selected_startofset , tidalknapnr , keybuffer );
       }
-      if (debugmode & 1) cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
+      if (debugmode & 1) cout << "Tidal Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else {
         tidal_oversigt.reset_amin_in_viewer();
     }

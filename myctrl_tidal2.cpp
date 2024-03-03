@@ -2348,7 +2348,7 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
             fprintf(stderr,"Curl error get user playlists\n");
             exit(0);
           }
-          // hent users playlist from spotify api
+          // hent users playlist from tidal api
           system("cat tidal_users_playlist.json | grep tidal:playlist: | awk {'print substr($0,31,22)'} > tidal_users_playlist.txt");
           // get antal playliste first time (we can only load 50 at time)
           if (tidal_playlistantal_loaded==0) {
@@ -2406,6 +2406,8 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
       }
       write_logfile(logfile,(char *) "process tidal playlist done..");
       mysql_close(conn);
+    } else {
+      write_logfile(logfile,(char *) "No mysql db ..");
     }
   }
   catch (...) {
@@ -2413,7 +2415,6 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
   }
   return(1);
 }
-
 
 
 
