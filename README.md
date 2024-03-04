@@ -10,7 +10,9 @@ Version.
 
 mythtv-controller ver 0.41.0
 
-tidal working. need some code fix to make it stable.
+Tidal working. need some code fix to make it stable.
+
+tidal-dl installed in /usr/local/bin
 
 mythtv-controller ver 0.40.7
 

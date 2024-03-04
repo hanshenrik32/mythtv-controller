@@ -14,6 +14,8 @@
 const int tidal_playlisttype=0;                         // playlist type
 const int tidal_songlisttype=1;                         // song list type
 
+const std::string tidal_download_home="/download/";
+
 //
 // device struct
 //
@@ -216,7 +218,7 @@ class tidal_class {
         void process_object_playlist(json_value* value, int depth);
         void process_array_playlist(json_value* value, int depth);
 
-        int tidal_play_now_song(char *playlist_song,bool now);                // play song
+        int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                // play song
         int get_playlist_from_file(char *filename);                           // read/import playlists from file
         
 

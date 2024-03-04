@@ -230,294 +230,7 @@ void tidal_class::process_value_token(json_value* value, int depth,int x) {
 
 
 
-// https://api.tidal.com/v1/login/username&username=hanshenrik32@gmail.com&password=hhpky83xbip&token=clientid
-
-// https://api.tidal.com/v1/login/username%26username%3Dhanshenrik32%40gmail.com%26password%3Dhhpky83xbip%26token%3Dclientid
-
-// ****************************************************************************************
-// IN USE NOT
-//
-// X-Tidal-Token have to token
-//
-// MEW web server handler (internal function)
-// Login web https://account.tidal.com/login
-//
-// ****************************************************************************************
-
-static void ev_handler(struct mg_connection *c, int ev, void *ev_data) {
-  int curl_error;
-  char *encoded;
-  const char *p;
-  const char *pspace;
-  unsigned int codel;
-  char user_token[1024];
-  char url_emcoded_user_token[1024];
-  char user_name[1024];
-  char url_emcoded_user_name[1024];
-  char user_pass[1024];
-  char url_emcoded_user_pass[1024];
-  char curlcommand[1024];
-  const char *returncode_pointer;
-  struct mg_serve_http_opts opts;
-  struct http_message *hm = (struct http_message *) ev_data;
-  CURL *curl = curl_easy_init();
-  strcpy(user_name,"");
-  strcpy(user_pass,"");
-  strcpy(user_token,"");
-  switch (ev) {
-    case MG_EV_HTTP_REQUEST:
-      // Invoked when the full HTTP request is in the buffer (including body).
-      printf("Tidal Return REQUEST Call \n");
-
-      printf("str %s \n",hm->uri.p);
-
-      if (mg_strncmp( hm->uri,mg_mk_str_n("/tidal_web/",11),11) == 0) {
-        char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
-        printf("Tidal Output %s \n", hm->uri.p);
-        printf("%s",(char *) hm->uri.p);
-        //exit(0);
-        p = strstr( hm->uri.p , "username="); // mg_mk_str_n("code=",5));
-        if (p) {
-          pspace=strchr(p,'&');
-          if (pspace==NULL) pspace=strchr(p,'\n');
-          if (pspace) {
-            codel=(pspace-p);
-            strncpy(user_name,p+9,pspace-p);
-            *(user_name+(pspace-p))='\0';
-          }
-          user_name[codel-9]='\0';
-        }
-        p = strstr( hm->uri.p , "password="); // mg_mk_str_n("code=",5));
-        if (p) {
-          pspace=strchr(p,'&');
-          if (pspace==NULL) pspace=strchr(p,'\n');
-          if (pspace) {
-            codel=(pspace-p);
-            strncpy(user_pass,p+9,pspace-p);
-            *(user_pass+(pspace-p))='\0';
-          }
-          user_pass[codel-9]='\0';
-        }
-
-        p = strstr( hm->uri.p , "token="); // mg_mk_str_n("code=",5));
-        if (p) {
-          pspace=strchr(p,'&');
-          if (pspace==NULL) pspace=strchr(p,'#');
-          if (pspace) {
-            codel=(pspace-p);
-            strncpy(user_token,p+6,pspace-p);
-            *(user_token+(pspace-p))='\0';
-          }
-          user_token[codel-6]='\0';
-          printf("Username found %s\n",user_name);
-          printf("password found %s\n",user_pass);
-          printf("token    found %s\n",user_token);
-        }
-        strcpy(user_token,"84f32ccefc36947285f266841cfa7a2e3d308118");                                    // bakYq0nMtpuRYDtM
-        strcpy(url_emcoded_user_name,"");
-        strcpy(url_emcoded_user_pass,"");
-        strcpy(url_emcoded_user_token,"");
-        if (p) {
-          encoded = curl_easy_escape(curl,user_name,strlen(user_name));
-          if (encoded) strncpy(url_emcoded_user_name,encoded,1020);
-          encoded = curl_easy_escape(curl,user_pass,strlen(user_pass));
-          if (encoded) strncpy(url_emcoded_user_pass,encoded,1020);
-          encoded = curl_easy_escape(curl,user_pass,strlen(user_pass));
-          if (encoded) strncpy(url_emcoded_user_pass,encoded,1020);
-          encoded = curl_easy_escape(curl,user_token,strlen(user_token));
-          if (encoded) strncpy(url_emcoded_user_token,encoded,1020);
-          if (encoded) {
-            if (strcmp(url_emcoded_user_name,"")!=0) {
-              sprintf(curlcommand,"curl -X POST -d 'username=%s&password=%s&token=%s' -H 'Content-Type: application/x-www-form-urlencoded' https://api.tidal.com/v1/login/username > tidal_access_token.txt",url_emcoded_user_name,url_emcoded_user_pass,url_emcoded_user_token);
-
-              printf("Curl command %s \n\n",curlcommand);
-
-              curl_error=system(curlcommand);
-
-              curl_error=system("cat tidal_access_token.txt");
-            }
-          }
-        }
-      }
-      if (mg_strncmp( hm->uri,mg_mk_str_n("/call",5),5) == 0) {
-        // Get server return code
-        returncode_pointer = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
-        if (returncode_pointer) {
-          // get user user_token
-          printf("get user token ************************** \n");
-        }
-        fprintf(stdout,"Got reply from server : %s \n", (mg_str) hm->uri);
-        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);          /* Serve static content */
-      } else {
-        // else show normal indhold
-        memset(&opts, 0, sizeof(opts));
-        opts.document_root = ".";                                                       // Serve files from the current directory
-        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);          /* Serve static content */
-      }
-      // We have received an HTTP request. Parsed request is contained in `hm`.
-      // Send HTTP reply to the client which shows full original request.
-      //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
-      //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
-      break;
-    case MG_EV_HTTP_REPLY:
-      c->flags |= MG_F_CLOSE_IMMEDIATELY;
-      fwrite(hm->body.p, 1, hm->body.len, stdout);
-      putchar('\n');
-      break;
-    case MG_EV_CLOSE:
-      fprintf(stdout,"Server closed connection\n");
-  }
-  if (curl) {
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-  }
-}
-
-
-
-
-
-
-
-
-// ****************************************************************************************
-// OLD NOT IN USE
-// web server handler (internal function)
-//
-// ****************************************************************************************
-
-
-
-static void tidal_server_ev_handler(struct mg_connection *c, int ev, void *ev_data) {
-  const char *p;
-  const char *pspace;
-  int n=0;
-  char user_token[1024];
-  char sql[2048];
-  struct http_message *hm = (struct http_message *) ev_data;
-  struct mg_serve_http_opts opts;
-  int curl_error;
-  char* file_contents=NULL;
-  size_t len;
-  int error;
-  FILE *tokenfile;
-  char *base64_code;
-  char data[512];
-  char token_string[512];
-  char token_refresh[512];
-  unsigned int codel;
-  strcpy(data,"");
-  //strcpy(data,spotify_oversigt.spotify_client_id);
-  //strcat(data,":");
-  //strcat(data,spotify_oversigt.spotify_secret_id);
-  // OLD FROM
-  /*
-  <form action="https://api.tidal.com/v1/login/username" method="post" name="loginform" id="loginform" onSubmit="loginStage1(this.username.value); return false;">
-  */
-  //
-  CURL *curl = curl_easy_init();
-  printf("TIDAL Calling web server \n");
-  char sed[]="cat tidal_access_token.txt | grep -Po '\"\\K[^:,\"}]*' | grep -Ev 'access_token|token_type|Bearer|expires_in|refresh_token|scope' > spotify_access_token2.txt";
-  //calc base64
-  base64_code=b64_encode((const unsigned char *) data, 65);
-  *(base64_code+88)='\0';
-  switch (ev) {
-    case MG_EV_HTTP_REQUEST:
-      // Invoked when the full HTTP request is in the buffer (including body).
-      // from spotify servershm->uri.p
-      // is callback call
-
-      if (mg_strncmp( hm->uri,mg_mk_str_n("/login",6),6) == 0) {
-        char *output = curl_easy_escape(curl, hm->uri.p,strlen(hm->uri.p));
-        printf("Encoded output %s \n", output);
-        printf("%s",(char *) hm->uri.p);
-        exit(0);
-      }
-
-      if (mg_strncmp( hm->uri,mg_mk_str_n("/callback",9),9) == 0) {
-        if (debugmode) fprintf(stdout,"Tidal Got reply server : %s \n", (mg_str) hm->uri);
-        p = strstr( hm->uri.p , "code="); // mg_mk_str_n("code=",5));
-        // get sptify code from server
-        if (p) {
-          pspace=strchr(p,' ');
-          if (pspace) {
-            codel=(pspace-p);
-            strncpy(user_token,p+5,pspace-p);
-            *(user_token+(pspace-p))='\0';
-          }
-          user_token[codel-4]='\0';
-        }
-        //sprintf(sql,"curl -X POST -H 'Authorization: Basic %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=http://localhost:8000/callback/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.spotify.com/api/token > spotify_access_token.txt",base64_code,user_token,spotify_oversigt.spotify_client_id,spotify_oversigt.spotify_secret_id);
-        //printf("sql curl : %s \n ",sql);
-
-        sprintf(sql,"curl -X POST -H 'Authorization: Bearer %s' -d grant_type=authorization_code -d code=%s -d redirect_uri=https://account.tidal.com/login/tidal/ -d client_id=%s -d client_secret=%s -H 'Content-Type: application/x-www-form-urlencoded' https://accounts.tidal.com/api/token > tidal_access_token.txt",base64_code,user_token,tidal_oversigt->tidal_client_id,tidal_oversigt->tidal_secret_id);
-
-        curl_error=system(sql);
-        if (curl_error==0) {
-          curl_error=system(sed);
-          if (curl_error==0) {
-            write_logfile(logfile,(char *) "******** Got tidal token ********");
-          } else {
-            write_logfile(logfile,(char *) "******** No tidal token ********");
-          }
-          if (curl_error==0) {
-            tokenfile=fopen("tidal_access_token2.txt","r");
-            error=getline(&file_contents,&len,tokenfile);
-            //strcpy(token_string,file_contenUser tidal download user playlistts);
-            token_string[strlen(token_string)-1]='\0';
-            error=getline(&file_contents,&len,tokenfile);
-            strcpy(token_refresh,file_contents);
-            token_refresh[strlen(token_refresh)-1]='\0';
-  //          printf("token     %s\n",token_string);
-  //          printf("ref token %s\n",token_refresh);
-            //spotify_oversigt.spotify_set_token(token_string,token_refresh);
-            fclose(tokenfile);
-            free(file_contents);
-            if (strcmp(token_string,"")!=0) {
-              //spotify_oversigt.spotify_get_user_id();                                   // get user id
-              //spotify_oversigt.active_spotify_device=spotify_oversigt.spotify_get_available_devices();
-              // set default spotify device if none
-              //if (spotify_oversigt.active_spotify_device==-1) spotify_oversigt.active_spotify_device=0;
-            }
-          }
-        }
-        //c->flags |= MG_F_SEND_AND_CLOSE;
-        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);  /* Serve static content */
-      } else {
-        // else show normal indhold
-        memset(&opts, 0, sizeof(opts));
-        opts.document_root = ".";       // Serve files from the current directory
-        mg_serve_http(c, (struct http_message *) ev_data, s_http_server_opts);
-      }
-      // We have received an HTTP request. Parsed request is contained in `hm`.
-      // Send HTTP reply to the client which shows full original request.
-      //mg_send_head(c, 200, hm->message.len, "Content-Type: text/plain");
-      //mg_printf(c, "%.*s", (int)hm->message.len, hm->message.p);
-      break;
-    case MG_EV_HTTP_REPLY:
-      write_logfile(logfile,(char *) "Other CALL BACK server reply");
-      c->flags |= MG_F_CLOSE_IMMEDIATELY;
-      fwrite(hm->body.p, 1, hm->body.len, stdout);
-      putchar('\n');
-      break;
-    case MG_EV_CLOSE:
-      fprintf(stdout,"Tidal Server closed connection\n");
-  }
-  curl_easy_cleanup(curl);
-  curl_global_cleanup();
-}
-
-
-// ****************************************************************************************
-//
-// client handler
-// get JSON return from tidal
-//
-// ****************************************************************************************
-
 static int s_exit_flag = 0;
-
-
 
 
 // ****************************************************************************************
@@ -663,10 +376,15 @@ tidal_class::~tidal_class() {
 
 
 
+// ****************************************************************************************
+//
+// set texture loaded flag
+//
+// ****************************************************************************************
+
 void tidal_class::set_textureloaded(bool set) {
   texture_loaded=set; 
 }
-
 
 
 int Get_albums_by_artist() {
@@ -1892,6 +1610,7 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
 
 
 // ****************************************************************************************
+// in use in main line 24229
 // Do work now
 // get user id from tidal api
 //
@@ -3167,19 +2886,57 @@ char *tidal_class::get_tidal_playlistid(int nr) {
 //
 // ****************************************************************************************
 
-int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
-  char curlstring[8192];
+int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now) { 
+  std::string temptxt;
+  std::string songpathtoplay;
+  std::string sysstring;
   int error;
-  //https://listen.tidal.com/playlist/f9075c2c-efe5-45ed-a68e-f3a1ef36ec8e
-  //https://listen.tidal.com/album/
-
-  // old
-  // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
-  sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
-  printf("%s \n",curlstring);
-  error=system(curlstring);
-  if (error==0) return(1); else return(0);
-  
+  int result;
+  std::string homedir;
+  // download stuf to be played
+  // check if exist
+  sysstring="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
+  sysstring = sysstring + playlist_song;
+  error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+  // then downloaded play the stuf
+  // first set homedir from global var have the users homedir
+  homedir=localuserhomedir;
+  if ((sndsystem) && (error==0)) {
+    // convert m4a files to wav if needed
+    temptxt=homedir;
+    temptxt=temptxt + tidal_download_home;
+    temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+    temptxt="/";
+    temptxt=temptxt + "/01.m4a";
+    // Is the file downloaded and converted before skip it
+    if ( file_exists(temptxt.c_str()) == false ) {
+      temptxt="ffmpeg -y -i '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + tidal_download_home;
+      temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+      temptxt=temptxt + "/01.m4a'";
+      temptxt=temptxt + " '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + tidal_download_home;
+      temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+      temptxt=temptxt + "/";
+      temptxt=temptxt + "01.wav'";
+      error=system(temptxt.c_str());
+      if (error==0) {
+        result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+        songpathtoplay=homedir;
+        songpathtoplay= songpathtoplay + tidal_download_home;
+        songpathtoplay=songpathtoplay + stack[tidalknapnr]->feed_showtxt;
+        songpathtoplay=songpathtoplay + "/01.wav";
+        result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+        if (result==FMOD_OK) {
+          if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+        }
+      }
+    }
+  }
+  if (result!=FMOD_OK) return(1); else return(0);
 }
 
 
@@ -3205,36 +2962,16 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 
 int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
-  std::string auth_kode;
-  char response_string[8192];
-  std::string url;
   std::string temptxt;
   std::string songpathtoplay;
   //std::string post_playlist_data;
-  char post_playlist_data[4096];
-  int httpCode;
-  CURLcode res;
-  struct curl_slist *header = NULL;
-  char *devid=get_active_device_id();
-  auth_kode="Authorization: Bearer ";
-  auth_kode=auth_kode + tidaltoken;
-  char curlstring[8192];
   int error;
   std::string sysstring;
   int result;
   std::string homedir;
-  
-  // old
-  // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
-  /*
-  sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
-  printf("%s \n",curlstring);
-  error=system(curlstring);
-  */
-
   // download stuf to be played
   // check if exist
-  sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
+  sysstring="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
   sysstring = sysstring + playlist_song;
   error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
   // then downloaded play the stuf
@@ -3243,7 +2980,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   if ((sndsystem) && (error==0)) {
     // convert m4a files to wav if needed
     temptxt=homedir;
-    temptxt=temptxt + "/download/";
+    temptxt=temptxt + tidal_download_home;
     temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
     temptxt="/";
     temptxt=temptxt + "/01.m4a";
@@ -3251,12 +2988,12 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
     if ( file_exists(temptxt.c_str()) == false ) {
       temptxt="ffmpeg -y -i '";
       temptxt=temptxt + homedir;
-      temptxt=temptxt + "/download/";
+      temptxt=temptxt + tidal_download_home;
       temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt=temptxt + "/01.m4a'";
       temptxt=temptxt + " '";
       temptxt=temptxt + homedir;
-      temptxt=temptxt + "/download/";
+      temptxt=temptxt + tidal_download_home;
       temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt=temptxt + "/";
       temptxt=temptxt + "01.wav'";
@@ -3264,7 +3001,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       if (error==0) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
         songpathtoplay=homedir;
-        songpathtoplay= songpathtoplay + "/download/";
+        songpathtoplay= songpathtoplay + tidal_download_home;
         songpathtoplay=songpathtoplay + stack[tidalknapnr]->feed_showtxt;
         songpathtoplay=songpathtoplay + "/01.wav";
         result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
