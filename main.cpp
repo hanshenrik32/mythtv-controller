@@ -9352,9 +9352,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
               // try load and start playing playlist
               if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==0) {
-                tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), 1);
+                tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
               }
-              // try load and  play song
+              // try load and play song
               if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), 1);
               }
@@ -9467,7 +9467,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             if (strcmp(tidal_oversigt.get_tidal_name(tidalknapnr-1),"")!=0) {
               switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
                 case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
-                        tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), 1);
+                        tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
                         break;
                 case 1: fprintf(stderr,"button nr %d play tidal artist song %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-2),tidal_oversigt.get_tidal_type(tidalknapnr-2));
                         tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-2 ), 1);

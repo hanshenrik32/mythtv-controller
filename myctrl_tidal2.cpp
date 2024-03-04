@@ -849,7 +849,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
               antalplaylists++;
             }
             if (stack[antal]) {
-              strcpy( stack[antal]->feed_showtxt , value->u.string.ptr );
+              strcpy( stack[antal]->feed_showtxt , value->u.string.ptr );                   // hent vist tekst
             }
             iconnr=0;                                                                       // reset gfx icon download counter
           }
@@ -1529,7 +1529,7 @@ void tidal_class::process_array_playlist_tidal_get_artists_all_albums(json_value
 
 // ****************************************************************************************
 //
-// sub stuf
+// sub stuf for playlist
 //
 // ****************************************************************************************
 
@@ -1670,7 +1670,7 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
           //
           // get artis name ok
           //
-          if ((depth==9) && (x==1)) {
+          if ((depth==10) && (x==1)) {
             if (stack[antal]) {
               // printf("Set artist name %s \n", value->u.string.ptr);
               strcpy( stack[antal]->feed_artist , value->u.string.ptr );
@@ -3179,6 +3179,7 @@ int tidal_class::tidal_play_now_song(char *playlist_song,bool now) {
 // ****************************************************************************************
 //
 // Play functios track.
+// works now
 //
 // ****************************************************************************************
 
@@ -3201,10 +3202,12 @@ extern FMOD::Channel   *channel;
 extern int fmodbuffersize;
 
 
-int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
+int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
   std::string auth_kode;
   char response_string[8192];
   std::string url;
+  std::string temptxt;
+  std::string songpathtoplay;
   //std::string post_playlist_data;
   char post_playlist_data[4096];
   int httpCode;
@@ -3220,7 +3223,6 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   
   // old
   // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
-
   /*
   sprintf(curlstring,"/bin/curl -X GET 'https://tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
   printf("%s \n",curlstring);
@@ -3230,61 +3232,40 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,bool now) {
   // download stuf to be played
   sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
   sysstring = sysstring + playlist_song;
-  error=system(sysstring.c_str());
+  error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
   // then downloaded play the stuf
-  if (sndsystem) {
-    result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
-    result = sndsystem->createSound("songs path", FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
-    if (result==FMOD_OK) {
-      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
-      if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
+  if ((sndsystem) && (error==0)) {
+    // convert m4a files to wav if needed
+    temptxt="/home/hans/download/";
+    temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+    temptxt="/";
+    temptxt=temptxt + "/01.m4a";
+    // Is the file downloaded and converted before skip it
+    if ( file_exists(temptxt.c_str()) == false ) {
+      temptxt="ffmpeg -y -i '/home/hans/download/";
+      temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+      temptxt=temptxt + "/01.m4a'";
+      temptxt=temptxt + " '/home/hans/download/";
+      temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+      temptxt=temptxt + "/";
+      temptxt=temptxt + "01.wav'";
+      error=system(temptxt.c_str());
+      if (error==0) {
+        result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+        songpathtoplay="/home/hans/download/";
+        songpathtoplay=songpathtoplay + stack[tidalknapnr]->feed_showtxt;
+        songpathtoplay=songpathtoplay + "/01.wav";
+        result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+        if (result==FMOD_OK) {
+          if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
+        }
+      }
     }
   }
-  
-
-  /*
-  // spotify as sample to do curl api call
-  url="https://api.spotify.com/v1/me/player/play?device_id=";
-  if (devid) url=url + devid;
-  // use libcurl
-  curl_global_init(CURL_GLOBAL_ALL);
-  CURL *curl = curl_easy_init();
-  if (curl) {
-    // Add a custom header
-    header = curl_slist_append(header, "Accept: application/json");
-    header = curl_slist_append(header, "Content-Type: application/json");
-    header = curl_slist_append(header, "charsets: utf-8");
-    header = curl_slist_append(header, auth_kode.c_str());
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
-    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
-    ////curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
-    curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POST, 1);
-    // set type post/put
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    sprintf((char *) post_playlist_data,"{\"context_uri\":\"spotify:playlist:%s\",\"offset\":{\"position\":5},\"position_ms\":0}",playlist_song);
-    // data to post
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_playlist_data );
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(post_playlist_data));
-
-    res = curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    if (res != CURLE_OK) {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-    }
-    // always cleanup
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    if (httpCode == 200) {
-      return(1);
-    }
-  }
-  */
- if (error==0) return(1); else return(0);
+  if (error==0) return(1); else return(0);
 }
+
 
 // ****************************************************************************************
 //
