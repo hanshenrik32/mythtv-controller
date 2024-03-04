@@ -10,6 +10,8 @@ Version.
 
 mythtv-controller ver 0.41.0
 
+tidal working. need some code fix to make it stable.
+
 mythtv-controller ver 0.40.7
 
 New logfile mythtv-controller.log in homedir. Spotify loader fixed. Not able to select last icon in music overview fixed.
