@@ -88,6 +88,13 @@ extern GLuint big_search_bar_artist;                    // big search bar used b
 
 extern float configsoundvolume;                           // default sound volume
 
+
+extern FMOD::System    *sndsystem;
+extern FMOD::Sound     *sound;
+extern FMOD::Channel   *channel;
+extern int fmodbuffersize;
+
+
 /*
 define('TIDAL_RESOURCES_URL','https://resources.tidal.com/images/');
 define('TIDAL_ALBUM_URL','https://listen.tidal.com/album/');
@@ -3196,11 +3203,6 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 */
 
 
-extern FMOD::System    *sndsystem;
-extern FMOD::Sound     *sound;
-extern FMOD::Channel   *channel;
-extern int fmodbuffersize;
-
 
 int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
   std::string auth_kode;
@@ -3220,6 +3222,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   int error;
   std::string sysstring;
   int result;
+  std::string homedir;
   
   // old
   // sprintf(curlstring,"/bin/curl -X GET 'https://openapi.tidal.com/us/album/%s/' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer %s' ",playlist_song,tidaltoken);
@@ -3230,40 +3233,49 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   */
 
   // download stuf to be played
+  // check if exist
   sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
   sysstring = sysstring + playlist_song;
   error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
   // then downloaded play the stuf
+  // first set homedir from global var have the users homedir
+  homedir=localuserhomedir;
   if ((sndsystem) && (error==0)) {
     // convert m4a files to wav if needed
-    temptxt="/home/hans/download/";
+    temptxt=homedir;
+    temptxt=temptxt + "/download/";
     temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
     temptxt="/";
     temptxt=temptxt + "/01.m4a";
     // Is the file downloaded and converted before skip it
     if ( file_exists(temptxt.c_str()) == false ) {
-      temptxt="ffmpeg -y -i '/home/hans/download/";
+      temptxt="ffmpeg -y -i '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + "/download/";
       temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt=temptxt + "/01.m4a'";
-      temptxt=temptxt + " '/home/hans/download/";
+      temptxt=temptxt + " '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + "/download/";
       temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt=temptxt + "/";
       temptxt=temptxt + "01.wav'";
       error=system(temptxt.c_str());
       if (error==0) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
-        songpathtoplay="/home/hans/download/";
+        songpathtoplay=homedir;
+        songpathtoplay= songpathtoplay + "/download/";
         songpathtoplay=songpathtoplay + stack[tidalknapnr]->feed_showtxt;
         songpathtoplay=songpathtoplay + "/01.wav";
         result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
         if (result==FMOD_OK) {
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
-          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile
+          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
       }
     }
   }
-  if (error==0) return(1); else return(0);
+  if (result!=FMOD_OK) return(1); else return(0);
 }
 
 
