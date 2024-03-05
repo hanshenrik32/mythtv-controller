@@ -2940,6 +2940,67 @@ int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool no
 }
 
 
+// *********************************************************************************************************
+//
+// convert m4a files to flac then fmod can play it
+//
+// *********************************************************************************************************
+
+
+void *thread_convert_m4a_to_flac(void *path) {
+  std::string temptxt;
+  std::string dirtocheck;
+  std::string homedir;
+  std::string filename;
+  std::size_t found;
+  std::string checkfilexist_name;
+  DIR *dp;
+  int i = 2;
+  int antalfiles=0;
+  int error;
+  struct dirent *ep;
+  homedir=localuserhomedir;
+  dirtocheck=homedir + tidal_download_home + (char *) path;
+  dp = opendir (dirtocheck.c_str());
+  if (dp != NULL) {
+    while (ep = readdir (dp)) {
+      filename=ep->d_name;
+      found=filename.find("m4a");
+      if (found!=std::string::npos) antalfiles++;
+    }
+    closedir (dp);
+  }
+  while(i<=antalfiles) {
+    checkfilexist_name=homedir;
+    checkfilexist_name=checkfilexist_name + tidal_download_home;
+    checkfilexist_name=checkfilexist_name + (char *) path;
+    if (i<10) checkfilexist_name=checkfilexist_name + "/0" + std::__cxx11::to_string(i) + ".flac'"; 
+      else checkfilexist_name=checkfilexist_name + "/" + std::__cxx11::to_string(i) + ".flac'";
+    if (!(file_exists(checkfilexist_name))) {
+      temptxt="ffmpeg -y -i '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + tidal_download_home;
+      temptxt=temptxt + (char *) path;
+      if (i<10) temptxt=temptxt + "/0" + std::__cxx11::to_string(i) + ".m4a'"; 
+        else temptxt=temptxt + "/" + std::__cxx11::to_string(i) + ".m4a'";
+      temptxt=temptxt + " '";
+      temptxt=temptxt + homedir;
+      temptxt=temptxt + tidal_download_home;
+      temptxt=temptxt + (char *) path;
+      temptxt=temptxt + "/";
+      if (i<10) temptxt=temptxt + "0" + std::__cxx11::to_string(i) + ".flac'";
+      else temptxt=temptxt + std::__cxx11::to_string(i) + ".flac'";
+      error=system(temptxt.c_str());
+      if (error!=0) {
+        write_logfile(logfile,(char *) "Tidal error: can not convert m4a files to flac.");
+      }
+      i++;
+    }
+  }
+}
+
+
+
 // ****************************************************************************************
 //
 // Play functios track.
@@ -2963,7 +3024,7 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
   std::string temptxt;
-  std::string songpathtoplay;
+  std::string songpathtoplay;  
   //std::string post_playlist_data;
   int error;
   std::string sysstring;
@@ -2984,7 +3045,8 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
     temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
     temptxt="/";
     temptxt=temptxt + "/01.m4a";
-    // Is the file downloaded and converted before skip it
+    // Is the file downloaded and converted before skip it.
+    // if not start convert to flac files
     if ( file_exists(temptxt.c_str()) == false ) {
       temptxt="ffmpeg -y -i '";
       temptxt=temptxt + homedir;
@@ -2996,25 +3058,33 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       temptxt=temptxt + tidal_download_home;
       temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt=temptxt + "/";
-      temptxt=temptxt + "01.wav'";
+      temptxt=temptxt + "01.flac'";
       error=system(temptxt.c_str());
       if (error==0) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
         songpathtoplay=homedir;
         songpathtoplay= songpathtoplay + tidal_download_home;
         songpathtoplay=songpathtoplay + stack[tidalknapnr]->feed_showtxt;
-        songpathtoplay=songpathtoplay + "/01.wav";
+        songpathtoplay=songpathtoplay + "/01.flac";
         result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
         if (result==FMOD_OK) {
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
       }
+      // convert the rest of the m4a files we have downloed to flac to play it in fmod
+      if (true) {
+        pthread_t loaderthread; // used to convert m4a files to flac
+        int rc2=pthread_create(&loaderthread,NULL,thread_convert_m4a_to_flac, (void *) stack[tidalknapnr]->feed_showtxt);
+        if (rc2) {
+          fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
+          exit(-1);
+        }
+      }
     }
   }
   if (result!=FMOD_OK) return(1); else return(0);
 }
-
 
 // ****************************************************************************************
 //
