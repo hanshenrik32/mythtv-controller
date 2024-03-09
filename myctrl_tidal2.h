@@ -57,7 +57,7 @@ class tidal_oversigt_type {
 };
 
 //
-// active song to play
+// to show active song to play in window
 //
 
 class tidal_active_play_info_type {                // sample data down here

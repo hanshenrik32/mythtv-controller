@@ -9322,7 +9322,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             tidal_selected_startofset=0;                                      //
           }
         } else {
-          // open spotify playlist
+          // open tidal playlist
           if ((( retfunc == 3 ) || ( button == 3 )) && (tidalknapnr>0)) {
             ask_open_dir_or_play_tidal=false;
             // write debug log
@@ -9330,10 +9330,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             write_logfile(logfile,(char *) debuglogdata);
             // opdate view from intnr id.
             tidal_oversigt.opdatere_tidal_oversigt(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view
-            tidal_oversigt.load_tidal_iconoversigt();                                                                 // load icons
-            //spotify_oversigt.set_search_loaded();                           // triger icon loader
-            tidalknapnr=0;                                                    // reset select
-            tidal_selected_startofset=0;                                      //
+            tidal_oversigt.load_tidal_iconoversigt();                                                           // load icons
+            tidalknapnr=0;                                                                                      // reset select
+            tidal_selected_startofset=0;                                                                        // and start ofset to.
             strcpy(tidal_oversigt.overview_show_band_name,"");
           }
           // play tidal playlist or song
@@ -9361,10 +9360,12 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                   ERRCHECK(result,0);
                   snd = 0;                                // set play new flag
                 }
+                write_logfile(logfile,(char *) "Tidal start play playlist");
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
               }
               // try load and play song
               if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
+                write_logfile(logfile,(char *) "Tidal start play song");
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
               }
               if (tidal_player_start_status == 0 ) {
@@ -9372,10 +9373,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                 do_zoom_tidal_cover=true;                                       // show we play
                 snd=1;
               } else {
-                printf("Error start plying tidal song \n");
                 do_play_tidal_cover=false;
-                do_zoom_tidal_cover=false;                                       // show we play
+                do_zoom_tidal_cover=false;                                       // show we play                
                 write_logfile(logfile,(char *) "Error loading tidal song");
+                snd=0;
                 // error start playing
               }
               /*
@@ -9436,7 +9437,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         if (do_zoom_tidal_cover) {
           // pause/stop tidal music
           if ((retfunc==5) || (button==3)) {
-            #ifdef ENABLE_tidal
             if (do_play_tidal_cover==false) tidal_oversigt.tidal_resume_play();
             tidal_oversigt.tidal_pause_play();                              // tidal stop play
             do_zoom_tidal_cover=false;
@@ -9444,7 +9444,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             do_play_tidal_cover=false;
             do_select_device_to_play=false;                                     // stop show device
             tidalknapnr=0;
-            #endif
           }
         } else {
           // open tidal artist
