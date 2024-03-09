@@ -3011,9 +3011,7 @@ void *thread_convert_m4a_to_flac(void *path) {
   int antalfiles=0;
   int error;
   struct dirent *ep;
-
   FILE *fp;
-
   conn=mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   homedir=localuserhomedir;
@@ -3075,7 +3073,7 @@ void *thread_convert_m4a_to_flac(void *path) {
         checkfilexist_name=checkfilexist_name + dir_file_array[i];
         checkfilexist_name=checkfilexist_name + ".wav";        
         // create records if needed
-        snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values ('%s','%s','%s','%s',%d)", dir_file_array[i].c_str() , "", checkfilexist_name.c_str(),playlist_id.c_str(), 0 );
+        snprintf(sql,sizeof(sql),"insert IGNORE into mythtvcontroller.tidalcontent (name, paththumb, playpath, playlistid, id) values ('%s','%s','%s','%s',%d)", dir_file_array[i].c_str() , "", checkfilexist_name.c_str(),playlist_id.c_str(), 0 );
         printf("sql %s \n",sql);
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
