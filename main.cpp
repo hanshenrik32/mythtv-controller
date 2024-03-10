@@ -5223,9 +5223,7 @@ void display() {
       if (tidalknapnr-1>0) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_texture(tidalknapnr-1));                        // get playlist conver icon
     else
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                              // else default icon
-
     if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);        // set active icon
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
@@ -5272,7 +5270,6 @@ void display() {
     glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+250+100,100+320 , 0.0);
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+250+100,320, 0.0);
     glEnd();
-
     // play list name or artist name
     // show playlist or artist name
     glPushMatrix();
@@ -5300,14 +5297,17 @@ void display() {
     glTranslatef(520.0f+textofset, 640.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
+    /*
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       strcpy(temptxt1,tidal_oversigt.tidal_playlistname);
       *(temptxt1+46)=0;
       glcRenderString(temptxt1);
     } else {
-      strcpy(temptxt,tidal_oversigt.get_tidal_artistname(tidalknapnr));
+      strcpy(temptxt,(char *) tidal_oversigt.get_tidal_artistname(tidalknapnr));
       glcRenderString(temptxt);
     }
+    */
+    glcRenderString(tidal_oversigt.tidal_playlistname);
     glPopMatrix();
 
     // show songname
@@ -5346,7 +5346,7 @@ void display() {
     }
     glPopMatrix();
 
-    // show artist value
+    // show artist value/or none
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5363,7 +5363,9 @@ void display() {
     }
     glPopMatrix();
 
-    // player device
+
+
+    // # of songs
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5371,10 +5373,9 @@ void display() {
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     // show active play device
-    glcRenderString("Player    ");
+    glcRenderString("song ");
     glPopMatrix();
-
-    // player device value
+    // # of songs + active nr
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5382,9 +5383,9 @@ void display() {
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     // show active play device
-    if (tidal_oversigt.active_tidal_device>-1) {
-      glcRenderString(tidal_oversigt.get_active_tidal_device_name());
-    }
+    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song(),tidal_oversigt.total_aktiv_songs());
+      else sprintf(temptxt1,"1/1");
+    glcRenderString(temptxt1);
     glPopMatrix();
 
     // player play status background
@@ -5414,10 +5415,29 @@ void display() {
     glPopMatrix();
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
+
+    unsigned int ms;
+    unsigned int playtime_songlength;
+
+    result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
+    if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+      ERRCHECK(result,do_play_music_aktiv_table_nr);
+    }
+    // get play length new version
+    result=sound->getLength(&playtime_songlength,FMOD_TIMEUNIT_MS);
+    if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
+      ERRCHECK(result,do_play_music_aktiv_table_nr);
+    }
+    result=sound->getLength(&lenbytes,FMOD_TIMEUNIT_RAWBYTES);
+    if (result!=FMOD_OK) {
+      ERRCHECK(result,do_play_music_aktiv_table_nr);
+    }
+
     int statuswxpos = 432;
     int statuswypos = 557-20;
-    float y=tidal_oversigt.tidal_aktiv_song_msplay()/1000;
-    float ll=tidal_oversigt.tidal_aktiv_song_mslength()/1000;
+    float y=ms/1000;
+    float ll=playtime_songlength/1000;
+    // printf("Play time %d  length %d \n",ms,playtime_songlength);
     int xxx;
     if ((y>0) && (ll>0)) {
       xxx = ((y/ll)*16);
