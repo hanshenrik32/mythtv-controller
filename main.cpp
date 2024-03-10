@@ -15445,12 +15445,13 @@ int main(int argc, char** argv) {
     if (tidalok) {   
       // login ok load playlistes from file
       // load from file
+      
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
-      tidal_oversigt.tidal_get_artists_all_albums("29893",false);
-      tidal_oversigt.tidal_get_artists_all_albums("1567",false);
-      tidal_oversigt.tidal_get_artists_all_albums("1565",false);
+      tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
+      // tidal_oversigt.tidal_get_artists_all_albums("1565",false);     // Maroon 5
+      tidal_oversigt.tidal_get_artists_all_albums("3346",false);        // Gnags
 
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal file load from tidal_playlists.txt OK.\n");
