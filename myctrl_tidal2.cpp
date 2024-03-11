@@ -2961,48 +2961,18 @@ char *tidal_class::get_tidal_playlistid(int nr) {
 // ****************************************************************************************
 
 int tidal_class::tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now) { 
-  std::string temptxt;
-  std::string songpathtoplay;
-  std::string sysstring;
-  int error;
-  int result;
+  int result;  
   // download stuf to be played
   // check if exist
-  sysstring="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
-  sysstring = sysstring + playlist_song;
-  error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
-  // then downloaded play the stuf
-  // first set homedir from global var have the users homedir
-  if ((sndsystem) && (error==0)) {
-    // convert m4a files to wav if needed
-    temptxt = tidal_download_home;
-    temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
-    temptxt = "/";
-    temptxt = temptxt + "/01.m4a";
+  if (sndsystem) {
     // Is the file downloaded and converted before skip it
-    if ( file_exists(temptxt.c_str()) == false ) {
-      temptxt = "ffmpeg -y -i '";
-      temptxt = tidal_download_home;
-      temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
-      temptxt = temptxt + "/01.m4a'";
-      temptxt = temptxt + " '";
-      temptxt = temptxt + tidal_download_home;
-      temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
-      temptxt = temptxt + "/";
-      temptxt = temptxt + "01.wav'";
-      error=system(temptxt.c_str());
-      if (error==0) {
-        result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
-        songpathtoplay = tidal_download_home;
-        songpathtoplay = songpathtoplay + stack[tidalknapnr]->feed_showtxt;
-        songpathtoplay = songpathtoplay + "/01.wav";
-        result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
-        if (result==FMOD_OK) {
-          if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
-          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
-        }
-      }
+    result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+    result = sndsystem->createSound(playlist_song, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+    if (result==FMOD_OK) {
+      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+      if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
     }
+    strcpy(tidal_aktiv_song[0].song_name,stack[tidalknapnr]->feed_showtxt);
   }
   if (result!=FMOD_OK) return(1); else return(0);
 }
@@ -3136,29 +3106,46 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   std::string songpathtoplay;
   std::string playfile;
   std::string dir_file_array[1024];
+  std::string filename;
   //std::string post_playlist_data;
-  int error;
+  int error=0;
   std::string sysstring;
   int result;
-  int entry=0;
+  int entry = 0;
   char sql[4096];
   int recnr;
   char *database = (char *) "mythtvcontroller";
+  bool skip_download_of_files = false;
+  std::size_t found;
   MYSQL *conn;
   MYSQL_RES *mysql_res;
   MYSQL_ROW mysql_row;
   // download stuf to be played
   // check if exist
-  sysstring="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
-  sysstring = sysstring + playlist_song;
-  error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+  temptxt=tidal_download_home;
+  temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
+  temptxt=temptxt + "/";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ent = readdir (dir)) != NULL) && (found==false)) {
+      found=filename.find("m4a");
+      if (found) {
+        printf ("m4a file found %s\n", ent->d_name);
+        skip_download_of_files=true;
+      }
+    }
+  }
+  if (!(skip_download_of_files)) {
+    sysstring="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
+    sysstring = sysstring + playlist_song;
+    error=system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+  }
   // then downloaded play the stuf
   // first set homedir from global var have the users homedir
   if ((sndsystem) && (error==0)) {
     // convert m4a files to wav if needed
-    temptxt=tidal_download_home;
-    temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
-    temptxt=temptxt + "/";
+    temptxt = tidal_download_home;
+    temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
+    temptxt = temptxt + "/";
     entry=0;
     // read dir
     if ((dir = opendir (temptxt.c_str())) != NULL) {

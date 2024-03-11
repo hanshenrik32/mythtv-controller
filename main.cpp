@@ -9385,6 +9385,14 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               }
               // try load and play song
               if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
+                if (snd) {
+                  // yes stop play
+                  // stop old playing
+                  sound->release();                                                                       // stop last playing song
+                  dsp = 0;                                                                                  // reset uv
+                  ERRCHECK(result,0);
+                  snd = 0;                                // set play new flag
+                }
                 write_logfile(logfile,(char *) "Tidal start play song");
                 tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
               }
