@@ -3112,6 +3112,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   char *database = (char *) "mythtvcontroller";
   bool skip_download_of_files = false;
   std::size_t found;
+  int entryindir=0;
   MYSQL *conn;
   MYSQL_RES *mysql_res;
   MYSQL_ROW mysql_row;
@@ -3122,9 +3123,9 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   temptxt=temptxt + "/";
   if ((dir = opendir (temptxt.c_str())) != NULL) {
     while (((ent = readdir (dir)) != NULL) && (found==false)) {
-      found=filename.find("m4a");
+      found=filename.find(".m4a");
       if (found) {
-        printf ("m4a file found %s\n", ent->d_name);
+        printf ("m4a file found %s. Skip downloading.\n", ent->d_name);
         skip_download_of_files=true;
       }
     }
@@ -3226,19 +3227,17 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       }
       
       /*
-      int entryindir=0;
       if ((dir = opendir (temptxt.c_str())) != NULL) {
         while ((ent = readdir (dir)) != NULL) {
           found=filename.find(".m4a");
           if (found) {
             entryindir++;
-          }
-          closedir (dir);
+          }        
         }
+        closedir (dir);
         tidal_aktiv_song_antal=entryindir-1;                                                   // set antal songs in playlist
       }
       */
-
       
       recnr=0;
       tidal_aktiv_song_antal=0;
