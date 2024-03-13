@@ -48,6 +48,8 @@ class tidal_oversigt_type {
     char        playlistid[100+1];                // playlist id
     char        playlisturl[1024+1];               // play list url + tidal command
     unsigned int feed_group_antal;
+    unsigned int numberOfTracks;
+    char        type_of_media[80+1];              // album or single
     unsigned int feed_path_antal;
     bool        nyt;                              //
     GLuint      textureId;                        // gfx icon loaded

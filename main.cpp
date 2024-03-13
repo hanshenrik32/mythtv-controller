@@ -3040,7 +3040,7 @@ void display() {
     iconsizex = 192;                            // icon size
     iconspacey = 192;
   }
-  // vis menu **********************************************************************
+  // show menu **********************************************************************
   // main menu
   if ((!(visur)) && (!(vis_tv_oversigt)) && (starttimer == 0)) {
       //
@@ -3305,17 +3305,17 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
         glEnd();
       }
-
+      // tidal show search icon or (back from search) icon
       if (vis_tidal_oversigt) {
         if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(5);
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050 , 0.0);
-        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex , 0.0);
-        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex , 0.0);
-        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050 , 0.0);
+        glTexCoord2f(0, 0); glVertex3f( orgwinsizex-200 ,  orgwinsizey-1050+96 , 0.0);
+        glTexCoord2f(0, 1); glVertex3f( orgwinsizex-200,   orgwinsizey-1050+iconsizex+96 , 0.0);
+        glTexCoord2f(1, 1); glVertex3f( orgwinsizex-200+iconsizex,orgwinsizey-1050+iconsizex+96 , 0.0);
+        glTexCoord2f(1, 0); glVertex3f( orgwinsizex-200+iconsizex,   orgwinsizey-1050+96 , 0.0);
         glEnd();
       }
 
@@ -15457,9 +15457,11 @@ int main(int argc, char** argv) {
       // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
-      tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
-      // tidal_oversigt.tidal_get_artists_all_albums("1565",false);     // Maroon 5
+      // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
+      tidal_oversigt.tidal_get_artists_all_albums("1565",false);     // Maroon 5
+      
       tidal_oversigt.tidal_get_artists_all_albums("3346",false);        // Gnags
+      tidal_oversigt.tidal_get_artists_all_albums("10249",false);       // Norah Jones
 
       tidal_oversigt.opdatere_tidal_oversigt(0);
       printf("Tidal file load from tidal_playlists.txt OK.\n");
