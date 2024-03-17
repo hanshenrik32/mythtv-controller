@@ -112,6 +112,7 @@ class tidal_class {
         // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
 
     public:
+        bool startplay;
         bool texture_loaded;
 
         bool reset_amin_in_viewer();
@@ -246,6 +247,8 @@ class tidal_class {
         int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
         void set_textureloaded(bool set);
+
+        int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
 
 };
 

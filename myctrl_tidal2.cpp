@@ -3092,6 +3092,119 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 */
 
 
+void *thread_convert_m4a(void *tidalnr) {
+  
+  //int *list=(int *) tidalnr;
+  int playlist;
+  int entry;
+  int n;
+  int error;
+  int result;
+  bool swap;
+  bool skip_download_of_files=false;
+  std::string dirtoread;
+  DIR *dir;
+  struct dirent *ent;
+  std::string dir_file_array[1024];
+  std::string syscall;
+  std::string convcommand;
+  std::string temptxt;
+  std::string playfile;
+  std::string songpathtoplay;
+  playlist=1;
+  // printf("%s\n" , tidal_oversigt->get_tidal_feed_showtxt(playlist));
+  dirtoread = tidal_download_home;
+  dirtoread = dirtoread + tidal_oversigt->get_tidal_feed_showtxt(playlist);
+  dirtoread = dirtoread + "/";
+
+  if (!(skip_download_of_files)) {
+    syscall="/usr/local/bin/tidal-dl -l https://tidal.com/album/";
+    syscall = syscall +  tidal_oversigt->get_tidal_playlistid(playlist);
+    error=system(syscall.c_str());                                                                      // do it (download songs by tidal-dl)
+  }
+
+  entry=0;
+  // read dir
+  if ((dir = opendir (dirtoread.c_str())) != NULL) {
+    while (((ent = readdir (dir)) != NULL) && (entry<1000)) {
+      printf ("%s\n", ent->d_name);
+      dir_file_array[entry]=ent->d_name;
+      entry++;
+    }
+    closedir (dir);
+  } else {
+    /* could not open directory */
+  }
+
+  // sort playlist files
+  swap=true;
+  while(swap) {
+    n=0;
+    swap=false;      
+    while(n<entry) {
+      if (strcmp(dir_file_array[n].c_str(),dir_file_array[n+1].c_str())>0) {
+        swap=true;
+        std::string tmparray;
+        tmparray=dir_file_array[n];
+        dir_file_array[n]=dir_file_array[n+1];
+        dir_file_array[n+1]=tmparray;
+      }
+      n++;
+    }
+  }
+
+  convcommand = tidal_download_home;
+  convcommand = convcommand + tidal_oversigt->get_tidal_feed_showtxt(playlist);
+  convcommand = convcommand + "/";
+  convcommand = convcommand + dir_file_array[3];
+  if ( file_exists(temptxt.c_str()) == true ) {
+    convcommand = "ffmpeg -y -i '";
+    convcommand = convcommand + temptxt;
+    convcommand = convcommand + "' '";
+    convcommand = convcommand + temptxt;
+    convcommand = convcommand + ".wav'";
+    error=system(convcommand.c_str());
+  }
+
+  playfile = tidal_download_home;
+  playfile = playfile + tidal_oversigt->get_tidal_feed_showtxt(playlist);
+  playfile = playfile + "/";
+  playfile = playfile + dir_file_array[3];
+  playfile = playfile + ".wav";
+
+  // Is the file downloaded and converted before skip it.
+  // if not start convert to flac files
+  if ( file_exists(playfile.c_str()) == true ) {
+    result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
+    songpathtoplay = tidal_download_home;
+    songpathtoplay = songpathtoplay + tidal_oversigt->get_tidal_feed_showtxt(playlist);
+    songpathtoplay = songpathtoplay + "/";
+    songpathtoplay = songpathtoplay + dir_file_array[3];
+    songpathtoplay = songpathtoplay + ".wav";
+    // start play first song
+    result = sndsystem->createSound(songpathtoplay.c_str(), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
+    if (result==FMOD_OK) {
+      if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
+      if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+    }
+  }
+
+}
+
+
+
+int tidal_class::tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now) {
+    pthread_t loaderthread;
+    int rc2=pthread_create( &loaderthread , NULL , thread_convert_m4a ,(void *) tidalknapnr);
+    if (rc2) {
+      fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
+      exit(-1);
+    }
+}
+
+
+
+
 int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
   DIR *dir;
   struct dirent *ent;
