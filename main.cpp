@@ -4199,7 +4199,7 @@ void display() {
   if (tidal_oversigt.startplay) {
     tidal_start_delay++;
   }
-
+  // first show status window
   if ((tidal_oversigt.startplay) && (tidal_start_delay<5)) {
     ask_open_dir_or_play_tidal=false;
     glPushMatrix();
@@ -4218,7 +4218,7 @@ void display() {
     glEnd();
     glPopMatrix();
   }
-
+  // after 5 frames. Do play
   if ((tidal_oversigt.startplay) && (tidal_start_delay==5)) {
     // start tidal play by fmod
     tidal_start_delay=0;
@@ -4270,12 +4270,6 @@ void display() {
     }
   }
   // end start play tidal
-
-
-
-
-
-
 
   #endif
 
