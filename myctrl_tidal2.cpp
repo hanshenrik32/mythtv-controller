@@ -3122,6 +3122,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
     if (mysql_res) {
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
         strcpy(tidal_aktiv_song[0].artist_name ,mysql_row[4]);
+        strcpy(tidal_aktiv_song[0].cover_image_url,mysql_row[1]);
       }
     }
     recnr=0;
@@ -3136,7 +3137,10 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
     mysql_res = mysql_store_result(conn);
     if (mysql_res) {      
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
-        if (recnr>0) strcpy(tidal_aktiv_song[recnr].artist_name,tidal_aktiv_song[0].artist_name);
+        if (recnr>0) {
+          strcpy(tidal_aktiv_song[recnr].artist_name,tidal_aktiv_song[0].artist_name);
+          strcpy(tidal_aktiv_song[recnr].cover_image_url,tidal_aktiv_song[0].cover_image_url);
+        }
         strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
         strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
         strcpy(tidal_aktiv_song[recnr].playurl,mysql_row[1]);
