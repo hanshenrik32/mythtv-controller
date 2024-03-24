@@ -478,6 +478,8 @@ int spotify_class::spotify_refresh_token() {
     //chunk = curl_slist_append(chunk, "Content-Type: application/json");
     //
     curl_easy_setopt(curl, CURLOPT_URL, "https://accounts.spotify.com/api/token");
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
@@ -840,6 +842,8 @@ int spotify_class::download_user_playlist(char *spotifytoken,int startofset) {
     chunk = curl_slist_append(chunk, auth_kode);
     //
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/playlists");
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -1424,6 +1428,8 @@ int spotify_class::spotify_get_playlist(const char *playlist,bool force,bool cre
         snprintf(url,sizeof(url),"https://api.spotify.com/v1/playlists/%s",playlist);
         if (curl) {
           curl_easy_setopt(curl, CURLOPT_URL, url);
+          // ask libcurl to use TLS version 1.3 or later
+          curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
           curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
           curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
@@ -1696,10 +1702,12 @@ int spotify_class::spotify_get_likedsongs(const char *playlist,bool force,bool c
     if ((strcmp(spotifytoken,"")!=0) && (strcmp(playlist,"")!=0)) {
       // always here
       if (do_curl) {
-        curl = curl_easy_init();
+        curl = curl_easy_init();        
         snprintf(doget,sizeof(doget),"https://api.spotify.com/v1/playlists/%s",playlist);
         if (curl) {
           curl_easy_setopt(curl, CURLOPT_URL, doget);
+          // ask libcurl to use TLS version 1.3 or later
+          curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
           curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
           curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
@@ -2101,6 +2109,8 @@ int spotify_class::spotify_do_we_play() {
   CURL *curl = curl_easy_init();
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player");
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
@@ -2169,6 +2179,8 @@ int spotify_class::spotify_pause_play2() {
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_URL, "https://api.spotify.com/v1/me/player/pause");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt (curl, CURLOPT_VERBOSE, 0L);
     /* Add a custom header */
@@ -2236,6 +2248,8 @@ int spotify_class::spotify_resume_play() {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2308,8 +2322,10 @@ int spotify_class::spotify_last_play2() {
     header = curl_slist_append(header, "Accept: application/json");
     header = curl_slist_append(header, "Content-Type: application/json");
     header = curl_slist_append(header, "charsets: utf-8");
-    header = curl_slist_append(header, auth_kode.c_str());
+    header = curl_slist_append(header, auth_kode.c_str());    
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2385,6 +2401,8 @@ int spotify_class::spotify_next_play2() {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2527,8 +2545,10 @@ int spotify_class::spotify_play_now_playlist(char *playlist_song,bool now) {
     header = curl_slist_append(header, "Accept: application/json");
     header = curl_slist_append(header, "Content-Type: application/json");
     header = curl_slist_append(header, "charsets: utf-8");
-    header = curl_slist_append(header, auth_kode.c_str());
+    header = curl_slist_append(header, auth_kode.c_str());  
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     ////curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2597,6 +2617,8 @@ int spotify_class::spotify_play_now_song(char *playlist_song,bool now) {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2663,6 +2685,8 @@ int spotify_class::spotify_play_now_artist(char *playlist_song,bool now) {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2731,6 +2755,8 @@ int spotify_class::spotify_play_now_album(char *playlist_song,bool now) {
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
@@ -2795,6 +2821,8 @@ int spotify_class::spotify_get_user_id() {
       header = curl_slist_append(header, "charsets: utf-8");
       header = curl_slist_append(header, auth_kode.c_str());
       curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+      // ask libcurl to use TLS version 1.3 or later
+      curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
       curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -3804,6 +3832,8 @@ int spotify_class::get_search_result_online(char *searchstring,int type) {
     header = curl_slist_append(header, "Content-Type: application/json");
     header = curl_slist_append(header, "charsets: utf-8");
     header = curl_slist_append(header, auth_kode.c_str());
+    // ask libcurl to use TLS version 1.3 or later
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, (long)CURL_SSLVERSION_TLSv1_3);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, file_write_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);

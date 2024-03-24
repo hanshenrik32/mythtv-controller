@@ -14,6 +14,8 @@
 const int tidal_playlisttype=0;                         // playlist type
 const int tidal_songlisttype=1;                         // song list type
 
+const std::string tidal_download_home="/home/hans/download/";
+
 //
 // device struct
 //
@@ -46,6 +48,8 @@ class tidal_oversigt_type {
     char        playlistid[100+1];                // playlist id
     char        playlisturl[1024+1];               // play list url + tidal command
     unsigned int feed_group_antal;
+    unsigned int numberOfTracks;
+    char        type_of_media[80+1];              // album or single
     unsigned int feed_path_antal;
     bool        nyt;                              //
     GLuint      textureId;                        // gfx icon loaded
@@ -55,7 +59,7 @@ class tidal_oversigt_type {
 };
 
 //
-// active song to play
+// to show active song to play in window
 //
 
 class tidal_active_play_info_type {                // sample data down here
@@ -63,7 +67,7 @@ class tidal_active_play_info_type {                // sample data down here
     tidal_active_play_info_type();
     long progress_ms;                                   // 27834
     long duration_ms;                                   // 245119
-    char song_name[200];                              // Joe Bonamassa
+    char song_name[200];                                // Joe Bonamassa
     char artist_name[200];                              // Joe Bonamassa
     char cover_image_url[256];                          // 300*300 pixel (https://i.scdn.co/image/0b8eca8ecc907dc58fbdacbc6ac6b58aca88b805)
     GLuint cover_image;
@@ -71,6 +75,7 @@ class tidal_active_play_info_type {                // sample data down here
     char release_date[24];                              //
     long popularity;                                    // (27)
     bool is_playing;                                    // (true)
+    char playurl[2048];
 };
 
 // tidal global class
@@ -81,8 +86,9 @@ class tidal_class {
         tidal_oversigt_type *stack[maxantal];			                            // tidal playlist stack
         tidal_device_def tidal_device[10];
         int tidal_device_antal;                                               // antal device found
-        tidal_active_play_info_type tidal_aktiv_song[1];                    //
+        tidal_active_play_info_type tidal_aktiv_song[200];                      //
         int tidal_aktiv_song_antal;					                                  // Antal songs in playlist
+        int tidal_aktiv_song_nr;
         bool tidal_update_loaded_begin;
         //
         char tidaltoken[512];                                                 // access_token
@@ -106,6 +112,7 @@ class tidal_class {
         // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
 
     public:
+        bool startplay;
         bool texture_loaded;
 
         bool reset_amin_in_viewer();
@@ -180,7 +187,7 @@ class tidal_class {
 
         char *get_tidal_name(int nr);                                         // get record name
         char *get_tidal_playlistid(int nr);                                   // get id to play
-        int tidal_play_now_playlist(char *playlist_song,bool now);            //
+        int tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now);            //
         char *get_active_tidal_device_name();                                 //
         int tidal_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
@@ -189,17 +196,22 @@ class tidal_class {
 
         int auth_device_authorization();
 
-        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[0].song_name ); };                       //
-        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[0].artist_name ); };                   // aktiv sang som spilles
-        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[0].release_date ); };            //
-
+        char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
+        char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].artist_name ); };                   // aktiv sang som spilles
+        char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[tidal_aktiv_song_nr].release_date ); };            //
+        bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; }
+        
+        // new
+        int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
+        int total_aktiv_songs() { return(tidal_aktiv_song_antal); };
 
         int get_tidal_type(int nr) { if ( nr < antal ) return(stack[nr]->type); else return(0); }
         GLuint get_texture(int nr) { if ( nr < antal ) return(stack[nr]->textureId); else return(0); }
         int antal_tidal_streams() { return antalplaylists; };
         char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
         char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
-        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
+        char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
+        char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
 
 
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
@@ -216,7 +228,7 @@ class tidal_class {
         void process_object_playlist(json_value* value, int depth);
         void process_array_playlist(json_value* value, int depth);
 
-        int tidal_play_now_song(char *playlist_song,bool now);                // play song
+        int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                // play song
         int get_playlist_from_file(char *filename);                           // read/import playlists from file
         
 
@@ -226,7 +238,7 @@ class tidal_class {
         // download albums items
         int tidal_get_album_items(char *albumid);
         // download all albums by artist id
-        int tidal_get_artists_all_albums(char *artistid);
+        int tidal_get_artists_all_albums(char *artistid,bool force);
 
         // used by tidal_get_artists_all_albums
         void process_tidal_get_artists_all_albums(json_value* value, int depth,int x);
@@ -237,6 +249,9 @@ class tidal_class {
         int opdatere_tidal_oversigt_searchtxt(char *keybuffer,int type);
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
         void set_textureloaded(bool set);
+
+        int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
+
 };
 
 int tidal_download_image(char *imgurl,char *filename);      // not in use
