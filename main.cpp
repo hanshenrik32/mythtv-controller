@@ -417,8 +417,8 @@ int music_icon_anim_icon_ofsety=0;                        //
 int spotify_icon_anim_icon_ofset=0;                         //
 int do_play_music_aktiv_nr=0;                           // den aktiv dirid som er trykket på
 
-int screenx=1920;                                         // default screen size
-int screeny=1080;                                         // default screen size
+const int screenx=1920;                                         // default screen size
+const int screeny=1080;                                         // default screen size
 
 
 // xbmc/kodi db version files
@@ -4677,7 +4677,7 @@ void display() {
         if (do_stop_music_all) {						// SKAL checkes om gfx er ok
             glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
         } else {
-            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);			//  _textureId1
+            glBindTexture(GL_TEXTURE_2D, _texturemusicplayer);
         }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -5299,8 +5299,6 @@ void display() {
   }
   #endif
 
-
-
   //
   // *************** Tidal show play stuf **********************************************************
   //
@@ -5483,7 +5481,6 @@ void display() {
     glTranslatef(520.0f, 580.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
-    // show active play device
     glcRenderString("song ");
     glPopMatrix();
     // # of songs + active nr
@@ -5493,8 +5490,7 @@ void display() {
     glTranslatef(520.0f+textofset, 580.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
-    // show active play device
-    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song(),tidal_oversigt.total_aktiv_songs());
+    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs());
       else sprintf(temptxt1,"1/1");
     glcRenderString(temptxt1);
     glPopMatrix();
@@ -5520,7 +5516,7 @@ void display() {
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(520.0f, 540.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);                    // danish charset ttf
+    glScalef(20.5, 20.5, 1.0);
     sprintf(temptxt1,"playtime  ");
     glcRenderString(temptxt1);
     glPopMatrix();
@@ -5574,7 +5570,6 @@ void display() {
     glcRenderString("Release   ");
     glPopMatrix();
 
-    // updated date on spotify value
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);

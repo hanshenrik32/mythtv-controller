@@ -161,7 +161,6 @@ class tidal_class {
         void tidal_set_token(char *token,char *refresh);
         char *tidal_get_token() { return(tidaltoken); };                    // get token from struct
         int tidal_get_user_id();
-        int tidal_get_available_devices();
         void clean_tidal_oversigt();
         void select_device_to_play();
         int gettoken();                               // TEST
@@ -187,7 +186,7 @@ class tidal_class {
 
         char *get_tidal_name(int nr);                                         // get record name
         char *get_tidal_playlistid(int nr);                                   // get id to play
-        int tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now);            //
+        int tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now);            // play playlist and update db
         char *get_active_tidal_device_name();                                 //
         int tidal_refresh_token();
         int tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb);       // get playlist name info + songs info and update db
@@ -219,19 +218,16 @@ class tidal_class {
         char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
 
         // works
-        int load_tidal_iconoversigt();
-        void print_depth_shift(int depth);
-        void playlist_print_depth_shift(int depth);
+        int load_tidal_iconoversigt();                                                                  // load all icons
         int get_access_token(char *loginbase64);                                                        // get token
-        int get_users_album(char *albumid);
+        int get_users_album(char *albumid);                                                             // download json file for album id
         void process_value_playlist(json_value* value, int depth,int x);
         void process_object_playlist(json_value* value, int depth);
         void process_array_playlist(json_value* value, int depth);
 
-        int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                // play song
-        int get_playlist_from_file(char *filename);                           // read/import playlists from file
+        int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
+        int get_playlist_from_file(char *filename);                                                     // read/import playlists from file
         
-
         //  in use from here and down.
         // download album by artist id
         int tidal_get_album_by_artist(char *artistid);
@@ -250,7 +246,7 @@ class tidal_class {
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
         void set_textureloaded(bool set);
 
-        int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
+        // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
 
 };
 
