@@ -947,8 +947,6 @@ int tidal_class::get_users_album(char *albumid) {
     write_logfile(logfile,(char *) "Error process Tidal playlist.");
   }
 
-
-
   // ************************
   //
   // get album by libcurl used by get_users_songs
@@ -1510,7 +1508,8 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
   if ((!(file_exists(tidal_artis_playlist_file))) || (force)) {
     // download artist album json file
-    tidal_get_album_by_artist(artistid);                                          // get album from artisid
+    // filename is tidal_artist_playlist_{playlistid}.json
+    tidal_get_album_by_artist(artistid);                                          // (download all albums json file)    
     stat(tidal_artis_playlist_file.c_str(), &filestatus);                         // get file info
     file_size = filestatus.st_size;                                               // get filesize
     if (file_size>0) {
@@ -1525,9 +1524,9 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
       json = (json_char*) file_contents;
       try {
         value = json_parse(file_contents,file_size);                                  // parser create value obj
-        antal=-1;                                                                     // reset antal  
-        antalplaylists=0;
-        process_tidal_get_artists_all_albums(value, 0,0);                             // process to stack variable      
+        antal=-1;                                                                     // reset antal
+        antalplaylists=0;                                                             // reset antal
+        process_tidal_get_artists_all_albums(value, 0,0);                             // process to stack variable
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
         // the array is ready
@@ -2501,7 +2500,7 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
         if ( tidal_process_image ) {
           // get playlist cover
           if (( depth == 12 ) && ( x == 0 )) {
-            // get covver file url
+            // get cover file url
             // printf("Set Image string: %s\n", value->u.string.ptr);
             if (stack[antal]) {
               strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);
@@ -2700,7 +2699,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
 
   url="curl -X GET 'https://openapi.tidal.com/search?query=";
   url=url + searchbuffer;
-  url=url + "&type=ALBUMS&offset=0&limit=100&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDY1MzE2MjMsImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.sM4HVvSw03beoptnwVRPrppfpsI9D70SNCoRRkgV5olSndgdTgANNKdkaEFZBF5lVwCpnHuIua1E_FCUDfQE0A' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+  url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
   error=system(url.c_str());
   // if no error we have json file have the search result
   if (error==0) {
