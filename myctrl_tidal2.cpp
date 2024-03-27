@@ -1555,9 +1555,9 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
           created_playlist=0;
           create_new_record_antal=antalplaylists;
           if (stack[recnr]) {
-            while(recnr<create_new_record_antal) {
+            while ((recnr<create_new_record_antal) && (stack[recnr])) {
               // check if exist
-              playlistexist = false;
+              playlistexist = false;Diatone Mamba Toka 2004 Brushless Motors 4-6S 1700kV
               strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
               strcat(sql,stack[recnr]->playlistid);
               strcat(sql,"'");
@@ -3110,7 +3110,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       skip_download_of_files=true;
     }
   }
-
+  // if exist load the files to play
   if (skip_download_of_files) {
     sqlstring = "select playlistname,paththumb,playlistid,release_date,artistid from tidalcontentplaylist where playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr]->playlistid;
@@ -3159,8 +3159,9 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       }
     }
   }
-
-
+  //
+  // we have to download the songs
+  //
   if ( skip_download_of_files == false ) {
     temptxt=tidal_download_home;
     temptxt=temptxt + stack[tidalknapnr]->feed_showtxt;
@@ -3220,7 +3221,6 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
       temptxt1 = temptxt1 + stack[tidalknapnr]->feed_showtxt;
       temptxt1 = temptxt1 + "/";
       temptxt1 = temptxt1 + dir_file_array[3];
-      
       if ( file_exists(temptxt1.c_str()) == true ) {
         convcommand = "ffmpeg -y -i \"";
         convcommand = convcommand + temptxt1;
@@ -3309,11 +3309,11 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
             aktiv_song_tidal_icon=stack[tidalknapnr]->textureId;
           }
           tidal_aktiv_song_nr=0;
-        }
-        if (conn) mysql_close(conn);
+        }  
       }
     }
   }
+  if (conn) mysql_close(conn);
   if (result!=FMOD_OK) return(1); else return(0);
 }
 
