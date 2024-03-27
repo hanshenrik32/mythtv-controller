@@ -1557,7 +1557,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
           if (stack[recnr]) {
             while ((recnr<create_new_record_antal) && (stack[recnr])) {
               // check if exist
-              playlistexist = false;Diatone Mamba Toka 2004 Brushless Motors 4-6S 1700kV
+              playlistexist = false;
               strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
               strcat(sql,stack[recnr]->playlistid);
               strcat(sql,"'");

@@ -4081,6 +4081,41 @@ void display() {
       glPopMatrix();
     }
   }
+  if (vis_tidal_oversigt) {
+    if (ask_save_playlist) {
+      xof = 500;
+      yof = 600;
+      glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+      glBlendFunc(GL_ONE, GL_ONE);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
+      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glBegin(GL_QUADS); // draw ask box
+      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
+      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
+      glEnd(); //End quadrilateral coordinates
+      glPopMatrix();
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(xof+20.0f,yof+10+5, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);
+      //aktivfont.selectfont((char *) "Courier 10 Pitch");
+      glcRenderString("Name for playlist :");
+      glcRenderString(keybuffer);
+      glPopMatrix();
+      glPushMatrix();
+      showcoursornow(330,460+5,strlen(keybuffer));
+      glPopMatrix();
+    }
+  }
   // save playlist to file
   if (save_ask_save_playlist) {
     musicoversigt.save_music_oversigt_playlists(playlistfilename);
@@ -4249,7 +4284,7 @@ void display() {
           snd = 0;                                // set play new flag
         }
         write_logfile(logfile,(char *) "Tidal start play playlist");
-        tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+        int antal_i_oversigt = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
         tidal_oversigt.tidal_set_aktiv_song(0);
       }
       // try load and play song

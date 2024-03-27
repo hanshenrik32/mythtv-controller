@@ -1,0 +1,5 @@
+line 4390 build play array from dirmusic class
+
+linie 8661 select playlist hent antal i playlist
+
+linie 8640 load playlist from db.
