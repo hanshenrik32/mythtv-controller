@@ -2386,8 +2386,8 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                   while(n<strlen(downloadfilenamelong)) {
                     if (downloadfilenamelong[n]==' ') downloadfilenamelong[n]='_';
                     n++;
-                  }                  
-                  tidal_download_image(value->u.string.ptr,downloadfilenamelong);                 // download file
+                  }
+                  tidal_download_image( value->u.string.ptr, downloadfilenamelong );                 // download file
                   strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong );
 
                   // stack[antal]->textureId=loadTexture (downloadfilenamelong);
@@ -2575,6 +2575,7 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         process_tidal_search_result(value, 0,0);                                      // process to stack variable
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
+        // stack is ready
         // the array is ready
         /*
         conn=mysql_init(NULL);
@@ -3570,7 +3571,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
               glBindTexture(GL_TEXTURE_2D,_textureIdback);
             } else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
           } else {
-            if (stack[i+sofset]->type==1) glBindTexture(GL_TEXTURE_2D,song_icon); else glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
+            glBindTexture(GL_TEXTURE_2D,stack[i+sofset]->textureId);
           }        
         } else {
           if ((i+sofset)==0) {

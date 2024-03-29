@@ -3523,7 +3523,8 @@ void display() {
         tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,0);	  // find do searcg for artist
       else
         tidal_oversigt.opdatere_tidal_oversigt_searchtxt(keybuffer,1);   // find do search for song name
-      //tidal_oversigt.load_tidal_iconoversigt();
+      // tidal_oversigt.set_search_loaded();                               // triger icon loader
+      tidal_oversigt.load_tidal_iconoversigt();
       keybuffer[0] = 0;
       keybufferindex = 0;
     }
@@ -8251,7 +8252,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           write_logfile(logfile,(char *) debuglogdata);
           #endif
 
-          // back button
+          // back button ved søgning
 
           // works ok
           // back icon to main playlist overview
@@ -9333,10 +9334,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             // write debug log
             sprintf(debuglogdata,"Open spotify playliste %s ", spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));
             write_logfile(logfile,(char *) debuglogdata);
-            // opdate view from intnr id.
-            
+            // opdate view from intnr id.           
             spotify_oversigt.opdatere_spotify_oversigt(spotify_oversigt.get_spotify_playlistid(spotifyknapnr-1));         // update view
-
             spotify_oversigt.load_spotify_iconoversigt();                                                                 // load icons
             //spotify_oversigt.set_search_loaded();                           // triger icon loader
 
@@ -9537,7 +9536,9 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             write_logfile(logfile,(char *) debuglogdata);
             // opdate view from intnr id.
             tidal_oversigt.opdatere_tidal_oversigt(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));         // update view
-            tidal_oversigt.load_tidal_iconoversigt();                                                           // load icons
+            
+            // tidal_oversigt.load_tidal_iconoversigt();                                                           // load icons            
+
             tidalknapnr=0;                                                                                      // reset select
             tidal_selected_startofset=0;                                                                        // and start ofset to.
             strcpy(tidal_oversigt.overview_show_band_name,"");
@@ -14329,8 +14330,8 @@ void *datainfoloader_webserver(void *data) {
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
       tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);
-
       // tidal_oversigt.load_tidal_iconoversigt();                       // load icons
+
       printf("Done Update tidal search result thread.\n");
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
