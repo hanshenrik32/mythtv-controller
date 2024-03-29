@@ -1,0 +1,183 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ([2.69])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_CONFIG_SRCDIR([checknet.h])
+AC_CONFIG_HEADERS([config.h])
+
+# Checks for programs.
+# AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lGLU':
+AC_CHECK_LIB([GLU], [main])
+# FIXME: Replace `main' with a function in `-lIL':
+AC_CHECK_LIB([IL], [main])
+# FIXME: Replace `main' with a function in `-lSDL':
+AC_CHECK_LIB([SDL], [main])
+# FIXME: Replace `main' with a function in `-lSDL_image':
+AC_CHECK_LIB([SDL_image], [main])
+# FIXME: Replace `main' with a function in `-lX11':
+AC_CHECK_LIB([X11], [main])
+# FIXME: Replace `main' with a function in `-lXrandr':
+AC_CHECK_LIB([Xrandr], [main])
+# FIXME: Replace `main' with a function in `-lc':
+AC_CHECK_LIB([c], [main])
+# FIXME: Replace `main' with a function in `-lccgi':
+AC_CHECK_LIB([ccgi], [main])
+# FIXME: Replace `main' with a function in `-lcirom':
+AC_CHECK_LIB([cirom], [main])
+# FIXME: Replace `main' with a function in `-lcrypto':
+AC_CHECK_LIB([crypto], [main])
+# FIXME: Replace `main' with a function in `-lcurl':
+AC_CHECK_LIB([curl], [main])
+# FIXME: Replace `main' with a function in `-ldl':
+AC_CHECK_LIB([dl], [main])
+# FIXME: Replace `main' with a function in `-lfontconfig':
+AC_CHECK_LIB([fontconfig], [main])
+# FIXME: Replace `main' with a function in `-lfreertos':
+AC_CHECK_LIB([freertos], [main])
+# FIXME: Replace `main' with a function in `-lgcc':
+AC_CHECK_LIB([gcc], [main])
+# FIXME: Replace `main' with a function in `-lgcc_sdk':
+AC_CHECK_LIB([gcc_sdk], [main])
+# FIXME: Replace `main' with a function in `-lglut':
+AC_CHECK_LIB([glut], [main])
+# FIXME: Replace `main' with a function in `-lhal':
+AC_CHECK_LIB([hal], [main])
+# FIXME: Replace `main' with a function in `-llwip':
+AC_CHECK_LIB([lwip], [main])
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [main])
+# FIXME: Replace `main' with a function in `-lmain':
+AC_CHECK_LIB([main], [main])
+# FIXME: Replace `main' with a function in `-lmbedcrypto':
+AC_CHECK_LIB([mbedcrypto], [main])
+# FIXME: Replace `main' with a function in `-lmbedtls':
+AC_CHECK_LIB([mbedtls], [main])
+# FIXME: Replace `main' with a function in `-lmbedx509':
+AC_CHECK_LIB([mbedx509], [main])
+# FIXME: Replace `main' with a function in `-lmysqlclient':
+AC_CHECK_LIB([mysqlclient], [main])
+# FIXME: Replace `main' with a function in `-lnet80211':
+AC_CHECK_LIB([net80211], [main])
+# FIXME: Replace `main' with a function in `-lnosys':
+AC_CHECK_LIB([nosys], [main])
+# FIXME: Replace `main' with a function in `-lphy':
+AC_CHECK_LIB([phy], [main])
+# FIXME: Replace `main' with a function in `-lpp':
+AC_CHECK_LIB([pp], [main])
+# FIXME: Replace `main' with a function in `-lpthread':
+AC_CHECK_LIB([pthread], [main])
+# FIXME: Replace `main' with a function in `-lsqlite3':
+AC_CHECK_LIB([sqlite3], [main])
+# FIXME: Replace `main' with a function in `-lssl':
+AC_CHECK_LIB([ssl], [main])
+# FIXME: Replace `main' with a function in `-lvlc':
+AC_CHECK_LIB([vlc], [main])
+# FIXME: Replace `main' with a function in `-lwpa':
+AC_CHECK_LIB([wpa], [main])
+# FIXME: Replace `main' with a function in `-lws2_32':
+AC_CHECK_LIB([ws2_32], [main])
+# FIXME: Replace `main' with a function in `-lxml2':
+AC_CHECK_LIB([xml2], [main])
+
+# Checks for header files.
+AC_PATH_X
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h malloc.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/mount.h sys/param.h sys/socket.h sys/statvfs.h sys/time.h sys/timeb.h syslog.h termios.h unistd.h utime.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_TYPE_UID_T
+AC_C_INLINE
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_INT8_T
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_C_RESTRICT
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_FORK
+AC_FUNC_FSEEKO
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_FUNC_REALLOC
+AC_FUNC_STRERROR_R
+AC_FUNC_STRTOD
+AC_CHECK_FUNCS([clock_gettime dup2 fdatasync ftime gethostbyname gethostname getpagesize gettimeofday inet_ntoa localtime_r memchr memmove memset mkdir pow rmdir select socket sqrt strcasecmp strchr strdup strerror strncasecmp strrchr strstr strtol strtoul strtoull utime])
+
+AC_CONFIG_FILES([Makefile
+                 mongoose-master/examples/CC3200/Makefile
+                 mongoose-master/examples/CC3200/ccs/Makefile
+                 mongoose-master/examples/ESP32_IDF/Makefile
+                 mongoose-master/examples/ESP8266_RTOS/Makefile
+                 mongoose-master/examples/ESP8266_RTOS/user/Makefile
+                 mongoose-master/examples/MSP432/ccs/Makefile
+                 mongoose-master/examples/Makefile
+                 mongoose-master/examples/PIC32/http_server/firmware/http_server.X/Makefile
+                 mongoose-master/examples/PIC32/mqtt_client/firmware/mqtt_client.X/Makefile
+                 mongoose-master/examples/STM32F4_CC3100/Makefile
+                 mongoose-master/examples/TM4C129/ccs/Makefile
+                 mongoose-master/examples/api_server/Makefile
+                 mongoose-master/examples/big_upload/Makefile
+                 mongoose-master/examples/captive_dns_server/Makefile
+                 mongoose-master/examples/coap_client/Makefile
+                 mongoose-master/examples/coap_server/Makefile
+                 mongoose-master/examples/connected_device_1/Makefile
+                 mongoose-master/examples/connected_device_2/Makefile
+                 mongoose-master/examples/connected_device_3/Makefile
+                 mongoose-master/examples/connected_device_4/Makefile
+                 mongoose-master/examples/cookie_auth/Makefile
+                 mongoose-master/examples/dll/Makefile
+                 mongoose-master/examples/http_client/Makefile
+                 mongoose-master/examples/mcast_udp_server/Makefile
+                 mongoose-master/examples/mqtt_broker/Makefile
+                 mongoose-master/examples/mqtt_client/Makefile
+                 mongoose-master/examples/mqtt_over_websocket_server/Makefile
+                 mongoose-master/examples/multithreaded/Makefile
+                 mongoose-master/examples/nRF51/http/boards/pca10028/armgcc/Makefile
+                 mongoose-master/examples/nRF52/http/boards/pca10040/armgcc/Makefile
+                 mongoose-master/examples/netcat/Makefile
+                 mongoose-master/examples/publish_subscribe/Makefile
+                 mongoose-master/examples/restful_client/Makefile
+                 mongoose-master/examples/restful_server/Makefile
+                 mongoose-master/examples/restful_server_s3/Makefile
+                 mongoose-master/examples/reverse_proxy/Makefile
+                 mongoose-master/examples/settings_panel_for_a_device/Makefile
+                 mongoose-master/examples/simple_crawler/Makefile
+                 mongoose-master/examples/simplest_web_server/Makefile
+                 mongoose-master/examples/simplest_web_server_ssl/Makefile
+                 mongoose-master/examples/sntp_client/Makefile
+                 mongoose-master/examples/socks_server/Makefile
+                 mongoose-master/examples/tcp_echo_server/Makefile
+                 mongoose-master/examples/timers/Makefile
+                 mongoose-master/examples/udp_client/Makefile
+                 mongoose-master/examples/udp_echo_server/Makefile
+                 mongoose-master/examples/websocket_chat/Makefile
+                 mongoose-master/examples/websocket_chat_client/Makefile
+                 mongoose-master/src/common/platforms/esp32/stubs/Makefile
+                 mongoose-master/src/common/platforms/esp8266/rboot/esptool2/Makefile
+                 mongoose-master/src/common/platforms/esp8266/stubs/Makefile
+                 mongoose-master/test/Makefile
+                 mongoose-master/test/ccgi-1.2/Makefile
+                 mongoose-master/test/ccgi-1.2/examples/Makefile
+                 mongoose-master/test/ccgi-1.2/t/Makefile])
+AC_CONFIG_SUBDIRS([json-parser])
+AC_OUTPUT

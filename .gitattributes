@@ -1,0 +1,8 @@
+*.gz filter=lfs diff=lfs merge=lfs -text
+mythtv-controller-0.40.8.tgz filter=lfs diff=lfs merge=lfs -text
+mythtv-controller-0.40.9.tgz filter=lfs diff=lfs merge=lfs -text
+tema1/* filter=lfs diff=lfs merge=lfs -text
+fmodstudioapi20218linux.tar.gz filter=lfs diff=lfs merge=lfs -text
+mongoose-master.zip filter=lfs diff=lfs merge=lfs -text
+spotify-icons-logos.zip filter=lfs diff=lfs merge=lfs -text
+json-parser.tar.gz filter=lfs diff=lfs merge=lfs -text
