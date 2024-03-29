@@ -2098,7 +2098,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
     getart = 0;
   } else {
     show_search_result=true;  
-    sprintf(sqlselect,"select name,paththumb,playpath,playlistid from tidalcontent where playlistid like '%s' order by id",refid);
+    sprintf(sqlselect,"select name,p.paththumb,playpath,p.playlistid from mythtvcontroller.tidalcontent t left join mythtvcontroller.tidalcontentplaylist p on t.playlistid = p.playlistid WHERE p.playlistid like '%s' order by t.name",refid);
     getart = 1;
   }
   this->type = getart;					                                                 // husk sql type
@@ -2167,15 +2167,8 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
               strncpy(stack[antal]->feed_showtxt,row[0],tidal_pathlength);
               strncpy(stack[antal]->feed_name,row[0],tidal_namelength);
               strncpy(stack[antal]->feed_gfx_url,row[1],tidal_namelength);
-              strcpy(stack[antal]->playlisturl,row[2]);   // get trackid
-              stack[antal]->type=1;
-              //songstrpointer=strstr(row[2],"https://api.spotify.com/v1/tracks/");
-              songstrpointer=strstr(row[2],"spotify:track:");
-              // get track id from string
-              if (songstrpointer) {
-                strcpy(temptxt2,row[2]+14);
-                strcpy(stack[antal]->playlistid,temptxt2);
-              } else strcpy(stack[antal]->playlistid,row[2]);
+              stack[antal]->type=1;              
+              strcpy(stack[antal]->playlistid,row[2]);                              // id is path here
               antal++;
             }
           }
@@ -3515,7 +3508,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
-      // load texture
+      // load texture if not loaded
+      
       if (this->texture_loaded==false) {
         if (stack[i+sofset]->textureId==0) {        
           if (file_exists(stack[i+sofset]->feed_gfx_url)) {
