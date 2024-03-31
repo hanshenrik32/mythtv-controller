@@ -424,6 +424,87 @@ int Get_albums_by_artist() {
   system(curlstring.c_str());
 }
 
+
+
+// *******************************************************************************************
+// 
+// save playlist
+//
+// *******************************************************************************************
+
+
+int tidal_class::save_music_oversigt_playlists(char *playlistfilename) {
+  bool fault;
+  std::string sql_insert;
+  std::string sql_search;
+  std::string playlistid;
+  bool fundet;
+  char temptxt[2048];
+  unsigned int i;
+  // mysql vars
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  char database[256];
+  strcpy(database,dbname);
+  write_logfile(logfile,(char *) "Tidal save music playlist.");
+  i=0;
+  conn=mysql_init(NULL);
+  // Connect to database
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+  mysql_query(conn,"set NAMES 'utf8'");
+  res = mysql_store_result(conn);
+  if (conn) {
+    // First inset into playlist db
+    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"";
+    sql_insert = sql_insert + playlistfilename;
+    sql_insert = sql_insert + "\",\"";
+    sql_insert = sql_insert + tidal_aktiv_song[0].cover_image_url;
+    sql_insert = sql_insert + "\",\"";
+    sql_insert = sql_insert + "0";
+    sql_insert = sql_insert + "\",\"";
+    sql_insert = sql_insert + tidal_aktiv_song[0].release_date;
+    sql_insert = sql_insert + "\",\"";
+    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;
+    sql_insert = sql_insert + "\",0)";
+    mysql_query(conn,sql_insert.c_str());
+    res = mysql_store_result(conn);
+    sql_search = "select id from mythtvcontroller.tidalcontentplaylist where playlistname like ";
+    sql_search = sql_search + playlistfilename;
+    mysql_query(conn,sql_search.c_str());
+    res = mysql_store_result(conn);
+    fundet=false;
+    if (res) {
+      while ((row = mysql_fetch_row(res)) != NULL) {
+        playlistid = row[0];
+        fundet = true;
+      }
+    }
+    if (fundet) {
+      // Now update play files in db.
+      i=0;
+      while(i<tidal_aktiv_song_antal) {
+        sql_insert = "insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"";
+        sql_insert = sql_insert + tidal_aktiv_song[i].song_name;
+        sql_insert = sql_insert + "\",\"";
+        sql_insert = sql_insert + "";                               // pathtumb
+        sql_insert = sql_insert + "\",\"";
+        sql_insert = sql_insert + tidal_aktiv_song[i].playurl;      // playpath
+        sql_insert = sql_insert + "\",\"";
+        sql_insert = sql_insert + playlistid;                       // playlistid
+        sql_insert = sql_insert + "\",0)";
+        mysql_query(conn,sql_insert.c_str());
+        res = mysql_store_result(conn);
+        if (res) fault=false;      
+        i++;
+      }
+    }
+    mysql_close(conn);
+  }
+  return(!(fault));
+}
+
+
 // ***************************************************************************************************************************
 
 //
@@ -2094,7 +2175,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
   // find records after type (0 = root, else = refid)
   if (refid == NULL) {
     show_search_result=false;
-    sprintf(sqlselect,"select * from mythtvcontroller.tidalcontentplaylist order by artistid,release_date desc,playlistname");
+    sprintf(sqlselect,"select playlistname,paththumb,playlistid,release_date,artistid,id  from mythtvcontroller.tidalcontentplaylist group by (playlistname) order by artistid,release_date desc,playlistname");
     getart = 0;
   } else {
     show_search_result=true;  
@@ -2939,6 +3020,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   std::string dir_file_array[1024];
   std::string filename;
   std::string sqlstring;
+  std::string ffilename;
   //std::string post_playlist_data;
   int error=0;
   std::string sysstring;
@@ -2953,6 +3035,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   MYSQL_RES *mysql_res;
   MYSQL_ROW mysql_row;
   bool skip_download_of_files = false;
+  bool swap=true;
   // download stuf to be played if not downloaded before
   // check if exist
   conn=mysql_init(NULL);
@@ -3008,7 +3091,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         recnr++;
       }
       tidal_aktiv_song_antal=recnr-1;
-      tidal_aktiv_song_nr=0;     
+      tidal_aktiv_song_nr=0;
+      if (sound) sound->release();                                    // stop last played
       if ( file_exists(tidal_aktiv_song[0].playurl) == true ) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
         // start play first song
@@ -3050,21 +3134,24 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
       temptxt = temptxt + "/";
       entry=0;
-      // read dir
+      // read dir and find *.m4a files.
       if ((dir = opendir (temptxt.c_str())) != NULL) {
         while (((ent = readdir (dir)) != NULL) && (entry<1000)) {
           printf ("%s\n", ent->d_name);
-          dir_file_array[entry]=ent->d_name;
-          entry++;
+          ffilename=ent->d_name;                    
+          if (ffilename.find("m4a")) {
+            dir_file_array[entry]=ent->d_name;
+            entry++;
+          }
         }
         closedir (dir);
       } else {
-        /* could not open directory */
+        // could not open directory
         perror ("");
         return EXIT_FAILURE;
       }
       // sort playlist files
-      bool swap=true;
+      swap=true;
       while(swap) {
         int n=0;
         swap=false;      
