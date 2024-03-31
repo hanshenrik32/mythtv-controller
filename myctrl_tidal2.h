@@ -75,6 +75,7 @@ class tidal_active_play_info_type {                // sample data down here
     char release_date[24];                              //
     long popularity;                                    // (27)
     bool is_playing;                                    // (true)
+    char playlistid[120];                               // playlistid
     char playurl[2048];
 };
 
@@ -247,7 +248,7 @@ class tidal_class {
         void set_textureloaded(bool set);
 
 
-        int save_music_oversigt_playlists(char *playlistfilename);
+        int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr);
 
         // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
 

@@ -3717,10 +3717,15 @@ void display() {
     aktivfont.selectfont(configfontname);
   }
   #endif
+  //
   // show search box and text for radio and music and movie and spotify offline search NOT spotify online search
+  //
   if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) || ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt==false))) {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
+    if ((vis_tidal_oversigt) && (ask_save_playlist)) {
+      keybufferopenwin=true;
+    }
     if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
@@ -4089,8 +4094,9 @@ void display() {
       glPopMatrix();
     }
   }
+  /*
   if (vis_tidal_oversigt) {
-    if (ask_save_playlist) {
+    if (ask_save_playlist) { 
       xof = 500;
       yof = 600;
       glPushMatrix();
@@ -4124,6 +4130,7 @@ void display() {
       glPopMatrix();
     }
   }
+  */
   // save playlist to file
   if ((vis_music_oversigt) && (save_ask_save_playlist)) {
     musicoversigt.save_music_oversigt_playlists(playlistfilename);
@@ -4138,7 +4145,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(keybuffer);
+    tidal_oversigt.save_music_oversigt_playlists(keybuffer,tidalknapnr);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -4341,12 +4348,12 @@ void display() {
         // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
       }
-
-
       if (tidal_player_start_status == 0 ) {
         fprintf(stderr,"tidal start play return ok.\n");
         do_zoom_tidal_cover=true;                                       // show we play
         snd=1;
+        show_uv=true;
+        vis_uv_meter=true;
       } else {
         do_play_tidal_cover=false;
         // do_zoom_tidal_cover=false;                                       // show we play
@@ -6195,7 +6202,7 @@ void display() {
   //
   // show uv metter in music player in the right corner
   // visur = screensaver
-  if (((snd) && (visur==false) && (urtype!=MUSICMETER) && (show_uv) && (vis_uv_meter) && (configuvmeter)) || (((vis_radio_oversigt) || (vis_music_oversigt)|| (vis_tidal_oversigt) || (vis_stream_oversigt) || (vis_radio_or_music_oversigt)) && (visur==false) && (snd))) {
+  if (((snd) && (visur==false) && (urtype!=MUSICMETER) && (show_uv) && (vis_uv_meter) && (configuvmeter)) || (((vis_radio_oversigt) || (vis_music_oversigt) || (vis_tidal_oversigt) || (vis_stream_oversigt) || (vis_radio_or_music_oversigt)) && (visur==false) && (snd))) {
     // draw uv meter in right corner
     int high = 2;
     int qq = 1;
@@ -11165,7 +11172,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
               }
             }
-            if (( vis_tidal_oversigt ) && (!( ask_open_dir_or_play )) && ( do_show_tidal_search_oversigt == false )) {
+            if (( vis_tidal_oversigt ) && ( ask_open_dir_or_play==false ) && ( do_show_tidal_search_oversigt == false )) {
               if (key!=13) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
@@ -11217,7 +11224,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
             // tidal skal vi save playlist
-            if (keybufferindex==0) {
+            if (keybufferindex==1) {
               if (key=='S') {
                 printf("Save playlist selected \n");
                 // do_select_device_to_play=true;                                                                  // enable select dvice to play on

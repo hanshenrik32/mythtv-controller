@@ -428,12 +428,12 @@ int Get_albums_by_artist() {
 
 // *******************************************************************************************
 // 
-// save playlist
+// save playlist in db
 //
 // *******************************************************************************************
 
 
-int tidal_class::save_music_oversigt_playlists(char *playlistfilename) {
+int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr) {
   bool fault;
   std::string sql_insert;
   std::string sql_search;
@@ -456,27 +456,29 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename) {
   res = mysql_store_result(conn);
   if (conn) {
     // First inset into playlist db
-    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"";
-    sql_insert = sql_insert + playlistfilename;
-    sql_insert = sql_insert + "\",\"";
-    sql_insert = sql_insert + tidal_aktiv_song[0].cover_image_url;
-    sql_insert = sql_insert + "\",\"";
-    sql_insert = sql_insert + "0";
-    sql_insert = sql_insert + "\",\"";
-    sql_insert = sql_insert + tidal_aktiv_song[0].release_date;
-    sql_insert = sql_insert + "\",\"";
-    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;
-    sql_insert = sql_insert + "\",0)";
+    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('";
+    sql_insert = sql_insert + playlistfilename;                           // playlist name
+    sql_insert = sql_insert + "','";
+    sql_insert = sql_insert + tidal_aktiv_song[0].cover_image_url;        // cover
+    sql_insert = sql_insert + "','";
+    sql_insert = sql_insert + tidal_aktiv_song[0].playlistid;             // playlist id 0
+    sql_insert = sql_insert + "',";
+    sql_insert = sql_insert + "now()";                                    // dato
+    sql_insert = sql_insert + ",'";
+    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;            // artist name
+    sql_insert = sql_insert + "',0)";
     mysql_query(conn,sql_insert.c_str());
     res = mysql_store_result(conn);
-    sql_search = "select id from mythtvcontroller.tidalcontentplaylist where playlistname like ";
+    // get id
+    sql_search = "select playlistid from mythtvcontroller.tidalcontentplaylist where playlistname like '";
     sql_search = sql_search + playlistfilename;
+    sql_search = sql_search + "'";
     mysql_query(conn,sql_search.c_str());
     res = mysql_store_result(conn);
     fundet=false;
     if (res) {
       while ((row = mysql_fetch_row(res)) != NULL) {
-        playlistid = row[0];
+        // playlistid = row[0];
         fundet = true;
       }
     }
@@ -484,15 +486,15 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename) {
       // Now update play files in db.
       i=0;
       while(i<tidal_aktiv_song_antal) {
-        sql_insert = "insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"";
+        sql_insert = "insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values ('";
         sql_insert = sql_insert + tidal_aktiv_song[i].song_name;
-        sql_insert = sql_insert + "\",\"";
-        sql_insert = sql_insert + "";                               // pathtumb
-        sql_insert = sql_insert + "\",\"";
-        sql_insert = sql_insert + tidal_aktiv_song[i].playurl;      // playpath
-        sql_insert = sql_insert + "\",\"";
-        sql_insert = sql_insert + playlistid;                       // playlistid
-        sql_insert = sql_insert + "\",0)";
+        sql_insert = sql_insert + "','";
+        sql_insert = sql_insert + tidal_aktiv_song[i].cover_image_url;  // pathtumb (image)
+        sql_insert = sql_insert + "','";
+        sql_insert = sql_insert + tidal_aktiv_song[i].playurl;               // playpath
+        sql_insert = sql_insert + "','";
+        sql_insert = sql_insert + tidal_aktiv_song[i].playlistid;           // playlistid
+        sql_insert = sql_insert + "',0)";
         mysql_query(conn,sql_insert.c_str());
         res = mysql_store_result(conn);
         if (res) fault=false;      
@@ -3086,6 +3088,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           strcpy(tidal_aktiv_song[recnr].cover_image_url,tidal_aktiv_song[0].cover_image_url);
         }
         strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
+        strcpy(tidal_aktiv_song[recnr].playlistid,stack[tidalknapnr]->playlistid);                                // playlistid
         strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
         strcpy(tidal_aktiv_song[recnr].playurl,mysql_row[1]);
         recnr++;
@@ -3386,7 +3389,7 @@ int tidal_class::load_tidal_iconoversigt() {
         } else {
           // else load normal from disk
           if (stack[nr]->textureId==NULL) {            
-            stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
+            if (strcmp( stack[nr]->feed_gfx_url , "" )!=0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
           }
         }
       }
