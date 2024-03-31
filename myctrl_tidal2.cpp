@@ -3089,7 +3089,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         }
         strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
         strcpy(tidal_aktiv_song[recnr].playlistid,stack[tidalknapnr]->playlistid);                                // playlistid
-        strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
         strcpy(tidal_aktiv_song[recnr].playurl,mysql_row[1]);
         recnr++;
       }

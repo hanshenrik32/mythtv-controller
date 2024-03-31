@@ -5564,7 +5564,7 @@ void display() {
     glTranslatef(520.0f+textofset, 580.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
-    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs());
+    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
       else sprintf(temptxt1,"1/1");
     glcRenderString(temptxt1);
     glPopMatrix();
