@@ -249,6 +249,7 @@ class tidal_class {
 
 
         int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr);
+        bool delete_record_in_view(int tidalknapnr);
 
         // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
 

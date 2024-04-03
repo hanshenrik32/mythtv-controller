@@ -501,7 +501,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
         sql_insert = sql_insert + "\"";
         */
 
-        snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl, tidal_aktiv_song[i].playlistid,tidal_aktiv_song[i].playurl );
+        snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[0].cover_image_url, tidal_aktiv_song[i].playurl, tidal_aktiv_song[i].playlistid,tidal_aktiv_song[i].playurl );
         printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt);
         res = mysql_store_result(conn);
@@ -858,6 +858,43 @@ int tidal_class::get_access_token(char *loginbase64) {
   if (error) return(0); else return(1);
 }
 
+
+
+// ****************************************************************************************
+//
+// Delete tidal playlist record from view and all record in playlist and songs in db
+//
+// ****************************************************************************************
+
+
+bool tidal_class::delete_record_in_view(int tidalknapnr) {
+  MYSQL *conn;
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+  int n;
+  char sql_delete[8192];
+  n=tidalknapnr;
+  conn = mysql_init(NULL);
+  mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
+  while(n<antalplaylists-2) {
+    stack[n]=stack[n+1];
+    n++;
+  }
+  // delete the last
+  if (tidalknapnr<=antalplaylists) {
+    antalplaylists--;  
+    // clean up in db to.
+    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid='%s' limit 1",stack[tidalknapnr]->playlistid);
+    mysql_query(conn,sql_delete);
+    res = mysql_store_result(conn);
+    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid='%s'",stack[tidalknapnr]->playlistid);
+    mysql_query(conn,sql_delete);
+    res = mysql_store_result(conn);
+    sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
+    write_logfile(logfile,(char *) sql_delete);
+  }
+  if (conn) mysql_close(conn);
+}
 
 
 // ****************************************************************************************
@@ -3110,16 +3147,17 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       write_logfile(logfile,(char *) "mysql select table error.");
       fprintf(stdout,"ERROR SQL : %s\n",sql);
     }
+    // get playlist from db
     mysql_res = mysql_store_result(conn);
     if (mysql_res) {      
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
-        if (recnr>0) {
+        if (recnr>=0) {
           strcpy(tidal_aktiv_song[recnr].artist_name,tidal_aktiv_song[0].artist_name);
           strcpy(tidal_aktiv_song[recnr].cover_image_url,tidal_aktiv_song[0].cover_image_url);
+          strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
+          strcpy(tidal_aktiv_song[recnr].playlistid,stack[tidalknapnr]->playlistid);                                // playlistid
+          strcpy(tidal_aktiv_song[recnr].playurl,mysql_row[1]);                                                     // play path
         }
-        strcpy(tidal_aktiv_song[recnr].song_name,mysql_row[0]);
-        strcpy(tidal_aktiv_song[recnr].playlistid,stack[tidalknapnr]->playlistid);                                // playlistid
-        strcpy(tidal_aktiv_song[recnr].playurl,mysql_row[1]);
         recnr++;
       }
       tidal_aktiv_song_antal=recnr-1;

@@ -865,6 +865,7 @@ GLuint _textureIdfilm_aktiv;
 GLuint _textureIdrecorded;
 GLuint _textureIdfilm;
 GLuint _textureIdmusic;
+GLuint _textureIplaylistsave;
 GLuint _textureIdtv;
 GLuint _tvbar1_1;
 
@@ -3718,7 +3719,7 @@ void display() {
   }
   #endif
   //
-  // show search box and text for radio and music and movie and spotify offline search NOT spotify online search
+  // show search box and text for radio and music and movie and spotify and tidal offline search NOT spotify online search
   //
   if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) || ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt==false))) {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
@@ -3726,7 +3727,7 @@ void display() {
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
       keybufferopenwin=true;
     }
-    if ((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) {
+    if (((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) || ((vis_tidal_oversigt) && (ask_save_playlist))) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -3741,8 +3742,14 @@ void display() {
       #endif
       #ifdef ENABLE_TIDAL
       if (vis_tidal_oversigt) {
-        if (tidal_oversigt.search_playlist_song==0) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
-        else glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch);
+        if (ask_save_playlist) {
+          // ask for filename to save
+          glBindTexture(GL_TEXTURE_2D,_textureIplaylistsave);
+        } else {
+          // ask for search string
+          if (tidal_oversigt.search_playlist_song==0) glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch1);
+          else glBindTexture(GL_TEXTURE_2D,_textureIdmusicsearch);
+        }
       }
       #endif
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3762,7 +3769,8 @@ void display() {
       glRasterPos2f(0.0f, 0.0f);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);
-      glcRenderString(keybuffer);
+      // ask for filename to save or normal search function.
+      if ((vis_tidal_oversigt) && (ask_save_playlist)) glcRenderString(playlistfilename); else glcRenderString(keybuffer);
       glPopMatrix();
     }
   }
@@ -4145,7 +4153,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(keybuffer,tidalknapnr);
+    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -7198,6 +7206,17 @@ void display() {
   glutSwapBuffers();
 }
 // end display()
+
+
+
+
+
+
+
+
+
+
+
 
 
 // ****************************************************************************************
@@ -11156,7 +11175,15 @@ void handleKeypress(unsigned char key, int x, int y) {
             keybufferindex--;
             keybuffer[keybufferindex]=0;
           }
+          // used for save or search playlist
+          if (vis_tidal_oversigt) {
+            if (keybufferindex>=0) playlistfilename[keybufferindex]=0;
+          }
         } else {
+          if ((vis_tidal_oversigt) && (key==127)) {
+            printf("delete record in overview\n");
+            tidal_oversigt.delete_record_in_view(tidalknapnr-1);
+          }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
               if (key==32) {
                 dirmusic.set_songaktiv(!(dirmusic.get_songaktiv(do_show_play_open_select_line+do_show_play_open_select_line_ofset)),do_show_play_open_select_line+do_show_play_open_select_line_ofset);
@@ -11211,6 +11238,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
           }
+          #endif
+          #ifdef ENABLE_TIDAL
           // tidal stuf
           if (vis_tidal_oversigt) {
             // do show search tidal oversigt online
@@ -11224,7 +11253,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
             // tidal skal vi save playlist
-            if (keybufferindex==1) {
+            if (keybufferindex>0) {
               if (key=='S') {
                 printf("Save playlist selected \n");
                 // do_select_device_to_play=true;                                                                  // enable select dvice to play on
@@ -11243,12 +11272,15 @@ void handleKeypress(unsigned char key, int x, int y) {
               // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
             }
           }
+          // used by tidal and spotify (playlistfilename)
           // is ask for playlist file name use keybuffer to get filename
           if (ask_save_playlist) {
             if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-              strcpy(playlistfilename,keybuffer);
-              playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+              if (key!='S') {
+                strcpy(playlistfilename,keybuffer);
+                playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+              }
             }
           }
           // is ask movie totle fill buffer from keyboard
@@ -14972,6 +15004,7 @@ void loadgfx() {
     setuptvgraberback    	= loadgfxfile(temapath,(char *) "images/",(char *) "setuptvgraberback");
     _textureIdtv         	= loadgfxfile(temapath,(char *) "buttons/",(char *) "tv");
     _textureIdmusic     	= loadgfxfile(temapath,(char *) "buttons/",(char *) "music");
+    _textureIplaylistsave	= loadgfxfile(temapath,(char *) "images/",(char *) "playlist_save");
     _textureIdfilm       	= loadgfxfile(temapath,(char *) "buttons/",(char *) "movie");
     _textureIdrecorded  	= loadgfxfile(temapath,(char *) "buttons/",(char *) "recorded");
     _texturemlast       	= loadgfxfile(temapath,(char *) "images/",(char *) "mplaylast");
@@ -15147,6 +15180,7 @@ void freegfx() {
     glDeleteTextures( 1, &setuptvgraberback);       // bryges af setup tv graber
     glDeleteTextures( 1, &_textureIdtv);						// bruges ikke
     glDeleteTextures( 1, &_textureIdmusic);			    // music
+    glDeleteTextures( 1, &_textureIplaylistsave);
     glDeleteTextures( 1, &_textureIdfilm);			    // default film icon
     glDeleteTextures( 1, &_textureIdrecorded);			// default recorded icon
     glDeleteTextures( 1, &_texturemlast);						// bruges ikke
