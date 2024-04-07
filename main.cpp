@@ -3513,6 +3513,7 @@ void display() {
   #endif
 
   // tidal
+  // hent saarch result
   #ifdef ENABLE_TIDAL
   // tidal do the search after enter is pressed
   if ((vis_tidal_oversigt) && (!(visur)) && (do_show_tidal_search_oversigt==false)) {
