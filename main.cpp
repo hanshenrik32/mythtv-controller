@@ -3513,7 +3513,7 @@ void display() {
   #endif
 
   // tidal
-  // hent saarch result
+  // get search result
   #ifdef ENABLE_TIDAL
   // tidal do the search after enter is pressed
   if ((vis_tidal_oversigt) && (!(visur)) && (do_show_tidal_search_oversigt==false)) {
@@ -3817,7 +3817,7 @@ void display() {
     glBindTexture(GL_TEXTURE_2D, _errorbox);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTranslatef(550, 19, 0.0f);                                          // orgwinsizey
+    glTranslatef(550, 19, 0.0f);
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( 10.0, 0.0, 0.0);
     glTexCoord2f(0, 1); glVertex3f( 10.0, 50.0, 0.0);
@@ -4103,43 +4103,7 @@ void display() {
       glPopMatrix();
     }
   }
-  /*
-  if (vis_tidal_oversigt) {
-    if (ask_save_playlist) { 
-      xof = 500;
-      yof = 600;
-      glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-      glBlendFunc(GL_ONE, GL_ONE);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
-      glBindTexture(GL_TEXTURE_2D, _texturesaveplaylist);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glBegin(GL_QUADS); // draw ask box
-      glTexCoord2f(0, 0); glVertex3f( xof, yof , 0.0);
-      glTexCoord2f(0, 1); glVertex3f( xof,yof+50, 0.0);
-      glTexCoord2f(1, 1); glVertex3f( xof+600, yof+50 , 0.0);
-      glTexCoord2f(1, 0); glVertex3f( xof+600,yof , 0.0);
-      glEnd(); //End quadrilateral coordinates
-      glPopMatrix();
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(xof+20.0f,yof+10+5, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      //aktivfont.selectfont((char *) "Courier 10 Pitch");
-      glcRenderString("Name for playlist :");
-      glcRenderString(keybuffer);
-      glPopMatrix();
-      glPushMatrix();
-      showcoursornow(330,460+5,strlen(keybuffer));
-      glPopMatrix();
-    }
-  }
-  */
+  
   // save playlist to file
   if ((vis_music_oversigt) && (save_ask_save_playlist)) {
     musicoversigt.save_music_oversigt_playlists(playlistfilename);
@@ -8251,6 +8215,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             fprintf(stderr,"(tidal) Stop play\n");
             write_logfile(logfile,(char *) "Stop tidal play.");
             returnfunc = 5;                                                       //
+            sound->release();
             fundet = true;
           }
           // next song
@@ -9033,12 +8998,10 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     }
                     // stop play online
                     if (retfunc==5) {
-                      if (tidalknapnr==9) {
-                        do_play_tidal=0;
-                        do_open_tidalplaylist=0;
-                        fprintf(stderr,"Set stop play tidal flag\n");
-                        write_logfile(logfile,(char *) "Set stop play tidal flag");
-                      }
+                      do_play_tidal=0;
+                      do_open_tidalplaylist=0;
+                      fprintf(stderr,"Set stop play tidal flag\n");
+                      write_logfile(logfile,(char *) "Set stop play tidal flag");
                     }
                     // next play  online
                     if (retfunc==7) {
@@ -9584,6 +9547,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
                 case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
                         // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
+                        if (snd) sound->release();
                         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
                         break;
                 case 1: fprintf(stderr,"button nr %d play tidal artist song %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-2));
@@ -9771,16 +9735,16 @@ void handlespeckeypress(int key,int x,int y) {
     int snumbersoficonline;
     int tnumbersoficonline;
     saver_irq=true;                                     // stop screen saver
-    mnumbersoficonline=8;		// antal i music oversigt
-    fnumbersoficonline=8;	  // antal i film oversigt
-    rnumbersoficonline=8;   // antal i radio oversigt
-    snumbersoficonline=8;   // antal i stream/spotify oversigt
-    tnumbersoficonline=8;   // antal i tidal oversigt
-    MOVIE_CS=46.0f;					// movie dvd cover side
-    MOVIE_CS=46.0f;					// movie dvd cover side
-    MOVIE_CS=46.0f;					// movie dvd cover side
-    MUSIC_CS=41.0;					// music cd cover side
-    RADIO_CS=41.0;					// radio cd cover side
+    mnumbersoficonline=8;		                            // antal i music oversigt
+    fnumbersoficonline=8;	                              // antal i film oversigt
+    rnumbersoficonline=8;                               // antal i radio oversigt
+    snumbersoficonline=8;                               // antal i stream/spotify oversigt
+    tnumbersoficonline=8;                               // antal i tidal oversigt
+    MOVIE_CS=46.0f;					                            // movie dvd cover side
+    MOVIE_CS=46.0f;				                            	// movie dvd cover side
+    MOVIE_CS=46.0f;					                            // movie dvd cover side
+    MUSIC_CS=41.0;					                            // music cd cover side
+    RADIO_CS=41.0;					                            // radio cd cover side
     switch(key) {
         // F1 setup menu
         case 1: if (vis_tv_oversigt) {
@@ -9977,7 +9941,7 @@ void handlespeckeypress(int key,int x,int y) {
                   if (tidalknapnr>1) {
                     if (tidalknapnr==1) {
                       if (tidal_selected_startofset>0) {
-                        tidal_selected_startofset-=9;
+                        tidal_selected_startofset-=9;                                   // last line
                         tidalknapnr+=8;
                       }
                     }
@@ -9986,7 +9950,7 @@ void handlespeckeypress(int key,int x,int y) {
                     tidal_select_iconnr--;
                   } else {
                     if (tidal_selected_startofset>0) {
-                      tidal_selected_startofset-=9;
+                      tidal_selected_startofset-=9;                                     // next line
                       tidalknapnr+=8;
                     }
                   }
