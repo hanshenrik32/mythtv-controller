@@ -3358,7 +3358,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         if (rc2) {
           fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
           exit(-1);
-        } 
+        }
+
+        pthread_join(loaderthread,NULL);
 
 
         conn=mysql_init(NULL);
