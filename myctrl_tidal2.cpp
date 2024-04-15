@@ -25,6 +25,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <thread>
+
 // sound system include fmod
 
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
@@ -3123,6 +3125,7 @@ void *thread_convert_m4a_to_flac(void *path) {
 
 
 
+
 // ****************************************************************************************
 //
 // Play functios track.
@@ -3158,7 +3161,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   std::string filename;
   std::string sqlstring;
   std::string ffilename;
-  //std::string post_playlist_data;
   int error=0;
   std::string sysstring;
   int result;
@@ -3349,13 +3351,16 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
+
         // convert the rest of the m4a files we have downloed to be able to play it in fmod
         pthread_t loaderthread; // thread_convert_m4a_to_flac() used to convert m4a files
         int rc2 = pthread_create( &loaderthread , NULL , thread_convert_m4a_to_flac , (void *) stack[tidalknapnr]->feed_showtxt);
         if (rc2) {
           fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
           exit(-1);
-        }
+        } 
+
+
         conn=mysql_init(NULL);
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         // hent song names from db

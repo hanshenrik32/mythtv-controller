@@ -253,6 +253,9 @@ class tidal_class {
 
         // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
 
+
+        // void thread_convert_m4a_to_flac(void *path);
+
 };
 
 int tidal_download_image(char *imgurl,char *filename);      // not in use
