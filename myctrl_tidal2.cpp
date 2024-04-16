@@ -25,8 +25,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <thread>
-
 // sound system include fmod
 
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
@@ -3436,6 +3434,7 @@ int tidal_class::tidal_play_now_artist(char *playlist_song,int tidalknapnr,bool 
   sysstring="/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
   sysstring = sysstring + playlist_song;
   error=system(sysstring.c_str());
+  return(1);
 }
 
 
@@ -3453,6 +3452,7 @@ int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,boo
   sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
   sysstring = sysstring + playlist_song;
   error=system(sysstring.c_str());
+  return(1);
 }
 
 
@@ -3511,6 +3511,7 @@ int tidal_class::tidal_do_we_play() {
 
 int tidal_class::tidal_pause_play() {
   sound->release();                                                                       // stop last playing song 
+  return(1);
 }
 
 // ****************************************************************************************

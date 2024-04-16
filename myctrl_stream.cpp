@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <cmath>
+#include <iostream>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -4120,10 +4121,10 @@ void *loadweb(void *data) {
 // ****************************************************************************************
 
 int stream_class::loadweb_stream_iconoversigt() {
+  std::string tmpfilename;
   int antal;
   int nr=0;
   int loadstatus;
-  char tmpfilename[2000];
   char downloadfilename[2900];
   char downloadfilenamelong[5000];
   char homedir[200];
@@ -4134,30 +4135,29 @@ int stream_class::loadweb_stream_iconoversigt() {
     if (strcmp(stack[nr]->feed_gfx_mythtv,"")!=0) {
       loadstatus=0;
       // return downloadfilename from stack[nr]->feed_gfx_mythtv
-      strcpy(tmpfilename,stack[nr]->feed_gfx_mythtv);
-      if (strncmp(tmpfilename,"http://",7)==0) {
+      tmpfilename=stack[nr]->feed_gfx_mythtv;
+      if (strncmp(tmpfilename.c_str(),"http://",7)==0) {
         // download file from web
         // return dowloadfilebame = file downloaded name no path
-        get_webfilename(downloadfilename,tmpfilename);
+        get_webfilename(downloadfilename,(char *) tmpfilename.c_str());
         // add download path
         // add download filename to class opbject
         //getuserhomedir(downloadfilenamelong);
         strcpy(downloadfilenamelong,localuserhomedir);
-
         strcat(downloadfilenamelong,"/rss/images/");
         strcat(downloadfilenamelong,downloadfilename);
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0))  {
-          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile(tmpfilename,downloadfilenamelong);
+          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,(char *) tmpfilename.c_str());
+          loadstatus=get_webfile((char *) tmpfilename.c_str(),downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
-          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
             //printf("File exist %s then set filename \n",downloadfilenamelong);
         }
-      } else if (strncmp(tmpfilename,"https://",8)==0) {
+      } else if (strncmp((char *) tmpfilename.c_str(),"https://",8)==0) {
         //strcpy(lastfile,downloadfilename);
-        get_webfilename(downloadfilename,tmpfilename);
+        get_webfilename(downloadfilename,(char *) tmpfilename.c_str());
         //getuserhomedir(downloadfilenamelong);
         strcpy(downloadfilenamelong,localuserhomedir);
 
@@ -4166,16 +4166,18 @@ int stream_class::loadweb_stream_iconoversigt() {
         strcat(downloadfilenamelong,downloadfilename);
         // Download stream gfx if not exist in rss/image dir
         if ((!(file_exists(downloadfilenamelong))) && (check_zerro_bytes_file(downloadfilenamelong)==0)) {
-          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,tmpfilename);
-          loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+          if (debugmode & 4) printf("nr %3d Downloading : %s \n",nr,(char *) tmpfilename.c_str());
+          loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
           strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
         } else {
-          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2(tmpfilename,downloadfilenamelong);
+          if (!(file_exists(downloadfilenamelong))) loadstatus=get_webfile2((char *) tmpfilename.c_str(),downloadfilenamelong);
           // file downloaded
           if (loadstatus==0) {
             strcpy(stack[nr]->feed_gfx_mythtv,downloadfilenamelong);
-            snprintf(tmpfilename,sizeof(tmpfilename),"RSS stream graphic download file %s",downloadfilenamelong);
-            write_logfile(logfile,tmpfilename);
+            //snprintf(tmpfilename,sizeof(tmpfilename),"RSS stream graphic download file %s",downloadfilenamelong);
+            tmpfilename = "RSS stream graphic download file ";
+            tmpfilename = tmpfilename + downloadfilenamelong;
+            write_logfile(logfile,(char *) tmpfilename.c_str());
           } else strcpy(stack[nr]->feed_gfx_mythtv,"");
         }
       }

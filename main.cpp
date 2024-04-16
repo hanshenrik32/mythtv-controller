@@ -5466,7 +5466,7 @@ void display() {
     glcRenderString(tidal_oversigt.tidal_playlistname);
     glPopMatrix();
 
-    // show songname
+    // show tidal songname
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5476,7 +5476,7 @@ void display() {
     glcRenderString("Songname ");
     glPopMatrix();
 
-    // show songname value
+    // show tidal songname value
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5488,7 +5488,7 @@ void display() {
     glcRenderString(temptxt1);
     glPopMatrix();
 
-    // show artist
+    // show tidal artist
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
