@@ -2889,9 +2889,10 @@ int tidal_class::tidal_next_play() {
     if (result==FMOD_OK) {
       if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+      return(1);
     }
   }
-  return(1);
+  return(0);
 }
 
 // ****************************************************************************************

@@ -6970,21 +6970,7 @@ void display() {
       //    
       if ((vis_tidal_oversigt) && (snd)) {
         sound->release();           // stop last playing song
-        result = sndsystem->createSound(tidal_oversigt.get_tidal_playurl(tidal_oversigt.get_aktiv_played_song()), FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
-        if (result==0) {
-          // start play song
-          result = sndsystem->playSound(sound,NULL,false, &channel);
-          ERRCHECK(result,do_play_music_aktiv_table_nr);
-          if (sndsystem) channel->setVolume(configsoundvolume);
-          if (tidal_oversigt.get_aktiv_played_song()<tidal_oversigt.total_aktiv_songs()) {
-            tidal_oversigt.tidal_set_aktiv_song(tidal_oversigt.get_aktiv_played_song()+1);
-          } else {
-            sound->release();           // stop no more songs in playlist
-            tidal_oversigt.tidal_set_aktiv_song(0);
-            snd=0;
-          }
-          //dsp = 0;
-        }
+        tidal_oversigt.tidal_next_play();   // play next song
       }
       if (vis_music_oversigt) {
         musicoversigt.update_afspillinger_music_song(aktivplay_music_path);				// Set aktive sang antal played +1 og set dagsdato til lastplayed mysql felt
