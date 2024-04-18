@@ -184,7 +184,7 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
-char playlistfilename[80];                              // name to use thewn save playlist
+char playlistfilename[512];                              // name to use thewn save playlist
 char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -4289,6 +4289,11 @@ void display() {
         }
         write_logfile(logfile,(char *) "Tidal start play play album");
         // int antal_i_oversigt = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
+        
+        // rember name of playlist to save it later
+        strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+        keybufferindex=strlen(playlistfilename);
+
         int antal_i_oversigt = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
         tidal_oversigt.tidal_set_aktiv_song(0);
       }
@@ -4319,6 +4324,7 @@ void display() {
         write_logfile(logfile,(char *) "Tidal start play search result");
         //tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
         // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
       }
       if (tidal_player_start_status == 0 ) {
@@ -6920,7 +6926,7 @@ void display() {
   if (do_stop_tidal) {
     do_stop_tidal=false;
     #if defined USE_FMOD_MIXER
-    if ((sound) && (snd)) result=sound->release();			// stop all music if user press show playlist stop button
+    if (sound) result=sound->release();			            // stop all music if user press show playlist stop button
     ERRCHECK(result,do_play_music_aktiv_table_nr);
     #endif
     #if defined USE_SDL_MIXER
@@ -9414,7 +9420,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         }
       }
       if (do_zoom_tidal_cover) {
-        // pause/stop spotify music
+        // pause/stop tidal music
         if (( retfunc == 5 ) || (button==3)) {
           if (do_play_tidal_cover==false) tidal_oversigt.tidal_resume_play();
           tidal_oversigt.tidal_pause_play();                              // spotify stop play
@@ -9424,6 +9430,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           do_select_device_to_play=false;                                     // stop show device
           tidalknapnr=0;
           tidal_selected_startofset=0;                                      //
+          do_stop_tidal=true;
         }
       } else {
         // open tidal playlist
@@ -9452,6 +9459,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     break;
           }
           tidal_oversigt.startplay=true;                          // set start play in main (display function)
+
         }
       }
     }
@@ -9489,14 +9497,17 @@ void handleMouse(int button,int state,int mousex,int mousey) {
       }
       if (do_zoom_tidal_cover) {
         // pause/stop tidal music
-        if ((retfunc==5) || (button==3)) {
+        if (( retfunc == 5 ) || (button==3)) {
           if (do_play_tidal_cover==false) tidal_oversigt.tidal_resume_play();
-          tidal_oversigt.tidal_pause_play();                              // tidal stop play
+          tidal_oversigt.tidal_pause_play();                              // spotify stop play
           do_zoom_tidal_cover=false;
           ask_open_dir_or_play_tidal=false;
           do_play_tidal_cover=false;
           do_select_device_to_play=false;                                     // stop show device
-          tidalknapnr=0;
+          do_stop_tidal=true;
+          // tidalknapnr=0;
+          // tidal_selected_startofset=0;                                        //
+          retfunc=0;
         }
       } else {
         // open tidal artist
@@ -9526,14 +9537,20 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           tidalknapnr=0;                                                  // reset selected
           tidal_selected_startofset=0;
         }
-        // tidal play artist/or playlist / or cd
+        //
+        // tidal start play artist/or playlist/cd
+        // 
         if ((((retfunc==4) || (retfunc==5)) || (button==3)) && (tidalknapnr>0)) {
+          // rember name of playlist to save it later if needed and user press 'S' for save playlist this it is in use.
+          strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+          keybufferindex=strlen(playlistfilename);          
           ask_open_dir_or_play_tidal=false;                                                               // close widow again
           // if (strcmp(tidal_oversigt.get_tidal_name(tidalknapnr-1),"")!=0) {
             switch (tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
               case 0: fprintf(stderr,"button nr %d play tidal playlist %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
                       // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
-                      if (snd) sound->release();
+                      write_logfile(logfile,(char *) "Tidal start play album");
+                      if (sound) sound->release();
                       tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
                       break;
               case 1: fprintf(stderr,"button nr %d play tidal artist song %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-2));
@@ -9545,6 +9562,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
               case 2: fprintf(stderr,"button nr %d play tidal artist name %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
                       // tidal_player_start_status = tidal_oversigt.tidal_play_now_artist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1 );                        
                       write_logfile(logfile,(char *) "Tidal start play song");
+                      if (sound) sound->release();
                       tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1 );
                       break;
               case 3: fprintf(stderr,"button nr %d play tidal album %s type = %d\n",tidalknapnr-1,tidal_oversigt.get_tidal_name(tidalknapnr-1),tidal_oversigt.get_tidal_type(tidalknapnr-1));
@@ -11109,6 +11127,19 @@ void handleKeypress(unsigned char key, int x, int y) {
         }
       }
       #endif
+      #ifdef ENABLE_TIDAL
+      // NEED FIX
+      if (do_show_setup_spotify) {
+        switch (do_show_setup_select_linie) {
+          case 0: // strcpy(keybuffer,spotify_oversigt.spotify_client_id);
+                  // keybufferindex=strlen(keybuffer);
+                  break;
+          case 1: // strcpy(keybuffer,spotify_oversigt.spotify_secret_id);
+                  // keybufferindex=strlen(keybuffer);
+                  break;
+        }
+      }
+      #endif
       if (do_show_setup_screen) {
         switch (do_show_setup_select_linie) {
           case 0: break;
@@ -11208,6 +11239,8 @@ void handleKeypress(unsigned char key, int x, int y) {
               if (key=='S') {
                 printf("Save playlist selected \n");
                 // do_select_device_to_play=true;                                                                  // enable select dvice to play on
+                // strcpy(playlistfilename,tidal_oversigt.tidal_aktiv_album_name(0));          // get name
+                // keybufferindex=strlen(playlistfilename);
                 ask_save_playlist=true;
               }
             }

@@ -1,3 +1,4 @@
+
 //
 // All tidal functions
 //
@@ -2435,6 +2436,7 @@ void tidal_class::process_array_tidal_search_result(json_value* value, int depth
 // ****************************************************************************************
 //
 // Used by opdatere_tidal_oversigt_searchtxt_online
+// Works fine
 //
 // ****************************************************************************************
 
@@ -2501,12 +2503,12 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
             // get cover file url
             // printf("Set Image string: %s\n", value->u.string.ptr);
             if (stack[antal]) {
-              strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);
+              // strcpy(stack[antal]->feed_gfx_url,value->u.string.ptr);
             }
           }
           if (( depth == 13 ) && ( x == 1 )) {
             if (stack[antal]) {
-              strcpy(stack[antal]->feed_gfx_url, value->u.string.ptr );
+              // strcpy(stack[antal]->feed_gfx_url, value->u.string.ptr );
             }
           }
           tidal_process_image = false;
@@ -2534,12 +2536,12 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                     if (downloadfilenamelong[n]==' ') downloadfilenamelong[n]='_';
                     n++;
                   }
-                  tidal_download_image( value->u.string.ptr, downloadfilenamelong );                 // download file
-                  strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong );
-
-                  // stack[antal]->textureId=loadTexture (downloadfilenamelong);
+                  // Set tidal cover file name 
+                  if (tidal_download_image( value->u.string.ptr, downloadfilenamelong )) {
+                    strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong );
+                  } else strcpy( stack[antal]->feed_gfx_url,"" );
                   printf("GFX FILE NAME %s \n ",stack[antal]->feed_gfx_url);
-                  stack[antal]->type=2;                                                           // playlist type
+                  stack[antal]->type=2;                                                           // 2 = type is playlist
               }
             }
             iconnr++;
@@ -4169,3 +4171,5 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
     }
   }
 }
+
+

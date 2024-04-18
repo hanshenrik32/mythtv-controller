@@ -195,8 +195,9 @@ class tidal_class {
         char *tidal_aktiv_song_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].song_name ); };                       //
         char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].artist_name ); };                   // aktiv sang som spilles
         char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[tidal_aktiv_song_nr].release_date ); };            //
+        char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song[nr].album_name ); };
         bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; }
-        
+
         // new
         int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };
         int total_aktiv_songs() { return(tidal_aktiv_song_antal); };
@@ -206,10 +207,9 @@ class tidal_class {
         int antal_tidal_streams() { return antalplaylists; };
         char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
         char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
+
         char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
         char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
-
-
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
         int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
         char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
