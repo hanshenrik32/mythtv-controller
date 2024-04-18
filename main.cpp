@@ -9505,8 +9505,6 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           do_play_tidal_cover=false;
           do_select_device_to_play=false;                                     // stop show device
           do_stop_tidal=true;
-          // tidalknapnr=0;
-          // tidal_selected_startofset=0;                                        //
           retfunc=0;
         }
       } else {
