@@ -185,6 +185,8 @@ channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
 char playlistfilename[512];                              // name to use thewn save playlist
+char playlistfilename_cover_path[512];
+char playlistfileid[200];                                   // playlistid
 char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -4118,7 +4120,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr);
+    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -4292,6 +4294,9 @@ void display() {
         
         // rember name of playlist to save it later
         strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+        if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
+        else strcpy(playlistfilename_cover_path,"");
+        strcpy(playlistfileid,tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
         keybufferindex=strlen(playlistfilename);
 
         int antal_i_oversigt = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
@@ -4322,8 +4327,15 @@ void display() {
           snd = 0;                                // set play new flag
         }
         write_logfile(logfile,(char *) "Tidal start play search result");
-        //tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
         // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+
+
+        strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
+        if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
+        else strcpy(playlistfilename_cover_path,"");
+        keybufferindex=strlen(playlistfilename);
+        strcpy(playlistfileid,tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
 
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
       }

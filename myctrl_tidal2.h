@@ -247,8 +247,7 @@ class tidal_class {
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
         void set_textureloaded(bool set);
 
-
-        int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr);
+        int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid);
         bool delete_record_in_view(int tidalknapnr);
 
         // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);

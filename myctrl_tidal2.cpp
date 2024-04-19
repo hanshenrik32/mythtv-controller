@@ -434,7 +434,7 @@ int Get_albums_by_artist() {
 // *******************************************************************************************
 
 
-int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr) {
+int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid) {
   bool fault;
   std::string sql_insert;
   std::string sql_search;
@@ -458,16 +458,17 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   if (conn) {
     // First inset into playlist db
     sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('";
-    sql_insert = sql_insert + playlistfilename;                           // playlist name
+    sql_insert = sql_insert + playlistfilename;                            // playlist name
     sql_insert = sql_insert + "','";
-    sql_insert = sql_insert + tidal_aktiv_song[0].cover_image_url;        // cover
+    sql_insert = sql_insert + cover_path;                                  // cover
     sql_insert = sql_insert + "','";
-    sql_insert = sql_insert + tidal_aktiv_song[0].playlistid;             // playlist id 0
+    sql_insert = sql_insert + playlstid;                                   // playlist id 0
     sql_insert = sql_insert + "',";
-    sql_insert = sql_insert + "now()";                                    // dato
+    sql_insert = sql_insert + "now()";                                     // dato
     sql_insert = sql_insert + ",'";
-    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;            // artist name
+    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;             // artist name
     sql_insert = sql_insert + "',0)";
+    printf("PLAYLIST SQL : %s \n ",sql_insert.c_str());
     mysql_query(conn,sql_insert.c_str());
     res = mysql_store_result(conn);
     // get id
@@ -502,7 +503,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
         sql_insert = sql_insert + "\"";
         */
 
-        snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl, tidal_aktiv_song[i].playlistid,tidal_aktiv_song[i].playurl );
+        snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl );
         printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt);
         res = mysql_store_result(conn);
