@@ -184,9 +184,10 @@ channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array us
 channel_configfile  xmltv_configcontrol;                //
 
 bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
-char playlistfilename[512];                              // name to use thewn save playlist
-char playlistfilename_cover_path[512];
-char playlistfileid[200];                                   // playlistid
+char playlistfilename[512];                             // name to use thewn save playlist
+char playlistfilename_cover_path[512];                  //
+char playlistfileid[200];                               // playlistid
+char playlistfileartistname[200];                       //
 char movie_search_name[80];                             // name to use thewn search for movies
 // ************************************************************************************************
 char configmysqluser[256];                              // /mythtv/mysql access info
@@ -4120,7 +4121,7 @@ void display() {
   #ifdef ENABLE_TIDAL
   // save playlist to db
   if ((vis_tidal_oversigt) && (save_ask_save_playlist)) {
-    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid);
+    tidal_oversigt.save_music_oversigt_playlists(playlistfilename,tidalknapnr,playlistfilename_cover_path,playlistfileid,playlistfileartistname);
     save_ask_save_playlist=false;
     ask_save_playlist=false;
     // reset keyboard buffer
@@ -4293,12 +4294,12 @@ void display() {
         // int antal_i_oversigt = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
         
         // rember name of playlist to save it later
-        strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
-        if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
-        else strcpy(playlistfilename_cover_path,"");
-        strcpy(playlistfileid,tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+        strcpy( playlistfilename , tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1) );          // get name of playlist
+        if ( strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0 ) strcpy( playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1) );
+        else strcpy( playlistfilename_cover_path , "" );
+        strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+        strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
         keybufferindex=strlen(playlistfilename);
-
         int antal_i_oversigt = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
         tidal_oversigt.tidal_set_aktiv_song(0);
       }
@@ -4327,17 +4328,18 @@ void display() {
           snd = 0;                                // set play new flag
         }
         write_logfile(logfile,(char *) "Tidal start play search result");
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-
-
         strcpy(playlistfilename,tidal_oversigt.get_tidal_feed_showtxt(tidalknapnr-1));          // get name of playlist
         if (strlen(tidal_oversigt.get_tidal_textureurl(tidalknapnr-1))>0) strcpy(playlistfilename_cover_path,tidal_oversigt.get_tidal_textureurl(tidalknapnr-1));
         else strcpy(playlistfilename_cover_path,"");
         keybufferindex=strlen(playlistfilename);
-        strcpy(playlistfileid,tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+        strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
+        strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_song( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
 
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
       }
       if (tidal_player_start_status == 0 ) {
         fprintf(stderr,"tidal start play return ok.\n");
@@ -5391,13 +5393,13 @@ void display() {
     glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+640,400+300 , 0.0);
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+640,300, 0.0);
     glEnd();
-    // spotify play info icon
+    // tidal play info icon
     glEnable(GL_BLEND);
     if (tidal_oversigt.get_texture(tidalknapnr))
-      if (tidalknapnr-1>0) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_texture(tidalknapnr-1));                        // get playlist conver icon
+      if (tidalknapnr-1>=0) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_texture(tidalknapnr-1));                        // get playlist conver icon
     else
-      glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                              // else default icon
-    if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);        // set active icon
+      glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
+    if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
@@ -5460,10 +5462,7 @@ void display() {
       glcRenderString(temptxt);
     }
     glPopMatrix();
-
-
     int textofset=140;
-
     // show value
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
@@ -5533,11 +5532,9 @@ void display() {
     } else {
       //glcRenderString("Album");
       //sprintf(temptxt1,"%s",(char *) );
-      //glcRenderString(temptxt1);
+      glcRenderString(tidal_oversigt.tidal_aktiv_artist_name());
     }
     glPopMatrix();
-
-
 
     // # of songs
     glPushMatrix();

@@ -434,7 +434,7 @@ int Get_albums_by_artist() {
 // *******************************************************************************************
 
 
-int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid) {
+int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname) {
   bool fault;
   std::string sql_insert;
   std::string sql_search;
@@ -466,7 +466,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
     sql_insert = sql_insert + "',";
     sql_insert = sql_insert + "now()";                                     // dato
     sql_insert = sql_insert + ",'";
-    sql_insert = sql_insert + tidal_aktiv_song[0].artist_name;             // artist name
+    sql_insert = sql_insert + artistname;                                  // artist name
     sql_insert = sql_insert + "',0)";
     printf("PLAYLIST SQL : %s \n ",sql_insert.c_str());
     mysql_query(conn,sql_insert.c_str());
@@ -2581,8 +2581,18 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
           if ((depth==9) && (x==1)) {
             if (stack[antal]) {
               // printf("Set artist name %s \n", value->u.string.ptr);
+              // strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+            }
+          }
+          //
+          // get artis name ok
+          //
+          if (( depth == 10 ) && ( x == 1 )) {
+            if (stack[antal]) {
+              // printf("Set artist name %s \n", value->u.string.ptr);
               strcpy( stack[antal]->feed_artist , value->u.string.ptr );
             }
+            tidal_process_name=false;
           }
         }
         // set release date
@@ -2594,10 +2604,11 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
           tidal_process_releasedate=false;
         }       
         // Set artist id
+        // we do not need artist id
         if (tidal_process_artist) {
           if (stack[antal]) {
             // printf("Set artist %s \n", value->u.string.ptr);
-            strcpy( stack[antal]->feed_artist , value->u.string.ptr );
+            // strcpy( stack[antal]->feed_artist , value->u.string.ptr );
           }
           tidal_process_artist=false;
         }
@@ -2699,10 +2710,17 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
     else searchbuffer=searchbuffer+"%20";
     n++;
   }
-
   url="curl -X GET 'https://openapi.tidal.com/search?query=";
   url=url + searchbuffer;
-  url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+  switch (type) {
+    case 0: url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            break;
+    case 1: url=url + "&type=ARTISTS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            break;
+    case 2: url=url + "&type=TRACKS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+            break;
+    default:url=url + "&type=ALBUMS&offset=0&limit=42&countryCode=US&popularity=WORLDWIDE' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer " + tidaltoken + "' -H 'Content-Type: application/vnd.tidal.v1+json' > tidal_search_result.json";
+  }
   error=system(url.c_str());
   // if no error we have json file have the search result
   if (error==0) {

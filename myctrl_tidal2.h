@@ -207,7 +207,8 @@ class tidal_class {
         int antal_tidal_streams() { return antalplaylists; };
         char *get_tidal_textureurl(int nr) { if ( nr < antal ) return(stack[nr]->feed_gfx_url); else return(0); }
         char *get_tidal_feed_showtxt(int nr) { if ( nr < antal ) return(stack[nr]->feed_showtxt); else return(0); }
-
+        char *get_tidal_feed_artistname(int nr) { if ( nr < antal ) return(stack[nr]->feed_artist); else return(0); }
+      
         char *get_tidal_artistname(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].artist_name ); else return(0); }
         char *get_tidal_playurl(int nr) { if ( nr < antal ) return(tidal_aktiv_song[nr].playurl ); else return(0); }
         int tidal_aktiv_song_msplay() { return( tidal_aktiv_song[0].progress_ms ); };                     //
@@ -247,7 +248,7 @@ class tidal_class {
         int opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int type);
         void set_textureloaded(bool set);
 
-        int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid);
+        int save_music_oversigt_playlists(char *playlistfilename,int tidalknapnr,char *cover_path,char *playlstid,char *artistname);
         bool delete_record_in_view(int tidalknapnr);
 
         // int tidal_play_playlist(char *playlist_song,int tidalknapnr,bool now);
