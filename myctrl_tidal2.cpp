@@ -4006,12 +4006,10 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   if (last_rawtime==0) {
     last_rawtime=rawtime;
   }
-
   if (rawtime>(last_rawtime+1)) {
     cursor=!cursor;
     last_rawtime=rawtime;
   }
-
   // last loaded filename
   if (tidal_oversigt_loaded_nr==0) strcpy(downloadfilename_last,"");
   // top
