@@ -4056,10 +4056,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glTranslatef(0,0,0.0f);
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
-    // if ((texture_loaded==false) && (this->search_loaded) && (gfx_loaded==false)) {
-
-    printf(" doneloadsearch loaded flag = %d  search_loaded = %d \n",doneloadsearch,search_loaded);
-   
+    // printf(" doneloadsearch loaded flag = %d  search_loaded = %d \n",doneloadsearch,search_loaded);
     if (search_loaded==false) doneloadsearch=false;
     if ((search_loaded==true) && (doneloadsearch==false)) {
       doneloadsearch=true;

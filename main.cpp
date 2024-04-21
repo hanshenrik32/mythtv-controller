@@ -14312,15 +14312,23 @@ void *datainfoloader_webserver(void *data) {
     if (do_hent_tidal_search_online) {
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
-      write_logfile(logfile,(char *) "Update tidal search result thread");
+      write_logfile(logfile,(char *) "Tidal start search result thread");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
       // clear old
       tidal_oversigt.clean_tidal_oversigt();
       // update from search
-      tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);
-      // tidal_oversigt.load_tidal_iconoversigt();                       // load icons
+      switch(tidal_oversigt.type) {
+        case 0: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
+                break;
+        case 1: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,1);               // ARTISTS
+                break;
+        case 2: tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,2);               // TRACKS
+                break;
+        default:tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);               // ALBUMS
+      }
       printf("Done Update tidal search result thread.\n");
+      write_logfile(logfile,(char *) "Tidal done search result thread");
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
       tidal_oversigt.set_search_loaded();                                 // load icons
