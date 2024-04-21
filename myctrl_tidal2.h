@@ -101,8 +101,8 @@ class tidal_class {
         bool tidal_is_playing;                                                // do we play ?
         bool tidal_is_pause;                                                  // do we pause
         //char overview_show_bane_name[81];                                       // name of the band show in overview then you search on band and play songs from it
-        bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
-        bool search_loaded;
+        // bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
+        // bool search_loaded;
 
 
         // used by opdatere_tidal_oversigt_searchtxt_online to process search json result file
@@ -113,6 +113,8 @@ class tidal_class {
         // process_tidal_search_result is used in opdatere_tidal_oversigt_searchtxt_online
 
     public:
+        bool search_loaded;
+        bool gfx_loaded;			                                                  // gfx_loaded = true then gfx is loaded
         bool startplay;
         bool texture_loaded;
 

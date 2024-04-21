@@ -12182,7 +12182,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
               #endif
               #ifdef ENABLE_TIDAL
-              // search tidal
+              // start search tidal
               if (vis_tidal_oversigt) {
                 hent_tidal_search = true;				                // start tidal search
                 tidalknapnr=tidal_select_iconnr;                // selected
@@ -14312,6 +14312,7 @@ void *datainfoloader_webserver(void *data) {
     if (do_hent_tidal_search_online) {
       tidal_oversigt.search_tidal_online_done=false;
       fprintf(stderr,"Update tidal search result thread.\n");
+      write_logfile(logfile,(char *) "Update tidal search result thread");
       do_hent_tidal_search_online=false;
       tidal_oversigt_loaded_begin=true;
       // clear old
@@ -14319,12 +14320,12 @@ void *datainfoloader_webserver(void *data) {
       // update from search
       tidal_oversigt.opdatere_tidal_oversigt_searchtxt_online(keybuffer,0);
       // tidal_oversigt.load_tidal_iconoversigt();                       // load icons
-
       printf("Done Update tidal search result thread.\n");
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
       tidal_oversigt.set_search_loaded();                                 // load icons
       tidal_oversigt.reset_amin_in_viewer();                              // reset anim
+      tidal_oversigt.search_loaded=true;
     }
     /*
     if (do_hent_tidal_online) {

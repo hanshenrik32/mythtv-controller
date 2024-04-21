@@ -2745,6 +2745,9 @@ int tidal_class::opdatere_tidal_oversigt_searchtxt_online(char *keybuffer,int ty
         process_tidal_search_result(value, 0,0);                                      // process to stack variable
         if (file_contents) free(file_contents);                                       // free memory again
         json_value_free(value);                                                       // json clean up
+  
+        texture_loaded = false;
+
         // stack is ready
         // the array is ready
         /*
@@ -3997,6 +4000,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   static time_t rawtime;
   static time_t last_rawtime=0;
   static bool gfx_loaded=false;
+  static bool doneloadsearch=false;
   rawtime=time(NULL);                                                         // hent now time
   if (timefirsttime==false) {
     timefirsttime=true;
@@ -4052,11 +4056,16 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glTranslatef(0,0,0.0f);
   // do tidal works ?
   if (strcmp(tidaltoken,"")) {
-    if ((texture_loaded==false) && (this->search_loaded) && (gfx_loaded==false) ) {
+    // if ((texture_loaded==false) && (this->search_loaded) && (gfx_loaded==false)) {
+
+    printf(" doneloadsearch loaded flag = %d  search_loaded = %d \n",doneloadsearch,search_loaded);
+   
+    if (search_loaded==false) doneloadsearch=false;
+    if ((search_loaded==true) && (doneloadsearch==false)) {
+      doneloadsearch=true;
       load_tidal_iconoversigt();
-      texture_loaded=true;
-      gfx_loaded=true;
     }
+
     while((i<lstreamoversigt_antal) && (i+sofset<antalplaylists) && (stack[i+sofset]!=NULL)) {
       if (((i % bonline)==0) && (i>0)) {
         yof=yof-(buttonsizey+20);
