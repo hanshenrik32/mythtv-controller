@@ -757,6 +757,9 @@ GLuint big_search_bar_playlist;           // big search bar used by sporify sear
 GLuint big_search_bar_track;              // big search bar used by sporify search
 GLuint big_search_bar_albumm;             // big search bar used by sporify search
 GLuint big_search_bar_artist;             // big search bar used by sporify search
+GLuint tidal_big_search_bar_artist;       // big search bar used by tidal search
+GLuint tidal_big_search_bar_track;         // big search bar used by tidal search
+GLuint tidal_big_search_bar_album;
 
 // radio view icons
 GLuint onlineradio;                       // default radio icon
@@ -4599,7 +4602,7 @@ void display() {
         fprintf(stderr,"Type af sange nr %d som skal loades %d\n ",mknapnr-1,musicoversigt.get_album_type(mknapnr-1));
         if (musicoversigt.get_album_type(mknapnr-1)==-1) {
           if (debugmode & 2) fprintf(stderr,"Loading songs from mythtv playlist: %4d %d\n",do_play_music_aktiv_nr,mknapnr);          
-          write_logfile(logfile,"Loading songs from mythtv playlist.");
+          write_logfile(logfile,(char *) "Loading songs from mythtv playlist.");
           if (hent_mythtv_playlist(musicoversigt.get_directory_id(mknapnr-1))==0) {		// tilføj musik valgte til playliste + load af covers
             fprintf(stderr,"**** PLAYLIST LOAD ERROR **** No songs. mythtv playlist id =%d\n",musicoversigt.get_directory_id(mknapnr-1));
             exit(2);        // STOP program
@@ -4650,7 +4653,7 @@ void display() {
                 ERRCHECK(result,do_play_music_aktiv_table_nr);
                 if (sndsystem) channel->setVolume(configsoundvolume);
               } else {
-                write_logfile(logfile,"Error loading song.");
+                write_logfile(logfile,(char *) "Error loading song.");
                 printf("Error loading song %s \n",aktivplay_music_path);
               }
               do_stop_music_all=false;						// fjern stop musik bremse
@@ -7916,7 +7919,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // write debug log
           #ifdef ENABLE_SPOTIFY
-          sprintf(debuglogdata,"spotifyknapnr %d type=%d fundet %d",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
+          sprintf(debuglogdata,"spotifyknapnr %d type=%d ",spotifyknapnr,spotify_oversigt.get_spotify_type(spotifyknapnr));
           write_logfile(logfile,(char *) debuglogdata);
           #endif
 
@@ -8162,7 +8165,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           }
           // write debug log
           #ifdef ENABLE_TIDAL
-          sprintf(debuglogdata,"tidalknapnr %d type=%d fundet %d",tidalknapnr,tidal_oversigt.get_tidal_type(tidalknapnr));
+          sprintf(debuglogdata,"tidalknapnr %d type=%d ",tidalknapnr,tidal_oversigt.get_tidal_type(tidalknapnr));
           write_logfile(logfile,(char *) debuglogdata);
           #endif
 
@@ -15094,6 +15097,11 @@ void loadgfx() {
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
     big_search_bar_albumm  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_album");
     big_search_bar_artist  = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_artist");
+
+    tidal_big_search_bar_artist = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_artist");
+    tidal_big_search_bar_album = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_album");
+    tidal_big_search_bar_track = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_big_search_bar_tracks");
+
     // radio options (O) key in radio oversigt
     radiooptions          = loadgfxfile(temapath,(char *) "images/",(char *) "radiooptions");
     // radio options mask (O) key in radio oversigt
@@ -15263,6 +15271,11 @@ void freegfx() {
     glDeleteTextures( 1, &big_search_bar_track);    //
     glDeleteTextures( 1, &big_search_bar_artist);   //
     glDeleteTextures( 1, &big_search_bar_albumm);   //
+
+    glDeleteTextures( 1, &tidal_big_search_bar_artist);   //
+    glDeleteTextures( 1, &tidal_big_search_bar_album);   //
+    glDeleteTextures( 1, &tidal_big_search_bar_track);   //
+
     glDeleteTextures( 1, &radiooptions);            //
     glDeleteTextures( 1, &_mainlogo);								// Main logo not in use any more
     glDeleteTextures( 1, &gfxlandemask);			      // lande mask
@@ -15548,7 +15561,7 @@ int main(int argc, char** argv) {
     #ifdef ENABLE_TIDAL
     bool tidalok;
     // login tidal
-    tidalok=tidal_oversigt.get_access_token("TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
+    tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
       // login ok load playlistes from file
       // load from file
@@ -15557,17 +15570,13 @@ int main(int argc, char** argv) {
       // get_playlist_from_file use get_users_album(albumid) to download files
       
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
-      tidal_oversigt.tidal_get_artists_all_albums("1565",false);     // Maroon 5
-      
-      tidal_oversigt.tidal_get_artists_all_albums("3346",false);        // Gnags
-      tidal_oversigt.tidal_get_artists_all_albums("10249",false);       // Norah Jones
-
-      // tidal_oversigt.tidal_get_artists_all_albums("9706",false);       // pink floyd
-      tidal_oversigt.tidal_get_artists_all_albums("3824",false);       // tears for fears
-
-      tidal_oversigt.tidal_get_artists_all_albums("10665",false);       // Rihanna
-
-      tidal_oversigt.tidal_get_artists_all_albums("3853703",false);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",false);        // Gnags
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",false);       // Norah Jones
+      // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",false);       // tears for fears
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",false);       // Rihanna
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",false);       // Skeikkex
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 

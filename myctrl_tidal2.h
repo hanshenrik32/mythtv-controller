@@ -196,7 +196,7 @@ class tidal_class {
         char *tidal_aktiv_artist_name() { return( tidal_aktiv_song[tidal_aktiv_song_nr].artist_name ); };                   // aktiv sang som spilles
         char *tidal_aktiv_song_release_date() { return( tidal_aktiv_song[tidal_aktiv_song_nr].release_date ); };            //
         char *tidal_aktiv_album_name(int nr) { return( tidal_aktiv_song[nr].album_name ); };
-        bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; }
+        bool tidal_set_aktiv_song(int nr) { tidal_aktiv_song_nr=nr; return(true); }
 
         // new
         int get_aktiv_played_song() { return(tidal_aktiv_song_nr); };

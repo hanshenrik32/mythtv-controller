@@ -88,7 +88,9 @@ extern GLuint big_search_bar_playlist;                    // big search bar used
 extern GLuint big_search_bar_track;                    // big search bar used by sporify search
 extern GLuint big_search_bar_albumm;                    // big search bar used by sporify search
 extern GLuint big_search_bar_artist;                    // big search bar used by sporify search
-
+extern GLuint tidal_big_search_bar_artist;
+extern GLuint tidal_big_search_bar_album;
+extern GLuint tidal_big_search_bar_track;
 
 extern float configsoundvolume;                           // default sound volume
 
@@ -366,7 +368,7 @@ tidal_class::tidal_class() : antal(0) {
     texture_loaded=false;
     tidal_aktiv_song_nr=0;
     //strcpy(tidal_aktiv_song[0].release_date,"");
-    //write_logfile(logfile,(char *) "Starting web server on port 8100");       //
+    //  gfile(logfile,(char *) "Starting web server on port 8100");       //
     //printf("Starting tidal web server on port %s \n",s_http_port);
     // start web server
     // create web server
@@ -4017,15 +4019,15 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   // type of search
   switch (searchtype) {
-    case 0: glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+    case 0: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
             break;
-    case 1: glBindTexture(GL_TEXTURE_2D,big_search_bar_albumm);
+    case 1: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_album);
             break;
-    case 2: glBindTexture(GL_TEXTURE_2D,big_search_bar_playlist);
+    case 2: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
             break;
-    case 3: glBindTexture(GL_TEXTURE_2D,big_search_bar_track);
+    case 3: glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_track);
             break;
-    default:glBindTexture(GL_TEXTURE_2D,big_search_bar_artist);
+    default:glBindTexture(GL_TEXTURE_2D,tidal_big_search_bar_artist);
   }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
