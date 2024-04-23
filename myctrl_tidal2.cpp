@@ -3070,9 +3070,83 @@ void *thread_convert_m4a_to_flac(void *path) {
         antalfiles++;
       }
     }
+    if (dir) closedir (dir);    
+  }
+  temptxt = dirtocheck;
+  temptxt = temptxt + "/CD5";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+      dir_found=true;
+      filename=ep->d_name;
+      if (filename.find(".m4a") != std::string::npos) {
+        dir_files=filename;
+        dir_file_array[antalfiles]="CD5/";
+        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
+        antalfiles++;
+      }
+    }
     if (dir) closedir (dir);
   }
-
+  temptxt = dirtocheck;
+  temptxt = temptxt + "/CD6";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+      dir_found=true;
+      filename=ep->d_name;
+      if (filename.find(".m4a") != std::string::npos) {
+        dir_files=filename;
+        dir_file_array[antalfiles]="CD6/";
+        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
+        antalfiles++;
+      }
+    }
+    if (dir) closedir (dir);
+  }
+  temptxt = dirtocheck;
+  temptxt = temptxt + "/CD7";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+      dir_found=true;
+      filename=ep->d_name;
+      if (filename.find(".m4a") != std::string::npos) {
+        dir_files=filename;
+        dir_file_array[antalfiles]="CD7/";
+        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
+        antalfiles++;
+      }
+    }
+    if (dir) closedir (dir);
+  }
+  temptxt = dirtocheck;
+  temptxt = temptxt + "/CD8";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+      dir_found=true;
+      filename=ep->d_name;
+      if (filename.find(".m4a") != std::string::npos) {
+        dir_files=filename;
+        dir_file_array[antalfiles]="CD8/";
+        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
+        antalfiles++;
+      }
+    }
+    if (dir) closedir (dir);
+  }
+  temptxt = dirtocheck;
+  temptxt = temptxt + "/CD9";
+  if ((dir = opendir (temptxt.c_str())) != NULL) {
+    while (((ep = readdir (dir)) != NULL) && (antalfiles<1000)) {
+      dir_found=true;
+      filename=ep->d_name;
+      if (filename.find(".m4a") != std::string::npos) {
+        dir_files=filename;
+        dir_file_array[antalfiles]="CD9/";
+        dir_file_array[antalfiles] = dir_file_array[antalfiles] + dir_files.stem().string();         // get only filename not .ext name
+        antalfiles++;
+      }
+    }
+    if (dir) closedir (dir);
+  }
   // normal no subdirs
   if (dir_found == false) {
     antalfiles=0;
@@ -3094,7 +3168,7 @@ void *thread_convert_m4a_to_flac(void *path) {
   std::ifstream myfile (dirtocheck);
   if (myfile.is_open()) {
     getline(myfile,playlist_id);
-    playlist_id.erase(0,14);
+    playlist_id.erase(0,14);                                                  // get playlistid
     myfile.close();
   }
   // create in db if not exist
@@ -3877,7 +3951,7 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         pline=0;
         glTranslatef(xof+20,yof-20,0);
         glDisable(GL_TEXTURE_2D);
-        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+        glScalef(configdefaultstreamfontsize+2.0f, configdefaultstreamfontsize+2.0f, 1.0f);
         glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         glRasterPos2f(0.0f, 0.0f);
         glDisable(GL_TEXTURE_2D);

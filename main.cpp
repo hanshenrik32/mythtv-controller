@@ -7898,7 +7898,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             }
           }
         }
+        //
         // online spotify stuf
+        //
         if (do_show_spotify_search_oversigt==true) {
           if ((!(do_show_setup_spotify))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
