@@ -2905,6 +2905,7 @@ void tidal_class::select_device_to_play() {
 
 int tidal_class::tidal_next_play() {
   int result;  
+  std::string logstring;
   if (tidal_aktiv_song_nr<tidal_aktiv_song_antal) {
     tidal_aktiv_song_nr++;
     tidal_pause_play();
@@ -2913,6 +2914,9 @@ int tidal_class::tidal_next_play() {
     if (result==FMOD_OK) {
       if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+      logstring="Tidal play song : ";
+      logstring = logstring + tidal_aktiv_song[tidal_aktiv_song_nr].playurl;
+      write_logfile(logfile,(char *) logstring.c_str());
       return(1);
     }
   }
@@ -2926,7 +2930,8 @@ int tidal_class::tidal_next_play() {
 // ****************************************************************************************
 
 int tidal_class::tidal_last_play() {
-  int result;  
+  int result;
+  std::string logstring;
   if (tidal_aktiv_song_nr>0) {
     tidal_aktiv_song_nr--;
     tidal_pause_play();
@@ -2935,6 +2940,9 @@ int tidal_class::tidal_last_play() {
     if (result==FMOD_OK) {
       if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
       if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+      logstring="Tidal play song : ";
+      logstring = logstring + tidal_aktiv_song[tidal_aktiv_song_nr].playurl;
+      write_logfile(logfile,(char *) logstring.c_str());
     }
   }
   return(1);
@@ -4224,7 +4232,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       pline=0;
       glTranslatef(xof+20,yof-20,0);
       glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
+      glScalef(configdefaultstreamfontsize+2.0f, configdefaultstreamfontsize+2.0f, 1.0);
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glRasterPos2f(0.0f, 0.0f);
       glDisable(GL_TEXTURE_2D);
