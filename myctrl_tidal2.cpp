@@ -334,6 +334,7 @@ bool tidal_class::reset_amin_in_viewer() {
   anim_viewer=true;
   anim_viewer_search=true;
   anim_angle=180.0f;
+  return(true);
 }
 
 
@@ -423,8 +424,8 @@ int Get_albums_by_artist() {
   -H 'accept: application/vnd.tidal.v1+json' \
   -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDI1MDMzMzksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ._nwyfiDuTO-MdHIlyzflhHklh6o-as0wlgWnoeVEumU8opSrSakLLfrKH_X-VNBE0SN31jRmbk_XdViuu-dBOQ' \
   -H 'Content-Type: application/vnd.tidal.v1+json'";
-
   system(curlstring.c_str());
+  return(1);
 }
 
 
@@ -830,12 +831,13 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
 // vxOmFp39rweIVD2rb20qmpETsoAECwhGUdnPIPSXq4g=
 
 
-
+// ****************************************************************************************
 // IN USE IN MAIN startup
 // ****************************************************************************************
 //
 // get users token (works and in use)
 //
+// ****************************************************************************************
 
 int tidal_class::get_access_token(char *loginbase64) {
   // lib curl stuf
@@ -2347,7 +2349,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
 // ****************************************************************************************
 
 int tidal_class::tidal_get_playlist(const char *playlist,bool force,bool create_playlistdb) {
-
+  return(0);
 }
 
 

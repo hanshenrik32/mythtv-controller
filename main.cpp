@@ -15484,7 +15484,7 @@ int main(int argc, char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.40.x \n",logfile);
+      fputs("Ver 0.42.x \n",logfile);
     }
     printf("Build date %s\n",build_str);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
@@ -15603,7 +15603,7 @@ int main(int argc, char** argv) {
       // login ok load playlistes from file
       // load from file
       
-      // tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
+      tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
