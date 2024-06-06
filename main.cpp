@@ -8321,6 +8321,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_music_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt=false;
+          printf("Enable radio view\n ");
         }
         // Music
         if ((GLubyte) names[i*4+3]==81) {
@@ -8329,6 +8330,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt = false;
+          printf("Enable music view\n ");
         } // spotify
         if ((GLubyte) names[i*4+3]==82) {
           fundet = true;
@@ -8336,6 +8338,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = true;                                          // show spotify overview
           vis_radio_or_music_oversigt = false;
+          printf("Enable spotify view\n ");
         }
         #if defined(ENABLE_TIDAL)
         // tidal
@@ -15601,11 +15604,14 @@ int main(int argc, char** argv) {
     tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
       // login ok load playlistes from file
+      // get users playlists if not loaded before      
+      tidal_oversigt.get_users_playlist_plus_favorite(false);
+
       // load from file
-      
       tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
+
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",false);        // Gnags
@@ -15621,6 +15627,7 @@ int main(int argc, char** argv) {
       printf("Tidal file load from tidal_playlists.txt OK.\n");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
+      write_logfile(logfile,(char *) "Tidal no data downloaded.");
     }
     
 

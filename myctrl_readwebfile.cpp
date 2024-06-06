@@ -25,7 +25,7 @@ extern int debugmode;                                           // 64 = radio st
 
 // ****************************************************************************************
 //
-// return string for filename long = last path + name as filename
+// return string (fname) for filename long = last path + name as filename
 //
 // ****************************************************************************************
 //
@@ -253,8 +253,8 @@ int get_webfile2(char *webpath,char *outfile) {
     strcat(command,webpath);
     strcat(command,"\" -O- | convert -thumbnail 'x320^' - - > ");
     strcat(command,outfile);
-    //strcat(command," 2>%1 ");
-    strcat(command," 2>> wget.log ");
+    strcat(command," 2>&1 ");                                                           // disable output
+    //strcat(command," 2>> wget.log ");
     //if (debugmode & 4) printf(" do COMMAND *%s* \n",command);
     return (system(command));
   }
