@@ -451,7 +451,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   MYSQL_ROW row;
   char database[256];
   strcpy(database,dbname);
-  write_logfile(logfile,(char *) "Tidal save music playlist.");
+  write_logfile(logfile,(char *) "Tidal start playlist save.");
   i=0;
   conn=mysql_init(NULL);
   // Connect to database
@@ -471,7 +471,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
     sql_insert = sql_insert + ",'";
     sql_insert = sql_insert + artistname;                                  // artist name
     sql_insert = sql_insert + "',0)";
-    printf("PLAYLIST SQL : %s \n ",sql_insert.c_str());
+    // printf("PLAYLIST SQL : %s \n ",sql_insert.c_str());
     mysql_query(conn,sql_insert.c_str());
     res = mysql_store_result(conn);
     // get id
@@ -492,7 +492,7 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
       i=0;
       while(i<tidal_aktiv_song_antal) {
         snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl );
-        printf("SQL : %s \n ",temptxt);
+        // printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt);
         res = mysql_store_result(conn);
         if (res) fault=false;
@@ -500,6 +500,10 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
       }
     }
     mysql_close(conn);
+    write_logfile(logfile,(char *) "Tidal playlist save done.");
+  } else {
+    write_logfile(logfile,(char *) "Tidal playlist save error. No access to mariadb.");
+
   }
   return(!(fault));
 }
@@ -1206,11 +1210,9 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   url="https://openapi.tidal.com/artists/";
   url= url + artistid;
   url= url + "/albums?countryCode=US&offset=0&limit=100";
-  
-  // userfilename = localuserhomedir;
-  // userfilename = userfilename + "/";
-
-  userfilename = "tidal_artist_playlist_";
+  userfilename = localuserhomedir;
+  userfilename = userfilename + "/";
+  userfilename = userfilename + "tidal_artist_playlist_";
   userfilename = userfilename + artistid;
   userfilename = userfilename + ".json";
   // use libcurl
@@ -1616,17 +1618,17 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   // process json artist file after create file name
   
   // tidal_artist_playlist_$artistid.json have the data
-  // tidal_artis_playlist_file = localuserhomedir;
-  // tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
-  // tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
-  tidal_artis_playlist_file = "tidal_artist_playlist_";
+  tidal_artis_playlist_file = localuserhomedir;
+  tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
+  tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
+  // tidal_artis_playlist_file = "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
   if ((!(file_exists(tidal_artis_playlist_file))) || (force)) {
     // download artist album json file
     // filename is tidal_artist_playlist_{playlistid}.json
     httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file)
-    if (httpcode==200) {
+    if ((httpcode==200) || (httpcode==207)) {
       stat(tidal_artis_playlist_file.c_str(), &filestatus);                             // get file info
       file_size = filestatus.st_size;                                                   // get filesize
       if (file_size>0) {
@@ -2338,7 +2340,10 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
     }
     antalplaylists=antal;
     return(antal);
-  } else fprintf(stderr,"Failed to update tidal db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+  } else {
+    write_logfile(logfile,(char *) "Failed to update tidal db, can not connect to database.");
+    fprintf(stderr,"Failed to update tidal db, can not connect to database: %s Error: %s\n",dbname,mysql_error(conn));
+  }
   fprintf(stderr,"Tidal loader done... Antal records %d \n",antalplaylists);
   return(0);
 }
