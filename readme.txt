@@ -18,6 +18,9 @@ https://www.imagemagick.org/Usage/thumbnails/#cut
 
 Version.
 
+mythtv-controller ver 0.41.0
+
+Tidal working. need some code fix to make it stable.
 
 mythtv-controller ver 0.39.0
 

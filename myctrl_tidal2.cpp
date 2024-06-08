@@ -491,21 +491,6 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
       // Now update play files in db.
       i=0;
       while(i<tidal_aktiv_song_antal) {
-
-        /*
-        sql_insert = "insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"";
-        sql_insert = sql_insert + tidal_aktiv_song[i].song_name;
-        sql_insert = sql_insert + "','";
-        sql_insert = sql_insert + tidal_aktiv_song[i].cover_image_url;  // pathtumb (image)
-        sql_insert = sql_insert + "','";
-        sql_insert = sql_insert + tidal_aktiv_song[i].playurl;               // playpath
-        sql_insert = sql_insert + "','";
-        sql_insert = sql_insert + tidal_aktiv_song[i].playlistid;           // playlistid
-        sql_insert = sql_insert + "',0) ON DUPLICATE KEY UPDATE playpath='";
-        sql_insert = sql_insert + tidal_aktiv_song[i].playurl;
-        sql_insert = sql_insert + "\"";
-        */
-
         snprintf(temptxt,2047,"insert into mythtvcontroller.tidalcontent (name,paththumb,playpath,playlistid,id) values (\"%s\",\"%s\",\"%s\",\"%s\",0) ON DUPLICATE KEY UPDATE playpath=\"%s\"", tidal_aktiv_song[i].song_name, tidal_aktiv_song[i].cover_image_url, tidal_aktiv_song[i].playurl,playlstid,tidal_aktiv_song[i].playurl );
         printf("SQL : %s \n ",temptxt);
         mysql_query(conn,temptxt);
@@ -1193,6 +1178,7 @@ int tidal_class::get_users_album(char *albumid) {
 
 
 // ****************************************************************************************
+//
 // NEW function works
 //
 // Retrieve a list of albums by TIDAL artist id.
@@ -1220,6 +1206,10 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
   url="https://openapi.tidal.com/artists/";
   url= url + artistid;
   url= url + "/albums?countryCode=US&offset=0&limit=100";
+  
+  // userfilename = localuserhomedir;
+  // userfilename = userfilename + "/";
+
   userfilename = "tidal_artist_playlist_";
   userfilename = userfilename + artistid;
   userfilename = userfilename + ".json";
@@ -1247,7 +1237,7 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
       res = curl_easy_perform(curl);
       fclose(userfile);
     }
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);                   // get result in httpCode
     if (res != CURLE_OK) {
       fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
     }
@@ -1257,12 +1247,15 @@ int tidal_class::tidal_get_album_by_artist(char *artistid) {
     if (httpCode == 200) {
       return(200);
     }
+  } else {
+    write_logfile(logfile,(char *) "Tidal curl fault");
   }
   return(httpCode);
 }
 
 
 // ****************************************************************************************
+//
 // works ( used by get_users_album )
 // 
 // get/download album items (download json file)
@@ -1600,6 +1593,7 @@ inline bool file_exists(const std::string& name) {
 
 
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
+  int httpcode;
   std::string logdata;
   struct stat filestatus;
   long file_size;
@@ -1620,133 +1614,139 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   int create_new_record_antal;
   int created_playlist;
   // process json artist file after create file name
+  
   // tidal_artist_playlist_$artistid.json have the data
+  // tidal_artis_playlist_file = localuserhomedir;
+  // tidal_artis_playlist_file = tidal_artis_playlist_file + "/";
+  // tidal_artis_playlist_file = tidal_artis_playlist_file + "tidal_artist_playlist_";
   tidal_artis_playlist_file = "tidal_artist_playlist_";
   tidal_artis_playlist_file = tidal_artis_playlist_file + artistid;
   tidal_artis_playlist_file = tidal_artis_playlist_file + ".json";
   if ((!(file_exists(tidal_artis_playlist_file))) || (force)) {
     // download artist album json file
     // filename is tidal_artist_playlist_{playlistid}.json
-    tidal_get_album_by_artist(artistid);                                          // (download all albums json file)    
-    stat(tidal_artis_playlist_file.c_str(), &filestatus);                         // get file info
-    file_size = filestatus.st_size;                                               // get filesize
-    if (file_size>0) {
-      file_contents = (char*) malloc(filestatus.st_size);                           // get some work mem
-      json_file = fopen(tidal_artis_playlist_file.c_str(), "r");
-      if (json_file) {
-        while(!(feof(json_file))) {
-          fread(file_contents,file_size,1,json_file);
+    httpcode=tidal_get_album_by_artist(artistid);                                       // (download all albums in in one json file)
+    if (httpcode==200) {
+      stat(tidal_artis_playlist_file.c_str(), &filestatus);                             // get file info
+      file_size = filestatus.st_size;                                                   // get filesize
+      if (file_size>0) {
+        file_contents = (char*) malloc(filestatus.st_size);                             // get some work mem
+        json_file = fopen(tidal_artis_playlist_file.c_str(), "r");                      // load jons file to process
+        if (json_file) {
+          while(!(feof(json_file))) {
+            fread(file_contents,file_size,1,json_file);
+          }
+          fclose(json_file);
         }
-        fclose(json_file);
-      }
-      json = (json_char*) file_contents;
-      try {
-        value = json_parse(file_contents,file_size);                                  // parser create value obj
-        antal=-1;                                                                     // reset antal
-        antalplaylists=0;                                                             // reset antal
-        process_tidal_get_artists_all_albums(value, 0,0);                             // process to stack variable
-        if (file_contents) free(file_contents);                                       // free memory again
-        json_value_free(value);                                                       // json clean up
-        // the array is ready
-        conn=mysql_init(NULL);
-        if (conn) {
-          mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
-          mysql_query(conn,"set NAMES 'utf8'");
-          res = mysql_store_result(conn);        
-          mysql_query(conn,"SELECT feedtitle from mythtvcontroller.tidalcontentarticles limit 1");
-          res = mysql_store_result(conn);
-          if (res) {
-            while ((row = mysql_fetch_row(res)) != NULL) {
-              dbexist = true;
-            }
-          }
-          if (dbexist==false) {
-            // create db (tidal songs table)           
-            sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,id int NOT NULL AUTO_INCREMENT KEY) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"SQL : %s\n",sql);
-            }
+        json = (json_char*) file_contents;                                              // make pointer
+        try {
+          value = json_parse(file_contents,file_size);                                  // parser create value obj
+          antal=-1;                                                                     // reset antal
+          antalplaylists=0;                                                             // reset antal
+          process_tidal_get_artists_all_albums(value, 0,0);                             // process to stack variable
+          if (file_contents) free(file_contents);                                       // free memory again
+          json_value_free(value);                                                       // json clean up
+          // the array is ready
+          conn=mysql_init(NULL);
+          if (conn) {
+            mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+            mysql_query(conn,"set NAMES 'utf8'");
+            res = mysql_store_result(conn);        
+            mysql_query(conn,"SELECT feedtitle from mythtvcontroller.tidalcontentarticles limit 1");
             res = mysql_store_result(conn);
-            // create db (tidal playlist table)
-            sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"SQL : %s\n",sql);
+            if (res) {
+              while ((row = mysql_fetch_row(res)) != NULL) {
+                dbexist = true;
+              }
             }
-            res = mysql_store_result(conn);
-            // create db (tidal playlists table)
-            sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),release_date DATE,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"SQL : %s\n",sql);
-            }
-            res = mysql_store_result(conn);
-            // create db (tidal artist table)
-            sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentartist (artistname varchar(255),paththumb text,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"SQL : %s\n",sql);
-            }
-            res = mysql_store_result(conn);
-            // create index for playlist
-            sprintf(sql,"CREATE UNIQUE INDEX tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
-            if (mysql_query(conn,sql)!=0) {
-              write_logfile(logfile,(char *) "mysql create table error.");
-              fprintf(stdout,"SQL : %s\n",sql);
-            }
-            res = mysql_store_result(conn);
-          }
-          //
-          // create all playlists in db if not exist
-          //  
-          // Husk antal
-          recnr=0;
-          created_playlist=0;
-          create_new_record_antal=antalplaylists;
-          if (stack[recnr]) {
-            while ((recnr<create_new_record_antal) && (stack[recnr])) {
-              // check if exist
-              playlistexist = false;
-              strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
-              strcat(sql,stack[recnr]->playlistid);
-              strcat(sql,"'");
-              mysql_query(conn,sql);
+            if (dbexist==false) {
+              // create db (tidal songs table)           
+              sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,id int NOT NULL AUTO_INCREMENT KEY) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create table error.");
+                fprintf(stdout,"SQL : %s\n",sql);
+              }
               res = mysql_store_result(conn);
-              if (res) {
-                while ((row = mysql_fetch_row(res)) != NULL) {
-                  playlistexist = true;
-                }
+              // create db (tidal playlist table)
+              sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create table error.");
+                fprintf(stdout,"SQL : %s\n",sql);
               }
-              // if do not exist create in db playlist
-              if ( playlistexist == false ) {
-                // only albums for now
-                if (strcmp(stack[recnr]->type_of_media,"ALBUM")==0) {
-                  snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('%s','%s','%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, stack[recnr]->feed_release_date,stack[recnr]->feed_artist, 0);
-                  strcpy(stack[recnr]->feed_artist,""); // reset to get data again else it will ignore it.
-                  if (mysql_query(conn,sql)!=0) {
-                    write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
-                    fprintf(stdout,"Error SQL : %s\n",sql);
-                  }
-                  mysql_store_result(conn);
-                  printf("Tidal downloading album + json file %s  nr %d \n",stack[recnr]->playlistid,recnr);
-                  // Download playlist json file + update db from the downloaded json file.
-                  // get_users_album(stack[recnr]->playlistid);
-                  logdata="TIDAL Update playlist id ";
-                  logdata=logdata + stack[recnr]->playlistid;
-                  write_logfile(logfile,(char *) logdata.c_str());
-                }
-                created_playlist++;
+              res = mysql_store_result(conn);
+              // create db (tidal playlists table)
+              sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),release_date DATE,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create table error.");
+                fprintf(stdout,"SQL : %s\n",sql);
               }
-              recnr++;
+              res = mysql_store_result(conn);
+              // create db (tidal artist table)
+              sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentartist (artistname varchar(255),paththumb text,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create table error.");
+                fprintf(stdout,"SQL : %s\n",sql);
+              }
+              res = mysql_store_result(conn);
+              // create index for playlist
+              sprintf(sql,"CREATE UNIQUE INDEX tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
+              if (mysql_query(conn,sql)!=0) {
+                write_logfile(logfile,(char *) "mysql create table error.");
+                fprintf(stdout,"SQL : %s\n",sql);
+              }
+              res = mysql_store_result(conn);
             }
+            //
+            // create all playlists in db if not exist
+            //  
+            // Husk antal
+            recnr=0;
+            created_playlist=0;
+            create_new_record_antal=antalplaylists;
+            if (stack[recnr]) {
+              while ((recnr<create_new_record_antal) && (stack[recnr])) {
+                // check if exist
+                playlistexist = false;
+                strcpy(sql,"select playlistid from mythtvcontroller.tidalcontentplaylist where playlistid like '");
+                strcat(sql,stack[recnr]->playlistid);
+                strcat(sql,"'");
+                mysql_query(conn,sql);
+                res = mysql_store_result(conn);
+                if (res) {
+                  while ((row = mysql_fetch_row(res)) != NULL) {
+                    playlistexist = true;
+                  }
+                }
+                // if do not exist create in db playlist
+                if ( playlistexist == false ) {
+                  // only albums for now
+                  if (strcmp(stack[recnr]->type_of_media,"ALBUM")==0) {
+                    snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('%s','%s','%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, stack[recnr]->feed_release_date,stack[recnr]->feed_artist, 0);
+                    strcpy(stack[recnr]->feed_artist,""); // reset to get data again else it will ignore it.
+                    if (mysql_query(conn,sql)!=0) {
+                      write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
+                      fprintf(stdout,"Error SQL : %s\n",sql);
+                    }
+                    mysql_store_result(conn);
+                    printf("Tidal downloading album + json file %s  nr %d \n",stack[recnr]->playlistid,recnr);
+                    // Download playlist json file + update db from the downloaded json file.
+                    // get_users_album(stack[recnr]->playlistid);
+                    logdata="TIDAL Update playlist id ";
+                    logdata=logdata + stack[recnr]->playlistid;
+                    write_logfile(logfile,(char *) logdata.c_str());
+                  }
+                  created_playlist++;
+                }
+                recnr++;
+              }
+            }
+            // restore antal
+            antalplaylists=create_new_record_antal;
           }
-          // restore antal
-          antalplaylists=create_new_record_antal;
         }
-      }
-      catch (...) {
-        printf("Error write file.\n");
+        catch (...) {
+          printf("Error write file.\n");
+        }
       }
     }
   }
@@ -1772,7 +1772,8 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
 
 
 // ****************************************************************************************
-// in use in main line 24229
+//
+// in use in main in function (webupdate_loader_tidal)
 // Do work now
 // get user id from tidal api
 //
@@ -3698,9 +3699,7 @@ int tidal_class::gettoken() {
   strcpy(auth_kode,"Authorization: Bearer ");
   strcat(auth_kode,tidaltoken);
   CURL *curl = curl_easy_init();
-
-printf("Get token  now\n\n");
-
+  printf("Get token now\n\n");
   if (curl) {
     curl_easy_setopt(curl, CURLOPT_URL, "https://cdn.jsdelivr.net/gh/yaronzz/CDN@latest/app/tidal/tokens.json");
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
@@ -3760,9 +3759,9 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
   url = "https://api.tidal.com/v1/users/";
   url = url + userid;
   url = url + "/playlistsAndFavoritePlaylists?countryCode=US";
-
   printf("Get users playlist and favorite playlist's \n\n");
-  if (curl) {
+  write_logfile(logfile,(char *) "tidal Get users playlist and favorite playlist");
+  if (curl) {    
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tidal_curl_writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
@@ -3790,6 +3789,7 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
     } else {
       printf("***** ERROR ***** \n");
       printf("***** %s ***** \n", response_string.c_str());
+      write_logfile(logfile,(char *) "Tidal error get users playlists and favorite");
     }
   }
   return(httpCode);

@@ -14385,15 +14385,14 @@ void *webupdate_loader_tidal(void *data) {
     */
     tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset tidal overview to default
   }
-
   // write debug log
-  if (loadedtidal) write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
-  else {
-    write_logfile(logfile,(char *) "Loader thread done update tidal.");
+  if (loadedtidal) {
+    write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
+  } else {
     if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) write_logfile(logfile,(char *) "Error on tidal token.");
     else {
       tidal_user_id_check=tidal_oversigt.tidal_get_user_id();
-      sprintf(debuglogdata,"Error loading tidal user data. Error code %d",tidal_user_id_check);
+      sprintf(debuglogdata,"Tidal Error loading user data. Error code %d",tidal_user_id_check);
       write_logfile(logfile,(char *) debuglogdata);
     }
   }
@@ -14403,13 +14402,6 @@ void *webupdate_loader_tidal(void *data) {
   #endif
   pthread_exit(NULL);
 }
-
-
-
-
-
-
-
 
 
 
