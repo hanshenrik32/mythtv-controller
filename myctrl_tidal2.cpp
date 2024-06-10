@@ -3337,6 +3337,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       fprintf(stdout,"ERROR SQL : %s\n",sql);
     }
     // get playlist from db
+    tidal_aktiv_song_antal=0;
     mysql_res = mysql_store_result(conn);
     if (mysql_res) {      
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
@@ -3348,8 +3349,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );                                                     // play path
         }
         recnr++;
+        tidal_aktiv_song_antal++;
       }
-      tidal_aktiv_song_antal=recnr-1;
       tidal_aktiv_song_nr=0;
       if (sound) sound->release();                                    // stop last played
       if ( file_exists(tidal_aktiv_song[0].playurl) == true ) {
@@ -3404,8 +3405,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           }        
         }
         if (dir) closedir (dir);
-
         // It must be dirs
+        // open dir and read it.
         if ( entry == 0 ) {
           temptxt = tidal_download_home;
           temptxt = temptxt + stack[tidalknapnr]->feed_showtxt;
@@ -3424,7 +3425,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         }
       } else {
         // could not open directory
-        perror ("");
+        perror ("could not open directory");
         return EXIT_FAILURE;
       }
       // sort playlist files
@@ -3732,10 +3733,6 @@ int tidal_class::gettoken() {
   }
   return(httpCode);
 }
-
-
-
-
 
 
 
