@@ -3308,6 +3308,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   mysql_res = mysql_store_result(conn);
   if (mysql_res) {
     while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
+      // if (file_exists(mysql_row[1])) 
       skip_download_of_files=true;
     }
   }
@@ -3351,15 +3352,16 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         recnr++;
         tidal_aktiv_song_antal++;
       }
+      if (tidal_aktiv_song_antal>0) tidal_aktiv_song_antal--;
       tidal_aktiv_song_nr=0;
-      if (sound) sound->release();                                    // stop last played
+      if (sound) sound->release();                                                                                      // stop last played
       if ( file_exists(tidal_aktiv_song[0].playurl) == true ) {
         result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
         // start play first song
         result = sndsystem->createSound(tidal_aktiv_song[0].playurl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
         if (result==FMOD_OK) {
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
-          if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
+          if (sndsystem) channel->setVolume(configsoundvolume);                                                         // set play volume from configfile
         }
       }
     }
@@ -3402,7 +3404,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (ffilename.find(".m4a")!= std::string::npos) {
             dir_file_array[entry]=ent->d_name;
             entry++;
-          }        
+          }
         }
         if (dir) closedir (dir);
         // It must be dirs
@@ -3479,10 +3481,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           fprintf(stderr,"ERROR webupdate_loader_tidal function\nreturn code from pthread_create() is %d\n", rc2);
           exit(-1);
         }
-
+        // wait for thread is done downloading songs
         pthread_join(loaderthread,NULL);
-
-
         conn=mysql_init(NULL);
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
         // hent song names from db
@@ -3491,7 +3491,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           write_logfile(logfile,(char *) "mysql select table error.");
           fprintf(stdout,"ERROR SQL : %s\n",sql);
         }
-        
         // get antal record and update song name + play url
         recnr=0;
         tidal_aktiv_song_antal = 0;
@@ -3502,7 +3501,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
             strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );
             recnr++;
           }
-          tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
+          if (recnr>0) tidal_aktiv_song_antal = recnr-1;                                                   // set antal songs in playlist
         }
         // hent artist name from db
         snprintf(sql,sizeof(sql),"select playlistname,artistid,release_date from mythtvcontroller.tidalcontentplaylist where playlistid like '%s'",stack[tidalknapnr]->playlistid);
