@@ -5555,7 +5555,7 @@ void display() {
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 580.0f, 0.0f);
+    glTranslatef(520.0f+textofset, 580.0f, 0.0f);   
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
@@ -5607,7 +5607,9 @@ void display() {
     if (result!=FMOD_OK) {
       ERRCHECK(result,do_play_music_aktiv_table_nr);
     }
-
+    if ((playtime_songlength>0) && (result==FMOD_OK)) {
+      kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
+    }
     int statuswxpos = 432;
     int statuswypos = 557-20;
     float y=ms/1000;
@@ -5627,11 +5629,39 @@ void display() {
     }
     glPopMatrix();
 
-    // updated date on spotify
+    float frequency;
+    #if defined USE_FMOD_MIXER
+    channel->getFrequency(&frequency);
+    #endif
+
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(520.0f, 560.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(20.5, 20.5, 1.0);
+    glcRenderString("Samplerate ");
+    glPopMatrix();
+
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glPopMatrix();
+    sprintf(temptxt1,"%5.0f/%d Kbits",frequency,kbps);
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(520.0f+textofset, 560.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(20.5, 20.5, 1.0);
+    glcRenderString(temptxt1);
+    glPopMatrix();
+
+
+    // updated date on tidal
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(520.0f, 500.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     glcRenderString("Release   ");
@@ -5640,7 +5670,7 @@ void display() {
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 560.0f, 0.0f);
+    glTranslatef(520.0f+textofset, 500.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     sprintf(temptxt1,"%s",tidal_oversigt.tidal_aktiv_song_release_date());
