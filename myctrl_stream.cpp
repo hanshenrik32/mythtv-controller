@@ -282,13 +282,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
   bool set_update_rss=false;
   conn=mysql_init(NULL);
   // get homedir
-  //getuserhomedir(homedir);
   strcpy(homedir,localuserhomedir);
   strcat(homedir,"/rss");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   strcat(homedir,"/images");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-
   if (configrssguidelastupdate==0) {    
     configrssguidelastupdate=time(NULL);
     set_update_rss=false;
