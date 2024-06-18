@@ -1019,35 +1019,35 @@ int tidal_class::get_users_album(char *albumid) {
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontent (name varchar(255),paththumb text,playpath varchar(255), playlistid varchar(255) ,id int NOT NULL AUTO_INCREMENT) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
-          fprintf(stdout,"SQL : %s\n",sql);
+          // fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify songs)
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentarticles (name varchar(255),paththumb text,gfxfilename varchar(255),player varchar(255),playlistid varchar(255),artist varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
-          fprintf(stdout,"SQL : %s\n",sql);
+          // fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (spotify playlists)
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentplaylist (playlistname varchar(255),paththumb text,playlistid varchar(255),release_date DATE,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
-          fprintf(stdout,"SQL : %s\n",sql);
+          // fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create db (tidal artist table)
         sprintf(sql,"CREATE TABLE IF NOT EXISTS mythtvcontroller.tidalcontentartist (artistname varchar(255),paththumb text,artistid varchar(255),id int NOT NULL AUTO_INCREMENT PRIMARY KEY) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
-          fprintf(stdout,"SQL : %s\n",sql);
+          // fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
         // create index for playlist
         sprintf(sql,"CREATE UNIQUE INDEX tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
         if (mysql_query(conn,sql)!=0) {
           write_logfile(logfile,(char *) "mysql create table error.");
-          fprintf(stdout,"SQL : %s\n",sql);
+          // fprintf(stdout,"SQL : %s\n",sql);
         }
         res = mysql_store_result(conn);
       }
@@ -1691,7 +1691,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
               }
               res = mysql_store_result(conn);
               // create index for playlist
-              sprintf(sql,"CREATE UNIQUE INDEX tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
+              sprintf(sql,"CREATE UNIQUE INDEX IF NOT EXISTS tidalcontent_playpath_IDX USING BTREE ON mythtvcontroller.tidalcontent (playpath)");
               if (mysql_query(conn,sql)!=0) {
                 write_logfile(logfile,(char *) "mysql create table error.");
                 fprintf(stdout,"SQL : %s\n",sql);

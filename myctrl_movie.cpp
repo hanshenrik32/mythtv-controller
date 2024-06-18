@@ -317,10 +317,11 @@ void film_oversigt_typem::softstopmovie() {
 }
 
 
+
 // ****************************************************************************************
 //
-// Play streams from web like shis
-// vlc_m = libvlc_media_new_location(vlc_inst, "http://www.ukaff.ac.uk/movies/cluster.avi");
+// Play streams from path
+// 
 //
 // ****************************************************************************************
 
@@ -331,7 +332,7 @@ int film_oversigt_typem::playmovie(int nr) {
     strcat(path,"/");
     film_is_playing=true;
     strcat(path,this->filmoversigt[nr].getfilmfilename());
-    vlc_controller::playmedia(path);
+    vlc_controller::playmedia(path);  
     return(1);
 }
 

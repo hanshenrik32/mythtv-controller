@@ -3734,8 +3734,11 @@ void display() {
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
       keybufferopenwin=true;
+    }   
+    if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
+      keybufferopenwin=true;
     }
-    if (((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) || ((vis_tidal_oversigt) && (ask_save_playlist))) {
+    if (((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) || ((vis_tidal_oversigt) && (ask_save_playlist)) || ((do_show_tidal_search_oversigt) && (ask_save_playlist))) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -3749,7 +3752,7 @@ void display() {
       }
       #endif
       #ifdef ENABLE_TIDAL
-      if (vis_tidal_oversigt) {
+      if ((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) {
         if (ask_save_playlist) {
           // ask for filename to save
           glBindTexture(GL_TEXTURE_2D,_textureIplaylistsave);
@@ -3778,7 +3781,7 @@ void display() {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);
       // ask for filename to save or normal search function.
-      if ((vis_tidal_oversigt) && (ask_save_playlist)) glcRenderString(playlistfilename); else glcRenderString(keybuffer);
+      if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) glcRenderString(playlistfilename); else glcRenderString(keybuffer);
       glPopMatrix();
     }
   }
@@ -11212,7 +11215,8 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       // gem key pressed in buffer
       if (keybufferindex<80) {
-        if (key==8) {						// back space
+        // backspace
+        if (key==8) {
           if (keybufferindex>0) {
             keybufferindex--;
             keybuffer[keybufferindex]=0;
@@ -11222,6 +11226,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (keybufferindex>=0) playlistfilename[keybufferindex]=0;
           }
         } else {
+          // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
             printf("delete record in overview\n");
             tidal_oversigt.delete_record_in_view(tidalknapnr-1);
@@ -11286,7 +11291,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (vis_tidal_oversigt) {
             // do show search tidal oversigt online
             if (do_show_tidal_search_oversigt) {
-              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='S') && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -11295,6 +11300,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
             // tidal skal vi save playlist
+            /*
             if (keybufferindex>0) {
               if (key=='S') {
                 printf("Save playlist selected \n");
@@ -11303,9 +11309,29 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // keybufferindex=strlen(playlistfilename);
                 ask_save_playlist=true;
               }
+              
             }
+            */
           }
           #endif
+
+          if (key=='S') {
+            if (vis_music_oversigt) {
+              // save playlist
+              fprintf(stderr,"Ask save playlist\n");
+              ask_save_playlist = true;                                         // set save playlist flag
+            }
+            if (vis_tidal_oversigt) {
+              // save playlist
+              fprintf(stderr,"Ask save playlist\n");
+              ask_save_playlist = true;                                         // set save playlist flag
+            }
+            if (do_show_tidal_search_oversigt) {
+              if (keybufferindex>0) {
+                ask_save_playlist = true;                                         // set save playlist flag
+              }
+            }
+          }
 
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
@@ -12067,6 +12093,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // save playlist
             case 'S':
               // do save playlist
+              /*
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -12077,7 +12104,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
               }
-
+              */
               break;
             case 't':
               if (vis_movie_options) {
