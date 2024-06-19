@@ -3729,7 +3729,7 @@ void display() {
   //
   // show search box and text for radio and music and movie and spotify and tidal offline search NOT spotify online search
   //
-  if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) || ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt==false))) {
+  if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || (do_show_spotify_search_oversigt) || (do_show_tidal_search_oversigt) || ((vis_spotify_oversigt))) {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
@@ -3738,7 +3738,7 @@ void display() {
     if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
       keybufferopenwin=true;
     }
-    if (((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) || ((vis_tidal_oversigt) && (ask_save_playlist)) || ((do_show_tidal_search_oversigt) && (ask_save_playlist))) {
+    if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -11316,19 +11316,26 @@ void handleKeypress(unsigned char key, int x, int y) {
           #endif
 
           if (key=='S') {
-            if (vis_music_oversigt) {
-              // save playlist
-              fprintf(stderr,"Ask save playlist\n");
-              ask_save_playlist = true;                                         // set save playlist flag
-            }
-            if (vis_tidal_oversigt) {
-              // save playlist
-              fprintf(stderr,"Ask save playlist\n");
-              ask_save_playlist = true;                                         // set save playlist flag
-            }
-            if (do_show_tidal_search_oversigt) {
-              if (keybufferindex>0) {
+            // (disable save as askbox) if 'S' is pressed again.
+            if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
+              ask_save_playlist=false;
+            } else {
+              if (vis_music_oversigt) {
+                // save playlist
+                fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
+              }
+              if (vis_tidal_oversigt) {
+                // save playlist
+                fprintf(stderr,"Ask save playlist\n");
+                ask_save_playlist = true;                                         // set save playlist flag
+              }
+              if (do_show_tidal_search_oversigt) {
+                if (keybufferindex>0) {
+                  // save playlist
+                  fprintf(stderr,"Ask save playlist\n");
+                  ask_save_playlist = true;                                         // set save playlist flag
+                }
               }
             }
           }
@@ -11336,10 +11343,12 @@ void handleKeypress(unsigned char key, int x, int y) {
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
             if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
-              keybuffer[keybufferindex]=key;
-              keybufferindex++;
-              keybuffer[keybufferindex]='\0';       // else input key text in buffer
-              // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              if ((key>31) && (key<127)) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              }
             }
           }
           // used by tidal and spotify (playlistfilename)
@@ -11347,9 +11356,11 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (ask_save_playlist) {
             if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-              if (key!='S') {
-                strcpy(playlistfilename,keybuffer);
-                playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+              if ((key!='S') && (key!=13)) {
+                if ((key>31) && (key<127)) {
+                  strcpy(playlistfilename,keybuffer);
+                  playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+                }
               }
             }
           }
