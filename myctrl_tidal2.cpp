@@ -460,9 +460,9 @@ int tidal_class::save_music_oversigt_playlists(char *playlistfilename,int tidalk
   res = mysql_store_result(conn);
   if (conn) {
     // First inset into playlist db
-    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('";
+    sql_insert = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"";
     sql_insert = sql_insert + playlistfilename;                            // playlist name
-    sql_insert = sql_insert + "','";
+    sql_insert = sql_insert + "\",'";
     sql_insert = sql_insert + cover_path;                                  // cover
     sql_insert = sql_insert + "','";
     sql_insert = sql_insert + playlstid;                                   // playlist id 0
@@ -1060,7 +1060,9 @@ int tidal_class::get_users_album(char *albumid) {
     //
     // get album by libcurl used by get_users_songs
     //
-    tidal_get_album_items(albumid);                                 // download json file for albumid
+    if (tidal_get_album_items(albumid)!=200) {                                 // download json file for albumid
+      write_logfile(logfile,(char *) "Tidal - Error download json file.");
+    }
     //
     //
     // ************************  
@@ -1156,7 +1158,7 @@ int tidal_class::get_users_album(char *albumid) {
             // insert record created playlist if not exist ( song name )
             //  
             if (playlistexist==false) {            
-              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('%s','%s','%s','%s','%s',%d)",  stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url, albumid, stack[tt]->feed_release_date,stack[tt]->feed_artist, 0);
+              snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"%s\",'%s','%s','%s','%s',%d)",  stack[tt]->feed_showtxt , stack[tt]->feed_gfx_url, albumid, stack[tt]->feed_release_date,stack[tt]->feed_artist, 0);
               //fprintf(stdout,"SQL : %s\n",sql);
               if (mysql_query(conn,sql)!=0) {
                 write_logfile(logfile,(char *) "mysql create table error.");
@@ -1179,8 +1181,6 @@ int tidal_class::get_users_album(char *albumid) {
 
 
 
-
-
 // ****************************************************************************************
 //
 // NEW function works
@@ -1189,7 +1189,7 @@ int tidal_class::get_users_album(char *albumid) {
 //
 // get allbum by artistid (download json file)
 //
-// return 0 if fault
+// return other that 200 if fault
 // 200 on ok
 //
 // ****************************************************************************************
@@ -1723,7 +1723,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                 if ( playlistexist == false ) {
                   // only albums for now
                   if (strcmp(stack[recnr]->type_of_media,"ALBUM")==0) {
-                    snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values ('%s','%s','%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, stack[recnr]->feed_release_date,stack[recnr]->feed_artist, 0);
+                    snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"%s\",'%s','%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, stack[recnr]->feed_release_date,stack[recnr]->feed_artist, 0);
                     strcpy(stack[recnr]->feed_artist,""); // reset to get data again else it will ignore it.
                     if (mysql_query(conn,sql)!=0) {
                       write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
@@ -1895,7 +1895,7 @@ int tidal_class::auth_device_authorization() {
       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
       curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
       //curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, my_trace);
-      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);                                    // enable stdio echo
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);                                    // enable stdio echo
       curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
       curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
       curl_easy_setopt(curl, CURLOPT_POST, 1);
@@ -3768,7 +3768,7 @@ int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (char *) &response_string);
     curl_easy_setopt(curl, CURLOPT_COOKIE, "cookies.txt");
     curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "cookies.txt");
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
     /* Add a custom header */
     chunk = curl_slist_append(chunk, "Accept: application/json");
     chunk = curl_slist_append(chunk, "Content-Type: application/json");
