@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vlc/vlc.h>
+#include <pthread.h>
 #include "myth_vlcplayer.h"
 
 // vlc player class stuf

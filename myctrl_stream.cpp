@@ -282,13 +282,11 @@ int stream_class::loadrssfile(bool updaterssfile) {
   bool set_update_rss=false;
   conn=mysql_init(NULL);
   // get homedir
-  //getuserhomedir(homedir);
   strcpy(homedir,localuserhomedir);
   strcat(homedir,"/rss");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   strcat(homedir,"/images");
   if (!(file_exists(homedir))) mkdir(homedir,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-
   if (configrssguidelastupdate==0) {    
     configrssguidelastupdate=time(NULL);
     set_update_rss=false;
@@ -3909,13 +3907,18 @@ int stream_class::opdatere_stream_oversigt(char *art,char *fpath) {
       strcat(sqlselect,"' GROUP BY title ORDER BY id");
       getart=1;
     } else if ((strcmp(art,"")!=0) && (strcmp(fpath,"")!=0)) {
-      snprintf(sqlselect,sizeof(sqlselect),"select ANY_VALUE(feedtitle) as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
+      snprintf(sqlselect,sizeof(sqlselect),"select feedtitle as feedtitle,(path) as path,(title) as title,(description),(url),(thumbnail),(paththumb),(time) as nroftimes,(id) as id from internetcontentarticles where mediaURL is NULL and feedtitle like '");
       strcat(sqlselect,art);
       strcat(sqlselect,"' AND path like '");
       strcat(sqlselect,fpath);
       strcat(sqlselect,"' ORDER BY abs(title) desc"); // ASC
       getart=2;
     }
+
+    printf("\n");
+    printf("SQL SELECT ****************************** : %s\n",sqlselect);
+    printf("\n");
+
     this->type=getart;					// husk sql type
     write_logfile(logfile,(char *) "RSS stream loader started.");
     conn=mysql_init(NULL);

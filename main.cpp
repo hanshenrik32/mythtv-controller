@@ -3729,13 +3729,16 @@ void display() {
   //
   // show search box and text for radio and music and movie and spotify and tidal offline search NOT spotify online search
   //
-  if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || ((vis_spotify_oversigt) && (do_show_spotify_search_oversigt==false)) || ((vis_tidal_oversigt) && (do_show_tidal_search_oversigt==false))) {
+  if ((vis_radio_oversigt) || (vis_music_oversigt) || (vis_film_oversigt) || (do_show_spotify_search_oversigt) || (do_show_tidal_search_oversigt) || ((vis_spotify_oversigt))) {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
       keybufferopenwin=true;
+    }   
+    if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
+      keybufferopenwin=true;
     }
-    if (((keybufferopenwin) && (strcmp(keybuffer,"")!=0)) || ((vis_tidal_oversigt) && (ask_save_playlist))) {
+    if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) {
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
       glEnable(GL_BLEND);
@@ -3749,7 +3752,7 @@ void display() {
       }
       #endif
       #ifdef ENABLE_TIDAL
-      if (vis_tidal_oversigt) {
+      if ((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) {
         if (ask_save_playlist) {
           // ask for filename to save
           glBindTexture(GL_TEXTURE_2D,_textureIplaylistsave);
@@ -3778,7 +3781,7 @@ void display() {
       glColor4f(1.0f, 1.0f, 1.0f,1.0f);
       glScalef(20.5, 20.5, 1.0);
       // ask for filename to save or normal search function.
-      if ((vis_tidal_oversigt) && (ask_save_playlist)) glcRenderString(playlistfilename); else glcRenderString(keybuffer);
+      if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) glcRenderString(playlistfilename); else glcRenderString(keybuffer);
       glPopMatrix();
     }
   }
@@ -5555,7 +5558,7 @@ void display() {
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 580.0f, 0.0f);
+    glTranslatef(520.0f+textofset, 580.0f, 0.0f);   
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
@@ -5607,7 +5610,9 @@ void display() {
     if (result!=FMOD_OK) {
       ERRCHECK(result,do_play_music_aktiv_table_nr);
     }
-
+    if ((playtime_songlength>0) && (result==FMOD_OK)) {
+      kbps = (lenbytes/(playtime_songlength/1000)*8)/1000;			// calc bit rate
+    }
     int statuswxpos = 432;
     int statuswypos = 557-20;
     float y=ms/1000;
@@ -5627,11 +5632,39 @@ void display() {
     }
     glPopMatrix();
 
-    // updated date on spotify
+    float frequency;
+    #if defined USE_FMOD_MIXER
+    channel->getFrequency(&frequency);
+    #endif
+
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glTranslatef(520.0f, 560.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(20.5, 20.5, 1.0);
+    glcRenderString("Samplerate ");
+    glPopMatrix();
+
+    glPushMatrix();
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glPopMatrix();
+    sprintf(temptxt1,"%5.0f/%d Kbits",frequency,kbps);
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(520.0f+textofset, 560.0f, 0.0f);
+    glRasterPos2f(0.0f, 0.0f);
+    glScalef(20.5, 20.5, 1.0);
+    glcRenderString(temptxt1);
+    glPopMatrix();
+
+
+    // updated date on tidal
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glTranslatef(520.0f, 500.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     glcRenderString("Release   ");
@@ -5640,7 +5673,7 @@ void display() {
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 560.0f, 0.0f);
+    glTranslatef(520.0f+textofset, 500.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
     sprintf(temptxt1,"%s",tidal_oversigt.tidal_aktiv_song_release_date());
@@ -8321,6 +8354,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_music_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt=false;
+          printf("Enable radio view\n ");
         }
         // Music
         if ((GLubyte) names[i*4+3]==81) {
@@ -8329,6 +8363,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt = false;
+          printf("Enable music view\n ");
         } // spotify
         if ((GLubyte) names[i*4+3]==82) {
           fundet = true;
@@ -8336,6 +8371,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_oversigt = false;
           vis_spotify_oversigt = true;                                          // show spotify overview
           vis_radio_or_music_oversigt = false;
+          printf("Enable spotify view\n ");
         }
         #if defined(ENABLE_TIDAL)
         // tidal
@@ -11179,7 +11215,8 @@ void handleKeypress(unsigned char key, int x, int y) {
       }
       // gem key pressed in buffer
       if (keybufferindex<80) {
-        if (key==8) {						// back space
+        // backspace
+        if (key==8) {
           if (keybufferindex>0) {
             keybufferindex--;
             keybuffer[keybufferindex]=0;
@@ -11189,6 +11226,7 @@ void handleKeypress(unsigned char key, int x, int y) {
             if (keybufferindex>=0) playlistfilename[keybufferindex]=0;
           }
         } else {
+          // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
             printf("delete record in overview\n");
             tidal_oversigt.delete_record_in_view(tidalknapnr-1);
@@ -11253,7 +11291,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (vis_tidal_oversigt) {
             // do show search tidal oversigt online
             if (do_show_tidal_search_oversigt) {
-              if ((key!=13) && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
+              if ((key!=13) && (key!='S') && (key!='*') && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY) &&  (keybufferindex<search_string_max_length)) {
                 keybuffer[keybufferindex]=key;
                 keybufferindex++;
                 keybuffer[keybufferindex]='\0';       // else input key text in buffer
@@ -11262,6 +11300,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               }
             }
             // tidal skal vi save playlist
+            /*
             if (keybufferindex>0) {
               if (key=='S') {
                 printf("Save playlist selected \n");
@@ -11270,17 +11309,46 @@ void handleKeypress(unsigned char key, int x, int y) {
                 // keybufferindex=strlen(playlistfilename);
                 ask_save_playlist=true;
               }
+              
             }
+            */
           }
           #endif
+
+          if (key=='S') {
+            // (disable save as askbox) if 'S' is pressed again.
+            if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
+              ask_save_playlist=false;
+            } else {
+              if (vis_music_oversigt) {
+                // save playlist
+                fprintf(stderr,"Ask save playlist\n");
+                ask_save_playlist = true;                                         // set save playlist flag
+              }
+              if (vis_tidal_oversigt) {
+                // save playlist
+                fprintf(stderr,"Ask save playlist\n");
+                ask_save_playlist = true;                                         // set save playlist flag
+              }
+              if (do_show_tidal_search_oversigt) {
+                if (keybufferindex>0) {
+                  // save playlist
+                  fprintf(stderr,"Ask save playlist\n");
+                  ask_save_playlist = true;                                         // set save playlist flag
+                }
+              }
+            }
+          }
 
           // søg efter radio station navn fill buffer from keyboard
           if ((vis_radio_oversigt) && (!(show_radio_options))) {
             if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
-              keybuffer[keybufferindex]=key;
-              keybufferindex++;
-              keybuffer[keybufferindex]='\0';       // else input key text in buffer
-              // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              if ((key>31) && (key<127)) {
+                keybuffer[keybufferindex]=key;
+                keybufferindex++;
+                keybuffer[keybufferindex]='\0';       // else input key text in buffer
+                // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
+              }
             }
           }
           // used by tidal and spotify (playlistfilename)
@@ -11288,9 +11356,11 @@ void handleKeypress(unsigned char key, int x, int y) {
           if (ask_save_playlist) {
             if ((key!=13) && (key!=SOUNDUPKEY)  && (key!=SOUNDDOWNKEY)) {
               // if (debugmode) fprintf(stderr,"Keybuffer=%s\n",keybuffer);
-              if (key!='S') {
-                strcpy(playlistfilename,keybuffer);
-                playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+              if ((key!='S') && (key!=13)) {
+                if ((key>31) && (key<127)) {
+                  strcpy(playlistfilename,keybuffer);
+                  playlistfilename[keybufferindex]='\0';       // else input key text in buffer
+                }
               }
             }
           }
@@ -12034,6 +12104,7 @@ void handleKeypress(unsigned char key, int x, int y) {
               // save playlist
             case 'S':
               // do save playlist
+              /*
               if (vis_music_oversigt) {
                 // save playlist
                 fprintf(stderr,"Ask save playlist\n");
@@ -12044,7 +12115,7 @@ void handleKeypress(unsigned char key, int x, int y) {
                 fprintf(stderr,"Ask save playlist\n");
                 ask_save_playlist = true;                                         // set save playlist flag
               }
-
+              */
               break;
             case 't':
               if (vis_movie_options) {
@@ -14382,15 +14453,14 @@ void *webupdate_loader_tidal(void *data) {
     */
     tidal_oversigt.opdatere_tidal_oversigt(0);                              // reset tidal overview to default
   }
-
   // write debug log
-  if (loadedtidal) write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
-  else {
-    write_logfile(logfile,(char *) "Loader thread done update tidal.");
+  if (loadedtidal) {
+    write_logfile(logfile,(char *) "Loader thread done update tidal from web.");
+  } else {
     if (strcmp(tidal_oversigt.tidal_get_token(),"")==0) write_logfile(logfile,(char *) "Error on tidal token.");
     else {
       tidal_user_id_check=tidal_oversigt.tidal_get_user_id();
-      sprintf(debuglogdata,"Error loading tidal user data. Error code %d",tidal_user_id_check);
+      sprintf(debuglogdata,"Tidal Error loading user data. Error code %d",tidal_user_id_check);
       write_logfile(logfile,(char *) debuglogdata);
     }
   }
@@ -14400,13 +14470,6 @@ void *webupdate_loader_tidal(void *data) {
   #endif
   pthread_exit(NULL);
 }
-
-
-
-
-
-
-
 
 
 
@@ -15601,19 +15664,22 @@ int main(int argc, char** argv) {
     tidalok=tidal_oversigt.get_access_token((char *) "TnE1V1FtVmh2Mkw3UVdRTzp2eE9tRnAzOXJ3ZUlWRDJyYjIwcW1wRVRzb0FFQ3doR1VkblBJUFNY.cTRnPQ==.");
     if (tidalok) {   
       // login ok load playlistes from file
+      // get users playlists if not loaded before      
+      tidal_oversigt.get_users_playlist_plus_favorite(false);
+
       // load from file
-      
       tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
+
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",false);        // Gnags
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",false);       // Norah Jones
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
       // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",false);       // tears for fears
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",false);       // Rihanna
-      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",false);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
@@ -15621,6 +15687,7 @@ int main(int argc, char** argv) {
       printf("Tidal file load from tidal_playlists.txt OK.\n");
     } else {
       printf("Unable to find file tidal_playlists.txt \n");
+      write_logfile(logfile,(char *) "Tidal no data downloaded.");
     }
     
 

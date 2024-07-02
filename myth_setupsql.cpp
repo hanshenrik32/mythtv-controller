@@ -412,6 +412,8 @@ const char *radio_station_setupsql45="REPLACE INTO `radio_stations` (`name`, `be
 ('Radio nord', 'Radio Nord FM', 'http://radionord.radiostreaming.dk/RadioNord', '', 'radionord.png', 1, 128, 0, 1, '2023-11-05', 14354, 0, '2023-11-05 00:00:00', 1), \
 ('Nordjyske', '', 'http://stream.anr.dk/nordjyske', '', 'nordjyske.png', 1, 128, 0, 1, '2023-11-05', 14360, 0, '2023-11-05 00:00:00', 1), \
 ('radio-xmas', 'jul', 'http://www.radio-xmas.at:443/xmas', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2017-12-01 00:00:00', 1), \
+('HBR1.com - Tranceponder', 'Trance', 'http://ubuntu.hbr1.com:19800/trance.ogg', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2014-06-11 00:00:00', 1), \
+('HBR1.com -  Tronic Lounge','House', 'http://ubuntu.hbr1.com:19800/tronic.ogg', '', '', 1, 128, 0, 1, '2017-12-01', 14364, 0, '2014-06-11 00:00:00', 1), \
 ('jule radio', 'jul', 'http://tx-bauerdk.sharp-stream.com/http_live.php?i=395_dk_aacp&amsparams=playerid:SBS_RP_WEB;skey:1512330381;&awparams=loggedin:false', '', '', 1, 128, 0, 1, '2017-12-01', 14365, 0, '2017-12-01 00:00:00', 1), \
 ('Vegas Alternative', 'Vegas Alternative Rock', 'http://player.radio.com/listen/station/x-1075', '', '', 1, 128, 0, 1, '2017-12-01', 14366, 0, '2017-12-01 00:00:00', 1)";
 

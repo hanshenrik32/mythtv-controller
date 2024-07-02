@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m64 -O2 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 
+CFLAGS = -Wformat-truncation -pthread -m64 -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -61,16 +61,18 @@ endif
 
 all:
 	@echo "mythtv-controller ver 0.38.1 \nPossible targets:"
-	@echo "'sudo sh apt-get.sh'       - Install software required by mythtv-controller"
-	@echo "'sudo make installsound'   - Install FMOD/irrklang sound system"
-	@echo "'make compile'             - Compile mythtv-controller"
-	@echo "'sudo make install'        - Install mythtv-controller in /usr/share/mythtv-controller"
-	@echo "'sudo make uninstall'      - Uninstall mythtv-controller FMOD/irrKlang libraries and headers"
+	@echo "'sudo sh apt-get.sh'        - Install software required by mythtv-controller"
+	@echo "'sudo make installsound'    - Install FMOD/irrklang sound system"
+	@echo "'make compile'              - Compile mythtv-controller"
+	@echo "'sudo make install'         - Install mythtv-controller in /usr/share/mythtv-controller"
+	@echo "'sudo make installtidal-dl' - Install tidal-dl"
+	@echo "'sudo make uninstall'       - Uninstall mythtv-controller FMOD/irrKlang libraries and headers"
+	
 
 
 compile: $(PROG)
 	@if ! test -f build-number.txt; then touch build-number.txt; fi
-	tar -zxvf json-parser.tar.gz
+	#tar -zxvf json-parser.tar.gz
 	cd json-parser \
 	./configure \
 	make
@@ -118,6 +120,11 @@ installsound:
 	@echo "Done installing fmod32/64 bit version 4.44.41"
 	@echo "Sound system installed."
 
+
+
+installtidal-dl:
+	/usr/bin/pip install tidal-dl
+	@echo "you have to copy tidal-dl from you homedir to /usr/bin/
 
 install:
 	@echo "Installing mythtv-controller ver 0.38.x in /opt/mythtv-controller."
