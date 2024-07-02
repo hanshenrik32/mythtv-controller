@@ -1066,6 +1066,8 @@ int tidal_class::get_users_album(char *albumid) {
     //
     //
     // ************************  
+    json_album_file_name = localuserhomedir;
+    json_album_file_name = json_album_file_name + "/";
     json_album_file_name = "tidal_users_album_";
     json_album_file_name = json_album_file_name + albumid;
     json_album_file_name = json_album_file_name + ".json";
@@ -1288,6 +1290,8 @@ int tidal_class::tidal_get_album_items(char *albumid) {
   url="https://openapi.tidal.com/albums/";
   url=url + albumid;
   url=url + "/items?countryCode=US&offset=0&limit=100";
+  userfilename = localuserhomedir;
+  userfilename = userfilename + "/";
   userfilename = "tidal_users_album_";
   userfilename = userfilename + albumid;
   userfilename = userfilename + ".json";
@@ -1573,6 +1577,16 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
 }
 
 
+// ****************************************************************************************
+//
+// fast file exist test func
+//
+// ****************************************************************************************
+
+inline bool file_exists(const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
 
 
 // ****************************************************************************************
@@ -1584,14 +1598,6 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
 //
 // ****************************************************************************************
 
-//
-// fast file exist test func
-//
-
-inline bool file_exists(const std::string& name) {
-  struct stat buffer;   
-  return (stat (name.c_str(), &buffer) == 0); 
-}
 
 
 int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
@@ -1776,7 +1782,6 @@ void tidal_class::tidal_set_token(char *token,char *refresh) {
 // ****************************************************************************************
 //
 // in use in main in function (webupdate_loader_tidal)
-// Do work now
 // get user id from tidal api
 //
 // return 0 if fault
@@ -1857,8 +1862,6 @@ int tidal_class::tidal_get_user_id() {
 // 200 on ok
 //
 // ****************************************************************************************
-
-
 
 int tidal_class::auth_device_authorization() {
   static const char *userfilename = "tidal_user_id.txt";
@@ -3263,9 +3266,11 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 */
 
-
+// ************************************************************************************************
+//
 // start play first song in playlist and start one thread to download the rest and update the db.
-
+//
+// ************************************************************************************************
 
 int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now) {
   DIR *dir;
@@ -3526,6 +3531,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
             strcpy( tidal_aktiv_song[recnr].release_date, tidal_aktiv_song[0].release_date );
             recnr++;
           }
+          // set icon texture
           if ( stack[tidalknapnr]->textureId ) {
             tidal_aktiv_song[0].cover_image = stack[tidalknapnr]->textureId;
             aktiv_song_tidal_icon = stack[tidalknapnr]->textureId;
@@ -3738,6 +3744,7 @@ int tidal_class::gettoken() {
 // ****************************************************************************************
 //
 // New get users play and favorite playlists
+// do not work for now
 //
 // ****************************************************************************************
 int tidal_class::get_users_playlist_plus_favorite(bool cleandb) {  
