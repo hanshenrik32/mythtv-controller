@@ -13958,10 +13958,6 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
 }
 
 
-
-
-
-
 // ****************************************************************************************
 //
 // init screen setup
