@@ -4,9 +4,7 @@ tv module to use in the future
 
 https://tvheadend.org/projects/tvheadend/wiki/Faq
 
-if you wants to make the deb file you have to install debhelper.
-
-Run on most debian based systems, like Ubuntu.
+if you wants to make the deb file you have to install debhelper
 
 Version.
 

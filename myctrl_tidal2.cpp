@@ -3671,7 +3671,7 @@ int tidal_class::load_tidal_iconoversigt() {
           }
         } else {
           // else load normal from disk
-          if (stack[nr]->textureId==NULL) {            
+          if ((stack[nr]->textureId==NULL) && (stack[nr]->feed_gfx_url)) {
             if (strcmp( stack[nr]->feed_gfx_url , "" )!=0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
           }
         }
@@ -4210,7 +4210,9 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glTranslatef(xof+210+(buttonsize/2),yof+240,0);
   glDisable(GL_TEXTURE_2D);
   glScalef(120, 120, 1.0);
-  if (strcmp(searchstring,"")!=0) glcRenderString(searchstring);
+  if (strcmp(searchstring,"")!=0) {
+    glcRenderString(searchstring);
+  }
   if (cursor) glcRenderString("_"); else glcRenderString(" ");
   glPopMatrix();
 
@@ -4260,7 +4262,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
           }
         } else anim_angle=0.0f;
       }
-
+      // Draw icon
       glTranslatef(xof+20+(buttonsize/2),yof-10,0);
       glRotatef(anim_angle,0.0f,1.0f,0.0f);
       glEnable(GL_TEXTURE_2D);
