@@ -184,7 +184,7 @@ bool do_save_config = false;                              // flag to save config
 channel_list_struct channel_list[MAXCHANNEL_ANTAL];     // channel_list array used in setup graber (default max 400) if you wats to change it look in myth_setup.h
 channel_configfile  xmltv_configcontrol;                //
 
-bool firsttime_xmltvupdate = false;                      // update tvguide xml files first start (force)
+bool firsttime_xmltvupdate = true;                      // update tvguide xml files first start (force)
 char playlistfilename[512];                             // name to use thewn save playlist
 char playlistfilename_cover_path[512];                  //
 char playlistfileid[200];                               // playlistid
@@ -2075,19 +2075,6 @@ unsigned int hent_antal_dir_songs(int dirid) {
 
 
 
-// ****************************************************************************************
-//
-// init lirc
-// remove controler
-//
-// ****************************************************************************************
-
-int initlirc() {
-  // LIRC SETUP
-  int flags;
-  return(0);
-}
-
 
 
 // ****************************************************************************************
@@ -2647,7 +2634,7 @@ void display() {
   if (((lasttoday+(doxmltvupdateinterval)<today) && (do_update_xmltv==false)) || (firsttime_xmltvupdate)) {
     write_logfile(logfile,(char *) "start timer xmltvguide update process.");
     lasttoday = today;                                                          // rember last update
-    // do_update_xmltv = true;                                                     // do update tvguide
+    do_update_xmltv = true;                                                     // do update tvguide
     do_update_xmltv_show = true;                                                // show we are updating
     firsttime_xmltvupdate=false;                                                // only used first time
   }
@@ -3568,7 +3555,7 @@ void display() {
         spotify_oversigt.select_device_to_play();
       }
     } else {
-      //if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
+      if (do_show_spotify_search_oversigt==false) spotify_oversigt.reset_amin_in_viewer();
     }
     #endif
 
@@ -3585,7 +3572,7 @@ void display() {
       }
       if (debugmode & 1) cout << "Tidal Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else {
-        // tidal_oversigt.reset_amin_in_viewer();
+        tidal_oversigt.reset_amin_in_viewer();
     }
     #endif
 
@@ -7158,7 +7145,7 @@ void display() {
   if (do_update_xmltv) {
     // call/start update xmltv multi phread
     fprintf(stderr,"Start phread xmltv.\n");
-    // update_xmltv_phread_loader();
+    update_xmltv_phread_loader();
     do_update_xmltv=false;
   }
   if (do_update_rss) {
@@ -7169,17 +7156,17 @@ void display() {
   }
   if (do_update_music) {
     fprintf(stderr,"call/Start phread music.\n");
-    // update_music_phread_loader();
+    update_music_phread_loader();
     do_update_music = false;
   }
   if (do_update_spotify) {
     fprintf(stderr,"call/Start phread spotify and web server.\n");
-    // update_spotify_phread_loader();                                           // update spotify view (load it)
-    // update_webserver_phread_loader();                                         //
+    update_spotify_phread_loader();                                           // update spotify view (load it)
+    update_webserver_phread_loader();                                         //
     do_update_spotify = false;
   }
   if (do_update_tidal_playlist) {
-    // update_tidalonline_phread_loader();                                     // start thread loader
+    update_tidalonline_phread_loader();                                     // start thread loader
     do_update_tidal_playlist=false;
   }
   //  don't wait!
@@ -12505,13 +12492,6 @@ void handleKeypress(unsigned char key, int x, int y) {
 }
 
 
-// ****************************************************************************************
-//
-// in use
-// lirc remove controller
-//
-// ****************************************************************************************
-
 
 
 // ****************************************************************************************
@@ -12927,7 +12907,7 @@ void *datainfoloader_webserver(void *data) {
       spotify_oversigt.search_spotify_online_done=true;
       spotify_oversigt_loaded_begin=false;
       spotify_oversigt.set_search_loaded();
-      // spotify_oversigt.reset_amin_in_viewer();                              // reset anim
+      spotify_oversigt.reset_amin_in_viewer();                              // reset anim
       //spotify_oversigt.type=2;
     }
     #endif
@@ -12957,7 +12937,7 @@ void *datainfoloader_webserver(void *data) {
       tidal_oversigt.search_tidal_online_done=true;
       tidal_oversigt_loaded_begin=false;
       tidal_oversigt.set_search_loaded();                                 // load icons
-      // tidal_oversigt.reset_amin_in_viewer();                              // reset anim
+      tidal_oversigt.reset_amin_in_viewer();                              // reset anim
       tidal_oversigt.search_loaded=true;
     }
     /*
@@ -13072,7 +13052,7 @@ void *update_xmltv_phread_loader() {
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_xmltv,NULL);
     if (rc2) {
       fprintf(stderr,"ERROR; return code from pthread_create() is %d\n", rc2);
-      // exit(-1);
+      exit(-1);
     }
   }
 }
@@ -13085,10 +13065,6 @@ void *update_xmltv_phread_loader() {
 // ****************************************************************************************
 
 void *update_rss_phread_loader() {
-  streamoversigt.loadrssfile(0);                                              // download rss files (())
-  streamoversigt.opdatere_stream_oversigt((char *)"",(char *)"");             // load all stream from rss files
-
-/*
   if (true) {
     pthread_t loaderthread2;           // load tvguide xml file in to db
     int rc2=pthread_create(&loaderthread2,NULL,datainfoloader_stream,NULL);
@@ -13097,7 +13073,6 @@ void *update_rss_phread_loader() {
       exit(-1);
     }
   }
-*/
 }
 
 
@@ -14335,7 +14310,7 @@ int main(int argc, char** argv) {
     //sleep(10); // play
     //libvlc_media_player_stop(vlc_mp);
     //libvlc_media_player_release(vlc_mp);
-    sock=initlirc();
+    // sock=initlirc();
     // bruges til at checke_copy radio icons som virker til nyt dir
     //check_radio_stations_icons();
     glutInit(&argc, argv);
@@ -14412,7 +14387,7 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
     glutSpecialFunc(handlespeckeypress);              // setup spacial key handler
     glutMouseFunc(handleMouse);                       // setup mousehandler
-    // glutTimerFunc(25, update2, 0);                    // set start loop
+    glutTimerFunc(25, update2, 0);                    // set start loop
     init_ttf_fonts();                                 // init fonts
     #ifdef ENABLE_SPOTIFY
     if (spotify_oversigt.spotify_check_spotifydb_empty()==true) firsttimespotifyupdate=false; // if true show update option first time
