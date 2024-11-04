@@ -4370,7 +4370,7 @@ void display() {
   #endif
 
   // start play radio station
-  // and stop old player if playing
+  // and stop old/other player if playing
   if (vis_radio_oversigt) {
     if ((do_play_radio) && (rknapnr>0) && (rknapnr<=radiooversigt.radioantal())) {
       // do we play now ?
@@ -6453,12 +6453,12 @@ void display() {
   }
   // do start movie player
   if ((startmovie) && (do_zoom_film_cover)) {
-    // non default player
+    // non default player use the batch file startmovie.sh from path where vi are installed
     if (strcmp("default",configdefaultplayer)!=0)  {
       // write debug log
       sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
       write_logfile(logfile,(char *) debuglogdata);
-      strcpy(systemcommand,"/bin/sh /usr/bin/startmovie.sh ");
+      strcpy(systemcommand,"/bin/sh startmovie.sh ");
       strcat(systemcommand,"'");
       strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
       strcat(systemcommand,"'");    
@@ -6466,7 +6466,7 @@ void display() {
       if (cmd_error) {
         sprintf(debuglogdata,"Error file not found %s.",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
         write_logfile(logfile,(char *) debuglogdata);
-      } else  write_logfile(logfile,(char *) "OK.");
+      } else write_logfile(logfile,(char *) "VLC OK. Start movie from startmovie.sh");
     } else {
       // default
       // start internal player (vlc)
@@ -6479,11 +6479,11 @@ void display() {
       write_logfile(logfile,(char *) "Stop playing music/radio.");
       #if defined USE_FMOD_MIXER
       if ((sound) && (snd)) {
-        // stop sound playing
+        // stop any sound playing
         result=channel->stop();                         // stop fmod player
-        // release sound system again
+        // release any sound system again
         result=sound->release();
-        // mp uv meters
+        // stop uv meters
         dsp=0;
       }
       #endif
@@ -6526,7 +6526,7 @@ void display() {
     //sleep(10); // play
     if (strcmp("default",configdefaultplayer)!=0) {
       // close non default player
-      // neeed to be coded
+      system("killall -9 startmovie.sh");
     } else {
       // close default player (vlc plugin)
       film_oversigt.stopmovie();
@@ -13958,6 +13958,10 @@ printf("LIRC-DOWN  ask_open_dir_or_play = %d stream antal %d \n",ask_open_dir_or
 }
 
 
+
+
+
+
 // ****************************************************************************************
 //
 // init screen setup
@@ -15676,6 +15680,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
