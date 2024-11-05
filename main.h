@@ -20,7 +20,7 @@ const char *SHOWVER={"0.42.2"};
 //
 // music overview 'S' Save playlist
 // Spotify        'D' Select device to play on
-//
+// Tidal          'S' Save playlist (album)
 
 //
 // xmltv and rss update interval in sec

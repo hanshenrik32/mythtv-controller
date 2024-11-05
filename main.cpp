@@ -5461,24 +5461,22 @@ void display() {
     glTranslatef(520.0f, 640.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
+    int textofset=140;
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      strcpy(temptxt1,"playlist  ");
-      glcRenderString(temptxt1);
+      glcRenderString("         ");
     } else {
-      strcpy(temptxt,"Artist    ");
-      glcRenderString(temptxt);
+      glcRenderString("Playlist ");
+      // show value
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);
+      if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
+      else glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
     }
     glPopMatrix();
-    int textofset=140;
-    // show value
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
-    else glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
     /*
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       strcpy(temptxt1,tidal_oversigt.tidal_playlistname);
