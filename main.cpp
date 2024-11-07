@@ -2706,7 +2706,7 @@ void display() {
   #endif
 
   glPushMatrix();
-  // background picture
+  // background picture if none type is selected
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
   if (visur) {
@@ -6213,7 +6213,10 @@ void display() {
     if ((fft) && (result==FMOD_OK)) {
       // new ver 4
       for (int i=0; i<fft->length; i++) {
-        float spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
+        float spectum_value;
+        if (numChannels==1) 
+          spectum_value=(fft->spectrum[0][i]*40);
+        else spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
         spectrum[i] = spectum_value;
         spectrum_left[i] = spectum_value;
         spectrum_right[i] = spectum_value;
@@ -6250,7 +6253,8 @@ void display() {
         ypos = 10;
         high = sqrt(spectrum[qq]*6);
         high += 1;
-        if (high>34) high=34;
+        if (high>24) high=24;
+        if (vis_tidal_oversigt) if (high>12) high=12;
         for(i=0;i<high;i++) {
           // uv color
           switch(i) {
@@ -6310,7 +6314,7 @@ void display() {
       for(qq=0;qq<16;qq++) {
         high = sqrt(uvmax_values[qq]*18)*2;
         ypos = 10+(siz_y*high);
-        for(i=0;i<1;i++) {
+        for(i=0;i<2;i++) {
           glColor3f(1.0f, 1.0f, 1.0f);
           glBindTexture(GL_TEXTURE_2D,texturedot1);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
