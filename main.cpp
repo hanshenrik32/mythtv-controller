@@ -4634,6 +4634,7 @@ void display() {
         // startplaying
         if (do_play_music_aktiv_table_nr>0) {
           #if defined USE_FMOD_MIXER
+          if (sound) result = sound->release();          		                            // stop last played sound on soundsystem fmod
           if (snd==0) {
               // aktiv_playlist = class to control music to play
               // (indenholder array til playliste samt hvor mange der er i playliste) 
@@ -7139,7 +7140,7 @@ void display() {
       sprintf(debuglogdata,"Auto2 Next song %s ",aktivplay_music_path);
       write_logfile(logfile,(char *) debuglogdata);
       #if defined USE_FMOD_MIXER
-      if (strcmp(aktivplay_music_path,"")) sound->release();          								// stop last playing song
+      if (strcmp(aktivplay_music_path,"")) sound->release();          								// stop last playing song      
       ERRCHECK(result,do_play_music_aktiv_table_nr);
       if (strcmp(configsoundoutport,"STREAM")!=0) {
         result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
