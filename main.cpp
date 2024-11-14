@@ -374,7 +374,7 @@ bool do_zoom_music_cover = false;                         // show music conver
 bool do_zoom_tidal = false;                               //
 bool do_zoom_radio = false;                               //
 bool do_zoom_spotify_cover = false;                       // show spotify cover
-bool do_zoom_tidal_cover = false;                         // show tidal cover
+bool do_zoom_tidal_cover = false;                         // show tidal play cover
 bool do_zoom_stream = false;                              //
 bool show_wlan_select = false;                            //
 bool do_zoom_film_cover = false;                          //
@@ -3733,10 +3733,10 @@ void display() {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
-      keybufferopenwin=true;
+      keybufferopenwin=true;                                                    // open input window
     }   
     if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
-      keybufferopenwin=true;
+      keybufferopenwin=true;                                                    // open input window
     }
     if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) {
       glPushMatrix();
@@ -6255,7 +6255,7 @@ void display() {
         high = sqrt(spectrum[qq]*6);
         high += 1;
         if (high>24) high=24;
-        if (vis_tidal_oversigt) if (high>12) high=12;
+        if (vis_tidal_oversigt) if (high>7) high=7;
         for(i=0;i<high;i++) {
           // uv color
           switch(i) {
@@ -8085,7 +8085,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (do_show_tidal_search_oversigt==false) {
           if ((!(do_show_setup_tidal))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
-              tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
+              tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent tidal knap nr
               tidal_select_iconnr=tidalknapnr;
               fundet = true;                                                    //
               do_zoom_tidal_cover = false;                                    // close player status to ask about play other selected playlist/song
@@ -8172,11 +8172,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 1;
               fundet = true;
             }
-            // show close spotify info (27 need to move) 27 now is global exit
+            // show close tidal info 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               // write debug log
               write_logfile(logfile,(char *) "Show/close tidal info");
-              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal==false) {
+                do_zoom_tidal_cover = false;
+                // do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              }
               if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
               fundet = true;
             }
@@ -8201,7 +8204,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((GLuint) names[i*4+3]==27) {
               tidalknapnr=(GLuint) names[i*4+3];
               if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
-              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal==false) {
+                do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              }
               if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
               fundet = true;
             }

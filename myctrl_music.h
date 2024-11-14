@@ -9,7 +9,7 @@
 //used in music oversigt
 
 
-// class for music oversigt;
+// class for music oversigt
 
 class music_oversigt_type {
   public:
