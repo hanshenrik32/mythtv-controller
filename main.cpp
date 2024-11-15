@@ -4285,6 +4285,7 @@ void display() {
     tidal_start_delay=0;
     ask_open_dir_or_play_tidal=false;
     tidal_oversigt.startplay=false;                                                   // stop starting more that one in next run
+    int antal_i_oversigt=0;
     if (strcmp(tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),"")!=0) {
       // try load and start playing playlist
       if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==0) {
@@ -4307,11 +4308,11 @@ void display() {
         strcpy( playlistfileid , tidal_oversigt.get_tidal_playlistid(tidalknapnr-1));
         strcpy( playlistfileartistname , tidal_oversigt.get_tidal_feed_artistname(tidalknapnr-1));
         keybufferindex=strlen(playlistfilename);
-        int antal_i_oversigt = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);        
+        antal_i_oversigt = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
         tidal_oversigt.tidal_set_aktiv_song(0);
       }
       // try load and play song
-      if (tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) {
+      if ((tidal_oversigt.get_tidal_type(tidalknapnr-1)==1) && (antal_i_oversigt)) {
         if (snd) {
           // yes stop play
           // stop old playing
@@ -4362,7 +4363,7 @@ void display() {
         // error start playing
       }
     } else {
-      printf("Error tidal playid is missing.\n");
+      printf("Error tidal playid is missing %s.\n",playlistfileid);
       write_logfile(logfile,(char *) "Error tidal playid is missing");
     }
   }
@@ -9521,8 +9522,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
             default: fprintf(stderr,"Error in type. Type found %d  \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
                     break;
           }
-          tidal_oversigt.startplay=true;                          // set start play in main (display function)
-
+          tidal_oversigt.startplay=true;                                                                      // set start play in main (display function)
         }
       }
     }
@@ -15684,7 +15684,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10249",true);       // Norah Jones
-      // tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "9706",false);       // pink floyd
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
