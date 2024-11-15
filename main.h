@@ -1,7 +1,7 @@
 #ifndef MYCTRL_MAIN
 #define MYCTRL_MAIN
 
-const char *SHOWVER={"0.42.4"};
+const char *SHOWVER={"0.40.8"};
 
 // debug modes
 // 1  = wifi net
@@ -20,7 +20,7 @@ const char *SHOWVER={"0.42.4"};
 //
 // music overview 'S' Save playlist
 // Spotify        'D' Select device to play on
-// Tidal          'S' Save playlist (album)
+//
 
 //
 // xmltv and rss update interval in sec

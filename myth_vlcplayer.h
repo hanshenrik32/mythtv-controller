@@ -10,7 +10,7 @@ class vlc_controller {
     libvlc_instance_t *vlc_inst;              //
     libvlc_media_player_t *vlc_mp;            //
     bool is_playing;                          // do we play media
-    bool is_pause;                            // do we play media
+    bool is_pause;                          // do we play media
   public:
     bool vlc_in_playing();
     vlc_controller();

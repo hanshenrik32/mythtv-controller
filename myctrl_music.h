@@ -9,7 +9,7 @@
 //used in music oversigt
 
 
-// class for music oversigt
+// class for music oversigt;
 
 class music_oversigt_type {
   public:
@@ -27,14 +27,13 @@ class music_oversigt_type {
 };
 
 
-const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
 
 class musicoversigt_class {
   private:
-    // const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
+    const unsigned int MAX_MUSIC_OVERSIGT_SIZE=300;                                       // MAX cd er i oversigt
     unsigned int antal_music_oversigt;
     void clean_music_oversigt();
-    music_oversigt_type musicoversigt[MAX_MUSIC_OVERSIGT_SIZE+1];
+    music_oversigt_type musicoversigt[300+1];
     bool do_play;
   public:
     bool play() { return(do_play);}    
