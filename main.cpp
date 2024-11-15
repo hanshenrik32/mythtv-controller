@@ -374,7 +374,7 @@ bool do_zoom_music_cover = false;                         // show music conver
 bool do_zoom_tidal = false;                               //
 bool do_zoom_radio = false;                               //
 bool do_zoom_spotify_cover = false;                       // show spotify cover
-bool do_zoom_tidal_cover = false;                         // show tidal cover
+bool do_zoom_tidal_cover = false;                         // show tidal play cover
 bool do_zoom_stream = false;                              //
 bool show_wlan_select = false;                            //
 bool do_zoom_film_cover = false;                          //
@@ -2706,7 +2706,7 @@ void display() {
   #endif
 
   glPushMatrix();
-  // background picture
+  // background picture if none type is selected
   if ((!(visur)) && (_textureIdback_music) && (_textureIdback_main) && (!(vis_radio_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_tv_oversigt))) show_background();
   //visur=1;
   if (visur) {
@@ -3733,10 +3733,10 @@ void display() {
     if ((vis_spotify_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (strcmp(keybuffer,"")!=0)) keybufferopenwin=true;
     if ((vis_tidal_oversigt) && (ask_save_playlist)) {
-      keybufferopenwin=true;
+      keybufferopenwin=true;                                                    // open input window
     }   
     if ((do_show_tidal_search_oversigt) && (ask_save_playlist)) {
-      keybufferopenwin=true;
+      keybufferopenwin=true;                                                    // open input window
     }
     if (((vis_tidal_oversigt) || (do_show_tidal_search_oversigt)) && (ask_save_playlist)) {
       glPushMatrix();
@@ -4370,7 +4370,7 @@ void display() {
   #endif
 
   // start play radio station
-  // and stop old player if playing
+  // and stop old/other player if playing
   if (vis_radio_oversigt) {
     if ((do_play_radio) && (rknapnr>0) && (rknapnr<=radiooversigt.radioantal())) {
       // do we play now ?
@@ -4634,6 +4634,7 @@ void display() {
         // startplaying
         if (do_play_music_aktiv_table_nr>0) {
           #if defined USE_FMOD_MIXER
+          if (sound) result = sound->release();          		                            // stop last played sound on soundsystem fmod
           if (snd==0) {
               // aktiv_playlist = class to control music to play
               // (indenholder array til playliste samt hvor mange der er i playliste) 
@@ -5461,24 +5462,22 @@ void display() {
     glTranslatef(520.0f, 640.0f, 0.0f);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.5, 20.5, 1.0);
+    int textofset=140;
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      strcpy(temptxt1,"playlist  ");
-      glcRenderString(temptxt1);
+      glcRenderString("         ");
     } else {
-      strcpy(temptxt,"Artist    ");
-      glcRenderString(temptxt);
+      glcRenderString("Playlist ");
+      // show value
+      glPushMatrix();
+      glDisable(GL_TEXTURE_2D);
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
+      glRasterPos2f(0.0f, 0.0f);
+      glScalef(20.5, 20.5, 1.0);
+      if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
+      else glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
     }
     glPopMatrix();
-    int textofset=140;
-    // show value
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
-    else glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
     /*
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       strcpy(temptxt1,tidal_oversigt.tidal_playlistname);
@@ -6215,7 +6214,10 @@ void display() {
     if ((fft) && (result==FMOD_OK)) {
       // new ver 4
       for (int i=0; i<fft->length; i++) {
-        float spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
+        float spectum_value;
+        if (numChannels==1) 
+          spectum_value=(fft->spectrum[0][i]*40);
+        else spectum_value=(fft->spectrum[0][i]*40)+(fft->spectrum[1][i]*40);
         spectrum[i] = spectum_value;
         spectrum_left[i] = spectum_value;
         spectrum_right[i] = spectum_value;
@@ -6252,7 +6254,8 @@ void display() {
         ypos = 10;
         high = sqrt(spectrum[qq]*6);
         high += 1;
-        if (high>34) high=34;
+        if (high>24) high=24;
+        if (vis_tidal_oversigt) if (high>7) high=7;
         for(i=0;i<high;i++) {
           // uv color
           switch(i) {
@@ -6312,7 +6315,7 @@ void display() {
       for(qq=0;qq<16;qq++) {
         high = sqrt(uvmax_values[qq]*18)*2;
         ypos = 10+(siz_y*high);
-        for(i=0;i<1;i++) {
+        for(i=0;i<2;i++) {
           glColor3f(1.0f, 1.0f, 1.0f);
           glBindTexture(GL_TEXTURE_2D,texturedot1);
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -6453,12 +6456,12 @@ void display() {
   }
   // do start movie player
   if ((startmovie) && (do_zoom_film_cover)) {
-    // non default player
+    // non default player use the batch file startmovie.sh from path where vi are installed
     if (strcmp("default",configdefaultplayer)!=0)  {
       // write debug log
       sprintf(debuglogdata,"Start movie nr %d Player is vlc path :%s ",fknapnr,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
       write_logfile(logfile,(char *) debuglogdata);
-      strcpy(systemcommand,"/bin/sh /usr/bin/startmovie.sh ");
+      strcpy(systemcommand,"/bin/sh startmovie.sh ");
       strcat(systemcommand,"'");
       strcat(systemcommand,film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());      // old strcat(systemcommand,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfilename());
       strcat(systemcommand,"'");    
@@ -6466,7 +6469,7 @@ void display() {
       if (cmd_error) {
         sprintf(debuglogdata,"Error file not found %s.",film_oversigt.filmoversigt[fknapnr-1].getfilmfilename());
         write_logfile(logfile,(char *) debuglogdata);
-      } else  write_logfile(logfile,(char *) "OK.");
+      } else write_logfile(logfile,(char *) "VLC OK. Start movie from startmovie.sh");
     } else {
       // default
       // start internal player (vlc)
@@ -6479,11 +6482,11 @@ void display() {
       write_logfile(logfile,(char *) "Stop playing music/radio.");
       #if defined USE_FMOD_MIXER
       if ((sound) && (snd)) {
-        // stop sound playing
+        // stop any sound playing
         result=channel->stop();                         // stop fmod player
-        // release sound system again
+        // release any sound system again
         result=sound->release();
-        // mp uv meters
+        // stop uv meters
         dsp=0;
       }
       #endif
@@ -6526,7 +6529,7 @@ void display() {
     //sleep(10); // play
     if (strcmp("default",configdefaultplayer)!=0) {
       // close non default player
-      // neeed to be coded
+      system("killall -9 startmovie.sh");
     } else {
       // close default player (vlc plugin)
       film_oversigt.stopmovie();
@@ -7137,7 +7140,7 @@ void display() {
       sprintf(debuglogdata,"Auto2 Next song %s ",aktivplay_music_path);
       write_logfile(logfile,(char *) debuglogdata);
       #if defined USE_FMOD_MIXER
-      if (strcmp(aktivplay_music_path,"")) sound->release();          								// stop last playing song
+      if (strcmp(aktivplay_music_path,"")) sound->release();          								// stop last playing song      
       ERRCHECK(result,do_play_music_aktiv_table_nr);
       if (strcmp(configsoundoutport,"STREAM")!=0) {
         result = sndsystem->createSound(aktivplay_music_path, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM, 0, &sound);
@@ -8082,7 +8085,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         if (do_show_tidal_search_oversigt==false) {
           if ((!(do_show_setup_tidal))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
-              tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent spotify knap nr
+              tidalknapnr = (GLuint) names[i*4+3]-99;				                  // hent tidal knap nr
               tidal_select_iconnr=tidalknapnr;
               fundet = true;                                                    //
               do_zoom_tidal_cover = false;                                    // close player status to ask about play other selected playlist/song
@@ -8169,11 +8172,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
               returnfunc = 1;
               fundet = true;
             }
-            // show close spotify info (27 need to move) 27 now is global exit
+            // show close tidal info 27 now is global exit
             if ((GLubyte) names[i*4+3]==27) {
               // write debug log
               write_logfile(logfile,(char *) "Show/close tidal info");
-              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal==false) {
+                do_zoom_tidal_cover = false;
+                // do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              }
               if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
               fundet = true;
             }
@@ -8198,7 +8204,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             if ((GLuint) names[i*4+3]==27) {
               tidalknapnr=(GLuint) names[i*4+3];
               if (debugmode & 8) fprintf(stderr,"Show/close tidal info\n");
-              if (ask_open_dir_or_play_tidal==false) do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              if (ask_open_dir_or_play_tidal==false) {
+                do_zoom_tidal_cover =! do_zoom_tidal_cover;
+              }
               if (ask_open_dir_or_play_tidal) ask_open_dir_or_play_tidal=false;
               fundet = true;
             }
@@ -15680,6 +15688,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3824",true);       // tears for fears
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
+      tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
