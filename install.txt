@@ -8,6 +8,7 @@
 # updated 09-10-2019
 # updated 21-08-2021
 # UPDATED 23-04-2024
+# Updated 07-07-2024
 
 
 This packets need to be installed on Ubuntu.
@@ -15,10 +16,12 @@ This packets need to be installed on Ubuntu.
 g++ make libdevil-dev libsdl1.2-dev glutg3-dev libmysqlclient-dev libsdl-image1.2-dev lirc-modules-source 
 dialog libglc-dev imagemagick liblircclient-dev xmltv libglc-dev libdevil1c2 unzip lirc
 
+Where is a fmodstudioapi20218linux.7z file that have the fmod files need to compile.
+you have to extract this file to the source directory to be able to compile and use the make installsound command to install fmod needed.
 
 Version.
 
-mythtv-controller ver 0.42.x
+mythtv-controller ver 0.42.2
 
 Now you have spotify view.
 

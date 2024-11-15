@@ -1,4 +1,3 @@
-
 //
 // All tidal functions
 //
@@ -908,7 +907,11 @@ int tidal_class::get_playlist_from_file(char *filename) {
     readok=true;
     while ((read = getline(&playlisttxt , &len, fp)) != -1) {
       playlisttxt[strcspn(playlisttxt,"\n")]=0;                                   // remove \n from string
-      get_users_album((char *) playlisttxt);                                      // download album to db (works if users have a account (enable or not))
+      if (playlisttxt) {
+        if (*playlisttxt='#') {
+          get_users_album((char *) playlisttxt);                                      // download album to db (works if users have a account (enable or not))
+        }
+      }
     }
     fclose(fp);
   }
@@ -1621,6 +1624,7 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
   bool dbexist=false;
   int create_new_record_antal;
   int created_playlist;
+  std::string sqll;
   // process json artist file after create file name
   
   // tidal_artist_playlist_$artistid.json have the data
@@ -1729,9 +1733,25 @@ int tidal_class::tidal_get_artists_all_albums(char *artistid,bool force) {
                 if ( playlistexist == false ) {
                   // only albums for now
                   if (strcmp(stack[recnr]->type_of_media,"ALBUM")==0) {
-                    snprintf(sql,sizeof(sql),"insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"%s\",'%s','%s','%s','%s',%d)",  stack[recnr]->feed_showtxt , stack[recnr]->feed_gfx_url, stack[recnr]->playlistid, stack[recnr]->feed_release_date,stack[recnr]->feed_artist, 0);
-                    strcpy(stack[recnr]->feed_artist,""); // reset to get data again else it will ignore it.
-                    if (mysql_query(conn,sql)!=0) {
+                    char p[2048];
+                    strcpy(p,stack[recnr]->feed_artist);
+                    for(int i=0;i<strlen(p);i++) {
+                      if (*(p+i)=='\"') (*(p+i))='\'';
+                    }
+                    sqll = "insert into mythtvcontroller.tidalcontentplaylist (playlistname,paththumb,playlistid,release_date,artistid,id) values (\"";
+                    sqll = sqll + stack[recnr]->feed_showtxt;                 // playlist name
+                    sqll = sqll + "\",'";
+                    sqll = sqll + stack[recnr]->feed_gfx_url;                 // cover
+                    sqll = sqll + "','";
+                    sqll = sqll + stack[recnr]->playlistid;                   // playlist id 0
+                    sqll = sqll + "','";
+                    sqll = sqll + stack[recnr]->feed_release_date;            // dato
+                    sqll = sqll + "',";
+                    sqll = sqll + "\"";
+                    sqll = sqll + p;
+                    sqll = sqll + "\",0)";
+                    strcpy(stack[recnr]->feed_artist,"");                   // reset to get data again else it will ignore it.
+                    if (mysql_query(conn,sqll.c_str())!=0) {
                       write_logfile(logfile,(char *) "mysql create insert error (insert into mythtvcontroller.tidalcontentplaylist).");
                       fprintf(stdout,"Error SQL : %s\n",sql);
                     }
@@ -3389,8 +3409,14 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       }
     }
     if (!(skip_download_of_files)) {
-      sysstring="/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
-      sysstring = sysstring + playlist_song;
+      if  (file_exists("/bin/gnome-terminal")) {
+        sysstring="/bin/gnome-terminal --wait -- bash -c '/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
+        sysstring = sysstring + playlist_song;
+        sysstring = sysstring + "'";  
+      } else {
+        sysstring="/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
+        sysstring = sysstring + playlist_song;
+      }
       error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
     }
     // then downloaded play the stuf
@@ -3671,7 +3697,7 @@ int tidal_class::load_tidal_iconoversigt() {
           }
         } else {
           // else load normal from disk
-          if (stack[nr]->textureId==NULL) {            
+          if ((stack[nr]->textureId==NULL) && (stack[nr]->feed_gfx_url)) {
             if (strcmp( stack[nr]->feed_gfx_url , "" )!=0) stack[nr]->textureId=loadTexture (stack[nr]->feed_gfx_url);          // load texture
           }
         }
@@ -4210,7 +4236,9 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
   glTranslatef(xof+210+(buttonsize/2),yof+240,0);
   glDisable(GL_TEXTURE_2D);
   glScalef(120, 120, 1.0);
-  if (strcmp(searchstring,"")!=0) glcRenderString(searchstring);
+  if (strcmp(searchstring,"")!=0) {
+    glcRenderString(searchstring);
+  }
   if (cursor) glcRenderString("_"); else glcRenderString(" ");
   glPopMatrix();
 
@@ -4260,7 +4288,7 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
           }
         } else anim_angle=0.0f;
       }
-
+      // Draw icon
       glTranslatef(xof+20+(buttonsize/2),yof-10,0);
       glRotatef(anim_angle,0.0f,1.0f,0.0f);
       glEnable(GL_TEXTURE_2D);
@@ -4358,6 +4386,22 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       i++;
       xof+=(buttonsize+10);
     }
+  } else {
+      // No tidal account
+      glTranslatef(xof+20+(buttonsize/2),yof-10,0);
+      glRotatef(anim_angle,0.0f,1.0f,0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D,spotify_icon_border);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glLoadName(100+i+sofset);
+      glBegin(GL_QUADS);
+      glTexCoord2f(0, 0); glVertex3f( 10-(buttonsize*4), 10, 0.0);
+      glTexCoord2f(0, 1); glVertex3f( 10-(buttonsize*4),buttonsizey*4, 0.0);
+      glTexCoord2f(1, 1); glVertex3f( buttonsize-10-(buttonsize*4), buttonsizey*4 , 0.0);
+      glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
+      glEnd();
+      glcRenderString("No tidal account enabled.");
   }
 }
 
