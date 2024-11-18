@@ -3568,7 +3568,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     }    
   }
   if (conn) mysql_close(conn);
-  if (result!=FMOD_OK) return(1); else return(0);
+  if (tidal_aktiv_song_antal) return(tidal_aktiv_song_antal); else return(0);
 }
 
 
