@@ -3391,7 +3391,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       }
     }
   }
-  // No hot happy
+  // No not happy
   // we have to download all the songs
   //
   if ( skip_download_of_files == false ) {
@@ -3410,7 +3410,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     }
     if (!(skip_download_of_files)) {
       if  (file_exists("/bin/gnome-terminal")) {
-        sysstring="/bin/gnome-terminal --wait -- bash -c '/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
+        sysstring="/bin/gnome-terminal --wait -t 'tidal' -- bash -c '/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
         sysstring = sysstring + playlist_song;
         sysstring = sysstring + "'";  
       } else {
@@ -3418,6 +3418,11 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         sysstring = sysstring + playlist_song;
       }
       error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
+      // 
+      // Bits 15-8 = Exit code.
+      // Bit     7 = 1 if a core dump was produced.
+      // Bits  6-0 = Signal number that killed the process.
+      error = error / 256;                                      // get exit code
     }
     // then downloaded play the stuf
     // first set homedir from global var have the users homedir
@@ -3568,7 +3573,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     }    
   }
   if (conn) mysql_close(conn);
-  if (result!=FMOD_OK) return(1); else return(0);
+  if ((tidal_aktiv_song_antal) && (error==0)) return(tidal_aktiv_song_antal); else return(0);
 }
 
 
