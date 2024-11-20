@@ -4315,7 +4315,9 @@ void display() {
         antal_i_tidal_playlist = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ), tidalknapnr-1 , 1);
         if (antal_i_tidal_playlist) {
           tidal_oversigt.tidal_set_aktiv_song(0);
-        } else tidal_oversigt.tidal_set_aktiv_song(-1);
+        } else {
+          tidal_oversigt.tidal_set_aktiv_song(-1);
+        }
       }
 
       // debug code
@@ -5389,7 +5391,7 @@ void display() {
   // ********************************** Tidal show play stuf **********************************************************
   //
   #ifdef ENABLE_TIDAL
-  if ((vis_tidal_oversigt) && (do_zoom_tidal_cover) && (!(visur))) {
+  if ((vis_tidal_oversigt)  && (do_zoom_tidal_cover) && (!(visur))) {
     do_we_play_check=0;
     if (do_we_play_check==0) {
       tidal_oversigt.tidal_do_we_play();
