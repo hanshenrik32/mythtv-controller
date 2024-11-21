@@ -8200,12 +8200,14 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
         // online tidal stuf
         if (do_show_tidal_search_oversigt==true) {
+          // get the record to play from icon (tidalknapnr)
+          // show we play music
           if ((!(do_show_setup_tidal))  && (!(fundet))) {
             if ((GLuint) names[i*4+3]>=100) {
-              tidalknapnr = (GLuint) names[i*4+3]-99;				                    // hent spotify knap nr
+              tidalknapnr = (GLuint) names[i*4+3]-99;				                    // get tidal play record
               tidal_select_iconnr=tidalknapnr;
               fundet = true;
-              do_zoom_tidal_cover = false;                                      // close player status to ask about play other selected playlist/song
+              // do_zoom_tidal_cover = false;                                      //
               if (tidal_oversigt.type==0) {                                     // playlist type
                 ask_open_dir_or_play_tidal=true;
               } else if (tidal_oversigt.type==1) {                              // song type
@@ -8261,7 +8263,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
             returnfunc = 5;
             fundet = true;
           }
-          // play song icon select (20) type 2
+          // play artist icon select (20) type 2
           if (((GLubyte) names[i*4+3]==20) && (tidal_oversigt.type==2)) {
             fprintf(stderr,"play tidal artist. type 2\n");
             write_logfile(logfile,(char *) "play tidal artist.");
@@ -8366,7 +8368,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
         }
       }
       #endif
-      // vælg skal der spilles music eller radio
+      // select what to play music/tidal/spotify or radio from icon nr
       if ((vis_radio_or_music_oversigt) && (!(fundet))) {
         // Radio
         if ((GLubyte) names[i*4+3]==80) {
@@ -8385,7 +8387,9 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_spotify_oversigt = false;
           vis_radio_or_music_oversigt = false;
           printf("Enable music view\n ");
-        } // spotify
+        } 
+        // spotify
+        #if defined(ENABLE_SPOTIFY)
         if ((GLubyte) names[i*4+3]==82) {
           fundet = true;
           vis_music_oversigt = false;
@@ -8394,6 +8398,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           vis_radio_or_music_oversigt = false;
           printf("Enable spotify view\n ");
         }
+        #endif
         #if defined(ENABLE_TIDAL)
         // tidal
         if ((GLubyte) names[i*4+3]==83) {
@@ -8557,7 +8562,7 @@ int list_hits(GLint hits, GLuint *names,int x,int y) {
           // write debug log
           write_logfile(logfile,(char *) "Set/reset player pause.");
         }
-        // jump forward button stream
+        // jump forward button stream 
         if (((GLubyte) names[i*4+3]==11) && (do_zoom_stream_cover) && (fundet==false)) {
           fundet = true;
           stream_jump=true;
@@ -15707,6 +15712,8 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "10665",true);       // Rihanna
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3853703",true);       // Skeikkex
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
+
+      tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
