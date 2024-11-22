@@ -4283,8 +4283,8 @@ void display() {
     glEnd();
     glPopMatrix();
   }
-  // after 5 frames. Do play
-  if ((tidal_oversigt.startplay) && (tidal_start_delay==5)) {
+  // after 4 frames. Do play
+  if ((tidal_oversigt.startplay) && (tidal_start_delay==4)) {
     // start tidal play by fmod
     tidal_start_delay=0;
     ask_open_dir_or_play_tidal=false;
@@ -4359,19 +4359,23 @@ void display() {
         // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
 
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-      }
-      if (tidal_player_start_status == 0 ) {
-        fprintf(stderr,"tidal start play return ok.\n");
         do_zoom_tidal_cover=true;                                       // show we play
         snd=1;
         show_uv=true;
         vis_uv_meter=true;
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+      }
+      if (tidal_player_start_status == 0 ) {
+        fprintf(stderr,"tidal start play return ok.\n");
+        snd=1;
+        show_uv=true;
+        vis_uv_meter=true;
+        do_zoom_tidal_cover=true;                                       // show we play
       } else {
         // error start playing
-        do_play_tidal_cover=false;                                          // do not show we play.
+        // do_play_tidal_cover=false;                                          // do not show we play.
         // do_zoom_tidal_cover=false;                                       // show we play
-        write_logfile(logfile,(char *) "Error loading tidal song");
+        //write_logfile(logfile,(char *) "Error loading tidal song");
         snd=0;
       }
     } else {
@@ -5633,8 +5637,8 @@ void display() {
     if ((y>0) && (ll>0)) {
       xxx = ((y/ll)*16);
     } else xxx=0;
+    glDisable(GL_TEXTURE_2D);
     for(int x=0;x<xxx;x++) {
-      glDisable(GL_TEXTURE_2D);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
       glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);

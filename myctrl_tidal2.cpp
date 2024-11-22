@@ -2256,6 +2256,7 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
   char downloadfilename1[1024];
   char downloadfilenamelong[1024];
   char homedir[1024];
+  std::string convertcommand;
   bool rss_update=false;
   MYSQL *conn;
   MYSQL_RES *res;
@@ -2350,6 +2351,13 @@ int tidal_class::opdatere_tidal_oversigt(char *refid) {
                 strncpy(stack[antal]->feed_gfx_url,downloadfilenamelong,1024);
               }
               strncpy(stack[antal]->playlistid,row[2],tidal_namelength);    //
+              // convert to -size 320x320 size of org
+              convertcommand = "convert -size 320x320 ";
+              convertcommand = convertcommand + downloadfilenamelong;
+              convertcommand = convertcommand + " ";
+              convertcommand = convertcommand + downloadfilenamelong;
+              system(convertcommand.c_str());
+
               antal++;
             }
             // load playlist songs
