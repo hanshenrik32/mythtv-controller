@@ -736,7 +736,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
                   // strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
                   strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
 
-                  convertcommand = "convert -resize 30% ";
+                  convertcommand = "convert -size 320x320 ";
                   convertcommand = convertcommand + downloadfilenamelong;
                   convertcommand = convertcommand + " ";
                   convertcommand = convertcommand + downloadfilenamelong;
@@ -1531,8 +1531,8 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
                 }
                 tidal_download_image(value->u.string.ptr,downloadfilenamelong);
                 strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
-                // convert to 30% size of org
-                convertcommand = "convert -resize 30% ";
+                // convert to -size 320x320 size of org
+                convertcommand = "convert -size 320x320 ";
                 convertcommand = convertcommand + downloadfilenamelong;
                 convertcommand = convertcommand + " ";
                 convertcommand = convertcommand + downloadfilenamelong;
