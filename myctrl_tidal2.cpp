@@ -608,6 +608,7 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
     static int iconnr=0;
     MYSQL_RES *res;
     MYSQL_ROW row;
+    std::string convertcommand;
     if (value == NULL) return;
     if (value->type != json_object) {
       // print_depth_shift(depth);
@@ -734,6 +735,13 @@ void tidal_class::process_value_playlist(json_value* value, int depth,int x) {
                   tidal_download_image(value->u.string.ptr,downloadfilenamelong);
                   // strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
                   strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
+
+                  convertcommand = "convert -resize 20% ";
+                  convertcommand = convertcommand + downloadfilenamelong;
+                  convertcommand = convertcommand + " ";
+                  convertcommand = convertcommand + downloadfilenamelong;
+                  system(convertcommand.c_str());
+
                   stack[antal]->type=1;
                 }                
               }
@@ -1415,6 +1423,7 @@ void tidal_class::process_array_playlist_tidal_get_artists_all_albums(json_value
 
 void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int depth,int x) {
     std::string artist="";
+    std::string convertcommand;
     char tempname[1024];
     int j;
     int dircreatestatus;
@@ -1522,6 +1531,12 @@ void tidal_class::process_tidal_get_artists_all_albums(json_value* value, int de
                 }
                 tidal_download_image(value->u.string.ptr,downloadfilenamelong);
                 strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong);
+                // convert to 20% size of org
+                convertcommand = "convert -resize 20% ";
+                convertcommand = convertcommand + downloadfilenamelong;
+                convertcommand = convertcommand + " ";
+                convertcommand = convertcommand + downloadfilenamelong;
+                system(convertcommand.c_str());
                 stack[antal]->type=1;                                                           // playlist type
               }
             }
@@ -2578,7 +2593,6 @@ void tidal_class::process_tidal_search_result(json_value* value, int depth,int x
                   if (tidal_download_image( value->u.string.ptr, downloadfilenamelong )) {
                     strcpy( stack[antal]->feed_gfx_url, downloadfilenamelong );
                   } else strcpy( stack[antal]->feed_gfx_url,"" );
-                  printf("GFX FILE NAME %s \n ",stack[antal]->feed_gfx_url);
                   stack[antal]->type=2;                                                           // 2 = type is playlist
               }
             }
