@@ -4223,6 +4223,7 @@ void display() {
     glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
     glEnd();
     glPopMatrix();
+    /*
     // if playlist or artist you can open it else only show play
     if ((tidal_oversigt.get_tidal_type(tidalknapnr)==0) || (tidal_oversigt.get_tidal_type(tidalknapnr)==2)) {
       // ***************************************************************** open icon
@@ -4247,6 +4248,7 @@ void display() {
       glEnd();
       glPopMatrix();
     }
+    */
   }
 
 
@@ -4283,8 +4285,8 @@ void display() {
     glEnd();
     glPopMatrix();
   }
-  // after 5 frames. Do play
-  if ((tidal_oversigt.startplay) && (tidal_start_delay==5)) {
+  // after 4 frames. Do play
+  if ((tidal_oversigt.startplay) && (tidal_start_delay==4)) {
     // start tidal play by fmod
     tidal_start_delay=0;
     ask_open_dir_or_play_tidal=false;
@@ -4359,19 +4361,23 @@ void display() {
         // tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
 
         tidal_player_start_status = tidal_oversigt.tidal_play_now_album( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
-      }
-      if (tidal_player_start_status == 0 ) {
-        fprintf(stderr,"tidal start play return ok.\n");
         do_zoom_tidal_cover=true;                                       // show we play
         snd=1;
         show_uv=true;
         vis_uv_meter=true;
+        // tidal_player_start_status = tidal_oversigt.tidal_play_now_playlist( tidal_oversigt.get_tidal_playlistid( tidalknapnr-1 ),tidalknapnr-1, 1);
+      }
+      if (tidal_player_start_status == 0 ) {
+        fprintf(stderr,"tidal start play return ok.\n");
+        snd=1;
+        show_uv=true;
+        vis_uv_meter=true;
+        do_zoom_tidal_cover=true;                                       // show we play
       } else {
         // error start playing
-        do_play_tidal_cover=false;                                          // do not show we play.
+        // do_play_tidal_cover=false;                                          // do not show we play.
         // do_zoom_tidal_cover=false;                                       // show we play
-        write_logfile(logfile,(char *) "Error loading tidal song");
+        //write_logfile(logfile,(char *) "Error loading tidal song");
         snd=0;
       }
     } else {
@@ -5633,8 +5639,8 @@ void display() {
     if ((y>0) && (ll>0)) {
       xxx = ((y/ll)*16);
     } else xxx=0;
+    glDisable(GL_TEXTURE_2D);
     for(int x=0;x<xxx;x++) {
-      glDisable(GL_TEXTURE_2D);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0); glVertex3f(statuswxpos+222+(x*12), statuswypos , 0.0);
       glTexCoord2f(0, 1); glVertex3f(statuswxpos+222+(x*12), statuswypos+(15), 0.0);
@@ -9509,8 +9515,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           ask_open_dir_or_play_tidal=false;
           do_play_tidal_cover=false;
           do_select_device_to_play=false;                                     // stop show device
-          tidalknapnr=0;
-          tidal_selected_startofset=0;                                      //
+          // tidalknapnr=0;
+          // tidal_selected_startofset=0;                                      //
           do_stop_tidal=true;
         }
       } else {
@@ -15702,7 +15708,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
-
+      /* ** my playliste default first time load
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
@@ -15714,6 +15720,8 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
 
       tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
+
+      */
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
