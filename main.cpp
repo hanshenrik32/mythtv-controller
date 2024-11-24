@@ -4223,6 +4223,7 @@ void display() {
     glTexCoord2f(1, 0); glVertex3f( xof+651-80,yof , 0.0);
     glEnd();
     glPopMatrix();
+    /*
     // if playlist or artist you can open it else only show play
     if ((tidal_oversigt.get_tidal_type(tidalknapnr)==0) || (tidal_oversigt.get_tidal_type(tidalknapnr)==2)) {
       // ***************************************************************** open icon
@@ -4247,6 +4248,7 @@ void display() {
       glEnd();
       glPopMatrix();
     }
+    */
   }
 
 
@@ -9513,8 +9515,8 @@ void handleMouse(int button,int state,int mousex,int mousey) {
           ask_open_dir_or_play_tidal=false;
           do_play_tidal_cover=false;
           do_select_device_to_play=false;                                     // stop show device
-          tidalknapnr=0;
-          tidal_selected_startofset=0;                                      //
+          // tidalknapnr=0;
+          // tidal_selected_startofset=0;                                      //
           do_stop_tidal=true;
         }
       } else {
@@ -15706,7 +15708,7 @@ int main(int argc, char** argv) {
       tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
       // get_playlist_from_file use get_users_album(albumid) to download files
       
-
+      /* ** my playliste default first time load
       // tidal_oversigt.tidal_get_artists_all_albums("29893",false);    // Dire straits
       tidal_oversigt.tidal_get_artists_all_albums((char *) "1565",false);     // Maroon 5     
       tidal_oversigt.tidal_get_artists_all_albums((char *) "3346",true);        // Gnags
@@ -15718,6 +15720,8 @@ int main(int argc, char** argv) {
       tidal_oversigt.tidal_get_artists_all_albums((char *) "17275",true);       // Skeikkex
 
       tidal_oversigt.tidal_get_album_by_artist("34363343");  // U2
+
+      */
 
       //tidal_oversigt.get_playlist_from_file("tidal_playlists.txt");
 
