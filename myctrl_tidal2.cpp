@@ -1989,6 +1989,7 @@ void tidal_class::clean_tidal_oversigt() {
     tidal_oversigt_loaded=false;			// set load icon texture again
     tidal_oversigt_loaded_nr=0;
     tidal_oversigt_nowloading=0;
+    // if (get_tidal_aktiv_cover_image()) glDeleteTextures(1, get_tidal_aktiv_cover_image());
 }
 
 
@@ -3377,7 +3378,8 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     }
     recnr=0;
     // get playlist from db
-    sqlstring = "select name,playpath,playlistid from mythtvcontroller.tidalcontent where playlistid like ";
+    // sqlstring = "select name,playpath,playlistid,playlistgfx from mythtvcontroller.tidalcontent where playlistid like ";
+    sqlstring = "select name,playpath,tidalcontent.playlistid,tidalcontentplaylist.paththumb from mythtvcontroller.tidalcontent , mythtvcontroller.tidalcontentplaylist where tidalcontentplaylist.playlistid=tidalcontent.playlistid and tidalcontentplaylist.playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr]->playlistid;
     sqlstring = sqlstring + " order by name";
     if (mysql_query(conn,sqlstring.c_str())!=0) {
@@ -3391,9 +3393,9 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
         if (recnr>=0) {
           strcpy( tidal_aktiv_song[recnr].artist_name, tidal_aktiv_song[0].artist_name );
-          strcpy( tidal_aktiv_song[recnr].cover_image_url, tidal_aktiv_song[0].cover_image_url );
+          strcpy( tidal_aktiv_song[recnr].cover_image_url, mysql_row[3] );
           strcpy( tidal_aktiv_song[recnr].song_name, mysql_row[0] );
-          strcpy( tidal_aktiv_song[recnr].playlistid, stack[tidalknapnr]->playlistid );                                // playlistid
+          strcpy( tidal_aktiv_song[recnr].playlistid, mysql_row[2] );                                // playlistid
           strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );                                                     // play path
         }
         recnr++;
