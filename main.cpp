@@ -5422,10 +5422,17 @@ void display() {
     glEnd();
     // tidal play info icon
     glEnable(GL_BLEND);
-    if (tidal_oversigt.get_texture(tidalknapnr))
-      if (tidalknapnr-1>=0) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_texture(tidalknapnr-1));                        // get playlist conver icon
-    else
+    // if (tidal_oversigt.get_texture(tidalknapnr))
+    if (tidal_oversigt.tidal_aktiv_cover_image_url()) {
+      if (tidal_oversigt.get_tidal_aktiv_cover_image()==0) {
+        // if not loaded. load image.
+        GLuint img;
+        img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
+        if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
+      } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+    } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
+    }
     if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
