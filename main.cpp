@@ -44,10 +44,10 @@ using namespace std;
 #define ENABLE_SPOTIFY
 //
 // web server used for spotify login (oauth)
-static bool runwebserver=true;
+static bool runwebserver=true;                                  // run spotify web server port 8080 default true else spotify do not work you need to login to be able to play
 bool do_open_spotifyplaylist=false;
 bool do_open_tidalplaylist=false;
-bool do_select_device_to_play=false;
+bool do_select_device_to_play=false;                            // if true select play device (used in spotify)
 bool ask_save_playlist = false;                                 // ask for name
 bool save_ask_save_playlist = false;                            // do the save after ask
 bool stream_jump = false;
