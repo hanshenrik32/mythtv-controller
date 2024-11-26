@@ -216,8 +216,7 @@ class tidal_class {
     int tidal_aktiv_song_mslength() { return( tidal_aktiv_song[0].duration_ms ); };                   //
     char *get_active_device_id() { return(tidal_device[active_tidal_device].id); };   // get active dev id
 
-    // works
-    
+
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
     
