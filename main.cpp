@@ -44,12 +44,12 @@ using namespace std;
 #define ENABLE_SPOTIFY
 //
 // web server used for spotify login (oauth)
-static bool runwebserver=true;
-bool do_open_spotifyplaylist=false;
-bool do_open_tidalplaylist=false;
-bool do_select_device_to_play=false;
-bool ask_save_playlist = false;                                 // ask for name
-bool save_ask_save_playlist = false;                            // do the save after ask
+static bool runwebserver=true;        // run spotify web server port 8080 default true else spotify do not work you need to login to be able to play
+bool do_open_spotifyplaylist=false;   //
+bool do_open_tidalplaylist=false;     // 
+bool do_select_device_to_play=false;  // if true select play device (used in spotify)
+bool ask_save_playlist = false;       // ask for name
+bool save_ask_save_playlist = false;  // do the save after ask
 bool stream_jump = false;
 
 FILE *logfile=NULL;                   // global logfile
@@ -5429,7 +5429,9 @@ void display() {
         GLuint img;
         img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
         if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
-      } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+      } else {
+        glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+      }
     } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
     }
