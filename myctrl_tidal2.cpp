@@ -1988,7 +1988,7 @@ void tidal_class::clean_tidal_oversigt() {
     antalplaylists=0;
     tidal_oversigt_loaded=false;			// set load icon texture again
     tidal_oversigt_loaded_nr=0;
-    tidal_oversigt_nowloading=0;
+    tidal_oversigt_nowloading=0;    
     // if (get_tidal_aktiv_cover_image()) glDeleteTextures(1, get_tidal_aktiv_cover_image());
 }
 
@@ -2237,6 +2237,9 @@ int tidal_class::tidal_get_user_playlists(bool force,int startoffset) {
   }
   return(1);
 }
+
+
+
 
 
 
@@ -3344,6 +3347,19 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
   bool swap=true;
   // download stuf to be played if not downloaded before
   // check if exist
+
+  // clean old playlist
+  recnr=0;
+  while(recnr<199) {
+    strcpy( tidal_aktiv_song[recnr].artist_name, "" );
+    strcpy( tidal_aktiv_song[recnr].cover_image_url, "" );
+    strcpy( tidal_aktiv_song[recnr].song_name, "" );
+    strcpy( tidal_aktiv_song[recnr].playlistid, "" );
+    strcpy( tidal_aktiv_song[recnr].playurl, "" );
+    tidal_aktiv_song[recnr].cover_image=0;
+    recnr++;
+  }
+
   conn=mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
   // check playlist exist
@@ -3601,46 +3617,12 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
 }
 
 
-// ****************************************************************************************
-//
-// play artist
-//
-// ****************************************************************************************
-
-int tidal_class::tidal_play_now_artist(char *playlist_song,int tidalknapnr,bool now) {
-  int error;
-  std::string sysstring;
-  // download stuf to be played
-  // sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/artist/"; // do nnot work here
-  sysstring="/usr/local/bin/tidal-dl -l https://listen.tidal.com/album/";
-  sysstring = sysstring + playlist_song;
-  error=system(sysstring.c_str());
-  return(1);
-}
 
 
 
 // ****************************************************************************************
 //
-// play playlist
-//
-// ****************************************************************************************
-
-int tidal_class::tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now) {
-  int error;
-  std::string sysstring;
-  // download stuf to be played
-  sysstring="/home/hans/.local/bin/tidal-dl -l https://tidal.com/album/";
-  sysstring = sysstring + playlist_song;
-  error=system(sysstring.c_str());
-  return(1);
-}
-
-
-
-// ****************************************************************************************
-//
-// play song in use.
+// play song by fmod.
 //
 // ****************************************************************************************
 

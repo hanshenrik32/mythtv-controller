@@ -218,9 +218,7 @@ class tidal_class {
 
     // works
     
-    int tidal_play_now_artist(char *playlist_song,int tidalknapnr,bool now);                    // play artist
     int tidal_play_now_album(char *playlist_song,int tidalknapnr,bool now);                     // play album
-    int tidal_play_now_playlist(char *playlist_song,int tidalknapnr,bool now);                  // play playlist and update db
     int tidal_play_now_song(char *playlist_song,int tidalknapnr,bool now);                          // play song
     
     
