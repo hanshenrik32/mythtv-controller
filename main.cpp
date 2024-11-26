@@ -15591,7 +15591,7 @@ int main(int argc, char** argv) {
       fputs("|  Y Y  \\___  | |  | |   Y  \\  |  \\   /  /_____/ \\  \\__(  <_> )   |  \\  |  |  | \\(  <_> )  |_|  |_\\  ___/|  | \\/   \n",logfile);
       fputs("|__|_|  / ____| |__| |___|  /__|   \\_/            \\___  >____/|___|  /__|  |__|   \\____/|____/____/\\___  >__|           \n",logfile);
       fputs("      \\/\\/                \\/                          \\/           \\/                                  \\/          \n",logfile);
-      fputs("Ver 0.42.x \n",logfile);
+      fputs("Ver 0.42.6 \n",logfile);
     }
     printf("Build date %s\n",build_str);
     printf("\n\nMythtv-controller Version %s \n",SHOWVER);
