@@ -2970,6 +2970,7 @@ int tidal_class::tidal_next_play() {
   if (tidal_aktiv_song_nr<tidal_aktiv_song_antal) {
     tidal_aktiv_song_nr++;
     tidal_pause_play();
+    #if defined USE_FMOD_MIXER
     result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
     result = sndsystem->createSound(tidal_aktiv_song[tidal_aktiv_song_nr].playurl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
     if (result==FMOD_OK) {
@@ -2980,6 +2981,7 @@ int tidal_class::tidal_next_play() {
       write_logfile(logfile,(char *) logstring.c_str());
       return(1);
     }
+    #endif
   }
   return(0);
 }
@@ -2995,6 +2997,7 @@ int tidal_class::tidal_last_play() {
   std::string logstring;
   if (tidal_aktiv_song_nr>0) {
     tidal_aktiv_song_nr--;
+    #if defined USE_FMOD_MIXER
     tidal_pause_play();
     result = sndsystem->setStreamBufferSize(fmodbuffersize, FMOD_TIMEUNIT_RAWBYTES);  
     result = sndsystem->createSound(tidal_aktiv_song[tidal_aktiv_song_nr].playurl, FMOD_DEFAULT | FMOD_2D | FMOD_CREATESTREAM  , 0, &sound);
@@ -3005,6 +3008,7 @@ int tidal_class::tidal_last_play() {
       logstring = logstring + tidal_aktiv_song[tidal_aktiv_song_nr].playurl;
       write_logfile(logfile,(char *) logstring.c_str());
     }
+    #endif
   }
   return(1);
 }

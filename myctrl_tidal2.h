@@ -79,7 +79,11 @@ class tidal_active_play_info_type {                // sample data down here
     char playurl[2048];
 };
 
+
+
 // tidal global class
+
+
 
 class tidal_class {
   private:
