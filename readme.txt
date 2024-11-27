@@ -4,19 +4,20 @@ tv module to use in the future
 
 https://tvheadend.org/projects/tvheadend/wiki/Faq
 
-
-
-if ypu wants to make the deb file you have to install debhelper
-
-https://www.imagemagick.org/Usage/thumbnails/#cut
+if you wants to make the deb file you have to install debhelper
 
 # mythtv-controller 
 # packs to install to compile on Ubuntu 10.xx/12.xx
 # Updated 01/11/2014
 # Updated 27/08/2017
+# Updated 26/11/2024
 # Soon support for vdr recording
 
 Version.
+
+mythtv-controller ver 0.42.6
+
+Tidal search for music is working.
 
 mythtv-controller ver 0.41.0
 

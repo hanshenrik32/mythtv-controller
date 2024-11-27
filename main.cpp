@@ -11273,7 +11273,7 @@ void handleKeypress(unsigned char key, int x, int y) {
           // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
             printf("delete record in overview\n");
-            tidal_oversigt.delete_record_in_view(tidalknapnr-1);
+            tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {
               if (key==32) {
