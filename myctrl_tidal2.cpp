@@ -887,14 +887,26 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
   if (tidalknapnr<=antalplaylists) {
     antalplaylists--;  
     // clean up in db to.
-    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid='%s' limit 1",stack[tidalknapnr]->playlistid);
-    mysql_query(conn,sql_delete);
-    res = mysql_store_result(conn);
-    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid='%s'",stack[tidalknapnr]->playlistid);
-    mysql_query(conn,sql_delete);
-    res = mysql_store_result(conn);
-    sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
-    write_logfile(logfile,(char *) sql_delete);
+    if (atoi(stack[tidalknapnr]->playlistid)>0) {
+      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid=%s limit 1",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      // delete files from playlist in disk
+      sprintf(sql_delete,"select playpath from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          printf("Song file to delete : %s \n",row[0]);
+          remove(row[0]);
+        }
+      }     
+      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
+      write_logfile(logfile,(char *) sql_delete);
+    }
   }
   if (conn) mysql_close(conn);
 }
