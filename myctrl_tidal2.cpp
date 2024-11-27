@@ -877,9 +877,6 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
   conn = mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
   n=tidalknapnr;
-
-  printf("Delete tidal record %d \n",tidalknapnr);
-
   // remove element from view
   while(n<antalplaylists-2) {
     stack[n]=stack[n+1];
