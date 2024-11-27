@@ -9051,7 +9051,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_play_tidal=0;
                     do_open_tidalplaylist=1;
                     // write debug log
-                    write_logfile(logfile,(char *) "Set next play tidal flag");
+                    // write_logfile(logfile,(char *) "Set next play tidal flag");
                     tidal_oversigt.tidal_next_play();
                   }
                   // last play
@@ -9059,7 +9059,7 @@ void handleMouse(int button,int state,int mousex,int mousey) {
                     do_play_tidal=0;
                     do_open_tidalplaylist=1;
                     // write debug log
-                    write_logfile(logfile,(char *) "Set last play tidal flag");
+                    // write_logfile(logfile,(char *) "Set last play tidal flag");
                     tidal_oversigt.tidal_last_play();
                   }
                 }
@@ -9545,17 +9545,17 @@ void handleMouse(int button,int state,int mousex,int mousey) {
         // play
         if ((( retfunc == 4 ) || ( retfunc == 5 )) && (tidalknapnr>0)) {
           switch(tidal_oversigt.get_tidal_type(tidalknapnr-1)) {
-            case 0: sprintf(temptxt,"Tidal play nr %d playliste id %s named %s \n",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+            case 0: sprintf(temptxt,"Tidal play nr %d playliste id %s named %s ",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                     write_logfile(logfile,(char *) temptxt);
-                    fprintf(stderr,"Tidal play nr %d playliste id %s named %s \n",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+                    fprintf(stderr,"Tidal play nr %d playliste id %s named %s ",tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                     break;
-            case 1: sprintf(temptxt,"Tidal play nr %d song id %s named %s \n", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+            case 1: sprintf(temptxt,"Tidal play nr %d song id %s named %s ", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                     write_logfile(logfile,(char *) temptxt);
-                    fprintf(stderr,"Tidal play nr %d song id %s named %s \n", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
+                    fprintf(stderr,"Tidal play nr %d song id %s named %s ", tidalknapnr-1, tidal_oversigt.get_tidal_playlistid(tidalknapnr-1),tidal_oversigt.get_tidal_name(tidalknapnr-1));
                     break;
-            default:sprintf(temptxt,"Error in type. Type found %d  \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
+            default:sprintf(temptxt,"Error in type. Type found %d \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
                     write_logfile(logfile,(char *) temptxt);
-                    fprintf(stderr,"Error in type. Type found %d  \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
+                    fprintf(stderr,"Error in type. Type found %d \n",tidal_oversigt.get_tidal_type(tidalknapnr-1));
                     break;
           }
           tidal_oversigt.startplay=true;                                                                      // set start play in main (display function)
@@ -11272,7 +11272,7 @@ void handleKeypress(unsigned char key, int x, int y) {
         } else {
           // delete key
           if ((vis_tidal_oversigt) && (key==127)) {
-            printf("delete record in overview\n");
+            printf("delete record in overview %d \n",(tidalknapnr-1)+tidal_selected_startofset);
             tidal_oversigt.delete_record_in_view((tidalknapnr-1)+tidal_selected_startofset);
           }
           if ((vis_music_oversigt) && (ask_open_dir_or_play)) {

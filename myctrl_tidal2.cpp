@@ -877,9 +877,6 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
   conn = mysql_init(NULL);
   mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, "mythtvcontroller", 0, NULL, 0);
   n=tidalknapnr;
-
-  printf("Delete tidal record %d \n",tidalknapnr);
-
   // remove element from view
   while(n<antalplaylists-2) {
     stack[n]=stack[n+1];
@@ -890,14 +887,26 @@ bool tidal_class::delete_record_in_view(int tidalknapnr) {
   if (tidalknapnr<=antalplaylists) {
     antalplaylists--;  
     // clean up in db to.
-    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid='%s' limit 1",stack[tidalknapnr]->playlistid);
-    mysql_query(conn,sql_delete);
-    res = mysql_store_result(conn);
-    sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid='%s'",stack[tidalknapnr]->playlistid);
-    mysql_query(conn,sql_delete);
-    res = mysql_store_result(conn);
-    sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
-    write_logfile(logfile,(char *) sql_delete);
+    if (atoi(stack[tidalknapnr]->playlistid)>0) {
+      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontentplaylist where playlistid=%s limit 1",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      // delete files from playlist in disk
+      sprintf(sql_delete,"select playpath from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      if (res) {
+        while ((row = mysql_fetch_row(res)) != NULL) {
+          printf("Song file to delete : %s \n",row[0]);
+          remove(row[0]);
+        }
+      }     
+      sprintf(sql_delete,"delete from mythtvcontroller.tidalcontent where playlistid=%s",stack[tidalknapnr]->playlistid);
+      mysql_query(conn,sql_delete);
+      res = mysql_store_result(conn);
+      sprintf(sql_delete,"Tidal delete playlist %s ",stack[tidalknapnr]->playlistid);
+      write_logfile(logfile,(char *) sql_delete);
+    }
   }
   if (conn) mysql_close(conn);
 }
