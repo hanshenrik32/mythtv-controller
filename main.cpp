@@ -5434,7 +5434,10 @@ void display() {
         if (tidal_oversigt.aktiv_song_tidal_icon) {
           glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
           tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
-        } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
+        } else {
+          if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
+          else glBindTexture(GL_TEXTURE_2D,spotify_ecover);
+        }
       }
     } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
