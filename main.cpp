@@ -3316,7 +3316,7 @@ void display() {
       }
       // spotify online search button
       if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
-        if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
+        if (do_show_spotify_search_oversigt) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(5);
@@ -3329,7 +3329,7 @@ void display() {
       }
       // tidal show search icon or (back from search) icon
       if (vis_tidal_oversigt) {
-        if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
+        if (do_show_tidal_search_oversigt) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(5);
