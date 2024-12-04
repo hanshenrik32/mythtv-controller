@@ -5424,13 +5424,18 @@ void display() {
     glEnable(GL_BLEND);
     // if (tidal_oversigt.get_texture(tidalknapnr))
     if (tidal_oversigt.tidal_aktiv_cover_image_url()) {
-      if (tidal_oversigt.get_tidal_aktiv_cover_image()==0) {
-        // if not loaded. load image.
+      //do file exist and have we not loaded it before then load it.
+      if ((tidal_oversigt.get_tidal_aktiv_cover_image()==0) && (tidal_oversigt.aktiv_song_tidal_icon==0)) {
         GLuint img;
         img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
         tidal_oversigt.aktiv_song_tidal_icon=img;
         if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
-      } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);                                   // set playlist conver icon
+      } else {
+        if (tidal_oversigt.aktiv_song_tidal_icon) {
+          glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+          tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
+        } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
+      }
     } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
     }
