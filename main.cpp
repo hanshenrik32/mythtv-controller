@@ -776,6 +776,7 @@ GLuint spotify_askopen;                   //
 GLuint spotify_search;                    // button in spotify search
 GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
+GLuint tidal_ecover;
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
@@ -5436,16 +5437,17 @@ void display() {
           tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
         } else {
           if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
-          else glBindTexture(GL_TEXTURE_2D,spotify_ecover);
+          else glBindTexture(GL_TEXTURE_2D,tidal_ecover);
         }
       }
     } else {
-      glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
+      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
     }
     if (tidal_oversigt.aktiv_song_tidal_icon) {
       glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
     } else {
-      printf("No icon \n");
+      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
+      printf("No Tidal icon\n");
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -15251,6 +15253,7 @@ void loadgfx() {
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
+    tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
@@ -15425,6 +15428,7 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
+    glDeleteTextures( 1, &tidal_ecover);            //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
     glDeleteTextures( 1, &big_search_bar_track);    //
