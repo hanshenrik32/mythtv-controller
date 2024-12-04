@@ -3316,7 +3316,7 @@ void display() {
       }
       // spotify online search button
       if ((vis_spotify_oversigt) && (firsttimespotifyupdate==false)) {
-        if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
+          if (do_show_spotify_search_oversigt) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(5);
@@ -3329,7 +3329,7 @@ void display() {
       }
       // tidal show search icon or (back from search) icon
       if (vis_tidal_oversigt) {
-        if (strcmp(keybuffer,"")!=0) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
+        if (do_show_tidal_search_oversigt) glBindTexture(GL_TEXTURE_2D, spotify_search_back); else glBindTexture(GL_TEXTURE_2D, spotify_search);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glLoadName(5);
@@ -3341,7 +3341,7 @@ void display() {
         glEnd();
       }
 
-      // exit button
+      // show exit button
       if ((!(vis_music_oversigt)) && (!(vis_music_oversigt)) && (!(vis_tv_oversigt)) && (!(vis_film_oversigt)) && (!(vis_stream_oversigt)) && (!(vis_spotify_oversigt)) && (!(vis_tidal_oversigt)) && (!(vis_radio_oversigt)) && (!((do_show_spotify_search_oversigt)))) {
         glBindTexture(GL_TEXTURE_2D, _textureexit);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -5428,12 +5428,17 @@ void display() {
         // if not loaded. load image.
         GLuint img;
         img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
+        tidal_oversigt.aktiv_song_tidal_icon=img;
         if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
       } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
     } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
     }
-    if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
+    if (tidal_oversigt.aktiv_song_tidal_icon) {
+      glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
+    } else {
+      printf("No icon \n");
+    }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBegin(GL_QUADS);
