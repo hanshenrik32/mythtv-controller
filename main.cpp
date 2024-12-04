@@ -5430,7 +5430,7 @@ void display() {
         img=loadTexture(tidal_oversigt.tidal_aktiv_cover_image_url());                                                    // download icon 
         tidal_oversigt.aktiv_song_tidal_icon=img;
         if (img) tidal_oversigt.set_tidal_aktiv_cover_image(img);                                                         // assign to aktiv play list
-      } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
+      } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);                                   // set playlist conver icon
     } else {
       glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
     }
