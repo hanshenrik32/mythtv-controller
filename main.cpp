@@ -776,6 +776,7 @@ GLuint spotify_askopen;                   //
 GLuint spotify_search;                    // button in spotify search
 GLuint spotify_search_back;               // back button in spotify search
 GLuint spotify_ecover;                    //
+GLuint tidal_ecover;
 GLuint spotify_pil;                       // pil bruges i spotify search nederst på skærmen midt for
 GLuint musicbutton;                       //
 GLuint streambutton;                      //
@@ -3562,9 +3563,8 @@ void display() {
     } else if (vis_stream_oversigt) {
       glPushMatrix();
       streamoversigt.show_stream_oversigt(onlinestream, onlinestream_empty,onlinestream_empty1 ,_sangley,stream_key_selected);
-      if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
+      // if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000 ) << " ms" << endl;
       glPopMatrix();
-      if (debugmode & 1) cout << "Stream Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     } else if (vis_radio_oversigt) {
       radio_pictureloaded=radiooversigt.show_radio_oversigt( _textureId_dir , 0 , _textureIdback , _textureId28 , _rangley);
       // show radio options menu
@@ -5084,9 +5084,6 @@ void display() {
       }
     }
   }
-
-
-
   // ******************************************************************************************************************
   // ******************************************************************************************************************
   // ******************************************************************************************************************
@@ -5434,15 +5431,19 @@ void display() {
         if (tidal_oversigt.aktiv_song_tidal_icon) {
           glBindTexture(GL_TEXTURE_2D,tidal_oversigt.get_tidal_aktiv_cover_image());                                   // set playlist conver icon
           tidal_oversigt.aktiv_song_tidal_icon=tidal_oversigt.get_tidal_aktiv_cover_image();                            // update show icon
-        } else glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
+        } else {
+          if (tidal_oversigt.aktiv_song_tidal_icon) glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);
+          else glBindTexture(GL_TEXTURE_2D,tidal_ecover);
+        }
       }
     } else {
-      glBindTexture(GL_TEXTURE_2D,spotify_ecover);                                                                        // else default icon
+      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
     }
     if (tidal_oversigt.aktiv_song_tidal_icon) {
       glBindTexture(GL_TEXTURE_2D,tidal_oversigt.aktiv_song_tidal_icon);          // set active icon
     } else {
-      printf("No icon \n");
+      glBindTexture(GL_TEXTURE_2D,tidal_ecover);                                                                        // else default icon
+      printf("No Tidal icon\n");
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -5526,7 +5527,6 @@ void display() {
     */
     // glcRenderString(tidal_oversigt.tidal_playlistname);
     glPopMatrix();
-
     // show tidal songname
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
@@ -5548,7 +5548,6 @@ void display() {
     temptxt1[40]=0;
     glcRenderString(temptxt1);
     glPopMatrix();
-
     // show tidal artist
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
@@ -5628,10 +5627,8 @@ void display() {
     glPopMatrix();
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
-
     unsigned int ms;
     unsigned int playtime_songlength;
-
     result=channel->getPosition(&ms, FMOD_TIMEUNIT_MS);		// get fmod audio info
     if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN)) {
       ERRCHECK(result,do_play_music_aktiv_table_nr);
@@ -5666,12 +5663,10 @@ void display() {
       glEnd();
     }
     glPopMatrix();
-
     float frequency;
     #if defined USE_FMOD_MIXER
     channel->getFrequency(&frequency);
     #endif
-
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5680,7 +5675,6 @@ void display() {
     glScalef(20.5, 20.5, 1.0);
     glcRenderString("Samplerate ");
     glPopMatrix();
-
     glPushMatrix();
     glColor3f(1.0f, 1.0f, 1.0f);
     glPopMatrix();
@@ -5693,8 +5687,6 @@ void display() {
     glScalef(20.5, 20.5, 1.0);
     glcRenderString(temptxt1);
     glPopMatrix();
-
-
     // updated date on tidal
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
@@ -5704,7 +5696,6 @@ void display() {
     glScalef(20.5, 20.5, 1.0);
     glcRenderString("Release   ");
     glPopMatrix();
-
     glPushMatrix();
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -5716,8 +5707,6 @@ void display() {
     glPopMatrix();
   }
   #endif
-
-
   // ******************************************************************************************************************
   // ******************************************************************************************************************
   // ******************************************************************************************************************
@@ -5858,7 +5847,6 @@ void display() {
   // show radio player
   if (!(visur)) {
     if (vis_radio_oversigt) {
-      // show playing radio station
       if ((snd) && (do_zoom_radio)) {
           glColor4f(1.0f, 1.0f, 1.0f,1.0f);
           // window texture
@@ -7224,7 +7212,7 @@ void display() {
     do_update_xmltv=false;
   }
   if (do_update_rss) {
-    // call/start update xmltv multi phread
+    // call/start update rss multi phread
     fprintf(stderr,"Start phread podcast.\n");
     update_rss_phread_loader();
     do_update_rss = false;
@@ -12260,6 +12248,10 @@ void handleKeypress(unsigned char key, int x, int y) {
                   }
                 }
               }
+              if (vis_stream_oversigt) {
+                do_update_rss_show = true;                                     // set show update flag
+                do_update_rss = true;                                          // set update flag
+              }
               break;
             case 13:           
               if (vis_music_oversigt) {
@@ -15248,6 +15240,7 @@ void loadgfx() {
     spotifybutton         = loadgfxfile(temapath,(char *) "buttons/",(char *) "spotify_button");
     tidalbutton           = loadgfxfile(temapath,(char *) "buttons/",(char *) "tidal_button");
     spotify_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_ecover");
+    tidal_ecover        = loadgfxfile(temapath,(char *) "images/",(char *) "tidal_ecover");
     spotify_pil           = loadgfxfile(temapath,(char *) "images/",(char *) "spotify_pil");
     big_search_bar_playlist= loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_playlist");
     big_search_bar_track   = loadgfxfile(temapath,(char *) "images/",(char *) "big_search_bar_song");
@@ -15422,6 +15415,7 @@ void freegfx() {
     glDeleteTextures( 1, &spotify_askplay);         //
     glDeleteTextures( 1, &spotifybutton);           //
     glDeleteTextures( 1, &spotify_ecover);          //
+    glDeleteTextures( 1, &tidal_ecover);            //
     glDeleteTextures( 1, &spotify_pil);             //
     glDeleteTextures( 1, &big_search_bar_playlist); // Spotify stuf
     glDeleteTextures( 1, &big_search_bar_track);    //

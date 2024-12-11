@@ -3309,7 +3309,6 @@ void *thread_convert_m4a_to_flac(void *path) {
 // ****************************************************************************************
 //
 // Play functios track.
-// works now
 //
 // ****************************************************************************************
 
@@ -3317,8 +3316,6 @@ void *thread_convert_m4a_to_flac(void *path) {
 eks
 
 /bin/curl -v 'https://listen.tidal.com/us/album/315509960/track/315509961' -H 'accept: application/vnd.tidal.v1+json' -H 'Authorization: Bearer eyJraWQiOiJ2OU1GbFhqWSIsImFsZyI6IkVTMjU2In0.eyJ0eXBlIjoibzJfYWNjZXNzIiwic2NvcGUiOiIiLCJnVmVyIjowLCJzVmVyIjowLCJjaWQiOjEwNjA2LCJleHAiOjE3MDMxOTAxNjksImlzcyI6Imh0dHBzOi8vYXV0aC50aWRhbC5jb20vdjEifQ.IEHjsNsu358r2I5ISJt57wYwlSW9xOFTpgwky_8zvkz9u42U3_qH1iOh6YDxaOZYbUwKfUrj6tBRn2lxm1H8Xw'
-
-
 // sample
 https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
@@ -3326,7 +3323,7 @@ https://tidal.com/browse/playlist/1b087082-ab54-4e7d-a0d3-b1cf1cf18ebc
 
 // ************************************************************************************************
 //
-// start play first song in playlist and start one thread to download the rest and update the db.
+// start play first song in playlist and start one thread to download the rest and update the db. (in use)
 //
 // ************************************************************************************************
 
@@ -3404,7 +3401,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     recnr=0;
     // get playlist from db
     // sqlstring = "select name,playpath,playlistid,playlistgfx from mythtvcontroller.tidalcontent where playlistid like ";
-    sqlstring = "select name,playpath,tidalcontent.playlistid,tidalcontentplaylist.paththumb from mythtvcontroller.tidalcontent , mythtvcontroller.tidalcontentplaylist where tidalcontentplaylist.playlistid=tidalcontent.playlistid and tidalcontentplaylist.playlistid like ";
+    sqlstring = "select name,playpath,tidalcontent.playlistid,tidalcontentplaylist.paththumb,release_date from mythtvcontroller.tidalcontent , mythtvcontroller.tidalcontentplaylist where tidalcontentplaylist.playlistid=tidalcontent.playlistid and tidalcontentplaylist.playlistid like ";
     sqlstring = sqlstring + stack[tidalknapnr]->playlistid;
     sqlstring = sqlstring + " order by name";
     if (mysql_query(conn,sqlstring.c_str())!=0) {
@@ -3417,11 +3414,12 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
     if (mysql_res) {      
       while (((mysql_row = mysql_fetch_row(mysql_res)) != NULL)) {
         if (recnr>=0) {
-          strcpy( tidal_aktiv_song[recnr].artist_name, tidal_aktiv_song[0].artist_name );
-          strcpy( tidal_aktiv_song[recnr].cover_image_url, mysql_row[3] );
-          strcpy( tidal_aktiv_song[recnr].song_name, mysql_row[0] );
-          strcpy( tidal_aktiv_song[recnr].playlistid, mysql_row[2] );                                // playlistid
+          strcpy( tidal_aktiv_song[recnr].artist_name, tidal_aktiv_song[0].artist_name );                              // playlist name
+          strcpy( tidal_aktiv_song[recnr].cover_image_url, mysql_row[3] );                                             //
+          strcpy( tidal_aktiv_song[recnr].song_name, mysql_row[0] );                                                   //
+          strcpy( tidal_aktiv_song[recnr].playlistid, mysql_row[2] );                                                  // playlistid
           strcpy( tidal_aktiv_song[recnr].playurl, mysql_row[1] );                                                     // play path
+          strcpy( tidal_aktiv_song[recnr].release_date, mysql_row[4] );                                                // release date
         }
         recnr++;
         tidal_aktiv_song_antal++;
@@ -3467,7 +3465,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
         sysstring = sysstring + playlist_song;
       }
       error = system(sysstring.c_str());                                                                      // do it (download songs by tidal-dl)
-      // 
+      // error bits desc.
       // Bits 15-8 = Exit code.
       // Bit     7 = 1 if a core dump was produced.
       // Bits  6-0 = Signal number that killed the process.
@@ -3558,7 +3556,6 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
           if (sound) result = sndsystem->playSound(sound,NULL, false, &channel);
           if (sndsystem) channel->setVolume(configsoundvolume);                                        // set play volume from configfile          
         }
-
         // convert the rest of the m4a files we have downloed to be able to play it in fmod
         pthread_t loaderthread; // thread_convert_m4a_to_flac() used to convert m4a files
         int rc2 = pthread_create( &loaderthread , NULL , thread_convert_m4a_to_flac , (void *) stack[tidalknapnr]->feed_showtxt);
@@ -3628,7 +3625,7 @@ int tidal_class::tidal_play_now_album(char *playlist_song,int tidalknapnr,bool n
 
 // ****************************************************************************************
 //
-// play song in use.
+// play song (in use).
 //
 // ****************************************************************************************
 
