@@ -737,7 +737,12 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   if (strcmp(ext,".avi")==0) film_ok=true;
                   if (strcmp(ext,".mp4")==0) film_ok=true;
                   if (strcmp(ext,".mkv")==0) film_ok=true;
+                  if (strcmp(ext,".mov")==0) film_ok=true;
+                  if (strcmp(ext,".wmv")==0) film_ok=true;
+                  if (strcmp(ext,".mpeg")==0) film_ok=true;
+                  if (strcmp(ext,".ogv")==0) film_ok=true;
                   if (strcmp(ext,".iso")==0) film_ok=true;
+                  if (strcmp(ext,".ISO")==0) film_ok=true;
                   if (strcmp(ext,".ISO")==0) film_ok=true;
                   if (film_ok) {
                     strcpy(movietitle,submoviefil->d_name);
@@ -1195,7 +1200,7 @@ int film_oversigt_typem::opdatere_film_oversigt(char *movietitle) {
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
-      // test fpom musik table exist
+      // test table exist
       sprintf(sqlselect,"SHOW TABLES LIKE 'videometadata'");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
