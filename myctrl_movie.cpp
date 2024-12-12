@@ -774,7 +774,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     coverfile=coverfile + "/";
                     coverfile=coverfile + "cover.jpg";
                     if (!(file_exists(coverfile.c_str()))) coverfile="";
-
                     fundet=false;
                     del_rec_nr=0;
                     sprintf(sqlselect,"select intid from videometadata where filename like '%%");
