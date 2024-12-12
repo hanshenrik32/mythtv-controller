@@ -11,12 +11,15 @@
 #include <dirent.h>                     // dir functions
 #include <linux/limits.h>
 #include <sys/stat.h>                   // stats func for file/dir info struct
+#include <string>
 
 #include "utility.h"
 #include "myctrl_movie.h"
 #include "readjpg.h"
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
+
+using namespace std;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                // used by log system
@@ -587,7 +590,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     char convert_command1[2000];
     char sqlselect[4000];
     char mainsqlselect[2000];
-    char temptxt[2000];
+    char temptxt[2000];    
     unsigned int recnr=0;
     unsigned int i;
     int filmantal=0;
@@ -614,6 +617,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     MYSQL_ROW row;
     struct stat statbuffer;
     bool film_ok=false;
+    bool film_cover_ok=false;
     int movieyear=2000;
     float movieuserrating=1.0f;
     int movielength=120;
@@ -622,6 +626,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     long delrecid;
     unsigned int filepathsize;
     char *file_to_check_path;
+    string coverfile;
+
     // mysql stuf
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
     strcpy(database,dbname);
@@ -762,6 +768,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     strcat(moviepathcheck,moviefil->d_name);                        // path
                     strcat(moviepathcheck,"/");
                     strcat(moviepathcheck,submoviefil->d_name);                     // get full filename
+
+                    coverfile=configmoviepath;
+                    coverfile=coverfile + moviefil->d_name;                        // path
+                    coverfile=coverfile + "/";
+                    coverfile=coverfile + "cover.jpg";
+                    if (!(file_exists(coverfile.c_str()))) coverfile="";
+
                     fundet=false;
                     del_rec_nr=0;
                     sprintf(sqlselect,"select intid from videometadata where filename like '%%");
@@ -792,7 +805,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     if (!(fundet)) {
                       sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                                                 (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile.c_str());
                       recnr++;
                       mysql_query(conn,"set NAMES 'utf8'");
                       res = mysql_store_result(conn);
@@ -824,6 +837,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   if (ext) {
                     *ext='\0';
                   }
+                  // make cover file name if exist.
+                  coverfile=moviefil->d_name;
+                  size_t lastindex = coverfile.find_last_of("."); 
+                  string tmpcovername = coverfile.substr(0, lastindex); 
+                  coverfile=tmpcovername;
+                  coverfile=coverfile + ".jpg";
+                  // if (!(file_exists(coverfile.c_str()))
                   strcpy(moviepath1,moviefil->d_name);                         // get full filename
                   fundet=false;
                   del_rec_nr=0;
@@ -861,7 +881,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   if (!(fundet)) {
                     sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
                                                               (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,"filetodownload");
+                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile);
                     recnr++;
                     fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
                     //mysql_query(conn,"set NAMES 'utf8'");
