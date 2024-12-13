@@ -852,7 +852,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   string tmpcovername = coverfile.substr(0, lastindex); 
                   coverfile=tmpcovername;
                   coverfile=coverfile + ".jpg";
-                  // if (!(file_exists(coverfile.c_str()))
+                  if (!(file_exists(coverfile.c_str()))) coverfile="";
                   strcpy(moviepath1,moviefil->d_name);                         // get full filename
                   fundet=false;
                   del_rec_nr=0;
