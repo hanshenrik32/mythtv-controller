@@ -12,6 +12,8 @@
 #include <linux/limits.h>
 #include <sys/stat.h>                   // stats func for file/dir info struct
 #include <string>
+#include <ctime>
+#include <iostream>
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -627,6 +629,9 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     unsigned int filepathsize;
     char *file_to_check_path;
     string coverfile;
+    string dato;
+    std::time_t t = std::time(0);   // get time now
+    std::tm* now = std::localtime(&t);
 
     // mysql stuf
     if (global_use_internal_music_loader_system) strcpy(database,dbname); else strcpy(database,"mythconverg");
@@ -717,6 +722,12 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
         mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass,database, 0, NULL, 0);
         // loop files in dirp
         while (moviefil = readdir(dirp)) {
+
+
+          t = std::time(0);   // get time now
+          now = std::localtime(&t);
+
+
           if ((strcmp(moviefil->d_name,".")!=0) && (strcmp(moviefil->d_name,"..")!=0)) {
             ext = strrchr(moviefil->d_name, '.');
             if (ext) {
@@ -812,9 +823,19 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       }
                     }
                     if (!(fundet)) {
-                      sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                                                (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                                movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile.c_str());
+                      dato=to_string(now->tm_year + 1900);
+                      dato=dato + "-";
+                      dato=dato + to_string(now->tm_mon + 1);
+                      dato=dato + "-";
+                      dato=dato + to_string(now->tm_mday);
+                      dato=dato + " ";
+                      dato=dato + to_string(now->tm_hour);
+                      dato=dato + ":";
+                      dato=dato + to_string(now->tm_min);
+                      dato=dato + ":";
+                      dato=dato + to_string(now->tm_sec);
+                      sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile.c_str(),dato.c_str());
+
                       recnr++;
                       mysql_query(conn,"set NAMES 'utf8'");
                       res = mysql_store_result(conn);
@@ -829,7 +850,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   }
                 }
               }
-            } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {
+            } else if ((statbuffer.st_mode & S_IFMT)==S_IFREG) {                        // if file
               // if file get ext of filename
               ext = strrchr(moviefil->d_name, '.');
               if (ext) {
@@ -888,9 +909,19 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     }
                   }
                   if (!(fundet)) {
-                    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values \
-                                                              (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','2016-01-01',0)", \
-                                                              movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile);
+                    dato=to_string(now->tm_year + 1900);
+                    dato=dato + "-";
+                    dato=dato + to_string(now->tm_mon + 1);
+                    dato=dato + "-";
+                    dato=dato + to_string(now->tm_mday);
+                    dato=dato + " ";
+                    dato=dato + to_string(now->tm_hour);
+                    dato=dato + ":";
+                    dato=dato + to_string(now->tm_min);
+                    dato=dato + ":";
+                    dato=dato + to_string(now->tm_sec);
+                    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath1,coverfile.c_str(),dato.c_str());
+                    // printf("%s \n",sqlselect);
                     recnr++;
                     fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
                     //mysql_query(conn,"set NAMES 'utf8'");
@@ -898,9 +929,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     mysql_query(conn,sqlselect);
                     res = mysql_store_result(conn);
                     if (mysql_error(conn)) {
+                      string tmplog;
                       write_logfile(logfile,(char *) "Mysql error.");
-                      printf("%s\n",mysql_error(conn));
-                      //exit(0);
+                      tmplog="Mysql error :";
+                      tmplog=tmplog + mysql_error(conn);
+                      write_logfile(logfile,(char *) tmplog.c_str());
+                      // printf("%s\n",mysql_error(conn));
+                      // exit(0);
                     }
                   }
                 }
