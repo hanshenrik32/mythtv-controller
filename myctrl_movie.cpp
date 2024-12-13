@@ -759,7 +759,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     }
                     // check for '\n' in the end of the string and remove it
                     if (movietitle[strlen(movietitle)-2]=='\n') movietitle[strlen(movietitle)-2]=0;
-
                     strcpy(moviepath1,moviefil->d_name);
                     strcat(moviepath1,"/");
                     strcat(moviepath1,submoviefil->d_name);
@@ -768,12 +767,23 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     strcat(moviepathcheck,moviefil->d_name);                        // path
                     strcat(moviepathcheck,"/");
                     strcat(moviepathcheck,submoviefil->d_name);                     // get full filename
-
+                    // get cover file from movie file name
                     coverfile=configmoviepath;
                     coverfile=coverfile + moviefil->d_name;                        // path
                     coverfile=coverfile + "/";
-                    coverfile=coverfile + "cover.jpg";
-                    if (!(file_exists(coverfile.c_str()))) coverfile="";
+                    coverfile=coverfile + submoviefil->d_name;                      // add file name
+                    size_t lastindex = coverfile.find_last_of("."); 
+                    string tmpcovername = coverfile.substr(0, lastindex); 
+                    coverfile=tmpcovername;
+                    coverfile=coverfile + ".jpg";
+                    if (!(file_exists(coverfile.c_str()))) {
+                      // cover file name do not exist do make name as cover.jpg else no cover
+                      coverfile=configmoviepath;
+                      coverfile=coverfile + moviefil->d_name;                        // path
+                      coverfile=coverfile + "/";
+                      coverfile=coverfile + "cover.jpg";
+                      if (!(file_exists(coverfile.c_str()))) coverfile="";
+                    }
                     fundet=false;
                     del_rec_nr=0;
                     sprintf(sqlselect,"select intid from videometadata where filename like '%%");
