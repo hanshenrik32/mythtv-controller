@@ -780,6 +780,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     strcat(moviepathcheck,submoviefil->d_name);                     // get full filename
                     // get cover file from movie file name
                     coverfile=configmoviepath;
+                    if (coverfile.back()!='/') coverfile=coverfile + "/";
                     coverfile=coverfile + moviefil->d_name;                        // path
                     coverfile=coverfile + "/";
                     coverfile=coverfile + submoviefil->d_name;                      // add file name
@@ -790,6 +791,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     if (!(file_exists(coverfile.c_str()))) {
                       // cover file name do not exist do make name as cover.jpg else no cover
                       coverfile=configmoviepath;
+                      if (coverfile.back()!='/') coverfile=coverfile + "/";
                       coverfile=coverfile + moviefil->d_name;                        // path
                       coverfile=coverfile + "/";
                       coverfile=coverfile + "cover.jpg";
