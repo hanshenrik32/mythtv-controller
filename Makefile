@@ -1,7 +1,7 @@
 C = gcc
 # CFLAGS for 32bits -m32 / 64 bits -m64
 # -Wall
-CFLAGS = -Wformat-truncation -pthread -m64 -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 
+CFLAGS = -Wformat-truncation -pthread -O0 -ggdb -std=c++17 -Wno-format-overflow Wformat-truncation -Wformat-truncation=2 
 LDFLAGS= 
 
 PROG       = mythtv-controller
@@ -15,7 +15,7 @@ DESTHDRDIR = /usr/local/include/fmodex
 ETCDIR     = /etc
 FMODFILE   = fmodstudioapi20218linux.tar.gz
 BINPROG    = /usr/bin/mythtv-controller
-FREETYPELIB= /usr/lib/x86_64-linux-gnu/libfreetype.so
+FREETYPELIB= /usr/lib/aarch64-linux-gnu/libfreetype.so
 LBITS := $(shell getconf LONG_BIT)
 
 BUILD_NUMBER_FILE=build-number.txt
@@ -28,24 +28,24 @@ LIRCSOURCES := $(shell find /usr/lib/ -name 'liblirc_client.so')
 LIBICAL:=$(shell find /usr/lib/ -name 'libical.so')
 
 ifeq ($(LBITS),64)
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86_64/ -name 'libfmod.so')
-	CFLAGS = -pthread -m64
-	FREETYPELIB = /usr/lib/x86_64-linux-gnu/libfreetype.so
+        LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/arm64/ -name 'libfmod.so')
+        CFLAGS = -pthread 
+        FREETYPELIB = /usr/lib/aarch64-linux-gnu/libfreetype.so
 else
-	LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/x86/ -name 'libfmod.so')
-        CFLAGS = -pthread -m32
-	FREETYPELIB = /usr/lib/i386-linux-gnu/libfreetype.so
+        LIBFMOD    = $(shell find /opt/mythtv-controller/fmodstudioapi20218linux/api/core/lib/arm64/ -name 'libfmod.so')
+        CFLAGS = -pthread 
+        FREETYPELIB = /usr/lib/aarch64-linux-gnu/libfreetype.so
 endif
 
 
 ifeq ($(LBITS),64)
-	STDCLIB = /usr/lib/x86_64-linux-gnu/libstdc++.so.6
-	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
-	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
+        STDCLIB = /usr/lib/aarch64-linux-gnu/libstdc++.so.6
+        LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+        LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 else
-	STDCLIB = /usr/lib/i386-linux-gnu/libstdc++.so.6
-	LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
-	LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
+        STDCLIB = /usr/lib/aarch32-linux-gnu/libstdc++.so.6
+        LIBGL:=$(shell find /usr/lib/ -name 'libGL.so')
+        LIBGLC:=$(shell find /usr/lib/ -name 'libGLC.so')
 endif
 
 
