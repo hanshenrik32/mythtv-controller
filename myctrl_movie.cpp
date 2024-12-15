@@ -870,7 +870,10 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     *ext='\0';
                   }
                   // make cover file name if exist.
-                  coverfile=moviefil->d_name;
+                  
+                  coverfile=configmoviepath;
+                  if (coverfile.back()!='/') coverfile=coverfile + "/";
+                  coverfile=coverfile + moviefil->d_name;
                   size_t lastindex = coverfile.find_last_of("."); 
                   string tmpcovername = coverfile.substr(0, lastindex); 
                   coverfile=tmpcovername;
