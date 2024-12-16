@@ -33,6 +33,9 @@
 // web file loader
 #include "myctrl_readwebfile.h"
 #include "myctrl_spotify.h"
+
+#include "myctrl_glprint.h"
+
 extern const char *dbname;                                                      // internal database name in mysql (music,movie,radio)
 // web port
 static const char *s_http_port = "8000";

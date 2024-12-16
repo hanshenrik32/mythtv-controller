@@ -76,6 +76,7 @@ FILE *logfile=NULL;                   // global logfile
 #endif
 
 #include "mongoose-master/mongoose.h"
+#include "myctrl_glprint.h"
 
 // glut fonts list
 
@@ -3357,6 +3358,13 @@ void display() {
       }
       glPopMatrix();
   }
+
+
+
+  // drawText("Hej OpenGL!", 200.00f, 200.0f, 1.2f);
+  // drawText("Hej OpenGL2!", 210.00f, 210.0f, 1.0f);
+
+
   //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
   // show new film
@@ -6800,17 +6808,26 @@ void display() {
     }
     // text genre
     glDisable(GL_TEXTURE_2D);
+
+    /*
     glPushMatrix();
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre);
     temptxt[41]=0;
     glTranslatef(670,800+100,0);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.0, 20.0, 1.0);
+
     glcRenderString(movie_genre[configland]);
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+
+    drawText(movie_genre[configland], 670, 890, 0.4f);
+    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f);
+    
     // show movie title
+    /*
     glPushMatrix();
     glTranslatef(670,760+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6823,7 +6840,13 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+    strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
+    drawText(movie_title[configland], 670, 870, 0.4f);
+    drawText(temptxt, 750, 870, 0.4f);
+
     // show movie length
+    /*
     glPushMatrix();
     glTranslatef(670,740+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6834,7 +6857,14 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+    sprintf(temptxt,"%d min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
+    drawText(movie_length[configland], 670, 870-20, 0.4f);
+    drawText(temptxt, 750, 870-20, 0.4f);
+
+
     // show movie year
+    /*
     glPushMatrix();
     glTranslatef(670,720+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6845,7 +6875,16 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+
+    sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
+    temptxt[23]=0;
+    drawText(movie_year[configland], 670, 870-40, 0.4f);
+    drawText(temptxt, 750, 870-40, 0.4f);
+
+
     // show movie rating on imdb
+    /*
     glPushMatrix();
     glTranslatef(670,700+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6859,7 +6898,18 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+
+    if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
+      else strcpy(temptxt,"None");
+    temptxt[23]=0;
+    drawText(movie_rating[configland], 670, 870-60, 0.4f);
+    drawText(temptxt, 750, 870-60, 0.4f);
+
+
+
     // show movie imdb nr
+    /*
     glPushMatrix();
     glTranslatef(670,680+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6871,6 +6921,15 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+
+    strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
+    if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
+    temptxt[23]=0;
+    drawText("Imdb", 670, 870-80, 0.4f);
+    drawText(temptxt, 750, 870-80, 0.4f);
+
+
     // show movie land
     glPushMatrix();
     glTranslatef(670,660+100,0);
@@ -15904,6 +15963,15 @@ int main(int argc, char** argv) {
       write_logfile(logfile,(char *) "Enter full screen mode.");
       glutFullScreen();                // set full screen mode
     }
+
+
+
+    // Initialiser FreeType med en TrueType-skrifttype
+    if (!initFreeType("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf")) {
+        return -1;
+    }
+
+
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler

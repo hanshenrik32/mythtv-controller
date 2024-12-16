@@ -22,6 +22,7 @@
 #include "myth_ttffont.h"
 
 #include "myth_saver.h"
+#include "myctrl_glprint.h"
 
 extern FILE *logfile;
 extern char debuglogdata[1024];

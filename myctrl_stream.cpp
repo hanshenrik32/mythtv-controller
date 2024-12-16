@@ -19,6 +19,8 @@
 #include "utility.h"
 #include "readjpg.h"
 #include "loadpng.h"
+#include "myctrl_glprint.h"
+
 // web file loader
 #include "myctrl_readwebfile.h"
 

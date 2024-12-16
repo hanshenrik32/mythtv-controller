@@ -20,6 +20,7 @@
 #include "readjpg.h"
 #include "myth_vlcplayer.h"
 #include "myctrl_music.h"
+#include "myctrl_glprint.h"
 
 using namespace std;
 
@@ -897,7 +898,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   coverfile=coverfile + moviefil->d_name;
                   size_t lastindex = coverfile.find_last_of("."); 
                   string tmpcovername = coverfile.substr(0, lastindex); 
-                  coverfile=tmpcovername;
+                  coverfile=tmpcovername;                                           // get name - ext
                   coverfile=coverfile + ".jpg";
                   if (!(file_exists(coverfile.c_str()))) coverfile="";
                   // strcpy(moviepath1,moviefil->d_name);                         // get full filename
@@ -1446,6 +1447,10 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       strcpy(temptxt,filmoversigt[i+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
+      temptxt[14]=0;
+      drawText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f);
+      // old print disabled
+      /*
       glPushMatrix();
       if (strlen(temptxt)<=14) {
         ofs=(strlen(temptxt)/2)*12;
@@ -1512,6 +1517,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       }
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
+      */
     }
     xpos+=205;
     i++;
@@ -1631,6 +1637,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());        // album navn
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
+      temptxt[16]=0;
+      drawText(temptxt, 14.00f+xpos, 114.0f+ypos, 0.4f);
+      /*
       glPushMatrix();
       pline=0;
       glTranslatef(xpos+(20), ypos+120 ,0.0f); // 100,120
@@ -1676,6 +1685,8 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       }
       glEnable(GL_TEXTURE_2D);
       glPopMatrix();
+      */
+      
     }
     // next button
     xpos+=buttonsize;                                                // 205
