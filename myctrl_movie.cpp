@@ -13,7 +13,9 @@
 #include <sys/stat.h>                   // stats func for file/dir info struct
 #include <string>
 #include <ctime>
+#define _UNICODE
 #include <iostream>
+#include <MediaInfo/MediaInfo.h>
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -23,6 +25,7 @@
 #include "myctrl_glprint.h"
 
 using namespace std;
+using namespace MediaInfoLib;
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                // used by log system
@@ -254,6 +257,55 @@ void film_oversigt_type::resetfilm() {
      sidecover=0;		                 // side cover
      backcover=0;             			 // back cover
 }
+
+
+// ****************************************************************************************
+//
+// get media info and update movie info
+//
+// ****************************************************************************************
+
+bool film_oversigt_type::get_media_info_from_file(char *moviepath) {
+  MediaInfo MI;
+  string movfile=moviepath;  
+  std::wstring wstr=std::wstring(movfile.begin(),movfile.end());
+  std::wstring path(wstr);
+  if (MI.Open(path)) {
+    std::wstring codec = MI.Get(Stream_General, 0, L"Format");
+    std::wstring Duration = MI.Get(Stream_General, 0, L"Duration"); // in ms Duration
+    std::wstring Title = MI.Get(Stream_General, 0, L"Title"); // in ms Duration
+    std::wstring Bitrate = MI.Get(Stream_General, 0, L"BitRate"); // in bitrate
+    std::wstring Framerate = MI.Get(Stream_General, 0, L"FrameRate"); // in bitrate
+    setBitrate(atoi((char *) Duration.c_str()));
+    setFramerate(atoi((char *) Framerate.c_str()));
+  }
+}
+
+
+// ****************************************************************************************
+// test get media info
+// ****************************************************************************************
+
+bool get_media_info_from_file1(char *filename) {
+  MediaInfo MI;
+  std::wstring path(L"/data2/Movies/Life.2017.720.HC.HDRip.800MB.MkvCage.mkv");
+  if (MI.Open(path)) {
+    std::wstring codec = MI.Get(Stream_General, 0, L"Format");
+    std::wstring Duration = MI.Get(Stream_General, 0, L"Duration"); // in ms Duration
+    std::wstring Title = MI.Get(Stream_General, 0, L"Title"); // in ms Duration
+    std::wstring Bitrate = MI.Get(Stream_General, 0, L"BitRate"); // in bitrate
+    std::wstring Framerate = MI.Get(Stream_General, 0, L"FrameRate"); // in bitrate
+    std::wcout << "Title     :" << Title << std::endl;
+    std::wcout << "Codec     :" << codec << std::endl;
+    std::wcout << "Length    :" << Duration << std::endl;
+    std::wcout << "bps       :" << Bitrate << std::endl; 
+    std::wcout << "Framerate :" << Framerate << std::endl; 
+    MI.Close();
+    return(1);
+  } else return(0);
+}
+
+
 
 
 // ****************************************************************************************
@@ -495,6 +547,9 @@ int film_oversigt_typem::load_film_dvcovers() {
     }
     return(1);
 }
+
+
+
 
 
 // ****************************************************************************************
@@ -775,32 +830,13 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     
                     moviepath=moviefil->d_name;
                     moviepath=moviepath + "/";
-                    moviepath=submoviefil->d_name;
-                    
-                    /*
-                    strcpy(moviepath1,moviefil->d_name);
-                    strcat(moviepath1,"/");
-                    strcat(moviepath1,submoviefil->d_name);
-                    */
-
-                    
+                    moviepath=submoviefil->d_name;          
                     moviepathcheck=configmoviepath;
                     if (moviepathcheck.back()!='/') moviepathcheck=moviepathcheck + "/";
 
                     moviepathcheck = moviepathcheck + moviefil->d_name;                     // dir name 
                     moviepathcheck = moviepathcheck + "/";
                     moviepathcheck = moviepathcheck + submoviefil->d_name;                     // get full filename
-
-                    /*
-                    strcpy(moviepathcheck,configmoviepath);
-                    strcat(moviepathcheck,"/");
-                    strcat(moviepathcheck,moviefil->d_name);                        // path
-                    strcat(moviepathcheck,"/");
-                    strcat(moviepathcheck,submoviefil->d_name);                     // get full filename
-                    */
-
-
-
                     // get cover file from movie file name
                     coverfile=configmoviepath;
                     if (coverfile.back()!='/') coverfile=coverfile + "/";
@@ -848,6 +884,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       }
                     }
                     if (!(fundet)) {
+                      // update movie info
                       dato=to_string(now->tm_year + 1900);
                       dato=dato + "-";
                       dato=dato + to_string(now->tm_mon + 1);
@@ -1011,6 +1048,12 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             strncpy(filmoversigt[i].category_name,row[10],127);   // get name from db
           } else strcpy(filmoversigt[i].category_name,"");
           if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
+          
+          
+          // check file
+          filmoversigt[i].get_media_info_from_file((char *) row[2]);
+
+          
           // hvis cover ikke findes som jpg fil lav dem med convert kommandoen.
           strcpy(convert_command,"convert/");
           strcat(convert_command,filmoversigt[i].getfilmtitle());

@@ -75,7 +75,7 @@ int initFreeType(const char *fontPath) {
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RED, // Internal format (3 color channels)
+            GL_R8, // Internal format (3 color channels)
             face->glyph->bitmap.width,
             face->glyph->bitmap.rows,
             0,
@@ -112,9 +112,9 @@ int initFreeType(const char *fontPath) {
 void drawText(const char *text, float x, float y, float scale) {
     glEnable(GL_BLEND);
     // default disabled
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // my stuf
-    glBlendFunc(GL_ONE, GL_ONE);
+    // glBlendFunc(GL_ONE, GL_ONE);
 
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);

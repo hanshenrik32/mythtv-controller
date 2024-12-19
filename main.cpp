@@ -6931,11 +6931,15 @@ void display() {
 
 
     // show movie land
+    /*
     glPushMatrix();
     glTranslatef(670,660+100,0);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.0, 20.0, 1.0);
     glcRenderString(movie_cast[configland]);
+    */
+    drawText(movie_cast[configland], 670, 870-100, 0.4f);
+
     int ll=0;
     float xof=0;
     float yof=0;
@@ -6948,34 +6952,44 @@ void display() {
         yof-=0.4;
       }
     }
-    glPopMatrix();
+    drawText(temptxt, 670, 870-120, 0.4f);
+    // glPopMatrix();
+
     // show movie descrition
+    /*
     glPushMatrix();
     glTranslatef(430,560+90,0);
     glRasterPos2f(0.0f, 0.0f);
     glScalef(20.0, 20.0, 1.0);
     glcRenderString(movie_description[configland]);
     glPopMatrix();
+    */
+
+    drawText(movie_description[configland], 670, 870-140, 0.4f);
+
     //
     // write beskrivelse
     //
-    glPushMatrix();
+    // glPushMatrix();
     int sted=0;
     float linof=0.0f;
     float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
     while((sted<(int) subtitlelength) && (linof>-60.0f)) {
       strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
       temptxt[45]='\0';
+      /*
       glPushMatrix();
       glTranslatef(430,(500+90)-linof,0);
       glRasterPos2f(0.0f, 0.0f);
       glScalef(20.0, 20.0, 1.0);
       glcRenderString(temptxt);
-      glPopMatrix();
+      */
+      drawText(temptxt, 670, 870-160-linof, 0.4f);
+      // glPopMatrix();
       sted+=45;
       linof-=20.f;
     }
-    glPopMatrix();
+    //glPopMatrix();
   }
 
   static bool retning=false;
@@ -6996,6 +7010,9 @@ void display() {
     color--;
     if (color==10) retning=false;
   }
+
+  bool show_status=true;
+  // show status line
   glPushMatrix();
   glTranslatef(1, 1, 0);
   glScalef(20,20, 1.0);
@@ -7010,17 +7027,19 @@ void display() {
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
   if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
-  if (strcmp(textstring,"")==0) strcat(textstring,"STATUS: None."); else strcat(textstring," running updates ..");
+  if (strcmp(textstring,"")==0) {
+    strcat(textstring,"STATUS: None."); 
+    show_status=false;
+  } else strcat(textstring," running updates ..");
   glcRenderString(textstring);
   glColor3b(255,255,255);
   glEnable(GL_TEXTURE_2D);
   glColor4f(1.0f,1.0f,1.0f,1.0f);
   glPopMatrix();
   
-
   // show pfs
   // debug mode 1
-  if ((showfps) && (debugmode & 1)) {
+  if ((showfps) && (debugmode & 1) && (show_status=false)) {
     glPushMatrix();
     // Gather our frames per second
     Frames++;
@@ -7154,9 +7173,9 @@ void display() {
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (!(sdlmusicplayer)) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
           #endif
-          do_zoom_music_cover_remove_timeout=showtimeout;			              // set close info window timeout
+          do_zoom_music_cover_remove_timeout=showtimeout;			                // set close info window timeout
           do_zoom_music_cover = true;				                                  // show music cover info til timeout showtimeout
-        } else {				                                    		// else slet playliste (reset player)
+        } else {				                                    		              // else slet playliste (reset player)
           do_play_music_aktiv_table_nr = 1;
           #if defined USE_FMOD_MIXER
           result = sound->release();          		                            // stop last played sound on soundsystem fmod
@@ -7168,10 +7187,10 @@ void display() {
           #endif
           // write debug log
           write_logfile(logfile,(char *) "Stop player and clear playlist");
-          do_stop_music_all = true;				                                 // stop all music
-          snd = 0;	                                             					 // clear music pointer for irrsound
-          do_zoom_music_cover = false;			                                 // remove play info window
-          aktiv_playlist.clean_playlist();		                             // clean play list (reset) play list
+          do_stop_music_all = true;				                                    // stop all music
+          snd = 0;	                                             					    // clear music pointer for irrsound
+          do_zoom_music_cover = false;			                                  // remove play info window
+          aktiv_playlist.clean_playlist();		                                // clean play list (reset) play list
           // do_play_music_aktiv_table_nr=1;
         }
       }
@@ -15682,6 +15701,9 @@ int main(int argc, char** argv) {
         exit(0);
       }
     }
+
+    get_media_info_from_file1((char *) "/data2/Movies/Life.2017.720.HC.HDRip.800MB.MkvCage.mkv");
+
     numCPU = sysconf( _SC_NPROCESSORS_ONLN );
     // write cpu info to log file
     sprintf(debuglogdata,"Numbers of cores :%d found.",numCPU);

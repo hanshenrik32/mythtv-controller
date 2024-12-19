@@ -25,6 +25,8 @@ class film_oversigt_type {
     unsigned int length;                // film length
     unsigned int year;                  // aar som den udkom
     unsigned int userrating;            // bruger rating
+    unsigned int Bitrate;               // movie Bitrate
+    unsigned int Frate;
     char *rating;			                  // imdb rating size = 100
     char *film_imdbnr;                  // movie imdb nr if any size = 20
     char *film_title;                   // film title size = 128
@@ -45,6 +47,10 @@ class film_oversigt_type {
     // functions
     // swap movies
     void swap_film(film_oversigt_type *film1,film_oversigt_type *film2);
+    void setBitrate(int rate) { Bitrate=rate; }
+    int getBitrate() { return(Bitrate); }
+    void setFramerate(int rate) { Frate=rate; }
+    int getFramerate() { return(Frate); }
     void setfilmnr(unsigned int intnr) { nr=intnr; }
     unsigned int getfilmnr() { return(nr); }
     bool getcover3d() { return(cover3d); }
@@ -95,6 +101,9 @@ class film_oversigt_type {
     void setfilmsubtitle(char *value) { strcpy(film_subtitle,value); }
 //    char *getfilmsubtitle() { return(film_subtitle); }
     void resetfilm();
+
+    bool get_media_info_from_file(char *moviepath);
+
 };
 
 
@@ -139,10 +148,11 @@ class film_oversigt_typem : vlc_controller {
       void volumedown();
       void setcolume(int volume);                                         // do not store volume in volume member int vaule
       void softstopmovie();
-      void pausemovie();
+      void pausemovie();      
       film_oversigt_typem(unsigned int antal);
       ~film_oversigt_typem();
 };
 
+bool get_media_info_from_file1(char *filename);
 
 #endif
