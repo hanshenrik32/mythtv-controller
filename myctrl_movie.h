@@ -58,13 +58,17 @@ class film_oversigt_type {
     int getFramerate() { return(Frate); }
 
     void setWidth(int wid) { Width=wid; }
-    int  getWidth(int wid) { return(Width); }
+    int  getWidth() { return(Width); }
 
     void setFormat(char *vformat) { if (format) strcpy(format,vformat); }
     char *getFormat() { return(format); }
 
     void setHigh(int hi) { High=hi; }
-    int  getHigh(int hi) { return(High); }
+    int  getHigh() { return(High); }
+
+    void setSize(int siz) { Flesize=siz; }
+    unsigned long getSize() { return(Flesize); }
+
 
     void setfilmnr(unsigned int intnr) { nr=intnr; }
     unsigned int getfilmnr() { return(nr); }
@@ -168,6 +172,5 @@ class film_oversigt_typem : vlc_controller {
       ~film_oversigt_typem();
 };
 
-bool get_media_info_from_file1(char *filename);
 
 #endif
