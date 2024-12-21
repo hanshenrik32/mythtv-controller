@@ -402,8 +402,8 @@ void film_oversigt_typem::softstopmovie() {
 int film_oversigt_typem::playmovie(int nr) {
     char path[PATH_MAX];                                  // max path length from os
     strcpy(path,"");
-    strcat(path,configmoviepath);                         // get movie path
-    strcat(path,"/");
+    // strcat(path,configmoviepath);                         // get movie path
+    // strcat(path,"/");
     film_is_playing=true;
     strcat(path,this->filmoversigt[nr].getfilmfilename());
     vlc_controller::playmedia(path);  
