@@ -16,6 +16,7 @@
 #include "utility.h"
 #include "myctrl_recorded.h"
 #include "myctrl_storagedef.h"
+#include "myctrl_glprint.h"
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system

@@ -25,10 +25,12 @@
 #include <fstream>
 #include <iostream>
 
+
 // sound system include fmod
 
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod.hpp"
 #include "/opt/mythtv-controller/fmodstudioapi20218linux/api/core/inc/fmod_errors.h"
+
 
 
 
@@ -47,6 +49,7 @@
 // web file loader
 #include "myctrl_readwebfile.h"
 #include "myctrl_tidal2.h"
+#include "myctrl_glprint.h"
 
 
 const char *tidal_gfx_path = "tidal_gfx/";
@@ -143,8 +146,6 @@ define('MPD_TIDAL_URL','tidal://track/');
 // web port
 static const char *s_http_port = "8100";
 static struct mg_serve_http_opts s_http_server_opts;
-
-
 
 size_t tidal_curl_writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);

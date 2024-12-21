@@ -76,6 +76,7 @@ FILE *logfile=NULL;                   // global logfile
 #endif
 
 #include "mongoose-master/mongoose.h"
+#include "myctrl_glprint.h"
 
 // glut fonts list
 
@@ -3357,6 +3358,13 @@ void display() {
       }
       glPopMatrix();
   }
+
+
+
+  // drawText("Hej OpenGL!", 200.00f, 200.0f, 1.2f);
+  // drawText("Hej OpenGL2!", 210.00f, 210.0f, 1.0f);
+
+
   //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
 
   // show new film
@@ -6747,7 +6755,7 @@ void display() {
     glBindTexture(GL_TEXTURE_2D, _texturemstop);        //
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glLoadName(25);                                                             // icon nr for stop movie
+    glLoadName(26);                                                             // icon nr for stop movie
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex3f( 0, 0 , 0.0);
     glTexCoord2f(0, 1); glVertex3f( 0, 0+65+10, 0.0);
@@ -6800,66 +6808,55 @@ void display() {
     }
     // text genre
     glDisable(GL_TEXTURE_2D);
-    glPushMatrix();
-    strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre);
-    temptxt[41]=0;
-    glTranslatef(670,800+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
-    glcRenderString(movie_genre[configland]);
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
+
+   
+    // show genre
+    drawText(movie_genre[configland], 670, 890, 0.4f);
+    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f);
+    
     // show movie title
-    glPushMatrix();
-    glTranslatef(670,760+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
     if (strlen(temptxt)>41) {
       temptxt[42]=0;
     }
-    glcRenderString(movie_title[configland]);
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(movie_title[configland], 670, 870, 0.4f);
+    drawText(temptxt, 750, 870, 0.4f);
+    
     // show movie length
-    glPushMatrix();
-    glTranslatef(670,740+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
     sprintf(temptxt,"%d min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
-    temptxt[23]=0;
-    glcRenderString(movie_length[configland]);
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(movie_length[configland], 670, 870-20, 0.4f);
+    drawText(temptxt, 750, 870-20, 0.4f);
+    
     // show movie year
-    glPushMatrix();
-    glTranslatef(670,720+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
     sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
     temptxt[23]=0;
-    glcRenderString(movie_year[configland]);
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(movie_year[configland], 670, 870-40, 0.4f);
+    drawText(temptxt, 750, 870-40, 0.4f);
+    
     // show movie rating on imdb
-    glPushMatrix();
-    glTranslatef(670,700+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
-    if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating())
-      sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
-    else
-      strcpy(temptxt,"None");
+    if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
+      else strcpy(temptxt,"None");
     temptxt[23]=0;
-    glcRenderString(movie_rating[configland]);
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(movie_rating[configland], 670, 870-60, 0.4f);
+    drawText(temptxt, 750, 870-60, 0.4f);
+    
+    // show movie format avi/mp4 osv
+    drawText("Format ", 670, 870-80, 0.4f);
+    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(), 750, 870-80, 0.4f);
+    
+    // show movie windows size
+    drawText("W/H ", 670, 870-100, 0.4f);
+    sprintf(temptxt,"%d/%d",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
+    drawText(temptxt, 750, 870-100, 0.4f);
+    
+    // show movie size
+    drawText("Size ", 670, 870-120, 0.4f);
+    if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) sprintf(temptxt,"%4d Gb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024);
+    else sprintf(temptxt,"%d Mb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024);
+    drawText(temptxt, 750, 870-120, 0.4f);
+
     // show movie imdb nr
+    /*
     glPushMatrix();
     glTranslatef(670,680+100,0);
     glRasterPos2f(0.0f, 0.0f);
@@ -6871,12 +6868,17 @@ void display() {
     glcRenderString(" ");
     glcRenderString(temptxt);
     glPopMatrix();
-    // show movie land
-    glPushMatrix();
-    glTranslatef(670,660+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
-    glcRenderString(movie_cast[configland]);
+    */
+
+    strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
+    if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
+    temptxt[23]=0;
+    drawText("Imdb", 670, 870-140, 0.4f);
+    drawText(temptxt, 750, 870-140, 0.4f);
+
+
+    // show movie cast
+    drawText(movie_cast[configland], 670, 870-160, 0.4f);
     int ll=0;
     float xof=0;
     float yof=0;
@@ -6886,37 +6888,29 @@ void display() {
       xof+=strlen(temptxt)/4;
       if (xof>2) {
         xof=0;
-        yof-=0.4;
+        yof-=20;
       }
+      drawText(temptxt, 750, 870-160-yof, 0.4f);
     }
-    glPopMatrix();
+    
+
     // show movie descrition
-    glPushMatrix();
-    glTranslatef(430,560+90,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
-    glcRenderString(movie_description[configland]);
-    glPopMatrix();
+    drawText(movie_description[configland], 670, 870-200, 0.4f);
+
     //
     // write beskrivelse
     //
-    glPushMatrix();
+
     int sted=0;
     float linof=0.0f;
     float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
     while((sted<(int) subtitlelength) && (linof>-60.0f)) {
       strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
       temptxt[45]='\0';
-      glPushMatrix();
-      glTranslatef(430,(500+90)-linof,0);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.0, 20.0, 1.0);
-      glcRenderString(temptxt);
-      glPopMatrix();
+      drawText(temptxt, 670, 870-220-linof, 0.4f);
       sted+=45;
-      linof-=20.f;
+      linof-=20.f;      
     }
-    glPopMatrix();
   }
 
   static bool retning=false;
@@ -6937,6 +6931,9 @@ void display() {
     color--;
     if (color==10) retning=false;
   }
+
+  bool show_status=true;
+  // show status line
   glPushMatrix();
   glTranslatef(1, 1, 0);
   glScalef(20,20, 1.0);
@@ -6951,17 +6948,19 @@ void display() {
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
   if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
-  if (strcmp(textstring,"")==0) strcat(textstring,"STATUS: None."); else strcat(textstring," running updates ..");
+  if (strcmp(textstring,"")==0) {
+    strcat(textstring,"STATUS: None."); 
+    show_status=false;
+  } else strcat(textstring," running updates ..");
   glcRenderString(textstring);
   glColor3b(255,255,255);
   glEnable(GL_TEXTURE_2D);
   glColor4f(1.0f,1.0f,1.0f,1.0f);
   glPopMatrix();
   
-
   // show pfs
   // debug mode 1
-  if ((showfps) && (debugmode & 1)) {
+  if ((showfps) && (debugmode & 1) && (show_status=false)) {
     glPushMatrix();
     // Gather our frames per second
     Frames++;
@@ -7095,9 +7094,9 @@ void display() {
           Mix_PlayMusic(sdlmusicplayer, 0);
           if (!(sdlmusicplayer)) ERRCHECK_SDL(Mix_GetError(),do_play_music_aktiv_table_nr);
           #endif
-          do_zoom_music_cover_remove_timeout=showtimeout;			              // set close info window timeout
+          do_zoom_music_cover_remove_timeout=showtimeout;			                // set close info window timeout
           do_zoom_music_cover = true;				                                  // show music cover info til timeout showtimeout
-        } else {				                                    		// else slet playliste (reset player)
+        } else {				                                    		              // else slet playliste (reset player)
           do_play_music_aktiv_table_nr = 1;
           #if defined USE_FMOD_MIXER
           result = sound->release();          		                            // stop last played sound on soundsystem fmod
@@ -7109,10 +7108,10 @@ void display() {
           #endif
           // write debug log
           write_logfile(logfile,(char *) "Stop player and clear playlist");
-          do_stop_music_all = true;				                                 // stop all music
-          snd = 0;	                                             					 // clear music pointer for irrsound
-          do_zoom_music_cover = false;			                                 // remove play info window
-          aktiv_playlist.clean_playlist();		                             // clean play list (reset) play list
+          do_stop_music_all = true;				                                    // stop all music
+          snd = 0;	                                             					    // clear music pointer for irrsound
+          do_zoom_music_cover = false;			                                  // remove play info window
+          aktiv_playlist.clean_playlist();		                                // clean play list (reset) play list
           // do_play_music_aktiv_table_nr=1;
         }
       }
@@ -15904,6 +15903,15 @@ int main(int argc, char** argv) {
       write_logfile(logfile,(char *) "Enter full screen mode.");
       glutFullScreen();                // set full screen mode
     }
+
+
+
+    // Initialiser FreeType med en TrueType-skrifttype
+    if (!initFreeType("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf")) {
+        return -1;
+    }
+
+
     glutDisplayFunc(display);                         // main loop func
     glutIdleFunc(NULL);                               // idle func
     glutKeyboardFunc(handleKeypress);                 // setup normal key handler
