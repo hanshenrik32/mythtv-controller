@@ -63,6 +63,7 @@ int write_logfile(FILE *fhandler,char *logentry) {
 	fprintf(fhandler,"%02d-%02d-%02d %02d:%02d:%02d ",tid->tm_mday,tid->tm_mon+1,tid->tm_year+1900,tid->tm_hour,tid->tm_min,tid->tm_sec);
    	fputs(logentry,fhandler);
    	fputs("\n",fhandler);
+	fflush(fhandler);
 	fileok=true;
   } else {
     printf("Error write to logfile... %s\n",filename);

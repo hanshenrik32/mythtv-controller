@@ -20,6 +20,7 @@
 #include "utility.h"
 #include "readjpg.h"
 #include "loadpng.h"
+#include "myctrl_glprint.h"
 
 extern FILE *logfile;
 extern char debuglogdata[1024];                                  // used by log system
