@@ -79,6 +79,7 @@ film_oversigt_type::film_oversigt_type() {
     film_sidecoverfile=new char[256];	  // path to side cover file hentet fra 3d
     film_adddate=new char[25];		      // format (åååå-mm-dd hh:mm:ss)
     rating=new char[100];		            // imdb rating
+    format=new char[100];		            // movie format
     textureId=0;		                  	// texture id for 3D cover hvis der findes en cover til filmen
     frontcover=0;			                  // normal cover
     sidecover=0;
@@ -89,6 +90,7 @@ film_oversigt_type::film_oversigt_type() {
     film_imdbnr=new char[20];           //
     category_name=new char[128];	      // from mythtv film type (tal = database)
     genre=new char[200];		            //
+    if (genre) strcpy(genre,"");
     for(int n=0;n<20;n++) strcpy(cast[n],"");
     cover3d=false;
 }
@@ -110,6 +112,7 @@ film_oversigt_type::~film_oversigt_type() {
     delete [] film_imdbnr;
     delete [] category_name;
     delete [] genre;
+    delete [] format;
 }
 
 // ****************************************************************************************
@@ -185,6 +188,7 @@ void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type 
         strcpy(tempfilm.film_subtitle , film1->film_subtitle);
         strcpy(tempfilm.category_name, film1->category_name);
         strcpy(tempfilm.genre , film1->genre);
+        strcpy(tempfilm.format , film1->format);
         for(i=0;i<castlinieantal;i++) {
           strcpy(tempfilm.cast[i],film1->cast[i]);
         }
@@ -210,6 +214,7 @@ void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type 
         strcpy(film1->film_subtitle,film2->film_subtitle);
         strcpy(film1->category_name,film2->category_name);
         strcpy(film1->genre,film2->genre);
+        strcpy(film1->format,film2->format);
         for(i=0;i<castlinieantal;i++) {
           strcpy(film1->cast[i],film2->cast[i]);
         }
@@ -235,6 +240,7 @@ void film_oversigt_type::swap_film(film_oversigt_type *film1,film_oversigt_type 
         strcpy(film2->film_subtitle,tempfilm.film_subtitle);
         strcpy(film2->category_name,tempfilm.category_name);
         strcpy(film2->genre,tempfilm.genre);
+        strcpy(film2->format,tempfilm.format);
         for(i=0;i<castlinieantal;i++) {
           strcpy(film2->cast[i],tempfilm.cast[i]);
         }
@@ -252,6 +258,8 @@ void film_oversigt_type::resetfilm() {
      // reset film oversigt
      strcpy(film_coverfile,"");
      strcpy(category_name,"");
+     strcpy(format,"");
+     strcpy(genre,"");
      textureId=0;                    // texture id for 3D cover hvis der findes en cover til filmen
      frontcover=0;                   // normal cover
      sidecover=0;		                 // side cover
@@ -279,8 +287,8 @@ bool film_oversigt_type::get_media_info_from_file(char *moviepath) {
     std::wstring Bitrate = MI.Get(Stream_General, 0, L"BitRate");               // in bitrate
     std::wstring Framerate = MI.Get(Stream_General, 0, L"FrameRate");           // in bitrate
     std::wstring Lenght = MI.Get(Stream_General, 0, L"Length");                 // in bitrate
-    std::wstring Width = MI.Get(Stream_General, 0, L"Width");
-    std::wstring High = MI.Get(Stream_General, 0, L"Height");
+    std::wstring Width = MI.Get(Stream_Video, 0, L"Width");
+    std::wstring High = MI.Get(Stream_Video, 0, L"Height");
     std::wstring Format = MI.Get(Stream_General, 0, L"Format");   
     std::wstring Filsize = MI.Get(Stream_General, 0, L"FileSize");
     if (Framerate.size()>0) setFramerate(stoul(Framerate));
@@ -298,30 +306,8 @@ bool film_oversigt_type::get_media_info_from_file(char *moviepath) {
 }
 
 
-// ****************************************************************************************
-// test get media info
-// ****************************************************************************************
 
-bool get_media_info_from_file1(char *filename) {
-  MediaInfo MI;
-  std::wstring path(L"/data2/Movies/Life.2017.720.HC.HDRip.800MB.MkvCage.mkv");
-  if (MI.Open(path)) {
-    std::wstring codec = MI.Get(Stream_General, 0, L"Format");
-    std::wstring Duration = MI.Get(Stream_General, 0, L"Duration"); // in ms Duration
-    std::wstring Title = MI.Get(Stream_General, 0, L"Title"); // in ms Duration
-    std::wstring Bitrate = MI.Get(Stream_General, 0, L"BitRate"); // in bitrate
-    std::wstring Framerate = MI.Get(Stream_General, 0, L"FrameRate"); // in bitrate
-    std::wcout << "Title     :" << Title << std::endl;
-    std::wcout << "Codec     :" << codec << std::endl;
-    std::wcout << "Length    :" << Duration << std::endl;
-    std::wcout << "bps       :" << Bitrate << std::endl; 
-    std::wcout << "Framerate :" << Framerate << std::endl; 
-    MI.Close();
-    return(1);
-  } else return(0);
-}
-
-
+// *********************************************************************************************************************************************
 
 
 // ****************************************************************************************
@@ -736,7 +722,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       // create databases/tables if not exist
       // needed by movie loader
       if (!(dbexist)) {
-        strcpy(sqlselect,"create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int)");
+        strcpy(sqlselect,"create table IF NOT EXISTS videometadata(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, title varchar(120), subtitle text, tagline varchar(255), director varchar(128), studio varchar(128), plot text, rating varchar(128), inetref  varchar(255), collectionref int, homepage text,year int, releasedate date, userrating float, length int, playcount int, season int, episode int,showlevel int, filename text,hash varchar(128), coverfile text, childid int, browse int, watched int, processed int, playcommand varchar(255), category int, trailer text,host text, screenshot text, banner text, fanart text,insertdate timestamp, contenttype int, bitrate int , width int , high int, fsize int, fformat varchar(150))");
         mysql_query(conn,sqlselect);
         res = mysql_store_result(conn);
         strcpy(sqlselect,"create table IF NOT EXISTS videocategory(intid int NOT NULL AUTO_INCREMENT PRIMARY KEY, category varchar(128))");
@@ -839,8 +825,8 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                   if (strcmp(ext,".ISO")==0) film_ok=true;
                   if (strcmp(ext,".ISO")==0) film_ok=true;
                   if (film_ok) {
-                    strcpy(movietitle,submoviefil->d_name);
                     // name title
+                    strcpy(movietitle,submoviefil->d_name);
                     ext = strrchr(movietitle, '.');
                     if (ext) {
                       *ext='\0';
@@ -917,7 +903,6 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                       dato=dato + ":";
                       dato=dato + to_string(now->tm_sec);
                       sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepathcheck.c_str(),coverfile.c_str(),dato.c_str());
-
                       recnr++;
                       mysql_query(conn,"set NAMES 'utf8'");
                       res = mysql_store_result(conn);
@@ -1010,8 +995,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
                     dato=dato + to_string(now->tm_min);
                     dato=dato + ":";
                     dato=dato + to_string(now->tm_sec);
-                    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str());
-                    // printf("%s \n",sqlselect);
+                    sprintf(sqlselect,"insert into videometadata(intid , title, subtitle, tagline, director, studio, plot, rating, inetref, collectionref, homepage, year, releasedate, userrating, length, playcount, season, episode,showlevel, filename,hash, coverfile, childid, browse, watched, processed, playcommand, category, trailer, host, screenshot, banner, fanart,insertdate, contenttype, bitrate , width , high, fsize) values (0,'%s','%s','','director','','%s','','%s',0,'',%d,'2016-12-31',%2.5f,%d,0,0,0,0,'%s','hash','%s',0,0,0,0,'playcommand',0,'','','','','','%s',0,%d,%d,%d,%d,%d)", movietitle,"moviesubtitle","movieplot","movieimdb",movieyear,movieuserrating,movielength ,moviepath.c_str(),coverfile.c_str(),dato.c_str(),0,0,0,0,"");
                     recnr++;
                     fprintf(stderr, "Movie db update %2d title %s \n",recnr,movietitle);
                     //mysql_query(conn,"set NAMES 'utf8'");
@@ -1074,13 +1058,12 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
           } else strcpy(filmoversigt[i].category_name,"");
           if (strcmp((char *) filmoversigt[i].getfilmcoverfile(),"No Cover")==0) filmoversigt[i].setfilmcoverfile((char *)"");
             // check file
-          filmoversigt[i].get_media_info_from_file((char *) row[2]);
-          sprintf(sqlselect1,"update videometadata set length=%lu where filename like '%s'",filmoversigt[i].getfilmlength(),row[2]);
-          printf("update movie %s \n",row[1]);
-          mysql_query(conn,sqlselect1);
-          res1 = mysql_store_result(conn);
-          
-         
+          if (filmoversigt[i].get_media_info_from_file((char *) row[2])) {
+            sprintf(sqlselect1,"update videometadata set length=%lu,bitrate=%d,width=%d,high=%d,fsize=%d,fformat='%s' where filename like '%s'",filmoversigt[i].getfilmlength(),filmoversigt[i].getBitrate(), filmoversigt[i].getWidth() ,filmoversigt[i].getHigh(), filmoversigt[i].getSize(), filmoversigt[i].getFormat() ,row[2]);
+            printf("update movie %s \n",row[1]);
+            mysql_query(conn,sqlselect1);
+            res1 = mysql_store_result(conn);
+          }         
           // hvis cover ikke findes som jpg fil lav dem med convert kommandoen.
           strcpy(convert_command,"convert/");
           strcat(convert_command,filmoversigt[i].getfilmtitle());
@@ -1782,25 +1765,15 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glTranslatef(550, 350, 0.0f);                                               // pos
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS);    glPushMatrix();
     glTexCoord2f(0.0, 0.0); glVertex3f(10.0, 0.0, 0.0);                         // draw bos
     glTexCoord2f(0.0, 1.0); glVertex3f(10.0, 400.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(640.0, 400.0, 0.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(640.0, 0.0, 0.0);
     glEnd();
-    glPopMatrix();
-
     sprintf(temptxt,"No movie info from %s backend.",configbackend);
-    strcat(temptxt,configmysqlhost);
-    glPushMatrix();
-    xpos=700;
-    ypos=550;
-    glTranslatef(xpos+10, ypos+40 ,0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(20.0, 20.0, 1.0);
-    glcRenderString(temptxt);
-    glEnable(GL_TEXTURE_2D);
+    strcat(temptxt,configmysqlhost);    
+    drawText(temptxt, 10.00f+xpos, 40.0f+ypos, 0.4f);
     glPopMatrix();
   }
 }
