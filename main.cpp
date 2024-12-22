@@ -6783,7 +6783,7 @@ void display() {
     if (textureId==0) textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid();
     if (textureId) {
       glPushMatrix();
-      if (textureId==0) textureId=_defaultdvdcover;                               // hvis ingen dvdcover findes
+      if (textureId==0) textureId =_defaultdvdcover;                               // hvis ingen dvdcover findes
       glBindTexture(GL_TEXTURE_2D, textureId);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
