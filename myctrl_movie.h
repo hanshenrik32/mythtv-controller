@@ -19,8 +19,6 @@ class film_oversigt_type {
     unsigned int nr;	               		// record nr
     GLuint textureId;                   // texture id for 3D cover hvis der findes en cover til filmen
     GLuint frontcover;                  // normal cover
-    GLuint backcover;		               	// back cover
-    GLuint sidecover;			              // side cover
     unsigned int film_id;               // filmid i mysql
     unsigned long length;                // film length
     unsigned int year;                  // aar som den udkom
@@ -36,9 +34,6 @@ class film_oversigt_type {
     char *film_imdbnr;                  // movie imdb nr if any size = 20
     char *film_title;                   // film title size = 128
     char *film_coverfile;               // path to created (by convert) 3d gfx file 256
-    char *film_frontcoverfile;          // path to front cover file hentet fra mythtv 256
-    char *film_backcoverfile;           // path to back cover file hentet fra mythtv 256
-    char *film_sidecoverfile;           // path to side cover file hentet fra mythtv 256
     char *film_filename;                // path to file 256
     char *film_adddate;			            // date added to db
     bool cover3d;		                   	// show 3d cover in movie display
@@ -56,20 +51,14 @@ class film_oversigt_type {
     int getBitrate() { return(Bitrate); }
     void setFramerate(int rate) { Frate=rate; }
     int getFramerate() { return(Frate); }
-
     void setWidth(int wid) { Width=wid; }
     int  getWidth() { return(Width); }
-
     void setFormat(char *vformat) { if (format) strcpy(format,vformat); }
     char *getFormat() { return(format); }
-
     void setHigh(int hi) { High=hi; }
     int  getHigh() { return(High); }
-
     void setSize(int siz) { Flesize=siz; }
     unsigned long getSize() { return(Flesize); }
-
-
     void setfilmnr(unsigned int intnr) { nr=intnr; }
     unsigned int getfilmnr() { return(nr); }
     bool getcover3d() { return(cover3d); }
@@ -79,16 +68,6 @@ class film_oversigt_type {
     void settextureidfile(char *filename);
     GLuint getfronttextureid() { return (frontcover); }
     void setfronttextureid(GLuint value) { frontcover=value; }
-    void setfronttextureidfile(char *filename);
-    void loadfronttextureidfile();
-    GLuint getbacktextureid() { return (backcover); }
-    void setbacktextureid(GLuint value) { backcover=value; }
-    void setbacktextureidfile(char *filename);
-    void loadbacktextureidfile();
-    GLuint getsidetextureid() { return (sidecover); }
-    void setsidetextureid(GLuint value) { sidecover=value; }
-    void setsidetextureidfile(char *filename);
-    void loadsidetextureidfile();
     void setfilmid(unsigned int value) { film_id=value; }
     unsigned int getfilmid() { return(film_id); }
     void setfilmlength(unsigned long value) { length=value; }
@@ -105,12 +84,6 @@ class film_oversigt_type {
     char *getfilmtitle() { return(film_title); }
     void setfilmcoverfile(char *value) { strcpy(film_coverfile,value); }
     char *getfilmcoverfile() { return(film_coverfile); }
-    void setfilmfcoverfile(char *value) { strcpy(film_frontcoverfile,value); }
-    char *getfilmfcoverfile() { return(film_frontcoverfile); }
-    void setfilmbcoverfile(char *value) { strcpy(film_backcoverfile,value); }
-    char *getfilmbcoverfile() { return(film_backcoverfile); }
-    void setfilmscoverfile(char *value) { strcpy(film_sidecoverfile,value); }
-    char *getfilmscoverfile() { return(film_sidecoverfile); }
     void setfilmfilename(char *value) { strcpy(film_filename,value); }
     char *getfilmfilename() { return(film_filename); }
     void setfilm_adddate(char *value) { strncpy(film_adddate,value,24); }
@@ -118,7 +91,7 @@ class film_oversigt_type {
     void setfilmgenre(char *value) { strcpy(genre,value); }
     char *getfilmgenre() { return(genre); }
     void setfilmsubtitle(char *value) { strcpy(film_subtitle,value); }
-//    char *getfilmsubtitle() { return(film_subtitle); }
+    char *getfilmsubtitle() { return(film_subtitle); }
     void resetfilm();
 
     bool get_media_info_from_file(char *moviepath);

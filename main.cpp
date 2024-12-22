@@ -37,6 +37,8 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
+#include <sstream>
+
 // type used
 using namespace std;
 // if defined the support will be enabled
@@ -6699,14 +6701,8 @@ void display() {
   //
   // show new movie info
   //
-  if (((vis_nyefilm_oversigt) || (vis_film_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
+  if (((vis_film_oversigt) || (vis_nyefilm_oversigt)) && (do_zoom_film_cover) && (fknapnr>0) && (!(visur))) {
     do_zoom_film_aktiv_nr=fknapnr-1;
-    if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmfcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfronttextureid()==0)) {
-      film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadfronttextureidfile();
-    }
-    if ((file_exists(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmbcoverfile())) && (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getbacktextureid()==0)) {
-      film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].loadbacktextureidfile();
-    }
     // draw window
     glPushMatrix();
     glColor4f(1.0f, 1.0f, 1.0f,1.0f);
@@ -6789,7 +6785,7 @@ void display() {
     if (textureId==0) textureId=film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].gettextureid();
     if (textureId) {
       glPushMatrix();
-      if (textureId==0) textureId=_defaultdvdcover;                               // hvis ingen dvdcover findes
+      if (textureId==0) textureId =_defaultdvdcover;                               // hvis ingen dvdcover findes
       glBindTexture(GL_TEXTURE_2D, textureId);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -6808,7 +6804,6 @@ void display() {
     }
     // text genre
     glDisable(GL_TEXTURE_2D);
-
    
     // show genre
     drawText(movie_genre[configland], 670, 890, 0.4f);
@@ -6856,26 +6851,11 @@ void display() {
     drawText(temptxt, 750, 870-120, 0.4f);
 
     // show movie imdb nr
-    /*
-    glPushMatrix();
-    glTranslatef(670,680+100,0);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.0, 20.0, 1.0);
-    strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
-    if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
-    temptxt[23]=0;
-    glcRenderString("Imdb");
-    glcRenderString(" ");
-    glcRenderString(temptxt);
-    glPopMatrix();
-    */
-
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
     if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
     temptxt[23]=0;
     drawText("Imdb", 670, 870-140, 0.4f);
     drawText(temptxt, 750, 870-140, 0.4f);
-
 
     // show movie cast
     drawText(movie_cast[configland], 670, 870-160, 0.4f);
@@ -6893,32 +6873,38 @@ void display() {
       drawText(temptxt, 750, 870-160-yof, 0.4f);
     }
     
-
     // show movie descrition
     drawText(movie_description[configland], 670, 870-200, 0.4f);
-
-    //
-    // write beskrivelse
-    //
-
     int sted=0;
     float linof=0.0f;
+    int maxWidth=36;
     float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
     while((sted<(int) subtitlelength) && (linof>-60.0f)) {
-      strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
-      temptxt[45]='\0';
-      drawText(temptxt, 670, 870-220-linof, 0.4f);
-      sted+=45;
-      linof-=20.f;      
+      std::istringstream stream(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle);
+      std::string word, line;
+      while (stream >> word) {
+        if (line.length() + word.length() + 1 > maxWidth) {
+          // outFile << line << '\n';
+          drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+          linof-=20.f;
+          line = word;
+        } else {
+          if (!line.empty()) line += ' ';
+          line += word;
+        }
+      }
+      if (!line.empty()) {
+        drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+        linof-=20.f;
+          // outFile << line << '\n';
+      }
     }
   }
 
   static bool retning=false;
   static int color=0;
   char textstring[4096];
-
   //printf("Color %d  retning % d \n",color,retning);
-
   if ((color<128) && (retning==false)) {
     color++;
     color++;
