@@ -37,6 +37,8 @@
 // file io
 #include <iostream>
 #include <pthread.h>                      // multi thread support
+#include <sstream>
+
 // type used
 using namespace std;
 // if defined the support will be enabled
@@ -6871,18 +6873,31 @@ void display() {
       drawText(temptxt, 750, 870-160-yof, 0.4f);
     }
     
-
     // show movie descrition
     drawText(movie_description[configland], 670, 870-200, 0.4f);
     int sted=0;
     float linof=0.0f;
+    int maxWidth=36;
     float subtitlelength=strlen(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle); // get title length
     while((sted<(int) subtitlelength) && (linof>-60.0f)) {
-      strncpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle+sted,45);
-      temptxt[45]='\0';
-      drawText(temptxt, 670, 870-220-linof, 0.4f);
-      sted+=45;
-      linof-=20.f;      
+      std::istringstream stream(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].film_subtitle);
+      std::string word, line;
+      while (stream >> word) {
+        if (line.length() + word.length() + 1 > maxWidth) {
+          // outFile << line << '\n';
+          drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+          linof-=20.f;
+          line = word;
+        } else {
+          if (!line.empty()) line += ' ';
+          line += word;
+        }
+      }
+      if (!line.empty()) {
+        drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+        linof-=20.f;
+          // outFile << line << '\n';
+      }
     }
   }
 

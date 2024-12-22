@@ -16,6 +16,7 @@
 #define _UNICODE
 #include <iostream>
 #include <MediaInfo/MediaInfo.h>
+#include <sstream>
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -624,7 +625,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
     bool film_cover_ok=false;
     int movieyear=2000;
     float movieuserrating=1.0f;
-    int movielength=120;
+    int movielength=0;
     unsigned int del_rec_nr;
     bool is_db_updated_then_do_clean_up=false;
     long delrecid;
@@ -976,7 +977,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
       mysql_query(conn,"set NAMES 'utf8'");
       res = mysql_store_result(conn);
       // sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
-      sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
+      sprintf(mainsqlselect,"SELECT videometadata.intid,title,filename,coverfile,length,year,rating,userrating,plot,inetref,videocategory.category,bitrate,width,high,fsize,fformat,subtitle from videometadata left join videocategory on videometadata.category=videocategory.intid and browse=1 order by category,title limit %d",FILM_OVERSIGT_TYPE_SIZE-1);
       mysql_query(conn,mainsqlselect);
       res = mysql_store_result(conn);
       i=0;
@@ -1003,6 +1004,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
           13 high,
           14 fsize,
           15 fformat
+          16 sub_title
           */
 
           filmoversigt[i].setfilmid(atoi(row[0]));
@@ -1031,6 +1033,7 @@ int film_oversigt_typem::opdatere_film_oversigt(void) {
             if (strlen(row[14])>0) filmoversigt[i].setSize(atoll(row[14]));
             if (strlen(row[15])>0) filmoversigt[i].setFormat(row[15]);
           }
+          if (row[16]) filmoversigt[i].setfilmsubtitle(row[16]);
           // if movie do not have any format check it and update
           if (strcmp(filmoversigt[i].getFormat(),"")==0) {
             if (filmoversigt[i].get_media_info_from_file((char *) row[2])) {
@@ -1470,11 +1473,49 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());        // album navn
+
+      
+      /*
+      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn
+      int subtitlelength=strlen(filmoversigt[film_nr+sofset].getfilmtitle());                       // get title length
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
+      float linof=0.0f;
+      int maxWidth=16;
+      int sted=0;
+      int ll=0;
+      while((sted<(int) subtitlelength) && (linof>-20.0f)) {
+        std::istringstream stream(filmoversigt[film_nr+sofset].getfilmtitle());
+        std::string word, line;
+        while (stream >> word) {
+          if (line.length() + word.length() + 1 > maxWidth) {
+            drawText(line.c_str(), 14.00f+xpos, 114.0f+ypos+linof, 0.4f);
+            line = word;
+            linof-=20.0f;
+            ll++;
+          } else {
+            if (!line.empty()) line += ' ';
+            line += word;
+          }
+        }
+        if (!line.empty()) {
+          drawText(line.c_str(), 14.00f+xpos, 114.0f+ypos+linof, 0.4f);
+          linof-=20.0f;
+          ll++;
+        }
+      }
+      */
+      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn      
       temptxt[16]=0;
-      drawText(temptxt, 14.00f+xpos, 114.0f+ypos, 0.4f);
+      float xoff=0.0f;
+      drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos, 0.4f);
+      if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>16) {
+        strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle()+16);                              // album navn      
+        temptxt[16]=0;
+        drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f);
+      }
+      
+      
       /*
       glPushMatrix();
       pline=0;

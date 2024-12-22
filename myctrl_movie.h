@@ -68,15 +68,6 @@ class film_oversigt_type {
     void settextureidfile(char *filename);
     GLuint getfronttextureid() { return (frontcover); }
     void setfronttextureid(GLuint value) { frontcover=value; }
-    // void setfronttextureidfile(char *filename);
-    // GLuint getbacktextureid() { return (backcover); }
-    // void setbacktextureid(GLuint value) { backcover=value; }
-    // void setbacktextureidfile(char *filename);
-    // void loadbacktextureidfile();
-    // GLuint getsidetextureid() { return (sidecover); }
-    // void setsidetextureid(GLuint value) { sidecover=value; }
-    // void setsidetextureidfile(char *filename);
-    // void loadsidetextureidfile();
     void setfilmid(unsigned int value) { film_id=value; }
     unsigned int getfilmid() { return(film_id); }
     void setfilmlength(unsigned long value) { length=value; }
@@ -100,7 +91,7 @@ class film_oversigt_type {
     void setfilmgenre(char *value) { strcpy(genre,value); }
     char *getfilmgenre() { return(genre); }
     void setfilmsubtitle(char *value) { strcpy(film_subtitle,value); }
-//    char *getfilmsubtitle() { return(film_subtitle); }
+    char *getfilmsubtitle() { return(film_subtitle); }
     void resetfilm();
 
     bool get_media_info_from_file(char *moviepath);
