@@ -613,71 +613,8 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
           }
         }
         // print radios station name
-        glPushMatrix();
-        pline=0;
-        glTranslatef(xof,yof-18,0);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(configdefaultradiofontsize, configdefaultradiofontsize, -3.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GLC_LINE);
-        bool stop=false;
         strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
-        base=temptxt;
-        length=strlen(temptxt);
-        width = 22;                                                             // normal 22 18 point font
-        while(*base) {
-          if(length <= width) {
-            glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-            glcRenderString(base);
-            pline++;
-            break;
-          }
-          right_margin = base+width;
-          while((!isspace(*right_margin)) && (stop==false)) {
-            right_margin--;
-            if (right_margin == base) {
-              right_margin += width;
-              while(!isspace(*right_margin)) {
-                if (*right_margin == '\0') break;
-                else stop=true;
-                right_margin++;
-              }
-            }
-          }
-          if (stop) *(base+width)='\0';
-          *right_margin = '\0';
-          glcRenderString(base);
-          pline++;
-          glTranslatef(xof,(yof-18)-pline*1.2f,0);
-          length -= right_margin-base+1;                         // +1 for the space
-          base = right_margin+1;
-          if (pline>=2) break;
-        }
-
-/*
-        float fontsiz=15.0f;
-        glDisable(GL_TEXTURE_2D);
-        glTranslatef(xof,yof-18,0);
-        glScalef(fontsiz, fontsiz, 1.0);
-        strcpy(temptxt,stack[i+sofset]->station_name);        // radio station navn
-        lastslash=strrchr(temptxt,'/');
-        if (lastslash) strcpy(temptxt,lastslash+1);
-        //float ytextofset=0.0f;
-        int ii,j,k,pos,ofs;
-        ii=pos=0;
-        char word[16000];
-        ofs=(strlen(temptxt)/2)*9;
-
-        //glTranslatef(1,10,0);
-        if (strlen(temptxt)<=14) glcRenderString(temptxt);
-        else {
-            temptxt[14]=0;
-            glcRenderString(temptxt);
-
-        }
-*/
-        glPopMatrix();
+        drawText(temptxt, xof+2, yof-18, 0.4f,1);
         xof=xof+buttonsize+6;
         i++;
     }
@@ -696,14 +633,7 @@ bool radiostation_class::show_radio_oversigt(GLuint normal_icon,GLuint normal_ic
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
       glEnd();
-      glPushMatrix();
-      glTranslatef((orgwinsizex/3)+30, 275.0f , 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(24.0, 24.0, 1.0);
-      glColor3f(0.6f, 0.6f, 0.6f);
-      sprintf(temptxt,"Error no radio stations load");
-      glcRenderString(temptxt);
-      glPopMatrix();
+      drawText("Error no radio stations load", (orgwinsizex/3)+30, 275.0f, 0.4f,15);
     }
     glPopMatrix();
     show_all_kode_errors=true;                                                  // stop loging.
@@ -771,45 +701,15 @@ void radiostation_class::show_radio_options() {
         }
       }
     }
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    //glTranslatef(0.0f, 0.0f, 0.0f);
-    glTranslatef(380.0f, 750.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    glScalef(25.0f, 25.0f, 1.00f);
-    glcRenderString("Sort options.");
-    glPopMatrix();
+    drawText("Sort options.", 410.0f, 770.0f, 0.8f,1);
     i=0;
     while ((strcmp(radiosortopt[i].radiosortopt,"")!=0) && (i<40)) {
-      glPushMatrix();
-      if (i<19) {
-        glTranslatef(600.0f, 700-(i*20.0f), 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-      } else {
-        glTranslatef(1100.0f, 1050-(i*20.0f), 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-      }
-      if (i==radiooptionsselect) glColor4f(0.0f,0.0f,1.0f,1.0f); else glColor4f(1.0f,1.0f,1.0f,1.0f);
-      glScalef(25.0f, 25.0f, 1.00f);
-      glcRenderString(radiosortopt[i].radiosortopt);
-      glPopMatrix();
-      glPushMatrix();
-      if (i<19) {
-        glTranslatef(500.0f, 700-(i*20.0f), 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-      } else {
-        glTranslatef(1000.0f, 1050-(i*20.0f), 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-      }
-      if (i==radiooptionsselect) glColor4f(0.0f,0.0f,1.0f,1.0f); else glColor4f(1.0f,1.0f,1.0f,1.0f);
-      if ((radiosortopt[i].radiosortoptart!=27) && (radiosortopt[i].radiosortoptart!=28)) {
-        sprintf(tmptxt,"%5d",radiosortopt[i].antal);
-        glScalef(25.0f, 25.0f, 1.00f);
-        glcRenderString(tmptxt);
-      }
+      if (i!=radiooptionsselect) drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,1);
+      else drawText(radiosortopt[i].radiosortopt, 500.0f, 700-(i*20.0f), 0.4f,2);
+      sprintf(tmptxt,"%5d",radiosortopt[i].antal);
+      if (i!=radiooptionsselect) drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,1);
+      else drawText(tmptxt, 1000.0f, 700-(i*20.0f), 0.4f,2);
       i++;
-      glPopMatrix();
     }
 }
 

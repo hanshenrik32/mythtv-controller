@@ -1287,7 +1287,7 @@ void film_oversigt_typem::show_minifilm_oversigt(float _mangley,int filmnr) {
       lastslash=strrchr(temptxt,'/');
       if (lastslash) strcpy(temptxt,lastslash+1);
       temptxt[14]=0;
-      drawText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f);
+      drawText(temptxt, 14.00f+xpos, 110.0f+ypos, 0.4f,1);
       // old print disabled
       /*
       glPushMatrix();
@@ -1508,11 +1508,11 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
       strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn      
       temptxt[16]=0;
       float xoff=0.0f;
-      drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos, 0.4f);
+      drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos, 0.4f,1);
       if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>16) {
         strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle()+16);                              // album navn      
         temptxt[16]=0;
-        drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f);
+        drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f,1);
       }
     }
     // next button
@@ -1538,7 +1538,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
     glEnd();
     sprintf(temptxt,"No movie info from %s backend.",configbackend);
     strcat(temptxt,configmysqlhost);    
-    drawText(temptxt, 10.00f+xpos, 40.0f+ypos, 0.4f);
+    drawText(temptxt, 10.00f+xpos, 40.0f+ypos, 0.4f,1);
     glPopMatrix();
   }
 }

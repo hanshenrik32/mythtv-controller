@@ -4078,50 +4078,14 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         glEnd();        
         glPopMatrix();
         // show text of element
-        glPushMatrix();
-        pline=0;
-        glTranslatef(xof+20,yof-20,0);
-        glDisable(GL_TEXTURE_2D);
-        glScalef(configdefaultstreamfontsize+2.0f, configdefaultstreamfontsize+2.0f, 1.0f);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glDisable(GL_TEXTURE_2D);
         strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-        base=temptxt;
-        length=strlen(temptxt);                               // get length
-        width = 19;                                           // max length to show
-        bool stop=false;                                      // done
-        while(*base) {
-          // if text can be on line
-          if(length <= width) {
-            glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-            glcRenderString(base);
-            pline++;
-            break;
-          }
-          right_margin = base+width;
-          while((!isspace(*right_margin)) && (stop==false)) {
-            right_margin--;
-            if (right_margin == base) {
-              right_margin += width;
-              while(!isspace(*right_margin)) {
-                if (*right_margin == '\0') break;
-                else stop=true;
-                right_margin++;
-              }
-            }
-          }
-          if (stop) *(base+width)='\0';
-          *right_margin = '\0';
-          glcRenderString(base);
-          pline++;
-          glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
-          //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
-          length -= right_margin-base+1;                         // +1 for the space
-          base = right_margin+1;
-          if (pline>=2) break;
+        temptxt[16]=0;
+        drawText(temptxt, xof+20,yof-20, 0.4f,1);
+        if (strlen(stack[i+sofset]->feed_showtxt)>16) {
+          strcpy(temptxt,stack[i+sofset]->feed_showtxt+16);        // text to show
+          drawText(temptxt, xof+20,yof-40, 0.4f,1);
+          temptxt[16]=0;
         }
-        glPopMatrix();
         // next button
         i++;
         xof+=(buttonsize+10);
@@ -4141,6 +4105,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         glEnd();
         glcRenderString("Loading textures.");
 
+        // drawText("Loading textures.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
+
       }
     }
   } else {
@@ -4159,6 +4125,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
       glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
       glEnd();
       glcRenderString("No tidal account enabled.");
+
+      // drawText("No tidal account enabled.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
   }
 }
 
@@ -4353,50 +4321,14 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       glEnd();        
       glPopMatrix();
       // show text of element
-      glPushMatrix();
-      pline=0;
-      glTranslatef(xof+20,yof-20,0);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize+2.0f, configdefaultstreamfontsize+2.0f, 1.0);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
       strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      base=temptxt;
-      length=strlen(temptxt);                               // get length
-      width = 19;                                           // max length to show
-      bool stop=false;                                      // done
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(-(1.0f+(strlen(base)/2)),-pline*1.2f,0.0f);
-        //glTranslatef(1.0f-(strlen(base)/1.6f)+1,-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
+      temptxt[16]=0;
+      drawText(temptxt, xof+20,yof-20, 0.4f,1);
+      if (strlen(stack[i+sofset]->feed_showtxt)>16) {
+        strcpy(temptxt,stack[i+sofset]->feed_showtxt+16);        // text to show
+        drawText(temptxt, xof+20,yof, 0.4f,1);
+        temptxt[16]=0;
       }
-      glPopMatrix();
       // next button
       i++;
       xof+=(buttonsize+10);
@@ -4417,7 +4349,8 @@ void tidal_class::show_tidal_search_oversigt(GLuint normal_icon,GLuint song_icon
       glTexCoord2f(1, 0); glVertex3f( buttonsize-10-(buttonsize*4), 10 , 0.0);
       glEnd();
       glcRenderString("No tidal account enabled.");
+
+      // drawText("No tidal account enabled.", xof+20+(buttonsize/2),yof-10, 0.4f,1);
+
   }
 }
-
-

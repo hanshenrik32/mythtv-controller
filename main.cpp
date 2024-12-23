@@ -3363,8 +3363,8 @@ void display() {
 
 
 
-  // drawText("Hej OpenGL!", 200.00f, 200.0f, 1.2f);
-  // drawText("Hej OpenGL2!", 210.00f, 210.0f, 1.0f);
+  // drawText("Hej OpenGL!", 200.00f, 200.0f, 1.2f,1);
+  // drawText("Hej OpenGL2!", 210.00f, 210.0f, 1.0f,1);
 
 
   //if (vis_stream_oversigt) printf("_sangley=%d stream_key_selected=%d stream_select_iconnr=%d  antal %d \n",_sangley,stream_key_selected,stream_select_iconnr,streamoversigt.streamantal());
@@ -6806,59 +6806,59 @@ void display() {
     glDisable(GL_TEXTURE_2D);
    
     // show genre
-    drawText(movie_genre[configland], 670, 890, 0.4f);
-    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f);
+    drawText(movie_genre[configland], 670, 890, 0.4f,1);
+    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].genre, 750, 890, 0.4f,1);
     
     // show movie title
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmtitle());
     if (strlen(temptxt)>41) {
       temptxt[42]=0;
     }
-    drawText(movie_title[configland], 670, 870, 0.4f);
-    drawText(temptxt, 750, 870, 0.4f);
+    drawText(movie_title[configland], 670, 870, 0.4f,1);
+    drawText(temptxt, 750, 870, 0.4f,1);
     
     // show movie length
     sprintf(temptxt,"%d min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
-    drawText(movie_length[configland], 670, 870-20, 0.4f);
-    drawText(temptxt, 750, 870-20, 0.4f);
+    drawText(movie_length[configland], 670, 870-20, 0.4f,1);
+    drawText(temptxt, 750, 870-20, 0.4f,1);
     
     // show movie year
     sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
     temptxt[23]=0;
-    drawText(movie_year[configland], 670, 870-40, 0.4f);
-    drawText(temptxt, 750, 870-40, 0.4f);
+    drawText(movie_year[configland], 670, 870-40, 0.4f,1);
+    drawText(temptxt, 750, 870-40, 0.4f,1);
     
     // show movie rating on imdb
     if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
       else strcpy(temptxt,"None");
     temptxt[23]=0;
-    drawText(movie_rating[configland], 670, 870-60, 0.4f);
-    drawText(temptxt, 750, 870-60, 0.4f);
+    drawText(movie_rating[configland], 670, 870-60, 0.4f,1);
+    drawText(temptxt, 750, 870-60, 0.4f,1);
     
     // show movie format avi/mp4 osv
-    drawText("Format ", 670, 870-80, 0.4f);
-    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(), 750, 870-80, 0.4f);
+    drawText("Format ", 670, 870-80, 0.4f,1);
+    drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(), 750, 870-80, 0.4f,1);
     
     // show movie windows size
-    drawText("W/H ", 670, 870-100, 0.4f);
+    drawText("W/H ", 670, 870-100, 0.4f,1);
     sprintf(temptxt,"%d/%d",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
-    drawText(temptxt, 750, 870-100, 0.4f);
+    drawText(temptxt, 750, 870-100, 0.4f,1);
     
     // show movie size
-    drawText("Size ", 670, 870-120, 0.4f);
+    drawText("Size ", 670, 870-120, 0.4f,1);
     if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) sprintf(temptxt,"%4d Gb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024);
     else sprintf(temptxt,"%d Mb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024);
-    drawText(temptxt, 750, 870-120, 0.4f);
+    drawText(temptxt, 750, 870-120, 0.4f,1);
 
     // show movie imdb nr
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
     if (strcmp(temptxt,"")!=0) sprintf(temptxt,"%s ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer()); else strcpy(temptxt,"None");
     temptxt[23]=0;
-    drawText("Imdb", 670, 870-140, 0.4f);
-    drawText(temptxt, 750, 870-140, 0.4f);
+    drawText("Imdb", 670, 870-140, 0.4f,1);
+    drawText(temptxt, 750, 870-140, 0.4f,1);
 
     // show movie cast
-    drawText(movie_cast[configland], 670, 870-160, 0.4f);
+    drawText(movie_cast[configland], 670, 870-160, 0.4f,1);
     int ll=0;
     float xof=0;
     float yof=0;
@@ -6870,11 +6870,11 @@ void display() {
         xof=0;
         yof-=20;
       }
-      drawText(temptxt, 750, 870-160-yof, 0.4f);
+      drawText(temptxt, 750, 870-160-yof, 0.4f,1);
     }
     
     // show movie descrition
-    drawText(movie_description[configland], 670, 870-200, 0.4f);
+    drawText(movie_description[configland], 670, 870-200, 0.4f,1);
     int sted=0;
     float linof=0.0f;
     int maxWidth=36;
@@ -6885,7 +6885,7 @@ void display() {
       while (stream >> word) {
         if (line.length() + word.length() + 1 > maxWidth) {
           // outFile << line << '\n';
-          drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+          drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
           linof-=20.f;
           line = word;
         } else {
@@ -6894,7 +6894,7 @@ void display() {
         }
       }
       if (!line.empty()) {
-        drawText(line.c_str(), 670, 870-220+linof, 0.4f);
+        drawText(line.c_str(), 670, 870-220+linof, 0.4f,1);
         linof-=20.f;
           // outFile << line << '\n';
       }

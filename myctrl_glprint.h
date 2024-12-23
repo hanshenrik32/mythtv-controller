@@ -12,7 +12,9 @@ typedef struct {
 } Character;
 
 int initFreeType(const char *fontPath);
-void drawText(const char *text, float x, float y, float scale);
+void drawText(const char *text, float x, float y, float scale,int color);
+// void set_color(float r,float g,float b) {};
+// void set_default_color() {};
 
 // *******************************************
 

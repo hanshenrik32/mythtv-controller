@@ -109,15 +109,36 @@ int initFreeType(const char *fontPath) {
 // Funktion til at tegne tekst
 //
 // ****************************************************************************************
-void drawText(const char *text, float x, float y, float scale) {
+void drawText(const char *text, float x, float y, float scale,int color) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
     // Set text color to white
-    glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
-    glColor3f(0.8f, 0.8f, 0.8f);
+    switch(color) {
+        case 0: glColor4f(0.8f, 0.8f, 0.8f, 1.0f);          // gray
+                glColor3f(0.8f, 0.8f, 0.8f);
+                break;
+        case 1:glColor4f(0.8f, 0.8f, 0.8f, 1.0f);           // gray
+                glColor3f(0.8f, 0.8f, 0.8f);
+                break;
+        case 2:glColor4f(0.8f, 1.0f, 0.4f, 1.0f);
+                glColor3f(0.8f, 1.0f, 0.4f);
+                break;
+        case 3:glColor4f(1.0f, 0.8f, 0.4f, 1.0f);
+                glColor3f(1.0f, 0.8f, 0.4f);
+                break;
+        case 4:glColor4f(1.0f, 0.0f, 0.0f, 1.0f);           // red
+                glColor3f(1.0f, 0.0f, 0.0f);
+                break;
+        case 15:glColor4f(1.0f, 1.0f, 1.0f, 1.0f);          // white
+                glColor3f(1.0f, 1.0f, 1.0f);
+                break;
+        default:
+                glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
+                glColor3f(0.8f, 0.8f, 0.8f);
 
+    };
     // Ensure texture environment mode is set to replace
     // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -143,3 +164,5 @@ void drawText(const char *text, float x, float y, float scale) {
     glDisable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
+
+
