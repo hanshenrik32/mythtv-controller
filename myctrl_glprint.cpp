@@ -43,16 +43,12 @@ int initFreeType(const char *fontPath) {
         fprintf(stderr, "Kunne ikke initialisere FreeType.\n");
         return 0;
     }
-
     if (FT_New_Face(ft, fontPath, 0, &face)) {
         fprintf(stderr, "Kunne ikke indlæse skrifttype: %s\n", fontPath);
         return 0;
     }
-
-    FT_Set_Pixel_Sizes(face, 0, 48); // Sæt skriftstørrelse
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Deaktiver bytejustering
-
+    FT_Set_Pixel_Sizes(face, 0, 48);                            // Sæt skriftstørrelse
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);                      // Deaktiver bytejustering
     // Indlæs alle ASCII-tegn
     for (unsigned char c = 0; c < MAX_CHARS; c++) {
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
@@ -65,8 +61,6 @@ int initFreeType(const char *fontPath) {
         flipBitmap(face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows);
         //
         // ****************************************************************************
-
-
         // Opret tekstur for hvert tegn
         unsigned int texture;
         glGenTextures(1, &texture);
@@ -82,13 +76,11 @@ int initFreeType(const char *fontPath) {
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
-
         // Teksturopsætning
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
         // Gem tegnets data
         characters[c].texture = texture;
         characters[c].width = face->glyph->bitmap.width;
@@ -97,27 +89,31 @@ int initFreeType(const char *fontPath) {
         characters[c].bearingY = face->glyph->bitmap_top;
         characters[c].advance = face->glyph->advance.x >> 6;
     }
-
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
-
     return 1;
 }
+
+
 
 // ****************************************************************************************
 //
 // Funktion til at tegne tekst
 //
 // ****************************************************************************************
+
 void drawText(const char *text, float x, float y, float scale) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
     // Set text color to white
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
+
     // Ensure texture environment mode is set to replace
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     // Tegn hvert tegn
     for (size_t i = 0; i < strlen(text); i++) {
         char c = text[i];
@@ -138,4 +134,5 @@ void drawText(const char *text, float x, float y, float scale) {
     }
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
