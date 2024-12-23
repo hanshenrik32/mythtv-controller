@@ -2731,25 +2731,10 @@ void display() {
           }
           tmpcounter++;
           strftime(temptxt, 20, "%H:%M", timeinfo);
-          glTranslatef(xrand+70, yrand, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-          glScalef(70.0, 70.0, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
-          // date
-          glPushMatrix();
-          glDisable(GL_TEXTURE_2D);
+          drawText(temptxt, xrand+70, yrand, 0.4f,1);
           strftime(temptxt, 80, "%d %B %Y", timeinfo);
-          //glTranslatef(((orgwinsizex/2)-(strlen(temptxt)*8))-xrand, ((orgwinsizey/2)-80)-yrand, 0.0f);
-          glTranslatef(xrand, yrand-(strlen(temptxt)*5), 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glColor3f(1.0f, 1.0f, 1.0f);
-          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-          glScalef(40.0, 40.0, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
+          drawText(temptxt, ((orgwinsizex/2)-(strlen(temptxt)*8))-xrand, ((orgwinsizey/2)-80)-yrand, 0.4f,1);
+
           break;
       case ANALOG:
       case MUSICMETER:
@@ -3888,14 +3873,8 @@ void display() {
             break;
       }
     }
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(580, 30, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString(temptxt1);
-    glPopMatrix();
+    drawText(temptxt1, 580, 30, 0.4f,15);
+
   }
   //
   // skal vi til at spørge ask open dir or play (ask about play (music))
@@ -4879,61 +4858,30 @@ void display() {
         glTexCoord2f(1, 1); glVertex3f(560+ (orgwinsizex/4)+200, 40+yof+200 , 0.0);
         glTexCoord2f(1, 0); glVertex3f(560+ (orgwinsizex/4)+200,40+yof , 0.0);
         glEnd();
-        glPopMatrix();
-        // show artist
-        glDisable(GL_TEXTURE_2D);
-        glPushMatrix();
-        glColor3f(0.5f, 0.5f, 0.5f);
-        glTranslatef(520.0f, 650.0f, 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(music_artist[configland]);
-        glPopMatrix();
+        drawText(music_artist[configland], 520.0f, 650.0f, 0.4f,1);
+
         // show artist name
-        glPushMatrix();
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glTranslatef(700.0f, 650.0f, 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
         aktiv_playlist.get_artistname(temptxt,do_play_music_aktiv_table_nr-1);
         temptxt[40]=0;
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        drawText(temptxt, 700.0f, 650.0f, 0.4f,1);
+
         // show cd album name
-        glPushMatrix();
-        glTranslatef(520.0f, 630.0f, 0.0f);
-        glColor3f(0.6f, 0.6f, 0.6f);
         strcpy(temptxt,music_album[configland]);                // music album text
-        temptxt[50]=0;
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        temptxt[50]=0;        
+        drawText(temptxt, 520.0f, 630.0f, 0.4f,1);
+
         // show album name
-        glPushMatrix();
-        glTranslatef(700.0f, 630.0f, 0.0f);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glRasterPos2f(0.0f, 0.0f);
+        drawText(temptxt, 700.0f, 630.0f, 0.4f,1);
         aktiv_playlist.get_albumname(temptxt,do_play_music_aktiv_table_nr-1);
         temptxt[40]=0;
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(temptxt);
-        glPopMatrix();
+
         // show song name
-        glPushMatrix();
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glTranslatef(520.0f, 610.0f, 0.0f);
         strcpy(temptxt,music_songname[configland]);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        drawText(temptxt, 520.0f, 610.0f, 0.4f,1);
+
+
         char *pos;
         // show artist name
-        glPushMatrix();
-        glTranslatef(700.0f, 610.0f, 0.0f);
-        // hent song name
         aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr-1);
         pos=strrchr(temptxt,'/');
         if (strrchr(temptxt,'/')) {
@@ -4945,11 +4893,9 @@ void display() {
           temptxt[pos-temptxt]='\0';
         }
         temptxt[40]=0;
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        drawText(temptxt, 700.0f, 610.0f, 0.4f,1);
+
+
         if (!(do_stop_music_all)) {
           // play position
           unsigned int ms = 0;
@@ -4999,8 +4945,6 @@ void display() {
             playtime_songlength=0;
             playtime = ms/1000;
           }
-          glPushMatrix();
-          glColor3f(0.6f, 0.6f, 0.6f);
           playtime_hour = (playtime/60)/60;
           playtime_min = (playtime/60);
           playtime_sec = playtime-(playtime_min*60);
@@ -5011,72 +4955,37 @@ void display() {
           // configland = lande kode
           strcpy(temptxt,music_play_time[configland]);
           temptxt[40] = 0;
-          glTranslatef(520.0f, 580.0f, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
-          glPushMatrix();
-          // show artist name
+          drawText(temptxt, 520.0f, 580.0f, 0.4f,1);
+
           sprintf(temptxt,"%02d:%02d/%02d:%02d ",playtime_min,playtime_sec,playtime_length_min,playtime_length_sec);
           temptxt[40]=0;
-          glTranslatef(700.0f, 580.0f, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
+          drawText(temptxt, 700.0f, 580.0f, 0.4f,1);
+
+
           #if defined USE_FMOD_MIXER
           channel->getFrequency(&frequency);
           #endif
-          glPushMatrix();
-          glColor3f(0.6f, 0.6f, 0.6f);
-          glTranslatef(520.0f, 560.0f, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(music_samplerate[configland]);
-          glPopMatrix();
-          glPushMatrix();
-          glTranslatef(700.0f, 560.0f, 0.0f);
-          // show artist name
+          drawText(music_samplerate[configland], 520.0f, 560.0f, 0.4f,1);
           sprintf(temptxt,"%5.0f/%d Kbits.",frequency,kbps);
           temptxt[40]=0;
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
+          drawText(temptxt, 700.0f, 560.0f, 0.4f,1);
+
         }
         // play list status
-        glPushMatrix();
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glTranslatef(520.0f, 540.0f, 0.0f);
-        temptxt[50]=0;
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(music_playsong[configland]);
-        glPopMatrix();
-        glPushMatrix();
-        glTranslatef(700.0f, 540.0f, 0.0f);
+        drawText(music_playsong[configland], 520.0f, 540.0f, 0.4f,1);
+
         // show artist name
         // format as %d/%d in playlist
         sprintf(temptxt,music_numberinplaylist[configland],do_play_music_aktiv_table_nr,aktiv_playlist.numbers_in_playlist());
         temptxt[40]=0;
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        drawText(temptxt, 700.0f, 540.0f, 0.4f,1);
+
         // show next song in status window
         glColor3f(0.6f, 0.6f, 0.6f);
         if ((do_play_music_aktiv_table_nr)<aktiv_playlist.numbers_in_playlist()) {
           strcpy(temptxt,music_nextsong[configland]);
           temptxt[52]=0;
-          glPushMatrix();
-          glTranslatef(520.0f, 520.0f, 0.0f);
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
-          glPushMatrix();
-          glTranslatef(700.0f, 520.0f, 0.0f);
+          drawText(temptxt, 520.0f, 520.0f, 0.4f,1);
           aktiv_playlist.get_songname(temptxt,do_play_music_aktiv_table_nr);
           pos=strrchr(temptxt,'/');
           if (strrchr(temptxt,'/')) {
@@ -5086,10 +4995,7 @@ void display() {
           pos=strrchr(temptxt,'.');
           if (strrchr(temptxt,'.')) temptxt[pos-temptxt]='\0';
           temptxt[40]=0;
-          glRasterPos2f(0.0f, 0.0f);
-          glScalef(20.5, 20.5, 1.0);
-          glcRenderString(temptxt);
-          glPopMatrix();
+          drawText(temptxt, 700.0f, 520.0f, 0.4f,1);
         }
       }
     }
@@ -5971,208 +5877,30 @@ void display() {
             #endif
             #if defined USE_SDL_MIXER
             #endif
-            glPushMatrix();
-            glDisable(GL_TEXTURE_2D);
-            // show song name
-            sprintf(temptxt,"Song Name ");
-            temptxt[22]=0;
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+200, 0);
-                      break;
-              default:glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
-            }
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            //
-            glPushMatrix();
-            glDisable(GL_TEXTURE_2D);
-            // show song name
+            drawText("Song Name ",(orgwinsizex/4)+20, (orgwinsizey/2)+120, 0.4f ,1);
             sprintf(temptxt," %-30s",aktivsongname);
-            temptxt[22]=0;
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+200, 0);
-                      break;
-              default:glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
-            }
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            // show station name
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+160, 0);
-                      break;
-              default:glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+80, 0);
-            }
-            sprintf(temptxt,"Station ");
-            temptxt[39]=0;
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            // show station name
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+160, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+80, 0);
-            }
+            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+120, 0.4f,1);
+            drawText("Station ",(orgwinsizex/4)+20, (orgwinsizey/2)+80, 0.4f,1);
             sprintf(temptxt," %s",radiooversigt.get_station_name(aktiv_radio_station));
             temptxt[39]=0;
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            // play time
+            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+80, 0.4f,1);
             radio_playtime_hour=(radio_playtime/60)/60;
             radio_playtime_min=(radio_playtime/60);
             radio_playtime_sec=radio_playtime-(radio_playtime_min*60);
             radio_playtime_min=radio_playtime_min-(radio_playtime_hour*60);
             if (radio_playtime_min>60) radio_playtime_min=0;
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+140, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+60, 0);
-            }
             sprintf(temptxt,"%s",music_timename[1]);       // 1 = danish
             temptxt[40]=0;
-            glTranslatef(1, 1, 0);
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glcRenderString(temptxt);                // write text
-            glPopMatrix();
-            glPushMatrix();
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+140, 0);
-                      break;
-              default:  glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+60, 0);
-            }
-            glTranslatef(1, 1, 0);
-            glScalef(20,20, 1.0);
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
+            drawText(temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+60, 0.4f,1);
             sprintf(temptxt," %02d:%02d:%02d ",radio_playtime_hour,radio_playtime_min,radio_playtime_sec);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            // speed info
-            frequency=192;
-            sprintf(temptxt,"Bitrate ");
-            temptxt[40]=0;
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+120, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+40, 0);
-            }
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glScalef(20,20, 1.0);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            // speed info
+            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+60, 0.4f,1);
+            drawText("Bitrate ",(orgwinsizex/4)+20, (orgwinsizey/2)+40, 0.4f,1);
             frequency=192;
             sprintf(temptxt," %3.0f Kbits",frequency);
-            temptxt[40]=0;
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+120, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+40, 0);
-            }
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glScalef(20,20, 1.0);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+100, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+20, 0);
-            }
-            // song status / loading
-            sprintf(temptxt,"Status ");
-            temptxt[40]=0;
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glRasterPos2f(120.f, 100.f);
-            glScalef(20,20, 1.0);
-            glcRenderString(temptxt);
-            glPopMatrix();
-            glPushMatrix();
-            switch (screen_size) {
-              case 1: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
-                      break;
-              case 2: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
-                      break;
-              case 3: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
-                      break;
-              case 4: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+100, 0);
-                      break;
-              default: glTranslatef((orgwinsizex/4)+140, (orgwinsizey/2)+20, 0);
-            }
-            // song status / loading
+            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+40, 0.4f,1);
+            drawText("Status ",(orgwinsizex/4)+20, (orgwinsizey/2)+20, 0.4f,1);
             sprintf(temptxt," %-20s",aktivsongstatus);
-            temptxt[40]=0;
-            glColor4f(1.0f,1.0f,1.0f,1.0f);
-            glRasterPos2f(120.f, 100.f);
-            glScalef(20,20, 1.0);
-            glcRenderString(temptxt);
-            glPopMatrix();
+            drawText(temptxt,(orgwinsizex/4)+140, (orgwinsizey/2)+20, 0.4f,1);
           }
         }
       }
@@ -6204,7 +5932,7 @@ void display() {
         // F1 in tv_guide view (show tv guidde setup)
         if (do_show_tvgraber) show_setup_tv_graber(tvchannel_startofset);   // tv graber
       }
-      glPopMatrix();
+      // glPopMatrix();
   }
   // end radio stuf
   // create uv meter
@@ -6920,6 +6648,7 @@ void display() {
 
   bool show_status=true;
   // show status line
+  /*
   glPushMatrix();
   glTranslatef(1, 1, 0);
   glScalef(20,20, 1.0);
@@ -6943,11 +6672,25 @@ void display() {
   glEnable(GL_TEXTURE_2D);
   glColor4f(1.0f,1.0f,1.0f,1.0f);
   glPopMatrix();
-  
+  */
+
+  strcpy(textstring,"");  
+  if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
+  if (do_update_moviedb) strcat(textstring,"MOVIE,");      
+  if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
+  if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
+  if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
+  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
+  if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
+  if (strcmp(textstring,"")==0) {
+    strcat(textstring,"STATUS: None."); 
+    show_status=false;
+  } else strcat(textstring," running updates ..");
+  drawText(textstring, 1, 1, 0.4f,1);
+ 
   // show pfs
   // debug mode 1
-  if ((showfps) && (debugmode & 1) && (show_status=false)) {
-    glPushMatrix();
+  if ((showfps) && (debugmode & 1) && (show_status=false)) {  
     // Gather our frames per second
     Frames++;
     GLuint t = SDL_GetTicks();
@@ -6957,11 +6700,7 @@ void display() {
     T0 = t;
     Frames = 0;
     sprintf(temptxt,"FPS: %-4.0f", fps);
-    glTranslatef(1, 1, 0);
-    glScalef(20,20, 1.0);
-    glDisable(GL_TEXTURE_2D);
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(textstring, 1, 1, 0.4f,1);
   }
   //  STOP ALL sound
   if (do_stop_music) {				// pressed stop music
