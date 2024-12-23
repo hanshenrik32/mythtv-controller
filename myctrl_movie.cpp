@@ -1473,9 +1473,9 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         glTexCoord2f(1, 0); glVertex3f(xpos+winsizx,ypos+((orgwinsizey/2)-(800/2))-boffset , 0.0);
         glEnd();
       }
-
-      
+   
       /*
+      // not in use
       strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn
       int subtitlelength=strlen(filmoversigt[film_nr+sofset].getfilmtitle());                       // get title length
       lastslash=strrchr(temptxt,'/');
@@ -1514,64 +1514,12 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         temptxt[16]=0;
         drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f);
       }
-      
-      
-      /*
-      glPushMatrix();
-      pline=0;
-      glTranslatef(xpos+(20), ypos+120 ,0.0f); // 100,120
-      glScalef(configdefaultmoviefontsize, configdefaultmoviefontsize, 1.0);
-      // temptxt = text to write
-      base=temptxt;
-      length=strlen(temptxt);                               // get length
-      width = 16;                                           // max length to show
-      bool stop=false;                                      // done
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef(1.0f-(strlen(base)/3.6f)+2,-pline*1.0f,0.0f);
-          //glTranslatef(((strlen(base)*6)/2),0.0f,0.0f);
-          glDisable(GL_TEXTURE_2D);
-          glRasterPos2f(0.0f, 0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glDisable(GL_TEXTURE_2D);
-        glRasterPos2f(0.0f, 0.0f);
-        glcRenderString(base);
-        pline++;
-        glTranslatef(3.0f-(strlen(base)/1.8f),-pline*1.0f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
-      }
-      glEnable(GL_TEXTURE_2D);
-      glPopMatrix();
-      */
-      
     }
     // next button
     xpos+=buttonsize;                                                // 205
     film_nr++;
     //glPopMatrix();
   }
-
-
   if ((film_nr==0) || (this->filmoversigt_antal==0)) {
     // show window
     glPushMatrix();
