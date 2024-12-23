@@ -30,7 +30,6 @@ void flipBitmap(unsigned char *buffer, int width, int height) {
     }
 }
 
-
 // ****************************************************************************************
 //
 // opengl text print (fast)
@@ -75,14 +74,15 @@ int initFreeType(const char *fontPath) {
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_R8, // Internal format (3 color channels)
+            GL_LUMINANCE, // Use luminance instead of red
             face->glyph->bitmap.width,
             face->glyph->bitmap.rows,
             0,
-            GL_RED, // Input format (3 color channels)
+            GL_LUMINANCE, // Input format as luminance
             GL_UNSIGNED_BYTE,
             face->glyph->bitmap.buffer
         );
+
         // Teksturopsætning
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -111,25 +111,21 @@ int initFreeType(const char *fontPath) {
 // ****************************************************************************************
 void drawText(const char *text, float x, float y, float scale) {
     glEnable(GL_BLEND);
-    // default disabled
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // my stuf
-    // glBlendFunc(GL_ONE, GL_ONE);
-
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
-
+    // Set text color to white
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    // Ensure texture environment mode is set to replace
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     // Tegn hvert tegn
     for (size_t i = 0; i < strlen(text); i++) {
         char c = text[i];
         Character ch = characters[c];
-
         float xpos = x + ch.bearingX * scale;
         float ypos = y - (ch.height - ch.bearingY) * scale;
-
         float w = ch.width * scale;
         float h = ch.height * scale;
-
         // Tegn et kvadrat for teksturen
         glBindTexture(GL_TEXTURE_2D, ch.texture);
         glBegin(GL_QUADS);
@@ -138,12 +134,8 @@ void drawText(const char *text, float x, float y, float scale) {
         glTexCoord2f(1.0, 1.0); glVertex2f(xpos + w, ypos + h);
         glTexCoord2f(0.0, 1.0); glVertex2f(xpos, ypos + h);
         glEnd();
-
         x += (ch.advance) * scale; // Flyt til næste tegn
     }
-
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 }
-
-
