@@ -1356,14 +1356,8 @@ void musicoversigt_class::show_music_oversigt(GLuint normal_icon,GLuint back_ico
     glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+450, 200+150 , 0.0);
     glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+450, 200 , 0.0);
     glEnd();
-    glPushMatrix();
-    glTranslatef((orgwinsizex/3)+30, 275.0f , 0.0f);
-    glDisable(GL_TEXTURE_2D);
-    glScalef(24.0, 24.0, 1.0);
-    glColor3f(0.6f, 0.6f, 0.6f);
     sprintf(temptxt,"Error no music loaded in db");
-    glcRenderString(temptxt);
-    glPopMatrix();
+    drawText(temptxt, (orgwinsizex/3)+30, 275.0f, 0.4f,1);
   }
 }
 

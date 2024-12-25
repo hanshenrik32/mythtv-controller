@@ -25,7 +25,8 @@
 #include "myctrl_readwebfile.h"
 
 //
-// text render is glcRenderString for freetype font support
+// text render is glcRenderString for freetype font support (slow)
+// new text render in use drawText()
 //
 
 extern long configrssguidelastupdate;
@@ -4589,20 +4590,14 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       // draw numbers in group
       if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
-        glPushMatrix();
-        glDisable(GL_TEXTURE_2D);
-        //glBlendFunc(GL_ONE, GL_ONE);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glTranslatef(xof+22,yof+14,0);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-        glColor4f(1.0f, 1.0f, 1.0f,1.0f);
         snprintf(temptxt,sizeof(temptxt),"Feeds %-4d",stack[i+sofset]->feed_group_antal);
-        glcRenderString(temptxt);
-        glPopMatrix();
+        drawText(temptxt, xof+22,yof+14, 0.4f,1);
+
       }
       // show text of element
-      glPushMatrix();
+      drawText(stack[i+sofset]->feed_showtxt, xof+20,yof-10, 0.4f,1);
+      /*
+      glPushMatrix();      
       pline=0;
       glTranslatef(xof+20,yof-10,0);
       glDisable(GL_TEXTURE_2D);
@@ -4645,6 +4640,7 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
         if (pline>=2) break;
       }
       glPopMatrix();
+      */
       // next button
       i++;
       xof+=(buttonsizex+10);
@@ -4664,15 +4660,6 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/3)+400, 200+150 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/3)+400, 200 , 0.0);
       glEnd();
-      glPushMatrix();
-      xof=700;
-      yof=260;
-      glTranslatef(xof, yof ,0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(22.0, 22.0, 1.0);
-      glcRenderString("Please wait Loading ...");
-      glEnable(GL_TEXTURE_2D);
-      glPopMatrix();
+      drawText("Please wait Loading ...", 700, 260, 0.4f,1);
     }
 }

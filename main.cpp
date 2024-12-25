@@ -3667,63 +3667,13 @@ void display() {
     glPopMatrix();
     aktivfont.selectfont((char *) "URW Bookman L");
     // print text in window
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(590, 370+300, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(20.5, 20.5, 1.0);
-    // 0 = uk 1 = dk 2 =  France 3 = tysk 4 = Arabi
-    glcRenderString(spotify_firsttime_line1[configland]);
-    glPopMatrix();
-    */
-
     drawText(spotify_firsttime_line1[configland],590, 370+300, 0.4f,1);
-
-
     // print text in window
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(590, 370+275, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString(spotify_firsttime_line2[configland]);
-    glPopMatrix();
-    */
     drawText(spotify_firsttime_line2[configland],590, 370+275, 0.4f,1);
-
     // print text in window
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(590, 370+250, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString(spotify_firsttime_line3[configland]);
-    glPopMatrix();
-    */
-
     drawText(spotify_firsttime_line3[configland],590, 370+250, 0.4f,1);
-
     // print text in window
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(590, 370+220, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString(spotify_firsttime_line4[configland]);
-    glPopMatrix();
-    */
-
     drawText(spotify_firsttime_line4[configland],590, 370+220, 0.4f,1);
-
-
     // print text in window
     static time_t today1=0;
     static time_t lasttime=0;
@@ -3733,18 +3683,6 @@ void display() {
       lasttime=today1;
       switch_text=!switch_text;
     }
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glTranslatef(780, 370+70, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-    glScalef(30.5, 30.5, 1.0);
-    if ((spotify_oversigt.get_spotify_update_flag()) && (switch_text)) {
-      glcRenderString(spotify_firsttime_pleasewait[configland]);
-    }
-    glPopMatrix();
-    */
     if ((spotify_oversigt.get_spotify_update_flag()) && (switch_text)) {
       drawText(spotify_firsttime_pleasewait[configland],780, 370+70, 0.4f,1);
     }
@@ -4071,9 +4009,9 @@ void display() {
         temptxt1[45]='\0';
         if (i==do_show_play_open_select_line) glColor4f(textcolor[0],textcolor[1],textcolor[2],1.0f);
           else glColor4f(selecttextcolor[0],selecttextcolor[1],selecttextcolor[2],1.0f);
-        drawText(temptxt1, 560.0f+10, 850.0f -ofset, 0.4f,1);
+        drawText(temptxt1, 560.0f+50.0f, 850.0f -ofset, 0.4f,1);
         if (aktiv==true) drawText ("[X]", 560.0f, 850.0f -ofset, 0.4f,1); 
-          else drawText("[ ]", 560.0f, 850.0f -ofset, 0.4f,1);
+          else drawText("[  ]", 560.0f, 850.0f -ofset, 0.4f,1);
         i++;
       }
     }
@@ -4102,19 +4040,6 @@ void display() {
       glEnd(); //End quadrilateral coordinates
       glPopMatrix();
       
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(xof+20.0f,yof+10+5, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      //aktivfont.selectfont((char *) "Courier 10 Pitch");
-      glcRenderString("Playlist name :");
-      glcRenderString(keybuffer);
-      glPopMatrix();
-      */
-
       strcpy(temptxt,"Playlist name :");
       strcat(temptxt,keybuffer);
       drawText(temptxt, xof+20.0f,yof+10.0f+5.0f, 0.4f,1);
@@ -4753,19 +4678,7 @@ void display() {
         glTexCoord2f(1, 0); glVertex3f( (orgwinsizex/4)+buttonsize,yof , 0.0);
         glEnd();
         // show no play
-        /*
-        glDisable(GL_TEXTURE_2D);
-        glPushMatrix();
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glTranslatef(740.0f, 650.0f, 0.0f);
-        glRasterPos2f(0.0f, 0.0f);
-        glScalef(20.5, 20.5, 1.0);
-        glcRenderString("No song is playing.");
-        glPopMatrix();
-        */
-
         drawText("No song is playing.", 740.0f, 650.0f, 0.4f,1);
-
       } else {        
         // background
         glPushMatrix();
@@ -5059,26 +4972,7 @@ void display() {
       // spotify play info icon
       glEnable(GL_BLEND);
       // text
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      glcRenderString("No song is playing.");
-      glPopMatrix();
-      */
       drawText("No song is playing.", 520.0f+textofset, 640.0f, 0.4f,1);
-
-      /*
-      glPushMatrix();
-      glTranslatef(420.0f+textofset, 600.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      glcRenderString("You have to pick playlist icon to start playing.");
-      glPopMatrix();
-      */
       drawText("You have to pick playlist icon to start playing.", 420.0f+textofset, 600.0f, 0.4f,1);
     } else {
       // window texture
@@ -5153,126 +5047,44 @@ void display() {
 
       // play list name or artist name
       // show playlist or artist name
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
         strcpy(temptxt1,"playlist  ");
-        glcRenderString(temptxt1);
       } else {
         strcpy(temptxt,"Artist    ");
-        glcRenderString(temptxt);
       }
-      glPopMatrix();
-
+      drawText(temptxt, 520.0f, 640.0f, 0.4f,1);
       // show value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
         strcpy(temptxt1,spotify_oversigt.spotify_playlistname);
         *(temptxt1+46)=0;
-        glcRenderString(temptxt1);
+        drawText(temptxt1, 520.0f+textofset, 640.0f, 0.4f,1);
       } else {
         strcpy(temptxt,spotify_oversigt.get_spotify_artistname(spotifyknapnr));
-        glcRenderString(temptxt);
+        drawText(temptxt, 520.0f+textofset, 640.0f, 0.4f,1);
       }
-      glPopMatrix();
-
       // show songname
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 620.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      glcRenderString("Songname ");
-      glPopMatrix();
-      */
       drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
-
       // show songname value
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 620.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
-      temptxt1[40]=0;
-      glcRenderString(temptxt1);
-      glPopMatrix();
-      */
       sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_song_name());
       temptxt1[40]=0;
       drawText(temptxt1, 520.0f+textofset, 620.0f, 0.4f,1);
-
       // show artist
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 600.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        glcRenderString("Artist    ");
+        drawText("Artist    ", 520.0f, 600.0f, 0.4f,1);
       } else {
-        glcRenderString("Album     ");
+        drawText("Album     ", 520.0f, 600.0f, 0.4f,1);
       }
-      glPopMatrix();
-
       // show artist value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 600.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
       if (spotify_oversigt.get_spotify_type(spotifyknapnr)==0) {
-        sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_artist_name());
-        glcRenderString(temptxt1);
-      } else {
-        //glcRenderString("Album");
-        //sprintf(temptxt1,"%s",(char *) );
-        //glcRenderString(temptxt1);
+        sprintf(temptxt1,"%s",(char *) spotify_oversigt.spotify_aktiv_artist_name());        
+        drawText(temptxt1, 520.0f+textofset, 600.0f, 0.4f,1);
       }
-      glPopMatrix();
-
       // player device
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 580.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      // show active play device
-      glcRenderString("Player    ");
-      glPopMatrix();
-      */
       drawText("Player    ", 520.0f, 580.0f, 0.4f,1);
-
       // player device value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 580.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      // show active play device
       if (spotify_oversigt.active_spotify_device>-1) {
-        glcRenderString(spotify_oversigt.get_active_spotify_device_name());
+        drawText(temptxt1, 520.0f+textofset, 580.0f, 0.4f,1);
       }
-      glPopMatrix();
-
       // player play status background
       glPushMatrix();
       glEnable(GL_TEXTURE_2D);
@@ -5289,19 +5101,7 @@ void display() {
       glEnd();
       glPopMatrix();
       // show playtime as gfx box
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 540.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      sprintf(temptxt1,"playtime  ");
-      glcRenderString(temptxt1);
-      glPopMatrix();
-      */
       drawText("playtime  ", 520.0f, 540.0f, 0.4f,1);
-
       glPushMatrix();
       glColor3f(1.0f, 1.0f, 1.0f);
       int statuswxpos = 432;
@@ -5322,32 +5122,9 @@ void display() {
         glEnd();
       }
       glPopMatrix();
-
       // updated date on spotify
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f, 560.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      glcRenderString("Release   ");
-      glPopMatrix();
-      */
       drawText("Release   ", 520.0f, 560.0f, 0.4f,1);
-
       // updated date on spotify value
-      /*
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 560.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
-      glcRenderString(temptxt1);
-      glPopMatrix();
-      */
       sprintf(temptxt1,"%s",spotify_oversigt.spotify_aktiv_song_release_date());
       drawText("Release   ", 520.0f+textofset, 560.0f, 0.4f,1);
     }
@@ -5460,28 +5237,16 @@ void display() {
     glEnd();
     // play list name or artist name
     // show playlist or artist name
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 640.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
     int textofset=140;
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      glcRenderString("         ");
+      drawText("         ",520.0f, 640.0f, 0.4f,1);
     } else {
-      glcRenderString("Playlist ");
       // show value
-      glPushMatrix();
-      glDisable(GL_TEXTURE_2D);
-      glColor3f(1.0f, 1.0f, 1.0f);
-      glTranslatef(520.0f+textofset, 640.0f, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
-      else glcRenderString(tidal_oversigt.get_tidal_artistname(tidalknapnr));
+      drawText("Playlist ",520.0f, 640.0f, 0.4f,1);
+      if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
+        else drawText(tidal_oversigt.get_tidal_artistname(tidalknapnr), 520.0f+textofset, 640.0f, 0.4f,1);
     }
-    glPopMatrix();
+
     /*
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       strcpy(temptxt1,tidal_oversigt.tidal_playlistname);
@@ -5493,99 +5258,33 @@ void display() {
     }
     */
     // glcRenderString(tidal_oversigt.tidal_playlistname);
-    /*
-    glPopMatrix();
-    // show tidal songname
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 620.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString("Songname ");
-    glPopMatrix();
-    */
     // show tidal songname
     drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
-
     // show tidal songname value
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 620.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
-    temptxt1[40]=0;
-    glcRenderString(temptxt1);
-    glPopMatrix();
-    */
     sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
     temptxt1[40]=0;
     drawText(temptxt1, 520.0f+textofset, 620.0f, 0.4f,1);
 
     // show tidal artist
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 600.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
-      glcRenderString("Artist    ");
+      drawText("Artist    ", 520.0f, 600.0f, 0.4f,1);
     } else {
-      glcRenderString("Album     ");
+      drawText("Album     ", 520.0f, 600.0f, 0.4f,1);
     }
-    glPopMatrix();
 
     // show artist value/or none
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 600.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
     if (tidal_oversigt.get_tidal_type(tidalknapnr)==0) {
       sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_artist_name());
-      glcRenderString(temptxt1);
+      drawText(temptxt1, 520.0f+textofset, 600.0f, 0.4f,1);
     } else {
-      //glcRenderString("Album");
-      //sprintf(temptxt1,"%s",(char *) );
-      glcRenderString(tidal_oversigt.tidal_aktiv_artist_name());
+      drawText(tidal_oversigt.tidal_aktiv_artist_name(),520.0f+textofset, 600.0f, 0.4f,1);
     }
-    glPopMatrix();
-
     // # of songs
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 580.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString("song ");
-    glPopMatrix();
-    */
     drawText("song ", 520.0f, 580.0f, 0.4f,1);
-
     // # of songs + active nr
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 580.0f, 0.0f);   
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
-      else sprintf(temptxt1,"1/1");
-    glcRenderString(temptxt1);
-    glPopMatrix();
-    */
     if (tidal_oversigt.total_aktiv_songs()>0) sprintf(temptxt1,"%d/%d",tidal_oversigt.get_aktiv_played_song()+1,tidal_oversigt.total_aktiv_songs()+1);
       else sprintf(temptxt1,"1/1");
     drawText(temptxt1, 520.0f+textofset, 580.0f, 0.4f,1);
-
     // player play status background
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -5603,17 +5302,6 @@ void display() {
     glPopMatrix();
     
     // show playtime as gfx box
-    /*
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 540.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    sprintf(temptxt1,"playtime  ");
-    glcRenderString(temptxt1);
-    glPopMatrix();
-    */
     drawText("playtime  ", 520.0f, 540.0f, 0.4f,1);
 
     glPushMatrix();
@@ -5658,44 +5346,13 @@ void display() {
     #if defined USE_FMOD_MIXER
     channel->getFrequency(&frequency);
     #endif
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 560.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString("Samplerate ");
-    glPopMatrix();
-    glPushMatrix();
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glPopMatrix();
+    drawText("Samplerate ", 520.0f, 560.0f, 0.4f,1);
     sprintf(temptxt1,"%5.0f/%d Kbits",frequency,kbps);
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 560.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString(temptxt1);
-    glPopMatrix();
+    drawText(temptxt1, 520.0f+textofset, 560.0f, 0.4f,1);
     // updated date on tidal
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f, 500.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
-    glcRenderString("Release   ");
-    glPopMatrix();
-    glPushMatrix();
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glTranslatef(520.0f+textofset, 500.0f, 0.0f);
-    glRasterPos2f(0.0f, 0.0f);
-    glScalef(20.5, 20.5, 1.0);
+    drawText("Release   ", 520.0f, 500.0f, 0.4f,1);
     sprintf(temptxt1,"%s",tidal_oversigt.tidal_aktiv_song_release_date());
-    glcRenderString(temptxt1);
-    glPopMatrix();
+    drawText(temptxt1, 520.0f+textofset, 500.0f, 0.4f,1);
   }
   #endif
   // ******************************************************************************************************************
@@ -5778,42 +5435,22 @@ void display() {
       glTexCoord2f(1, 1); glVertex3f((orgwinsizex/4)+350+100,100+320 , 0.0);
       glTexCoord2f(1, 0); glVertex3f((orgwinsizex/4)+350+100,320, 0.0);
       glEnd();
-      glPushMatrix();
-      glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
-      glScalef(20,20, 1.0);
-      glColor4f(1.0f,1.0f,1.0f,1.0f);
-      glDisable(GL_TEXTURE_2D);
       sprintf(temptxt,"Name      %-20s",stream_playing_name);
-      temptxt[26]=0;
-      glcRenderString(temptxt);
-      glPopMatrix();
+      drawText(temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.4f,1);
+
       // play position
       if (streamoversigt.stream_is_playing) playtime=streamoversigt.getstream_pos()*1000;
       else playtime=0;
       playtime_hour=(playtime/60)/60;
       playtime_min=(playtime/60);
       playtime_sec=(int) playtime % 60;
-      glPushMatrix();
-      glColor3f(0.6f, 0.6f, 0.6f);
-      // show artist name
       if (streamoversigt.stream_is_playing) sprintf(temptxt,"Playing    %02d:%02d:%02d ",playtime_hour,playtime_min,playtime_sec);
       else sprintf(temptxt,"                                        ");
       temptxt[40]=0;
-      glTranslatef((orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0);
-      //glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+96, 0.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glScalef(20.5, 20.5, 1.0);
-      glcRenderString(temptxt);
-      glPopMatrix();
-      glPushMatrix();
-      glTranslatef((orgwinsizex/4)+20,(orgwinsizey/2)+0, 0);
-      glScalef(20,20, 1.0);
-      glColor4f(1.0f,1.0f,1.0f,1.0f);
-      glDisable(GL_TEXTURE_2D);
+      drawText(temptxt,(orgwinsizex/4)+20, (orgwinsizey/2)+48+20, 0.4f,1);
       sprintf(temptxt,"%-30s",stream_playing_desc);
       temptxt[30]='\0';
-      glcRenderString(temptxt);
-      glPopMatrix();
+      drawText(temptxt,(orgwinsizex/4)+20,(orgwinsizey/2)+0, 0.4f,1);
       // get stream texture
       if (stream_playing_icon) {
         glEnable(GL_TEXTURE_2D);
@@ -15705,9 +15342,8 @@ int main(int argc, char** argv) {
     }
 
 
-
     // Initialiser FreeType med en TrueType-skrifttype
-    if (!initFreeType("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf")) {
+    if (!initFreeType("/usr/share/fonts/truetype/teluguvijayam/Mandali-Regular.ttf")) {
         return -1;
     }
 
