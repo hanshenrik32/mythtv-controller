@@ -119,23 +119,25 @@ void drawText(const char *text, float x, float y, float scale,int color) {
         case 0: glColor4f(0.8f, 0.8f, 0.8f, 1.0f);          // gray
                 glColor3f(0.8f, 0.8f, 0.8f);
                 break;
-        case 1:glColor4f(0.8f, 0.8f, 0.8f, 1.0f);           // gray
+        case 1: glColor4f(0.8f, 0.8f, 0.8f, 1.0f);           // gray
                 glColor3f(0.8f, 0.8f, 0.8f);
                 break;
-        case 2:glColor4f(0.8f, 1.0f, 0.4f, 1.0f);
+        case 2: glColor4f(0.8f, 1.0f, 0.4f, 1.0f);
                 glColor3f(0.8f, 1.0f, 0.4f);
                 break;
-        case 3:glColor4f(1.0f, 0.8f, 0.4f, 1.0f);
+        case 3: glColor4f(1.0f, 0.8f, 0.4f, 1.0f);
                 glColor3f(1.0f, 0.8f, 0.4f);
                 break;
-        case 4:glColor4f(1.0f, 0.0f, 0.0f, 1.0f);           // red
+        case 4: glColor4f(1.0f, 0.0f, 0.0f, 1.0f);           // red
                 glColor3f(1.0f, 0.0f, 0.0f);
+                break;
+        case 5: glColor4f(0.5f, 0.5f, 0.5f, 1.0f);           // gray 1
+                glColor3f(0.5f, 0.5f, 0.5f);
                 break;
         case 15:glColor4f(1.0f, 1.0f, 1.0f, 1.0f);          // white
                 glColor3f(1.0f, 1.0f, 1.0f);
                 break;
-        default:
-                glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
+        default:glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
                 glColor3f(0.8f, 0.8f, 0.8f);
 
     };

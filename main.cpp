@@ -5260,6 +5260,7 @@ void display() {
     // glcRenderString(tidal_oversigt.tidal_playlistname);
     // show tidal songname
     drawText("Songname ", 520.0f, 620.0f, 0.4f,1);
+
     // show tidal songname value
     sprintf(temptxt1,"%s",(char *) tidal_oversigt.tidal_aktiv_song_name());
     temptxt1[40]=0;
