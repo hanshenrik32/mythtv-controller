@@ -4092,6 +4092,7 @@ void display() {
     glBlendFunc(GL_ONE, GL_ONE);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
     glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D, spotify_askplay);						// texture9
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -4142,10 +4143,14 @@ void display() {
     buttonsize = 200;
     // ***************************************************************** play icon
     glPushMatrix();
-    glEnable(GL_TEXTURE_2D);
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_TEXTURE_2D); 
     glColor3f(1.0f, 1.0f, 1.0f);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendFunc(GL_ONE_MINUS_DST_COLOR,GL_ONE);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendFunc(GL_DST_COLOR, GL_ZERO);
+    glEnable(GL_BLEND);
     glRotatef(0.0f, 0.0f, 0.0f, 0.0f);
     glBindTexture(GL_TEXTURE_2D, spotify_askplay);						// texture9
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
