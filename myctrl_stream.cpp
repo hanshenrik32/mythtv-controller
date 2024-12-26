@@ -4591,56 +4591,10 @@ void stream_class::show_stream_oversigt(GLuint normal_icon,GLuint empty_icon,GLu
       if (stack[i+sofset]->feed_group_antal>1) {
         // show numbers in group
         snprintf(temptxt,sizeof(temptxt),"Feeds %-4d",stack[i+sofset]->feed_group_antal);
-        drawText(temptxt, xof+22,yof+14, 0.4f,1);
-
+        drawText(temptxt, xof+22,yof+14, 0.3f,1);
       }
       // show text of element
       drawText(stack[i+sofset]->feed_showtxt, xof+20,yof-10, 0.4f,1);
-      /*
-      glPushMatrix();      
-      pline=0;
-      glTranslatef(xof+20,yof-10,0);
-      glDisable(GL_TEXTURE_2D);
-      glScalef(configdefaultstreamfontsize, configdefaultstreamfontsize, 1.0);
-      glColor4f(1.0f, 1.0f, 1.0f,1.0f);
-      glRasterPos2f(0.0f, 0.0f);
-      glDisable(GL_TEXTURE_2D);
-      strcpy(temptxt,stack[i+sofset]->feed_showtxt);        // text to show
-      base=temptxt;
-      length=strlen(temptxt);
-      width = 20;
-      bool stop=false;
-      while(*base) {
-        // if text can be on line
-        if(length <= width) {
-          glTranslatef((width/5)-(strlen(base)/4),0.0f,0.0f);
-          glcRenderString(base);
-          pline++;
-          break;
-        }
-        right_margin = base+width;
-        while((!isspace(*right_margin)) && (stop==false)) {
-          right_margin--;
-          if (right_margin == base) {
-            right_margin += width;
-            while(!isspace(*right_margin)) {
-              if (*right_margin == '\0') break;
-              else stop=true;
-              right_margin++;
-            }
-          }
-        }
-        if (stop) *(base+width)='\0';
-        *right_margin = '\0';
-        glcRenderString(base);
-        pline++;
-        glTranslatef(1.0f-(strlen(base)/1.6f)+2,-pline*1.2f,0.0f);
-        length -= right_margin-base+1;                         // +1 for the space
-        base = right_margin+1;
-        if (pline>=2) break;
-      }
-      glPopMatrix();
-      */
       // next button
       i++;
       xof+=(buttonsizex+10);

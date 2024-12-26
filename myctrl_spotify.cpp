@@ -4281,6 +4281,7 @@ void spotify_class::select_device_to_play() {
   glTexCoord2f(1, 0); glVertex3f( xof+winsizex-10, yof+10 , 0.0);
   glEnd();
   glPopMatrix();
+  /*
   glPushMatrix();
   glDisable(GL_TEXTURE_2D);
   glColor4f(1.0f, 1.0f, 1.0f,select_device_to_playfader);
@@ -4289,6 +4290,9 @@ void spotify_class::select_device_to_play() {
   glScalef(configdefaultstreamfontsize+8, configdefaultstreamfontsize+8, 1.0);
   glcRenderString("Select play device");
   glPopMatrix();
+  */
+  drawText("Select play device", xof+60,yof+240, 0.4f,1);
+
   //active_spotify_device
   while(strcmp(spotify_device[i].id,"")!=0) {
     xof3=xof+14;
@@ -4312,6 +4316,7 @@ void spotify_class::select_device_to_play() {
     glEnd();
     glPopMatrix();
     // draw text
+    /*
     glPushMatrix();
     glTranslatef(xof+30,(yof+200)-(i*30),0);
     glRasterPos2f(0.0f, 0.0f);
@@ -4322,6 +4327,18 @@ void spotify_class::select_device_to_play() {
     if ( i == active_spotify_device ) glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader); else glColor4f( 1.0f, 1.0f, 1.0f, select_device_to_playfader);
     glcRenderString(temptxt);
     glPopMatrix();
+    */
+    if (active_spotify_device>=0) strcpy( temptxt , spotify_device[i].name );
+    else strcpy( temptxt , "None" );
+    if ( i == active_spotify_device ) {
+      glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader);
+      drawText(temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
+    } else {
+      glColor4f( 1.0f, 1.0f, 0.0f, select_device_to_playfader);
+      drawText(temptxt, xof+30,(yof+200)-(i*30), 0.4f,1);
+    }
+
+    /*
     glPushMatrix();
     glTranslatef(xof+180,(yof+200)-(i*30),0);
     glRasterPos2f(0.0f, 0.0f);
@@ -4329,6 +4346,12 @@ void spotify_class::select_device_to_play() {
     glcRenderString(" - ");
     glcRenderString(spotify_device[i].devtype);
     glPopMatrix();
+    */
+    strcpy(temptxt," - ");
+    strcat(temptxt,spotify_device[i].devtype);
+    drawText(temptxt, xof+180,(yof+200)-(i*30), 0.4f,1);
+
+
     //draw icon
     xof2=xof+330;
     yof2=(yof+184)-(i*30);
