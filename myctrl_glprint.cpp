@@ -163,7 +163,8 @@ void drawText(const char *text, float x, float y, float scale,int color) {
         x += (ch.advance) * scale; // Flyt til næste tegn
     }
     glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
+    // glDisable(GL_BLEND);
+    glEnable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 

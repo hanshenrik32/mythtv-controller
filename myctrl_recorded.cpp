@@ -11,6 +11,8 @@
 #include <GL/glc.h>       		// danish ttf support
 // mysql support
 #include <mysql.h>
+#include <sstream>
+#include <iostream>
 #include "text3d.h"
 #include "readjpg.h"
 #include "utility.h"
@@ -34,6 +36,7 @@ extern GLuint _textureId22;    // movie open info box1
 extern GLuint _textureId23;    // movie open info box2
 extern GLuint _textureId24;    // movie open info box3
 extern int screen_size;
+extern int visvalgtnrtype;
 
 // ****************************************************************************************
 //
@@ -188,7 +191,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
   MYSQL *conn;
   MYSQL_RES *res;
   MYSQL_ROW row;
-  char *database = (char *) "mythconverg";
+  char *database = (char *) "mythtvcontroller";                                          // old ver mythconverg
   char filename[512];
   int storagegroupused=0;
   //gotoxy(10,17);
@@ -196,15 +199,15 @@ int recorded_overigt::opdatere_recorded_oversigt() {
   try {
     conn=mysql_init(NULL);
     if (conn) {
+      write_logfile(logfile,(char *) "Update recorded programs from database.");
       mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
       mysql_query(conn,"set NAMES 'utf8'");
-      strcpy(sqlselect,"create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int.stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
+      strcpy(sqlselect,"create table IF NOT EXISTS recorded(chanid int, starttime datetime, endtime datetime, title varchar(128), subtitle varchar(128), description text, season int,episode int ,category varchar(64), hostname varchar(255), bookmark int,editing int, cutlist int,autoexpire int, commflagged int,recgroup varchar(32), recordid int, seriesid varchar(64), inetref varchar(64), lastmodified datetime, filesize int,stars float, previouslyshown int, originalairdate date, preserve int, findid int, deletepending int, transcoder int, timestretch float, recpriority int,basename  varchar(255), progstart datetime, progend datetime, playgroup varchar(32), profile varchar(32), duplicate int, transcoded int, watched int, storagegroup varchar(32), bookmarkupdate datetime)");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
       strcpy(sqlselect,"create table IF NOT EXISTS recordedprogram(chanid int(10) unsigned,starttime datetime,endtime datetime,title varchar(128),subtitle varchar(128),description text,category varchar(64),category_type varchar(64),airdate year(4),stars float unsigned,previouslyshown tinyint(4),title_pronounce varchar(128),stereo tinyint(1),subtitled tinyint(1),hdtv tinyint(1),closecaptioned tinyint(1),partnumber int,parttotal int,seriesid varchar(12),originalairdate date,showtype varchar(30),colorcode  varchar(20),syndicatedepisodenumber varchar(20),programid varchar(64),manualid int(10) unsigned,generic tinyint(1),listingsource int(11),first tinyint(1),last tinyint(1),audioprop varchar(20),subtitletypes varchar(20),videoprop varchar(20))");
       mysql_query(conn,sqlselect);
       res = mysql_store_result(conn);
-      write_logfile(logfile,(char *) "Update recorded programs from mythtv database.");
 
       strcpy(sqlselect,"select title,subtitle,starttime,endtime,basename,description from recorded order by title,starttime desc");
       mysql_query(conn,sqlselect);
@@ -223,7 +226,7 @@ int recorded_overigt::opdatere_recorded_oversigt() {
             nn++;
           }
           // printf("title=%s n=%d nn=%d  \n",title,n,nn);
-          strcpy(filename,row[4]);
+          if (row[4]) strcpy(filename,row[4]); else strcpy(filename,"");
           storagegroupused=find_storagegroupfile(filename);						// hent storage group info
           if (storagegroupused==0) strcpy(filename,row[4]);
           if ((n<40) && (nn<200)) {
@@ -283,7 +286,7 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
   glLineWidth(2.0);
   glScalef(0.003, 0.003, 0.003);
   for (p = buffer; *p; p++) glutStrokeCharacter(GLUT_STROKE_ROMAN, *p);
-    glPopMatrix();
+  glPopMatrix();
 }
 
 
@@ -297,7 +300,7 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 // subvalgtnr = den valgte som skal vises i under liste
 //
 // ****************************************************************************************
-void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
+void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   static GLuint texture=0;
   unsigned int i=0;
   int ii,iii;
@@ -315,6 +318,7 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
   char temptxt[256];
   char temptxt1[256];
   int xpos,ypos;
+  static unsigned int flipflop=0;
   if (valgtnr>10) {
     startofset=valgtnr-10;
     valgtnr=10;
@@ -376,39 +380,42 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
   glTexCoord2f(1.0, 0.0); glVertex3f(xpos+1210, ypos+100, 0.0);
   glEnd();
   // main start off text in window
-  drawText("temptxt", 210.0f, 820.0f, 0.4f,1);
-
   while ((i<=recordoversigt.top_antal()) && (i<11)) { 				// vis max
     recordoversigt.programs[i+startofset].recorded_programs[0].get_recorded(i,title,subtitle,startdato,slutdato,desc);
     // hvis valgte
     if (i+startofset==valgtnr+startofset) {
+      strcpy(temptxt,title);
+      if (visvalgtnrtype==1) drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,2);
+        else drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,3);
+    } else {
+      strcpy(temptxt,title);
+      drawText(temptxt, 220.0f, 800.0f-(i*25.0f), 0.4f,1);
     }
-    strcpy(temptxt,title);
-    drawText(temptxt, 210.0f, 820.0f, 0.4f,1);
     i++;
   }
   i=0;
+  // show sub (epsiode)
   while ((i<recordoversigt.programs[valgtnr+startofset].prg_antal) && (i<11)) { 				// vis max
     recordoversigt.programs[valgtnr+startofset].recorded_programs[i+substartofset].get_recorded(i+substartofset,title,subtitle,startdato,slutdato,desc);
     strcpy(temptxt,subtitle);					// get sub title
     if (strcmp(temptxt,"")==0) strcpy(temptxt,desc);                // Hvis der ikke er nogle subtitle bruge description i stedet
-    drawText(temptxt, 620.0f, 820.0f, 0.4f,1);
+    if (i+startofset==subvalgtnr+startofset) {
+      drawText(temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,2);
+    } else {
+      drawText(temptxt, 620.0f, 800.0f-(i*25.0f), 0.4f,1);
+    }
     i++;
   }
   recordoversigt.programs[valgtnr+startofset].recorded_programs[subvalgtnr+substartofset].get_recorded(subvalgtnr,title,subtitle,startdato,slutdato,desc);
-  glPushMatrix();
-  glTranslatef(220.0f, 310.0f,0);
-  glRasterPos2f(0.0f, 0.0f);
-  glScalef(20.0f, 20.0f, 1.0f);
-  glcRenderString("Date...:");
+  // show prg start date
   strcpy(temptxt,startdato);
   temptxt[10]=0;
-  glcRenderString(temptxt);
-  glcRenderString(" KL.:");
-  strcpy(temptxt,startdato);
+  drawText("Date...:", 220.0f, 310.0f, 0.4f,1);
+  drawText(temptxt, 220.0f+70, 310.0f, 0.4f,1);           // show date
+  drawText("KL : ", 220.0f+190.0f, 310.0f, 0.4f,1);
+  strcpy(temptxt,startdato+11);
   temptxt[5]=0;
-  glcRenderString(temptxt);
-  glPopMatrix();
+  drawText(temptxt, 220.0f+230.0f, 310.0f, 0.4f,1);       // show kl
   static time_t tm;				// this time (now)
   struct tm *nutid;
   struct tm prgstarttid;
@@ -424,8 +431,36 @@ void recorded_overigt::show_recorded_oversigt1(int valgtnr,int subvalgtnr) {
   time_t st=mktime(&prgstarttid);
   time_t et=mktime(&prgsluttid);
   if ((tm>st) && (tm<et)) {				// er tiden inden for nu så hvis at vi optager live nu
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glScalef(18.0f, 18.0f, 1.0f);
-    drawText("Recording", 220.0f, 310.0f+40, 0.4f,1);
-  }    
+    flipflop++;
+    if (flipflop<24) drawText("Recording now",  220.0f+290.0f, 310.0f, 0.4f,1);
+    if (flipflop>48) flipflop=0;  
+  }  
+  // show desc
+  // drawText(temptxt, 220.0f+480, 280.0f, 0.4f,1);           // show desc
+
+  int subtitlelength=strlen(desc);                       // get desc length
+  float linof=0.0f;
+  int maxWidth=70;
+  int sted=0;
+  int ll=0;
+  std::istringstream stream(desc);
+  std::string word, line;
+  while (stream >> word) {
+    if (line.length() + word.length() + 1 > maxWidth) {
+      drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
+      // printf("%s\n",line.c_str());
+      line = word;
+      linof-=20.0f;
+      ll++;
+    } else {
+      if (!line.empty()) line += ' ';
+      line += word;
+    }
+  }
+  if (!line.empty()) {
+    drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
+    // printf("%s\n",line.c_str());
+    linof-=20.0f;
+    ll++;
+  }
 }

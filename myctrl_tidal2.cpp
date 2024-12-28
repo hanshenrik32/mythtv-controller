@@ -4083,8 +4083,8 @@ void tidal_class::show_tidal_oversigt(GLuint normal_icon,GLuint song_icon,GLuint
         drawText(temptxt, xof+30,yof-20, 0.4f,1);
         if (strlen(stack[i+sofset]->feed_showtxt)>16) {
           strcpy(temptxt,stack[i+sofset]->feed_showtxt+16);        // text to show
-          drawText(temptxt, xof+30,yof-40, 0.4f,1);
           temptxt[16]=0;
+          drawText(temptxt, xof+30,yof-40, 0.4f,1);
         }
         // next button
         i++;

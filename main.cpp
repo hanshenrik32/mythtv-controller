@@ -3630,7 +3630,7 @@ void display() {
       }
       // show record program menu
     } else if (vis_recorded_oversigt) {
-      recordoversigt.show_recorded_oversigt1(0,0);
+      recordoversigt.show_recorded_oversigt(valgtrecordnr,subvalgtrecordnr);
       //if (debugmode & 1) cout << "Time: " << (clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << endl;
     }
     // show record tv programs in tv guide
@@ -6682,10 +6682,6 @@ void display() {
   glutSwapBuffers();
 }
 // end display()
-
-
-
-
 
 
 
@@ -15204,6 +15200,9 @@ int main(int argc, char** argv) {
     // in use tridal_oversigt.tridal_login_token2
     //tridal_oversigt.tridal_login_token2();
     #endif
+
+
+    recordoversigt.opdatere_recorded_oversigt();      
 
     if (configbackend_openspotify_player) {
       // check if running do not start new.
