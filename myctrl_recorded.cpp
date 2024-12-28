@@ -436,8 +436,6 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     if (flipflop>48) flipflop=0;  
   }  
   // show desc
-  // drawText(temptxt, 220.0f+480, 280.0f, 0.4f,1);           // show desc
-
   int subtitlelength=strlen(desc);                       // get desc length
   float linof=0.0f;
   int maxWidth=70;
@@ -445,10 +443,9 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   int ll=0;
   std::istringstream stream(desc);
   std::string word, line;
-  while (stream >> word) {
+  while ((stream >> word) && (linof>-120.0f)) {
     if (line.length() + word.length() + 1 > maxWidth) {
       drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
-      // printf("%s\n",line.c_str());
       line = word;
       linof-=20.0f;
       ll++;
@@ -459,7 +456,6 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   }
   if (!line.empty()) {
     drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
-    // printf("%s\n",line.c_str());
     linof-=20.0f;
     ll++;
   }
