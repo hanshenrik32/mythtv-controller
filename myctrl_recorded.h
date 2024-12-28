@@ -45,7 +45,7 @@ class recorded_overigt {
         recorded_overigt() { title_antal=0; }
         unsigned int programs_type_antal(int nr) { return(programs[nr].prg_antal); }
         int opdatere_recorded_oversigt();
-        void show_recorded_oversigt1(int valgtnr,int subvalgtnr);
+        void show_recorded_oversigt(int valgtnr,int subvalgtnr);
         unsigned int top_antal() { return(title_antal); }
         void set_top_antal(unsigned int ant) { title_antal=ant; }
         void get_recorded_filepath(char *filepath,int valgtnr,int subvalgtnr);
