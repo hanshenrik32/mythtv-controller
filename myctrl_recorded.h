@@ -1,22 +1,24 @@
 #ifndef MYCTRL_RECORDED
 #define MYCTRL_RECORDED
 
-
+#include <string>
+#include <string.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-//#include <irrKlang.h>
+
 
 class recorded_oversigt_type {		// data types from mythtv ver 0.22
     private:
-        char title[128+1];				// title
-        char subtitle[128+1];				// sub title
+        char title[128+1];				    // program title
+        char subtitle[128+1];				// sub title (desc)
         char recordedpath[255+1];			// recorded file path
         char startdato[20+1];
         char enddato[20+1];
         char description[200+1];
     public:
+        std::string start_prg_image;             // image string to file from recorded tv
         recorded_oversigt_type();
         void put_recorded(char *tit,char *subtit,char *startdag,char *enddag,char *filepath,char *desc);
         void get_recorded(int recnr,char *tit,char *subtit,char *startdag,char *enddag,char *desc);

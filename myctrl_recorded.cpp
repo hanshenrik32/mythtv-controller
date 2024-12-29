@@ -52,6 +52,7 @@ recorded_oversigt_type::recorded_oversigt_type() {
 //    strcpy(startdato,"");
 //    strcpy(enddato,"");
 //    strcpy(description,"");
+  start_prg_image="";
 }
 
 // ****************************************************************************************
@@ -436,8 +437,6 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     if (flipflop>48) flipflop=0;  
   }  
   // show desc
-  // drawText(temptxt, 220.0f+480, 280.0f, 0.4f,1);           // show desc
-
   int subtitlelength=strlen(desc);                       // get desc length
   float linof=0.0f;
   int maxWidth=70;
@@ -445,10 +444,9 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   int ll=0;
   std::istringstream stream(desc);
   std::string word, line;
-  while (stream >> word) {
+  while ((stream >> word) && (linof>-120.0f)) {
     if (line.length() + word.length() + 1 > maxWidth) {
-      drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
-      // printf("%s\n",line.c_str());
+      drawText(line.c_str(), 220.0f+480.0f, 290.0f+linof, 0.4f,1);
       line = word;
       linof-=20.0f;
       ll++;
@@ -458,9 +456,24 @@ void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
     }
   }
   if (!line.empty()) {
-    drawText(line.c_str(), 220.0f+470.0f, 290.0f+linof, 0.4f,1);
-    // printf("%s\n",line.c_str());
+    drawText(line.c_str(), 220.0f+480.0f, 290.0f+linof, 0.4f,1);
     linof-=20.0f;
     ll++;
   }
+  // show image from recorded if exist
+  if (programs[valgtnr].recorded_programs->start_prg_image.length()>0) {
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D,_textureId23);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(xpos+120, ypos+120, 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(xpos+120, ypos+260, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(xpos+310, ypos+260, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(xpos+310, ypos+120, 0.0);
+    glEnd();
+  }
 }
+
+
