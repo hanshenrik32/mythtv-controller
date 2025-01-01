@@ -1,6 +1,5 @@
 # packs to install to compile
 # The program req 300 Mbytes of diskspace.
-# open shell
 # 
 # updated 02-09-2014
 # updated 27-08-2017
@@ -9,6 +8,7 @@
 # updated 21-08-2021
 # UPDATED 23-04-2024
 # Updated 07-07-2024
+# Updated 30-12-2024
 
 
 This packets need to be installed on Ubuntu.
@@ -21,9 +21,15 @@ you have to extract this file to the source directory to be able to compile and 
 
 Version.
 
-mythtv-controller ver 0.42.2
+mythtv-controller ver 0.42.6
 
-Now you have spotify view.
+New font system to write text faster. called drawText 
+
+def
+
+void drawText(const char *text, float x, float y, float scale,int color)
+
+Now you have spotify and tidal view.
 
 Howto install.
 
@@ -64,7 +70,7 @@ You can uninstall by.
 # If you change the sound device or the screen size. The program have to be
 # restarted before the change is applyed.
 #
-# Programmed by Hans-Henrik Grüner-Pedersen
+# Programmed by Hans-Henrik Grüner-Pedersen 2022 to 2025
 # release under GPL V2
 # hanshenrik32@gmail.com
 #

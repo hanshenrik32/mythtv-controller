@@ -1,12 +1,12 @@
 HTTP/2 404 
 content-type: application/json
 content-length: 66
-date: Fri, 25 Oct 2024 18:24:24 GMT
-cache-control: no-cache
+date: Wed, 01 Jan 2025 19:26:34 GMT
 server: noyb
+cache-control: no-cache
 x-cache: Error from cloudfront
-via: 1.1 6ee89b3e6dcaec24bb10163246825fba.cloudfront.net (CloudFront)
-x-amz-cf-pop: CPH50-P1
-x-amz-cf-id: rL4cnMhP_m8014aGHdqCdb07Bd7ObLSjMWr-_YGwMLZObrI0FQLOvg==
+via: 1.1 3b78d7f6f4659eac59b9364313823246.cloudfront.net (CloudFront)
+x-amz-cf-pop: CPH50-C2
+x-amz-cf-id: 08pSflbwV5KO9Cs51rfzk2sbqw-8yf-9C1FSsFN-dAGzVBGFNm-DqA==
 
 {"status":404,"subStatus":2001,"userMessage":"Resource not found"}

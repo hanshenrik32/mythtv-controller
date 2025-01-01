@@ -41,17 +41,16 @@ extern int visvalgtnrtype;
 // ****************************************************************************************
 //
 // constructor
-// this fault why ?
 //
 // ****************************************************************************************
 
 recorded_oversigt_type::recorded_oversigt_type() {
-//    strcpy(title,"");
-//    strcpy(subtitle,"");
-//    strcpy(recordedpath,"");
-//    strcpy(startdato,"");
-//    strcpy(enddato,"");
-//    strcpy(description,"");
+  strcpy(title,"");
+  strcpy(subtitle,"");
+  strcpy(recordedpath,"");
+  strcpy(startdato,"");
+  strcpy(enddato,"");
+  strcpy(description,"");
   start_prg_image="";
 }
 
@@ -291,7 +290,6 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 }
 
 
-
 // ****************************************************************************************
 //
 // In use
@@ -301,6 +299,7 @@ void stroke_output1(GLfloat x, GLfloat y, char *format,...) {
 // subvalgtnr = den valgte som skal vises i under liste
 //
 // ****************************************************************************************
+
 void recorded_overigt::show_recorded_oversigt(int valgtnr,int subvalgtnr) {
   static GLuint texture=0;
   unsigned int i=0;

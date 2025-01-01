@@ -17,6 +17,7 @@
 #include <iostream>
 #include <MediaInfo/MediaInfo.h>
 #include <sstream>
+#include <fmt/format.h>
 
 #include "utility.h"
 #include "myctrl_movie.h"
@@ -1396,6 +1397,7 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
   int buttonsizey=180;
   int xof=5;
   int yof=orgwinsizey-(buttonsizey);
+  std:string temptxt1;
   // load dvd covers dynamic one pr frame
   if ((movie_oversigt_loaded==false) && (movie_oversigt_loaded_nr<(int) this->filmoversigt_antal)) {
     movie_oversigt_gfx_loading=true;
@@ -1505,14 +1507,18 @@ void film_oversigt_typem::show_film_oversigt(float _mangley,int filmnr) {
         }
       }
       */
-      strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn      
-      temptxt[16]=0;
+      // strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle());                              // album navn      
+      // temptxt[16]=0;
       float xoff=0.0f;
-      drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos, 0.4f,1);
-      if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>16) {
-        strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle()+16);                              // album navn      
-        temptxt[16]=0;
-        drawText(temptxt, 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f,1);
+
+      temptxt1 = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle());
+      temptxt1.resize(20);
+      drawText(temptxt1.c_str(), 14.00f+xpos+xoff, 114.0f+ypos, 0.4f,1);
+      if (strlen(filmoversigt[film_nr+sofset].getfilmtitle())>20) {
+        strcpy(temptxt,filmoversigt[film_nr+sofset].getfilmtitle()+20);                              // album navn
+        temptxt1 = fmt::v8::format("{:^20}",filmoversigt[film_nr+sofset].getfilmtitle()+20);
+        temptxt1.resize(20);
+        drawText(temptxt1.c_str(), 14.00f+xpos+xoff, 114.0f+ypos-20.0f, 0.4f,1);
       }
     }
     // next button

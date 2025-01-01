@@ -19,6 +19,8 @@
 //#include <ical.h>
 #include <libical/ical.h>
 #include <libxml/parser.h>
+#include <fmt/format.h>
+
 #include "utility.h"
 #include "myctrl_tvprg.h"
 #include "myth_ttffont.h"
@@ -4521,22 +4523,23 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   glPopMatrix();
   */
 
+  std::string temprgtxt1;
   // new ver 2
   switch (configland) {
-    case 0: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 0: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 1: snprintf(temprgtxt,65,"Prg navn : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 1: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 2: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 2: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 3: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 3: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    case 4: snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    case 4: temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
             break;
-    default:
-          snprintf(temprgtxt,65,"Prg name : %-20s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
+    default:    
+          temprgtxt1 = fmt::v8::format("Prg name : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn);
   }
-  drawText(temprgtxt, 700,525, 0.4f,1);
+  drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
 
   /* old ver 3
   glPushMatrix();
@@ -4563,20 +4566,26 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   */
   // new ver 3
   switch (configland) {
-    case 0: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 0: // snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 1: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 1: // snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 2: snprintf(temprgtxt,65,"début    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 2: // snprintf(temprgtxt,65,"début    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("début    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 3: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 3: // snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    case 4: snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    case 4: // snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
             break;
-    default:snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+    default:// snprintf(temprgtxt,65,"Start    : %10s",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
+            temprgtxt1 = fmt::v8::format("Start    : {}",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].starttime);
 
   }
-  drawText(temprgtxt, 700,525, 0.4f,1);
+  drawText(temprgtxt1.c_str(), 700,525, 0.4f,1);
 
   /*  old ver 4
   glPushMatrix();
@@ -4603,20 +4612,26 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   */
   // new ver 4
   switch (configland) {
-    case 0: snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 0: // snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 1: snprintf(temprgtxt,65,"Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 1: // snprintf(temprgtxt,65,"Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("Længde   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 2: snprintf(temprgtxt,65,"durée du : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 2: // snprintf(temprgtxt,65,"durée du : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("durée du : {} min..",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 3: snprintf(temprgtxt,65,"Programmlänge : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 3: // snprintf(temprgtxt,65,"Programmlänge : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("Programmlänge : {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
-    case 4: snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+    case 4: // snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
             break;
     default:
-            snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            // snprintf(temprgtxt,65,"Length   : %d min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
+            temprgtxt1 = fmt::v8::format("Length   :  {} min.",tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_length_minuter);
   }
-  drawText(temprgtxt, 700,475, 0.4f,1);
+  drawText(temprgtxt1.c_str(), 700,475, 0.4f,1);
 
   /* old ver 5
   glPushMatrix();
@@ -4646,21 +4661,27 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
   // new ver 5
   if (antalrec==-1) antalrec=tvprgrecordedbefore(tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].program_navn,tvkanaler[tvvalgtrecordnr].chanid);
   switch (configland) {
-    case 0: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+    case 0: // snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
             break;
-    case 1: snprintf(temprgtxt,65,"Optaget  : %d gange før.",antalrec);
+    case 1: // snprintf(temprgtxt,65,"Optaget  : %d gange før.",antalrec);
+            temprgtxt1 = fmt::v8::format("Optaget  : %d gange før.",antalrec);
             break;
-    case 2: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+    case 2: // snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
             break;
-    case 3: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+    case 3: // snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
             break;
-    case 4: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+    case 4: // snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
             break;
-    default: snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+    default:// snprintf(temprgtxt,65,"Recorded : %d times before.",antalrec);
+            temprgtxt1 = fmt::v8::format("Recorded : %d times before.",antalrec);
 
   }
   if (tvkanaler[tvvalgtrecordnr].tv_prog_guide[tvsubvalgtrecordnr].recorded) strcat(temprgtxt," Set to record");
-  drawText(temprgtxt, 700,450, 0.4f,1);
+  drawText(temprgtxt1.c_str(), 700,450, 0.4f,1);
 
 
   /* old ver 6  
@@ -4707,19 +4728,25 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
 
   // new ver 7
   switch (configland) {
-    case 0: sprintf(temprgtxt,"Description : ");
+    case 0: // sprintf(temprgtxt,"Description : ");
+            temprgtxt1 = fmt::v8::format("Description : ");
             break;
-    case 1: sprintf(temprgtxt,"Beskrivelse : ");
+    case 1: // sprintf(temprgtxt,"Beskrivelse : ");
+            temprgtxt1 = fmt::v8::format("Description : ");
             break;
-    case 2: sprintf(temprgtxt,"Description : ");
+    case 2: // sprintf(temprgtxt,"Description : ");
+            temprgtxt1 = fmt::v8::format("Description : ");
             break;
-    case 3: sprintf(temprgtxt,"Description : ");
+    case 3: // sprintf(temprgtxt,"Description : ");
+            temprgtxt1 = fmt::v8::format("Description : ");    
             break;
-    case 4: sprintf(temprgtxt,"Description : ");
+    case 4: // sprintf(temprgtxt,"Description : ");
+            temprgtxt1 = fmt::v8::format("Description : ");
             break;
-    default: sprintf(temprgtxt,"Description :");
+    default:// sprintf(temprgtxt,"Description :");
+            temprgtxt1 = fmt::v8::format("Description : ");
   }
-  drawText(temprgtxt, 700,375, 0.4f,1);
+  drawText(temprgtxt1.c_str(), 700,375, 0.4f,1);
 
 
   // show description
@@ -4792,7 +4819,6 @@ void tv_oversigt::showandsetprginfo(int tvvalgtrecordnr,int tvsubvalgtrecordnr) 
     glEnd(); //End quadrilateral coordinates
     glPopMatrix();
   }
-
   //glPopMatrix();
 }
 

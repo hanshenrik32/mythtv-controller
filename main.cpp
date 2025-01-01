@@ -38,6 +38,7 @@
 #include <iostream>
 #include <pthread.h>                      // multi thread support
 #include <sstream>
+#include <fmt/format.h>
 
 // type used
 using namespace std;
@@ -918,7 +919,7 @@ int hentmythtvver() {
 //    int i;
     // mysql stuf
     strcpy(txtversion,"");
-    snprintf(sqlselect,sizeof(sqlselect),"select data from settings where value like 'DBSchemaVer'");
+    strcpy(sqlselect,"select data from settings where value like 'DBSchemaVer'");    
     // mysql stuf
     char *database = (char *) "mythconverg";
     conn=mysql_init(NULL);
@@ -2540,6 +2541,9 @@ void display() {
   float *spec2;
   float *specLeft, *specRight;
   bool startup = true;
+
+  std::string temptxt2;
+
   // uv color table
   static int tmpcounter=0;
   // fade colors (over time) for clock
@@ -6264,15 +6268,14 @@ void display() {
     drawText(temptxt, 750, 870, 0.4f,1);
     
     // show movie length
-    sprintf(temptxt,"%d min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
+    temptxt2 = fmt::v8::format("{} min.",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmlength());
     drawText(movie_length[configland], 670, 870-20, 0.4f,1);
-    drawText(temptxt, 750, 870-20, 0.4f,1);
+    drawText(temptxt2.c_str(), 750, 870-20, 0.4f,1);
     
     // show movie year
-    sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
-    temptxt[23]=0;
+    temptxt2 = fmt::v8::format("{} ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmaar());
     drawText(movie_year[configland], 670, 870-40, 0.4f,1);
-    drawText(temptxt, 750, 870-40, 0.4f,1);
+    drawText(temptxt2.c_str(), 750, 870-40, 0.4f,1);
     
     // show movie rating on imdb
     if (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating()) sprintf(temptxt,"%d ",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmrating());
@@ -6284,17 +6287,19 @@ void display() {
     // show movie format avi/mp4 osv
     drawText("Format ", 670, 870-80, 0.4f,1);
     drawText(film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getFormat(), 750, 870-80, 0.4f,1);
-    
+
     // show movie windows size
     drawText("W/H ", 670, 870-100, 0.4f,1);
-    sprintf(temptxt,"%d/%d",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
-    drawText(temptxt, 750, 870-100, 0.4f,1);
+    temptxt2 = fmt::v8::format("{}/{}",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getWidth(),film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getHigh());
+    drawText(temptxt2.c_str(), 750, 870-100, 0.4f,1);
     
     // show movie size
     drawText("Size ", 670, 870-120, 0.4f,1);
-    if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) sprintf(temptxt,"%4d Gb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024);
-    else sprintf(temptxt,"%d Mb",film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024);
-    drawText(temptxt, 750, 870-120, 0.4f,1);
+    if ((film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024)>1) 
+      temptxt2 = fmt::v8::format("{} Gb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024/1024));
+    else
+      temptxt2 = fmt::v8::format("{} Mb",(int ) (film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getSize()/1024/1024));
+    drawText(temptxt2.c_str(), 750, 870-120, 0.4f,1);
 
     // show movie imdb nr
     strcpy(temptxt,film_oversigt.filmoversigt[do_zoom_film_aktiv_nr].getfilmimdbnummer());
@@ -6366,39 +6371,13 @@ void display() {
 
   bool show_status=true;
   // show status line
-  /*
-  glPushMatrix();
-  glTranslatef(1, 1, 0);
-  glScalef(20,20, 1.0);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
-  glColor4f(1.0f,1.0f,1.0f,(float) color/255);
   strcpy(textstring,"");  
   if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
   if (do_update_moviedb) strcat(textstring,"MOVIE,");      
   if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
   if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
-  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
-  if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
-  if (strcmp(textstring,"")==0) {
-    strcat(textstring,"STATUS: None."); 
-    show_status=false;
-  } else strcat(textstring," running updates ..");
-  glcRenderString(textstring);
-  glColor3b(255,255,255);
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(1.0f,1.0f,1.0f,1.0f);
-  glPopMatrix();
-  */
-
-  strcpy(textstring,"");  
-  if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
-  if (do_update_moviedb) strcat(textstring,"MOVIE,");      
-  if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
-  if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
-  if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
-  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
+  // if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
   if (strcmp(textstring,"")==0) {
     strcat(textstring,"STATUS: None."); 
