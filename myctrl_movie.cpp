@@ -328,13 +328,21 @@ void film_oversigt_typem::softstopmovie() {
 // ****************************************************************************************
 
 int film_oversigt_typem::playmovie(int nr) {
-    char path[PATH_MAX];                                  // max path length from os
-    strcpy(path,"");
-    // strcat(path,configmoviepath);                         // get movie path
-    // strcat(path,"/");
-    film_is_playing=true;
-    strcat(path,this->filmoversigt[nr].getfilmfilename());
-    vlc_controller::playmedia(path);  
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    std::string updatedbplayed;
+    char *database = (char *) "mythtvcontroller";
+    conn=mysql_init(NULL);
+    if (conn) {
+      mysql_real_connect(conn, configmysqlhost,configmysqluser, configmysqlpass, database, 0, NULL, 0);
+      updatedbplayed = fmt::v8::format("update videometadata set playcount=playcount+1 where filename like '{}'",this->filmoversigt[nr].getfilmfilename());
+      mysql_query(conn,updatedbplayed.c_str());
+      res = mysql_store_result(conn);
+      mysql_close(conn);
+    }
+    film_is_playing=true;                                       // set play flag
+    vlc_controller::playmedia(this->filmoversigt[nr].getfilmfilename());
     return(1);
 }
 
