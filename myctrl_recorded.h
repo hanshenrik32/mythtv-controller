@@ -8,7 +8,6 @@
 #include <GL/glu.h>
 
 
-
 class recorded_oversigt_type {		// data types from mythtv ver 0.22
     private:
         char title[128+1];				    // program title

@@ -12,6 +12,7 @@
 #include <time.h>
 #include <cmath>
 #include <iostream>
+#include <fmt/format.h>
 
 #include "myctrl_stream.h"
 #include "utility.h"
@@ -413,7 +414,7 @@ int stream_class::loadrssfile(bool updaterssfile) {
 // ****************************************************************************************
 
 
-char search_and_replace2(char *text) {
+void search_and_replace2(char *text) {
   int n=0;
   int nn=0;
   char newtext[2048];
@@ -462,6 +463,12 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
   char result[2048+1];
   char sqlinsert[32768];
   char sqlselect[32768];
+
+  std::string sqlinsert1;
+  std::string sqlselect1;
+  std::string debuglogdata1;
+  
+
   char *database = (char *) "mythtvcontroller";
   bool recordexist=false;
   time_t raw_tid;
@@ -600,9 +607,13 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                     search_and_replace2(rssprgfeedtitle);
                     search_and_replace2(rssprgdesc);
                     // write debug log
-                    snprintf(debuglogdata,sizeof(debuglogdata),"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
-                    write_logfile(logfile,(char *) debuglogdata);
+                    // snprintf(debuglogdata,sizeof(debuglogdata),"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
+
+                    debuglogdata1 = fmt::v8::format("Podcast update title {} date {}", rssprgtitle,rssprgpubdate);
+
+                    write_logfile(logfile,(char *) debuglogdata1.c_str());                  
                     snprintf(sqlinsert,sizeof(sqlinsert),"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage,rssopretdato,0);
+                    std::string sqlinsert1 = fmt::v8::format("REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('{}','{}','{}','{}','{}','{}','','{}','{}','{}')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,rssprgdesc,rssprgimage,rssopretdato,0);
                     if (mysql_query(conn,sqlinsert)!=0) {
                       printf("mysql REPLACE table error. %s\n",sqlinsert);
                     }
@@ -676,6 +687,9 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
               }
               recordexist=false;
               snprintf(sqlinsert,sizeof(sqlinsert),"SELECT feedtitle from internetcontentarticles where (feedtitle like '%s' mediaURL like '%s' and title like '%s')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+
+              sqlinsert1 = fmt::v8::format("SELECT feedtitle from internetcontentarticles where (feedtitle like '{}' mediaURL like '{}' and title like '{}')",rssprgtitle,rssvideolink,rssprgfeedtitle);
+
               mysql_query(conn,sqlinsert);
               res = mysql_store_result(conn);
               if (res) {
@@ -690,8 +704,10 @@ int stream_class::parsexmlrssfile(char *filename,char *baseiconfile) {
                 // write debug log
                 snprintf(debuglogdata,sizeof(debuglogdata),"Podcast update title %-20s Date %s",rssprgtitle,rssprgpubdate);
                 write_logfile(logfile,(char *) debuglogdata);
-                snprintf(sqlinsert,sizeof(sqlinsert),"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
-                //sprintf(sqlinsert,"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb) values('%s','%s','%s',%d,%d,'%s','%s','%s','%s')",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1);
+                snprintf(sqlinsert,sizeof(sqlinsert),"REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values(\"%s\",'%s',\"%s\",%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%d)",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);                
+
+                sqlinsert1 = fmt::v8::format("REPLACE into internetcontentarticles(feedtitle,mediaURL,title,episode,season,author,path,description,paththumb,date,time) values('{}','{}','{}',{},{},'{}','{}','{}','{}','{}',{})",rssprgtitle,rssvideolink,rssprgfeedtitle,rssepisode,rssseason,rssauthor,"",rssprgdesc,rssprgimage1,rssopretdato,0);
+
                 if (mysql_query(conn,sqlinsert)!=0) {
                   printf("mysql REPLACE table error. %s\n",sqlinsert);
                 }

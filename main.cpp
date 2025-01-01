@@ -6366,39 +6366,13 @@ void display() {
 
   bool show_status=true;
   // show status line
-  /*
-  glPushMatrix();
-  glTranslatef(1, 1, 0);
-  glScalef(20,20, 1.0);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
-  glColor4f(1.0f,1.0f,1.0f,(float) color/255);
   strcpy(textstring,"");  
   if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
   if (do_update_moviedb) strcat(textstring,"MOVIE,");      
   if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
   if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
   if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
-  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
-  if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
-  if (strcmp(textstring,"")==0) {
-    strcat(textstring,"STATUS: None."); 
-    show_status=false;
-  } else strcat(textstring," running updates ..");
-  glcRenderString(textstring);
-  glColor3b(255,255,255);
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(1.0f,1.0f,1.0f,1.0f);
-  glPopMatrix();
-  */
-
-  strcpy(textstring,"");  
-  if (strcmp(music_db_update_loader,"")>0) strcat(textstring,"MUSIC,");
-  if (do_update_moviedb) strcat(textstring,"MOVIE,");      
-  if (spotify_oversigt.get_spotify_update_flag()) strcat(textstring,"SPOTIFY,");
-  if (!(radio_oversigt_loaded_done)) strcat(textstring,"RADIO,"); 
-  if (do_update_spotify_playlist)  strcat(textstring,"SPOTIFY, update.."); 
-  if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
+  // if ((do_update_xmltv_show) || (do_update_xmltv)) strcat(textstring,"TV guide,"); 
   if ((do_update_rss_show) || (do_update_rss)) strcat(textstring,"Podcast rss,"); 
   if (strcmp(textstring,"")==0) {
     strcat(textstring,"STATUS: None."); 

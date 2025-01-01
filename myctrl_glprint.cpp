@@ -104,9 +104,10 @@ int initFreeType(const char *fontPath) {
     return 1;
 }
 
+
 // ****************************************************************************************
 //
-// Funktion til at tegne tekst
+// Funktion to draw text in screen.
 //
 // ****************************************************************************************
 void drawText(const char *text, float x, float y, float scale,int color) {
@@ -122,7 +123,7 @@ void drawText(const char *text, float x, float y, float scale,int color) {
         case 1: glColor4f(0.8f, 0.8f, 0.8f, 1.0f);           // gray
                 glColor3f(0.8f, 0.8f, 0.8f);
                 break;
-        case 2: glColor4f(0.8f, 1.0f, 0.4f, 1.0f);
+        case 2: glColor4f(0.8f, 1.0f, 0.4f, 1.0f);          // red
                 glColor3f(0.8f, 1.0f, 0.4f);
                 break;
         case 3: glColor4f(1.0f, 0.8f, 0.4f, 1.0f);
